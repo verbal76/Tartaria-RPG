@@ -1,0 +1,1682 @@
+=== TARTARIA LOG · 160900 CHARS · BEGIN ===
+[2026-09-07T17:52:38.052Z] [debug] APK session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T17:52:38.055Z] [debug] scene: loc=dynasty_border_post hub=outpost_gate arrival=n opening=y passing=n
+[2026-09-07T17:52:38.056Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:52:38.100Z] [debug] spawn: gear=[Salvager's Worn Greaves] window=0 roster=new
+[2026-09-07T17:52:38.100Z] [world] Your blood is Reclaimers. Your work, from this hour on, belongs to the Eternal Dynasty. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.
+[2026-09-07T17:52:38.101Z] [world] Dynasty Spire rises out of the silt at the edge of the Dynasty Border Post. You arrive at The Crown Gate. Twin standards of the lost line flank the doorway, banners dust-grayed but unbroken. The herald nods to your bloodline before your face.
+[2026-09-07T17:52:38.101Z] [world] Smoke from the cook-fires turns blue where the Aether crosses it. No one comments. A black rain presses on the world — -1 CHA. What you do here is yours to choose.
+[2026-09-07T17:52:38.101Z] [world] Paths: north to Promenade · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:52:38.102Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtrjgazg_fumkzk left intact
+[2026-09-07T17:52:38.167Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtrjgazg_fumkzk left intact
+[2026-09-07T17:52:40.432Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-09-07T17:52:40.432Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtrjgazg_fumkzk left intact
+[2026-09-07T17:52:50.255Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=0
+[2026-09-07T17:52:50.360Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=0
+[2026-09-07T17:52:50.439Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=0
+[2026-09-07T17:53:01.737Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-07T17:53:01.740Z] [player] Johnny Blaze
+[2026-09-07T17:53:01.741Z] [arbiter] "Well met, Johnny Blaze. To business."
+[2026-09-07T17:53:01.744Z] [arbiter] "First, get your bearings. Tap LOOK AROUND YOU — I'll read the room for you: what's here, your way out, and whatever you're still chasing. Use it any time you're lost."
+[2026-09-07T17:53:02.548Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-07T17:53:04.780Z] [debug] ui: tap "look around you" ⏱+23ms
+[2026-09-07T17:53:04.788Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-09-07T17:53:04.792Z] [player] look
+[2026-09-07T17:53:04.793Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:53:04.795Z] [world] You look around. You're in The Crown Gate (Dynasty Border Post). You see: Salvager's Worn Greaves, table, brick, stairwell, arch, lantern, weathered vault relic pedestal, cracked sentinel diagnostic console, sign. Hazard active: Corrupted Spores. Exits: north to Promenade · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:53:04.796Z] [arbiter] "A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You'll want a weapon."
+[2026-09-07T17:53:06.365Z] [debug] ui: tap "take / salvage" ⏱+18ms
+[2026-09-07T17:53:08.384Z] [player] take cudgel
+[2026-09-07T17:53:08.385Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your grip without thinking.
+[2026-09-07T17:53:08.385Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-09-07T17:53:08.385Z] [arbiter] "Good. Keep it close."
+[2026-09-07T17:53:08.385Z] [arbiter] "That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."
+[2026-09-07T17:53:09.935Z] [debug] ui: tap "take / salvage" ⏱+11ms
+[2026-09-07T17:53:11.633Z] [player] take Mud-Warden's Vest
+[2026-09-07T17:53:11.633Z] [world] You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.
+[2026-09-07T17:53:11.633Z] [reward] ✦ Mud-Warden's Vest (Common).
+[2026-09-07T17:53:11.636Z] [debug] stats: STR6 DEX11 INT2 WIS6 CHA8 STE3 | gear: WIS+2,STR+1 | worn: main=Cudgel chest=Mud-Warden's Vest
+[2026-09-07T17:53:11.689Z] [arbiter] "Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it's on your head."
+[2026-09-07T17:53:15.000Z] [debug] ui: tap "★ Take & wear Reclaimer's Salvage Cap — your head slot is bare"
+[2026-09-07T17:53:15.006Z] [world] You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.
+[2026-09-07T17:53:15.006Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-09-07T17:53:15.014Z] [debug] stats: STR6 DEX11 INT4 WIS6 CHA8 STE3 | gear: INT+2,WIS+2,STR+1 | worn: main=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-07T17:53:15.017Z] [arbiter] "Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."
+[2026-09-07T17:53:30.430Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=5
+[2026-09-07T17:53:30.553Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=5
+[2026-09-07T17:53:30.587Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=5
+[2026-09-07T17:53:35.686Z] [player] take rope
+[2026-09-07T17:53:35.687Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-09-07T17:53:35.688Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-09-07T17:53:35.688Z] [arbiter] "Good. That rope earns its keep."
+[2026-09-07T17:53:35.689Z] [arbiter] "That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."
+[2026-09-07T17:53:35.745Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=6
+[2026-09-07T17:53:37.403Z] [debug] ui: tap "take / salvage" ⏱+21ms
+[2026-09-07T17:53:39.319Z] [player] salvage broken chest plate
+[2026-09-07T17:53:39.320Z] [world] You pop the rusted plate off its strap and it comes apart along old hammer-marks.
+[2026-09-07T17:53:39.320Z] [reward] ✦ Plate Fragment x2 (Common). [salvaged]
+[2026-09-07T17:53:39.320Z] [arbiter] "Now the rope earns its keep. Tap CLIMB — top out, then climb back down."
+[2026-09-07T17:53:40.918Z] [debug] ui: tap "climb" ⏱+39ms
+[2026-09-07T17:53:42.755Z] [player] climb arch
+[2026-09-07T17:53:42.756Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-07T17:53:42.763Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 1/3 cleared.
+[2026-09-07T17:53:42.763Z] [world] You reach the first hold of the arch (tier 1/3). Higher still to go.
+[2026-09-07T17:53:42.764Z] [system] ⏳ Time passed: 30 min
+[2026-09-07T17:53:43.852Z] [debug] ui: tap "climb up (1/3)" ⏱+29ms
+[2026-09-07T17:53:43.872Z] [player] climb arch
+[2026-09-07T17:53:43.872Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-07T17:53:43.879Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 2/3 cleared.
+[2026-09-07T17:53:43.880Z] [world] You reach the last stretch of the arch (tier 2/3). Higher still to go.
+[2026-09-07T17:53:43.881Z] [system] ⏳ Time passed: 30 min
+[2026-09-07T17:53:44.505Z] [debug] ui: tap "climb up (2/3)" ⏱+17ms
+[2026-09-07T17:53:44.527Z] [player] climb arch
+[2026-09-07T17:53:44.527Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-07T17:53:44.534Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 3/3 cleared.
+[2026-09-07T17:53:44.534Z] [world] You reach the top of the arch (tier 3/3). The view changes; the room reads differently from here.
+[2026-09-07T17:53:44.535Z] [reward] ✦ A small pouch, tucked where only a climber would look — 15 TC. High places keep things for whoever bothers to reach them.
+[2026-09-07T17:53:44.536Z] [reward] ✦ Bioluminescent Fungus (Uncommon) — tucked into a crack at the top of the arch.
+[2026-09-07T17:53:44.537Z] [system] ⏳ Time passed: 30 min
+[2026-09-07T17:53:47.403Z] [debug] ui: tap "climb down" ⏱+24ms
+[2026-09-07T17:53:47.424Z] [player] climb down
+[2026-09-07T17:53:47.425Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:53:47.426Z] [world] You make your way back down the arch. Boots back on the ground.
+[2026-09-07T17:53:47.427Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-09-07T17:53:47.427Z] [system] ⏳ Time passed: 15 min
+[2026-09-07T17:53:49.108Z] [debug] ui: tap "investigate" ⏱+17ms
+[2026-09-07T17:53:50.976Z] [player] investigate door
+[2026-09-07T17:53:50.977Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-09-07T17:53:50.978Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call. Out there every step costs 1 stamina and a little time; REST brings it back."
+[2026-09-07T17:53:52.921Z] [arbiter] "Take your time. Tap EXIT when you're ready."
+[2026-09-07T17:53:54.438Z] [debug] ui: tap "take / salvage" ⏱+15ms
+[2026-09-07T17:53:56.245Z] [world] You salvage the brick. The take is small but real.
+[2026-09-07T17:53:56.245Z] [world] You break the cracked sentinel diagnostic console apart. Among the pieces, something worth keeping.
+[2026-09-07T17:53:56.245Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-07T17:53:56.245Z] [world] You strip the sign carefully. Something usable comes free in your hand.
+[2026-09-07T17:53:56.246Z] [world] You work the stairwell over. A part of it comes loose, intact.
+[2026-09-07T17:53:56.246Z] [world] You work the table over. A part of it comes loose, intact.
+[2026-09-07T17:53:56.246Z] [world] You lever something loose from the weathered vault relic pedestal — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-07T17:53:56.246Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:53:56.246Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-07T17:53:56.246Z] [reward]     • Scrap Metal x4 (Common)
+[2026-09-07T17:53:56.247Z] [reward]     • Mud Fragment (Common)
+[2026-09-07T17:53:56.247Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-07T17:53:56.247Z] [reward]     • Cloth Scrap (Common)
+[2026-09-07T17:53:56.247Z] [reward]     • Mortar-Bound Cobble (Common)
+[2026-09-07T17:53:56.353Z] [debug] persist sizes(KB): total=40 player=6 wm=18[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=15 scene=2
+[2026-09-07T17:53:57.113Z] [world] You take the Salvager's Worn Greaves from where it lay.
+[2026-09-07T17:53:57.114Z] [reward] ✦ Salvager's Worn Greaves (Common).
+[2026-09-07T17:53:57.872Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:54:03.128Z] [debug] ui: tap "↑ PROMENADE" ⏱+22ms
+[2026-09-07T17:54:03.158Z] [player] go north
+[2026-09-07T17:54:03.159Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:54:03.160Z] [world] You head on to the Promenade.
+[2026-09-07T17:54:03.161Z] [debug] scene: loc=dynasty_border_post hub=outpost_central arrival=n opening=n passing=n
+[2026-09-07T17:54:03.161Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:54:03.169Z] [debug] spawn: gear=[Tartarian Claw Knife, Aetheric Touch Wand] window=1 roster=new
+[2026-09-07T17:54:03.170Z] [world] Dynasty Spire — The Throne Promenade. A long colonnaded hall under a vaulted Aetheric ceiling. The map-stone at its heart shows the empire as it WAS — every district, every spire, every capital still standing.
+[2026-09-07T17:54:03.170Z] [world] Paths: north to Vault · south to Crown Gate · east to Armory · west to Imperial Hall. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:54:03.171Z] [system] Weather effect — Black Rain: -1 CHA
+[2026-09-07T17:54:03.171Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:54:03.171Z] [arbiter] The Arbiter scans the treeline out of habit. "I do not know you yet. Down here that is the ordinary state of things — most people go up again before it changes."
+[2026-09-07T17:54:03.260Z] [cognitive] TRAVEL  (81ms)
+[2026-09-07T17:54:04.727Z] [debug] ui: tap "take / salvage" ⏱+11ms
+[2026-09-07T17:54:05.991Z] [world] You pick up the Aetheric Touch Wand.
+[2026-09-07T17:54:05.991Z] [reward] ✦ Aetheric Touch Wand (Common).
+[2026-09-07T17:54:05.994Z] [world] You lift the Tartarian Claw Knife clear.
+[2026-09-07T17:54:05.994Z] [reward] ✦ Tartarian Claw Knife (Common).
+[2026-09-07T17:54:06.921Z] [world] Tucked inside the door: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:54:06.921Z] [world] You break the lantern apart. Among the pieces, something worth keeping.
+[2026-09-07T17:54:06.921Z] [world] You break the rusted royal vault pedestal apart. Among the pieces, something worth keeping.
+[2026-09-07T17:54:06.922Z] [world] You strip the salt-crusted royal display case carefully. Something usable comes free in your hand.
+[2026-09-07T17:54:06.922Z] [world] You strip the stripped maintenance panel carefully. Something usable comes free in your hand.
+[2026-09-07T17:54:06.922Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:54:06.922Z] [reward]     • Corroded Hinge Set (Common)
+[2026-09-07T17:54:06.922Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-07T17:54:06.922Z] [reward]     • Worn Tartarian Coin x8 (Common)
+[2026-09-07T17:54:06.923Z] [reward]     • Automaton Circuit (Common)
+[2026-09-07T17:54:08.796Z] [debug] ui: tap "investigate" ⏱+12ms
+[2026-09-07T17:54:10.533Z] [player] investigate the floor
+[2026-09-07T17:54:10.534Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:54:10.535Z] [world] You sweep the floor with your eyes. Boards, dust, nothing on top of it worth pocketing.
+[2026-09-07T17:54:10.536Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T17:54:11.067Z] [debug] qwen⏱ narration:travel preempted 7815ms read 7755ms/write 0ms in 717t→out 0t thr2 10.8ms/t (3ch)
+[2026-09-07T17:54:11.149Z] [debug] qwen⏱ ✂ DISCARDED narration:travel after 7815ms — cancelled:player-acted-again
+[2026-09-07T17:54:11.188Z] [cognitive] neutral  (651ms)
+[2026-09-07T17:54:11.629Z] [debug] ui: tap "↑ VAULT" ⏱+12ms
+[2026-09-07T17:54:11.648Z] [player] go north
+[2026-09-07T17:54:11.648Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:54:11.649Z] [world] You head on to the Vault.
+[2026-09-07T17:54:11.650Z] [debug] scene: loc=dynasty_border_post hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-07T17:54:11.650Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:54:11.656Z] [debug] spawn: gear=[Sentinel's Mobile Greaves] window=3 roster=new
+[2026-09-07T17:54:11.657Z] [world] Dynasty Spire — The Imperial Vault. The dynasty's confiscated treasures, returned to their proper case. The lock is mechanical and the key is hereditary.
+[2026-09-07T17:54:11.657Z] [world] Paths: south to Promenade · east to Workshop · west to Library. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:54:11.715Z] [cognitive] TRAVEL  (55ms)
+[2026-09-07T17:54:12.676Z] [debug] ui: tap "take / salvage" ⏱+19ms
+[2026-09-07T17:54:14.151Z] [world] You strip the cracked maintenance tunnel ladder carefully. Something usable comes free in your hand.
+[2026-09-07T17:54:14.151Z] [world] You strip the door carefully. Something usable comes free in your hand.
+[2026-09-07T17:54:14.151Z] [world] You work the leaning royal vault pedestal apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-07T17:54:14.152Z] [world] The lock yields little of value, though a Bent Nail ends up in your pack.
+[2026-09-07T17:54:14.152Z] [world] You salvage the relic. The take is small but real.
+[2026-09-07T17:54:14.152Z] [world] You strip the shelf carefully. Something usable comes free in your hand.
+[2026-09-07T17:54:14.152Z] [world] You break the stripped maintenance panel apart. Among the pieces, something worth keeping.
+[2026-09-07T17:54:14.153Z] [world] Already worked over: salt-crusted hidden weapon locker.
+[2026-09-07T17:54:14.153Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:54:14.153Z] [reward]     • Bent Nail x5 (Common)
+[2026-09-07T17:54:14.154Z] [reward]     • Oil-Stained Sash (Common)
+[2026-09-07T17:54:14.154Z] [reward]     • Worn Tartarian Coin x9 (Common)
+[2026-09-07T17:54:14.155Z] [reward]     • Automaton Circuit (Common)
+[2026-09-07T17:54:14.290Z] [debug] persist sizes(KB): total=50 player=8 wm=18[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=23 scene=2
+[2026-09-07T17:54:15.899Z] [world] You get a hand under the Sentinel's Mobile Greaves and take it.
+[2026-09-07T17:54:15.900Z] [reward] ✦ Sentinel's Mobile Greaves (Common).
+[2026-09-07T17:54:18.246Z] [debug] ui: tap "more ▸" ⏱+20ms
+[2026-09-07T17:54:19.398Z] [debug] ui: tap "inventory" ⏱+23ms
+[2026-09-07T17:54:42.902Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:54:59.271Z] [debug] stats: STR6 DEX11 INT5 WIS6 CHA8 STE3 | gear: INT+3,WIS+2,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-07T17:55:06.702Z] [debug] stats: STR6 DEX11 INT7 WIS6 CHA8 STE3 | gear: INT+5,WIS+2,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves
+[2026-09-07T17:55:09.434Z] [debug] stats: STR6 DEX12 INT7 WIS6 CHA8 STE3 | gear: INT+5,WIS+2,DEX+1,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves feet=Echoing Steps Boots
+[2026-09-07T17:55:13.173Z] [debug] stats: STR6 DEX12 INT7 WIS7 CHA8 STE3 | gear: INT+5,WIS+3,DEX+1,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves feet=Echoing Steps Boots amulet=Aetheric Locket
+[2026-09-07T17:55:24.982Z] [world] You tuck Trail Rations ×3 into your healing pouch.
+[2026-09-07T17:55:27.920Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:55:30.298Z] [debug] ui: tap "→ WORKSHOP" ⏱+30ms
+[2026-09-07T17:55:30.325Z] [player] go east
+[2026-09-07T17:55:30.327Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:55:30.328Z] [world] You head on to the Workshop.
+[2026-09-07T17:55:30.329Z] [debug] scene: loc=dynasty_border_post hub=outpost_workshop arrival=n opening=n passing=n
+[2026-09-07T17:55:30.330Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:55:30.356Z] [debug] spawn: gear=[Rust Dagger] window=4 roster=new
+[2026-09-07T17:55:30.357Z] [world] Dynasty Spire — The Heir's Workshop. Restoration benches under crystal lamps. Tarek is a third-generation court tinkerer; he rebuilds dynasty-marked weapons to original tolerance.
+[2026-09-07T17:55:30.358Z] [world] Paths: west to Vault. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:55:30.358Z] [system] Weather effect — Whisper Fog: -1 WIS
+[2026-09-07T17:55:30.358Z] [world] Tarek the Tinkerer (Mechanical Outfitter) is already here when you arrive, stall half-unpacked. They look up and nod once.
+[2026-09-07T17:55:30.359Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Tarek the Tinkerer, Mechanical Outfitter. Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem parts and experimental gear."
+[2026-09-07T17:55:30.373Z] [world] Rare workings for sale: Aetheric Crown of the Giants (500 TC), Aetheric Padded Vest (200 TC), Aetheric Spear (Legendary) (500 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-07T17:55:30.373Z] [world] Tarek the Tinkerer offers a contract: "Scrap Run." (Say 'accept scrap' or open Contracts for details.)
+[2026-09-07T17:55:30.374Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:55:30.374Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:55:30.446Z] [cognitive] neutral  (68ms)
+[2026-09-07T17:55:30.512Z] [debug] persist sizes(KB): total=57 player=8 wm=19[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=27 scene=2
+[2026-09-07T17:55:31.246Z] [debug] ui: tap "take / salvage" ⏱+15ms
+[2026-09-07T17:55:33.031Z] [world] You claim the Rust Dagger.
+[2026-09-07T17:55:33.031Z] [reward] ✦ Rust Dagger (Common).
+[2026-09-07T17:55:33.936Z] [world] You lever something loose from the crate — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-07T17:55:33.936Z] [world] You strip the drone carefully. Something usable comes free in your hand.
+[2026-09-07T17:55:33.937Z] [world] You work the leaning grand spire capacitor over. A part of it comes loose, intact.
+[2026-09-07T17:55:33.937Z] [world] You salvage the rusted tartarian power conduit. The take is small but real.
+[2026-09-07T17:55:33.937Z] [world] Tucked inside the stripped library archive console: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:55:33.937Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:55:33.938Z] [reward]     • Faded Ribbon Coil (Common)
+[2026-09-07T17:55:33.938Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T17:55:33.938Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-07T17:55:33.939Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T17:55:33.939Z] [reward]     • Mud-Frosted Bead (Common)
+[2026-09-07T17:55:34.981Z] [debug] ui: tap "investigate" ⏱+23ms
+[2026-09-07T17:55:36.364Z] [player] investigate the floor
+[2026-09-07T17:55:36.365Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:55:36.366Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-07T17:55:36.425Z] [cognitive] neutral  (58ms)
+[2026-09-07T17:55:37.549Z] [debug] ui: tap "← ✓ VAULT" ⏱+19ms
+[2026-09-07T17:55:37.567Z] [player] go west
+[2026-09-07T17:55:37.568Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:55:37.569Z] [world] You head on to the Vault.
+[2026-09-07T17:55:37.569Z] [debug] scene: loc=dynasty_border_post hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-07T17:55:37.570Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:55:37.582Z] [world] Dynasty Spire — The Imperial Vault. The dynasty's confiscated treasures, returned to their proper case. The lock is mechanical and the key is hereditary.
+[2026-09-07T17:55:37.583Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-07T17:55:37.584Z] [world] Paths: south to Promenade · east to Workshop · west to Library. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:55:37.584Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:55:37.584Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:55:37.790Z] [cognitive] TRAVEL  (202ms)
+[2026-09-07T17:55:38.916Z] [debug] ui: tap "← LIBRARY" ⏱+26ms
+[2026-09-07T17:55:38.939Z] [player] go west
+[2026-09-07T17:55:38.940Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:55:38.942Z] [world] You head on to the Library.
+[2026-09-07T17:55:38.942Z] [debug] scene: loc=dynasty_border_post hub=outpost_lab arrival=n opening=n passing=n
+[2026-09-07T17:55:38.942Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:55:38.969Z] [debug] spawn: gear=[Aether-Runner Boots, Bone Sling, Force Wave Wand] window=5 roster=new
+[2026-09-07T17:55:38.971Z] [world] Dynasty Spire — The Library of the Line. Dynasty genealogies on Aether-preserved scrolls, lineage walls, restored coronation records. Jorah trace-checks every claim of blood that walks through the door.
+[2026-09-07T17:55:38.971Z] [world] Paths: east to Vault. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:55:38.971Z] [world] Jorah the Scholar (Tomekeeper) is already here when you arrive, stall half-unpacked. They look up and nod once.
+[2026-09-07T17:55:38.972Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Jorah the Scholar, Tomekeeper. Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves."
+[2026-09-07T17:55:38.985Z] [world] Rare workings for sale: Sentinel Cleaver (200 TC), Shadow Caller Stave (200 TC), Sickening Light Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-07T17:55:38.985Z] [world] Jorah the Scholar nods at a mystery notice: "Fragment of the Red Tower." (Say 'accept tower' or open Contracts.)
+[2026-09-07T17:55:38.985Z] [debug] arbiter: template (reason=sprinting)
+[2026-09-07T17:55:38.985Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:55:38.988Z] [debug] arbiter: template (reason=sprinting)
+[2026-09-07T17:55:38.988Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:55:39.047Z] [cognitive] TRAVEL  (58ms)
+[2026-09-07T17:55:39.984Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-07T17:55:41.306Z] [world] The Bone Sling comes up out of the silt with a small sucking protest.
+[2026-09-07T17:55:41.307Z] [reward] ✦ Bone Sling (Common).
+[2026-09-07T17:55:41.317Z] [world] The Force Wave Wand was half under something. It is not now.
+[2026-09-07T17:55:41.317Z] [reward] ✦ Force Wave Wand (Common).
+[2026-09-07T17:55:41.319Z] [world] You work the Aether-Runner Boots loose from where the mud had it.
+[2026-09-07T17:55:41.319Z] [reward] ✦ Aether-Runner Boots (Common).
+[2026-09-07T17:55:41.546Z] [debug] persist sizes(KB): total=68 player=10 wm=20[rooms=5 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=35 scene=2
+[2026-09-07T17:55:42.570Z] [reward] ✦ Found Second Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-09-07T17:55:42.575Z] [world] You strip the crystal carefully. Something usable comes free in your hand.
+[2026-09-07T17:55:42.575Z] [world] You break the desk apart. Among the pieces, something worth keeping.
+[2026-09-07T17:55:42.575Z] [world] You strip the jar carefully. Something usable comes free in your hand.
+[2026-09-07T17:55:42.576Z] [world] Tucked inside the lantern: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:55:42.576Z] [world] Tucked inside the shattered library archive console: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:55:42.576Z] [world] You strip the shelf carefully. Something usable comes free in your hand.
+[2026-09-07T17:55:42.576Z] [world] Behind the stripped maintenance panel, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-09-07T17:55:42.576Z] [world] You break the weathered royal vault pedestal apart. Among the pieces, something worth keeping.
+[2026-09-07T17:55:42.577Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:55:42.577Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-07T17:55:42.577Z] [reward]     • Stick (Common)
+[2026-09-07T17:55:42.577Z] [reward]     • Worn Tartarian Coin x13 (Common)
+[2026-09-07T17:55:42.577Z] [reward]     • Bent Shackle Pin (Common)
+[2026-09-07T17:55:42.577Z] [reward]     • Weathered Granite Knob (Common)
+[2026-09-07T17:55:42.578Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T17:55:46.986Z] [debug] ui: tap "→ ✓ VAULT" ⏱+112ms
+[2026-09-07T17:55:46.996Z] [player] go east
+[2026-09-07T17:55:46.996Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:55:46.997Z] [world] You head on to the Vault.
+[2026-09-07T17:55:46.997Z] [debug] scene: loc=dynasty_border_post hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-07T17:55:46.997Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:55:47.002Z] [world] Dynasty Spire — The Imperial Vault. The dynasty's confiscated treasures, returned to their proper case. The lock is mechanical and the key is hereditary.
+[2026-09-07T17:55:47.002Z] [world] Something about this ground is already familiar.
+[2026-09-07T17:55:47.002Z] [world] Paths: south to Promenade · east to Workshop · west to Library. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:55:47.002Z] [world] You think back to the jar from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-07T17:55:47.178Z] [cognitive] neutral  (171ms)
+[2026-09-07T17:55:48.419Z] [debug] ui: tap "investigate" ⏱+15ms
+[2026-09-07T17:55:49.894Z] [player] investigate the floor
+[2026-09-07T17:55:49.895Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=1
+[2026-09-07T17:55:49.900Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-07T17:55:49.950Z] [cognitive] neutral  (49ms)
+[2026-09-07T17:55:51.137Z] [player] investigate tag
+[2026-09-07T17:55:51.138Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tag resolved=tag range=- enemies=0 hooks=1
+[2026-09-07T17:55:51.142Z] [world] The tag reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-07T17:55:51.217Z] [cognitive] neutral  (71ms)
+[2026-09-07T17:55:52.367Z] [player] investigate jar
+[2026-09-07T17:55:52.368Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=jar resolved=jar range=- enemies=0 hooks=1
+[2026-09-07T17:55:52.369Z] [debug] route: hook intercept (kind=thread, target="jar") — original intent=investigate
+[2026-09-07T17:55:52.369Z] [world] ★ STORY THREAD (step 1) — You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.
+[2026-09-07T17:55:53.458Z] [debug] qwen⏱ investigate_lore ok 2251ms read/write unusable (native mis-reported 101456ms/941ms — llama.rn split bug, not this call) in 125t→out 30t thr2 (138ch)
+[2026-09-07T17:55:54.228Z] [world] ★★ STORY THREAD COMPLETE — You wedge yourself into the gap. At the bottom — a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.
+[2026-09-07T17:55:54.228Z] [reward] ✦ Trail Rations, Aether Residue, +12 TC.
+[2026-09-07T17:55:54.229Z] [reward] ✦ For your persistence — Iron Core (Legendary).
+[2026-09-07T17:56:01.149Z] [debug] ui: tap "↓ ✓ PROMENADE" ⏱+25ms
+[2026-09-07T17:56:01.175Z] [player] go south
+[2026-09-07T17:56:01.176Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-09-07T17:56:01.177Z] [world] You head on to the Promenade.
+[2026-09-07T17:56:01.177Z] [debug] scene: loc=dynasty_border_post hub=outpost_central arrival=n opening=n passing=n
+[2026-09-07T17:56:01.178Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:56:01.185Z] [world] Dynasty Spire — The Throne Promenade. A long colonnaded hall under a vaulted Aetheric ceiling. The map-stone at its heart shows the empire as it WAS — every district, every spire, every capital still standing.
+[2026-09-07T17:56:01.186Z] [world] You know this place. Not well, but you know it.
+[2026-09-07T17:56:01.187Z] [world] Paths: north to Vault · south to Crown Gate · east to Armory · west to Imperial Hall. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:56:01.187Z] [world] You think back to the crystal from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-07T17:56:01.187Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:56:01.188Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:56:01.260Z] [cognitive] neutral  (65ms)
+[2026-09-07T17:56:03.631Z] [debug] ui: tap "map"
+[2026-09-07T17:56:03.813Z] [debug] persist sizes(KB): total=77 player=11 wm=21[rooms=5 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=43 scene=2
+[2026-09-07T17:56:06.011Z] [debug] qwen⏱ ambient ok 4756ms read 3776ms/write 950ms in 365t→out 31t thr1 10.3ms/t HIT-CAP (153ch)
+[2026-09-07T17:56:06.031Z] [arbiter] You've traversed the land, navigating through mud, but your eyes seem to take in every detail.
+[2026-09-07T17:56:06.031Z] [debug] arbiter: ambient ✓ 4838ms
+[2026-09-07T17:56:06.032Z] [debug] arbiter: ambient-said "You've traversed the land, navigating through mud, but your eyes seem to take in every detail."
+[2026-09-07T17:56:11.185Z] [debug] ui: tap "take / salvage" ⏱+13ms
+[2026-09-07T17:56:12.433Z] [world] You strip the map-stone carefully. Something usable comes free in your hand.
+[2026-09-07T17:56:12.433Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:56:12.434Z] [reward]     • Worn Tartarian Coin x6 (Common)
+[2026-09-07T17:56:12.935Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:56:13.517Z] [debug] ui: tap "investigate" ⏱+16ms
+[2026-09-07T17:56:15.026Z] [player] investigate path
+[2026-09-07T17:56:15.026Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=path resolved=path range=- enemies=0 hooks=1
+[2026-09-07T17:56:15.027Z] [world] You look for a way forward. The Arbiter notes a lost capital toward Yuldra-Tul and a site toward The Cistern Intake.
+[2026-09-07T17:56:15.104Z] [cognitive] neutral  (74ms)
+[2026-09-07T17:56:16.262Z] [player] investigate square
+[2026-09-07T17:56:16.263Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=square resolved=square range=- enemies=0 hooks=1
+[2026-09-07T17:56:16.268Z] [world] The square resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-07T17:56:16.345Z] [cognitive] neutral  (75ms)
+[2026-09-07T17:56:17.953Z] [debug] ui: tap "↓ ✓ CROWN GATE" ⏱+23ms
+[2026-09-07T17:56:17.982Z] [player] go south
+[2026-09-07T17:56:17.983Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-09-07T17:56:17.985Z] [world] You head on to the Crown Gate.
+[2026-09-07T17:56:17.985Z] [debug] scene: loc=dynasty_border_post hub=outpost_gate arrival=n opening=n passing=n
+[2026-09-07T17:56:17.985Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:56:18.015Z] [world] Dynasty Spire — The Crown Gate. Twin standards of the lost line flank the doorway, banners dust-grayed but unbroken. The herald nods to your bloodline before your face.
+[2026-09-07T17:56:18.015Z] [world] The look of it lands a half-second before the memory does.
+[2026-09-07T17:56:18.016Z] [world] Paths: north to Promenade · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:56:18.016Z] [world] Halem the Trader half-recognises you and doesn't say so. The wares stay where they are.
+[2026-09-07T17:56:18.016Z] [debug] arbiter: template (reason=sprinting)
+[2026-09-07T17:56:18.017Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:56:18.111Z] [cognitive] neutral  (87ms)
+[2026-09-07T17:56:18.720Z] [debug] qwen⏱ investigate_lore ok 2387ms read 1212ms/write 1143ms in 125t→out 36t thr2 9.7ms/t (187ch)
+[2026-09-07T17:56:18.985Z] [debug] ui: tap "take / salvage" ⏱+39ms
+[2026-09-07T17:56:20.112Z] [world] You work the shattered engine chamber scaffolding apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-07T17:56:20.112Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:56:20.113Z] [reward]     • Stiffened Leather Offcut (Uncommon)
+[2026-09-07T17:56:21.203Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-07T17:56:22.773Z] [player] investigate the floor
+[2026-09-07T17:56:22.774Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:56:22.776Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-07T17:56:22.857Z] [cognitive] neutral  (79ms)
+[2026-09-07T17:56:23.999Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-09-07T17:56:24.012Z] [player] investigate arch
+[2026-09-07T17:56:24.013Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-07T17:56:24.014Z] [world] The frame is warped where the hinge anchored — long-dried iron, blooming with patient rust.
+[2026-09-07T17:56:24.101Z] [cognitive] TALK · SEARCH  (84ms)
+[2026-09-07T17:56:24.178Z] [debug] persist sizes(KB): total=86 player=11 wm=22[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=50 scene=2
+[2026-09-07T17:56:25.544Z] [debug] qwen⏱ investigate_lore ok 1454ms read 268ms/write 1157ms in 125t→out 36t thr2 2.1ms/t (186ch)
+[2026-09-07T17:56:26.655Z] [player] Ask how business is
+[2026-09-07T17:56:26.657Z] [world] "Business is people," Halem says cheerfully, moving a crate that did not need moving. "Everything on this post came off somebody who needed something else more. I do not think there is a single new thing in Tartaria. Just things that have changed hands enough times to look new."
+[2026-09-07T17:56:26.661Z] [world] Halem the Trader shifts the pack higher on his shoulder and does not put it down.
+[2026-09-07T17:56:27.553Z] [world] You let the conversation go and Halem the Trader gets back to it.
+[2026-09-07T17:56:28.075Z] [debug] qwen⏱ flourish ok 2657ms read 1832ms/write 641ms in 178t→out 20t thr2 10.3ms/t (82ch)
+[2026-09-07T17:56:28.146Z] [debug] qwen⏱ ✂ DISCARDED flourish after 2657ms — flourish:stale-walked-away
+[2026-09-07T17:56:28.146Z] [debug] flourish: stale 2821ms
+[2026-09-07T17:56:40.663Z] [reward] Bought 5× Aether Mud from Halem the Trader for 35 TC. (102 TC left)
+[2026-09-07T17:56:42.314Z] [reward] Bought 2× Patched Cloth from Halem the Trader for 42 TC. (60 TC left)
+[2026-09-07T17:56:47.836Z] [reward] Bought First Aid Kit from Halem the Trader for 32 TC. (28 TC left)
+[2026-09-07T17:56:50.031Z] [reward] Bought 2× Trail Rations from Halem the Trader for 14 TC. (14 TC left)
+[2026-09-07T17:56:57.516Z] [player] Ask about the trading post
+[2026-09-07T17:56:57.519Z] [world] "It was my father's, and it was not a post then, it was a front room." He gestures at the roof, which is three different roofs. "Every bit of this is somebody's payment. That beam is a debt. That shutter is a debt. I have been paid in doors more times than in coin." He grins. "Do not tell anybody. It is the only reason I have a building."
+[2026-09-07T17:56:57.521Z] [world] Halem the Trader shifts the pack higher on his shoulder and does not put it down.
+[2026-09-07T17:56:57.949Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:56:58.349Z] [player] Ask about the acid trade
+[2026-09-07T17:56:58.352Z] [world] "Careful with that shelf." Halem slides a wax-sealed flask an inch further from your elbow. "Battery bile. The old world kept its lightning in acid — jar-batteries taller than a house, vault floors full of them. The flood shorted the lightning out and left the bile leaking for a thousand years. Scavengers milk the jars that held; I cut it with aether dust so it eats armor instead of hands." He taps the wax. "Sells to people who plan on winning slowly."
+[2026-09-07T17:56:58.353Z] [world] Halem the Trader keeps facing the way he was going, and talks to you sideways.
+[2026-09-07T17:56:59.581Z] [world] You let the conversation go and Halem the Trader gets back to it.
+[2026-09-07T17:57:09.150Z] [debug] ui: tap "↓ FIRST LANDING" ⏱+24ms
+[2026-09-07T17:57:09.177Z] [player] go south
+[2026-09-07T17:57:09.177Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:09.179Z] [world] You head on to the First Landing.
+[2026-09-07T17:57:09.179Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_one arrival=n opening=n passing=n
+[2026-09-07T17:57:09.179Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:09.186Z] [debug] spawn: gear=[Sentinel's Chestplate] window=8 roster=new
+[2026-09-07T17:57:09.187Z] [world] Dynasty Spire — First Landing. A wide platform of cracked Tartarian stone, the sockets of stripped standards still set in the wall. The stair behind you climbs north to the Crown Gate; ahead it keeps dropping south, past everything the empire never got around to finishing.
+[2026-09-07T17:57:09.188Z] [world] Paths: north to Crown Gate · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:09.188Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:57:09.188Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:09.391Z] [cognitive] neutral  (191ms)
+[2026-09-07T17:57:09.476Z] [debug] persist sizes(KB): total=92 player=12 wm=23[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=55 scene=2
+[2026-09-07T17:57:10.167Z] [debug] ui: tap "take / salvage" ⏱+18ms
+[2026-09-07T17:57:11.318Z] [world] You strip the ancient grand spire capacitor carefully. Something usable comes free in your hand.
+[2026-09-07T17:57:11.318Z] [world] You break the broken capacitor coil rack apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:11.318Z] [world] You break the lantern apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:11.319Z] [world] You strip the platform down. Mostly debris — but a Cloth Scrap comes loose at the bottom of the pile.
+[2026-09-07T17:57:11.319Z] [world] The stone gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-07T17:57:11.319Z] [world] You work the weathered vault relic pedestal apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-07T17:57:11.319Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:57:11.320Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-09-07T17:57:11.320Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T17:57:11.320Z] [reward]     • Cloth Scrap (Common)
+[2026-09-07T17:57:11.320Z] [reward]     • Cracked Carapace Curl (Common)
+[2026-09-07T17:57:11.320Z] [reward]     • Flint-and-Twine Bundle (Common)
+[2026-09-07T17:57:12.268Z] [world] The Sentinel's Chestplate had settled into the ground. You unsettle it.
+[2026-09-07T17:57:12.269Z] [reward] ✦ Sentinel's Chestplate (Common).
+[2026-09-07T17:57:13.267Z] [debug] ui: tap "investigate" ⏱+16ms
+[2026-09-07T17:57:14.684Z] [player] investigate the floor
+[2026-09-07T17:57:14.684Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:14.689Z] [world] You sweep the floor with your eyes. Boards, dust, nothing on top of it worth pocketing.
+[2026-09-07T17:57:14.780Z] [cognitive] neutral  (90ms)
+[2026-09-07T17:57:15.926Z] [player] investigate corridor
+[2026-09-07T17:57:15.927Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=0
+[2026-09-07T17:57:15.927Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T17:57:17.717Z] [debug] ui: tap "↓ SECOND LANDING" ⏱+18ms
+[2026-09-07T17:57:17.747Z] [player] go south
+[2026-09-07T17:57:17.748Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:17.749Z] [world] You head on to the Second Landing.
+[2026-09-07T17:57:17.749Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-07T17:57:17.749Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:17.755Z] [debug] spawn: gear=[Mud Harpoon] window=9 roster=new
+[2026-09-07T17:57:17.756Z] [world] Dynasty Spire — Second Landing. Where the imperial survey simply stops. Pumps west, the tribute stores east, the cuts south, the stair back north. The last herald to inventory this level wrote 'pending' beside the south corridor, in a hand three hundred years dead.
+[2026-09-07T17:57:17.757Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:17.868Z] [cognitive] neutral  (105ms)
+[2026-09-07T17:57:18.289Z] [debug] qwen⏱ narration:travel preempted 8843ms read 8783ms/write 0ms in 713t→out 0t thr2 12.3ms/t (4ch)
+[2026-09-07T17:57:18.390Z] [debug] qwen⏱ ✂ DISCARDED narration:travel after 8843ms — cancelled:player-acted-again
+[2026-09-07T17:57:18.454Z] [cognitive] neutral  (2524ms)
+[2026-09-07T17:57:19.184Z] [debug] ui: tap "take / salvage" ⏱+18ms
+[2026-09-07T17:57:20.470Z] [world] Whatever the Mud Harpoon was lying against, it lets go without much argument.
+[2026-09-07T17:57:20.471Z] [reward] ✦ Mud Harpoon (Common).
+[2026-09-07T17:57:20.712Z] [debug] qwen⏱ investigate_lore ok 4695ms wait 2437ms read 1491ms/write 959ms in 125t→out 30t thr2 11.9ms/t (160ch)
+[2026-09-07T17:57:21.322Z] [world] You work the lantern over. A part of it comes loose, intact.
+[2026-09-07T17:57:21.322Z] [world] You work the mud-glazed sentinel diagnostic console over. A part of it comes loose, intact.
+[2026-09-07T17:57:21.322Z] [world] You strip the rusted maintenance tunnel ladder carefully. Something usable comes free in your hand.
+[2026-09-07T17:57:21.323Z] [world] The salt-crusted royal display case gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-07T17:57:21.323Z] [world] You break the sign apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:21.323Z] [world] Tucked inside the step: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:57:21.323Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:57:21.324Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-07T17:57:21.324Z] [reward]     • Bent Nail x3 (Common)
+[2026-09-07T17:57:21.324Z] [reward]     • Obsidian Chip (Common)
+[2026-09-07T17:57:21.324Z] [reward]     • Mud Fragment (Common)
+[2026-09-07T17:57:21.324Z] [reward]     • Copper-Threaded Veil (Uncommon)
+[2026-09-07T17:57:22.218Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-07T17:57:23.537Z] [player] investigate the floor
+[2026-09-07T17:57:23.538Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:23.540Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-07T17:57:23.540Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T17:57:23.540Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:23.616Z] [cognitive] neutral  (75ms)
+[2026-09-07T17:57:23.716Z] [debug] persist sizes(KB): total=102 player=13 wm=23[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=63 scene=2
+[2026-09-07T17:57:24.777Z] [player] investigate corridor
+[2026-09-07T17:57:24.778Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=0
+[2026-09-07T17:57:24.779Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T17:57:24.858Z] [cognitive] neutral  (76ms)
+[2026-09-07T17:57:25.666Z] [debug] qwen⏱ investigate_lore ok 753ms read 0ms/write 730ms in 125t→out 22t thr2 (125ch)
+[2026-09-07T17:57:27.241Z] [debug] ui: tap "→ STORAGE HALLS" ⏱+19ms
+[2026-09-07T17:57:27.274Z] [player] go east
+[2026-09-07T17:57:27.275Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:27.276Z] [world] You head on to the Storage Halls.
+[2026-09-07T17:57:27.277Z] [debug] scene: loc=dynasty_border_post hub=buried_storage arrival=n opening=n passing=n
+[2026-09-07T17:57:27.277Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:27.283Z] [debug] spawn: gear=[Pyric Wand, Mud Grinder Axe, Arcane Sprinter's Legplates] window=10 roster=new
+[2026-09-07T17:57:27.286Z] [world] Dynasty Spire — Storage Halls. Tartarian crates stamped with the marks of districts that no longer exist, most rotted through, some intact. The mud-glass containers in the back row were somebody's taxes once. One corridor, back west to the junction.
+[2026-09-07T17:57:27.286Z] [world] Paths: west to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:27.286Z] [system] Weather effect — Glass Hail: -1 DEX
+[2026-09-07T17:57:27.370Z] [cognitive] neutral  (77ms)
+[2026-09-07T17:57:28.205Z] [debug] ui: tap "take / salvage" ⏱+20ms
+[2026-09-07T17:57:29.574Z] [world] You work the cracked hidden weapon locker over. A part of it comes loose, intact.
+[2026-09-07T17:57:29.574Z] [world] You break the crate apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:29.575Z] [world] You work the lantern apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-07T17:57:29.575Z] [world] You break the rusted tartarian power conduit apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:29.576Z] [world] You work the shelf over. A part of it comes loose, intact.
+[2026-09-07T17:57:29.576Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:57:29.576Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T17:57:29.576Z] [reward]     • Brittle Antler Fork (Common)
+[2026-09-07T17:57:29.580Z] [reward]     • Automaton Circuit (Common)
+[2026-09-07T17:57:29.580Z] [reward]     • Worn Tartarian Coin x8 (Common)
+[2026-09-07T17:57:30.442Z] [world] The Mud Grinder Axe is heavier than it looks. Most things down here are.
+[2026-09-07T17:57:30.448Z] [reward] ✦ Mud Grinder Axe (Common).
+[2026-09-07T17:57:30.460Z] [world] The Pyric Wand is lighter than it looks, which is its own kind of warning.
+[2026-09-07T17:57:30.461Z] [reward] ✦ Pyric Wand (Common).
+[2026-09-07T17:57:30.463Z] [world] The Arcane Sprinter's Legplates is cold through your glove.
+[2026-09-07T17:57:30.463Z] [reward] ✦ Arcane Sprinter's Legplates (Common).
+[2026-09-07T17:57:31.504Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-07T17:57:32.884Z] [player] investigate the floor
+[2026-09-07T17:57:32.884Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:32.890Z] [world] You sweep the floor with your eyes. Boards, dust, nothing on top of it worth pocketing.
+[2026-09-07T17:57:32.891Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T17:57:32.891Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:32.964Z] [cognitive] neutral  (71ms)
+[2026-09-07T17:57:34.126Z] [player] investigate container
+[2026-09-07T17:57:34.127Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=container resolved=container range=- enemies=0 hooks=0
+[2026-09-07T17:57:34.127Z] [world] You tilt the rim. A residue of something long-evaporated coats the inside — sour, organic, old.
+[2026-09-07T17:57:34.421Z] [debug] ui: tap "← ✓ SECOND LANDING" ⏱+19ms
+[2026-09-07T17:57:34.444Z] [player] go west
+[2026-09-07T17:57:34.444Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:34.445Z] [world] You head on to the Second Landing.
+[2026-09-07T17:57:34.445Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-07T17:57:34.446Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:34.451Z] [world] Dynasty Spire — Second Landing. Where the imperial survey simply stops. Pumps west, the tribute stores east, the cuts south, the stair back north. The last herald to inventory this level wrote 'pending' beside the south corridor, in a hand three hundred years dead.
+[2026-09-07T17:57:34.451Z] [world] You have stood on this exact patch of ground before.
+[2026-09-07T17:57:34.452Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:34.452Z] [world] You think back to the crate from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-07T17:57:34.452Z] [debug] arbiter: template (reason=cooldown)
+[2026-09-07T17:57:34.453Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:34.548Z] [cognitive] TRAVEL  (89ms)
+[2026-09-07T17:57:34.781Z] [debug] persist sizes(KB): total=112 player=14 wm=24[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=71 scene=2
+[2026-09-07T17:57:36.638Z] [debug] ui: tap "investigate" ⏱+22ms
+[2026-09-07T17:57:36.767Z] [debug] qwen⏱ ambient preempted 3746ms read 0ms/write 0ms in 365t→out 0t thr1 (0ch)
+[2026-09-07T17:57:36.768Z] [debug] qwen⏱ stats — investigate_lore n5 avg2.3s max4.7s read1.0s/write1.0s ⚠1unusable in125t→out31t ms/tok 2.1-11.9 | narration:travel n2 avg8.3s max8.8s read8.3s in715t→out0t ms/tok 10.8-12.3 ⏸2 ✂2/16.7s | ambient n2 avg4.3s max4.8s read3.8s/write0.9s ⚠1unusable in365t→out16t ms/tok 10.3-10.3 cap1 ⏸1 | flourish n1 avg2.7s max2.7s read1.8s/write0.6s in178t→out20t ms/tok 10.3-10.3 ✂1/2.7s || WASTED 3 calls / 19.3s
+[2026-09-07T17:57:36.826Z] [debug] arbiter: ambient cut short 3933ms — yielded to the player
+[2026-09-07T17:57:36.827Z] [debug] qwen⏱ ✂ DISCARDED ambient after 3746ms — ambient:preempted
+[2026-09-07T17:57:36.886Z] [cognitive] CURIOSITY · SEARCH  (2757ms)
+[2026-09-07T17:57:38.020Z] [player] investigate crate
+[2026-09-07T17:57:38.021Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crate resolved=crate range=- enemies=0 hooks=1
+[2026-09-07T17:57:38.021Z] [debug] route: hook intercept (kind=thread, target="crate") — original intent=investigate
+[2026-09-07T17:57:38.022Z] [world] ★ STORY THREAD (step 1) — You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.
+[2026-09-07T17:57:39.024Z] [debug] qwen⏱ investigate_lore ok 4789ms wait 2651ms read/write unusable (native mis-reported 5083ms/874ms — llama.rn split bug, not this call) in 125t→out 27t thr2 (141ch)
+[2026-09-07T17:57:39.337Z] [world] ★★ STORY THREAD COMPLETE — You wedge yourself into the gap. At the bottom — a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.
+[2026-09-07T17:57:39.338Z] [reward] ✦ Trail Rations, Aether Residue, +12 TC.
+[2026-09-07T17:57:45.551Z] [debug] ui: tap "← PUMP ROOM" ⏱+29ms
+[2026-09-07T17:57:45.572Z] [player] go west
+[2026-09-07T17:57:45.578Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=1
+[2026-09-07T17:57:45.580Z] [world] You head on to the Pump Room.
+[2026-09-07T17:57:45.580Z] [debug] scene: loc=dynasty_border_post hub=buried_pumps arrival=n opening=n passing=n
+[2026-09-07T17:57:45.580Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:45.586Z] [debug] spawn: gear=[Forgotten Leggings, Mud Buckler, Iron Spear] window=10 roster=new
+[2026-09-07T17:57:45.587Z] [world] Dynasty Spire — The Pump Room. Old Aetheric pumps churn the silt-water out of the lower chambers — imperial work still doing imperial duty with nobody left to bill for it. They have run for centuries. The only corridor runs back east to the junction.
+[2026-09-07T17:57:45.587Z] [world] Paths: east to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:45.588Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:57:45.588Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:45.671Z] [cognitive] TRAVEL  (75ms)
+[2026-09-07T17:57:46.633Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-07T17:57:47.788Z] [world] You work the lantern over. A part of it comes loose, intact.
+[2026-09-07T17:57:47.788Z] [world] You strip the panel carefully. Something usable comes free in your hand.
+[2026-09-07T17:57:47.788Z] [world] Tucked inside the pump: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-07T17:57:47.789Z] [world] You strip the shattered dormant architectural sentinel carefully. Something usable comes free in your hand.
+[2026-09-07T17:57:47.789Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:57:47.789Z] [reward]     • Aether Crystal x3 (Common)
+[2026-09-07T17:57:47.789Z] [reward]     • Salvager's Tether Loop (Uncommon)
+[2026-09-07T17:57:47.789Z] [reward]     • Aether Dust (Common)
+[2026-09-07T17:57:48.704Z] [world] The Iron Spear fits the hand better than it has any right to.
+[2026-09-07T17:57:48.705Z] [reward] ✦ Iron Spear (Common).
+[2026-09-07T17:57:48.712Z] [world] You turn the Mud Buckler over once, then keep it.
+[2026-09-07T17:57:48.712Z] [reward] ✦ Mud Buckler (Common).
+[2026-09-07T17:57:48.713Z] [world] The Forgotten Leggings comes away clean.
+[2026-09-07T17:57:48.713Z] [reward] ✦ Forgotten Leggings (Common).
+[2026-09-07T17:57:49.716Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-07T17:57:51.099Z] [player] investigate the floor
+[2026-09-07T17:57:51.100Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:51.102Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-07T17:57:51.103Z] [reward] ✦ Stick.
+[2026-09-07T17:57:51.220Z] [cognitive] neutral  (115ms)
+[2026-09-07T17:57:52.100Z] [debug] ui: tap "→ ✓ SECOND LANDING" ⏱+25ms
+[2026-09-07T17:57:52.122Z] [player] go east
+[2026-09-07T17:57:52.123Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:52.124Z] [world] You head on to the Second Landing.
+[2026-09-07T17:57:52.124Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-07T17:57:52.124Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:52.132Z] [world] Dynasty Spire — Second Landing. Where the imperial survey simply stops. Pumps west, the tribute stores east, the cuts south, the stair back north. The last herald to inventory this level wrote 'pending' beside the south corridor, in a hand three hundred years dead.
+[2026-09-07T17:57:52.133Z] [world] Your feet find the dry line without being asked.
+[2026-09-07T17:57:52.133Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:52.133Z] [debug] arbiter: template (reason=cooldown)
+[2026-09-07T17:57:52.134Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:52.139Z] [debug] arbiter: template (reason=cooldown)
+[2026-09-07T17:57:52.139Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:57:52.234Z] [cognitive] neutral  (93ms)
+[2026-09-07T17:57:52.825Z] [debug] persist sizes(KB): total=122 player=15 wm=25[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2
+[2026-09-07T17:57:54.513Z] [debug] qwen⏱ narration:travel preempted 8782ms read 8723ms/write 0ms in 740t→out 0t thr2 11.8ms/t (3ch)
+[2026-09-07T17:57:54.586Z] [debug] qwen⏱ ✂ DISCARDED narration:travel after 8782ms — cancelled:player-acted-again
+[2026-09-07T17:57:57.237Z] [debug] ui: tap "↓ SHALLOW DIGS" ⏱+26ms
+[2026-09-07T17:57:57.260Z] [player] go south
+[2026-09-07T17:57:57.261Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:57:57.262Z] [world] You head on to the Shallow Digs.
+[2026-09-07T17:57:57.262Z] [debug] scene: loc=dynasty_border_post hub=buried_shallow_digs arrival=n opening=n passing=n
+[2026-09-07T17:57:57.263Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:57:57.270Z] [debug] spawn: gear=[Mud-Stalker Leggings, Forgotten Faceshroud] window=10 roster=new
+[2026-09-07T17:57:57.271Z] [world] Dynasty Spire — The Shallow Digs. An imperial excavation that ran out of empire. Tarpaulins, rope ladders, braziers relit by whoever is posted here now. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, and every survey peg still standing carries a crown. The way out is north, the way you came.
+[2026-09-07T17:57:57.272Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:57:57.363Z] [cognitive] neutral  (85ms)
+[2026-09-07T17:57:58.202Z] [debug] ui: tap "take / salvage" ⏱+19ms
+[2026-09-07T17:57:59.301Z] [world] You work the dust-buried sentinel diagnostic console over. A part of it comes loose, intact.
+[2026-09-07T17:57:59.301Z] [world] You break the half-buried dormant architectural sentinel apart. Among the pieces, something worth keeping.
+[2026-09-07T17:57:59.302Z] [world] You salvage the weathered capacitor coil rack. The take is small but real.
+[2026-09-07T17:57:59.302Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:57:59.302Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-07T17:57:59.303Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T17:57:59.303Z] [reward]     • Automaton Circuit (Common)
+[2026-09-07T17:58:00.164Z] [world] It takes two pulls. The Forgotten Faceshroud is yours on the second.
+[2026-09-07T17:58:00.165Z] [reward] ✦ Forgotten Faceshroud (Common).
+[2026-09-07T17:58:00.180Z] [world] The Mud-Stalker Leggings resists, then does not.
+[2026-09-07T17:58:00.180Z] [reward] ✦ Mud-Stalker Leggings (Common).
+[2026-09-07T17:58:00.991Z] [world] You brace a foot and the Climbing Rope gives.
+[2026-09-07T17:58:00.992Z] [reward] ✦ Climbing Rope (Common).
+[2026-09-07T17:58:01.994Z] [debug] ui: tap "investigate" ⏱+11ms
+[2026-09-07T17:58:03.457Z] [player] investigate the floor
+[2026-09-07T17:58:03.458Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:58:03.460Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-07T17:58:03.545Z] [cognitive] neutral  (84ms)
+[2026-09-07T17:58:04.690Z] [player] investigate tool
+[2026-09-07T17:58:04.691Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tool resolved=tool range=- enemies=0 hooks=0
+[2026-09-07T17:58:04.692Z] [world] You look the tool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T17:58:04.810Z] [cognitive] neutral  (115ms)
+[2026-09-07T17:58:04.888Z] [debug] ui: tap "map"
+[2026-09-07T17:58:05.930Z] [player] investigate cut
+[2026-09-07T17:58:05.931Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cut resolved=cut range=- enemies=0 hooks=0
+[2026-09-07T17:58:05.932Z] [world] The cut reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-07T17:58:06.010Z] [debug] persist sizes(KB): total=124 player=16 wm=25[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2
+[2026-09-07T17:58:07.165Z] [player] investigate brazier
+[2026-09-07T17:58:07.166Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=brazier resolved=brazier range=- enemies=0 hooks=0
+[2026-09-07T17:58:07.169Z] [world] The flame is long out, but the residue tells you what it burned and roughly when — probably the night the world ended here.
+[2026-09-07T17:58:07.626Z] [debug] qwen⏱ investigate_lore ok 2828ms read/write unusable (native mis-reported 11979ms/1163ms — llama.rn split bug, not this call) in 125t→out 37t thr2 (169ch)
+[2026-09-07T17:58:07.641Z] [cognitive] neutral  (1705ms)
+[2026-09-07T17:58:07.651Z] [cognitive] neutral  (479ms)
+[2026-09-07T17:58:08.858Z] [debug] qwen⏱ investigate_lore ok 2886ms wait 1679ms read 251ms/write 942ms in 125t→out 30t thr2 2.0ms/t (148ch)
+[2026-09-07T17:58:10.260Z] [debug] ui: tap "↑ ✓ SECOND LANDING" ⏱+22ms
+[2026-09-07T17:58:10.279Z] [player] go north
+[2026-09-07T17:58:10.280Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:58:10.281Z] [world] You head on to the Second Landing.
+[2026-09-07T17:58:10.281Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-07T17:58:10.281Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:58:10.292Z] [world] Dynasty Spire — Second Landing. Where the imperial survey simply stops. Pumps west, the tribute stores east, the cuts south, the stair back north. The last herald to inventory this level wrote 'pending' beside the south corridor, in a hand three hundred years dead.
+[2026-09-07T17:58:10.292Z] [world] You step around something that is no longer there.
+[2026-09-07T17:58:10.293Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:58:10.293Z] [world] You think back to the half-buried dormant architectural sentinel from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-07T17:58:10.384Z] [cognitive] TRAVEL  (85ms)
+[2026-09-07T17:58:10.440Z] [debug] qwen⏱ investigate_lore ok 3227ms wait 1710ms read 273ms/write 1143ms in 126t→out 35t thr2 2.2ms/t (164ch)
+[2026-09-07T17:58:13.928Z] [debug] ui: tap "↑ ✓ FIRST LANDING" ⏱+18ms
+[2026-09-07T17:58:13.940Z] [player] go north
+[2026-09-07T17:58:13.940Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-07T17:58:13.941Z] [world] You head on to the First Landing.
+[2026-09-07T17:58:13.941Z] [debug] scene: loc=dynasty_border_post hub=buried_landing_one arrival=n opening=n passing=n
+[2026-09-07T17:58:13.941Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:58:13.946Z] [world] Dynasty Spire — First Landing. A wide platform of cracked Tartarian stone, the sockets of stripped standards still set in the wall. The stair behind you climbs north to the Crown Gate; ahead it keeps dropping south, past everything the empire never got around to finishing.
+[2026-09-07T17:58:13.947Z] [world] Your shoulders drop a fraction. Whatever this place is, it is not new.
+[2026-09-07T17:58:13.947Z] [world] Paths: north to Crown Gate · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:58:13.947Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-07T17:58:13.948Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T17:58:14.033Z] [cognitive] TRAVEL  (77ms)
+[2026-09-07T17:58:15.149Z] [debug] ui: tap "↑ ✓ CROWN GATE" ⏱+13ms
+[2026-09-07T17:58:15.170Z] [player] go north
+[2026-09-07T17:58:15.171Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:58:15.172Z] [world] You head on to the Crown Gate.
+[2026-09-07T17:58:15.172Z] [debug] scene: loc=dynasty_border_post hub=outpost_gate arrival=n opening=n passing=n
+[2026-09-07T17:58:15.172Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:58:15.207Z] [world] Dynasty Spire — The Crown Gate. Twin standards of the lost line flank the doorway, banners dust-grayed but unbroken. The herald nods to your bloodline before your face.
+[2026-09-07T17:58:15.208Z] [world] You breathe easier here than you did the first time.
+[2026-09-07T17:58:15.208Z] [world] Paths: north to Promenade · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-07T17:58:15.208Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Johnny Blaze."
+[2026-09-07T17:58:15.269Z] [cognitive] TRAVEL  (56ms)
+[2026-09-07T17:58:16.698Z] [debug] ui: tap "🚪 EXIT" ⏱+20ms
+[2026-09-07T17:58:16.705Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-07T17:58:19.781Z] [debug] ui: tap "rest" ⏱+22ms
+[2026-09-07T17:58:19.785Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-09-07T17:58:19.790Z] [player] rest
+[2026-09-07T17:58:19.791Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:58:19.793Z] [world] You rest for 8 hours. +8 stamina, −1 corruption recovered. (Day 2, night)
+[2026-09-07T17:58:19.799Z] [system] ⏳ Time passed: 8h
+[2026-09-07T17:58:21.922Z] [debug] render⏱ 2123ms after engine-done · feed 500
+[2026-09-07T17:58:22.056Z] [cognitive] REST  (2256ms)
+[2026-09-07T17:58:22.246Z] [debug] persist sizes(KB): total=127 player=16 wm=26[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-09-07T17:58:28.074Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:58:35.279Z] [debug] appstate: active → background (was active for 332692ms)
+[2026-09-07T17:59:42.176Z] [debug] appstate: background → active (was background for 66893ms)
+[2026-09-07T17:59:42.296Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T17:59:46.366Z] [debug] ui: tap "🚪 EXIT" ⏱+17ms
+[2026-09-07T17:59:46.377Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-09-07T17:59:46.403Z] [player] leave outpost
+[2026-09-07T17:59:46.404Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-09-07T17:59:46.408Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-09-07T17:59:46.409Z] [debug] scene: loc=dynasty_border_post hub=- arrival=n opening=n passing=n
+[2026-09-07T17:59:46.409Z] [debug] missions: none active · at=dynasty_border_post
+[2026-09-07T17:59:46.453Z] [debug] spawn: gear=[Aetherium Spear, Bonebreaker Mace, Flame of Aether Wand] window=10 roster=new
+[2026-09-07T17:59:46.470Z] [world] Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors — the Etheric fields the Overload buried still discharging where the old grid shorts against itself. Electronics fail. The air tastes like copper.
+
+You are at Dynasty Border Post. An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing; the road past them runs down into the flooded capitals.
+[2026-09-07T17:59:46.470Z] [system] Weather effect — Aetheric Storm: +1 INT · -1 WIS
+[2026-09-07T17:59:46.476Z] [world] [Dynasty Border Post] north: open ground · east: Tartarian Pilgrim Camp (4 tiles, 10 hours) · south: Samarran (6 tiles, 15 hours) · west: The Monarch's Waystation (4 tiles, 10 hours)
+[2026-09-07T17:59:46.477Z] [world] You hear a kettle whistling before you see them. Talla Mudfoot, wandering trader, has made camp here.
+[2026-09-07T17:59:46.478Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Talla Mudfoot, wandering trader. A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with one eye and the merchandise with the other."
+[2026-09-07T17:59:46.490Z] [world] Rare workings for sale: Amulet of the Cold Star (500 TC), Amulet of the Silt Warden (200 TC), Anvil Shield (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-07T17:59:46.494Z] [arbiter] "Nine Cores, nine Guardians, nine Lost Capitals. That's the road. Tap MAIN QUEST to start."
+[2026-09-07T17:59:46.498Z] [system] ⏳ Time passed: 1h
+[2026-09-07T17:59:48.930Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-07T17:59:50.115Z] [world] One good tug and the Scrap Metal is out.
+[2026-09-07T17:59:50.116Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-07T17:59:51.117Z] [world] The Aetherium Spear leaves a shape behind it in the mud, filling slowly.
+[2026-09-07T17:59:51.118Z] [reward] ✦ Aetherium Spear (Common).
+[2026-09-07T17:59:51.125Z] [world] Where the Bonebreaker Mace was, the ground is a shade darker.
+[2026-09-07T17:59:51.125Z] [reward] ✦ Bonebreaker Mace (Common).
+[2026-09-07T17:59:51.126Z] [world] You take the Flame of Aether Wand. The hollow it came out of starts closing.
+[2026-09-07T17:59:51.126Z] [reward] ✦ Flame of Aether Wand (Common).
+[2026-09-07T17:59:52.120Z] [reward] ✦ Found Entry 7 — last page — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-07T17:59:52.133Z] [world] You salvage the banner. The take is small but real.
+[2026-09-07T17:59:52.134Z] [world] The cart yields little of value, though a Cloth Scrap ends up in your pack.
+[2026-09-07T17:59:52.134Z] [world] You break the cracked submerged giant statue apart. Among the pieces, something worth keeping.
+[2026-09-07T17:59:52.134Z] [world] You work the jagged ruined skyscraper apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-07T17:59:52.134Z] [world] You break the shattered crashed automaton chassis apart. Among the pieces, something worth keeping.
+[2026-09-07T17:59:52.135Z] [world] You salvage the stall. The take is small but real.
+[2026-09-07T17:59:52.135Z] [world] You strip the tent carefully. Something usable comes free in your hand.
+[2026-09-07T17:59:52.135Z] [reward] ✦ Salvage haul:
+[2026-09-07T17:59:52.135Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T17:59:52.136Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-07T17:59:52.136Z] [reward]     • Stick (Common)
+[2026-09-07T17:59:52.136Z] [reward]     • Scrap Metal x3 (Common)
+[2026-09-07T17:59:53.346Z] [debug] ui: tap "investigate" ⏱+18ms
+[2026-09-07T17:59:54.722Z] [player] investigate shallow pool
+[2026-09-07T17:59:54.722Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=0
+[2026-09-07T17:59:54.724Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T17:59:54.891Z] [debug] persist sizes(KB): total=134 player=17 wm=31[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=3
+[2026-09-07T17:59:55.968Z] [player] investigate watch fire
+[2026-09-07T17:59:55.969Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=0
+[2026-09-07T17:59:55.970Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-07T17:59:57.884Z] [debug] qwen⏱ narration:travel preempted 11038ms read 10928ms/write 0ms in 802t→out 0t thr2 13.6ms/t (3ch)
+[2026-09-07T17:59:57.986Z] [debug] qwen⏱ ✂ DISCARDED narration:travel after 11038ms — cancelled:player-acted-again
+[2026-09-07T17:59:58.646Z] [arbiter] "Tap the objective box up top. Pick a Capital; the Aether marks the road. And if you lose the thread out there, ask me — type ask about anything."
+[2026-09-07T18:00:00.515Z] [debug] qwen⏱ investigate_lore ok 5663ms wait 3291ms read 1602ms/write 1045ms in 126t→out 31t thr2 12.7ms/t (146ch)
+[2026-09-07T18:00:01.767Z] [debug] qwen⏱ investigate_lore ok 5670ms wait 4419ms read 277ms/write 958ms in 126t→out 28t thr2 2.2ms/t (138ch)
+[2026-09-07T18:00:14.895Z] [debug] appstate: active → background (was active for 32723ms)
+[2026-09-07T18:01:27.251Z] [debug] appstate: background → active (was background for 72352ms)
+[2026-09-07T18:01:27.263Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T18:01:34.141Z] [world] You set course for Samarran. 6 tiles — about 15 hours of travel, all in. Tap the → SAMARRAN button on the travel row to press on; STOP TRAVEL to halt.
+[2026-09-07T18:01:34.141Z] [arbiter] "Your road runs to Samarran. When you're ready to leave, tap the button marked → SAMARRAN on the travel row below. Keep tapping it to close the distance, mile by mile."
+[2026-09-07T18:01:35.915Z] [debug] qwen⏱ narration:scene_intro_fill preempted 8613ms read 0ms/write 0ms in 689t→out 0t thr1 (0ch)
+[2026-09-07T18:01:36.026Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 8613ms — intro-fill:∅
+[2026-09-07T18:01:36.026Z] [debug] homework: scene_intro "Dynasty Border Post" ∅ 8764ms
+[2026-09-07T18:01:40.712Z] [debug] ui: tap "rest" ⏱+13ms
+[2026-09-07T18:01:40.728Z] [player] rest
+[2026-09-07T18:01:40.728Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-07T18:01:40.730Z] [world] You rest for 8 hours. +1 HP, +8 stamina recovered. (Day 2, morning)
+[2026-09-07T18:01:40.740Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:01:40.836Z] [cognitive] REST  (95ms)
+[2026-09-07T18:01:46.000Z] [debug] qwen⏱ ambient_fill ok 5079ms read/write unusable (native mis-reported 15990ms/1068ms — llama.rn split bug, not this call) in 363t→out 31t js-late 1505ms thr1 HIT-CAP (152ch)
+[2026-09-07T18:01:46.000Z] [debug] qwen⏱ stats — investigate_lore n11 avg3.3s max5.7s read0.8s/write1.0s ⚠3unusable in125t→out31t ms/tok 2.0-12.7 wait1.5s | narration:travel n4 avg9.1s max11.0s read9.0s in743t→out0t ms/tok 10.8-13.6 ⏸4 ✂4/36.5s | ambient n2 avg4.3s max4.8s read3.8s/write0.9s ⚠1unusable in365t→out16t ms/tok 10.3-10.3 cap1 ⏸1 ✂1/3.7s | flourish n1 avg2.7s max2.7s read1.8s/write0.6s in178t→out20t ms/tok 10.3-10.3 ✂1/2.7s | narration:scene_intro_fill n1 avg8.6s max8.6s ⚠1unusable in689t→out0t ⏸1 ✂1/8.6s | ambient_fill n1 avg5.1s max5.1s ⚠1unusable in363t→out31t cap1 || WASTED 7 calls / 51.5s
+[2026-09-07T18:01:46.137Z] [debug] arbiter: ambient-fill ∅ 5405ms
+[2026-09-07T18:01:46.137Z] [debug] qwen⏱ ✂ DISCARDED ambient_fill after 5079ms — ambient:fill-∅
+[2026-09-07T18:01:48.465Z] [debug] ui: tap "→ SAMARRAN" ⏱+17ms
+[2026-09-07T18:01:48.491Z] [debug] spawn: gear=[Slick Mud Wand, Aetheric Helm of Command, Crude Golem Greatsword] window=10 roster=new
+[2026-09-07T18:01:48.493Z] [world] Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.
+[2026-09-07T18:01:48.495Z] [system] Try "talk to the traveler" — they want something from you.
+[2026-09-07T18:01:48.496Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-07T18:01:48.497Z] [world] A wagon, abandoned and broken-axled, leans into the mud ahead.
+[2026-09-07T18:01:49.435Z] [debug] ui: tap "take / salvage" ⏱+15ms
+[2026-09-07T18:01:50.733Z] [world] The Crude Golem Greatsword goes in your pack. Its outline stays in the silt a while.
+[2026-09-07T18:01:50.734Z] [reward] ✦ Crude Golem Greatsword (Common).
+[2026-09-07T18:01:50.751Z] [world] You crouch, take the Slick Mud Wand, and are moving again before you have straightened up.
+[2026-09-07T18:01:50.752Z] [reward] ✦ Slick Mud Wand (Common).
+[2026-09-07T18:01:50.753Z] [world] You do not think about it. The Aetheric Helm of Command is simply in your hand now.
+[2026-09-07T18:01:50.753Z] [reward] ✦ Aetheric Helm of Command (Common).
+[2026-09-07T18:01:51.014Z] [debug] persist sizes(KB): total=129 player=18 wm=24[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=3
+[2026-09-07T18:01:51.614Z] [reward] ✦ Found Chit 5 — Intruder — Logic Core 04-B. (open Contracts → Collectibles to read)
+[2026-09-07T18:01:51.631Z] [world] You work the banner apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-07T18:01:51.637Z] [world] You work the barrel over. A part of it comes loose, intact.
+[2026-09-07T18:01:51.638Z] [world] You salvage the tent. The take is small but real.
+[2026-09-07T18:01:51.638Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:01:51.639Z] [reward]     • Worn Tartarian Coin x10 (Common)
+[2026-09-07T18:01:51.639Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-07T18:01:53.705Z] [debug] appstate: active → background (was active for 26458ms)
+[2026-09-07T18:02:42.814Z] [debug] appstate: background → active (was background for 49110ms)
+[2026-09-07T18:02:42.910Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-07T18:02:45.571Z] [debug] ui: tap "investigate" ⏱+24ms
+[2026-09-07T18:02:47.118Z] [player] investigate shallow pool
+[2026-09-07T18:02:47.122Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:02:47.127Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:02:47.130Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:02:47.130Z] [arbiter] The Arbiter looks around. "Boot-prints in the mud parade ground, in formation, fresh each dawn."
+[2026-09-07T18:02:47.130Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:48.371Z] [debug] ui: tap "→ SAMARRAN" ⏱+21ms
+[2026-09-07T18:02:48.390Z] [debug] spawn: gear=[Bone Shortsword] window=10 roster=new
+[2026-09-07T18:02:48.392Z] [world] You push south. The silt is heavy underfoot, the horizon unchanged.
+[2026-09-07T18:02:48.394Z] [world] The thread you were following waits where you left it.
+[2026-09-07T18:02:49.622Z] [debug] ui: tap "take / salvage" ⏱+7ms
+[2026-09-07T18:02:49.947Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6871ms read 0ms/write 0ms in 685t→out 0t thr1 (0ch)
+[2026-09-07T18:02:50.068Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6871ms — intro-fill:∅
+[2026-09-07T18:02:50.068Z] [debug] homework: scene_intro "Dynasty Border Post" ∅ 7159ms
+[2026-09-07T18:02:51.029Z] [world] You strip the banner carefully. Something usable comes free in your hand.
+[2026-09-07T18:02:51.030Z] [world] You break the rubble apart. Among the pieces, something worth keeping.
+[2026-09-07T18:02:51.030Z] [world] You strip the sack carefully. Something usable comes free in your hand.
+[2026-09-07T18:02:51.031Z] [world] You break the tent apart. Among the pieces, something worth keeping.
+[2026-09-07T18:02:51.031Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:02:51.032Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-09-07T18:02:51.032Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T18:02:51.032Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-07T18:02:51.958Z] [world] Old habit: see it, take it, keep walking. The Bone Shortsword is yours.
+[2026-09-07T18:02:51.958Z] [reward] ✦ Bone Shortsword (Common).
+[2026-09-07T18:02:52.893Z] [debug] qwen⏱ investigate_lore ok 5614ms wait 2784ms read/write unusable (native mis-reported 8478ms/1310ms — llama.rn split bug, not this call) in 126t→out 33t thr2 (163ch)
+[2026-09-07T18:02:53.089Z] [debug] ui: tap "investigate" ⏱+71ms
+[2026-09-07T18:02:55.220Z] [player] investigate shallow pool
+[2026-09-07T18:02:55.221Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:02:55.223Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:02:55.227Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:02:55.227Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:02:55.228Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:55.336Z] [cognitive] SWIM  (107ms)
+[2026-09-07T18:02:56.192Z] [debug] ui: tap "→ SAMARRAN" ⏱+20ms
+[2026-09-07T18:02:56.193Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-07T18:02:56.439Z] [debug] qwen⏱ investigate_lore ok 1121ms read 0ms/write 1084ms in 126t→out 27t thr2 (141ch)
+[2026-09-07T18:02:56.537Z] [player] investigate waterskin
+[2026-09-07T18:02:56.537Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=2
+[2026-09-07T18:02:56.538Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-07T18:02:56.539Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:02:56.540Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:02:56.540Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:56.741Z] [cognitive] SWIM  (200ms)
+[2026-09-07T18:02:57.332Z] [debug] ui: tap "rest" ⏱+10ms
+[2026-09-07T18:02:57.337Z] [player] rest
+[2026-09-07T18:02:57.337Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:02:57.339Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 2, evening)
+[2026-09-07T18:02:57.339Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:57.340Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:02:57.466Z] [cognitive] REST  (124ms)
+[2026-09-07T18:02:57.930Z] [debug] persist sizes(KB): total=134 player=19 wm=30[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3
+[2026-09-07T18:02:58.090Z] [debug] ui: tap "rest" ⏱+87ms
+[2026-09-07T18:02:58.094Z] [player] rest
+[2026-09-07T18:02:58.094Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:02:58.095Z] [world] You rest for 8 hours. +6 stamina recovered. (Day 3, night)
+[2026-09-07T18:02:58.095Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:58.096Z] [arbiter] The Arbiter is quiet a long moment after you stir. "I was wrong about something earlier. I'll say so when the moment's right."
+[2026-09-07T18:02:58.101Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-07T18:02:58.101Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:02:58.102Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:02:58.102Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:02:58.179Z] [world] A Mud Monarchs war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Eternal Dynasty.
+[2026-09-07T18:02:58.216Z] [arbiter] "The Mud Monarchs do not forgive a friend of the Eternal Dynasty," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-07T18:02:58.586Z] [debug] render⏱ 336ms after engine-done · feed 500
+[2026-09-07T18:02:58.924Z] [cognitive] REST  (786ms)
+[2026-09-07T18:02:59.387Z] [debug] qwen⏱ investigate_lore ok 2648ms read 375ms/write 1936ms in 126t→out 28t js-late 1016ms thr2 3.0ms/t (121ch)
+[2026-09-07T18:03:01.876Z] [debug] ui: tap "dodge" ⏱+22ms
+[2026-09-07T18:03:01.968Z] [player] dodge
+[2026-09-07T18:03:01.990Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-07T18:03:02.034Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:03:02.105Z] [combat] Mud Monarchs Raider 1 — d20 → 1 + ATK 4 = 5 vs your AC 17 — ✗ EVADED
+[2026-09-07T18:03:02.129Z] [combat] Dodge — Mud Monarchs Raider 1 overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-09-07T18:03:02.175Z] [world] You slip Mud Monarchs Raider 1's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-07T18:03:02.270Z] [debug] ac-shift 17→20: race/base 10 + gear 7 + title 0 → trimmed 17 + status 3 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=—
+[2026-09-07T18:03:02.295Z] [combat] Mud Monarchs Raider 2 — d20 → 9 + ATK 6 = 15 vs your AC 20 — ✗ MISS
+[2026-09-07T18:03:02.342Z] [combat] Mud Monarchs Raider 3 and 2 others close the distance.
+[2026-09-07T18:03:02.366Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T18:03:02.390Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:03:02.413Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:03:04.212Z] [debug] ui: tap "touch wand ✦" ⏱+20ms
+[2026-09-07T18:03:04.318Z] [system] evasive — harder to hit fades.
+[2026-09-07T18:03:04.363Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:03:04.385Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=5 hooks=2
+[2026-09-07T18:03:04.428Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:03:04.471Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T18:03:04.536Z] [world] You commit forward with the aetheric touch wand. Mud Monarchs Raider 1 watches your hands.
+[2026-09-07T18:03:04.558Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:03:05.579Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-07T18:03:06.545Z] [debug] dice⏱ initiative: shown +223ms, tapped +842ms, settled +967ms (hold late 167ms) = 2032ms
+[2026-09-07T18:03:07.345Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-07T18:03:08.296Z] [debug] dice⏱ attack: shown +157ms, tapped +640ms, settled +951ms (hold late 151ms) = 1748ms
+[2026-09-07T18:03:08.928Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-07T18:03:09.880Z] [debug] dice⏱ damage: shown +144ms, tapped +486ms, settled +951ms (hold late 151ms) = 1581ms
+[2026-09-07T18:03:09.922Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.
+[2026-09-07T18:03:09.926Z] [combat] You — d20 → 2 + INT 8 + 2 (point blank) perfect opening (2× dice) = 12 vs Mud Monarchs Raider 1 AC 9 — ✓ HIT
+[2026-09-07T18:03:09.929Z] [combat] The Aetheric Touch Wand hums against whole skin — nothing to mend.
+[2026-09-07T18:03:09.931Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, ×0.5 for 5)
+[2026-09-07T18:03:09.938Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Rusted Blade — slashing or bludgeoning will bite where aetheric won't."
+[2026-09-07T18:03:09.942Z] [combat] Clean hit with the aetheric touch wand for 5. Mud Monarchs Raider 1 has 8 left and does not back away.
+[2026-09-07T18:03:09.944Z] [debug] ac-shift 20→17: race/base 10 + gear 7 + title 0 → trimmed 17 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=—
+[2026-09-07T18:03:09.944Z] [combat] Mud Monarchs Raider 1 — d20 → 9 + ATK 4 = 13 vs your AC 17 — ✗ MISS
+[2026-09-07T18:03:09.946Z] [combat] Mud Monarchs Raider 2 — d20 → 20 + ATK 6 = 26 vs your AC 17 — ✓ CRITICAL HIT
+[2026-09-07T18:03:09.955Z] [combat] Mud Monarchs Raider 3 — d20 → 5 + ATK 6 = 11 vs your AC 17 — ✗ MISS
+[2026-09-07T18:03:09.956Z] [combat] Mud Monarchs Raider 5 and 1 other close the distance.
+[2026-09-07T18:03:09.956Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The Mud Monarchs Raider 1 is patient. Be patienter."
+[2026-09-07T18:03:10.150Z] [combat] Mud Monarchs Raider 2 deals 1 slashing damage [armor −51%] [edge of reach — halved]. You have 22 HP remaining.
+[2026-09-07T18:03:10.172Z] [combat] That's your slashing resist working — the armor drank most of that hit (1 of 3 got through).
+[2026-09-07T18:03:12.790Z] [debug] ui: tap "cudgel ⚒" ⏱+26ms
+[2026-09-07T18:03:12.874Z] [player] attack with the cudgel
+[2026-09-07T18:03:12.895Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=5 hooks=2
+[2026-09-07T18:03:12.940Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:03:13.030Z] [world] You commit forward with the cudgel. Mud Monarchs Raider 1 watches your hands.
+[2026-09-07T18:03:13.051Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:03:14.658Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T18:03:15.607Z] [debug] dice⏱ initiative: shown +218ms, tapped +1432ms, settled +949ms (hold late 149ms) = 2599ms
+[2026-09-07T18:03:20.426Z] [debug] appstate: active → background (was active for 37612ms)
+[2026-09-07T18:04:13.057Z] [debug] appstate: background → active (was background for 52626ms)
+[2026-09-07T18:04:14.147Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T18:04:15.098Z] [debug] dice⏱ attack: shown +141ms, tapped +58396ms, settled +952ms (hold late 152ms) = 59489ms
+[2026-09-07T18:04:15.698Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T18:04:16.649Z] [debug] dice⏱ damage: shown +133ms, tapped +465ms, settled +950ms (hold late 150ms) = 1548ms
+[2026-09-07T18:04:16.669Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.
+[2026-09-07T18:04:16.669Z] [combat] You — d20 → 4 + STR 6 = 10 vs Mud Monarchs Raider 1 AC 9 — ✓ HIT
+[2026-09-07T18:04:16.676Z] [combat] Mud Monarchs Raider 1 takes 4 with the cudgel. It reels: 4 left. Then it fights back.
+[2026-09-07T18:04:16.681Z] [combat] Mud Monarchs Raider 4 — d20 → 2 + ATK 5 = 7 vs your AC 17 — ✗ MISS
+[2026-09-07T18:04:16.684Z] [combat] Mud Monarchs Raider 5 — d20 → 18 + ATK 9 = 27 vs your AC 17 — ✓ HIT
+[2026-09-07T18:04:16.690Z] [combat] Mud Monarchs Raider 1 — d20 → 17 + ATK 4 = 21 vs your AC 17 — ✓ HIT
+[2026-09-07T18:04:16.698Z] [combat] Mud Monarchs Raider 2 and 1 other press in behind their own pack, waiting for an opening.
+[2026-09-07T18:04:16.930Z] [combat] Mud Monarchs Raider 5 deals 1 slashing damage [armor −51%] [edge of reach — halved]. You have 21 HP remaining.
+[2026-09-07T18:04:16.952Z] [combat] Mud Monarchs Raider 1 deals 1 bludgeoning damage. You have 20 HP remaining.
+[2026-09-07T18:04:18.331Z] [debug] ui: tap "touch wand ✦" ⏱+25ms
+[2026-09-07T18:04:18.430Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:04:18.452Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=5 hooks=2
+[2026-09-07T18:04:18.496Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:04:18.582Z] [world] Your aetheric touch wand comes around in an arc; Mud Monarchs Raider 1 squares up to meet it.
+[2026-09-07T18:04:18.603Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:04:22.929Z] [debug] appstate: active → background (was active for 9877ms)
+[2026-09-07T18:04:23.161Z] [debug] persist sizes(KB): total=137 player=19 wm=31[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=6
+[2026-09-07T18:04:43.749Z] [debug] appstate: background → active (was background for 20819ms)
+[2026-09-07T18:05:02.984Z] [debug] appstate: active → background (was active for 19235ms)
+[2026-09-07T18:05:52.552Z] [debug] appstate: background → active (was background for 49569ms)
+[2026-09-07T18:05:53.553Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:05:54.508Z] [debug] dice⏱ initiative: shown +217ms, tapped +94775ms, settled +955ms (hold late 155ms) = 95947ms
+[2026-09-07T18:05:55.054Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-07T18:05:56.005Z] [debug] dice⏱ attack: shown +131ms, tapped +413ms, settled +951ms (hold late 151ms) = 1495ms
+[2026-09-07T18:05:56.570Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-07T18:05:57.522Z] [debug] dice⏱ damage: shown +143ms, tapped +419ms, settled +952ms (hold late 152ms) = 1514ms
+[2026-09-07T18:05:57.576Z] [world] Mud Monarchs Raider 1 moves first. The pressure is immediate.
+[2026-09-07T18:05:57.580Z] [combat] Mud Monarchs Raider 1 — d20 → 11 + ATK 4 = 15 vs your AC 17 — ✗ MISS
+[2026-09-07T18:05:57.582Z] [combat] Mud Monarchs Raider 2 — d20 → 14 + ATK 6 = 20 vs your AC 17 — ✓ HIT
+[2026-09-07T18:05:57.585Z] [combat] Mud Monarchs Raider 3 — d20 → 3 + ATK 6 = 9 vs your AC 17 — ✗ MISS
+[2026-09-07T18:05:57.586Z] [combat] Mud Monarchs Raider 4 and 1 other press in behind their own pack, waiting for an opening.
+[2026-09-07T18:05:57.586Z] [combat] You — d20 → 9 + INT 8 + 2 (point blank) = 19 vs Mud Monarchs Raider 1 AC 9 — ✓ HIT
+[2026-09-07T18:05:57.590Z] [combat] The Aetheric Touch Wand knits you back together — +1 HP.
+[2026-09-07T18:05:57.591Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, ×0.5 for 2)
+[2026-09-07T18:05:57.593Z] [combat] Clean hit with the aetheric touch wand for 2. Mud Monarchs Raider 1 has 2 left and does not back away.
+[2026-09-07T18:05:57.809Z] [combat] Mud Monarchs Raider 2 deals 1 slashing damage [armor −51%] [edge of reach — halved]. You have 19 HP remaining.
+[2026-09-07T18:06:04.948Z] [debug] ui: tap "flee 70%" ⏱+83ms
+[2026-09-07T18:06:05.020Z] [player] flee
+[2026-09-07T18:06:05.044Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-07T18:06:05.133Z] [system] ⏳ Time passed: 15 min
+[2026-09-07T18:06:05.965Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:06:06.918Z] [debug] dice⏱ skill_check: shown +182ms, tapped +672ms, settled +953ms (hold late 153ms) = 1807ms
+[2026-09-07T18:06:06.927Z] [debug] skillcheck: escape d20=12 DEX 12 = 24 vs Pursuit 18 — Mud Monarchs Raider 5 (d20 10 + SPD 8) → PASS
+[2026-09-07T18:06:06.976Z] [debug] stats: STR6 DEX12 INT7 WIS7 CHA8 STE3 | gear: INT+5,WIS+3,DEX+1,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves feet=Echoing Steps Boots amulet=Aetheric Locket
+[2026-09-07T18:06:06.976Z] [debug] train: dexterity (escape check) → progress 10/100
+[2026-09-07T18:06:06.979Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.
+[2026-09-07T18:06:11.726Z] [debug] ui: tap "craft" ⏱+20ms
+[2026-09-07T18:06:12.595Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-07T18:06:15.660Z] [world] You repair the Aetheric Touch Wand. Back to full. (spent: Scrap Metal x4, Stick x2)
+[2026-09-07T18:06:15.687Z] [arbiter] The Arbiter nods. "Patched in: Reclaimer's Rope → Patched Cloth, Cloth Scrap → Patched Cloth."
+[2026-09-07T18:06:15.691Z] [world] You repair the Echoing Steps Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-07T18:06:15.733Z] [arbiter] The Arbiter nods. "Patched in: 3× Cloth Scrap → Patched Cloth, Spider Silk → Patched Cloth."
+[2026-09-07T18:06:15.747Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-09-07T18:06:15.761Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Cap. "Short on stock: Patched Cloth 1 short. Gather, then return."
+[2026-09-07T18:06:22.135Z] [debug] qwen⏱ narration:scene_intro_fill ok 9537ms read 8285ms/write 1161ms in 694t→out 33t thr1 11.9ms/t HIT-CAP (159ch)
+[2026-09-07T18:06:22.165Z] [debug] homework: scene_intro "Dynasty Border Post" ✓ 9573ms
+[2026-09-07T18:06:24.946Z] [player] craft Acid Flask
+[2026-09-07T18:06:24.946Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:06:25.046Z] [reward] ✦ Crafted Acid Flask ×5. The Arbiter watches you set the last piece.
+[2026-09-07T18:06:25.047Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-07T18:06:25.047Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:06:25.150Z] [cognitive] neutral  (101ms)
+[2026-09-07T18:06:25.237Z] [debug] persist sizes(KB): total=133 player=18 wm=32[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3
+[2026-09-07T18:06:30.742Z] [player] summon aether golem
+[2026-09-07T18:06:30.742Z] [debug] parser: intent=cast conf=1.00 verb=summon target=aether golem resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:06:30.776Z] [combat] Aether Golem Constructor — d20 4 + INT 8 = 12 vs DC 20 — ✗ FAILED
+[2026-09-07T18:06:30.777Z] [world] (2× Aether Crystal + 1× Aetheric Shard consumed.)
+[2026-09-07T18:06:30.777Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.
+[2026-09-07T18:06:30.778Z] [system] ⏳ Time passed: 30 min
+[2026-09-07T18:06:30.958Z] [cognitive] USE_ITEM · SEARCH  (179ms)
+[2026-09-07T18:06:36.535Z] [debug] qwen⏱ ambient ok 5649ms read 2506ms/write 2135ms in 363t→out 31t js-late 451ms thr1 6.9ms/t HIT-CAP (134ch)
+[2026-09-07T18:06:36.603Z] [arbiter] You've come a long way, and even though your HP is down by three, you've not lost hope.
+[2026-09-07T18:06:36.604Z] [debug] arbiter: ambient ✓ 5826ms
+[2026-09-07T18:06:36.604Z] [debug] arbiter: ambient-said "You've come a long way, and even though your HP is down by three, you've not lost hope."
+[2026-09-07T18:06:36.699Z] [debug] ui: tap "craft" ⏱+112ms
+[2026-09-07T18:06:49.206Z] [player] craft Aether-Shard Spear
+[2026-09-07T18:06:49.206Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aether shard spear resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:06:49.208Z] [arbiter] "Crafting Aether-Shard Spear would strip Aether Crystal → Aetheric Shard from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-07T18:06:49.275Z] [cognitive] USE_ITEM  (64ms)
+[2026-09-07T18:06:50.569Z] [player] craft Aether-Shard Spear
+[2026-09-07T18:06:50.570Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aether shard spear resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:06:50.572Z] [arbiter] The Arbiter nods. "Stripped for parts: Aether Crystal → Aetheric Shard."
+[2026-09-07T18:06:50.573Z] [reward] ✦ Crafted Aether-Shard Spear. The Arbiter watches you set the last piece.
+[2026-09-07T18:06:50.684Z] [cognitive] USE_ITEM  (109ms)
+[2026-09-07T18:07:02.619Z] [debug] homework: intro-fill armed after 10425ms idle
+[2026-09-07T18:07:09.541Z] [player] craft Riveted Leather Vest
+[2026-09-07T18:07:09.542Z] [debug] parser: intent=craft conf=1.00 verb=craft target=riveted leather vest resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:09.567Z] [arbiter] "Crafting Riveted Leather Vest would strip 2× Spider Silk → Patched Cloth, Worn Tartarian Coin → Scrap Metal from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-07T18:07:09.568Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-07T18:07:09.568Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:07:09.583Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6960ms read 6239ms/write 577ms in 693t→out 17t thr1 9.0ms/t (72ch)
+[2026-09-07T18:07:09.596Z] [cognitive] neutral  (26ms)
+[2026-09-07T18:07:09.605Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6960ms — intro-fill:∅
+[2026-09-07T18:07:09.605Z] [debug] homework: scene_intro "Dynasty Border Post" ∅ 6988ms
+[2026-09-07T18:07:10.820Z] [player] craft Riveted Leather Vest
+[2026-09-07T18:07:10.821Z] [debug] parser: intent=craft conf=1.00 verb=craft target=riveted leather vest resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:10.845Z] [arbiter] The Arbiter nods. "Stripped for parts: 2× Spider Silk → Patched Cloth, Worn Tartarian Coin → Scrap Metal."
+[2026-09-07T18:07:10.856Z] [reward] ✦ Crafted Riveted Leather Vest. The Arbiter watches you set the last piece.
+[2026-09-07T18:07:10.927Z] [cognitive] neutral  (69ms)
+[2026-09-07T18:07:18.182Z] [player] craft Mud Scanner
+[2026-09-07T18:07:18.183Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud scanner resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:18.194Z] [arbiter] "Crafting Mud Scanner would strip Worn Tartarian Coin → Scrap Metal from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-07T18:07:18.194Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-07T18:07:18.194Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:07:18.246Z] [cognitive] neutral  (50ms)
+[2026-09-07T18:07:19.716Z] [player] craft Mud Scanner
+[2026-09-07T18:07:19.716Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud scanner resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:19.723Z] [arbiter] The Arbiter nods. "Stripped for parts: Worn Tartarian Coin → Scrap Metal."
+[2026-09-07T18:07:19.728Z] [reward] ✦ Crafted Mud Scanner. The Arbiter watches you set the last piece.
+[2026-09-07T18:07:19.729Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-07T18:07:19.729Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:07:19.824Z] [cognitive] neutral  (94ms)
+[2026-09-07T18:07:22.663Z] [player] craft Pulse Scanner
+[2026-09-07T18:07:22.663Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:22.671Z] [arbiter] "Crafting Pulse Scanner would strip 2× Worn Tartarian Coin → Scrap Metal from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-07T18:07:22.716Z] [cognitive] neutral  (43ms)
+[2026-09-07T18:07:22.780Z] [debug] persist sizes(KB): total=133 player=18 wm=32[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3
+[2026-09-07T18:07:23.935Z] [player] craft Pulse Scanner
+[2026-09-07T18:07:23.936Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:07:23.942Z] [arbiter] The Arbiter nods. "Stripped for parts: 2× Worn Tartarian Coin → Scrap Metal."
+[2026-09-07T18:07:23.948Z] [reward] ✦ Crafted Pulse Scanner. The Arbiter watches you set the last piece.
+[2026-09-07T18:07:23.948Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-07T18:07:23.948Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:07:24.041Z] [cognitive] neutral  (92ms)
+[2026-09-07T18:07:27.669Z] [debug] render⏱ 3716ms after engine-done · feed 500
+[2026-09-07T18:07:28.967Z] [debug] ui: tap "inventory" ⏱+24ms
+[2026-09-07T18:07:32.217Z] [world] You clip Mud Scanner into your scanner pouch. It runs whenever you search.
+[2026-09-07T18:07:34.157Z] [world] You clip Pulse Scanner into your scanner pouch. It runs whenever you search.
+[2026-09-07T18:07:42.098Z] [world] You tuck First Aid Kit into your healing pouch.
+[2026-09-07T18:07:46.167Z] [world] You tuck Water Bottle into your healing pouch.
+[2026-09-07T18:07:47.678Z] [debug] homework: intro-fill armed after 9994ms idle (strike 2/3)
+[2026-09-07T18:07:52.197Z] [world] You rack Acid Flask on your bandolier. Ready to throw.
+[2026-09-07T18:07:52.397Z] [debug] qwen⏱ narration:scene_intro_fill ok 4713ms read/write unusable (native mis-reported 39943ms/2817ms — llama.rn split bug, not this call) in 687t→out 33t thr1 HIT-CAP (163ch)
+[2026-09-07T18:07:52.409Z] [debug] homework: scene_intro "Dynasty Border Post" ✓ 4733ms
+[2026-09-07T18:07:54.273Z] [debug] persist sizes(KB): total=134 player=19 wm=33[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3
+[2026-09-07T18:07:55.884Z] [debug] ui: tap "inventory" ⏱+23ms
+[2026-09-07T18:08:06.640Z] [reward] You work the acid flask along the weapon. Now wielding the Acid-Etched Cudgel — 1d4 acid on every landing hit.
+[2026-09-07T18:08:06.641Z] [arbiter] "Battery bile," the Arbiter says, watching the edge darken. "The old world stored its lightning in acid — jar-batteries taller than a house, vault floors full of them. The flood shorted the lightning out and left the bile keeping for a thousand years. Down here everything is either preserved by the mud or eaten by what leaked into it. Now your blade gets a say in which."
+[2026-09-07T18:08:13.757Z] [debug] ui: tap "ENTER" ⏱+29ms
+[2026-09-07T18:08:13.762Z] [world] You step inside a tin-roof shed, into the shed.
+[2026-09-07T18:08:13.764Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.
+[2026-09-07T18:08:15.475Z] [debug] ui: tap "take / salvage" ⏱+15ms
+[2026-09-07T18:08:16.539Z] [world] You lever something loose from the workbench — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-07T18:08:16.539Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:08:16.540Z] [reward]     • Reed Shaft Cutting (Common)
+[2026-09-07T18:08:17.575Z] [debug] ui: tap "investigate" ⏱+25ms
+[2026-09-07T18:08:19.118Z] [player] investigate the mud
+[2026-09-07T18:08:19.118Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:19.121Z] [world] You scrape at the silt with the pocket knife. Nothing of worth.
+[2026-09-07T18:08:19.133Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:08:19.134Z] [arbiter] The Arbiter looks around. "The border the post guards no longer exists. The guarding continues, and is somehow not absurd."
+[2026-09-07T18:08:19.134Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:19.227Z] [cognitive] SWIM  (91ms)
+[2026-09-07T18:08:20.275Z] [debug] ui: tap "↗ Bedroom" ⏱+11ms
+[2026-09-07T18:08:20.278Z] [world] You step into the bedroom.
+[2026-09-07T18:08:20.279Z] [world] Somebody slept in here long after the shed stopped being a shed — a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.
+[2026-09-07T18:08:20.384Z] [player] investigate tools
+[2026-09-07T18:08:20.384Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=- range=- enemies=0 hooks=0
+[2026-09-07T18:08:20.385Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:08:20.385Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:08:20.385Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:08:20.476Z] [cognitive] neutral  (88ms)
+[2026-09-07T18:08:20.569Z] [arbiter] The Arbiter tilts their head. "I do not see a 'tools' here. Choose words carefully — try: bed, cupboard, jars, lamp."
+[2026-09-07T18:08:21.641Z] [player] investigate pegs
+[2026-09-07T18:08:21.642Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=- range=- enemies=0 hooks=0
+[2026-09-07T18:08:21.644Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:08:21.745Z] [arbiter] The Arbiter tilts their head. "I do not see a 'pegs' here. Choose words carefully — try: bed, cupboard, jars, lamp."
+[2026-09-07T18:08:21.823Z] [cognitive] neutral  (178ms)
+[2026-09-07T18:08:21.959Z] [debug] ui: tap "take / salvage" ⏱+38ms
+[2026-09-07T18:08:22.860Z] [player] investigate floorboards
+[2026-09-07T18:08:22.861Z] [world] Hidden until now: The Hidden Cellar opens up. It joins the rooms you can reach.
+[2026-09-07T18:08:23.185Z] [world] You work the bed over. A part of it comes loose, intact.
+[2026-09-07T18:08:23.185Z] [world] You break the cupboard apart. Among the pieces, something worth keeping.
+[2026-09-07T18:08:23.185Z] [world] You work the jars over. A part of it comes loose, intact.
+[2026-09-07T18:08:23.186Z] [world] You break the lamp apart. Among the pieces, something worth keeping.
+[2026-09-07T18:08:23.186Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:08:23.186Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-07T18:08:23.187Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T18:08:23.187Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-07T18:08:23.187Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T18:08:24.962Z] [debug] ui: tap "investigate" ⏱+14ms
+[2026-09-07T18:08:26.505Z] [player] investigate the mud
+[2026-09-07T18:08:26.506Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:26.518Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Firewood (Common).
+[2026-09-07T18:08:26.524Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:08:26.525Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:26.606Z] [cognitive] SWIM  (80ms)
+[2026-09-07T18:08:26.718Z] [debug] persist sizes(KB): total=127 player=19 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:08:27.860Z] [debug] ui: tap "↓ Storage" ⏱+13ms
+[2026-09-07T18:08:27.862Z] [world] You step into the storage.
+[2026-09-07T18:08:27.862Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.
+[2026-09-07T18:08:28.965Z] [debug] ui: tap "take / salvage" ⏱+9ms
+[2026-09-07T18:08:30.063Z] [reward] ✦ Found Verse Two — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-07T18:08:30.078Z] [world] Behind the bottles, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-09-07T18:08:30.079Z] [world] You work the sacking apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-07T18:08:30.079Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:08:30.080Z] [reward]     • Salt-Cured Dowel (Common)
+[2026-09-07T18:08:31.129Z] [debug] ui: tap "investigate" ⏱+25ms
+[2026-09-07T18:08:32.454Z] [player] investigate the mud
+[2026-09-07T18:08:32.455Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:32.459Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Mud Fragment (Common).
+[2026-09-07T18:08:32.466Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:32.557Z] [cognitive] SWIM  (91ms)
+[2026-09-07T18:08:33.279Z] [debug] ui: tap "↓ Cellar" ⏱+21ms
+[2026-09-07T18:08:33.285Z] [world] You step into the hidden cellar.
+[2026-09-07T18:08:33.286Z] [world] Beneath the lifted boards, a ladder drops into a cramped stone cellar. Whoever dug it did not want it found.
+[2026-09-07T18:08:33.711Z] [player] investigate shelves
+[2026-09-07T18:08:33.712Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=- range=- enemies=0 hooks=0
+[2026-09-07T18:08:33.713Z] [world] ★ STORY THREAD — You feel through the shelves and your fingers close on something that does not belong here.
+[2026-09-07T18:08:33.714Z] [world] A rug lies dead-centre on the floor — wrong for the room. The boards along its edge are dark with something old that soaked in.
+[2026-09-07T18:08:33.716Z] [system] ⏳ Time passed: 15 min
+[2026-09-07T18:08:34.022Z] [cognitive] neutral  (306ms)
+[2026-09-07T18:08:34.329Z] [debug] ui: tap "take / salvage" ⏱+20ms
+[2026-09-07T18:08:34.959Z] [player] investigate tins
+[2026-09-07T18:08:34.960Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tins resolved=- range=- enemies=0 hooks=1
+[2026-09-07T18:08:34.962Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:08:34.962Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:08:35.058Z] [cognitive] neutral  (95ms)
+[2026-09-07T18:08:35.187Z] [arbiter] The Arbiter tilts their head. "I do not see a 'tins' here. Choose words carefully — try: rug, carpet, ladder, crate, strongbox."
+[2026-09-07T18:08:35.506Z] [world] You salvage the crate. The take is small but real.
+[2026-09-07T18:08:35.507Z] [world] You scavenge the strongbox thoroughly. One Bent Nail survives the sorting.
+[2026-09-07T18:08:35.507Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:08:35.512Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-07T18:08:35.512Z] [reward]     • Bent Nail (Common)
+[2026-09-07T18:08:37.148Z] [debug] ui: tap "investigate" ⏱+15ms
+[2026-09-07T18:08:38.458Z] [player] investigate the mud
+[2026-09-07T18:08:38.458Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1
+[2026-09-07T18:08:38.467Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Aether Mud (Common).
+[2026-09-07T18:08:38.468Z] [system] ⚠ Your Pocket Knife is coming apart — a few more hits will finish it. Mend it or lose it.
+[2026-09-07T18:08:38.474Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:38.558Z] [cognitive] SWIM  (84ms)
+[2026-09-07T18:08:38.797Z] [debug] persist sizes(KB): total=127 player=20 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:08:39.698Z] [player] investigate ladder
+[2026-09-07T18:08:39.699Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=1
+[2026-09-07T18:08:39.700Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T18:08:39.800Z] [cognitive] neutral  (96ms)
+[2026-09-07T18:08:40.735Z] [debug] ui: tap "↖ Shed ✓" ⏱+9ms
+[2026-09-07T18:08:40.736Z] [world] You step into the shed.
+[2026-09-07T18:08:40.736Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.
+[2026-09-07T18:08:40.943Z] [player] investigate rug
+[2026-09-07T18:08:40.944Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rug resolved=- range=- enemies=0 hooks=0
+[2026-09-07T18:08:42.732Z] [debug] ui: tap "investigate" ⏱+7ms
+[2026-09-07T18:08:42.839Z] [debug] qwen⏱ investigate_lore ok 3051ms read 1228ms/write 1725ms in 125t→out 52t thr2 9.8ms/t (266ch)
+[2026-09-07T18:08:42.984Z] [cognitive] neutral  (2038ms)
+[2026-09-07T18:08:43.057Z] [arbiter] The Arbiter tilts their head. "I do not see a 'rug' here. Choose words carefully — try: tools, pegs, floorboards."
+[2026-09-07T18:08:44.122Z] [player] investigate the mud
+[2026-09-07T18:08:44.123Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:44.127Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Mudstone (Rare).
+[2026-09-07T18:08:44.140Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:44.229Z] [cognitive] SWIM  (88ms)
+[2026-09-07T18:08:45.366Z] [player] investigate tools
+[2026-09-07T18:08:45.367Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=tools range=- enemies=0 hooks=0
+[2026-09-07T18:08:45.368Z] [world] You take the measure of the tools. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-07T18:08:45.469Z] [cognitive] neutral  (99ms)
+[2026-09-07T18:08:46.595Z] [player] investigate pegs
+[2026-09-07T18:08:46.596Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=pegs range=- enemies=0 hooks=0
+[2026-09-07T18:08:46.597Z] [world] You study the pegs and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-07T18:08:46.684Z] [cognitive] neutral  (83ms)
+[2026-09-07T18:08:46.749Z] [debug] qwen⏱ investigate_lore ok 1214ms read 270ms/write 786ms in 125t→out 24t thr2 2.2ms/t (114ch)
+[2026-09-07T18:08:46.749Z] [debug] qwen⏱ stats — investigate_lore n16 avg3.1s max5.7s read0.7s/write1.1s ⚠4unusable in125t→out32t ms/tok 2.0-12.7 wait1.2s | narration:scene_intro_fill n5 avg7.3s max9.5s read7.3s/write1.2s ⚠3unusable in690t→out17t ms/tok 9.0-11.9 cap2 ⏸3 ✂3/22.4s | narration:travel n4 avg9.1s max11.0s read9.0s in743t→out0t ms/tok 10.8-13.6 ⏸4 ✂4/36.5s | ambient n3 avg4.7s max5.6s read3.1s/write1.5s ⚠1unusable in364t→out21t ms/tok 6.9-10.3 cap2 ⏸1 ✂1/3.7s | flourish n1 avg2.7s max2.7s read1.8s/write0.6s in178t→out20t ms/tok 10.3-10.3 ✂1/2.7s | ambient_fill n1 avg5.1s max5.1s ⚠1unusable in363t→out31t cap1 ✂1/5.1s || WASTED 10 calls / 70.4s
+[2026-09-07T18:08:47.850Z] [player] investigate floorboards
+[2026-09-07T18:08:47.851Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floorboards resolved=floorboards range=- enemies=0 hooks=0
+[2026-09-07T18:08:47.852Z] [world] You study the floorboards and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-07T18:08:47.853Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:08:47.853Z] [arbiter] The Arbiter looks around. "The garrison's roll-call includes names no one answers to. They are called anyway, every morning."
+[2026-09-07T18:08:47.999Z] [debug] qwen⏱ investigate_lore ok 1250ms read 303ms/write 861ms in 126t→out 27t thr2 2.4ms/t (126ch)
+[2026-09-07T18:08:48.150Z] [cognitive] neutral  (296ms)
+[2026-09-07T18:08:49.237Z] [debug] qwen⏱ investigate_lore ok 1260ms read 282ms/write 791ms in 126t→out 24t thr2 2.2ms/t (115ch)
+[2026-09-07T18:08:49.419Z] [debug] ui: tap "investigate" ⏱+162ms
+[2026-09-07T18:08:50.800Z] [player] investigate the mud
+[2026-09-07T18:08:50.800Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:50.804Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Big Rock (Common).
+[2026-09-07T18:08:50.810Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:08:50.810Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:50.901Z] [cognitive] SWIM  (90ms)
+[2026-09-07T18:08:53.802Z] [debug] ui: tap "investigate" ⏱+14ms
+[2026-09-07T18:08:55.192Z] [player] investigate the mud
+[2026-09-07T18:08:55.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0
+[2026-09-07T18:08:55.198Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Stick (Common).
+[2026-09-07T18:08:55.207Z] [system] ⏳ Time passed: 24 min
+[2026-09-07T18:08:55.293Z] [combat] Your Pocket Knife shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.
+[2026-09-07T18:08:55.294Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-07T18:08:55.362Z] [cognitive] SWIM  (87ms)
+[2026-09-07T18:08:55.483Z] [debug] persist sizes(KB): total=128 player=20 wm=27[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2
+[2026-09-07T18:08:55.752Z] [debug] ui: tap "investigate" ⏱+38ms
+[2026-09-07T18:09:01.403Z] [debug] ui: tap "🚪 EXIT" ⏱+12ms
+[2026-09-07T18:09:01.404Z] [world] You step back outside, leaving shed behind.
+[2026-09-07T18:09:03.304Z] [debug] ui: tap "rest" ⏱+15ms
+[2026-09-07T18:09:03.311Z] [player] rest
+[2026-09-07T18:09:03.311Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:09:03.312Z] [world] You rest for 8 hours. +3 HP, +8 stamina recovered. (Day 3, evening)
+[2026-09-07T18:09:03.313Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:09:03.324Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:09:03.325Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:09:03.414Z] [cognitive] REST  (89ms)
+[2026-09-07T18:09:04.170Z] [debug] ui: tap "→ SAMARRAN" ⏱+17ms
+[2026-09-07T18:09:04.190Z] [debug] spawn: gear=[Salvager's Trench Coat] window=10 roster=new
+[2026-09-07T18:09:04.192Z] [world] You set out south. Your boots sink half an inch into the mud-flats and pull free with each step.
+[2026-09-07T18:09:04.193Z] [world] You crest a low rise and a Reclaimer caravan slumps in the silt — axle snapped, banner half-buried. Whoever drove it left in a hurry, or didn't leave at all.
+[2026-09-07T18:09:04.194Z] [world] A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'
+[2026-09-07T18:09:04.194Z] [reward] ✦ Recovered Patched Cloth.
+[2026-09-07T18:09:04.199Z] [world] What you started here has not finished itself in your absence.
+[2026-09-07T18:09:06.636Z] [debug] appstate: active → background (was active for 194083ms)
+[2026-09-07T18:19:05.399Z] [debug] appstate: background → active (was background for 598759ms)
+[2026-09-07T18:19:06.493Z] [debug] ui: tap "★ Take & wear Salvager's Trench Coat — your cloak slot is bare"
+[2026-09-07T18:19:06.499Z] [world] You take the Salvager's Trench Coat the way you take everything out here — quickly, and without ceremony.
+[2026-09-07T18:19:06.500Z] [reward] ✦ Salvager's Trench Coat (Common).
+[2026-09-07T18:19:06.513Z] [debug] take&wear: equipping "Salvager's Trench Coat" -> cloak
+[2026-09-07T18:19:06.552Z] [debug] stats: STR6 DEX12 INT9 WIS7 CHA8 STE3 | gear: INT+7,WIS+3,DEX+1,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat amulet=Aetheric Locket
+[2026-09-07T18:19:08.394Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-07T18:19:09.672Z] [world] You pocket the Scrap Metal and check the horizon, in that order.
+[2026-09-07T18:19:09.672Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-07T18:19:10.574Z] [world] You break the crate apart. Among the pieces, something worth keeping.
+[2026-09-07T18:19:10.575Z] [world] You work the signpost over. A part of it comes loose, intact.
+[2026-09-07T18:19:10.575Z] [world] You strip the tent carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:10.576Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:19:10.576Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T18:19:10.577Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T18:19:10.577Z] [reward]     • Cloth Scrap (Common)
+[2026-09-07T18:19:10.944Z] [debug] persist sizes(KB): total=129 player=20 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3
+[2026-09-07T18:19:11.712Z] [debug] ui: tap "investigate" ⏱+10ms
+[2026-09-07T18:19:13.020Z] [player] investigate the mud
+[2026-09-07T18:19:13.021Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=2
+[2026-09-07T18:19:13.025Z] [world] The rusted petrified mud wave reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T18:19:14.290Z] [player] investigate shallow pool
+[2026-09-07T18:19:14.291Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:19:14.293Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:19:15.064Z] [debug] qwen⏱ investigate_lore ok 1942ms read 599ms/write 1267ms in 131t→out 38t thr2 4.6ms/t (182ch)
+[2026-09-07T18:19:15.554Z] [player] investigate waterskin
+[2026-09-07T18:19:15.555Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=2
+[2026-09-07T18:19:15.556Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-07T18:19:15.557Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:15.557Z] [arbiter] The Arbiter glances toward the traveler. "Still there. Still yours, if you take it."
+[2026-09-07T18:19:15.686Z] [cognitive] SWIM  (127ms)
+[2026-09-07T18:19:16.013Z] [debug] ui: tap "→ SAMARRAN" ⏱+23ms
+[2026-09-07T18:19:16.025Z] [debug] spawn: gear=[Stone Spear, Architect's Mask of Vision, Bone Javelin] window=10 roster=new
+[2026-09-07T18:19:16.027Z] [world] You strike out south. The country resists you with sameness more than distance.
+[2026-09-07T18:19:16.029Z] [world] A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.
+[2026-09-07T18:19:16.029Z] [world] Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road.
+[2026-09-07T18:19:16.030Z] [reward] ✦ Recovered Bioluminescent Fungus.
+[2026-09-07T18:19:16.039Z] [world] The loose end is exactly as loose as you left it.
+[2026-09-07T18:19:16.557Z] [debug] qwen⏱ investigate_lore ok 2124ms wait 917ms read 270ms/write 922ms in 126t→out 30t thr2 2.1ms/t (157ch)
+[2026-09-07T18:19:17.031Z] [debug] ui: tap "take / salvage" ⏱+16ms
+[2026-09-07T18:19:17.701Z] [debug] qwen⏱ investigate_lore ok 1915ms wait 849ms read 285ms/write 756ms in 126t→out 23t thr2 2.3ms/t (103ch)
+[2026-09-07T18:19:18.231Z] [reward] ✦ Found Unsent Letter — to the Council of Sovereigns — The Black Cloak Confessions. (open Contracts → Collectibles to read)
+[2026-09-07T18:19:18.244Z] [world] You salvage the firepit. The take is small but real.
+[2026-09-07T18:19:18.244Z] [world] You work the lantern apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-07T18:19:18.244Z] [world] You strip the shattered crashed automaton chassis carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:18.245Z] [world] You strip the stall carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:18.245Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:19:18.245Z] [reward]     • Mud Fragment (Common)
+[2026-09-07T18:19:18.245Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-09-07T18:19:18.246Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-07T18:19:19.152Z] [world] The Bone Javelin goes into the pack by feel. You have done this a great many times.
+[2026-09-07T18:19:19.153Z] [reward] ✦ Bone Javelin (Common).
+[2026-09-07T18:19:19.165Z] [world] You take the Stone Spear from where it lay.
+[2026-09-07T18:19:19.165Z] [reward] ✦ Stone Spear (Common).
+[2026-09-07T18:19:19.166Z] [world] You pick up the Architect's Mask of Vision.
+[2026-09-07T18:19:19.166Z] [reward] ✦ Architect's Mask of Vision (Common).
+[2026-09-07T18:19:20.297Z] [debug] ui: tap "investigate" ⏱+15ms
+[2026-09-07T18:19:21.680Z] [player] investigate the mud
+[2026-09-07T18:19:21.681Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=2
+[2026-09-07T18:19:21.684Z] [world] The rusted petrified mud wave reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T18:19:21.685Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:21.685Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:21.838Z] [cognitive] SWIM  (151ms)
+[2026-09-07T18:19:21.913Z] [debug] qwen⏱ ambient preempted 7480ms wait 3392ms read 0ms/write 0ms in 363t→out 0t thr1 (0ch)
+[2026-09-07T18:19:21.991Z] [debug] arbiter: ambient cut short 7691ms — yielded to the player
+[2026-09-07T18:19:21.992Z] [debug] qwen⏱ ✂ DISCARDED ambient after 7480ms — ambient:preempted
+[2026-09-07T18:19:22.950Z] [player] investigate shallow pool
+[2026-09-07T18:19:22.951Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:19:22.952Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:19:22.953Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:22.953Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:23.095Z] [cognitive] SWIM  (140ms)
+[2026-09-07T18:19:23.255Z] [debug] persist sizes(KB): total=136 player=22 wm=33[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3
+[2026-09-07T18:19:24.348Z] [debug] qwen⏱ investigate_lore ok 2435ms read/write unusable (native mis-reported 5485ms/1004ms — llama.rn split bug, not this call) in 131t→out 31t thr2 (137ch)
+[2026-09-07T18:19:24.916Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-07T18:19:24.923Z] [player] rest
+[2026-09-07T18:19:24.924Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:19:24.925Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 4, morning)
+[2026-09-07T18:19:24.926Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:19:24.926Z] [world] A bird you can't name lands a foot from where you slept, looks at you, takes off again.
+[2026-09-07T18:19:24.936Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:19:25.025Z] [world] No war party crests the rise — one figure does. A Mud Monarchs Reaver-Captain comes alone, unhurried, and does not need the others. You are marked for standing with the Eternal Dynasty.
+[2026-09-07T18:19:25.065Z] [arbiter] "The Mud Monarchs do not forgive a friend of the Eternal Dynasty," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-07T18:19:25.465Z] [debug] render⏱ 360ms after engine-done · feed 500
+[2026-09-07T18:19:25.761Z] [cognitive] REST  (796ms)
+[2026-09-07T18:19:26.396Z] [debug] qwen⏱ investigate_lore ok 3173ms wait 1205ms read 272ms/write 881ms in 126t→out 28t js-late 1244ms thr2 2.2ms/t (132ch)
+[2026-09-07T18:19:30.706Z] [debug] ui: tap "approach" ⏱+15ms
+[2026-09-07T18:19:30.829Z] [player] approach Mud Monarchs Reaver-Captain
+[2026-09-07T18:19:30.854Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs reaver captain resolved=Mud Monarchs Reaver-Captain range=mid enemies=1 hooks=2
+[2026-09-07T18:19:30.905Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0
+[2026-09-07T18:19:30.955Z] [debug] move: field advance target=Mud Monarchs Reaver-Captain d 1.50->0.50 band mid->close
+[2026-09-07T18:19:30.980Z] [world] You close the gap with Mud Monarchs Reaver-Captain. (range: close / arm's reach)
+[2026-09-07T18:19:31.006Z] [combat] Mud Monarchs Reaver-Captain — d20 → 3 + ATK 8 = 11 vs your AC 18 — ✗ MISS
+[2026-09-07T18:19:31.030Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T18:19:31.055Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:32.705Z] [debug] ui: tap "dodge" ⏱+15ms
+[2026-09-07T18:19:32.800Z] [player] dodge
+[2026-09-07T18:19:32.824Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-07T18:19:32.876Z] [world] You commit to the dodge. Slip Mud Monarchs Reaver-Captain's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:19:32.955Z] [combat] Mud Monarchs Reaver-Captain — d20 → 16 + ATK 8 = 24 vs your AC 18 — ✗ EVADED
+[2026-09-07T18:19:32.980Z] [combat] Dodge — d20 → 13 + DEX 12 = 25 vs ATK 24. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-07T18:19:33.077Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:34.069Z] [debug] ui: tap "touch wand ✦" ⏱+23ms
+[2026-09-07T18:19:34.192Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:19:34.217Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:19:34.268Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:19:34.322Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T18:19:34.398Z] [world] You commit forward with the aetheric touch wand. Mud Monarchs Reaver-Captain watches your hands.
+[2026-09-07T18:19:34.422Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:35.524Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-07T18:19:36.455Z] [debug] dice⏱ initiative: shown +241ms, tapped +910ms, settled +931ms (hold late 131ms) = 2082ms
+[2026-09-07T18:19:37.121Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T18:19:38.071Z] [debug] dice⏱ attack: shown +147ms, tapped +517ms, settled +949ms (hold late 149ms) = 1613ms
+[2026-09-07T18:19:38.705Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:19:39.656Z] [debug] dice⏱ damage: shown +148ms, tapped +484ms, settled +951ms (hold late 151ms) = 1583ms
+[2026-09-07T18:19:39.703Z] [world] Mud Monarchs Reaver-Captain moves first. The pressure is immediate.
+[2026-09-07T18:19:39.705Z] [combat] Mud Monarchs Reaver-Captain — d20 → 17 + ATK 8 = 25 vs your AC 18 — ✓ HIT
+[2026-09-07T18:19:39.707Z] [combat] You — d20 → 4 + INT 10 + 2 (point blank) perfect opening (2× dice) = 16 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:19:39.708Z] [combat] The Aetheric Touch Wand knits you back together — +2 HP.
+[2026-09-07T18:19:39.709Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 6)
+[2026-09-07T18:19:39.710Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Tartarian Claw Knife — piercing will bite where aetheric won't."
+[2026-09-07T18:19:39.711Z] [combat] Clean hit with the aetheric touch wand for 6. Mud Monarchs Reaver-Captain has 58 left and does not back away.
+[2026-09-07T18:19:39.917Z] [combat] Mud Monarchs Reaver-Captain deals 3 slashing damage [armor −51%] +1 acid [Mud-Warden's Vest took it]. You have 20 HP remaining.
+[2026-09-07T18:19:39.942Z] [combat] That's your slashing resist working — the armor drank most of that hit (3 of 5 got through).
+[2026-09-07T18:19:42.189Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+16ms
+[2026-09-07T18:19:42.306Z] [player] attack with the cudgel
+[2026-09-07T18:19:42.331Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:19:42.380Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:19:42.481Z] [world] You bring the acid-etched cudgel to bear on Mud Monarchs Reaver-Captain.
+[2026-09-07T18:19:42.505Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:45.759Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-07T18:19:46.708Z] [debug] dice⏱ initiative: shown +240ms, tapped +3062ms, settled +949ms (hold late 149ms) = 4251ms
+[2026-09-07T18:19:48.175Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:19:49.126Z] [debug] dice⏱ attack: shown +149ms, tapped +1316ms, settled +950ms (hold late 150ms) = 2415ms
+[2026-09-07T18:19:49.775Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:19:50.728Z] [debug] dice⏱ damage: shown +158ms, tapped +486ms, settled +953ms (hold late 153ms) = 1597ms
+[2026-09-07T18:19:51.469Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T18:19:52.419Z] [debug] dice⏱ coating: shown +165ms, tapped +571ms, settled +949ms (hold late 149ms) = 1685ms
+[2026-09-07T18:19:52.436Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:19:52.436Z] [combat] You — d20 → 15 + STR 6 = 21 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:19:52.440Z] [combat] Mud Monarchs Reaver-Captain takes 6 with the acid-etched cudgel. It reels: 52 left. Then it fights back.
+[2026-09-07T18:19:52.441Z] [combat] Acid-Etched Cudgel — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-07T18:19:52.444Z] [debug] ac-shift 18→16: race/base 10 + gear 9 + title 0 → trimmed 18 + status -2 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-07T18:19:52.444Z] [combat] Mud Monarchs Reaver-Captain — d20 → 15 + ATK 8 = 23 vs your AC 16 — ✓ HIT
+[2026-09-07T18:19:52.663Z] [combat] Mud Monarchs Reaver-Captain deals 6 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 16 HP remaining.
+[2026-09-07T18:19:52.687Z] [combat] Mud Monarchs Reaver-Captain's strike leaves you stunned.
+[2026-09-07T18:19:54.521Z] [debug] ui: tap "touch wand ✦" ⏱+23ms
+[2026-09-07T18:19:54.627Z] [system] stunned fades.
+[2026-09-07T18:19:54.674Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:19:54.700Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:19:54.749Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (51/64 HP, 2 turns left)
+[2026-09-07T18:19:54.798Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:19:54.896Z] [world] You raise the aetheric touch wand toward Mud Monarchs Reaver-Captain. The room narrows around the both of you.
+[2026-09-07T18:19:54.920Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:56.510Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-07T18:19:57.463Z] [debug] dice⏱ initiative: shown +246ms, tapped +1392ms, settled +951ms (hold late 151ms) = 2589ms
+[2026-09-07T18:19:58.111Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T18:19:59.061Z] [debug] dice⏱ attack: shown +160ms, tapped +483ms, settled +950ms (hold late 150ms) = 1593ms
+[2026-09-07T18:19:59.916Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T18:20:00.862Z] [debug] dice⏱ damage: shown +148ms, tapped +705ms, settled +946ms (hold late 146ms) = 1799ms
+[2026-09-07T18:20:00.905Z] [world] Mud Monarchs Reaver-Captain moves first. The pressure is immediate.
+[2026-09-07T18:20:00.908Z] [combat] Mud Monarchs Reaver-Captain — d20 → 14 + ATK 8 = 22 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:00.910Z] [combat] You — d20 → 8 + INT 10 + 2 (point blank) = 20 vs Mud Monarchs Reaver-Captain AC 11 — ✓ HIT
+[2026-09-07T18:20:00.911Z] [combat] The Aetheric Touch Wand knits you back together — +6 HP.
+[2026-09-07T18:20:00.912Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 3)
+[2026-09-07T18:20:00.914Z] [combat] Your strike with the aetheric touch wand lands for 3. Mud Monarchs Reaver-Captain staggers — 48 HP remaining. It answers.
+[2026-09-07T18:20:01.126Z] [combat] Mud Monarchs Reaver-Captain deals 4 slashing damage [armor −51%] +1 acid [Salvager's Trench Coat took it]. You have 12 HP remaining.
+[2026-09-07T18:20:01.382Z] [debug] persist sizes(KB): total=139 player=22 wm=34[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=4
+[2026-09-07T18:20:03.587Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-07T18:20:03.692Z] [player] dodge
+[2026-09-07T18:20:03.716Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-07T18:20:03.764Z] [world] You commit to the dodge. Slip Mud Monarchs Reaver-Captain's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:20:03.789Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (47/64 HP, 1 turn left)
+[2026-09-07T18:20:03.887Z] [combat] Mud Monarchs Reaver-Captain — d20 → 16 + ATK 8 = 24 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:03.911Z] [combat] Dodge — d20 → 1 + DEX 12 = 13 vs ATK 24. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-07T18:20:03.935Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-09-07T18:20:03.984Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:04.248Z] [combat] Mud Monarchs Reaver-Captain deals 5 slashing damage [armor −51%] +1 acid [Salvager's Trench Coat took it]. You have 13 HP remaining.
+[2026-09-07T18:20:05.692Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+27ms
+[2026-09-07T18:20:05.766Z] [system] braced — will not go down again fades.
+[2026-09-07T18:20:05.803Z] [player] attack with the cudgel
+[2026-09-07T18:20:05.828Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:20:05.877Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (46/64 HP, 0 turns left)
+[2026-09-07T18:20:05.902Z] [combat] Mud Monarchs Reaver-Captain shakes off the last of the acid — the Cudgel has run its course.
+[2026-09-07T18:20:05.951Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:20:06.001Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:06.074Z] [world] Your acid-etched cudgel comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:06.098Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:07.554Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:08.503Z] [debug] dice⏱ initiative: shown +241ms, tapped +1263ms, settled +949ms (hold late 149ms) = 2453ms
+[2026-09-07T18:20:09.054Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:20:10.006Z] [debug] dice⏱ attack: shown +161ms, tapped +387ms, settled +952ms (hold late 152ms) = 1500ms
+[2026-09-07T18:20:10.604Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:20:11.585Z] [debug] dice⏱ damage: shown +156ms, tapped +437ms, settled +981ms (hold late 181ms) = 1574ms
+[2026-09-07T18:20:12.690Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:20:13.657Z] [debug] dice⏱ coating: shown +114ms, tapped +991ms, settled +967ms (hold late 167ms) = 2072ms
+[2026-09-07T18:20:13.680Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:13.680Z] [combat] You — d20 → 12 + STR 6 tired -1 = 17 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:20:13.683Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-07T18:20:13.684Z] [combat] Your strike with the acid-etched cudgel lands for 14. Mud Monarchs Reaver-Captain staggers — 32 HP remaining. It answers.
+[2026-09-07T18:20:13.685Z] [combat] Acid-Etched Cudgel — 2 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-07T18:20:13.685Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:13.689Z] [combat] Mud Monarchs Reaver-Captain — d20 → 17 + ATK 8 = 25 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:13.695Z] [arbiter] "Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."
+[2026-09-07T18:20:13.907Z] [combat] Mud Monarchs Reaver-Captain deals 7 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 6 HP remaining.
+[2026-09-07T18:20:13.933Z] [combat] Mud Monarchs Reaver-Captain's strike leaves you stunned.
+[2026-09-07T18:20:15.306Z] [debug] ui: tap "touch wand ✦" ⏱+26ms
+[2026-09-07T18:20:15.404Z] [system] stunned fades.
+[2026-09-07T18:20:15.456Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:20:15.481Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:20:15.530Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 2. (30/64 HP, 2 turns left)
+[2026-09-07T18:20:15.579Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:20:15.628Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:15.702Z] [world] Your aetheric touch wand comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:15.726Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:16.658Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:17.611Z] [debug] dice⏱ initiative: shown +243ms, tapped +737ms, settled +954ms (hold late 154ms) = 1934ms
+[2026-09-07T18:20:19.641Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-07T18:20:20.610Z] [debug] dice⏱ attack: shown +135ms, tapped +1894ms, settled +969ms (hold late 169ms) = 2998ms
+[2026-09-07T18:20:21.960Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-07T18:20:22.908Z] [debug] dice⏱ damage: shown +143ms, tapped +1204ms, settled +949ms (hold late 149ms) = 2296ms
+[2026-09-07T18:20:22.968Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:22.968Z] [combat] You — d20 → 13 + INT 10 + 2 (point blank) tired -1 = 24 vs Mud Monarchs Reaver-Captain AC 10 — ✓ HIT
+[2026-09-07T18:20:22.970Z] [combat] The Aetheric Touch Wand knits you back together — +4 HP.
+[2026-09-07T18:20:22.971Z] [combat] Aetheric flares — +2 on hit.
+[2026-09-07T18:20:22.971Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 5)
+[2026-09-07T18:20:22.974Z] [combat] The aetheric has worn Mud Monarchs Reaver-Captain's guard through — it bites full from here.
+[2026-09-07T18:20:22.976Z] [combat] Mud Monarchs Reaver-Captain takes 5 with the aetheric touch wand. It reels: 25 left. Then it fights back.
+[2026-09-07T18:20:22.976Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:22.978Z] [combat] Mud Monarchs Reaver-Captain — d20 → 8 + ATK 8 = 16 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:23.184Z] [combat] Mud Monarchs Reaver-Captain deals 5 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 5 HP remaining.
+[2026-09-07T18:20:23.209Z] [combat] Mud Monarchs Reaver-Captain's blow rings off you — braced; you keep your feet.
+[2026-09-07T18:20:42.926Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+24ms
+[2026-09-07T18:20:43.048Z] [player] attack with the cudgel
+[2026-09-07T18:20:43.074Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:20:43.123Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 2. (23/64 HP, 1 turn left)
+[2026-09-07T18:20:43.172Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:20:43.222Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:43.294Z] [world] Your acid-etched cudgel comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:43.318Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:44.508Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T18:20:45.474Z] [debug] dice⏱ initiative: shown +257ms, tapped +981ms, settled +966ms (hold late 166ms) = 2204ms
+[2026-09-07T18:20:46.109Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:20:47.060Z] [debug] dice⏱ attack: shown +160ms, tapped +472ms, settled +950ms (hold late 150ms) = 1582ms
+[2026-09-07T18:20:47.658Z] [debug] ui: tap "roll" ⏱+68ms
+[2026-09-07T18:20:48.610Z] [debug] dice⏱ damage: shown +162ms, tapped +434ms, settled +951ms (hold late 151ms) = 1547ms
+[2026-09-07T18:20:49.259Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:50.226Z] [debug] dice⏱ coating: shown +162ms, tapped +479ms, settled +966ms (hold late 166ms) = 1607ms
+[2026-09-07T18:20:50.267Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:50.267Z] [combat] You — d20 → 6 + STR 6 tired -1 = 11 vs Mud Monarchs Reaver-Captain AC 9 — ✓ HIT
+[2026-09-07T18:20:50.270Z] [combat] Bludgeoning flares — +3 on hit.
+[2026-09-07T18:20:50.271Z] [combat] The blow with the acid-etched cudgel finds purchase — 11 damage, 12 HP standing. Mud Monarchs Reaver-Captain commits to the counter.
+[2026-09-07T18:20:50.271Z] [combat] Acid-Etched Cudgel — 3 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 3 total).
+[2026-09-07T18:20:50.271Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:50.278Z] [combat] Mud Monarchs Reaver-Captain — d20 → 14 + ATK 8 = 22 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:50.279Z] [arbiter] The Arbiter does not look away from the Mud Monarchs Reaver-Captain. "Decide quickly. It already has."
+[2026-09-07T18:20:50.490Z] [combat] Mud Monarchs Reaver-Captain deals 7 slashing damage [armor −51%] +4 acid [Salvager's Worn Greaves took it]. You fall.
+[2026-09-07T18:20:50.516Z] [combat] Johnny Blaze falls in Dynasty Border Post. The Aetherstone grows dim and does not lift.
+[2026-09-07T18:20:50.540Z] [system] Johnny Blaze has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-07T18:20:50.989Z] [system] You join the Fallen of Tartaria — 21 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-07T18:20:57.282Z] [debug] scene: loc=dynasty_border_post hub=- arrival=n opening=n passing=y
+[2026-09-07T18:20:57.282Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:20:57.322Z] [world] Not even wind. The kind of stillness that means something is watching.
+
+You are at Dynasty Border Post. An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing; the road past them runs down into the flooded capitals.
+
+A Reclaimer Ambusher (Human, Uncommon) emerges. Its Crossbow Volley can deal 1D6.
+[2026-09-07T18:20:57.324Z] [combat] Distance: mid-range. Cudgel — needs approach · Aetheric Touch Wand ✓ in range.
+[2026-09-07T18:20:57.350Z] [system] Weather effect — Eerie Calm: +1 WIS
+[2026-09-07T18:20:57.353Z] [world] [Samarran Outskirts] north: Dynasty Border Post (4 tiles, 10 hours) · east: The Buried Cities (4 tiles, 10 hours) · south: Samarran (2 tiles, 5 hours) · west: The Reaver's Crest (6 tiles, 15 hours)
+[2026-09-07T18:20:57.356Z] [reward] ✦ Resurrection. Johnny Blaze returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-07T18:20:58.032Z] [debug] persist sizes(KB): total=147 player=30 wm=35[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:21:05.054Z] [debug] ui: tap "dodge" ⏱+19ms
+[2026-09-07T18:21:05.170Z] [system] braced — will not go down again fades.
+[2026-09-07T18:21:05.200Z] [player] dodge
+[2026-09-07T18:21:05.225Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-07T18:21:05.276Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:21:05.377Z] [combat] Reclaimer Ambusher — d20 → 9 + ATK 8 = 17 vs your AC 16 — ✓ HIT
+[2026-09-07T18:21:05.401Z] [combat] Dodge — d20 → 1 + DEX 12 = 13 vs ATK 17. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-07T18:21:05.425Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-09-07T18:21:05.473Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:05.736Z] [combat] Reclaimer Ambusher deals 3 bludgeoning damage. You have 20 HP remaining.
+[2026-09-07T18:21:06.992Z] [debug] ui: tap "touch wand ✦" ⏱+20ms
+[2026-09-07T18:21:07.132Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:21:07.158Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-07T18:21:07.208Z] [debug] attack: target=Reclaimer Ambusher range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:21:07.308Z] [world] You bring the aetheric touch wand to bear on Reclaimer Ambusher.
+[2026-09-07T18:21:07.332Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:08.290Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T18:21:09.272Z] [debug] dice⏱ initiative: shown +238ms, tapped +768ms, settled +981ms (hold late 181ms) = 1987ms
+[2026-09-07T18:21:10.974Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T18:21:11.956Z] [debug] dice⏱ attack: shown +160ms, tapped +1536ms, settled +983ms (hold late 183ms) = 2679ms
+[2026-09-07T18:21:12.641Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:21:13.623Z] [debug] dice⏱ damage: shown +161ms, tapped +522ms, settled +982ms (hold late 182ms) = 1665ms
+[2026-09-07T18:21:13.668Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-07T18:21:13.669Z] [combat] You — d20 → 4 + INT 9 = 13 vs Reclaimer Ambusher AC 10 — ✓ HIT
+[2026-09-07T18:21:13.670Z] [combat] The Aetheric Touch Wand knits you back together — +3 HP.
+[2026-09-07T18:21:13.671Z] [combat] Reclaimer Ambusher shrugs off the aetheric. (resisted, ×0.5 for 2)
+[2026-09-07T18:21:13.672Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Rusted Blade — slashing will bite where aetheric won't."
+[2026-09-07T18:21:13.672Z] [combat] The blow with the aetheric touch wand finds purchase — 2 damage, 22 HP standing. Reclaimer Ambusher commits to the counter.
+[2026-09-07T18:21:13.674Z] [combat] Reclaimer Ambusher — d20 → 12 + ATK 6 = 18 vs your AC 16 — ✓ HIT
+[2026-09-07T18:21:13.877Z] [combat] Reclaimer Ambusher deals 3 bludgeoning damage. You have 20 HP remaining.
+[2026-09-07T18:21:16.673Z] [debug] ui: tap "throw spear" ⏱+18ms
+[2026-09-07T18:21:16.849Z] [system] acid (from Mud Monarchs Reaver-Captain) fades.
+[2026-09-07T18:21:16.895Z] [player] attack with the off-hand Bone Javelin
+[2026-09-07T18:21:16.920Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone javelin resolved=Bone Javelin range=mid enemies=1 hooks=0
+[2026-09-07T18:21:16.970Z] [debug] attack: target=Reclaimer Ambusher range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Javelin bareHand=false
+[2026-09-07T18:21:17.067Z] [world] You commit forward with the bone javelin. Reclaimer Ambusher watches your hands.
+[2026-09-07T18:21:17.091Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:22.335Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-07T18:21:23.319Z] [debug] dice⏱ initiative: shown +244ms, tapped +5048ms, settled +984ms (hold late 184ms) = 6276ms
+[2026-09-07T18:21:24.020Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:21:24.999Z] [debug] dice⏱ attack: shown +169ms, tapped +527ms, settled +979ms (hold late 179ms) = 1675ms
+[2026-09-07T18:21:25.960Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-07T18:21:26.930Z] [debug] dice⏱ damage: shown +160ms, tapped +799ms, settled +969ms (hold late 169ms) = 1928ms
+[2026-09-07T18:21:26.993Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-07T18:21:26.993Z] [combat] You — d20 → 12 + WIS 10 = 22 vs Reclaimer Ambusher AC 10 — ✓ HIT
+[2026-09-07T18:21:26.995Z] [world] The Bone Javelin sings through the air — spent. Your hand is empty.
+[2026-09-07T18:21:26.996Z] [combat] Clean hit with the bone javelin for 3. Reclaimer Ambusher has 19 left and does not back away.
+[2026-09-07T18:21:26.999Z] [debug] ac-shift 16→18: race/base 10 + gear 9 + title 0 → trimmed 18 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-07T18:21:26.999Z] [combat] Reclaimer Ambusher — d20 → 15 + ATK 6 = 21 vs your AC 18 — ✓ HIT
+[2026-09-07T18:21:27.204Z] [combat] Reclaimer Ambusher deals 2 bludgeoning damage. You have 18 HP remaining.
+[2026-09-07T18:21:32.306Z] [debug] appstate: active → background (was active for 146911ms)
+[2026-09-07T18:24:17.185Z] [debug] appstate: background → active (was background for 164874ms)
+[2026-09-07T18:24:18.356Z] [debug] persist sizes(KB): total=147 player=30 wm=36[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:24:36.732Z] [debug] OTA session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T18:24:36.732Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-07T18:24:36.733Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again."
+[2026-09-07T18:24:36.733Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-07T18:24:37.386Z] [debug] ═══ SESSION 2026-09-07T18:24:37.385Z · build 2026-09-07-1738-the-game-teaches-what-it-runs · previous entry moments earlier ═══
+[2026-09-07T18:24:37.411Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:24:37.436Z] [debug] boot: life bmtrjfbvm8w started 2026-09-07T17:51:52.546Z · not an OTA apply (no handoff on disk)
+[2026-09-07T18:24:49.119Z] [debug] send-log: #mtrkloryry0l — DELIVERED (inline, no attachments): beacon out, 9/9 parts accepted (58393 chars) — flush said yes, transport took every part
+[2026-09-07T18:25:02.827Z] [debug] appstate: active → background (was active for 45648ms)
+[2026-09-07T18:41:24.042Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07cd8-ac42-7650-88ea-bdc78fed427a
+[2026-09-07T18:41:24.042Z] [debug] ota: Checking…
+[2026-09-07T18:41:24.109Z] [debug] ota: Already up to date
+[2026-09-07T18:41:24.109Z] [debug] ota: boot check result = noUpdate
+[2026-09-07T18:41:24.188Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-07T18:41:24.188Z] [debug] voice: bundled idle
+[2026-09-07T18:51:23.950Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07cd8-ac42-7650-88ea-bdc78fed427a
+[2026-09-07T18:51:23.950Z] [debug] ota: Checking…
+[2026-09-07T18:51:24.012Z] [debug] ota: Already up to date
+[2026-09-07T18:51:24.013Z] [debug] ota: boot check result = noUpdate
+[2026-09-07T18:51:24.032Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-07T18:51:24.035Z] [debug] voice: bundled idle
+[2026-09-07T18:51:28.073Z] [debug] OTA session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T18:51:28.073Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-07T18:51:28.073Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Johnny Blaze. The buried country is no place to walk alone."
+
+=== END LOG · 160900 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-07T18:51:28.976Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-07-1738-the-game-teaches-what-it-runs)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-07T18:51:24.066Z
+  Last init success: 2026-09-07T18:51:24.753Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtrljvi98b · started 2026-09-07T18:51:23.841Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 7 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T19:15:20.497Z (2856m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (2791m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (2623m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (1506m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (1247m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (1211m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (1079m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (970m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (928m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (10m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: (no action yet)
+     Where: (unknown) on (unknown) screen
+     Last seen alive: 2026-09-07T18:41:33.227Z (10 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:active→background (+9204ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

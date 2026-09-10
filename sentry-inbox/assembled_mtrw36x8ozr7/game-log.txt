@@ -1,0 +1,774 @@
+Bug Report — Great Scott · (2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it) · Pre list 3 lag test
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-07T23:46:21.256Z
+Character: Great Scott
+Slot ID: slot_mt52mm21_5mcq3a
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 34/62
+
+--- DESCRIPTION ---
+Pre list 3 lag test
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-07T23:46:21.076Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-07T23:42:17.989Z
+  Last init success: 2026-09-07T23:42:19.594Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtrvxtgaww · started 2026-09-07T23:42:10.522Z
+  Followed an OTA apply 215ms ago (mid-session)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 7 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T19:15:20.497Z (3151m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (3086m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (2918m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (1801m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (1542m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (1506m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (1373m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (1265m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (1223m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (305m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 5.6s · 1 job kind queued >3s · worst 11.8ms/prompt-token · 2 generations thrown away (15.2s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  App state trail: (none recorded)
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 34/62  Stamina: 0/19  TC: 474  Corruption: 12
+  Pack: 135 distinct rows / 407 total
+  Dog: Wick (Mutt) loyalty 80 HP 15/15
+
+Weapons (18)
+  Aetheric Touch Wand (1d6 aetheric, dur 32/32, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Sling (1d4 bludgeoning, dur 13/14, equipped:off, [weapon,ranged,thrown,giants])
+    actions: equip:main, unequip:off, use, repair
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 13/13, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 42/54, equipped:main, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:off, unequip:main, use(off), repair
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 38/38, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Reaver's Greatsword (Legendary, 2d10 slashing, dur 50/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (17)
+  Anvil-Struck Footguards (Legendary, dur 44/45, equipped:feet, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:feet, repair
+  Burl Aegis (Legendary, dur 43/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest, repair
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 45/45, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Forge-Black Cowl (Legendary, dur 42/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head, repair
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,cloak,outer,mud_dwellers])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Spore-Crusted Tassets (Legendary, dur 42/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs, repair
+  Traveler's Cloak (dur 14/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · STR +2 · HP +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 17/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, repair, drop
+
+Dog Armor (4)
+  ◆ Burlap Vest (dur 18/18, ♥reserved, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, release-from-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  ◆ Riveted Leather Vest (Uncommon, AC +2 (dog), [dog_armor,vest,leather,loot])
+    actions: scrap, save-for-fusion, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (9)
+  Blue Aetheric Fungus ×2 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×4 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  First Aid Kit ×5 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Honey-Glazed Knuckle (Rare, [food,treat,dog_treat,baker])
+    actions: use(eat), drop
+  Oat Cake ([food,cooked])
+    actions: use(eat), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Wild Carrot ×4 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask ×9 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste ×2 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×5 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×18 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (10)
+  Aetheric Compass (Uncommon, dur 25/25, +1 WIS (passive), [detection,navigation,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Mud Scanner ([exploration,relic,common,mud_dweller])
+    actions: equip:off, use(off), scrap, drop
+  Pry Bar (dur 111/120, [tool,pry,utility,metal])
+    actions: scrap, repair, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 300/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, drop
+
+Materials (51)
+  Aether Crystal ×13 ([aether,crystal])
+    actions: drop
+  Aether Dust ×6 ([aether,dust,distillable])
+    actions: drop
+  Aether Mud ×3 ([mud,aether])
+    actions: drop
+  Aether Residue ×4 ([aether,loot])
+    actions: drop
+  ◆ Aether Venom (♥reserved, [trophy,loot,organic,aether,alchemy])
+    actions: scrap, release-from-fusion, drop
+  ◆ Aetheric Cog (♥reserved, [metal,automation,aether,salvage,loot])
+    actions: scrap, release-from-fusion, drop
+  Aetheric Dust ×5 (Uncommon, [aether])
+    actions: scrap, drop
+  ◆ Aetheric Mud Fragment (Uncommon, ♥reserved, [mud,aether,stone,loot])
+    actions: scrap, release-from-fusion, drop
+  Aetheric Pelt (Rare, [organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Shard ×33 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetheric Sludge ([mud,aether,loot])
+    actions: scrap, drop
+  Automaton Circuit ×6 ([automation,tech,scrap])
+    actions: drop
+  ◆ Beetle-Chitin Flake ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  Bent Nail ×29 ([metal,junk,scrap])
+    actions: scrap, drop
+  ◆ Bent Shackle Pin ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  Big Rock ×5 ([thrown,stone,improvised,heavy])
+    actions: drop
+  Blank Runecaster Casing (Common) ×2 ([runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Legendary) (Legendary, [runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Rare) ×2 (Rare, [runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Uncommon) ×3 (Uncommon, [runecaster,casing,blank,loot])
+    actions: drop
+  ◆ Bone Bolt ×8 (♥reserved, [ammunition,bone,loot])
+    actions: release-from-fusion, drop
+  Bone Sliver ×12 ([bone,junk,scrap])
+    actions: drop
+  ◆ Chipped Phial Neck (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  Clockwork Core (Rare, ♥reserved, [machine,core,loot])
+    actions: release-from-fusion, drop
+  Cloth Scrap ×7 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Clouded Lens Blank (♥reserved, [trophy,crystal,glass])
+    actions: scrap, release-from-fusion, drop
+  ◆ Dried Tendon Coil ×2 (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Drone Core ×4 (Uncommon, [automation,aether,loot,bonus])
+    actions: scrap, drop
+  ◆ Drone Processor ×3 (♥reserved, [metal,automation,tech,salvage,loot])
+    actions: scrap, release-from-fusion, drop
+  Energy Fragment ×2 (Uncommon, [aether,energy])
+    actions: scrap, drop
+  ◆ Flint Core Nodule ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Hardened Mudstone ×3 (Rare, [mud,stone,tartarian,found-recipe])
+    actions: scrap, drop
+  ◆ Minor Relic ([aether,ancient,trophy,loot])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×4 ([mud])
+    actions: drop
+  Mudstone ×3 (Rare, [mud,stone])
+    actions: drop
+  ◆ Obsidian Chip (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  ◆ Oil-Stained Sash ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Patched Cloth ×19 ([fiber,cloth])
+    actions: drop
+  Scrap Metal ×38 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Shadow Core (Rare, [aether,core,loot])
+    acti
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 375 of 3518 entries; older trimmed to fit a single email paste)
+
+[2026-09-07T23:45:51.928Z] [debug] homework: scene_intro "The Monarch's Waystation" ∅ 11158ms
+[2026-09-07T23:45:51.927Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10828ms — intro-fill:∅
+[2026-09-07T23:45:51.758Z] [debug] qwen⏱ narration:scene_intro_fill ok 10828ms read 9652ms/write 1126ms in 828t→out 33t thr1 11.7ms/t HIT-CAP (148ch)
+[2026-09-07T23:45:49.650Z] [reward] ✦ Legacy of Power — you channel Aether into the Mud-Warden's Vest. It mends to full.
+[2026-09-07T23:45:48.279Z] [debug] ui: tap "✦ ability" ⏱+19ms
+[2026-09-07T23:45:40.772Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T23:45:24.034Z] [debug] qwen⏱ investigate_lore ok 2688ms read 1277ms/write 1106ms in 129t→out 34t js-late 409ms thr2 9.9ms/t (167ch)
+[2026-09-07T23:45:23.485Z] [reward]     • Aether Dust (Common)
+[2026-09-07T23:45:23.484Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-09-07T23:45:23.484Z] [reward] ✦ Salvage haul:
+[2026-09-07T23:45:23.484Z] [world] You strip the rubble carefully. Something usable comes free in your hand.
+[2026-09-07T23:45:23.484Z] [world] You break the marker down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-09-07T23:45:23.484Z] [world] You salvage the cart. The take is small but real.
+[2026-09-07T23:45:23.480Z] [reward] ✦ Found Verse One — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-07T23:45:22.372Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-07T23:45:21.348Z] [cognitive] neutral  (271ms)
+[2026-09-07T23:45:21.075Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-07T23:45:21.075Z] [world] The roadside camp reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-07T23:45:21.074Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=roadside camp resolved=roadside camp range=- enemies=0 hooks=1
+[2026-09-07T23:45:21.074Z] [player] investigate roadside camp
+[2026-09-07T23:45:19.508Z] [debug] ui: tap "investigate" ⏱+14ms
+[2026-09-07T23:45:17.685Z] [debug] persist sizes(KB): total=254 player=58 wm=111[rooms=50 events=7 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=3
+[2026-09-07T23:45:07.203Z] [debug] ui: tap "⚑ WORLD"
+[2026-09-07T23:45:07.066Z] [debug] homework: scene_intro "The Monarch's Waystation" ✓ 11338ms
+[2026-09-07T23:45:06.893Z] [debug] qwen⏱ narration:scene_intro_fill ok 11003ms read 9817ms/write 1136ms in 833t→out 33t js-late 443ms thr1 11.8ms/t HIT-CAP (130ch)
+[2026-09-07T23:45:02.241Z] [dog_quest] The Arbiter studies the new pair. "Wick, then. The chain is off. The road is open."
+[2026-09-07T23:45:02.240Z] [world] Wick circles three times and curls beside you. His breathing slows to yours.
+[2026-09-07T23:45:02.236Z] [world] A Mutt. Wick. The name settles on the dog like a coat.
+[2026-09-07T23:44:55.730Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-07T23:44:48.953Z] [dog_quest] The Arbiter raises a hand. "The dog first. Answer the card in front of you."
+[2026-09-07T23:44:48.953Z] [player] use Aetheric Torch
+[2026-09-07T23:44:48.948Z] [debug] ui: tap "use aetheric torch" ⏱+19ms
+[2026-09-07T23:44:48.209Z] [reward] +8 TC pried from the dust.
+[2026-09-07T23:44:48.208Z] [dog_quest] The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-09-07T23:44:48.206Z] [reward] Unaligned Poacher defeated. You recover Scrap Metal ×2, Riveted Leather Vest.
+[2026-09-07T23:44:48.205Z] [combat] Final strike with the searing knot-grained gouge for 22. Unaligned Poacher is still. The Aetherstone hums on, indifferent.
+[2026-09-07T23:44:48.204Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-07T23:44:48.203Z] [combat] You — d20 → 12 + DEX 17 − 1 (Whisper Fog) tired -1 = 27 vs Unaligned Poacher AC 9 — ✓ HIT
+[2026-09-07T23:44:48.203Z] [combat] Unaligned Poacher — d20 → 2 + ATK 4 = 6 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:44:48.199Z] [world] Unaligned Poacher moves first. The pressure is immediate.
+[2026-09-07T23:44:48.148Z] [debug] dice⏱ coating: shown +251ms, tapped +399ms, settled +834ms = 1484ms
+[2026-09-07T23:44:47.314Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T23:44:46.663Z] [debug] dice⏱ damage: shown +259ms, tapped +457ms, settled +834ms = 1550ms
+[2026-09-07T23:44:45.829Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T23:44:45.113Z] [debug] dice⏱ attack: shown +252ms, tapped +544ms, settled +832ms = 1628ms
+[2026-09-07T23:44:44.281Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T23:44:43.480Z] [debug] dice⏱ initiative: shown +635ms, tapped +743ms, settled +833ms = 2211ms
+[2026-09-07T23:44:42.647Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T23:44:41.362Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-09-07T23:44:41.315Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:44:41.315Z] [world] Your searing knot-grained gouge comes around in an arc; Unaligned Poacher squares up to meet it.
+[2026-09-07T23:44:41.221Z] [debug] attack: status mods tired -1
+[2026-09-07T23:44:41.221Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:44:41.173Z] [debug] attack: target=Unaligned Poacher range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:44:41.076Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=1
+[2026-09-07T23:44:41.076Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:44:41.005Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-09-07T23:44:40.856Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+20ms
+[2026-09-07T23:44:38.821Z] [combat] Unaligned Poacher — d20 → 12 + ATK 4 = 16 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:44:38.818Z] [combat] Unaligned Poacher reads the motion and slips it — the searing knot-grained gouge carves only air. The counter is already coming.
+[2026-09-07T23:44:38.818Z] [combat] You — d20 → 1 + DEX 17 − 1 (Whisper Fog) tired -1 perfect opening (2× dice) = 16 vs Unaligned Poacher AC 9 — ✗ FUMBLE
+[2026-09-07T23:44:38.818Z] [world] You seize the initiative. Unaligned Poacher has no time to react.
+[2026-09-07T23:44:38.762Z] [debug] dice⏱ attack: shown +262ms, tapped +403ms, settled +835ms = 1500ms
+[2026-09-07T23:44:37.927Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T23:44:37.261Z] [debug] dice⏱ initiative: shown +309ms, tapped +3932ms, settled +833ms = 5074ms
+[2026-09-07T23:44:36.428Z] [debug] ui: tap "roll" ⏱+30ms
+[2026-09-07T23:44:32.233Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:44:32.233Z] [world] You bring the searing knot-grained gouge to bear on Unaligned Poacher.
+[2026-09-07T23:44:32.139Z] [debug] attack: status mods tired -1 · perfect opening (2× dice)
+[2026-09-07T23:44:32.139Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:44:32.087Z] [debug] attack: target=Unaligned Poacher range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:44:31.989Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=1
+[2026-09-07T23:44:31.988Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:44:31.843Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+20ms
+[2026-09-07T23:44:30.997Z] [debug] persist sizes(KB): total=254 player=58 wm=111[rooms=50 events=7 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=81 scene=3
+[2026-09-07T23:44:30.538Z] [debug] render⏱ 334ms after engine-done · feed 500
+[2026-09-07T23:44:30.157Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:44:30.157Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:44:30.156Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T23:44:30.109Z] [combat] Dodge — Unaligned Poacher overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-09-07T23:44:30.109Z] [combat] Unaligned Poacher — d20 → 1 + ATK 4 = 5 vs your AC 26 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-07T23:44:29.967Z] [world] You commit to the dodge. Slip Unaligned Poacher's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T23:44:29.919Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-07T23:44:29.919Z] [player] dodge
+[2026-09-07T23:44:29.817Z] [debug] ui: tap "dodge" ⏱+166ms
+[2026-09-07T23:44:29.302Z] [combat] Unaligned Poacher deals 4 bludgeoning damage [plate −3]. You have 34 HP remaining.
+[2026-09-07T23:44:29.255Z] [debug] render⏱ 340ms after engine-done · feed 500
+[2026-09-07T23:44:28.863Z] [combat] Unaligned Poacher — d20 → 17 + ATK 4 = 21 vs your AC 26 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-07T23:44:28.813Z] [world] You close the gap with Unaligned Poacher. (range: close / arm's reach)
+[2026-09-07T23:44:28.813Z] [debug] move: field advance target=Unaligned Poacher d 1.50->0.50 band mid->close
+[2026-09-07T23:44:28.761Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-09-07T23:44:28.711Z] [debug] parser: intent=advance conf=1.00 verb=approach target=unaligned poacher resolved=Unaligned Poacher range=mid enemies=1 hooks=1
+[2026-09-07T23:44:28.710Z] [player] approach Unaligned Poacher
+[2026-09-07T23:44:28.558Z] [debug] ui: tap "approach" ⏱+22ms
+[2026-09-07T23:44:21.929Z] [debug] qwen⏱ investigate_lore ok 6850ms wait 5588ms read 393ms/write 855ms in 128t→out 27t thr2 3.1ms/t (128ch)
+[2026-09-07T23:44:20.576Z] [debug] qwen⏱ investigate_lore ok 6742ms wait 5022ms read 398ms/write 1304ms in 129t→out 40t thr2 3.1ms/t (174ch)
+[2026-09-07T23:44:18.805Z] [debug] qwen⏱ investigate_lore ok 6256ms wait 3315ms read/write unusable (native mis-reported 6350ms/1191ms — llama.rn split bug, not this call) in 130t→out 32t js-late 1554ms thr2 (138ch)
+[2026-09-07T23:44:16.708Z] [debug] render⏱ 509ms after engine-done · feed 500
+[2026-09-07T23:44:16.198Z] [dog_quest] The roadside camp shifts as you reach it — and behind it the Mud Monarch Enforcer steps out, a leash in one hand, a shepherd lashed to a wheel and snarling against the cord. "Walk on, stranger. Or stay, and lose."
+[2026-09-07T23:44:16.047Z] [player] investigate roadside camp
+[2026-09-07T23:44:15.864Z] [cognitive] neutral  (1133ms)
+[2026-09-07T23:44:15.728Z] [cognitive] SWIM  (2245ms)
+[2026-09-07T23:44:15.600Z] [cognitive] SWIM · SEARCH  (3350ms)
+[2026-09-07T23:44:15.473Z] [debug] qwen⏱ ✂ DISCARDED ambient after 4371ms — ambient:preempted
+[2026-09-07T23:44:15.473Z] [debug] arbiter: ambient cut short 4770ms — yielded to the player
+[2026-09-07T23:44:15.339Z] [cognitive] SWIM  (4349ms)
+[2026-09-07T23:44:15.210Z] [debug] qwen⏱ ambient preempted 4371ms read 0ms/write 0ms in 367t→out 0t js-late 339ms thr1 (0ch)
+[2026-09-07T23:44:14.730Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-07T23:44:14.729Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:44:14.729Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T23:44:14.728Z] [world] You look the cart over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T23:44:14.726Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cart resolved=cart range=- enemies=0 hooks=1
+[2026-09-07T23:44:14.725Z] [player] investigate cart
+[2026-09-07T23:44:13.481Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-07T23:44:13.479Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1
+[2026-09-07T23:44:13.478Z] [player] investigate still pond
+[2026-09-07T23:44:12.248Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-07T23:44:12.245Z] [world] You run a hand along the Mud Harpoon. Cold, set fast in place, and about as talkative as the rest of the buried world.
+[2026-09-07T23:44:12.244Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud harpoon resolved=Mud Harpoon range=- enemies=0 hooks=1
+[2026-09-07T23:44:12.242Z] [player] investigate Mud Harpoon
+[2026-09-07T23:44:10.987Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:44:10.987Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T23:44:10.987Z] [debug] investigate: "mud" marked searched
+[2026-09-07T23:44:10.986Z] [reward] ✦ Aether Mud x3 (Common).
+[2026-09-07T23:44:10.986Z] [world] Mud Scanner ticks — buried trace in the mud.
+[2026-09-07T23:44:10.984Z] [reward] ✦ Wild Carrot (Common).
+[2026-09-07T23:44:10.982Z] [world] A pair of wild carrots, earth-streaked, half-buried beside the mud.
+[2026-09-07T23:44:10.981Z] [world] You inspect the mud. Whatever was here once, this is what remains.
+[2026-09-07T23:44:10.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1
+[2026-09-07T23:44:10.979Z] [player] investigate the mud
+[2026-09-07T23:44:09.302Z] [debug] ui: tap "investigate" ⏱+19ms
+[2026-09-07T23:44:06.648Z] [reward] +24 TC pried from the dust.
+[2026-09-07T23:44:06.647Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-07T23:44:06.647Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-07T23:44:06.646Z] [reward] True Tartarians Raider 5 defeated. You recover Patched Cloth ×2, True Tartarian Sigil.
+[2026-09-07T23:44:06.645Z] [combat] True Tartarians Raider 5 folds under the searing knot-grained gouge. 41 damage was enough. The room exhales.
+[2026-09-07T23:44:06.642Z] [combat] You — d20 → 20 + DEX 17 − 1 (Whisper Fog) perfect opening (2× dice) = 36 vs True Tartarians Raider 5 AC 10 — ✓ CRITICAL HIT
+[2026-09-07T23:44:06.642Z] [world] You seize the initiative. True Tartarians Raider 5 has no time to react.
+[2026-09-07T23:44:06.587Z] [debug] dice⏱ coating: shown +252ms, tapped +1670ms, settled +836ms = 2758ms
+[2026-09-07T23:44:05.751Z] [debug] ui: tap "roll" ⏱+32ms
+[2026-09-07T23:44:03.823Z] [debug] dice⏱ damage: shown +254ms, tapped +457ms, settled +840ms = 1551ms
+[2026-09-07T23:44:02.983Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T23:44:02.267Z] [debug] dice⏱ attack: shown +255ms, tapped +573ms, settled +834ms = 1662ms
+[2026-09-07T23:44:01.433Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T23:44:00.601Z] [debug] dice⏱ initiative: shown +303ms, tapped +891ms, settled +834ms = 2028ms
+[2026-09-07T23:43:59.767Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T23:43:58.620Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:58.620Z] [world] You bring the searing knot-grained gouge to bear on True Tartarians Raider 5.
+[2026-09-07T23:43:58.527Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T23:43:58.527Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:43:58.478Z] [debug] attack: target=True Tartarians Raider 5 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:43:58.379Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=1
+[2026-09-07T23:43:58.379Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:43:58.184Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+19ms
+[2026-09-07T23:43:56.976Z] [debug] render⏱ 318ms after engine-done · feed 500
+[2026-09-07T23:43:56.612Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:56.611Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:43:56.611Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T23:43:56.565Z] [combat] Dodge — True Tartarians Raider 5 overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-09-07T23:43:56.565Z] [combat] True Tartarians Raider 5 — d20 → 1 + ATK 6 = 7 vs your AC 26 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-07T23:43:56.420Z] [world] You commit to the dodge. Slip True Tartarians Raider 5's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T23:43:56.371Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-07T23:43:56.371Z] [player] dodge
+[2026-09-07T23:43:56.319Z] [system] unseen — next strike +5 fades.
+[2026-09-07T23:43:56.197Z] [debug] ui: tap "dodge" ⏱+12ms
+[2026-09-07T23:43:54.610Z] [combat] True Tartarians Raider 5 — d20 → 11 + ATK 6 = 17 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:54.608Z] [debug] stealth: reset WIN init 24 vs 6 (dust, +5 1r)
+[2026-09-07T23:43:54.608Z] [world] You fling a fistful of grit into True Tartarians Raider 5's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)
+[2026-09-07T23:43:54.607Z] [world] Dusk is with you — the silt eats sound after dark. (stealth +1, night)
+[2026-09-07T23:43:54.607Z] [debug] train: stealth (stealth check) → progress 13/100
+[2026-09-07T23:43:54.607Z] [debug] stats: STR21 DEX17 INT10 WIS15 CHA12 STE5 | gear: STR+7,DEX+8,STE+2,WIS+3,CHA+1 | worn: main=Knot-Grained Gouge off=Bone Sling head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring
+[2026-09-07T23:43:54.518Z] [debug] skillcheck: stealth d20=15 STE 5 + 1 (title: Shadow Diver) = 21 vs DC 12 — Hard → (resolved below)
+[2026-09-07T23:43:54.513Z] [debug] dice⏱ skill_check: shown +303ms, tapped +908ms, settled +833ms = 2044ms
+[2026-09-07T23:43:53.680Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T23:43:53.081Z] [debug] persist sizes(KB): total=247 player=57 wm=104[rooms=43 events=7 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3
+[2026-09-07T23:43:52.517Z] [system] ⏳ Time passed: 15 min
+[2026-09-07T23:43:52.373Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-07T23:43:52.373Z] [player] sneak
+[2026-09-07T23:43:52.246Z] [debug] ui: tap "stealth" ⏱+18ms
+[2026-09-07T23:43:49.179Z] [combat] True Tartarians Raider 5 deals 6 bludgeoning damage [plate −2]. You have 38 HP remaining.
+[2026-09-07T23:43:48.776Z] [combat] True Tartarians Raider 5 — d20 → 17 + ATK 6 = 23 vs your AC 26 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-07T23:43:48.776Z] [debug] ac-shift 29→26: race/base 12 + gear 24 + title 0 → trimmed 26 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak
+[2026-09-07T23:43:48.725Z] [reward] +18 TC pried from the dust.
+[2026-09-07T23:43:48.725Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-07T23:43:48.724Z] [combat] 1 attacker remains. True Tartarians Raider 5 now in your sights.
+[2026-09-07T23:43:48.724Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-09-07T23:43:48.723Z] [reward] True Tartarians Raider 4 defeated. You recover Patched Cloth ×2.
+[2026-09-07T23:43:48.722Z] [combat] True Tartarians Raider 4 folds under the searing knot-grained gouge. 32 damage was enough. The room exhales.
+[2026-09-07T23:43:48.720Z] [combat] You — d20 → 14 + DEX 17 − 1 (Whisper Fog) perfect opening (2× dice) = 30 vs True Tartarians Raider 4 AC 11 — ✓ HIT
+[2026-09-07T23:43:48.720Z] [world] You seize the initiative. True Tartarians Raider 4 has no time to react.
+[2026-09-07T23:43:48.663Z] [debug] dice⏱ coating: shown +252ms, tapped +743ms, settled +835ms = 1830ms
+[2026-09-07T23:43:47.827Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T23:43:46.830Z] [debug] dice⏱ damage: shown +260ms, tapped +724ms, settled +834ms = 1818ms
+[2026-09-07T23:43:45.996Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T23:43:45.009Z] [debug] dice⏱ attack: shown +252ms, tapped +696ms, settled +840ms = 1788ms
+[2026-09-07T23:43:44.169Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T23:43:43.219Z] [debug] dice⏱ initiative: shown +304ms, tapped +779ms, settled +832ms = 1915ms
+[2026-09-07T23:43:42.387Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-07T23:43:41.351Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:41.351Z] [world] You bring the searing knot-grained gouge to bear on True Tartarians Raider 4.
+[2026-09-07T23:43:41.258Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T23:43:41.258Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:43:41.209Z] [debug] attack: target=True Tartarians Raider 4 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:43:41.113Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=2 hooks=1
+[2026-09-07T23:43:41.113Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:43:41.047Z] [system] evasive — harder to hit fades.
+[2026-09-07T23:43:40.952Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+27ms
+[2026-09-07T23:43:38.640Z] [debug] render⏱ 316ms after engine-done · feed 500
+[2026-09-07T23:43:38.278Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:38.278Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:43:38.278Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T23:43:38.277Z] [combat] True Tartarians Raider 4 — d20 → 4 + ATK 7 = 11 vs your AC 29 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:38.277Z] [debug] ac-shift 26→29: race/base 12 + gear 24 + title 0 → trimmed 26 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak
+[2026-09-07T23:43:38.229Z] [world] You slip True Tartarians Raider 5's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-07T23:43:38.183Z] [combat] Dodge — d20 → 15 + DEX 17 = 32 vs ATK 9. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-07T23:43:38.183Z] [combat] True Tartarians Raider 5 — d20 → 3 + ATK 6 = 9 vs your AC 26 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-07T23:43:38.041Z] [world] You commit to the dodge. Slip True Tartarians Raider 4's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T23:43:37.993Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1
+[2026-09-07T23:43:37.993Z] [player] dodge
+[2026-09-07T23:43:37.943Z] [system] bleeding fades.
+[2026-09-07T23:43:37.820Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-07T23:43:34.083Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-09-07T23:43:34.083Z] [combat] True Tartarians Raider 4 — d20 → 14 + ATK 7 = 21 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:34.081Z] [combat] True Tartarians Raider 5 — d20 → 6 + ATK 6 = 12 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:34.030Z] [reward] +10 TC pried from the dust.
+[2026-09-07T23:43:34.030Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-07T23:43:34.029Z] [combat] 2 attackers remain. True Tartarians Raider 4 now in your sights.
+[2026-09-07T23:43:34.029Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-07T23:43:34.028Z] [reward] True Tartarians Raider 3 defeated. You recover Aether Residue ×2.
+[2026-09-07T23:43:34.027Z] [combat] The killing blow with the searing knot-grained gouge: 18. True Tartarians Raider 3 drops where it stood.
+[2026-09-07T23:43:34.025Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-07T23:43:34.025Z] [combat] You — d20 → 9 + DEX 17 − 1 (Whisper Fog) = 25 vs True Tartarians Raider 3 AC 11 — ✓ HIT
+[2026-09-07T23:43:34.024Z] [world] You seize the initiative. True Tartarians Raider 3 has no time to react.
+[2026-09-07T23:43:33.969Z] [debug] dice⏱ coating: shown +254ms, tapped +2658ms, settled +835ms = 3747ms
+[2026-09-07T23:43:33.134Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T23:43:30.218Z] [debug] dice⏱ damage: shown +250ms, tapped +929ms, settled +835ms = 2014ms
+[2026-09-07T23:43:29.383Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-07T23:43:28.200Z] [debug] dice⏱ attack: shown +252ms, tapped +481ms, settled +833ms = 1566ms
+[2026-09-07T23:43:27.367Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T23:43:26.633Z] [debug] dice⏱ initiative: shown +259ms, tapped +840ms, settled +833ms = 1932ms
+[2026-09-07T23:43:25.800Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-07T23:43:24.747Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:24.747Z] [world] Your searing knot-grained gouge comes around in an arc; True Tartarians Raider 3 squares up to meet it.
+[2026-09-07T23:43:24.655Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:43:24.608Z] [debug] attack: target=True Tartarians Raider 3 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:43:24.562Z] [combat] True Tartarians Raider 3 blisters — clinging fire sears 3. (1/17 HP, 1 turn left)
+[2026-09-07T23:43:24.516Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=3 hooks=1
+[2026-09-07T23:43:24.516Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:43:24.448Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-09-07T23:43:24.401Z] [reward] ✦ The corruption tightens its grip — Tainted. (CHA −1)
+[2026-09-07T23:43:24.232Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+22ms
+[2026-09-07T23:43:21.019Z] [debug] render⏱ 326ms after engine-done · feed 500
+[2026-09-07T23:43:20.692Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T23:43:20.692Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T23:43:20.692Z] [combat] True Tartarians Raider 5 — d20 → 11 + ATK 6 = 17 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:20.690Z] [combat] True Tartarians Raider 4 — d20 → 13 + ATK 7 = 20 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:20.689Z] [combat] True Tartarians Raider 3 — d20 → 3 + ATK 7 = 10 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:20.641Z] [combat] True Tartarians Raider 3 blisters — clinging fire sears 3. (4/17 HP, 2 turns left)
+[2026-09-07T23:43:20.641Z] [world] The field shifts around you — True Tartarians Raider 5 now close / arm's reach.
+[2026-09-07T23:43:20.641Z] [world] You close the gap with the True Tartarians Raider 3 and 2 others. (range: close / arm's reach)
+[2026-09-07T23:43:20.640Z] [debug] move: field advance target=True Tartarians Raider 3 d 0.78->0.35 band close->close
+[2026-09-07T23:43:20.595Z] [debug] move: advance from range=close enemies=3 weather=Whisper Fog cost=1 partial=0
+[2026-09-07T23:43:20.547Z] [debug] parser: intent=advance conf=1.00 verb=approach target=true tartarians raider 3 resolved=True Tartarians Raider 3 range=close enemies=3 hooks=1
+[2026-09-07T23:43:20.546Z] [player] approach True Tartarians Raider 3
+[2026-09-07T23:43:20.425Z] [debug] ui: tap "approach" ⏱+143ms
+[2026-09-07T23:43:20.015Z] [combat] True Tartarians Raider 4's strike leaves you bleeding.
+[2026-09-07T23:43:20.014Z] [combat] True Tartarians Raider 4 deals 1 slashing damage [armor −65%, plate −1]. You have 44 HP remaining.
+[2026-09-07T23:43:19.666Z] [arbiter] The Arbiter does not look away from the True Tartarians Raider 3. "Decide quickly. It already has."
+[2026-09-07T23:43:19.666Z] [combat] True Tartarians Raider 3 — d20 → 10 + ATK 7 = 17 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:19.663Z] [combat] True Tartarians Raider 5 — d20 → 1 + ATK 6 = 7 vs your AC 26 (needs nat 16+ — AC capped) — ✗ FUMBLE
+[2026-09-07T23:43:19.657Z] [combat] True Tartarians Raider 4 — d20 → 17 + ATK 7 = 24 vs your AC 26 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-07T23:43:19.654Z] [combat] True Tartarians Raider 3 is left exposed — easier to hit.
+[2026-09-07T23:43:19.654Z] [combat] Searing Knot-Grained Gouge — 3 burn bites in and festers (3 turns).
+[2026-09-07T23:43:19.654Z] [combat] The blow with the searing knot-grained gouge finds purchase — 7 damage, 7 HP standing. True Tartarians Raider 3 commits to the counter.
+[2026-09-07T23:43:19.651Z] [combat] Bludgeoning flares — +2 on hit.
+[2026-09-07T23:43:19.651Z] [combat] You — d20 → 3 + DEX 17 − 1 (Whisper Fog) = 19 vs True Tartarians Raider 3 AC 11 — ✓ HIT
+[2026-09-07T23:43:19.650Z] [world] You seize the initiative. True Tartarians Raider 3 has no time to react.
+[2026-09-07T23:43:19.598Z] [debug] dice⏱ coating: shown +248ms, tapped +398ms, settled +834ms = 1480ms
+[2026-09-07T23:43:18.764Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-07T23:43:18.115Z] [debug] dice⏱ damage: shown +254ms, tapped +418ms, settled +833ms = 1505ms
+[2026-09-07T23:43:17.281Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T23:43:16.605Z] [debug] dice⏱ attack: shown +235ms, tapped +444ms, settled +842ms = 1521ms
+[2026-09-07T23:43:15.763Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-07T23:43:15.081Z] [debug] dice⏱ initiative: shown +341ms, tapped +1129ms, settled +835ms = 2305ms
+[2026-09-07T23:43:14.246Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-07T23:43:12.822Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:12.821Z] [world] Your searing knot-grained gouge comes around in an arc; True Tartarians Raider 3 squares up to meet it.
+[2026-09-07T23:43:12.730Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:43:12.683Z] [debug] attack: target=True Tartarians Raider 3 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:43:12.602Z] [reward] +8 TC pried from the dust.
+[2026-09-07T23:43:12.556Z] [system] ▼ True Tartarians turns HOSTILE — their patrols hunt you on their own ground now, and their counters mark you up.
+[2026-09-07T23:43:12.556Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-07T23:43:12.511Z] [combat] 3 attackers remain. True Tartarians Raider 3 now in your sights.
+[2026-09-07T23:43:12.511Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-07T23:43:12.419Z] [reward] True Tartarians Raider 2 defeated. You recover Patched Cloth ×2.
+[2026-09-07T23:43:12.275Z] [combat] True Tartarians Raider 2 blisters — clinging fire sears 2. (0/18 HP, 1 turn left)
+[2026-09-07T23:43:12.226Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=4 hooks=1
+[2026-09-07T23:43:12.225Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:43:12.130Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+22ms
+[2026-09-07T23:43:08.702Z] [debug] persist sizes(KB): total=251 player=56 wm=103[rooms=43 events=7 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=86 scene=5
+[2026-09-07T23:43:08.203Z] [combat] True Tartarians Raider 3 deals 3 slashing damage [armor −65%, plate −1, floor 30%]. You have 45 HP remaining.
+[2026-09-07T23:43:07.853Z] [combat] True Tartarians Raider 5 — d20 → 10 + ATK 6 = 16 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:07.851Z] [combat] True Tartarians Raider 4 — d20 → 6 + ATK 7 = 13 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:07.844Z] [combat] True Tartarians Raider 3 — d20 → 20 + ATK 7 = 27 vs your AC 26 (needs nat 16+ — AC capped) — ✓ CRITICAL HIT
+[2026-09-07T23:43:07.841Z] [combat] Your strike with the bone sling lands for 3. True Tartarians Raider 3 staggers — 14 HP remaining. It answers.
+[2026-09-07T23:43:07.837Z] [combat] You — d20 → 18 + WIS 14 − 1 (Whisper Fog) + 2 (point blank) = 33 vs True Tartarians Raider 3 AC 11 — ✓ HIT
+[2026-09-07T23:43:07.836Z] [world] You seize the initiative. True Tartarians Raider 3 has no time to react.
+[2026-09-07T23:43:07.780Z] [debug] dice⏱ damage: shown +256ms, tapped +423ms, settled +833ms = 1512ms
+[2026-09-07T23:43:06.946Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T23:43:06.265Z] [debug] dice⏱ attack: shown +256ms, tapped +442ms, settled +837ms = 1535ms
+[2026-09-07T23:43:05.428Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-07T23:43:04.728Z] [debug] dice⏱ initiative: shown +304ms, tapped +754ms, settled +835ms = 1893ms
+[2026-09-07T23:43:03.894Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-07T23:43:02.881Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:43:02.881Z] [world] You commit forward with the bone sling. True Tartarians Raider 3 watches your hands.
+[2026-09-07T23:43:02.786Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:43:02.738Z] [debug] attack: target=True Tartarians Raider 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Sling bareHand=false
+[2026-09-07T23:43:02.689Z] [combat] True Tartarians Raider 2 blisters — clinging fire sears 2. (1/18 HP, 2 turns left)
+[2026-09-07T23:43:02.642Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone sling resolved=Bone Sling range=close enemies=4 hooks=1
+[2026-09-07T23:43:02.641Z] [player] attack with the off-hand bone sling
+[2026-09-07T23:43:02.543Z] [debug] ui: tap "bone sling ⚒" ⏱+19ms
+[2026-09-07T23:43:01.550Z] [combat] True Tartarians Raider 2 deals 8 bludgeoning damage [plate −1]. You have 48 HP remaining.
+[2026-09-07T23:43:01.198Z] [combat] Searing Knot-Grained Gouge — 2 burn bites in and festers (3 turns).
+[2026-09-07T23:43:01.198Z] [combat] True Tartarians Raider 2 is out of it. True Tartarians Raider 3 now in your sights.
+[2026-09-07T23:43:01.198Z] [combat] You crack the True Tartarians Raider 2 with the Searing Knot-Grained Gouge for 15 — the better part of their fight, gone in one blow. They crumple, out cold. (3/18 HP) Loot them before they come to.
+[2026-09-07T23:43:01.195Z] [combat] You — d20 → 8 + DEX 17 − 1 (Whisper Fog) perfect opening (2× dice) = 24 vs True Tartarians Raider 2 AC 11 — ✓ HIT
+[2026-09-07T23:43:01.195Z] [combat] True Tartarians Raider 3 presses in behind the others, waiting for an opening.
+[2026-09-07T23:43:01.192Z] [combat] True Tartarians Raider 2 — d20 → 16 + ATK 7 = 23 vs your AC 26 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-07T23:43:01.189Z] [combat] True Tartarians Raider 5 — d20 → 9 + ATK 6 = 15 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:01.186Z] [combat] True Tartarians Raider 4 — d20 → 5 + ATK 7 = 12 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:43:01.186Z] [debug] ac-shift 29→26: race/base 12 + gear 24 + title 0 → trimmed 26 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak
+[2026-09-07T23:43:01.183Z] [world] True Tartarians Raider 2 moves first. The pressure is immediate.
+[2026-09-07T23:43:01.125Z] [debug] dice⏱ coating: shown +252ms, tapped +386ms, settled +832ms = 1470ms
+[2026-09-07T23:43:00.293Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T23:42:59.651Z] [debug] dice⏱ damage: shown +282ms, tapped +464ms, settled +840ms = 1586ms
+[2026-09-07T23:42:58.811Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-07T23:42:58.060Z] [debug] dice⏱ attack: shown +252ms, tapped +430ms, settled +832ms = 1514ms
+[2026-09-07T23:42:57.227Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-07T23:42:56.543Z] [debug] dice⏱ initiative: shown +317ms, tapped +756ms, settled +835ms = 1908ms
+[2026-09-07T23:42:55.708Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T23:42:54.681Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:42:54.681Z] [world] You bring the searing knot-grained gouge to bear on True Tartarians Raider 2.
+[2026-09-07T23:42:54.590Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T23:42:54.589Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-07T23:42:54.542Z] [debug] attack: target=True Tartarians Raider 2 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-07T23:42:54.450Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=4 hooks=1
+[2026-09-07T23:42:54.450Z] [player] attack with the knot-grained gouge
+[2026-09-07T23:42:54.428Z] [system] evasive — harder to hit fades.
+[2026-09-07T23:42:54.428Z] [system] bleeding fades.
+[2026-09-07T23:42:54.335Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+156ms
+[2026-09-07T23:42:53.466Z] [combat] True Tartarians Raider 5 deals 1 bludgeoning damage [plate −3] [edge of reach — halved]. You have 56 HP remaining.
+[2026-09-07T23:42:53.418Z] [debug] render⏱ 339ms after engine-done · feed 500
+[2026-09-07T23:42:53.033Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T23:42:53.033Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The True Tartarians Raider 2 is patient. Be patienter."
+[2026-09-07T23:42:53.033Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T23:42:53.032Z] [combat] True Tartarians Raider 2 presses in behind the others, waiting for an opening.
+[2026-09-07T23:42:52.986Z] [combat] True Tartarians Raider 5 — d20 → 19 + ATK 6 = 25 vs your AC 29 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-07T23:42:52.984Z] [combat] True Tartarians Raider 4 — d20 → 10 + ATK 7 = 17 vs your AC 29 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:42:52.984Z] [debug] ac-shift 26→29: race/base 12 + gear 24 + title 0 → trimmed 26 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak
+[2026-09-07T23:42:52.799Z] [world] You slip True Tartarians Raider 3's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-07T23:42:52.753Z] [combat] Dodge — d20 → 19 + DEX 17 = 36 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-07T23:42:52.753Z] [combat] True Tartarians Raider 3 — d20 → 10 + ATK 7 = 17 vs your AC 26 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-07T23:42:52.613Z] [world] You commit to the dodge. Slip True Tartarians Raider 2's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T23:42:52.566Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1
+[2026-09-07T23:42:52.566Z] [player] dodge
+[2026-09-07T23:42:52.440Z] [debug] ui: tap "dodge" ⏱+32ms
+[2026-09-07T23:42:50.273Z] [combat] Your strike with the searing knot-grained gouge glances off. True Tartarians Raider 2 seizes the opening.
+[2026-09-07T23:42:50.273Z] [combat] You — d20 → 1 + DEX 17 − 1 (Whisper Fog) = 17 vs True Tartarians Raider 2 AC 11 — ✗ FUMBLE
+[2026-09-07T23:42:50.273Z] [combat] True Tartarians Raider 3 presses in behind the others, waiting for an opening.
+[2026-09-07T23:42:50.272Z] [combat] True Tartarians Raider 2 — d20 → 3 + ATK 7 = 10 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:42:50.270Z] [combat] True Tartarians Raider 5 — d20 → 15 + ATK 6 = 21 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:42:50.267Z] [combat] True Tartarians Raider 4 — d20 → 12 + ATK 7 = 19 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-07T23:42:50.264Z] [world] True Tartarians Raider 2 moves first. The pressure is immediate.
+[2026-09-07T23:42:50.211Z] [debug] dice⏱ attack: shown +237ms, tapped +462ms, settled +840ms = 1539ms
+[2026-09-07T23:42:49.371Z] [debug] ui: tap "roll" ⏱+28ms
+
+=== END REPORT ===

@@ -1,0 +1,427 @@
+Bug Report — Verbal · (2026-09-09-1790-the-exchange-reads-as-a-sentence) · Game freeze
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-10T00:57:13.086Z
+Character: Verbal
+Slot ID: slot_mtutb8rb_twunb2
+Race: Mud Golems
+Location: The Monarch's Waystation
+HP: 31/31
+
+--- DESCRIPTION ---
+Game freeze
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-10T00:57:13.056Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-09-09-1790-the-exchange-reads-as-a-sentence)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-10T00:56:32.446Z
+  Last init success: 2026-09-10T00:56:37.815Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtuth5if85 · started 2026-09-10T00:56:32.295Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 3.6s (cognition) · 1 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory
+  (no active character)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 341 of 346 entries; older trimmed to fit a single email paste)
+
+[2026-09-10T00:56:37.654Z] [debug] voice⏱ gap 1127ms (wait 52ms + synth 1074ms, live) "Choose your character."
+[2026-09-10T00:56:36.500Z] [debug] voice: bundled ready
+[2026-09-10T00:56:33.088Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-10T00:56:32.577Z] [debug] voice: bundled loading
+[2026-09-10T00:56:32.577Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-10T00:56:32.434Z] [debug] ota: boot check result = noUpdate
+[2026-09-10T00:56:32.434Z] [debug] ota: Already up to date
+[2026-09-10T00:56:32.334Z] [debug] ota: Checking…
+[2026-09-10T00:56:32.334Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a08837-4912-7f92-86d6-b12a7dac26d1
+[2026-09-10T00:56:27.862Z] [debug] appstate: active → inactive (was active for 75324ms)
+[2026-09-10T00:56:04.082Z] [reward]     • Aetheric Shard x2 (Uncommon)
+[2026-09-10T00:56:04.082Z] [reward]     • Salt-Cured Dowel (Common)
+[2026-09-10T00:56:04.082Z] [reward]     • Stick (Common)
+[2026-09-10T00:56:04.082Z] [reward] ✦ Salvage haul:
+[2026-09-10T00:56:04.082Z] [world] Already worked over: tilted engine room toolbench.
+[2026-09-10T00:56:04.081Z] [world] You strip the tilting royal vault pedestal carefully. Something usable comes free in your hand.
+[2026-09-10T00:56:04.081Z] [world] You break the mud-glazed tartarian power conduit apart. Among the pieces, something worth keeping.
+[2026-09-10T00:56:04.081Z] [world] You lever something loose from the lantern — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-10T00:56:04.081Z] [world] You break the door apart. Among the pieces, something worth keeping.
+[2026-09-10T00:56:04.081Z] [world] Something papery rustles as you strip the bench. You pull free a journal leaf.
+[2026-09-10T00:56:04.069Z] [reward] ✦ Found Entry 6 — the Teeth — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-10T00:56:03.815Z] [cognitive] neutral  (183ms)
+[2026-09-10T00:56:03.764Z] [debug] qwen⏱ investigate_lore ok 1267ms read 397ms/write 861ms in 128t→out 38t thr2 3.1ms/t (171ch)
+[2026-09-10T00:56:03.630Z] [world] You look for a way forward. The Arbiter notes a lost capital toward Iskan-Veil and a tower toward Grand Spire of Asgardar.
+[2026-09-10T00:56:03.629Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=path resolved=path range=- enemies=0 hooks=0
+[2026-09-10T00:56:03.629Z] [player] investigate path
+[2026-09-10T00:56:02.931Z] [debug] persist sizes(KB): total=100 player=29 wm=20[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=50 scene=2
+[2026-09-10T00:56:02.745Z] [debug] stats: STR9 DEX7 INT9 WIS6 CHA6 STE4 | gear: INT+2,WIS+1,STR+2 | worn: main=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest feet=Architect's Aetheric Boots
+[2026-09-10T00:56:02.735Z] [debug] take&wear: equipping "Architect's Aetheric Boots" -> feet
+[2026-09-10T00:56:02.735Z] [reward] ✦ Architect's Aetheric Boots (Common).
+[2026-09-10T00:56:02.735Z] [world] You get a hand under the Architect's Aetheric Boots and take it.
+[2026-09-10T00:56:02.498Z] [cognitive] neutral  (93ms)
+[2026-09-10T00:56:02.403Z] [world] You run your hands over the worn surface. Faint indentations — the shape of past use — refuse to tell their story.
+[2026-09-10T00:56:02.403Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bench resolved=bench range=- enemies=0 hooks=0
+[2026-09-10T00:56:02.402Z] [player] investigate bench
+[2026-09-10T00:56:02.150Z] [debug] qwen⏱ investigate_lore ok 884ms read 330ms/write 547ms in 128t→out 27t thr2 2.6ms/t (134ch)
+[2026-09-10T00:56:01.267Z] [cognitive] neutral  (93ms)
+[2026-09-10T00:56:01.173Z] [world] The frame is warped where the hinge anchored — long-dried iron, blooming with patient rust.
+[2026-09-10T00:56:01.172Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=door resolved=door range=- enemies=0 hooks=0
+[2026-09-10T00:56:01.171Z] [player] investigate door
+[2026-09-10T00:56:00.890Z] [debug] qwen⏱ investigate_lore ok 870ms read 339ms/write 524ms in 130t→out 27t thr2 2.6ms/t (121ch)
+[2026-09-10T00:56:00.021Z] [cognitive] neutral  (83ms)
+[2026-09-10T00:55:59.937Z] [reward] ✦ Bone Sliver from the Bone Shortsword.
+[2026-09-10T00:55:59.937Z] [world] Bleached and porous. Tooth-marks at one end, deliberate cuts at the other — something used it before it was discarded. Tucked into the seam: a bone sliver.
+[2026-09-10T00:55:59.936Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bone shortsword resolved=Bone Shortsword range=- enemies=0 hooks=0
+[2026-09-10T00:55:59.936Z] [player] investigate Bone Shortsword
+[2026-09-10T00:55:59.835Z] [debug] ui: tap "take / salvage"
+[2026-09-10T00:55:58.760Z] [cognitive] neutral  (56ms)
+[2026-09-10T00:55:58.667Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-10T00:55:58.667Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-09-10T00:55:58.665Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-10T00:55:58.665Z] [player] investigate the floor
+[2026-09-10T00:55:57.201Z] [debug] ui: tap "investigate"
+[2026-09-10T00:55:55.482Z] [cognitive] TRAVEL  (86ms)
+[2026-09-10T00:55:55.396Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-10T00:55:55.395Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-10T00:55:55.395Z] [debug] arbiter: template (reason=outpost-room)
+[2026-09-10T00:55:55.395Z] [system] Weather effect — Black Rain: -1 CHA
+[2026-09-10T00:55:55.395Z] [world] Paths: north to Strongroom · south to Atrium · east to Arsenal · west to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-10T00:55:55.394Z] [world] Monarch Court — The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.
+[2026-09-10T00:55:55.394Z] [debug] spawn: gear=[Architect's Aetheric Boots, Bone Shortsword] window=3 roster=new
+[2026-09-10T00:55:55.388Z] [debug] missions: · at=monarch_waystation
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.388Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-10T00:55:55.387Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-10T00:55:55.386Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.385Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-10T00:55:55.384Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.383Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.382Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-10T00:55:55.381Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-10T00:55:55.380Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-10T00:55:55.379Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-10T00:55:55.378Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-10T00:55:55.378Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-10T00:55:55.378Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-10T00:55:55.378Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-10T00:55:55.378Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-10T00:55:55.377Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-10T00:55:55.376Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-10T00:55:55.375Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-10T00:55:55.374Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-10T00:55:55.373Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-10T00:55:55.372Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-10T00:55:55.371Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-10T00:55:55.369Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n
+[2026-09-10T00:55:55.369Z] [world] You head on to the Standards.
+[2026-09-10T00:55:55.368Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-10T00:55:55.367Z] [player] go north
+[2026-09-10T00:55:55.335Z] [debug] ui: tap "↑ STANDARDS"
+[2026-09-10T00:55:52.814Z] [reward]     • Splintered Haft End (Common)
+[2026-09-10T00:55:52.814Z] [reward]     • Automaton Circuit (Common)
+[2026-09-10T00:55:52.814Z] [reward]     • Aether Crystal x3 (Common)
+[2026-09-10T00:55:52.813Z] [reward]     • Worn Tartarian Coin x8 (Common)
+[2026-09-10T00:55:52.813Z] [reward] ✦ Salvage haul:
+[2026-09-10T00:55:52.813Z] [world] You strip the tilted capacitor coil rack carefully. Something usable comes free in your hand.
+[2026-09-10T00:55:52.813Z] [world] You lever something loose from the table — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-10T00:55:52.812Z] [world] You salvage the stripped sentinel diagnostic console. The take is small but real.
+[2026-09-10T00:55:52.812Z] [world] You salvage the sign. The take is small but real.
+[2026-09-10T00:55:52.812Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-10T00:55:52.810Z] [world] You work the gate over. A part of it comes loose, intact.
+[2026-09-10T00:55:51.813Z] [reward] ✦ Wanderer's Face of Shadows (Common).
+[2026-09-10T00:55:51.813Z] [world] You lift the Wanderer's Face of Shadows clear.
+[2026-09-10T00:55:51.810Z] [reward] ✦ Bone Splitter Axe (Common).
+[2026-09-10T00:55:51.810Z] [world] You pick up the Bone Splitter Axe.
+[2026-09-10T00:55:51.807Z] [reward] ✦ Salvaged Bow (Common).
+[2026-09-10T00:55:51.806Z] [world] You take the Salvaged Bow from where it lay.
+[2026-09-10T00:55:50.451Z] [debug] ui: tap "take / salvage"
+[2026-09-10T00:55:49.996Z] [debug] qwen⏱ investigate_lore ok 7740ms wait 6552ms read 410ms/write 735ms in 128t→out 32t thr2 3.2ms/t (138ch)
+[2026-09-10T00:55:49.954Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-10T00:55:48.808Z] [debug] qwen⏱ investigate_lore ok 7773ms wait 6781ms read 410ms/write 574ms in 128t→out 25t thr2 3.2ms/t (116ch)
+[2026-09-10T00:55:47.816Z] [debug] qwen⏱ investigate_lore ok 7995ms wait 6575ms read 483ms/write 929ms in 133t→out 41t thr2 3.6ms/t (187ch)
+[2026-09-10T00:55:46.395Z] [debug] qwen⏱ investigate_lore ok 7807ms wait 6720ms read 433ms/write 647ms in 130t→out 29t thr2 3.3ms/t (118ch)
+[2026-09-10T00:55:45.307Z] [debug] qwen⏱ investigate_lore ok 7945ms wait 5145ms read 1998ms/write 789ms in 131t→out 35t thr2 15.3ms/t (165ch)
+[2026-09-10T00:55:42.508Z] [cognitive] neutral  (343ms)
+[2026-09-10T00:55:42.469Z] [cognitive] neutral  (1524ms)
+[2026-09-10T00:55:42.429Z] [cognitive] SEARCH  (2696ms)
+[2026-09-10T00:55:42.390Z] [cognitive] neutral  (3886ms)
+[2026-09-10T00:55:42.350Z] [cognitive] DISENGAGE  (5073ms)
+[2026-09-10T00:55:42.308Z] [cognitive] neutral  (6265ms)
+[2026-09-10T00:55:42.164Z] [reward] ✦ Small Rock from the brick.
+[2026-09-10T00:55:42.163Z] [world] Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere. Tucked into the seam: a small rock.
+[2026-09-10T00:55:42.162Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=brick resolved=brick range=- enemies=0 hooks=0
+[2026-09-10T00:55:42.162Z] [player] investigate brick
+[2026-09-10T00:55:41.096Z] [debug] persist sizes(KB): total=66 player=27 wm=19[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=19 scene=2
+[2026-09-10T00:55:40.943Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-10T00:55:40.943Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-10T00:55:40.943Z] [world] The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.
+[2026-09-10T00:55:40.942Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sign resolved=sign range=- enemies=0 hooks=0
+[2026-09-10T00:55:40.942Z] [player] investigate sign
+[2026-09-10T00:55:40.476Z] [debug] voice⏱ gap 8127ms (wait 1294ms + synth 1060ms, live) "Take your time."
+[2026-09-10T00:55:39.732Z] [world] You take the measure of the Wanderer's Face of Shadows. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-10T00:55:39.731Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wanderer face shadows resolved=Wanderer's Face of Shadows range=- enemies=0 hooks=0
+[2026-09-10T00:55:39.731Z] [player] investigate Wanderer's Face of Shadows
+[2026-09-10T00:55:38.502Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-10T00:55:38.502Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-10T00:55:38.502Z] [world] The Salvaged Bow sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-10T00:55:38.501Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=salvaged bow resolved=Salvaged Bow range=- enemies=0 hooks=0
+[2026-09-10T00:55:38.501Z] [player] investigate Salvaged Bow
+[2026-09-10T00:55:37.275Z] [world] Bleached and porous. Tooth-marks at one end, deliberate cuts at the other — something used it before it was discarded.
+[2026-09-10T00:55:37.274Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bone splitter axe resolved=Bone Splitter Axe range=- enemies=0 hooks=0
+[2026-09-10T00:55:37.274Z] [player] investigate Bone Splitter Axe
+[2026-09-10T00:55:36.041Z] [arbiter] The Arbiter looks around. "The seneschal logs your name without asking it. The Monarchs' ledgers have their ways."
+[2026-09-10T00:55:36.041Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-10T00:55:36.037Z] [reward] ✦ Small Rock.
+[2026-09-10T00:55:36.036Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-10T00:55:36.034Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-10T00:55:36.034Z] [player] investigate the floor
+[2026-09-10T00:55:33.866Z] [debug] ui: tap "investigate"
+[2026-09-10T00:55:33.074Z] [debug] voice⏱ gap 2686ms (wait 0ms + synth 973ms, live) "The way's open."
+[2026-09-10T00:55:32.316Z] [arbiter] "Take your time. Tap EXIT when you're ready."
+[2026-09-10T00:55:30.387Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call. Out there every step costs 1 stamina and a little time; REST brings it back."
+[2026-09-10T00:55:30.387Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-09-10T00:55:30.387Z] [player] investigate door
+[2026-09-10T00:55:30.018Z] [debug] voice⏱ gap 2850ms (wait 0ms + synth 1148ms, live) "The north door is locked."
+[2026-09-10T00:55:28.784Z] [debug] ui: tap "investigate"
+[2026-09-10T00:55:27.116Z] [system] ⏳ Time passed: 15 min
+[2026-09-10T00:55:27.115Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-09-10T00:55:27.115Z] [world] You make your way back down the arch. Boots back on the ground.
+[2026-09-10T00:55:27.113Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-10T00:55:27.113Z] [player] climb down
+[2026-09-10T00:55:27.085Z] [debug] ui: tap "climb down"
+[2026-09-10T00:55:26.011Z] [system] ⏳ Time passed: 30 min
+[2026-09-10T00:55:26.010Z] [world] You reach the first hold of the arch (tier 1/3). Higher still to go.
+[2026-09-10T00:55:26.009Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 1/3 cleared.
+[2026-09-10T00:55:26.001Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-10T00:55:26.001Z] [player] climb arch
+[2026-09-10T00:55:24.632Z] [debug] ui: tap "climb"
+[2026-09-10T00:55:23.910Z] [debug] voice⏱ gap 1548ms (wait 0ms + synth 1461ms, live) "Now the rope earns its keep."
+[2026-09-10T00:55:22.359Z] [arbiter] "Now the rope earns its keep. Tap CLIMB — top out, then climb back down."
+[2026-09-10T00:55:22.357Z] [reward] ✦ Plate Fragment x2 (Common). [salvaged]
+[2026-09-10T00:55:22.357Z] [world] You pop the rusted plate off its strap and it comes apart along old hammer-marks.
+[2026-09-10T00:55:22.356Z] [player] salvage broken chest plate
+[2026-09-10T00:55:20.500Z] [debug] ui: tap "take / salvage"
+[2026-09-10T00:55:12.538Z] [debug] appstate: background → active (was background for 919ms)
+[2026-09-10T00:55:11.619Z] [debug] appstate: inactive → background (was inactive for 628ms)
+[2026-09-10T00:55:10.992Z] [debug] appstate: active → inactive (was active for 493ms)
+[2026-09-10T00:55:10.470Z] [debug] ctx: OPENED — live=1 (opened=3 released=2) ≈425MB est
+[2026-09-10T00:55:09.280Z] [debug] appstate: background → active (was background for 963ms)
+[2026-09-10T00:55:08.317Z] [debug] appstate: inactive → background (was inactive for 830ms)
+[2026-09-10T00:55:07.530Z] [debug] persist sizes(KB): total=56 player=26 wm=17[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=11 scene=2
+[2026-09-10T00:55:07.487Z] [debug] appstate: active → inactive (was active for 9214ms)
+[2026-09-10T00:55:06.297Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-10T00:55:06.288Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-09-10T00:54:58.273Z] [debug] appstate: background → active (was background for 2428ms)
+[2026-09-10T00:54:57.470Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-09-10T00:54:55.845Z] [debug] appstate: inactive → background (was inactive for 35ms)
+[2026-09-10T00:54:55.810Z] [debug] appstate: active → inactive (was active for 17085ms)
+[2026-09-10T00:54:42.923Z] [debug] voice⏱ gap 2721ms (wait 0ms + synth 1021ms, prefetch) "That broken plate is worth more in piece…"
+[2026-09-10T00:54:40.856Z] [debug] voice⏱ gap 654ms (wait 0ms + synth 611ms, live) "Good."
+[2026-09-10T00:54:40.202Z] [arbiter] "That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."
+[2026-09-10T00:54:40.201Z] [arbiter] "Good. That rope earns its keep."
+[2026-09-10T00:54:40.201Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-09-10T00:54:40.201Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-09-10T00:54:40.200Z] [player] take rope
+[2026-09-10T00:54:38.691Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-09-10T00:54:35.046Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-10T00:54:35.046Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-09-10T00:54:30.955Z] [debug] kbbar: mounted bottom=260 raw=260 from=live winH=667 beat=5
+[2026-09-10T00:54:30.873Z] [debug] kbbar: mounted bottom=260 raw=260 from=cached winH=667 beat=5
+[2026-09-10T00:54:30.117Z] [debug] voice⏱ gap 1912ms (wait 443ms + synth 1399ms, live) "Now the rope, on the shelf."
+[2026-09-10T00:54:28.148Z] [arbiter] "Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."
+[2026-09-10T00:54:28.148Z] [debug] stats: STR9 DEX7 INT8 WIS6 CHA6 STE4 | gear: INT+1,WIS+1,STR+2 | worn: main=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-10T00:54:28.144Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-09-10T00:54:28.143Z] [world] You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.
+[2026-09-10T00:54:28.141Z] [debug] ui: tap "★ Take & wear Reclaimer's Salvage Cap — your head slot is bare"
+[2026-09-10T00:54:27.039Z] [debug] appstate: background → active (was background for 8180ms)
+[2026-09-10T00:54:27.038Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-09-10T00:54:26.200Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-10T00:54:18.859Z] [debug] appstate: inactive → background (was inactive for 38ms)
+[2026-09-10T00:54:18.821Z] [debug] appstate: active → inactive (was active for 12100ms)
+[2026-09-10T00:54:14.759Z] [debug] voice⏱ gap 1597ms (wait 0ms + synth 1595ms, live) "tar taireea reads your gear as you walk."
+[2026-09-10T00:54:13.122Z] [arbiter] "Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it's on your head."
+[2026-09-10T00:54:12.993Z] [debug] stats: STR9 DEX7 INT7 WIS6 CHA6 STE4 | gear: WIS+1,STR+2 | worn: main=Cudgel chest=Mud-Warden's Vest
+[2026-09-10T00:54:12.974Z] [reward] ✦ Mud-Warden's Vest (Common).
+[2026-09-10T00:54:12.973Z] [world] You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.
+[2026-09-10T00:54:12.971Z] [player] take Mud-Warden's Vest
+[2026-09-10T00:54:11.202Z] [debug] ui: tap "take / salvage"
+[2026-09-10T00:54:06.692Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-10T00:53:52.975Z] [debug] voice⏱ gap 3569ms (wait 0ms + synth 996ms, prefetch) "That vest is better than bare cloth, and…"
+[2026-09-10T00:53:50.163Z] [debug] voice⏱ gap 6080ms (wait 3867ms + synth 1272ms, live) "A cudgel, by your boots."
+[2026-09-10T00:53:49.405Z] [arbiter] "That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."
+[2026-09-10T00:53:49.405Z] [arbiter] "Good. Keep it close."
+[2026-09-10T00:53:49.405Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-09-10T00:53:49.405Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your grip without thinking.
+[2026-09-10T00:53:49.403Z] [player] take cudgel
+[2026-09-10T00:53:44.965Z] [debug] ui: tap "take / salvage"
+[2026-09-10T00:53:44.078Z] [arbiter] "A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You'll want a weapon."
+[2026-09-10T00:53:44.078Z] [world] You look around. You're in The Atrium (The Monarch's Waystation). You see: Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows, sign, brick, gate, arch, lantern, tilted capacitor coil rack, stripped sentinel diagnostic console, table. Exits: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-10T00:53:44.070Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-10T00:53:44.070Z] [player] look
+[2026-09-10T00:53:44.054Z] [debug] ui: tap "look around you"
+[2026-09-10T00:53:43.451Z] [debug] voice⏱ gap 1154ms (wait 0ms + synth 1063ms, live) "Well met, Verbal."
+[2026-09-10T00:53:42.390Z] [reward] ✦ A Resurrection Gem is set aside for Verbal — the buried world keeps its own. (2 held)
+[2026-09-10T00:53:42.298Z] [arbiter] "First, get your bearings. Tap LOOK AROUND YOU — I'll read the room for you: what's here, your way out, and whatever you're still chasing. Use it any time you're lost."
+[2026-09-10T00:53:42.298Z] [reward] ✦ The Arbiter unrolls the whole ledger for Verbal: every hunt, mystery, storyline and faction quest is open on the board — 50 contracts and 65 faction quests — plus all five Skyreacher Maps, every great climb already charted. Test freely.
+[2026-09-10T00:53:42.297Z] [reward] ✦ A crash-test kit lands in Verbal's pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.
+[2026-09-10T00:53:42.297Z] [arbiter] "Well met, Verbal. To business."
+[2026-09-10T00:53:42.296Z] [player] Verbal
+[2026-09-10T00:53:42.296Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-10T00:53:37.163Z] [debug] kbbar: mounted bottom=260 raw=260 from=live winH=667 beat=0
+[2026-09-10T00:53:31.169Z] [debug] voice⏱ gap 1035ms (wait 0ms + synth 1006ms, live) "Your name, traveler."
+[2026-09-10T00:53:30.134Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtutb8rb_twunb2 left intact
+[2026-09-10T00:53:30.070Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-09-10T00:52:54.066Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtutb8rb_twunb2 left intact
+[2026-09-10T00:51:56.683Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mtutb8rb_twunb2 left intact
+[2026-09-10T00:51:56.629Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-10T00:51:56.628Z] [world] The Arbiter is already here, slouched against a post under a cloak that has seen more weather than most people. He looks asleep. He isn't. His eyes track you for one quiet beat before he goes back to looking at nothing. A black rain presses on the world — -1 CHA. What you do here is yours to choose.
+[2026-09-10T00:51:56.628Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+
+=== END REPORT ===

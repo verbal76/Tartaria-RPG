@@ -1,0 +1,739 @@
+Bug Report — Johnny Blaze · (2026-09-07-1738-the-game-teaches-what-it-runs) · Chatgpt log attempt
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-07T18:51:54.753Z
+Character: Johnny Blaze
+Slot ID: slot_mtrjgazg_fumkzk
+Race: Reclaimers
+Location: Dynasty Border Post
+HP: 18/23
+
+--- DESCRIPTION ---
+Chatgpt log attempt
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-07T18:51:54.636Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-07-1738-the-game-teaches-what-it-runs)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-07T18:51:24.066Z
+  Last init success: 2026-09-07T18:51:24.753Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtrljvi98b · started 2026-09-07T18:51:23.841Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 7 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T19:15:20.497Z (2857m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (2792m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (2624m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (1506m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (1248m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (1211m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (1079m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (971m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (929m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (10m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: (no action yet)
+     Where: (unknown) on (unknown) screen
+     Last seen alive: 2026-09-07T18:41:33.227Z (10 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:active→background (+9204ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Johnny Blaze)
+  HP: 18/23  Stamina: 11/14  TC: 26  Corruption: 3
+  Pack: 84 distinct rows / 182 total
+
+Weapons (19)
+  Aether-Shard Spear (Uncommon, 2d6 piercing, dur 10/10, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 38/42, equipped:off, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, unequip:off, use, repair
+  Aetherium Spear (1d8 aetheric, dur 14/14, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Shortsword (1d6 slashing, dur 36/36, [weapon,melee,single_handed,blade,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Sling (1d4 bludgeoning, dur 15/15, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bonebreaker Mace (1d8 bludgeoning, dur 26/26, [weapon,melee,two_handed,hammer,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 29/29, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Cudgel (1d8 bludgeoning, +1d4 acid coat, dur 17/21, equipped:main, [weapon,club,melee,improvised,weighted])
+    actions: equip:off, unequip:main, use(off), repair
+  Flame of Aether Wand (1d6 burn, dur 14/14, [weapon,runecaster,rune_power,aetheric,fire])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Iron Spear (1d8 piercing, dur 27/27, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grinder Axe (1d8 slashing, dur 14/14, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Harpoon (1d8 piercing, dur 26/26, [weapon,melee,two_handed,spear,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pyric Wand (1d6 burn, dur 33/33, [weapon,runecaster])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rust Dagger (1d4 slashing, dur 16/16, [weapon,melee,dual_wield,knife,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusted Blade (1d6 slashing, dur 21/21, [weapon,starter,blade,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 11/11, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Stone Spear (1d8 piercing, dur 11/11, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tartarian Claw Knife (1d4 piercing, dur 41/41, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (14)
+  Aether-Runner Boots (dur 26/26, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,feet,boots,aetherborn])
+    actions: equip:feet, use, scrap, drop
+  Aetheric Helm of Command (dur 32/32, AC +1 · Regen: +1 stamina per action · CHA +1, [armor,head,cloth,helmet,tartarian_giants])
+    actions: equip:head, use, scrap, drop
+  Arcane Sprinter's Legplates (dur 14/14, AC +2 · Resists: slashing · Regen: +1 HP per action · INT +2, [armor,legs,greaves,aetherborn])
+    actions: equip:legs, use, scrap, drop
+  Architect's Mask of Vision (dur 12/12, AC +2 · Resists: slashing · INT +2, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 19/23, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet, repair
+  Forgotten Faceshroud (dur 11/11, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Forgotten Leggings (dur 8/8, AC +2 · Resists: slashing · DEX +2, [armor,legs,greaves,unknowing_masses])
+    actions: equip:legs, use, scrap, drop
+  Mud-Stalker Leggings (dur 22/22, AC +1 · STE +1, [armor,legs,greaves,mud_dwellers])
+    actions: equip:legs, use, scrap, drop
+  Mud-Warden's Vest (dur 19/19, equipped:chest, AC +2 · Resists: slashing · WIS +2, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 7/10, equipped:head, AC +2 · INV +2, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head, repair
+  Salvager's Trench Coat (dur 15/17, AC +2 · Resists: cold · INT +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Salvager's Worn Greaves (dur 17/19, equipped:legs, AC +2 · Resists: slashing · INT +2, [armor,legs,greaves,reclaimers])
+    actions: unequip:legs, repair
+  Sentinel's Chestplate (dur 29/29, AC +1 · HP +10 · STR +1, [armor,chest,plate,architectural_sentinels])
+    actions: equip:chest, use, scrap, drop
+  Sentinel's Mobile Greaves (dur 14/14, AC +2 · DEX +2, [armor,legs,greaves,architectural_sentinels])
+    actions: equip:legs, use, scrap, drop
+
+Shields (1)
+  Mud Buckler (1d4 bludgeoning, dur 264/264, [weapon,shield,dual_wield,mud_dwellers])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (1)
+  Riveted Leather Vest (Uncommon, dur 24/24, AC +2 (dog), [dog_armor,vest,leather,cloth])
+    actions: scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (6)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Trail Rations ×4 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Coatings (1)
+  Acid Flask ×4 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+
+Tools (5)
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Mud Scanner ([exploration,relic,common,mud_dweller])
+    actions: equip:off, use(off), scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 300/300, [exploration,tool,common,race_starter,reclaimer])
+    actions: use, scrap, drop
+
+Materials (35)
+  Aether Crystal ×11 ([aether,crystal])
+    actions: drop
+  Aether Dust ×2 ([aether,dust,distillable])
+    actions: drop
+  Aether Mud ×3 ([mud,aether])
+    actions: drop
+  Aether Residue ×2 ([aether])
+    actions: drop
+  Aetheric Shard (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×7 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×9 ([metal,junk,scrap])
+    actions: scrap, drop
+  ◆ Bent Shackle Pin ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  Big Rock ([thrown,stone,improvised,heavy])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  Cloth Scrap ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Copper-Threaded Veil (Uncommon, [trophy,metal,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Corroded Hinge Set ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Cracked Carapace Curl ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Faded Ribbon Coil ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Firewood ([wood,fuel,campfire,weightless])
+    actions: scrap, drop
+  ◆ Flint-and-Twine Bundle ([trophy,fiber,stone])
+    actions: scrap, save-for-fusion, drop
+  Iron Core (Legendary, [construct,metal,boss,legendary,loot])
+    actions: scrap, drop
+  ◆ Mortar-Bound Cobble ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×2 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  Mudstone (Rare, [mud,stone])
+    actions: drop
+  ◆ Obsidian Chip ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Oil-Stained Sash ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Patched Cloth ([cloth,fiber])
+    actions: drop
+  ◆ Reed Shaft Cutting ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  ◆ Salt-Cured Dowel ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  ◆ Salvager's Tether Loop (Uncommon, [trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  Scrap Metal ×6 ([metal])
+    actions: drop
+  Smooth Stone ×4 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×2 ([organic,fiber])
+    actions: drop
+  Stick ([wood,improvised,kindling])
+    actions: drop
+  ◆ Stiffened Leather Offcut (Uncommon, [trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Weathered Granite Knob ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Worn Tartarian Coin ×53 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore,improvised,loot])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 375 of 1544 entries; older trimmed to fit a single email paste)
+
+[2026-09-07T18:51:33.617Z] [debug] boot: life bmtrljvi98b started 2026-09-07T18:51:23.841Z · not an OTA apply (no handoff on disk)
+[2026-09-07T18:51:33.594Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:51:33.570Z] [debug] ═══ SESSION 2026-09-07T18:51:33.569Z · build 2026-09-07-1738-the-game-teaches-what-it-runs · previous entry moments earlier ═══
+[2026-09-07T18:51:32.959Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Johnny Blaze. I kept watch while you were gone."
+[2026-09-07T18:51:32.959Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-07T18:51:32.959Z] [debug] OTA session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T18:51:29.454Z] [debug] send-log: crash on record (2026-09-07T18:41:33.227Z) — game log pushed automatically, delivered to Sentry, #mtrljzio8ztr cleared from disk
+[2026-09-07T18:51:28.776Z] [debug] boot: life bmtrljvi98b started 2026-09-07T18:51:23.841Z · not an OTA apply (no handoff on disk)
+[2026-09-07T18:51:28.752Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:51:28.728Z] [debug] ═══ SESSION 2026-09-07T18:51:28.727Z · build 2026-09-07-1738-the-game-teaches-what-it-runs · previous entry moments earlier ═══
+[2026-09-07T18:51:28.073Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Johnny Blaze. The buried country is no place to walk alone."
+[2026-09-07T18:51:28.073Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-07T18:51:28.073Z] [debug] OTA session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T18:51:24.035Z] [debug] voice: bundled idle
+[2026-09-07T18:51:24.032Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-07T18:51:24.013Z] [debug] ota: boot check result = noUpdate
+[2026-09-07T18:51:24.012Z] [debug] ota: Already up to date
+[2026-09-07T18:51:23.950Z] [debug] ota: Checking…
+[2026-09-07T18:51:23.950Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07cd8-ac42-7650-88ea-bdc78fed427a
+[2026-09-07T18:41:24.188Z] [debug] voice: bundled idle
+[2026-09-07T18:41:24.188Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-07T18:41:24.109Z] [debug] ota: boot check result = noUpdate
+[2026-09-07T18:41:24.109Z] [debug] ota: Already up to date
+[2026-09-07T18:41:24.042Z] [debug] ota: Checking…
+[2026-09-07T18:41:24.042Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07cd8-ac42-7650-88ea-bdc78fed427a
+[2026-09-07T18:25:02.827Z] [debug] appstate: active → background (was active for 45648ms)
+[2026-09-07T18:24:49.119Z] [debug] send-log: #mtrkloryry0l — DELIVERED (inline, no attachments): beacon out, 9/9 parts accepted (58393 chars) — flush said yes, transport took every part
+[2026-09-07T18:24:37.436Z] [debug] boot: life bmtrjfbvm8w started 2026-09-07T17:51:52.546Z · not an OTA apply (no handoff on disk)
+[2026-09-07T18:24:37.411Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:24:37.386Z] [debug] ═══ SESSION 2026-09-07T18:24:37.385Z · build 2026-09-07-1738-the-game-teaches-what-it-runs · previous entry moments earlier ═══
+[2026-09-07T18:24:36.733Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-07T18:24:36.733Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again."
+[2026-09-07T18:24:36.732Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-07T18:24:36.732Z] [debug] OTA session start: 2026-09-07-1738-the-game-teaches-what-it-runs.
+[2026-09-07T18:24:18.356Z] [debug] persist sizes(KB): total=147 player=30 wm=36[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:24:17.185Z] [debug] appstate: background → active (was background for 164874ms)
+[2026-09-07T18:21:32.306Z] [debug] appstate: active → background (was active for 146911ms)
+[2026-09-07T18:21:27.204Z] [combat] Reclaimer Ambusher deals 2 bludgeoning damage. You have 18 HP remaining.
+[2026-09-07T18:21:26.999Z] [combat] Reclaimer Ambusher — d20 → 15 + ATK 6 = 21 vs your AC 18 — ✓ HIT
+[2026-09-07T18:21:26.999Z] [debug] ac-shift 16→18: race/base 10 + gear 9 + title 0 → trimmed 18 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-07T18:21:26.996Z] [combat] Clean hit with the bone javelin for 3. Reclaimer Ambusher has 19 left and does not back away.
+[2026-09-07T18:21:26.995Z] [world] The Bone Javelin sings through the air — spent. Your hand is empty.
+[2026-09-07T18:21:26.993Z] [combat] You — d20 → 12 + WIS 10 = 22 vs Reclaimer Ambusher AC 10 — ✓ HIT
+[2026-09-07T18:21:26.993Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-07T18:21:26.930Z] [debug] dice⏱ damage: shown +160ms, tapped +799ms, settled +969ms (hold late 169ms) = 1928ms
+[2026-09-07T18:21:25.960Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-07T18:21:24.999Z] [debug] dice⏱ attack: shown +169ms, tapped +527ms, settled +979ms (hold late 179ms) = 1675ms
+[2026-09-07T18:21:24.020Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:21:23.319Z] [debug] dice⏱ initiative: shown +244ms, tapped +5048ms, settled +984ms (hold late 184ms) = 6276ms
+[2026-09-07T18:21:22.335Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-07T18:21:17.091Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:17.067Z] [world] You commit forward with the bone javelin. Reclaimer Ambusher watches your hands.
+[2026-09-07T18:21:16.970Z] [debug] attack: target=Reclaimer Ambusher range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Javelin bareHand=false
+[2026-09-07T18:21:16.920Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone javelin resolved=Bone Javelin range=mid enemies=1 hooks=0
+[2026-09-07T18:21:16.895Z] [player] attack with the off-hand Bone Javelin
+[2026-09-07T18:21:16.849Z] [system] acid (from Mud Monarchs Reaver-Captain) fades.
+[2026-09-07T18:21:16.673Z] [debug] ui: tap "throw spear" ⏱+18ms
+[2026-09-07T18:21:13.877Z] [combat] Reclaimer Ambusher deals 3 bludgeoning damage. You have 20 HP remaining.
+[2026-09-07T18:21:13.674Z] [combat] Reclaimer Ambusher — d20 → 12 + ATK 6 = 18 vs your AC 16 — ✓ HIT
+[2026-09-07T18:21:13.672Z] [combat] The blow with the aetheric touch wand finds purchase — 2 damage, 22 HP standing. Reclaimer Ambusher commits to the counter.
+[2026-09-07T18:21:13.672Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Rusted Blade — slashing will bite where aetheric won't."
+[2026-09-07T18:21:13.671Z] [combat] Reclaimer Ambusher shrugs off the aetheric. (resisted, ×0.5 for 2)
+[2026-09-07T18:21:13.670Z] [combat] The Aetheric Touch Wand knits you back together — +3 HP.
+[2026-09-07T18:21:13.669Z] [combat] You — d20 → 4 + INT 9 = 13 vs Reclaimer Ambusher AC 10 — ✓ HIT
+[2026-09-07T18:21:13.668Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-07T18:21:13.623Z] [debug] dice⏱ damage: shown +161ms, tapped +522ms, settled +982ms (hold late 182ms) = 1665ms
+[2026-09-07T18:21:12.641Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:21:11.956Z] [debug] dice⏱ attack: shown +160ms, tapped +1536ms, settled +983ms (hold late 183ms) = 2679ms
+[2026-09-07T18:21:10.974Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T18:21:09.272Z] [debug] dice⏱ initiative: shown +238ms, tapped +768ms, settled +981ms (hold late 181ms) = 1987ms
+[2026-09-07T18:21:08.290Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T18:21:07.332Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:07.308Z] [world] You bring the aetheric touch wand to bear on Reclaimer Ambusher.
+[2026-09-07T18:21:07.208Z] [debug] attack: target=Reclaimer Ambusher range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:21:07.158Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-07T18:21:07.132Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:21:06.992Z] [debug] ui: tap "touch wand ✦" ⏱+20ms
+[2026-09-07T18:21:05.736Z] [combat] Reclaimer Ambusher deals 3 bludgeoning damage. You have 20 HP remaining.
+[2026-09-07T18:21:05.473Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:21:05.425Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-09-07T18:21:05.401Z] [combat] Dodge — d20 → 1 + DEX 12 = 13 vs ATK 17. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-07T18:21:05.377Z] [combat] Reclaimer Ambusher — d20 → 9 + ATK 8 = 17 vs your AC 16 — ✓ HIT
+[2026-09-07T18:21:05.276Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:21:05.225Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-07T18:21:05.200Z] [player] dodge
+[2026-09-07T18:21:05.170Z] [system] braced — will not go down again fades.
+[2026-09-07T18:21:05.054Z] [debug] ui: tap "dodge" ⏱+19ms
+[2026-09-07T18:20:58.032Z] [debug] persist sizes(KB): total=147 player=30 wm=35[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2
+[2026-09-07T18:20:57.356Z] [reward] ✦ Resurrection. Johnny Blaze returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-07T18:20:57.353Z] [world] [Samarran Outskirts] north: Dynasty Border Post (4 tiles, 10 hours) · east: The Buried Cities (4 tiles, 10 hours) · south: Samarran (2 tiles, 5 hours) · west: The Reaver's Crest (6 tiles, 15 hours)
+[2026-09-07T18:20:57.350Z] [system] Weather effect — Eerie Calm: +1 WIS
+[2026-09-07T18:20:57.324Z] [combat] Distance: mid-range. Cudgel — needs approach · Aetheric Touch Wand ✓ in range.
+A Reclaimer Ambusher (Human, Uncommon) emerges. Its Crossbow Volley can deal 1D6.
+You are at Dynasty Border Post. An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing; the road past them runs down into the flooded capitals.
+[2026-09-07T18:20:57.322Z] [world] Not even wind. The kind of stillness that means something is watching.
+[2026-09-07T18:20:57.282Z] [debug] missions: none active · at=dynasty_border_post travelTo=samarran
+[2026-09-07T18:20:57.282Z] [debug] scene: loc=dynasty_border_post hub=- arrival=n opening=n passing=y
+[2026-09-07T18:20:50.989Z] [system] You join the Fallen of Tartaria — 21 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-07T18:20:50.540Z] [system] Johnny Blaze has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-07T18:20:50.516Z] [combat] Johnny Blaze falls in Dynasty Border Post. The Aetherstone grows dim and does not lift.
+[2026-09-07T18:20:50.490Z] [combat] Mud Monarchs Reaver-Captain deals 7 slashing damage [armor −51%] +4 acid [Salvager's Worn Greaves took it]. You fall.
+[2026-09-07T18:20:50.279Z] [arbiter] The Arbiter does not look away from the Mud Monarchs Reaver-Captain. "Decide quickly. It already has."
+[2026-09-07T18:20:50.278Z] [combat] Mud Monarchs Reaver-Captain — d20 → 14 + ATK 8 = 22 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:50.271Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:50.271Z] [combat] Acid-Etched Cudgel — 3 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 3 total).
+[2026-09-07T18:20:50.271Z] [combat] The blow with the acid-etched cudgel finds purchase — 11 damage, 12 HP standing. Mud Monarchs Reaver-Captain commits to the counter.
+[2026-09-07T18:20:50.270Z] [combat] Bludgeoning flares — +3 on hit.
+[2026-09-07T18:20:50.267Z] [combat] You — d20 → 6 + STR 6 tired -1 = 11 vs Mud Monarchs Reaver-Captain AC 9 — ✓ HIT
+[2026-09-07T18:20:50.267Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:50.226Z] [debug] dice⏱ coating: shown +162ms, tapped +479ms, settled +966ms (hold late 166ms) = 1607ms
+[2026-09-07T18:20:49.259Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:48.610Z] [debug] dice⏱ damage: shown +162ms, tapped +434ms, settled +951ms (hold late 151ms) = 1547ms
+[2026-09-07T18:20:47.658Z] [debug] ui: tap "roll" ⏱+68ms
+[2026-09-07T18:20:47.060Z] [debug] dice⏱ attack: shown +160ms, tapped +472ms, settled +950ms (hold late 150ms) = 1582ms
+[2026-09-07T18:20:46.109Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:20:45.474Z] [debug] dice⏱ initiative: shown +257ms, tapped +981ms, settled +966ms (hold late 166ms) = 2204ms
+[2026-09-07T18:20:44.508Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-07T18:20:43.318Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:43.294Z] [world] Your acid-etched cudgel comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:43.222Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:43.172Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:20:43.123Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 2. (23/64 HP, 1 turn left)
+[2026-09-07T18:20:43.074Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:20:43.048Z] [player] attack with the cudgel
+[2026-09-07T18:20:42.926Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+24ms
+[2026-09-07T18:20:23.209Z] [combat] Mud Monarchs Reaver-Captain's blow rings off you — braced; you keep your feet.
+[2026-09-07T18:20:23.184Z] [combat] Mud Monarchs Reaver-Captain deals 5 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 5 HP remaining.
+[2026-09-07T18:20:22.978Z] [combat] Mud Monarchs Reaver-Captain — d20 → 8 + ATK 8 = 16 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:22.976Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:22.976Z] [combat] Mud Monarchs Reaver-Captain takes 5 with the aetheric touch wand. It reels: 25 left. Then it fights back.
+[2026-09-07T18:20:22.974Z] [combat] The aetheric has worn Mud Monarchs Reaver-Captain's guard through — it bites full from here.
+[2026-09-07T18:20:22.971Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 5)
+[2026-09-07T18:20:22.971Z] [combat] Aetheric flares — +2 on hit.
+[2026-09-07T18:20:22.970Z] [combat] The Aetheric Touch Wand knits you back together — +4 HP.
+[2026-09-07T18:20:22.968Z] [combat] You — d20 → 13 + INT 10 + 2 (point blank) tired -1 = 24 vs Mud Monarchs Reaver-Captain AC 10 — ✓ HIT
+[2026-09-07T18:20:22.968Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:22.908Z] [debug] dice⏱ damage: shown +143ms, tapped +1204ms, settled +949ms (hold late 149ms) = 2296ms
+[2026-09-07T18:20:21.960Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-07T18:20:20.610Z] [debug] dice⏱ attack: shown +135ms, tapped +1894ms, settled +969ms (hold late 169ms) = 2998ms
+[2026-09-07T18:20:19.641Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-07T18:20:17.611Z] [debug] dice⏱ initiative: shown +243ms, tapped +737ms, settled +954ms (hold late 154ms) = 1934ms
+[2026-09-07T18:20:16.658Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:15.726Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:15.702Z] [world] Your aetheric touch wand comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:15.628Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:15.579Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:20:15.530Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 2. (30/64 HP, 2 turns left)
+[2026-09-07T18:20:15.481Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:20:15.456Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:20:15.404Z] [system] stunned fades.
+[2026-09-07T18:20:15.306Z] [debug] ui: tap "touch wand ✦" ⏱+26ms
+[2026-09-07T18:20:13.933Z] [combat] Mud Monarchs Reaver-Captain's strike leaves you stunned.
+[2026-09-07T18:20:13.907Z] [combat] Mud Monarchs Reaver-Captain deals 7 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 6 HP remaining.
+[2026-09-07T18:20:13.695Z] [arbiter] "Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."
+[2026-09-07T18:20:13.689Z] [combat] Mud Monarchs Reaver-Captain — d20 → 17 + ATK 8 = 25 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:13.685Z] [combat] Mud Monarchs Reaver-Captain is left exposed — easier to hit.
+[2026-09-07T18:20:13.685Z] [combat] Acid-Etched Cudgel — 2 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-07T18:20:13.684Z] [combat] Your strike with the acid-etched cudgel lands for 14. Mud Monarchs Reaver-Captain staggers — 32 HP remaining. It answers.
+[2026-09-07T18:20:13.683Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-07T18:20:13.680Z] [combat] You — d20 → 12 + STR 6 tired -1 = 17 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:20:13.680Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:20:13.657Z] [debug] dice⏱ coating: shown +114ms, tapped +991ms, settled +967ms (hold late 167ms) = 2072ms
+[2026-09-07T18:20:12.690Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:20:11.585Z] [debug] dice⏱ damage: shown +156ms, tapped +437ms, settled +981ms (hold late 181ms) = 1574ms
+[2026-09-07T18:20:10.604Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:20:10.006Z] [debug] dice⏱ attack: shown +161ms, tapped +387ms, settled +952ms (hold late 152ms) = 1500ms
+[2026-09-07T18:20:09.054Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:20:08.503Z] [debug] dice⏱ initiative: shown +241ms, tapped +1263ms, settled +949ms (hold late 149ms) = 2453ms
+[2026-09-07T18:20:07.554Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:20:06.098Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:06.074Z] [world] Your acid-etched cudgel comes around in an arc; Mud Monarchs Reaver-Captain squares up to meet it.
+[2026-09-07T18:20:06.001Z] [debug] attack: status mods tired -1
+[2026-09-07T18:20:05.951Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:20:05.902Z] [combat] Mud Monarchs Reaver-Captain shakes off the last of the acid — the Cudgel has run its course.
+[2026-09-07T18:20:05.877Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (46/64 HP, 0 turns left)
+[2026-09-07T18:20:05.828Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:20:05.803Z] [player] attack with the cudgel
+[2026-09-07T18:20:05.766Z] [system] braced — will not go down again fades.
+[2026-09-07T18:20:05.692Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+27ms
+[2026-09-07T18:20:04.248Z] [combat] Mud Monarchs Reaver-Captain deals 5 slashing damage [armor −51%] +1 acid [Salvager's Trench Coat took it]. You have 13 HP remaining.
+[2026-09-07T18:20:03.984Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:20:03.935Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-09-07T18:20:03.911Z] [combat] Dodge — d20 → 1 + DEX 12 = 13 vs ATK 24. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-07T18:20:03.887Z] [combat] Mud Monarchs Reaver-Captain — d20 → 16 + ATK 8 = 24 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:03.789Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (47/64 HP, 1 turn left)
+[2026-09-07T18:20:03.764Z] [world] You commit to the dodge. Slip Mud Monarchs Reaver-Captain's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:20:03.716Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-07T18:20:03.692Z] [player] dodge
+[2026-09-07T18:20:03.587Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-07T18:20:01.382Z] [debug] persist sizes(KB): total=139 player=22 wm=34[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=4
+[2026-09-07T18:20:01.126Z] [combat] Mud Monarchs Reaver-Captain deals 4 slashing damage [armor −51%] +1 acid [Salvager's Trench Coat took it]. You have 12 HP remaining.
+[2026-09-07T18:20:00.914Z] [combat] Your strike with the aetheric touch wand lands for 3. Mud Monarchs Reaver-Captain staggers — 48 HP remaining. It answers.
+[2026-09-07T18:20:00.912Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 3)
+[2026-09-07T18:20:00.911Z] [combat] The Aetheric Touch Wand knits you back together — +6 HP.
+[2026-09-07T18:20:00.910Z] [combat] You — d20 → 8 + INT 10 + 2 (point blank) = 20 vs Mud Monarchs Reaver-Captain AC 11 — ✓ HIT
+[2026-09-07T18:20:00.908Z] [combat] Mud Monarchs Reaver-Captain — d20 → 14 + ATK 8 = 22 vs your AC 16 — ✓ HIT
+[2026-09-07T18:20:00.905Z] [world] Mud Monarchs Reaver-Captain moves first. The pressure is immediate.
+[2026-09-07T18:20:00.862Z] [debug] dice⏱ damage: shown +148ms, tapped +705ms, settled +946ms (hold late 146ms) = 1799ms
+[2026-09-07T18:19:59.916Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T18:19:59.061Z] [debug] dice⏱ attack: shown +160ms, tapped +483ms, settled +950ms (hold late 150ms) = 1593ms
+[2026-09-07T18:19:58.111Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-07T18:19:57.463Z] [debug] dice⏱ initiative: shown +246ms, tapped +1392ms, settled +951ms (hold late 151ms) = 2589ms
+[2026-09-07T18:19:56.510Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-07T18:19:54.920Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:54.896Z] [world] You raise the aetheric touch wand toward Mud Monarchs Reaver-Captain. The room narrows around the both of you.
+[2026-09-07T18:19:54.798Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:19:54.749Z] [combat] Mud Monarchs Reaver-Captain smokes — acid eats 1. (51/64 HP, 2 turns left)
+[2026-09-07T18:19:54.700Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:19:54.674Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:19:54.627Z] [system] stunned fades.
+[2026-09-07T18:19:54.521Z] [debug] ui: tap "touch wand ✦" ⏱+23ms
+[2026-09-07T18:19:52.687Z] [combat] Mud Monarchs Reaver-Captain's strike leaves you stunned.
+[2026-09-07T18:19:52.663Z] [combat] Mud Monarchs Reaver-Captain deals 6 slashing damage [armor −51%] +3 acid [Mud-Warden's Vest took it]. You have 16 HP remaining.
+[2026-09-07T18:19:52.444Z] [combat] Mud Monarchs Reaver-Captain — d20 → 15 + ATK 8 = 23 vs your AC 16 — ✓ HIT
+[2026-09-07T18:19:52.444Z] [debug] ac-shift 18→16: race/base 10 + gear 9 + title 0 → trimmed 18 + status -2 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=— legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-07T18:19:52.441Z] [combat] Acid-Etched Cudgel — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-07T18:19:52.440Z] [combat] Mud Monarchs Reaver-Captain takes 6 with the acid-etched cudgel. It reels: 52 left. Then it fights back.
+[2026-09-07T18:19:52.436Z] [combat] You — d20 → 15 + STR 6 = 21 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:19:52.436Z] [world] You seize the initiative. Mud Monarchs Reaver-Captain has no time to react.
+[2026-09-07T18:19:52.419Z] [debug] dice⏱ coating: shown +165ms, tapped +571ms, settled +949ms (hold late 149ms) = 1685ms
+[2026-09-07T18:19:51.469Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-07T18:19:50.728Z] [debug] dice⏱ damage: shown +158ms, tapped +486ms, settled +953ms (hold late 153ms) = 1597ms
+[2026-09-07T18:19:49.775Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-07T18:19:49.126Z] [debug] dice⏱ attack: shown +149ms, tapped +1316ms, settled +950ms (hold late 150ms) = 2415ms
+[2026-09-07T18:19:48.175Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-07T18:19:46.708Z] [debug] dice⏱ initiative: shown +240ms, tapped +3062ms, settled +949ms (hold late 149ms) = 4251ms
+[2026-09-07T18:19:45.759Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-07T18:19:42.505Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:42.481Z] [world] You bring the acid-etched cudgel to bear on Mud Monarchs Reaver-Captain.
+[2026-09-07T18:19:42.380Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[close] reach.label=Cudgel bareHand=false
+[2026-09-07T18:19:42.331Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=2
+[2026-09-07T18:19:42.306Z] [player] attack with the cudgel
+[2026-09-07T18:19:42.189Z] [debug] ui: tap "⚗ cudgel ⚒" ⏱+16ms
+[2026-09-07T18:19:39.942Z] [combat] That's your slashing resist working — the armor drank most of that hit (3 of 5 got through).
+[2026-09-07T18:19:39.917Z] [combat] Mud Monarchs Reaver-Captain deals 3 slashing damage [armor −51%] +1 acid [Mud-Warden's Vest took it]. You have 20 HP remaining.
+[2026-09-07T18:19:39.711Z] [combat] Clean hit with the aetheric touch wand for 6. Mud Monarchs Reaver-Captain has 58 left and does not back away.
+[2026-09-07T18:19:39.710Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Tartarian Claw Knife — piercing will bite where aetheric won't."
+[2026-09-07T18:19:39.709Z] [combat] Mud Monarchs Reaver-Captain shrugs off the aetheric. (resisted, ×0.5 for 6)
+[2026-09-07T18:19:39.708Z] [combat] The Aetheric Touch Wand knits you back together — +2 HP.
+[2026-09-07T18:19:39.707Z] [combat] You — d20 → 4 + INT 10 + 2 (point blank) perfect opening (2× dice) = 16 vs Mud Monarchs Reaver-Captain AC 12 — ✓ HIT
+[2026-09-07T18:19:39.705Z] [combat] Mud Monarchs Reaver-Captain — d20 → 17 + ATK 8 = 25 vs your AC 18 — ✓ HIT
+[2026-09-07T18:19:39.703Z] [world] Mud Monarchs Reaver-Captain moves first. The pressure is immediate.
+[2026-09-07T18:19:39.656Z] [debug] dice⏱ damage: shown +148ms, tapped +484ms, settled +951ms (hold late 151ms) = 1583ms
+[2026-09-07T18:19:38.705Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-07T18:19:38.071Z] [debug] dice⏱ attack: shown +147ms, tapped +517ms, settled +949ms (hold late 149ms) = 1613ms
+[2026-09-07T18:19:37.121Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-07T18:19:36.455Z] [debug] dice⏱ initiative: shown +241ms, tapped +910ms, settled +931ms (hold late 131ms) = 2082ms
+[2026-09-07T18:19:35.524Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-07T18:19:34.422Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:34.398Z] [world] You commit forward with the aetheric touch wand. Mud Monarchs Reaver-Captain watches your hands.
+[2026-09-07T18:19:34.322Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-07T18:19:34.268Z] [debug] attack: target=Mud Monarchs Reaver-Captain range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-07T18:19:34.217Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=2
+[2026-09-07T18:19:34.192Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-07T18:19:34.069Z] [debug] ui: tap "touch wand ✦" ⏱+23ms
+[2026-09-07T18:19:33.077Z] [system] ⏳ Time passed: 6 min
+[2026-09-07T18:19:32.980Z] [combat] Dodge — d20 → 13 + DEX 12 = 25 vs ATK 24. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-07T18:19:32.955Z] [combat] Mud Monarchs Reaver-Captain — d20 → 16 + ATK 8 = 24 vs your AC 18 — ✗ EVADED
+[2026-09-07T18:19:32.876Z] [world] You commit to the dodge. Slip Mud Monarchs Reaver-Captain's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-07T18:19:32.824Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-07T18:19:32.800Z] [player] dodge
+[2026-09-07T18:19:32.705Z] [debug] ui: tap "dodge" ⏱+15ms
+[2026-09-07T18:19:31.055Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:31.030Z] [debug] arbiter: template (reason=combat)
+[2026-09-07T18:19:31.006Z] [combat] Mud Monarchs Reaver-Captain — d20 → 3 + ATK 8 = 11 vs your AC 18 — ✗ MISS
+[2026-09-07T18:19:30.980Z] [world] You close the gap with Mud Monarchs Reaver-Captain. (range: close / arm's reach)
+[2026-09-07T18:19:30.955Z] [debug] move: field advance target=Mud Monarchs Reaver-Captain d 1.50->0.50 band mid->close
+[2026-09-07T18:19:30.905Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0
+[2026-09-07T18:19:30.854Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs reaver captain resolved=Mud Monarchs Reaver-Captain range=mid enemies=1 hooks=2
+[2026-09-07T18:19:30.829Z] [player] approach Mud Monarchs Reaver-Captain
+[2026-09-07T18:19:30.706Z] [debug] ui: tap "approach" ⏱+15ms
+[2026-09-07T18:19:26.396Z] [debug] qwen⏱ investigate_lore ok 3173ms wait 1205ms read 272ms/write 881ms in 126t→out 28t js-late 1244ms thr2 2.2ms/t (132ch)
+[2026-09-07T18:19:25.761Z] [cognitive] REST  (796ms)
+[2026-09-07T18:19:25.465Z] [debug] render⏱ 360ms after engine-done · feed 500
+[2026-09-07T18:19:25.065Z] [arbiter] "The Mud Monarchs do not forgive a friend of the Eternal Dynasty," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-07T18:19:25.025Z] [world] No war party crests the rise — one figure does. A Mud Monarchs Reaver-Captain comes alone, unhurried, and does not need the others. You are marked for standing with the Eternal Dynasty.
+[2026-09-07T18:19:24.936Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:19:24.926Z] [world] A bird you can't name lands a foot from where you slept, looks at you, takes off again.
+[2026-09-07T18:19:24.926Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:19:24.925Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 4, morning)
+[2026-09-07T18:19:24.924Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:19:24.923Z] [player] rest
+[2026-09-07T18:19:24.916Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-07T18:19:24.348Z] [debug] qwen⏱ investigate_lore ok 2435ms read/write unusable (native mis-reported 5485ms/1004ms — llama.rn split bug, not this call) in 131t→out 31t thr2 (137ch)
+[2026-09-07T18:19:23.255Z] [debug] persist sizes(KB): total=136 player=22 wm=33[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3
+[2026-09-07T18:19:23.095Z] [cognitive] SWIM  (140ms)
+[2026-09-07T18:19:22.953Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:22.953Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:22.952Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:19:22.951Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:19:22.950Z] [player] investigate shallow pool
+[2026-09-07T18:19:21.992Z] [debug] qwen⏱ ✂ DISCARDED ambient after 7480ms — ambient:preempted
+[2026-09-07T18:19:21.991Z] [debug] arbiter: ambient cut short 7691ms — yielded to the player
+[2026-09-07T18:19:21.913Z] [debug] qwen⏱ ambient preempted 7480ms wait 3392ms read 0ms/write 0ms in 363t→out 0t thr1 (0ch)
+[2026-09-07T18:19:21.838Z] [cognitive] SWIM  (151ms)
+[2026-09-07T18:19:21.685Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-07T18:19:21.685Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:21.684Z] [world] The rusted petrified mud wave reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T18:19:21.681Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=2
+[2026-09-07T18:19:21.680Z] [player] investigate the mud
+[2026-09-07T18:19:20.297Z] [debug] ui: tap "investigate" ⏱+15ms
+[2026-09-07T18:19:19.166Z] [reward] ✦ Architect's Mask of Vision (Common).
+[2026-09-07T18:19:19.166Z] [world] You pick up the Architect's Mask of Vision.
+[2026-09-07T18:19:19.165Z] [reward] ✦ Stone Spear (Common).
+[2026-09-07T18:19:19.165Z] [world] You take the Stone Spear from where it lay.
+[2026-09-07T18:19:19.153Z] [reward] ✦ Bone Javelin (Common).
+[2026-09-07T18:19:19.152Z] [world] The Bone Javelin goes into the pack by feel. You have done this a great many times.
+[2026-09-07T18:19:18.246Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-07T18:19:18.245Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-09-07T18:19:18.245Z] [reward]     • Mud Fragment (Common)
+[2026-09-07T18:19:18.245Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:19:18.245Z] [world] You strip the stall carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:18.244Z] [world] You strip the shattered crashed automaton chassis carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:18.244Z] [world] You work the lantern apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-07T18:19:18.244Z] [world] You salvage the firepit. The take is small but real.
+[2026-09-07T18:19:18.231Z] [reward] ✦ Found Unsent Letter — to the Council of Sovereigns — The Black Cloak Confessions. (open Contracts → Collectibles to read)
+[2026-09-07T18:19:17.701Z] [debug] qwen⏱ investigate_lore ok 1915ms wait 849ms read 285ms/write 756ms in 126t→out 23t thr2 2.3ms/t (103ch)
+[2026-09-07T18:19:17.031Z] [debug] ui: tap "take / salvage" ⏱+16ms
+[2026-09-07T18:19:16.557Z] [debug] qwen⏱ investigate_lore ok 2124ms wait 917ms read 270ms/write 922ms in 126t→out 30t thr2 2.1ms/t (157ch)
+[2026-09-07T18:19:16.039Z] [world] The loose end is exactly as loose as you left it.
+[2026-09-07T18:19:16.030Z] [reward] ✦ Recovered Bioluminescent Fungus.
+[2026-09-07T18:19:16.029Z] [world] Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road.
+[2026-09-07T18:19:16.029Z] [world] A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.
+[2026-09-07T18:19:16.027Z] [world] You strike out south. The country resists you with sameness more than distance.
+[2026-09-07T18:19:16.025Z] [debug] spawn: gear=[Stone Spear, Architect's Mask of Vision, Bone Javelin] window=10 roster=new
+[2026-09-07T18:19:16.013Z] [debug] ui: tap "→ SAMARRAN" ⏱+23ms
+[2026-09-07T18:19:15.686Z] [cognitive] SWIM  (127ms)
+[2026-09-07T18:19:15.557Z] [arbiter] The Arbiter glances toward the traveler. "Still there. Still yours, if you take it."
+[2026-09-07T18:19:15.557Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-07T18:19:15.556Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-07T18:19:15.555Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=2
+[2026-09-07T18:19:15.554Z] [player] investigate waterskin
+[2026-09-07T18:19:15.064Z] [debug] qwen⏱ investigate_lore ok 1942ms read 599ms/write 1267ms in 131t→out 38t thr2 4.6ms/t (182ch)
+[2026-09-07T18:19:14.293Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-07T18:19:14.291Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-07T18:19:14.290Z] [player] investigate shallow pool
+[2026-09-07T18:19:13.025Z] [world] The rusted petrified mud wave reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-07T18:19:13.021Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=2
+[2026-09-07T18:19:13.020Z] [player] investigate the mud
+[2026-09-07T18:19:11.712Z] [debug] ui: tap "investigate" ⏱+10ms
+[2026-09-07T18:19:10.944Z] [debug] persist sizes(KB): total=129 player=20 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3
+[2026-09-07T18:19:10.577Z] [reward]     • Cloth Scrap (Common)
+[2026-09-07T18:19:10.577Z] [reward]     • Aether Crystal (Common)
+[2026-09-07T18:19:10.576Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-07T18:19:10.576Z] [reward] ✦ Salvage haul:
+[2026-09-07T18:19:10.575Z] [world] You strip the tent carefully. Something usable comes free in your hand.
+[2026-09-07T18:19:10.575Z] [world] You work the signpost over. A part of it comes loose, intact.
+[2026-09-07T18:19:10.574Z] [world] You break the crate apart. Among the pieces, something worth keeping.
+[2026-09-07T18:19:09.672Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-07T18:19:09.672Z] [world] You pocket the Scrap Metal and check the horizon, in that order.
+[2026-09-07T18:19:08.394Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-07T18:19:06.552Z] [debug] stats: STR6 DEX12 INT9 WIS7 CHA8 STE3 | gear: INT+7,WIS+3,DEX+1,STR+1 | worn: main=Cudgel off=Aetheric Touch Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest legs=Salvager's Worn Greaves feet=Echoing Steps Boots cloak=Salvager's Trench Coat amulet=Aetheric Locket
+[2026-09-07T18:19:06.513Z] [debug] take&wear: equipping "Salvager's Trench Coat" -> cloak
+[2026-09-07T18:19:06.500Z] [reward] ✦ Salvager's Trench Coat (Common).
+[2026-09-07T18:19:06.499Z] [world] You take the Salvager's Trench Coat the way you take everything out here — quickly, and without ceremony.
+[2026-09-07T18:19:06.493Z] [debug] ui: tap "★ Take & wear Salvager's Trench Coat — your cloak slot is bare"
+[2026-09-07T18:19:05.399Z] [debug] appstate: background → active (was background for 598759ms)
+[2026-09-07T18:09:06.636Z] [debug] appstate: active → background (was active for 194083ms)
+[2026-09-07T18:09:04.199Z] [world] What you started here has not finished itself in your absence.
+[2026-09-07T18:09:04.194Z] [reward] ✦ Recovered Patched Cloth.
+[2026-09-07T18:09:04.194Z] [world] A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'
+[2026-09-07T18:09:04.193Z] [world] You crest a low rise and a Reclaimer caravan slumps in the silt — axle snapped, banner half-buried. Whoever drove it left in a hurry, or didn't leave at all.
+[2026-09-07T18:09:04.192Z] [world] You set out south. Your boots sink half an inch into the mud-flats and pull free with each step.
+[2026-09-07T18:09:04.190Z] [debug] spawn: gear=[Salvager's Trench Coat] window=10 roster=new
+[2026-09-07T18:09:04.170Z] [debug] ui: tap "→ SAMARRAN" ⏱+17ms
+[2026-09-07T18:09:03.414Z] [cognitive] REST  (89ms)
+[2026-09-07T18:09:03.325Z] [system] ⏳ Time passed: 8h
+[2026-09-07T18:09:03.324Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:09:03.313Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-07T18:09:03.312Z] [world] You rest for 8 hours. +3 HP, +8 stamina recovered. (Day 3, evening)
+[2026-09-07T18:09:03.311Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-07T18:09:03.311Z] [player] rest
+[2026-09-07T18:09:03.304Z] [debug] ui: tap "rest" ⏱+15ms
+[2026-09-07T18:09:01.404Z] [world] You step back outside, leaving shed behind.
+[2026-09-07T18:09:01.403Z] [debug] ui: tap "🚪 EXIT" ⏱+12ms
+
+=== END REPORT ===
