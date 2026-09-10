@@ -124,5 +124,9 @@ describe('publication depends on validation', () => {
 
   it('⚠⚠ a trunk push is never cancelled by the next one — each OTA and its catch-up is owed its own publish', () => {
     expect(CI.concurrency!['cancel-in-progress']).toBe("${{ github.ref != 'refs/heads/golem-line' }}");
+    // ...and never REPLACED while pending, either: GitHub keeps one pending run
+    // per group, so a trunk push must be its own group. Measured the hour the
+    // first version shipped — two trunk runs cancelled before any job started.
+    expect(CI.concurrency!.group).toBe("ci-${{ github.ref == 'refs/heads/golem-line' && github.sha || github.ref }}");
   });
 });

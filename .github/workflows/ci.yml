@@ -62,7 +62,15 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # ⚠⚠ ON THE TRUNK, EVERY PUSH IS ITS OWN GROUP. `cancel-in-progress: false`
+  # was not enough, and it was measured within the hour of shipping it: GitHub
+  # keeps at most ONE PENDING run per group, so while a slow run held the group
+  # (the heavy sims), each new trunk push replaced the previous PENDING run —
+  # runs 2110 and 2111 ([ota-hal] OTA-1798) were cancelled before a single job
+  # started, and the publish they carried was lost. A group keyed on the SHA
+  # cannot be replaced by a later push. Other branches keep the per-ref group
+  # with cancellation, which is the right economy for a branch under iteration.
+  group: ci-${{ github.ref == 'refs/heads/golem-line' && github.sha || github.ref }}
   # ⚠ Never on the trunk — see the header. Two trunk pushes minutes apart are
   # two publishes, and cancelling the first would silently drop the one that
   # carried the marker.
