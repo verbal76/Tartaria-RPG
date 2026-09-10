@@ -218,6 +218,15 @@ export function armSpawnStagesAtArrival(get: Get, set: Set): void {
     const scene = get().currentScene;
     const liveHostiles = (scene?.enemies ?? []).some((_, i) => (scene?.enemyHps?.[i] ?? 0) > 0 && !(scene?.enemyKnockedOut?.[i] ?? false));
     if (liveHostiles) continue;
+    // ⚠⚠ OTA-1796 — BUT THIS STAGE'S OWN BODIES, OUT COLD, ARE THE FIGHT ALREADY
+    // STOOD UP. "Live means conscious" opens the door past a sleeping wandering
+    // pack; it must not open it past the stage's own brood the player has just
+    // put down — that re-summons a second brood over the sleepers. Found the day
+    // the slice's FRESH_ENEMY_ARRAYS reset went live: until then the re-summon
+    // inherited the sleepers' knocked-out flags (the reset spread `undefined`),
+    // which hid it, and a flee then owed nothing for three fresh bodies.
+    const ownKey = `hunt:${s.recId}:${s.stageIndex}`;
+    if ((scene?.enemies ?? []).some((e) => (e as { stageKey?: string }).stageKey === ownKey)) continue;
     // One writer: the same advance the attack verb and the card run — the
     // narration, the spawn, the freeze-for-kill, the escort clear all come
     // from machinery this file does not duplicate.

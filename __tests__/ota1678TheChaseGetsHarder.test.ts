@@ -336,9 +336,12 @@ describe('OTA-1678 — the store: four producers stamp, every scripted site does
   });
 
   it('the count cannot outlive the bodies: reset by FRESH_ENEMY_ARRAYS and by every lineup producer', () => {
-    const fresh = STORE.slice(STORE.indexOf('export const FRESH_ENEMY_ARRAYS = {'), STORE.indexOf('} as const;', STORE.indexOf('export const FRESH_ENEMY_ARRAYS = {')));
+    // OTA-1796 — FRESH_ENEMY_ARRAYS moved to app/state/storeLeaves.ts.
+    const LEAF = src('app', 'state', 'storeLeaves.ts');
+    const fresh = LEAF.slice(LEAF.indexOf('export const FRESH_ENEMY_ARRAYS = {'), LEAF.indexOf('} as const;', LEAF.indexOf('export const FRESH_ENEMY_ARRAYS = {')));
     expect(fresh.includes('fleeAttempts: undefined,')).toBe(true);
-    expect((STORE.match(/fleeAttempts: undefined,/g) ?? []).length).toBe(3); // FRESH + rest ambush + climb
+    expect((LEAF.match(/fleeAttempts: undefined,/g) ?? []).length).toBe(1); // FRESH
+    expect((STORE.match(/fleeAttempts: undefined,/g) ?? []).length).toBe(2); // rest ambush + climb
     expect(PARTY.includes('fleeAttempts: undefined,')).toBe(true);
     expect(STORE.includes('fleeAttempts?: number;')).toBe(true);
   });

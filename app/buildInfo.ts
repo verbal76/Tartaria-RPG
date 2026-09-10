@@ -30060,7 +30060,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
 // SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
 // SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
-export const OTA_BUILD_ID = '2026-09-10-1795-retreat-gives-ground';
+// SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
+export const OTA_BUILD_ID = '2026-09-10-1796-the-store-reads-its-leaves';
+// OTA-1796 - the store reads its leaves. Owner ruling: "Web-line boot/module-
+// init cycle: Fix it, surgically, with a regression test." OTA-1756 found the
+// web bundle throwing "Cannot access 'FRESH_ENEMY_ARRAYS' before
+// initialization" at createStore and stubbed the store for its harness. The
+// cause: create() runs during gameStore's module evaluation and hands the
+// quest slice a deps object; two of those deps were module bindings declared
+// ~25,000 lines BELOW the create( call. On web Metro keeps `const`, so the
+// read is a TDZ error and the line cannot boot. On native and under jest the
+// RN Babel preset downlevels const to var, so the SAME read returned undefined
+// SILENTLY - measured today: the slice's two wholesale roster writes spread
+// `...deps.FRESH_ENEMY_ARRAYS` = nothing, so the OTA-1140 reset never ran at
+// the escort spawn or the hunt-boss spawn. And the second dep, `_chainRouting`
+// (a let), was copied into deps BY VALUE: the slice wrote `deps._chainRouting
+// = true` to a property nobody read while setTravelCourse read the module
+// binding, so ROUTE TO on a faction contract set routedMission and the next
+// line dropped it as a manual diversion - measured: three starter contracts
+// routed, routedMission null after each. Both values now live in
+// app/state/storeLeaves.ts (no imports; exists before create runs): the
+// constant is imported and re-exported by the store, and the chain flag is
+// ONE object {active} the store and the slice both hold. Suite
+// ota1796TheStoreReadsItsLeaves: the slice's deps are defined at creation and
+// are the leaf's own objects; ROUTE TO keeps the chain and a manual course
+// still drops it; the flag is back to false after the call. OTA-1140's and
+// OTA-1678's declaration pins re-aimed at the leaf. The web harness stub
+// (TARTARIA_WEB_HARNESS=1) is left in place; the real store now boots on web
+// (verified: export + headless Chromium, title screen, zero exceptions).
+// WHAT THE LIVE RESET UNCOVERED: with the slice's reset actually running,
+// OTA-1688's "every body out cold, nothing owed" claim failed - the per-action
+// ground arm (stageArrival) saw no CONSCIOUS hostiles, re-summoned the stage's
+// brood over the three the player had just put down, and the flee counted
+// three fresh bodies. The re-summon had inherited the sleepers' knocked-out
+// flags before, which hid it. The arm now skips a stage whose own stamped
+// bodies are already on the field, conscious or not; the suite holds that
+// claim too. Store ceiling lowered 36963 -> 36945 onto the extraction.
 // golem catch-up 2026-09-10: markerless publish of OTA-1795.
 // OTA-1795 - retreat gives ground. Owner ruling 2026-09-10: "retreat: Give
 // ground. Reserve flee for actually attempting to leave combat." This REVERSES

@@ -743,6 +743,9 @@ import {
 // selector over the save (see its file note: a selector, not a hook into
 // movement), and every button routes through `applyChoice`.
 import { missionTraceArrivalLines, missionArrivalLines } from '../engine/missionTrace';
+// OTA-1796 — leaves the initial state reads; imported so they exist before create() runs.
+import { FRESH_ENEMY_ARRAYS, chainRouting } from './storeLeaves';
+export { FRESH_ENEMY_ARRAYS, chainRouting };
 import { armedEncounter } from '../engine/missionEncounterArm';
 import {
   applyChoice as applyEncounterChoice,
@@ -8620,7 +8623,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   // seam, and it is not the one the file layout suggested.
   ...createQuestSlice(set, get, {
     FRESH_ENEMY_ARRAYS,
-    _chainRouting,
+    chainRouting,
     acceptCellStamp,
     advanceMissionRoute,
     advanceTime,
@@ -26513,7 +26516,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // currently centered on the regenerated world map.
     // A MANUAL course (not one the mission chain set) means the player diverted;
     // drop any active route chain so it doesn't yank them back.
-    const dropChain = !_chainRouting;
+    const dropChain = !chainRouting.active;
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     // ⚠⚠⚠ OTA-1632 — SET COURSE STAYS PUT. From OTA 053 this function took the
     // first step ITSELF ("so the player sees motion now"), and OTA-1469 rebuilt
@@ -31598,12 +31601,9 @@ function advanceActiveFactionQuests(
   );
 }
 
-// MISSION ROUTE CHAIN. When the player taps ROUTE TO on a contract,
-// `player.routedMission` is set and the engine courses to the objective, then —
-// once the work is done — auto-courses to the turn-in. `_chainRouting` lets the
-// engine's own setTravelCourse calls bypass the "player diverted, drop the chain"
-// guard in setTravelCourse.
-export let _chainRouting = false;
+// MISSION ROUTE CHAIN — see storeLeaves.chainRouting (OTA-1796: one object the
+// store and the quest slice both hold; the old `let` was copied into the slice's
+// deps by value and the slice's writes never reached this file's reader).
 
 export function safeLocName(id: string): string {
   try { return getLocationById(id).name ?? id; } catch { return id; }
@@ -31836,8 +31836,8 @@ export function advanceMissionRoute(
   }
   if (player.travelTarget?.locationId === want.loc) return; // already en route
   set((s) => (s.player ? { player: { ...s.player, routedMission: { id: rm.id, phase: want.phase } } } : s));
-  _chainRouting = true;
-  try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
+  chainRouting.active = true;
+  try { get().setTravelCourse(want.loc); } finally { chainRouting.active = false; }
   get().appendLog('world', want.phase === 'to_turnin'
     ? `✦ Objective complete — ${def.title}. Auto-routing to turn in at ${safeLocName(want.loc)}.`
     : `Auto-routing to the objective for ${def.title}: ${safeLocName(want.loc)}.`);
@@ -32994,25 +32994,7 @@ function hasAethericVision(player: PlayerCharacter | null): boolean {
 
 
 
-/** ⚠ OTA-1140 (pressure test) — EVERY per-enemy parallel array, reset in one
- *  place. Three agents independently converged on the same defect class: sites
- *  that replace or clear the `enemies` roster wholesale reset SOME of the
- *  parallel arrays and leave the rest — so a hunt boss spawned into a scene
- *  that held an acid-shredded enemy was born at reduced AC, a fled Guardian's
- *  ground-off armor was BANKED for the re-summon (the ":20271 flee can't chip
- *  them down" promise held for HP and silently failed for AC), and a stagger
- *  latched on a non-boss survived into the next roster. Spread this FIRST in
- *  any wholesale roster write; explicit per-site resets after it still win. */
-export const FRESH_ENEMY_ARRAYS = {
-  enemyStatuses: undefined,
-  enemyArmorShred: undefined,
-  enemyCorruptionStacks: undefined,
-  enemyStaggered: undefined,
-  enemyKnockedOut: undefined,
-  enemyAmbushUsed: undefined,
-  // ⚠ OTA-1678 — the failed-break count belongs to the bodies it was earned against.
-  fleeAttempts: undefined,
-} as const;
+// OTA-1796 — FRESH_ENEMY_ARRAYS lives in ./storeLeaves (read by the initial state).
 
 
 

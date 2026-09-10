@@ -61,7 +61,7 @@ const STORE = 'app/state/gameStore.ts';
  * display functions went to the file already named for them and the pass gave
  * back more than it took. That is the intended pressure — the valve works by
  * making somebody find a boundary, not by making them ask for a bigger number. */
-export const CEILING = 36963;
+export const CEILING = 36945;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

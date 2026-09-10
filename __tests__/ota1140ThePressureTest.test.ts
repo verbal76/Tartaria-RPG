@@ -117,7 +117,9 @@ describe('OTA-1140 — the stagger family is sealed', () => {
   });
 
   it('⚠ FRESH_ENEMY_ARRAYS resets all six at every wholesale roster write', () => {
-    const def = STORE.slice(STORE.indexOf('const FRESH_ENEMY_ARRAYS'), STORE.indexOf('} as const;', STORE.indexOf('const FRESH_ENEMY_ARRAYS')));
+    // OTA-1796 — the constant moved to app/state/storeLeaves.ts (the store's initial state reads it).
+    const LEAF = read('app/state/storeLeaves.ts');
+    const def = LEAF.slice(LEAF.indexOf('const FRESH_ENEMY_ARRAYS'), LEAF.indexOf('} as const;', LEAF.indexOf('const FRESH_ENEMY_ARRAYS')));
     for (const f of ['enemyStatuses', 'enemyArmorShred', 'enemyCorruptionStacks', 'enemyStaggered', 'enemyKnockedOut', 'enemyAmbushUsed']) {
       expect(def).toContain(`${f}: undefined`);
     }

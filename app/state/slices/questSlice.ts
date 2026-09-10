@@ -175,7 +175,8 @@ export interface QuestSlice {
 
 export interface QuestSliceDeps {
   FRESH_ENEMY_ARRAYS: typeof Store.FRESH_ENEMY_ARRAYS;
-  _chainRouting: typeof Store._chainRouting;
+  // OTA-1796 — a shared object, not a copied boolean: writes here are reads in the store.
+  chainRouting: typeof Store.chainRouting;
   acceptCellStamp: typeof Store.acceptCellStamp;
   advanceMissionRoute: typeof Store.advanceMissionRoute;
   advanceTime: typeof Store.advanceTime;
@@ -1212,8 +1213,8 @@ export const createQuestSlice = (
       return;
     }
     set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
-    deps._chainRouting = true;
-    try { get().setTravelCourse(want.loc); } finally { deps._chainRouting = false; }
+    deps.chainRouting.active = true;
+    try { get().setTravelCourse(want.loc); } finally { deps.chainRouting.active = false; }
     get().appendLog('world', want.phase === 'to_turnin'
       ? `✦ Course set — ${def.title}. Heading to turn in at ${deps.safeLocName(want.loc)}.`
       : `✦ Course set — ${def.title}. Heading to the objective: ${deps.safeLocName(want.loc)}.`);
@@ -2068,8 +2069,8 @@ export const createQuestSlice = (
         const liveNow = get().player;
         if (movedGround && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
-          deps._chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { deps._chainRouting = false; }
+          deps.chainRouting.active = true;
+          try { get().setTravelCourse(nextId); } finally { deps.chainRouting.active = false; }
           // ⚠⚠ ONLY CLAIM IT IF IT HAPPENED. `setTravelCourse` has six refusals of its own
           // (unplaceable destination, already standing on the target's cell, no scene…) and
           // every one of them returns without setting a course. Announcing the auto-route
@@ -2606,8 +2607,8 @@ export const createQuestSlice = (
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
-          deps._chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { deps._chainRouting = false; }
+          deps.chainRouting.active = true;
+          try { get().setTravelCourse(nextId); } finally { deps.chainRouting.active = false; }
           // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
           if (get().player?.travelTarget?.locationId === nextId) {
             get().appendLog('world', `Auto-routing to the next stage of ${mystery.title}: ${deps.safeLocName(nextId)}.`);
@@ -2961,8 +2962,8 @@ export const createQuestSlice = (
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
-          deps._chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { deps._chainRouting = false; }
+          deps.chainRouting.active = true;
+          try { get().setTravelCourse(nextId); } finally { deps.chainRouting.active = false; }
           // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
           if (get().player?.travelTarget?.locationId === nextId) {
             get().appendLog('world', `Auto-routing to the next chapter of ${def.title}: ${deps.safeLocName(nextId)}.`);
