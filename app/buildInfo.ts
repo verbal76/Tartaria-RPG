@@ -30063,6 +30063,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
 // SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
 export const OTA_BUILD_ID = '2026-09-10-1797-the-word-beside-the-number';
+// golem catch-up 2026-09-10: markerless publish of OTA-1797.
 // OTA-1797 - the word beside the number. Owner ruling 2026-09-10 on the
 // relative-threat matrix (revision 2): thresholds set D' fitted to measured
 // win rates (LETHAL <0.65, SEVERE <0.95, DANGEROUS <1.20, RISKY <1.80,
