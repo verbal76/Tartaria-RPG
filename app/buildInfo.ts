@@ -30064,6 +30064,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
 // SUPERSEDED: '2026-09-10-1797-the-word-beside-the-number'
 export const OTA_BUILD_ID = '2026-09-10-1798-the-instruments-stop-when-the-app-does';
+// golem catch-up 2026-09-10: markerless publish of OTA-1798.
 // OTA-1798 - the instruments stop when the app does. Owner ruling: "OTA-1743/
 // runtimePressureWatch: Repair next as its own package. Proven lifecycle/
 // test-isolation defect. Do not associate it with the SE freeze without
