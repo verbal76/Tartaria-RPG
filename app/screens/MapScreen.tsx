@@ -1562,6 +1562,24 @@ const styles = StyleSheet.create({
   // OTA-171 — Places panel at the bottom of MapScreen. Scrollable
   // capped height so the panel doesn't push the atlas image off-
   // screen on smaller phones.
+  //
+  // ⚠⚠⚠ OTA-1799 — THE CAP WAS THE ONLY THING IT KNEW, AND IT KNEW NOTHING ELSE.
+  // OTA-171's instinct was right — the panel must not push the atlas off a small
+  // screen — and a constant was the obvious way to say it. The viewport audit
+  // measured what that constant actually does: a 248 pt window over 2,844 pt of
+  // atlas index, IDENTICAL on 320×568, 375×667, 390×844, 412×915 and 430×932.
+  // A Pro Max shows the same 9 % of the index as a 4.7" SE while leaving 60 %
+  // of its own canvas unused. The number was never wrong for the SE; it was the
+  // ONLY input, so the panel could not adapt in either direction.
+  //
+  // ⚠⚠ IT DOES NOT NEED ARITHMETIC — IT NEEDS THE COLUMN IT IS ALREADY IN. This
+  // screen's root is `container: { flex: 1 }` inside App's fixed-height interior,
+  // and this panel is the last child of that column. `flex: 1` here means "take
+  // what the atlas and the footer leave", which is the rule the rest of the app's
+  // screens already use, and it is why a taller phone now shows more of the
+  // index without anything being computed. The `minHeight` floor is what OTA-171
+  // was really protecting: on a short screen the panel stops giving ground
+  // before it becomes useless, and the atlas keeps its room.
   placesPanel: {
     marginTop: 8,
     backgroundColor: '#13110f',
@@ -1570,7 +1588,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingTop: 8,
     paddingBottom: 4,
-    maxHeight: 280,
+    flex: 1,
+    minHeight: 160,
   },
   placesPanelTitle: {
     color: '#c9a86a',

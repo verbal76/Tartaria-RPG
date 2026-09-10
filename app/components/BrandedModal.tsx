@@ -167,8 +167,37 @@ export function BrandedModal({
       ) : null}
     </>
   );
+  // ⚠⚠⚠ OTA-1799 — THE ACTION ROW IS A LIST WHEN THE CALLER MAKES IT ONE.
+  //
+  // OTA-1614 (above) pinned this row below the scrolling body so a long BODY
+  // could never push the controls off the card. It fixed the failure it was
+  // built for and it is still right. What it could not foresee is a caller
+  // whose ACTIONS are the variable thing: APPLY ACID FLASK lists every coatable
+  // weapon in the pack here, one Pressable per weapon, so on a real Android
+  // phone the rows walked straight out of the bottom of the card, off the
+  // screen, and into the system navigation bar — CANCEL with them. The owner
+  // photographed it. The audit reproduced it at 375×667 with a thirty-weapon
+  // pack: 23 of 33 rows outside the card, the worst by 985 px, and the modal's
+  // own escape hatch off the display.
+  //
+  // ⚠⚠ SO THE PINNED ROW GETS THE SAME TREATMENT THE BODY GOT, AND FOR THE SAME
+  // REASON. It scrolls, and it yields — `flexShrink` — so it can never grow the
+  // card past the ceiling `kit.modalCard` sets. NOTHING WHOSE HEIGHT COMES FROM
+  // DATA MAY BE UNBOUNDED; that is the rule, and the actions were the last place
+  // in this component where it was not enforced.
+  //
+  // ⚠ AND IT COSTS NOTHING WHEN THERE IS ROOM. A ScrollView sized by its content
+  // is exactly as tall as the View it replaces, so every confirmation card in
+  // the game — one, two, three buttons — lays out to the same pixels it did
+  // before. The scroll only appears when the alternative was leaving the card.
+  // `keyboardSafeCard.layoutCard` is the arithmetic of that promise and the
+  // suite checks it; this is the shape that keeps it.
   const cardButtons = (
-      <View style={styles.buttonRow}>
+      <ScrollView
+        style={styles.actionsArea}
+        contentContainerStyle={styles.buttonRow}
+        keyboardShouldPersistTaps="handled"
+      >
         {buttons.map((b) => (
           <Pressable
             key={b.label}
@@ -182,7 +211,7 @@ export function BrandedModal({
             <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
           </Pressable>
         ))}
-      </View>
+      </ScrollView>
   );
   // ⚠ The scroll view takes `flexShrink` so it yields to the pinned rows rather
   // than the other way round — without it the buttons are what gets squeezed,
@@ -319,6 +348,12 @@ const styles = StyleSheet.create({
   stepperRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 4, gap: 8 },
   stepperLabel: { color: '#cdbf99', fontSize: 12, letterSpacing: 1 },
   context: { color: '#9ec96a', fontSize: 12, marginTop: 8, letterSpacing: 1 },
+  // ⚠ OTA-1799 — the actions' own region. `flexShrink` is the whole point: it
+  // yields to the card's ceiling instead of pushing through it. `flexGrow: 0`
+  // keeps a two-button card exactly as tall as its two buttons, so nothing
+  // changes anywhere there was already room. The 14 pt gap that used to live on
+  // `buttonRow` moved here so the spacing above the actions is unchanged.
+  actionsArea: { flexShrink: 1, flexGrow: 0, marginTop: 14 },
   buttonRow: {
     // Buttons stack vertically so three-action modals (Equip Main Hand /
     // Equip Off Hand / Close) don't overflow the left edge of the card
@@ -329,7 +364,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
     gap: 8,
-    marginTop: 14,
   },
   btn: {
     paddingHorizontal: 14,
