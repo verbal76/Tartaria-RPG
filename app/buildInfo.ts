@@ -30057,7 +30057,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
 // SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
 // SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
-export const OTA_BUILD_ID = '2026-09-10-1792-the-log-keeps-the-freeze';
+// SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
+export const OTA_BUILD_ID = '2026-09-10-1793-stealth-is-not-steal';
+// OTA-1793 - stealth is not steal. Reported by OTA-1738 and left open: a typed
+// `stealth` answered "Nothing to steal here". The deterministic verb table had
+// ten ways to say the stealth intent - hide, sneak, creep, lurk... - and not
+// the word itself, so `stealth` missed exact match and fell to the prefix
+// rule, where `steal` shares five letters and sits two apart, and won. The LLM
+// path's canonical verb list always carried `stealth`; the typed path did not.
+// The word, `stealthy` and `stealthily` join the stealth intent's table. Exact
+// match returns at distance 0 before any fuzzy comparison, so `steal` and
+// `steal the purse` are untouched, and a drunk `stelth` now lands on stealth
+// at distance 1 instead of nowhere. The STEALTH button still submits `sneak`,
+// which was always the stealth intent; the primer's STEALTH row now describes
+// a word the player can also type. Suite ota1793StealthIsNotSteal.
 // golem catch-up 2026-09-10: markerless publish of OTA-1792.
 // OTA-1792 - the log keeps the freeze. The 2026-09-10 iPhone SE freeze report
 // arrived as 297 of 3,048 entries - 57 seconds of a nine-minute session - and

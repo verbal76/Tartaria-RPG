@@ -11,7 +11,13 @@ import { normalizeForCompare, matchAmbientNoun } from './ambientNouns';
 // added from the action-card reference (dash, disengage, help, ready,
 // mount, climb, swim, jump).
 const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
-  stealth: ['hide', 'sneak', 'crawl', 'creep', 'lurk', 'crouch', 'silently', 'shadow', 'conceal', 'slink'],
+  // ⚠ OTA-1793 — THE INTENT'S OWN NAME IS A VERB. The table had ten ways to say
+  // stealth and not the word itself, so a typed `stealth` fell through exact
+  // match to the prefix rule and became `steal` (five shared letters, two apart)
+  // — "Nothing to steal here", on a STEALTH button the primer teaches by that
+  // name. The LLM path's canonical list (llmParser) always had it; this table
+  // did not. Exact match wins at distance 0, so `steal` itself is untouched.
+  stealth: ['hide', 'sneak', 'crawl', 'creep', 'lurk', 'crouch', 'silently', 'shadow', 'conceal', 'slink', 'stealth', 'stealthy', 'stealthily'],
   attack: [
     'attack', 'strike', 'slash', 'stab', 'shoot', 'kill', 'fight', 'charge', 'fire',
     'swing', 'pierce', 'blast', 'smash', 'punch', 'kick', 'cleave', 'loose', 'engage',
