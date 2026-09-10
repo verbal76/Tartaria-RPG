@@ -30063,7 +30063,60 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
 // SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
 // SUPERSEDED: '2026-09-10-1797-the-word-beside-the-number'
-export const OTA_BUILD_ID = '2026-09-10-1798-the-instruments-stop-when-the-app-does';
+// SUPERSEDED: '2026-09-10-1798-the-instruments-stop-when-the-app-does'
+export const OTA_BUILD_ID = '2026-09-10-1799-nothing-from-data-is-unbounded';
+// OTA-1799 - nothing whose height comes from data may be unbounded. A physical
+// Android photograph: APPLY ACID FLASK lists every coatable weapon in the pack
+// as a PINNED action row, so the rows run past the card's own boundary, off the
+// bottom of the screen and into the system navigation region. The owner's
+// ruling on scope is the shape of the whole repair: "ACID FLASK IS ONLY THE
+// PHYSICAL SPECIMEN. DO NOT create an Acid Flask-specific bug... Fix the lowest
+// correct shared authority." And on method: "DO NOT solve this by shrinking
+// rows, shrinking typography, reducing touch targets... The repair target is
+// ALLOCATION OF FINITE VIEWPORT SPACE."
+//
+// So nothing here is smaller. Five packages, each at the lowest authority that
+// owns the question:
+//   P1 keyboardSafeCard  - edge insets, so "usable" means what the platform
+//                          actually leaves; layoutCard/cardStaysBounded answer
+//                          what each scrolling region really gets. Purely
+//                          additive: insets default to zero, so every OTA-1718
+//                          consumer's arithmetic is byte-identical.
+//   P2 BrandedModal      - the chooser's action region becomes a bounded
+//                          scroll. ONE component serves both the weapon and
+//                          the armour picker, so the class is fixed once.
+//                          MapScreen's places panel drops a magic 280 pt cap
+//                          for the room the viewport actually has.
+//   P3 GatherModal       - the bulk sweeps leave their lanes and join IGNORE
+//                          THE REST in one persistent region that the room can
+//                          never scroll away, bounded by construction.
+//   P4 TitleScreen       - the roster gets a floor of two cards and the crest
+//                          gets permission to yield; the masthead passes the
+//                          deficit down. Typography, touch targets and card
+//                          density are untouched, and from 390x844 up nothing
+//                          moves at all.
+//   P5 TutorialOverlay   - the SKIP pill reads the safe-area insets it had been
+//                          ignoring. The residual overlap with the WORLD button
+//                          is REPORTED WITH MEASUREMENTS, not guessed at.
+//
+// Measured on real exported builds - one from 065250f4, one from this tree -
+// driven through real navigation at 375x667 / 390x844 / 430x932. The coating
+// chooser at 30 targets, weapon and armour: ROWS INSIDE A SCROLLER 0 -> 33
+// (0 -> 31 for armour), which is the whole defect and the one number that does
+// not depend on how the instrument treats clipping. Before, the rows laid out
+// 985 pt below the card's own bottom edge in a 667 pt window with NO scroll
+// path to any of them and 21 of 33 not hittable; the way out was the last row
+// and could not be reached. After, all 33 are scroll content - a 430 pt window
+// onto 1458 pt - and CANCEL owns its touch point at the end of the scroll. At
+// one target the card is 353 px before and after, unchanged to the pixel.
+//
+// The room sheet's SALVAGE ALL measured visibleH=0 at BOTH 375x667 and
+// 390x844 before, so this was never an SE-only class; it is fully visible at
+// rest at all three after. The title roster goes 87 -> 148 pt at 375x667 (1.2
+// -> 2.0 cards) with the version footer at an identical y, and 390x844 and
+// 430x932 stay byte-identical band-for-band.
+//
+// Physical device verification remains the owner's, and is NOT claimed here.
 // golem catch-up 2026-09-10: markerless publish of OTA-1798.
 // hal re-issue 2026-09-10: OTA-1798's [ota-hal] CI run (2111) was cancelled by the trunk queue before any job started; republished by this commit under the per-SHA concurrency fix.
 // OTA-1798 - the instruments stop when the app does. Owner ruling: "OTA-1743/
