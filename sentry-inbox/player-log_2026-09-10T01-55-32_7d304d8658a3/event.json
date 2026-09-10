@@ -1,0 +1,243 @@
+{
+  "id": "7d304d8658a348e29dbd312f1de86dad",
+  "groupID": "7723000567",
+  "eventID": "7d304d8658a348e29dbd312f1de86dad",
+  "projectID": "4511945117532160",
+  "size": 10370,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-09-1790-the-exchange-reads-as-a-sentence #mtuvl17tojc3 [inline 7/7]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-09-1790-the-exchange-reads-as-a-sentence",
+  "message": "player-log 2026-09-09-1790-the-exchange-reads-as-a-sentence #mtuvl17tojc3 [inline 7/7]",
+  "title": "player-log 2026-09-09-1790-the-exchange-reads-as-a-sentence #mtuvl17tojc3 [inline 7/7]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "59642ba9853f4975b6b2568b548b3471",
+      "span_id": "b4542bd25e2395bc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6N-TI6-MTk-uOD-kxW-l0g-W3d-vcm-xkX-SBZ-b3U-gc3-Rlc-CBi-YWN-rIG-lud-G8g-VGh-lIE-1vb-mFy-Y2g-ncy-BXY-Xlz-dGF-0aW-9uL-iBU-aGU-gd2-9yb-GQg-d2F-pdH-MgZ-m9y-IHl-vdX-Igb-W92-ZS4-KWz-IwM-jYt-MDk-tMT-BUM-DE6-NTI-6MT-kuO-Dkx-Wl0-gW2-RlY-nVn-XSB-PVE-Egc-2Vz-c2l-vbi-Bzd-GFy-dDo-gMj-AyN-i0w-OS0-wOS-0xN-zkw-LXR-oZS-1le-GNo-YW5-nZS-1yZ-WFk-cy1-hcy-1hL-XNl-bnR-lbm-NlL-gpb-MjA-yNi-0wO-S0x-MFQ-wMT-o1M-jow-OS4-2Mz-BaX-SBb-ZGV-idW-ddI-HZv-aWN-l4o-+xI-Gdh-cCA-xMT-Eyb-XMg-KHd-haX-QgM-TA0-bXM-gKy-Bze-W50-aCA-xMD-A3b-XMs-IGx-pdm-UpI-CJD-aG9-vc2-Uge-W91-ciB-jaG-FyY-WN0-ZXI-uIg-pbM-jAy-Ni0-wOS-0xM-FQw-MTo-1Mj-owO-C40-ODR-aXS-BbZ-GVi-dWd-dIH-Zva-WNl-OiB-idW-5kb-GVk-IHJ-lYW-R5C-g==",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6N-TI6-MDQ-uMz-I0W-l0g-W2R-lYn-VnX-SBu-YXR-pdm-Utc-2Rr-IHZ-lcm-RpY-3Q6-IG5-vbi-1ib-29s-ZWF-uIC-hud-Wxs-KSD-igJ-Qgb-mF0-aXZ-lIH-NpZ-GUg-aGF-kIG-5vd-CBy-ZXN-vbH-ZlZ-CB0-aGU-gbG-Fzd-CBy-dW4-geW-V0C-lsy-MDI-2LT-A5L-TEw-VDA-xOj-UyO-jA0-LjA-5N1-pdI-Ftk-ZWJ-1Z1-0gd-m9p-Y2U-6IG-J1b-mRs-ZWQ-gbG-9hZ-Glu-Zwp-bMj-AyN-i0w-OS0-xMF-QwM-To1-Mjo-wNC-4wO-Tda-XSB-bZG-Vid-Wdd-IHZ-vaW-NlO-iBl-bmd-pbm-U9Y-nVu-ZGx-lZC-B0d-HM9-b24-gdm-9pY-2U9-YW1-fbW-lja-GFl-bAp-bMj-AyN-i0w-OS0-xMF-QwM-To1-Mjo-wMy-44O-TFa-XSB-bZG-Vid-Wdd-IG9-0YT-ogY-m9v-dCB-jaG-Vja-yBy-ZXN-1bH-QgP-SBu-b1V-wZG-F0Z-Qpb-MjA-yNi-0wO-S0x-MFQ-wMT-o1M-jow-My4-4OT-BaX-SBb-ZGV-idW-ddI-G90-YTo-gQW-xyZ-WFk-eSB-1cC-B0b-yBk-YXR-lCg-==",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6N-TI6-MDM-uNT-Y5W-l0g-W2R-lYn-VnX-SBv-dGE-6IE-NoZ-WNr-aW5-n4o-CmC-lsy-MDI-2LT-A5L-TEw-VDA-xOj-UyO-jAz-LjU-2OV-pdI-Ftk-ZWJ-1Z1-0gb-3Rh-OiB-ib2-90I-GNo-ZWN-rIO-KAl-CBl-bmF-ibG-VkP-XRy-dWU-gY2-hhb-m5l-bD1-wcm-V2a-WV3-IHJ-0PT-IuN-C4x-IHV-wZG-F0Z-Ulk-PTA-xYT-A4O-DM3-LTQ-5MT-ItN-2Y5-Mi0-4Nm-Q2L-WIx-MmE-3ZG-FjM-jZk-MQp-bMj-AyN-i0w-OS0-xMF-QwM-Tow-ODo-wOS-4xM-TJa-XSB-bZG-Vid-Wdd-IGF-wcH-N0Y-XRl-OiB-pbm-Fjd-Gl2-ZSD-ihp-IgY-mFj-a2d-yb3-VuZ-CAo-d2F-zIG-luY-WN0-aXZ-lIG-Zvc-iA3-MjB-tcy-kKW-zIw-MjY-tMD-ktM-TBU-MDE-6MD-g6M-Dgu-Mzk-zWl-0gW-2Rl-YnV-nXS-Bhc-HBz-dGF-0ZT-ogY-WN0-aXZ-lIO-KGk-iBp-bmF-jdG-l2Z-SAo-d2F-zIG-Fjd-Gl2-ZSB-mb3-IgO-TE0-NG1-zKQ-o=",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-Dc6-NTk-uMj-Q4W-l0g-W2R-lYn-VnX-SBx-d2V-uOi-BMT-0FE-IEN-BTk-NFT-ExF-RCA-oc3-Rhd-HVz-PWl-kbG-UpI-OKA-lCB-hcH-Agb-W92-ZWQ-gb2-4gb-Wlk-LWx-vYW-Q7I-Hdp-bGw-gcm-Utd-2Fy-bQp-bMj-AyN-i0w-OS0-xMF-QwM-Tow-Nzo-1Ny-45O-DFa-XSB-bZG-Vid-Wdd-IG1-lbW-9ye-Tog-Tk9-USE-lOR-yBU-TyB-SRU-xFQ-VNF-IOK-AlC-Bub-yBt-b2R-lbC-B3Y-XMg-bG9-hZG-VkI-Chx-d2V-uPS-dkb-3du-bG9-hZG-luZ-ycp-LCB-zby-B0a-Glz-IGZ-yZW-VkI-DAg-Ynl-0ZX-MuI-FRo-ZSB-wcm-Vzc-3Vy-ZSB-pcy-Bjb-21p-bmc-gZn-Jvb-SBz-b21-ldG-hpb-mcg-ZWx-zZS-4K",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-Dc6-NTc-uOT-gwW-l0g-W2R-lYn-VnX-SDi-mqD-imq-AgT-UVN-T1J-ZIF-dBU-k5J-Tkc-gIz-E3I-GZy-b20-gdG-hlI-E9T-ICg-xOT-UuO-HMg-c2l-uY2-Ugd-Ghl-IGx-hc3-Qgb-25l-KSD-igJ-QgY-XBw-PWF-jdG-l2Z-SDC-tyB-xd2-VuP-Sdk-b3d-ubG-9hZ-Glu-Zyc-gwr-cgd-m9p-Y2U-9J3-JlY-WR5-JyD-Cty-ByZ-Wxv-YWR-zPT-Agw-rcg-c2F-2ZT-0xN-jRL-Qi4-gVG-hlI-HN5-c3R-lbS-Bpc-yBh-c2t-pbm-cgZ-m9y-IG1-lbW-9ye-SBi-YWN-rOy-BhI-GZy-ZWV-6ZS-Bvc-iBh-IGt-pbG-wgY-2Fu-IGZ-vbG-xvd-y4K-WzI-wMj-YtM-Dkt-MTB-UMD-E6M-Dc6-NTc-uND-YxW-l0g-W2R-lYn-VnX-SBx-d2V-uOi-Bsb-2Fk-aW5-nIC-h3Y-XMg-aWR-sZS-kg4-oCU-IHR-oZS-BBc-mJp-dGV-yIH-NwZ-WFr-cyB-0ZW-1wb-GF0-ZXM-gdW-50a-Wwg-aXQ-gaX-Mgc-mVh-ZHk-K",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-Dc6-NTc-uND-U5W-l0g-W2R-lYn-VnX-SBx-d2V-uOi-ByZ-S13-YXJ-taW-5nI-GFm-dGV-yID-gwM-DBt-cyB-zZX-R0b-GVk-IGZ-vcm-Vnc-m91-bmQ-KWz-IwM-jYt-MDk-tMT-BUM-DE6-MDc-6ND-kuN-DUw-Wl0-gW2-RlY-nVn-XSB-hcH-Bzd-GF0-ZTo-gYm-Fja-2dy-b3V-uZC-Dih-pIg-YWN-0aX-ZlI-Ch3-YXM-gYm-Fja-2dy-b3V-uZC-Bmb-3Ig-MTc-zMz-kxb-XMp-Cls-yMD-I2L-TA5-LTE-wVD-AxO-jA0-OjU-3Lj-ExN-Fpd-IFt-kZW-J1Z-10g-cXd-lbi-13Y-XRj-aGR-vZz-ogY-XBw-IGl-zIG-JhY-2tn-cm9-1bm-RlZ-CDi-gJQ-gaG-9sZ-Glu-ZyB-yZX-Zpd-mFs-IHV-udG-lsI-GZv-cmV-ncm-91b-mQg-KHN-0YX-R1c-z0n-aWR-sZS-cpL-go=",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NTY-uMD-k4W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-TY0-IHB-sYX-llc-j00-MCB-3bT-0zM-lty-b29-tcz-0xM-yBl-dmV-udH-M9M-CBt-ZW1-vcz-0wI-G5w-Y3M-9MS-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MC-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-04N-yBz-Y2V-uZT-01C-lsy-MDI-2LT-A5L-TEw-VDA-xOj-A0O-jU2-LjA-1OF-pdI-Ftk-ZWJ-1Z1-0gY-XBw-c3R-hdG-U6I-Glu-YWN-0aX-ZlI-OKG-kiB-iYW-NrZ-3Jv-dW5-kIC-h3Y-XMg-aW5-hY3-Rpd-mUg-Zm9-yID-Ezb-XMp-Cls-yMD-I2L-TA5-LTE-wVD-AxO-jA0-OjU-2Lj-A0N-Fpd-IFt-kZW-J1Z-10g-YXB-wc3-Rhd-GU6-IGF-jdG-l2Z-SDi-hpI-gaW-5hY-3Rp-dmU-gKH-dhc-yBh-Y3R-pdm-UgZ-m9y-IDQ-zND-Y1N-G1z-KQo-=",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NTE-uMj-k5W-l0g-W2R-lYn-VnX-SBz-ZW5-kLW-xvZ-zog-I21-0dX-Ryd-Tl5-NHd-3eC-Dig-JQg-REV-MSV-ZFU-kVE-ICh-pbm-xpb-mUs-IG5-vIG-F0d-GFj-aG1-lbn-RzK-Tog-YmV-hY2-9uI-G91-dCw-gNy-83I-HBh-cnR-zIG-FjY-2Vw-dGV-kIC-g0O-DI0-NSB-jaG-Fyc-ykg-4oC-UIG-Zsd-XNo-IHN-haW-Qge-WVz-LCB-0cm-Fuc-3Bv-cnQ-gdG-9va-yBl-dmV-yeS-BwY-XJ0-Cls-yMD-I2L-TA5-LTE-wVD-AxO-jA0-OjQ-yLj-E5M-Fpd-IFt-kZW-J1Z-10g-bWV-tb3-J5O-iBO-T1R-ISU-5HI-FRP-IFJ-FTE-VBU-0Ug-4oC-UIG-5vI-G1v-ZGV-sIH-dhc-yBs-b2F-kZW-QgK-HF3-ZW4-9J2-lkb-GUn-KSw-gc2-8gd-Ghp-cyB-mcm-VlZ-CAw-IGJ-5dG-VzL-iBU-aGU-gcH-Jlc-3N1-cmU-gaX-MgY-29t-aW5-nIG-Zyb-20g-c29-tZX-Roa-W5n-IGV-sc2-UuC-g==",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NDI-uMT-g5W-l0g-W2R-lYn-VnX-SDi-mqD-imq-AgT-UVN-T1J-ZIF-dBU-k5J-Tkc-gIz-E2I-GZy-b20-gdG-hlI-E9T-ICg-xOC-40c-yBz-aW5-jZS-B0a-GUg-bGF-zdC-Bvb-mUp-IOK-AlC-Bhc-HA9-YWN-0aX-ZlI-MK3-IHF-3ZW-49J-2lk-bGU-nIM-K3I-HZv-aWN-lPS-dyZ-WFk-eSc-gwr-cgc-mVs-b2F-kcz-0xI-MK3-IHN-hdm-U9M-TYw-S0I-uIF-RoZ-SBz-eXN-0ZW-0ga-XMg-YXN-raW-5nI-GZv-ciB-tZW-1vc-nkg-YmF-jaz-sgY-SBm-cmV-lem-Ugb-3Ig-YSB-raW-xsI-GNh-biB-mb2-xsb-3cu-Cls-yMD-I2L-TA5-LTE-wVD-AxO-jA0-OjQ-wLj-AwO-Fpd-IFt-kZW-J1Z-10g-Ym9-vdD-ogb-Glm-ZSB-ibX-R1d-Gg1-aWY-4NS-Bzd-GFy-dGV-kID-IwM-jYt-MDk-tMT-BUM-DA6-NTY-6Mz-IuM-jk1-WiD-Cty-Bub-3Qg-YW4-gT1-RBI-GFw-cGx-5IC-hub-yBo-YW5-kb2-ZmI-G9u-IGR-pc2-spC-g==",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NDA-uMD-A4W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-wrc-gYX-Q9b-W9u-YXJ-jaF-93Y-Xlz-dGF-0aW-9uC-lsy-MDI-2LT-A5L-TEw-VDA-xOj-A0O-jQw-LjA-wN1-pdI-Ftk-ZWJ-1Z1-0gb-Wlz-c2l-vbn-M6I-GZh-Y3R-pb2-46Z-nFf-dGF-ydG-Fya-WFu-X3J-ldm-l2Y-Wxp-c3R-zX3-N0c-mFu-ZGV-kX2-VzY-29y-dCB-bc2-luZ-2xl-IG9-iam-Vjd-Gl2-ZV0-gUE-FVU-0VE-Cls-yMD-I2L-TA5-LTE-wVD-AxO-jA0-OjQ-wLj-AwN-1pd-IFt-kZW-J1Z-10g-bWl-zc2-lvb-nM6-IGZ-hY3-Rpb-246-ZnF-fc3-Rvb-mVf-YnV-pbG-Rlc-nNf-c3R-yYW-5kZ-WRf-ZXN-jb3-J0I-Ftz-aW5-nbG-Ugb-2Jq-ZWN-0aX-ZlX-SBQ-QVV-TRU-QK",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NDA-uMD-A3W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-ZmF-jdG-lvb-jpm-cV9-zZX-J2Y-W50-c19-vZl-9na-WFu-dHN-fc3-RyY-W5k-ZWR-fZX-Njb-3J0-IFt-zaW-5nb-GUg-b2J-qZW-N0a-XZl-XSB-QQV-VTR-UQK-WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NDA-uMD-A3W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-ZmF-jdG-lvb-jpm-cV9-jb2-5zc-Gly-YWN-5X2-FyY-2hp-dGV-jdH-Nfc-3Ry-YW5-kZW-RfZ-XNj-b3J-0IF-tza-W5n-bGU-gb2-JqZ-WN0-aXZ-lXS-BQQ-VVT-RUQ-KWz-IwM-jYt-MDk-tMT-BUM-DE6-MDQ-6ND-AuM-DA3-Wl0-gW2-RlY-nVn-XSB-taX-Nza-W9u-czo-gZm-Fjd-Glv-bjp-mcV-9ld-GVy-bmF-sX2-R5b-mFz-dHl-fc3-RyY-W5k-ZWR-fZX-Njb-3J0-IFt-zaW-5nb-GUg-b2J-qZW-N0a-XZl-XSB-QQV-VTR-UQK",
+      "WzI-wMj-YtM-Dkt-MTB-UMD-E6M-DQ6-NDA-uMD-A3W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-ZmF-jdG-lvb-jpm-cV9-0cn-VlX-3Rh-cnR-hcm-lhb-nNf-c3R-yYW-5kZ-WRf-ZXN-jb3-J0I-Ftz-aW5-nbG-Ugb-2Jq-ZWN-0aX-ZlX-SBQ-QVV-TRU-QKW-zIw-MjY-tMD-ktM-TBU-MDE-6MD-Q6N-DAu-MDA-3Wl-0gW-2Rl-YnV-nXS-Bta-XNz-aW9-ucz-ogZ-mFj-dGl-vbj-pmc-V9y-ZWN-sYW-ltZ-XJz-X2d-1aW-xkX-3N0-cmF-uZG-VkX-2Vz-Y29-ydC-Bbc-2lu-Z2x-lIG-9ia-mVj-dGl-2ZV-0gU-EFV-U0V-ECl-syM-DI2-LTA-5LT-EwV-DAx-OjA-0Oj-QwL-jAw-N1p-dIF-tkZ-WJ1-Z10-gbW-lzc-2lv-bnM-6IG-ZhY-3Rp-b24-6Zn-FfZ-m9y-Z29-0dG-VuX-29y-ZGV-yX3-N0c-mFu-ZGV-kX2-VzY-29y-dCB-bc2-luZ-2xl-IG9-iam-Vjd-Gl2-ZV0-gUE-FVU-0VE-Cgo-9PT-0gR-U5E-IFJ-FUE-9SV-CA9-PT0-="
+    ],
+    "chunkChars": 4143,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-09-1790-the-exchange-reads-as-a-sentence #mtuvl17tojc3 [inline 7/7]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtuvl17tojc3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-09-1790-the-exchange-reads-as-a-sentence"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "7"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-09-1790-the-exchange-reads-as-a-sentence"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-10T01:55:32.666647Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-10T01:55:32.605000Z",
+  "fingerprints": [
+    "7b96534d631d8c949645c3d15d7e63cd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1964188154,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-09T22:08:07.566363Z",
+    "dateReleased": "2026-09-09T22:08:45.613129Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5c76fa201241b3d2915a0557dd1204ab0c9091b8",
+      "message": "[ota-hal] OTA-1790 \u2014 the exchange reads as a sentence\n\nThe reference pack's central instruction: *\"The current transcript contains the\nright facts but makes the player reconstruct the event from fragments. Replace\nthe math/problem-reading presentation with plain-language event reporting.\"*\nIts target, verbatim: `YOU HIT Conspiracy Architect 1 for 25 HP`. Its\nprohibition, verbatim: *\"Do not show the old equation-like fragments, duplicated\nactor/outcome labels, arrows, or disconnected damage values when the same\ninformation can be read as one sentence.\"*\n\nWHAT SHIPPED WAS ALL FOUR OF THOSE, AND IT COST TWO ROWS PER SWING. One player\nattack writes TWO log lines \u2014 the to-hit verdict and then the damage \u2014 and\nVIS-2's strip drew each as its own instrument row:\n\n    YOU > Raider                     HIT\n    YOU > Raider                     HIT   25\n      Rusted Blade          Raider 12/40\n\nDuplicated actor labels, a duplicated stamp, an arrow, and a damage value\nmarooned in a column eight positions away from the words that explain it.\n\nWHAT THE PASS ACTUALLY DOES\n\n  A. THE EVENT LINE. `engine/combatSentence.eventLine` turns one authoritative\n     `CombatEvent` into the pack's sentence as ORDERED PARTS \u2014 subject, verb,\n     object, damage tail, note, standing readout \u2014 so a renderer can colour a\n     part without ever being the thing that decides word order. Two rulings\n     inside it are worth naming:\n       * A DEFENSIVE OUTCOME IS REPORTED FROM THE DEFENDER'S SIDE. `side` says\n         who swung; on a dodge nobody cares who swung. `Raider DODGED YOU`,\n         `YOU EVADED Raider` \u2014 the pack's own example is written that way.\n       * `crit` AND `fumble` BECOME A NOTE, NOT A VERB. \"YOU CRIT Raider\" is\n         jargon and \"YOU FUMBLED Raider\" is not English. Both keep the emphasis\n         VIS-2 reserved for them, as `\u2014 CRITICAL` / `\u2014 FUMBLE`.\n     The pack's zero-damage case is implemented verbatim:\n     `Conspiracy Architect 1 HIT YOU for 0 HP \u2014 ARMOUR ABSORBED`.\n\n  B. THE FOLD. `foldExchanges` pairs each to-hit verdict with the damage line\n     reporting the same exchange and drops the verdict's row, keeping its roll.\n     Two passes, because order is not negotiable \u2014 a one-pass version has to HOLD\n     a verdict it might later emit, and an unconsumed verdict would surface at\n     the wrong place in the feed. The match is narrow (same side, same\n     counterpart, no intervening verdict for that combatant), because a\n     five-raider round interleaves and a loose match would staple one raider's\n     roll onto another raider's blow. An EXCEPTIONAL verdict wins over the\n     damage line's plain outcome \u2014 the resolver writes `crit` on the swing and\n     `hit` on the damage, so a naive merge would silently demote every critical\n     hit in the game.\n\n  C. THE WEAPON MARK. `weaponFamilyArt` (OTA-1789) finally has a consumer. The\n     family is resolved AT THE SWING from the catalog row `getEquippedWeapon`\n     returns \u2014 never from `weaponName`, which is a display string and may carry a\n     coating prefix; the pack forbids prose string matching by name. Bare hands\n     are a family rather than a missing weapon (`swungFamily(row, bareHanded)`).\n     The mark is 20dp because the event line is 14/20 and one line box is exactly\n     what a subordinate mark may cost \u2014 the pack allowed a smaller governed\n     density than 28 explicitly, and this is a derivation rather than a taste\n     call. The column is RESERVED whether or not there is a picture.\n\n  D. LAYER B. The consequence in words, naming the actual weapon, riding on the\n     EVENT rather than replacing `entry.text`. The resolver still writes its full\n     sentence \u2014 every number in it \u2014 so the disk log, the LOG export and the\n     playtest reports read exactly as they did. One authority, two audiences.\n     `enemyStrikeProse` takes `armour` as an argument rather than guessing:\n     *\"Your armour turns the blow aside\"* is a claim about mechanics and must be\n     true when it is printed.\n\n  E. THE COATING. Named only at the proc site, where a roll actually landed, and\n     drawn with the DAMAGE/COATING glyph family \u2014 never the weapon one. The pack:\n     *\"Weapon glyph = what delivered the attack. Damage/coating glyph = what kind\n     of damage/effect occurred. Do not collapse those concepts into one icon.\"*\n\nTHE EXTRACTION, AND WHY IT WAS THE PRICE OF ADMISSION\n\n`check:storeceiling` sat at 36,998 of 36,998 with NO headroom, and this pass\nneeded lines the store did not have. The owner's ruling was *\"EXTRACT, DO NOT\nJUST RAISE IT\"*. Five pure functions of (weapon, name, damage) \u2014 `weaponPhrase`,\n`attackOpener`, `attackHit`, `attackMiss`, `attackKill` \u2014 were living at the\nbottom of a 37,000-line store; `engine/combatProse.ts` was already named for\nexactly them and already declared the rule they obey. They moved verbatim: same\nwords, same pools, same order, so every line the game has ever printed still\nprints. The store went 36,998 -> 36,963 and the CEILING came down onto the\nmeasurement. This is the first time that number has fallen as a CONDITION OF\nWORK rather than as tidying, which is the pressure the valve exists to create.\n\nWHAT CHANGED THAT SOMEBODY MIGHT MISS\n\n  * `row-reverse` IS GONE. VIS-2 flipped the whole incoming row to move the\n    spine to the far side. A reserved glyph column cannot survive that \u2014 the mark\n    lands on a different x on every incoming blow and the column stops being one.\n    BOTH edges are reserved now and exactly one is lit: 4px buys back the same\n    non-chromatic \"which way did this go\", and the mark's x is identical in both\n    directions rather than merely close. VIS-2's third structural cue (the\n    indent) is retired with it; the sentence's own word order replaces it and is\n    the strongest of the four, being English rather than a convention to learn.\n  * THE NAME IS NO LONGER CLAMPED TO ONE LINE. Deliberately reversed, on the\n    pack's instruction: *\"Allow long enemy names to wrap/truncate according to a\n    governed rule without scrambling HIT/target/damage order.\"* The governed rule\n    is WRAP. This is also what closes OTA-1772's defect class structurally \u2014 you\n    cannot weld a stamp to an ellipsis when there is neither.\n  * A LANDED BLOW IS NOW ONE ROW, NOT TWO. VIS-2's density measurement improves;\n    ota1745's assertion was re-aimed upward rather than relaxed.\n  * THE SCREEN READER GETS THE SAME SENTENCE THE EYE DOES. It used to get\n    \"YOU attacks Raider: HIT, 25 damage\" \u2014 a third phrasing invented in the\n    component.\n\nFINDING, REPORTED NOT FIXED \u2014 THE ENEMY HAS NO WEAPON FAMILY\n\n`Enemy` carries `attack` and `damage` as dice strings and nothing that names an\nobject. The only weapon-shaped fact in reach is `enemyDamageType`, and deriving a\nsword from \"slashing\" would make the mark a DAMAGE-TYPE icon, which the pack says\nin so many words the weapon glyph is not. So incoming exchanges reserve the\ncolumn and leave it empty, per the pack's own fail-safe rule, and a test pins the\ngap so a later pass has to argue with it rather than quietly fill it in.\n\nTHREE SHIPPED SUITES WERE RE-AIMED AT THEIR CLAIMS, NOT DELETED\n\nota1772 (the stamp/name collision), ota1745 (density and the one-second read).\nEvery re-aim is annotated in place with what changed and why, including the one\nclaim this pass deliberately REVERSED (the one-line name clamp). Where a claim\nbecame structurally impossible, the test now asserts the impossibility \u2014 which is\na stronger guard than the layout assertion it replaces.\n\nGrade the code, not the prose \u2014 28th sighting. This file's own header quotes the\nfragments it deleted (`YOU > Raider`, the arrow, the stamp), so a scanner reading\nraw source would report the defect as still present. The suite carries a\n`codeOf()` stripper plus an assertion that the RAW file still names them.\n\n23/23 gates green. Full surface green.\n\nStamp: 2026-09-09-1790-the-exchange-reads-as-a-sentence\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-09T22:04:45Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-09-1790-the-exchange-reads-as-a-sentence",
+          "shortVersion": "tartaria@4.32.11+2026-09-09-1790-the-exchange-reads-as-a-sentence",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-09T22:08:45.613129Z",
+          "dateCreated": "2026-09-09T22:08:07.566363Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "157055280",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-09T22:08:45.936189Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-09-1790-the-exchange-reads-as-a-sentence",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-09-1790-the-exchange-reads-as-a-sentence",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-09-1790-the-exchange-reads-as-a-sentence",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-09-1790-the-exchange-reads-as-a-sentence)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7f61c2dcfe1e49409b0784c0543ef532",
+  "previousEventID": "43e4116e11524afc932cd85c0a12153b"
+}
