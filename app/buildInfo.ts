@@ -30060,6 +30060,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
 // SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
 export const OTA_BUILD_ID = '2026-09-10-1794-one-ceiling-per-tile';
+// golem catch-up 2026-09-10: markerless publish of OTA-1794.
 // OTA-1794 - one ceiling per tile. The rarity ceiling a tile's danger allows
 // (0-1 Common, 2 Uncommon, 3 Rare, 4+ Legendary) was written three times in
 // encounter.ts - inline in pickEnemyForLocation, inline in
