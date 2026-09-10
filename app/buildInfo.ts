@@ -30061,6 +30061,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
 // SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
 export const OTA_BUILD_ID = '2026-09-10-1795-retreat-gives-ground';
+// golem catch-up 2026-09-10: markerless publish of OTA-1795.
 // OTA-1795 - retreat gives ground. Owner ruling 2026-09-10: "retreat: Give
 // ground. Reserve flee for actually attempting to leave combat." This REVERSES
 // the audit-brief canon OTA-1724 pinned ("RETREAT = attempt to leave combat")
