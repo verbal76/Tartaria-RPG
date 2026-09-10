@@ -56,8 +56,126 @@ export function keyboardInset(vp: CardViewport): number {
 /** ⚠ THE ONE NUMBER EVERY CARD NEEDS: how tall it may be. A percentage of the
  *  WINDOW — which is what these modals used — is the defect, because it does not
  *  know the keyboard exists. */
-export function cardMaxHeight(vp: CardViewport): number {
-  return Math.max(0, visibleBottom(vp) - CARD_MARGIN * 2);
+export function cardMaxHeight(vp: UsableViewport): number {
+  return Math.max(0, usableBottom(vp) - usableTop(vp) - CARD_MARGIN * 2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ⚠⚠⚠ OTA-1799 — THE SAME QUESTION, ASKED BY EVERYTHING THAT SCROLLS.
+   ══════════════════════════════════════════════════════════════════════════
+   OTA-1718 built the arithmetic above for one question — can the player reach
+   SEND with the keyboard open — and it has been right about that question ever
+   since. The viewport audit found the question is more general than the file it
+   lives in, and found a second shape of the same defect on a physical Android
+   phone: APPLY ACID FLASK listed every coatable weapon in the pack as a PINNED
+   action row, so the rows grew past the card's own boundary, off the bottom of
+   the screen, and into the system navigation region.
+
+   ⚠⚠ THAT IS THE MIRROR OF OTA-1614. OTA-1614 stopped the BODY growing the card
+   past the screen by giving the body a scroll and pinning the buttons below it.
+   It could not have anticipated a caller putting a DYNAMIC POPULATION into the
+   pinned row — the one region whose whole job is never to move. The rule is the
+   same either way, and it is worth stating once, plainly:
+
+       NOTHING WHOSE HEIGHT COMES FROM DATA MAY BE UNBOUNDED.
+
+   ⚠ WHAT IS ADDED HERE, AND WHAT DELIBERATELY IS NOT. Added: edge insets, so
+   "usable" can mean what the platform actually leaves rather than the raw
+   window; and `layoutCard`, which answers what each scrolling region ACTUALLY
+   gets once the ceiling is applied. NOT added: any notion that a fixed size is
+   suspect. A 44dp control is a 44dp control. This file answers one question —
+   HOW MUCH SPACE DOES THIS FLEXIBLE BODY HAVE — and it now answers it for
+   action rows as well as for prose.
+
+   ⚠ EVERY EXISTING CONSUMER IS UNCHANGED. Insets default to zero, and with zero
+   insets `usableBottom`/`usableTop` reduce to `visibleBottom`/0, so
+   `cardMaxHeight` returns exactly what it returned before. */
+
+/** What the platform reserves at the edges of the window: the notch and status
+ *  bar above, the home indicator or Android navigation bar below. Zero on a
+ *  device that reserves nothing, which is why zero is the default. */
+export interface EdgeInsets {
+  top: number;
+  bottom: number;
+}
+
+export const NO_INSETS: EdgeInsets = { top: 0, bottom: 0 };
+
+/** A viewport that also knows what the platform is keeping. `CardViewport` is
+ *  this with no insets, which is why every existing caller still type-checks. */
+export interface UsableViewport extends CardViewport {
+  insets?: EdgeInsets;
+}
+
+/** The first row of pixels the app may actually paint into. */
+export function usableTop(vp: UsableViewport): number {
+  const t = vp.insets?.top;
+  return typeof t === 'number' && Number.isFinite(t) ? Math.max(0, t) : 0;
+}
+
+/** The last row of pixels the app may actually paint into: whichever comes
+ *  first, the keyboard's top edge or the start of the system's own furniture. */
+export function usableBottom(vp: UsableViewport): number {
+  const b = vp.insets?.bottom;
+  const reserved = typeof b === 'number' && Number.isFinite(b) ? Math.max(0, b) : 0;
+  return Math.max(0, Math.min(visibleBottom(vp), vp.windowHeight - reserved));
+}
+
+/** Everything between the two — the number a scrolling body is entitled to ask
+ *  about before it decides how tall to be. */
+export function usableHeight(vp: UsableViewport): number {
+  return Math.max(0, usableBottom(vp) - usableTop(vp));
+}
+
+/** A card's parts, sorted by what they can do under pressure. */
+export interface CardRegions {
+  /** Chrome that cannot give: header, padding, borders, a pinned rule. */
+  fixed: number;
+  /** Natural heights of the regions that CAN scroll, in render order. A
+   *  region's natural height is what it would be with nothing in its way. */
+  scrollable: number[];
+}
+
+/** ⚠⚠ WHAT THE CARD ACTUALLY BECOMES. Given the room available and the parts,
+ *  return the card's height and what each scrolling region really gets.
+ *
+ *  The rule matches Yoga's, because the layout IS Yoga's: regions that may
+ *  shrink absorb the shortfall in proportion to their natural height, which is
+ *  what equal `flexShrink` does. When there is room, every region gets its
+ *  natural height and the card is exactly as tall as it was before this file
+ *  existed — that is the property the audit's negative control turns on, and it
+ *  is why adopting this costs nothing on a roomy screen.
+ *
+ *  `overflowed` is the honest failure: chrome alone taller than the ceiling.
+ *  Nothing can scroll its way out of that, and a caller that sees it is being
+ *  told to show less rather than to lay out smaller. */
+export function layoutCard(
+  vp: UsableViewport,
+  regions: CardRegions,
+): { cardHeight: number; regionHeights: number[]; overflowed: boolean } {
+  const ceiling = cardMaxHeight(vp);
+  const fixed = Math.max(0, regions.fixed);
+  const natural = regions.scrollable.map((h) => Math.max(0, h));
+  const naturalTotal = natural.reduce((a, b) => a + b, 0);
+
+  if (fixed >= ceiling) {
+    return { cardHeight: ceiling, regionHeights: natural.map(() => 0), overflowed: true };
+  }
+  const forRegions = ceiling - fixed;
+  if (naturalTotal <= forRegions) {
+    return { cardHeight: fixed + naturalTotal, regionHeights: natural, overflowed: false };
+  }
+  const scale = forRegions / naturalTotal;
+  return { cardHeight: ceiling, regionHeights: natural.map((h) => h * scale), overflowed: false };
+}
+
+/** ⚠ THE CHOOSER INVARIANT, AS ARITHMETIC. A chooser is sound when the card
+ *  stays inside its ceiling and its chrome still fits — however many targets the
+ *  player's pack happens to hold. Growing the population must grow the
+ *  SCROLLABLE CONTENT, never the card. */
+export function cardStaysBounded(vp: UsableViewport, regions: CardRegions): boolean {
+  const out = layoutCard(vp, regions);
+  return !out.overflowed && out.cardHeight <= cardMaxHeight(vp) + 0.5;
 }
 
 /** Fixed chrome: the parts of a card that do not scroll. The footer is the row
@@ -74,12 +192,12 @@ export interface CardChrome {
  *  can reach and activate SEND." That is true exactly when the header, the
  *  footer and a usable body all fit above the keyboard — the body scrolls, so
  *  the amount of text typed cannot change the answer. */
-export function footerIsReachable(vp: CardViewport, chrome: CardChrome): boolean {
+export function footerIsReachable(vp: UsableViewport, chrome: CardChrome): boolean {
   return bodyHeight(vp, chrome) >= MIN_BODY_HEIGHT;
 }
 
 /** What is left for the scrolling middle once the chrome is paid for. */
-export function bodyHeight(vp: CardViewport, chrome: CardChrome): number {
+export function bodyHeight(vp: UsableViewport, chrome: CardChrome): number {
   return cardMaxHeight(vp) - chrome.header - chrome.footer - chrome.padding;
 }
 
