@@ -31,6 +31,8 @@ import { reachBandsFor, reachFiresDown } from '../app/engine/types';
 
 const ROOT = join(__dirname, '..');
 const INPUT = readFileSync(join(ROOT, 'app', 'components', 'InputBox.tsx'), 'utf8');
+// ⚠ OTA-1800 — the shared authority both sides now read.
+const RESOLUTION = readFileSync(join(ROOT, 'app', 'state', 'combatResolution.ts'), 'utf8');
 const STORE = readFileSync(join(ROOT, 'app', 'state', 'gameStore.ts'), 'utf8');
 const SCREEN = readFileSync(join(ROOT, 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
 
@@ -64,7 +66,15 @@ describe('OTA-1517 — one predicate, asked by both sides', () => {
     // Both the gate and the button must call the shared export. A literal
     // far/distant test in either file is the desync waiting to happen.
     expect(codeOnly(STORE)).toContain('const firesDown = reachFiresDown(reach.bands);');
-    expect(codeOnly(INPUT)).toContain('if (groundedFoesBelow && !reachFiresDown(bands)) return \'needs-approach\';');
+    /* ⚠ OTA-1800 — THE BUTTON'S HALF MOVED, AND THIS CLAIM GOT STRONGER FOR IT.
+     * The button used to spell the elevation test itself, one line down from
+     * this pin. It now asks `weaponSwingRefusal`, which is the store's three
+     * gates in the store's order — so "neither side hand-rolls it" is no longer
+     * a thing two files each remember to do, it is a thing only one file can
+     * do. The desync this test exists to prevent is now structurally
+     * unavailable rather than merely absent. */
+    expect(codeOnly(INPUT)).toContain('weaponSwingRefusal({');
+    expect(codeOnly(RESOLUTION)).toContain("if (f.groundedFoesBelow && !reachFiresDown(f.bands)) return 'cannot-fire-down';");
     for (const src of [STORE, INPUT]) {
       expect(codeOnly(src)).not.toMatch(/includes\('far'\)\s*\|\|\s*.*includes\('distant'\)/);
     }
@@ -73,15 +83,23 @@ describe('OTA-1517 — one predicate, asked by both sides', () => {
 
 describe('OTA-1517 — the button now answers the gate\'s question', () => {
   it('⚠⚠ weaponTone takes the elevation fact and answers it BEFORE the band test', () => {
-    const fn = INPUT.slice(INPUT.indexOf('function weaponTone('));
+    const fn = INPUT.slice(INPUT.indexOf('export function weaponTone('));
     const body = fn.slice(0, fn.indexOf('\n}'));
     expect(body).toContain('groundedFoesBelow?: boolean,');
-    // Elevation first — a weapon can be perfectly in-band and still unable to
-    // land, which is precisely the case that produced four dead taps.
-    const elevAt = body.indexOf('groundedFoesBelow && !reachFiresDown(bands)');
-    const bandAt = body.indexOf('return bands.includes(range)');
+    // ⚠ OTA-1800 — the button still TAKES the elevation fact and still passes
+    // it on; what it no longer does is decide what to do with it. The ORDER
+    // this test was really about (elevation answered before the band, because a
+    // weapon can be in-band and still unable to land) now lives in
+    // `weaponSwingRefusal` and is asserted there, against the store's order.
+    expect(body).toContain('groundedFoesBelow,');
+    const order = RESOLUTION.slice(RESOLUTION.indexOf('export function weaponSwingRefusal('));
+    const elevAt = order.indexOf("return 'cannot-fire-down'");
+    const bandAt = order.indexOf("return 'out-of-reach'");
     expect(elevAt).toBeGreaterThan(-1);
-    expect(bandAt).toBeGreaterThan(elevAt);
+    expect(bandAt).toBeGreaterThan(-1);
+    // The store refuses on reach FIRST — the thing the player can act on by
+    // moving — so the predicate must report them in that same order.
+    expect(elevAt).toBeGreaterThan(bandAt);
   });
 
   it('⚠⚠ EVERY weapon button gets the fact — however many there are', () => {

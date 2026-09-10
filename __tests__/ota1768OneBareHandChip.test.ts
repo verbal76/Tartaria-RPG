@@ -67,9 +67,14 @@ describe('the chip is gone', () => {
     /* `weaponTone(..., null, ...)` with a null hand resolves bare-hand reach, so
      * PUNCH still goes amber when the foe is out of arm's length rather than
      * going green and bouncing. That was OTA-1517's fix and it is not this
-     * pass's to undo. */
+     * pass's to undo.
+     *
+     * ⚠ OTA-1800 MOVED THIS PIN, NOT THE RULE IT GUARDS. `weaponTone` gained a
+     * fifth argument — the name of the weapon being swung — so a JAMMED weapon
+     * can no longer paint itself green. A bare hand has no weapon to jam, so it
+     * passes `null` there, and every claim this test makes is unchanged. */
     const code = codeOf(INPUTBOX);
-    expect(code).toContain('weaponTone(reachPlayer, null, range, groundedFoesBelow)');
+    expect(code).toContain('weaponTone(reachPlayer, null, range, groundedFoesBelow, null)');
     expect(code).toContain("outOfRange={punchT === 'needs-approach'}");
   });
 });

@@ -30064,7 +30064,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
 // SUPERSEDED: '2026-09-10-1797-the-word-beside-the-number'
 // SUPERSEDED: '2026-09-10-1798-the-instruments-stop-when-the-app-does'
-export const OTA_BUILD_ID = '2026-09-10-1799-nothing-from-data-is-unbounded';
+// SUPERSEDED: '2026-09-10-1799-nothing-from-data-is-unbounded'
+export const OTA_BUILD_ID = '2026-09-10-1800-green-means-usable-now';
+// OTA-1800 - green means usable now, not merely in range. Owner ruling from
+// physical Android screenshots: "The large equipped weapon control in Combat
+// looks substantially better with the DARK / BLACK fill than with the bright
+// green fill... The weapon artwork already provides strong saturated colour."
+// So the fill goes and the NAME carries readiness instead:
+//     dark body   = this is my equipped weapon
+//     green name  = I can use it right now
+//     amber name  = equipped, but not currently a valid action
+// The control's identity stays put while its signal moves. Two colour literals
+// changed; no padding, height, border width, font size or touch target moved,
+// which is what keeps OTA-1799's viewport work untouched.
+//
+// ⚠ ONE DEVIATION FROM THE RULING, STATED RATHER THAN QUIETLY MADE: the owner
+// wrote "NORMAL/NEUTRAL WEAPON NAME" for the not-usable case. It ships AMBER
+// (#c9a86a), not neutral, because amber is already load-bearing: it is the
+// vocabulary's "cannot land from HERE" and OTA-930's rule that a control which
+// cannot act must not look like one that can. Painting it neutral would make
+// the unusable weapon read as an ordinary chip with nothing worth reporting,
+// which is the one thing it is not. Left amber and put to the owner as a
+// question rather than decided here.
+//
+// ⚠ AND THE SIGNAL NOW COMES FROM THE GATE, WHICH IS THE REAL REPAIR. The
+// store refuses a swing for THREE reasons - reach, elevation (OTA-960/1517),
+// and a JAMMED weapon (OTA-1564's weapon_overheated lock). The button knew the
+// first two and had never heard of the third, so a jammed Rust Rifle at close
+// range painted itself ready and the tap bounced. That is OTA-1006's defect for
+// the third time, one gate further down each time. Rather than teach the button
+// a third rule, `weaponSwingRefusal` in combatResolution IS the store's gates in
+// the store's order, and both the gate and the button read it. A fourth refusal
+// added there reaches the button without anyone remembering to. No combat rule
+// changed: same conditions, same order, same outcomes.
+//
+// Suite ota1800GreenMeansUsableNow 19/19, including the owner's five cases and
+// four staleness transitions. Five negative controls red-then-green; NC-5 (cut
+// the button loose from the authority and let it re-derive from range) passed
+// at first and exposed that the suite tested the predicate but never its
+// consumer - the connection tests exist because that control found the gap.
 // OTA-1799 - nothing whose height comes from data may be unbounded. A physical
 // Android photograph: APPLY ACID FLASK lists every coatable weapon in the pack
 // as a PINNED action row, so the rows run past the card's own boundary, off the

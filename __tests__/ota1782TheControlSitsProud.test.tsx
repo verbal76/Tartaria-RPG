@@ -96,9 +96,18 @@ function lum([r, g, b]: [number, number, number]): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** The four faces the owner named, taken from the shipped styles. */
+/** The four faces the owner named, taken from the shipped styles.
+ *
+ * ⚠ OTA-1800 NOTE: `filled sage` was `quickStrike`'s body until the owner ruled
+ * the equipped weapon dark on 2026-09-10; the weapon chip now wears the neutral
+ * outline below. The row STAYS, and not as a fossil — the claim these four
+ * measure is that ONE highlight/shadow pair serves faces at both ends of the
+ * range without a per-face variant, and dropping the brightest face would leave
+ * the claim asserted only over faces that agree with each other. `#9ec96a` is
+ * still shipped (it is the weapon chip's border and its lettering), so this is
+ * a real face and not a hypothetical one. */
 const FACES = {
-  'filled sage': '#9ec96a',      // quickStrike — a weapon that can land
+  'filled sage': '#9ec96a',      // the sage — now the weapon chip's rim and ink
   'filled gold': '#c9a86a',      // the modals' btnPrimary
   'semantic outline': '#1b2417', // quickReady — an available tool
   'neutral outline': '#1a1714',  // the quick chassis — the default chip
@@ -327,11 +336,22 @@ describe('OTA-1782 — the combat colour vocabulary is untouched', () => {
   /* Owner: *"Do not allow this work to change the already-established combat
    * color vocabulary... Depth must be orthogonal to those meanings."* Six
    * values, asserted literally, because that is exactly the list that was
-   * ruled on. */
+   * ruled on.
+   *
+   * ⚠⚠⚠ ONE ROW MOVED, AND ONLY BY A LATER RULING FROM THE SAME DESK. This
+   * guard says DEPTH may not repaint the vocabulary, and depth never did — the
+   * strike row below changed on 2026-09-10 because the owner ruled *"KEEP THE
+   * EQUIPPED WEAPON CONTROL DARK"* in a separate pass (OTA-1800), which is the
+   * one authority this guard was never meant to stand against. The value is
+   * updated rather than the assertion loosened, so the row keeps doing its job:
+   * the NEXT depth pass still cannot touch it. The hue itself did not move —
+   * `#9ec96a` is still the strike colour, spent on rim and lettering instead of
+   * on the body. */
+
   const code = codeOf(read(INPUT_BOX));
 
   it.each([
-    ['strike — filled sage', "quickStrike: { borderColor: '#9ec96a', backgroundColor: '#9ec96a' }"],
+    ['strike — sage on the chassis ground', "quickStrike: { borderColor: '#9ec96a', backgroundColor: '#1a1714' }"],
     ['ready — sage outline', "quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' }"],
     ['defensive — blue', "quickDefensive: { borderColor: '#6a9bbf' }"],
     ['needs-approach — amber', "quickNeedsApproach: { borderColor: '#c9a86a' }"],

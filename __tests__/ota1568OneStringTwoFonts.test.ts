@@ -33,6 +33,15 @@
  * carry on the dark chips, while the black outline separates them from the light
  * one.
  *
+ * ⚠⚠ FOOTNOTE, OTA-1800 (2026-09-10): the "light sage `quickStrike`" this
+ * header argues against no longer exists. The owner ruled the equipped weapon
+ * control DARK, so every combat chip now has a near-black body and the strike
+ * label wears the sage instead. The halo is NOT thereby decoration: it is still
+ * the only technique that reaches a COLOUR EMOJI, whose own colours no chip
+ * background can override, which is the case this header opened with. What the
+ * ruling removed is the SECOND reason — "no single hue reads on both fills" —
+ * because there is only one kind of fill left.
+ *
  * ⚠ HONESTLY STATED, HERE AND IN THE SOURCE: on a device that renders `🔥` as a
  * colour emoji, its colour entry does nothing. The colours are the fallback for
  * the text-presentation case. An emoji's own colours cannot be overridden, and
@@ -102,11 +111,23 @@ describe('OTA-1568 — the split says exactly what the flat label says', () => {
     // sitting on a sage-green button, which is the collision he photographed —
     // but the PROPERTY this pins is unchanged and is the thing he asked for:
     // acid has a colour of its own instead of inheriting the chip's label.
+    //
+    // ⚠⚠ AND OTA-1800 MADE THE LAST LINE READ ITS SOURCE INSTEAD OF A HEX. The
+    // owner ruled the equipped weapon dark, so the strike LABEL colour moved
+    // from soot `#15180f` to the sage `#9ec96a` the body used to wear. The line
+    // below existed to name "whatever the strike chip's own lettering is", so
+    // that acid could be asserted NOT to be it; hard-coding that value made it
+    // a spelling pin that the next repaint breaks for no reason. It now reads
+    // the colour out of the shipped style, which is both the same claim and a
+    // stronger one — the property survives any future repaint in either
+    // direction.
     const INPUT = src('app/components/InputBox.tsx');
+    const strikeInk = /quickStrikeText: \{ color: '(#[0-9a-fA-F]{6})'/.exec(INPUT)?.[1];
+    expect(strikeInk).toBeDefined();
+    expect(COATING_GLYPH_COLOR.acid).not.toBe(strikeInk);
     expect(COATING_GLYPH_COLOR.acid).not.toBe('#15180f');
     expect(COATING_GLYPH_COLOR.acid).not.toBe('#9ec96a');
     expect(COATING_GLYPH_COLOR.acid).toMatch(/^#[0-9a-f]{6}$/);
-    expect(INPUT).toContain('quickStrikeText: { color: \'#15180f\'');
   });
 
   it('⚠⚠ NO TWO COATINGS SHARE A COLOUR — six glyphs must stay six signals', () => {

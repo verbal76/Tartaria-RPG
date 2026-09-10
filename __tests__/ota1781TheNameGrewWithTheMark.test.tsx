@@ -228,10 +228,20 @@ describe('OTA-1781 — the colour ruling, recorded as code', () => {
    * `#9ec96a`. So NOTHING MOVED: the safe reading of "keep the current" is the
    * current pixels, and the hex is on the owner's desk as a question.
    * This test exists so that a later pass cannot quietly "apply" the ruling by
-   * typing the other hex in. */
-  it('the strike fill is untouched', () => {
+   * typing the other hex in.
+   *
+   * ⚠⚠ AND THAT IS STILL EXACTLY WHAT IT DOES AFTER OTA-1800. On 2026-09-10 the
+   * owner ruled the equipped weapon control DARK, so the sage stopped being the
+   * chip's BODY and became its rim and its lettering. THE HUE DID NOT MOVE —
+   * `#9ec96a` is still the strike colour, which is the thing this test was
+   * written to protect. What moved is where the chip spends it, and that is a
+   * composition decision the owner made explicitly. The assertion below now
+   * pins the HUE rather than one style's spelling, so it survives the next
+   * composition change and still fails the moment `#87966A` is typed in. */
+  it('the strike sage is untouched', () => {
     const code = codeOf(read(INPUT_BOX));
-    expect(code).toContain("quickStrike: { borderColor: '#9ec96a', backgroundColor: '#9ec96a' }");
+    expect(code).toContain("quickStrike: { borderColor: '#9ec96a'");
+    expect(code).toContain("quickStrikeText: { color: '#9ec96a'");
     expect(code.toLowerCase()).not.toContain('87966a');
   });
 });

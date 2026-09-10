@@ -111,14 +111,25 @@ describe('OTA-1787 — PUNCH stops reading as a weapon', () => {
   });
 
   /* ⚠⚠ AND THE WEAPON BUTTONS ARE UNTOUCHED — the other half of the ruling.
-   * They still take the raw tone, so a weapon that can land is still a filled
-   * sage block; the hierarchy comes from PUNCH stepping down, not from the
-   * weapons stepping up. */
-  it('the weapon chips still take the raw tone, filled', () => {
+   * They still take the RAW tone while PUNCH takes a stepped-down one; the
+   * hierarchy comes from PUNCH stepping down, not from the weapons stepping up.
+   *
+   * ⚠ OTA-1800 CHANGED WHAT `strike` LOOKS LIKE, NOT WHO WEARS IT, and that
+   * distinction is the whole of this test. The owner ruled the equipped weapon
+   * DARK, so `strike` is no longer a filled sage block — it is sage rim and
+   * bold sage lettering on the chassis ground. The weapon chips still take the
+   * raw tone; punch still does not; the two tones are still distinct. Every
+   * claim OTA-1787 makes survives, so the pins move to the part that carries
+   * it: the weapons get the undiluted tone, and `strike` and `ready` remain two
+   * different styles rather than one. */
+  it('the weapon chips still take the raw tone, and it is still its own tone', () => {
     expect(code).toContain('tone={mainT}');
     expect(code).toContain('tone={offT}');
-    expect(code).toContain("quickStrike: { borderColor: '#9ec96a', backgroundColor: '#9ec96a' }");
+    expect(code).toContain("quickStrike: { borderColor: '#9ec96a'");
     expect(code).toContain("quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' }");
+    const body = (k: string) => new RegExp(`\\n {2}${k}: \\{([^}]*)\\}`).exec(code)?.[1] ?? '';
+    expect(body('quickStrike')).not.toBe('');
+    expect(body('quickStrike')).not.toBe(body('quickReady'));
   });
 
   /* ⚠ THE 28dp MARK AND OTA-1781's TYPOGRAPHY ARE LOCKED AND STAY LOCKED. */

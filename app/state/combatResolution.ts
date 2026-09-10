@@ -62,7 +62,7 @@ import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
 import { reachClassFor, bossSwingsTwice, enemyAttackBonus } from '../engine/combatRules';
 import { parseWeaponEffect, applyRangeNote, shieldAcVersus } from '../engine/weaponEffects';
-import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
+import { reachBandsFor, reachFiresDown, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 // ⚠ OTA-1506 — the bullseye (per-enemy bearing + distance). See the FIELD
 // helpers below activeEnemy for how the legacy shared band is derived from it.
 import {
@@ -669,6 +669,87 @@ export function playerWeaponReach(
     return { bands: reachBandsFor('throwable'), label: w.name }; // far/mid/close
   }
   return { bands: applyRangeNote(reachBandsFor(cls), rangeNote), label: w.name };
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ⚠⚠⚠ OTA-1800 — CAN THIS SWING HAPPEN RIGHT NOW? ONE ANSWER, TWO READERS.
+   ══════════════════════════════════════════════════════════════════════════
+   The attack path in the store refuses a swing for THREE separate reasons, each
+   a free refusal that costs the player no stamina and no turn:
+
+     1. the weapon does not reach the band the target is standing in
+     2. the target is grounded at the base of a climb and the weapon does not
+        fire down (OTA-960 / OTA-1517)
+     3. ⚠ the weapon is JAMMED — a `weapon_overheated` lock naming this weapon,
+        from a natural 1 on an overheat-capable firearm (OTA-1564)
+
+   The combat button asked (1) and (2) and had never heard of (3). So a jammed
+   Rust Rifle at close range painted itself READY and the tap bounced off the
+   third gate — the OTA-1006 defect exactly, one gate further down. The owner,
+   naming the contract this file now has to keep:
+
+     *"GREEN = PRESSING THIS WEAPON IS A VALID ACTION NOW. Not merely: GREEN =
+     ENEMY DISTANCE MATCHES WEAPON RANGE."*
+
+   ⚠⚠ WHY A PREDICATE AND NOT A SECOND COPY. The instruction is explicit — *"Do
+   not create isWeaponInRangeForColor() or another parallel approximation if
+   actual action eligibility already exists."* It did not exist as a callable
+   thing: it was three inline `if`s inside one 36,000-line branch, which is why
+   the button could only ever approximate it. This is that decision lifted out
+   whole. The store keeps its three refusal SENTENCES — each names different
+   facts and the player reads them — and now takes its three ANSWERS from here.
+
+   ⚠ THIS CHANGES NO RULE. Same conditions, same order, same outcomes. What
+   changes is that there is one place to read them, so the button and the gate
+   cannot drift again. A fourth refusal added here reaches the button for free;
+   a fourth refusal added inline in the store would not, and that is the failure
+   this exists to make structural rather than vigilant. */
+
+/** Why a swing cannot happen. `null` from `weaponSwingRefusal` means it can. */
+export type WeaponSwingRefusal = 'out-of-reach' | 'cannot-fire-down' | 'jammed';
+
+/** ⚠ THE JAM LOCK, BY NAME. Without the name a seized sidearm would stop the
+ *  blade in the other hand too — the store has matched on the label since
+ *  OTA-1564 and this is that same match, in one place both readers can call. */
+export function weaponJamLock(
+  statusEffects: readonly StatusEffect[] | undefined,
+  swungWeaponName: string | null | undefined,
+): StatusEffect | null {
+  if (!swungWeaponName) return null;
+  const want = String(swungWeaponName).toLowerCase();
+  return (statusEffects ?? []).find(
+    (e) => e.kind === 'weapon_overheated'
+      && e.remainingRounds > 0
+      && (e.label ?? '').toLowerCase() === want,
+  ) ?? null;
+}
+
+/** What a swing needs to know about the world to say whether it may happen. */
+export interface WeaponSwingFacts {
+  /** The bands this weapon reaches — from `playerWeaponReach`, never re-derived. */
+  bands: readonly CombatRange[];
+  /** The band the target is standing in. */
+  range: CombatRange | null | undefined;
+  /** ⚠ True when the only live foes are grounded at the base of a climb. The
+   *  caller computes it because it is a question about the SCENE (who is alive,
+   *  who is airborne), not about the weapon. Both callers already had it. */
+  groundedFoesBelow?: boolean;
+  /** The weapon being swung, for the jam lock. */
+  swungWeaponName?: string | null;
+  statusEffects?: readonly StatusEffect[];
+}
+
+/** ⚠⚠ THE ORDER IS THE STORE'S ORDER, and it is load-bearing: the store prints
+ *  the FIRST refusal it hits and stops, so a jammed weapon that is also out of
+ *  reach is told about the reach — the thing the player can act on by moving.
+ *  A predicate that reported them in a different order would light the button
+ *  correctly and describe it wrongly. */
+export function weaponSwingRefusal(f: WeaponSwingFacts): WeaponSwingRefusal | null {
+  if (!f.range) return null;
+  if (!f.bands.includes(f.range)) return 'out-of-reach';
+  if (f.groundedFoesBelow && !reachFiresDown(f.bands)) return 'cannot-fire-down';
+  if (weaponJamLock(f.statusEffects, f.swungWeaponName)) return 'jammed';
+  return null;
 }
 
 // OTA-934 — a frost/cold coating on armour (-> a 'cold' entry in the piece's addedResists)

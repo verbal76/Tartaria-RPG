@@ -253,6 +253,7 @@ import {
   recordEnemyIntel, runEnemyGroupCounters, runMoveCombatRange, runSurvivorVolley,
   staggerEnemy, sweepDeadEnemies, tickEnemyDotsAndMaybeEndFight,
   dogVestStatBonus, // OTA-1640
+  weaponJamLock, // OTA-1800 — the jam gate, shared with the weapon button
 } from './combatResolution';
 import { applyWeaponSelfBuff, shredEnemyArmor, landControlOnScene } from './weaponRiderEffects'; // OTA-1676
 // ⚠ OTA-1404 — gear wear moved DOWN because combat AND digging both wear gear,
@@ -14424,10 +14425,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           // can decide between waiting and drawing something else.
           {
             const swungName = offHandSwing ? player.equipped?.off : (player.equipped?.main ?? player.equipped?.weaponName);
-            const lock = (player.statusEffects ?? []).find(
-              (e) => e.kind === 'weapon_overheated' && e.remainingRounds > 0
-                && (e.label ?? '').toLowerCase() === String(swungName ?? '').toLowerCase(),
-            );
+            // ⚠ OTA-1800 — the same by-name lock the weapon button now asks, so
+            // a jammed weapon cannot paint itself ready. See `weaponJamLock`.
+            const lock = weaponJamLock(player.statusEffects, swungName);
             if (lock && swungName) {
               get().appendLog(
                 'arbiter',

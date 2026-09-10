@@ -83,24 +83,48 @@ describe('⚠⚠⚠ five tones and a default — no sixth colour has crept in', 
 
 // ═══ 2. WHAT EACH FAMILY MEANS, ASSERTED AS A RELATIONSHIP ═══════════════════
 describe('⚠⚠⚠ the families mean what the vocabulary says they mean', () => {
-  test('strike is the only FILLED chip — weight, not a new hue', () => {
-    /* OTA-1454's ruling: separate the turn-ending commitment from the utilities
-     * by fill-versus-outline INSIDE one hue, rather than by inventing a sixth
-     * colour in a game built of parchment and soot.
-     * ⚠ Asserted as the relationship — strike fills with the same value `ready`
-     * merely rims with — so a later re-tune of the sage keeps the claim. */
+  /* ⚠⚠⚠ SUPERSEDED IN PART BY THE OWNER, 2026-09-10, AND THE SUPERSESSION IS
+   * WRITTEN DOWN RATHER THAN QUIETLY EDITED IN. This suite shipped saying
+   * *"strike is the only FILLED chip"*, and that sentence was true of the
+   * pixels it was written against. The owner then ruled: *"KEEP THE EQUIPPED
+   * WEAPON CONTROL DARK... DARK BODY = THIS IS MY EQUIPPED WEAPON."* The
+   * equipped weapon is a thing you are carrying, not an offer; a bright block
+   * was announcing it as an offer.
+   *
+   * ⚠⚠ WHAT SURVIVES IS THE AXIS, WHICH IS THE PART THAT WAS EVER LOAD-BEARING.
+   * OTA-1454's ruling was *"in a restricted palette you do not spend a colour on
+   * rank, you spend WEIGHT"* — one hue, told apart by fill rather than by
+   * inventing a sixth colour. That is still exactly how these two are told
+   * apart; only the weapon's POSITION on the axis moved. Strike now wears
+   * `styles.quick`'s own plain chassis ground, ready keeps its green-tinted
+   * dark, and the decisive weight moved into the type. The two tests below are
+   * the same two claims re-asserted against where the axis actually runs, so a
+   * later pass still cannot collapse the groups into one another. */
+  test('strike and ready are ONE hue told apart by fill — the axis, not the position', () => {
     const strike = bodyOf('quickStrike');
     const ready = bodyOf('quickReady');
+    const bg = (body: string) => /backgroundColor: '(#[0-9a-fA-F]{6})'/.exec(body)?.[1];
     const border = /borderColor: '(#[0-9a-fA-F]{6})'/.exec(strike)?.[1];
     expect(border).toBeDefined();
-    expect(strike).toContain(`backgroundColor: '${border}'`);      // filled
     expect(ready).toContain(`borderColor: '${border}'`);           // same hue
-    expect(ready).not.toContain(`backgroundColor: '${border}'`);   // outline only
+    // ...and still two distinguishable groups, which is the thing that matters.
+    expect(bg(strike)).toBeDefined();
+    expect(bg(ready)).toBeDefined();
+    expect(bg(strike)).not.toBe(bg(ready));
+    // ⚠ strike takes the CHASSIS ground — the plain background every ordinary
+    // chip already wears — so it reads as the object you are carrying rather
+    // than as an offer. That is the owner's ruling, pinned to its source rather
+    // than to a hex, so re-tuning the chassis carries the weapon with it.
+    expect(bg(strike)).toBe(bg(bodyOf('quick')));
   });
 
-  test('⚠⚠ and the fill carries INVERTED lettering, which is what reads as filled', () => {
-    /* A light block with light text is not a filled chip, it is an unreadable
-     * one. The dark-on-light inversion is the other half of the mechanism. */
+  test('⚠⚠ and the lettering READS against the body it sits on, whichever way round', () => {
+    /* The original claim was "the fill carries INVERTED lettering", which was
+     * the dark-on-light half of a mechanism that no longer runs that way. The
+     * requirement underneath it never depended on the direction: a chip whose
+     * label does not separate from its own ground is unreadable, and that is
+     * true of light-on-dark exactly as it was of dark-on-light. Asserted as a
+     * contrast floor so it survives the next repaint in either direction. */
     const lum = (h: string) => {
       const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
       return 0.299 * r! + 0.587 * g! + 0.114 * b!;
@@ -109,7 +133,17 @@ describe('⚠⚠⚠ the families mean what the vocabulary says they mean', () =>
     const ink = /color: '(#[0-9a-fA-F]{6})'/.exec(bodyOf('quickStrikeText'))?.[1];
     expect(fill).toBeDefined();
     expect(ink).toBeDefined();
-    expect(lum(ink!)).toBeLessThan(lum(fill!));
+    expect(Math.abs(lum(ink!) - lum(fill!))).toBeGreaterThan(80);
+  });
+
+  test('⚠⚠ the decisive weight the fill used to carry now lives in the TYPE', () => {
+    /* OTA-1454 spends WEIGHT, not colour, and taking the fill away would have
+     * spent nothing at all if the weight went with it. It did not: the strike
+     * label is the only chip label in the vocabulary set in bold. */
+    expect(bodyOf('quickStrikeText')).toContain("fontWeight: '700'");
+    for (const other of ['quickReadyText', 'quickDefensiveText', 'quickNeedsApproachText', 'quickUnavailableText']) {
+      expect([other, bodyOf(other).includes('fontWeight')]).toEqual([other, false]);
+    }
   });
 
   test('⚠ defensive, needs-approach and unavailable are each their own hue', () => {

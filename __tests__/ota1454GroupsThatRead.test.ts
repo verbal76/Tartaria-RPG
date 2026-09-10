@@ -57,6 +57,21 @@ describe('OTA-1454 — the combat groups are mutually distinct', () => {
     };
   };
 
+  /* ⚠⚠⚠ SUPERSEDED IN PART BY OTA-1800, AND THE PART MATTERS. The owner, from
+   * a physical build: *"The large equipped weapon control in Combat looks
+   * substantially better with the DARK / BLACK fill than with the bright green
+   * fill... The weapon artwork already provides strong saturated colour."* So
+   * the weapon is no longer a FILLED chip, and the two assertions below that
+   * said so — `strike.fill === strike.border`, and dark lettering inverted
+   * against a light fill — described a treatment that has been ruled out.
+   *
+   * ⚠ WHAT SURVIVES UNCHANGED IS THE AXIS ITSELF: one hue, told apart by
+   * WEIGHT rather than by spending a second colour on rank. Strike still shares
+   * ready's border hue and still differs from it by fill — it simply sits at
+   * the OTHER end of the weight scale now (the chip's own neutral ground)
+   * instead of at the filled end. The `NO GROUP WEARS A STATE'S COLOUR` test
+   * below still counts three distinguishable groups, which is the claim this
+   * pair was really protecting. */
   it('⚠⚠⚠ STRIKE AND READY SHARE THE HUE AND DIFFER BY FILL — the whole design', () => {
     // ⚠⚠ REBUILT MID-OTA, AND THE REBUILD IS THE INTERESTING PART. This first
     // asserted that no two groups share a border colour, because my first fix
@@ -69,20 +84,36 @@ describe('OTA-1454 — the combat groups are mutually distinct', () => {
     const ready = skin('quickReady');
     expect(strike.border).toBe(ready.border);          // one hue…
     expect(strike.fill).not.toBe(ready.fill);          // …two weights
-    // The strike is FILLED with its own hue; the ready is not.
-    expect(strike.fill).toBe(strike.border);
+    // ⚠ OTA-1800 — NEITHER group is filled with its own hue any more. The
+    // equipped weapon reads as the object you carry, not as a decisive action,
+    // so it wears the chassis ground; ready keeps its green-tinted dark. What
+    // this line now forbids is the thing the owner ruled out: a saturated block.
+    expect(strike.fill).not.toBe(strike.border);
     expect(ready.fill).not.toBe(ready.border);
   });
 
-  it('⚠⚠ the filled chip inverts its TEXT, which is what makes "filled" read', () => {
-    // A solid block with the same light lettering as everything else reads as a
-    // slightly odd outlined chip, not as a primary action.
+  it('⚠⚠ OTA-1800 — the weapon NAME carries readiness, and it is the only thing that moves', () => {
+    /* ⚠⚠⚠ THIS TEST REVERSED, and the reversal is the owner's ruling rather
+     * than a drift. It used to require DARK lettering inverted against a light
+     * fill, because the chip was a solid green block. The block is gone:
+     *     dark body   = this is my equipped weapon
+     *     green name  = I can use it right now
+     *     neutral name= equipped, but not currently a valid action
+     * so the lettering is now the sage itself, ON the dark — the exact
+     * green-on-green the old assertion forbade, because the thing it was
+     * protecting against (a solid block reading as a slightly odd outlined
+     * chip) cannot happen to a chip that is no longer solid. */
     const strikeText = /quickStrikeText:\s*\{\s*color:\s*'(#[0-9a-fA-F]{6})'/.exec(IB)?.[1]?.toLowerCase();
     expect(strikeText).toBeDefined();
-    expect(strikeText).not.toBe(skin('quickStrike').border);   // not green-on-green
-    // …and it is DARK, against the light fill it sits on.
+    // The NAME is the readiness signal, so it carries the group's hue.
+    expect(strikeText).toBe(skin('quickStrike').border);
+    // …and it is LIGHT, because it sits on a dark body now.
     const lum = parseInt(strikeText!.slice(1, 3), 16) + parseInt(strikeText!.slice(3, 5), 16) + parseInt(strikeText!.slice(5, 7), 16);
-    expect(lum).toBeLessThan(200);
+    expect(lum).toBeGreaterThan(200);
+    // ⚠ The body it sits on is genuinely dark — the owner's "DARK / BLACK fill".
+    const fill = skin('quickStrike').fill!;
+    const fillLum = parseInt(fill.slice(1, 3), 16) + parseInt(fill.slice(3, 5), 16) + parseInt(fill.slice(5, 7), 16);
+    expect(fillLum).toBeLessThan(120);
   });
 
   it('⚠⚠⚠ EVERY chip fill is OPAQUE — arb86, and the reviewer could not have known', () => {
@@ -119,13 +150,23 @@ describe('OTA-1454 — the combat groups are mutually distinct', () => {
   it('⚠⚠ AN IN-REACH ATTACK RESOLVES TO `strike`, NOT `ready` — one function, four buttons', () => {
     // punch / kick / main-hand / off-hand all read their tone from weaponTone, so
     // the group lives in ONE place and cannot be half-applied.
-    const fn = blockAt(IB, 'function weaponTone(', { mode: 'opener' });
-    expect(fn).toContain("bands.includes(range) ? 'strike' : 'needs-approach'");
+    const fn = blockAt(IB, 'export function weaponTone(', { mode: 'opener' });
+    /* ⚠ OTA-1800 — THE CLAIM IS UNCHANGED; ONLY WHERE THE ANSWER COMES FROM
+     * MOVED. This used to pin `bands.includes(range) ? 'strike' : ...` — the
+     * button computing its own eligibility. It now asks `weaponSwingRefusal`,
+     * which is the store's own three gates (reach, elevation, and OTA-1564's
+     * jammed weapon) in the store's order, because composing the answer here
+     * had missed a gate three times running. In-reach STILL resolves to
+     * `strike` and never to `ready`; that is what these two lines say. */
+    expect(fn).toContain("weaponSwingRefusal(");
+    expect(fn).toContain("refusal ? 'needs-approach' : 'strike'");
     expect(fn).not.toContain("? 'ready'");
     // …and every attack button actually goes through it.
-    // ⚠ OTA-1517 added the elevation fact as a fourth argument. What this pins —
-    // ONE function behind every attack button — is exactly unchanged.
-    for (const call of ['weaponTone(reachPlayer, null, range, groundedFoesBelow)', "weaponTone(reachPlayer, 'main', range, groundedFoesBelow)", "weaponTone(reachPlayer, 'off', range, groundedFoesBelow)"]) {
+    // ⚠ OTA-1517 added the elevation fact as a fourth argument; OTA-1800 added
+    // the swung weapon's NAME as a fifth, so the jam lock can be asked about the
+    // weapon actually in that hand. What this pins — ONE function behind every
+    // attack button — is exactly unchanged by either.
+    for (const call of ['weaponTone(reachPlayer, null, range, groundedFoesBelow, null)', "weaponTone(reachPlayer, 'main', range, groundedFoesBelow, equippedMain)", "weaponTone(reachPlayer, 'off', range, groundedFoesBelow, equippedOff)"]) {
       expect(IB).toContain(call);
     }
   });

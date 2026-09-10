@@ -21,7 +21,7 @@ import { useGameStore, logUiTap } from '../state/gameStore';
 import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695 — the tap has a clock
 import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
-import { playerWeaponReach } from '../state/combatResolution';
+import { playerWeaponReach, weaponSwingRefusal } from '../state/combatResolution';
 // ⚠ OTA-1678 — the FLEE chip's odds, from the one reader the escape roll uses.
 import { fleeOddsFor } from '../state/fleeOdds';
 import { itemIsShield, findWeaponByName } from '../engine/crafting';
@@ -95,7 +95,13 @@ import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/type
  *  ⚠ AND NO NEW HUE. `strike` is the game's own parchment turned up, because
  *  amber already means out-of-reach and red already means unavailable; a sixth
  *  colour here would have read as a warning on the button you press most. */
-function weaponTone(
+/* ⚠⚠ EXPORTED FOR ONE REASON: so a test can prove the CONNECTION, not just the
+ * authority behind it. OTA-1800's own negative control caught this — cutting
+ * `weaponTone` loose from `weaponSwingRefusal` and letting it re-derive
+ * readiness from range alone left the suite fully green, because the suite was
+ * exercising the predicate and nobody was exercising the consumer. A rule with
+ * no reader is not enforced. This is the reader, and now it is reachable. */
+export function weaponTone(
   player: PlayerCharacter | null,
   hand: 'main' | 'off' | null,
   range: CombatRange | null | undefined,
@@ -106,14 +112,37 @@ function weaponTone(
    *  below is not wrong — the raider really WAS at close band — it was just
    *  answering a different question than the gate. */
   groundedFoesBelow?: boolean,
+  /** ⚠⚠⚠ OTA-1800 — THE WEAPON IN THIS HAND, for the jam lock. Null for bare
+   *  hands, which cannot jam. */
+  swungWeaponName?: string | null,
 ): 'strike' | 'needs-approach' | undefined {
   if (!range) return undefined;
   const bands = hand && player ? playerWeaponReach(player, hand).bands : reachBandsFor('barehanded');
-  // ⚠ Elevation FIRST: a weapon can be perfectly in-band and still unable to
-  // land, and the amber's own meaning ("this one cannot land from here") is
-  // exactly right for it. No new tone — see the header on why not.
-  if (groundedFoesBelow && !reachFiresDown(bands)) return 'needs-approach';
-  return bands.includes(range) ? 'strike' : 'needs-approach';
+  /* ⚠⚠⚠ OTA-1800 — THE BUTTON STOPPED ASSEMBLING ITS OWN ANSWER.
+   * This composed eligibility out of pieces — bands vs range, plus the
+   * elevation predicate OTA-1517 bolted on after the owner's tower relay
+   * bounced four taps. Composing works right up until the store grows a
+   * refusal the composition has never heard of, and it had: OTA-1564's JAMMED
+   * WEAPON gate refuses the swing outright, and this button painted straight
+   * through it. A jammed Rust Rifle at close range read READY and the tap
+   * bounced — OTA-1006's defect, one gate further down.
+   * The owner's contract: *"GREEN = PRESSING THIS WEAPON IS A VALID ACTION
+   * NOW. Not merely: GREEN = ENEMY DISTANCE MATCHES WEAPON RANGE."* So the
+   * decision comes from the store's own gates now, in the store's own order.
+   * The button asks one question and no longer knows what the reasons ARE —
+   * which is what makes a fourth refusal reach it without anyone remembering. */
+  const refusal = weaponSwingRefusal({
+    bands,
+    range,
+    groundedFoesBelow,
+    swungWeaponName,
+    statusEffects: player?.statusEffects,
+  });
+  // ⚠ ONE AMBER FOR EVERY REFUSAL, deliberately. OTA-930's rule is that a
+  // control which cannot act must not look like one that can; WHICH reason it
+  // is belongs in the Arbiter's sentence on the tap, where the player gets the
+  // whole explanation — not in a fourth chip colour.
+  return refusal ? 'needs-approach' : 'strike';
 }
 
 interface Props {
@@ -860,7 +889,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 !!resolveDisplayWeaponByName(equippedMain ?? '', inventory)?.tags?.includes('barehanded') ||
                 !!resolveDisplayWeaponByName(equippedOff ?? '', inventory)?.tags?.includes('barehanded')
               ) && (() => {
-                const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
+                const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow, null);
                 /* ⚠⚠⚠ OTA-1787 — PUNCH IS SAGE OUTLINE, NOT SAGE FILL, AND THE
                  * VOCABULARY ALREADY SAID SO.
                  * Owner, from the device: *"PUNCH now looks visually odd beside
@@ -900,14 +929,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   two hands, side by side, and the word restated their own
                   arrangement while crowding out the thing worth reading. */}
               {equippedMain ? (() => {
-                const mainT = weaponTone(reachPlayer, 'main', range, groundedFoesBelow);
+                const mainT = weaponTone(reachPlayer, 'main', range, groundedFoesBelow, equippedMain);
                 const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
                 return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} weapon onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
-                const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
+                const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow, equippedOff);
                 const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
@@ -1428,15 +1457,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
  *   (no tone)        the default chip — parchment lettering on soot. NOT a
  *                    fourth colour family: it is the ABSENCE of a claim. "An
  *                    ordinary action with no state worth reporting."
- *   'strike'         FILLED sage, soot lettering. "This weapon lands from where
- *                    you stand." The only turn-ending commitment on the row and
- *                    the only filled chip — OTA-1454 gave it WEIGHT rather than a
- *                    new hue, because a sixth colour in a parchment-and-soot game
- *                    buys separation by spending meaning.
- *   'ready'          sage BORDER on near-black. "Available." The modifiers and
- *                    setup tools: golem, dog, bandolier, heals, ability, loot.
- *                    Same hue as `strike` deliberately — one axis (fill against
- *                    outline), one job.
+ *   'strike'         sage border and BOLD sage lettering on the plain chassis
+ *                    ground. "Pressing this weapon is a valid action NOW."
+ *                    ⚠ AMENDED BY THE OWNER, 2026-09-10. This was a FILLED sage
+ *                    block until they ruled *"KEEP THE EQUIPPED WEAPON CONTROL
+ *                    DARK ... DARK BODY = THIS IS MY EQUIPPED WEAPON."* The
+ *                    equipped weapon is a thing you are carrying, and a bright
+ *                    block was announcing it as an offer. OTA-1454's axis is
+ *                    unchanged — still WEIGHT inside one hue, never a sixth
+ *                    colour — the weapon's position on it simply moved from
+ *                    filled to grounded, and the weight it gave up in fill it
+ *                    took back in type. See OTA-1800 at `weaponTone`.
+ *   'ready'          sage BORDER on a green-tinted near-black. "Available." The
+ *                    modifiers and setup tools: golem, dog, bandolier, heals,
+ *                    ability, loot. Same hue as `strike` deliberately — one axis
+ *                    (which ground, which weight), one job.
  *   'defensive'      blue border and label. "Defensive, or escape." Dodge,
  *                    stealth, flee. Dodge's cooldown bar reuses the same blue so
  *                    a full bar reads as the chip's ordinary ready state rather
@@ -2006,7 +2041,42 @@ const styles = StyleSheet.create({
   // bright hue flooded straight through them ("weird coloring"). So the ghost
   // reads unfilled and is a solid near-black; the effect is the same and it
   // survives any background the player picks.
-  quickStrike: { borderColor: '#9ec96a', backgroundColor: '#9ec96a' },
+  /* ⚠⚠⚠ OTA-1800 — THE EQUIPPED WEAPON KEEPS ITS DARK BODY.
+   * Owner, from the physical build: *"The large equipped weapon control in
+   * Combat looks substantially better with the DARK / BLACK fill than with the
+   * bright green fill... The weapon artwork already provides strong saturated
+   * colour."* And the ruling that follows from it: *"DO NOT USE MORE COLOUR
+   * WHEN BETTER INFORMATION WILL DO."*
+   *
+   * So the fill goes and the NAME carries the readiness instead:
+   *     dark body  = this is my equipped weapon
+   *     green name = I can use it right now
+   *   neutral name = equipped, but not a valid action from here
+   * The control's IDENTITY stays put while its SIGNAL moves — which is the
+   * whole point, and why the border, the geometry, the artwork and the touch
+   * target are all untouched.
+   *
+   * ⚠ THIS TONE IS THE WEAPON'S ALONE, so repainting it reaches nothing else.
+   * OTA-1454 split `strike` from `ready` when PUNCH and the weapons shared a
+   * fill; OTA-1787 then moved punch to `ready` outline, and after that the only
+   * two consumers left in the game are the main-hand and off-hand chips. What
+   * distinguishes them from the ready pool is no longer a fill — it is the
+   * artwork and the 15pt name OTA-1781 gave them, which is the owner's own
+   * argument for taking the fill away.
+   *
+   * ⚠⚠ AND IT TAKES THE CHIP'S OWN GROUND, NOT `quickReady`'S. Borrowing
+   * ready's `#1b2417` was the obvious move and it was wrong: it made the two
+   * tones byte-identical and collapsed OTA-1454's axis — *"in a restricted
+   * palette you do not spend a colour on rank, you spend WEIGHT"* — from three
+   * distinguishable groups to two. That axis survives the owner's new ruling
+   * intact; only the WEAPON's position on it moves, from filled to grounded.
+   * `#1a1714` is `styles.quick`'s own backgroundColor, so this invents no
+   * value: the equipped weapon now wears the plain chassis every other control
+   * wears, which is the most literal way a control can say "I am the object you
+   * are carrying" rather than "I am an available action". Ready keeps its
+   * green-tinted dark, strike takes the neutral one, and the groups stay told
+   * apart by fill exactly as OTA-1454 requires. */
+  quickStrike: { borderColor: '#9ec96a', backgroundColor: '#1a1714' },
   quickDefensive: { borderColor: '#6a9bbf' },
   // ⚠ OTA-1170 — the dodge recharge bar. Two absolute layers INSIDE the chip and behind
   // the label, clipped by the chip's own radius. `overflow: 'hidden'` on `quick` is what
@@ -2062,8 +2132,14 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   quickDisabledText: { color: '#6a6253' },
-  // Soot on the solid block — the dark-on-light inversion is what makes it read
-  // as FILLED at a glance rather than as another outlined chip.
+  // ⚠ OTA-1800 REVERSED THIS PAIR, and the note is kept because the reversal is
+  // the whole point. Until 2026-09-10 the strike label was SOOT on a solid sage
+  // block: dark-on-light, which is what made it read as filled. The owner then
+  // ruled the equipped weapon dark, so the block became the plain chassis and
+  // the lettering took the sage. Light-on-dark now, same separation, opposite
+  // direction — and the label colour is what carries the readiness meaning:
+  // sage means "you can swing this right now", amber means "equipped, but not a
+  // valid action from here". See OTA-1800 at `weaponTone`.
   // ⚠⚠⚠ OTA-1568 — THE BLACK HALO, and it is a SHADOW rather than a border on
   // purpose: React Native cannot stroke glyph outlines, but a text shadow is
   // drawn from the glyph's own alpha mask, which is the only technique that
@@ -2093,6 +2169,15 @@ const styles = StyleSheet.create({
   //
   // ⚠ The halo stays. On the sage chip it now softens the cell's hard edge; on
   // the dark chips it is what it always was — invisible and harmless.
+  //
+  // ⚠⚠ FOOTNOTE, OTA-1800: the "TWO hostile fills" above is now ONE. The owner
+  // ruled the equipped weapon dark, so there is no light-sage chip left for a
+  // glyph to sit on and the collision OTA-1569 solved cannot recur here. Both
+  // mechanisms stay anyway, and not out of caution: the halo is still the only
+  // technique that reaches a COLOUR EMOJI, whose own colours no chip background
+  // can override, and the glyph's own cell is what keeps the six colours chosen
+  // against one known backdrop for anything added later. Neither was ever
+  // load-bearing ONLY for the light fill.
   /* ⚠⚠⚠ OTA-1766 — THE LABEL IS A ROW OF BOXES. See the render for why this
    * stopped being one inline `<Text>`: an inline Text has no box, which is what
    * forced OTA-1569's hair spaces and OTA-1638's escaped em space. A row gives
@@ -2159,7 +2244,11 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 3,
   },
-  quickStrikeText: { color: '#15180f', fontWeight: '700' },
+  /* ⚠ OTA-1800 — the readiness signal, and now the ONLY one that moves between
+   * the two states. Soot-on-sage became sage-on-dark when the fill went; the
+   * 700 weight stays, so a usable weapon still reads heavier than the chips
+   * around it without needing a block of colour to say so. */
+  quickStrikeText: { color: '#9ec96a', fontWeight: '700' },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#c9a86a' },

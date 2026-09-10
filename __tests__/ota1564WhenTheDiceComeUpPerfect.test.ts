@@ -253,6 +253,8 @@ describe('OTA-1564 — the repeater and the weapon that punishes you later', () 
 
 describe('OTA-1564 — the wiring', () => {
   const STORE = src('app/state/gameStore.ts');
+  // ⚠ OTA-1800 — the shared jam lock the store and the weapon button both read.
+  const RESOLUTION = src('app/state/combatResolution.ts');
   const RULES = src('app/engine/combatRules.ts');
   const TYPES = src('app/engine/types.ts');
   const PREVIEW = src('app/components/itemPreview.ts');
@@ -282,7 +284,17 @@ describe('OTA-1564 — the wiring', () => {
 
   it('⚠⚠⚠ the lock is by WEAPON NAME, so a jammed sidearm frees the other hand', () => {
     expect(STORE).toContain('label: hotWeapon.name,');
-    expect(STORE).toContain("(e.label ?? '').toLowerCase() === String(swungName ?? '').toLowerCase()");
+    /* ⚠ OTA-1800 — THE MATCH MOVED OUT OF THE STORE, AND THAT IS THE POINT.
+     * This lock lived inline in the attack branch and nowhere else, so the
+     * combat button could not see it: a jammed weapon in perfect range painted
+     * itself ready-green and the tap bounced off this gate. The by-name match is
+     * now `weaponJamLock` in combatResolution, called by BOTH the gate and the
+     * button, so the rule has one spelling and neither reader can drift from the
+     * other. Same rule, same case-folded name comparison. */
+    expect(STORE).toContain('weaponJamLock(player.statusEffects, swungName)');
+    expect(RESOLUTION).toContain("(e.label ?? '').toLowerCase() === want");
+    expect(RESOLUTION).toContain("e.kind === 'weapon_overheated'");
+    expect(RESOLUTION).toContain('e.remainingRounds > 0');
   });
 
   it('⚠⚠ the refusal sits ABOVE the stamina spend, like every other free refusal', () => {
