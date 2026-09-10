@@ -30059,6 +30059,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
 // SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
 export const OTA_BUILD_ID = '2026-09-10-1793-stealth-is-not-steal';
+// golem catch-up 2026-09-10: markerless publish of OTA-1793.
 // OTA-1793 - stealth is not steal. Reported by OTA-1738 and left open: a typed
 // `stealth` answered "Nothing to steal here". The deterministic verb table had
 // ten ways to say the stealth intent - hide, sneak, creep, lurk... - and not
