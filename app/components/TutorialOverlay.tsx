@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useGameStore } from '../state/gameStore';
 import { isTutorialLocked } from './tutorialSteps';
 
@@ -49,6 +50,16 @@ export function TutorialOverlay() {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const skipTutorial = useGameStore((s) => s.skipTutorial);
+  // ⚠⚠ OTA-1799 — THE CONTEXT, NOT THE HOOK, AND FOR A REASON WORTH KEEPING.
+  // `useSafeAreaInsets()` THROWS when no `SafeAreaProvider` sits above it. This
+  // component is an overlay whose whole job is to be the escape hatch out of a
+  // lockdown — a decorative offset is never worth turning it into a render
+  // error, and an existing suite that mounts it on its own found exactly that.
+  // Reading the context directly returns null instead of throwing, and null
+  // means what it says: nobody told us the platform reserves anything, so
+  // reserve nothing. That is byte-identical to this file's behaviour before the
+  // insets were read at all.
+  const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 };
   // The opening's own cards, in the order a new character meets them.
   const storyIntro = useGameStore((s) => s.storyIntro);
   const chapterCard = useGameStore((s) => s.chapterCard);
@@ -63,7 +74,32 @@ export function TutorialOverlay() {
   if (!isTutorialLocked(tutorialStep, tutorialExploreChosen)) return null;
 
   return (
-    <View style={styles.root} pointerEvents="box-none" accessibilityViewIsModal={true}>
+    // ⚠⚠⚠ OTA-1799 — THE PILL SAT IN THE NOTCH. This overlay mounts OUTSIDE the
+    // safe-area padding App applies to the screens (App.tsx:1179), which was the
+    // right call when TutorialOverlay still positioned highlight boxes from
+    // `measureInWindow` coordinates. It no longer measures anything — its only
+    // job is this pill — so the old reason had outlived itself while the
+    // consequence had not: `paddingTop: 8` is 8 points from the top of the RAW
+    // window, which on a notch phone is 8 points into the notch.
+    //
+    // ⚠⚠ IT NOW TAKES THE SAME INSETS THE SCREENS TAKE, from the same provider,
+    // so the pill starts where content starts. Zero-inset devices are unchanged
+    // to the pixel.
+    //
+    // ⚠ WHAT THIS DOES NOT FIX, AND DELIBERATELY LEAVES TO THE OWNER: on the
+    // exploration screen the pill still overlaps the top of the ⚑ WORLD button
+    // (measured: pill y 8–34, WORLD y 25–50 at 390×844; WORLD's centre still
+    // owns its own touch point, so the control works — it is obscured, not
+    // stolen). Every candidate position in that top band overlaps SOME control:
+    // the stats panel is one, the map thumbnail is one, WORLD and LORE are two
+    // more. Choosing which control SKIP is allowed to sit over is a design call
+    // on the game's busiest screen, not a repair, so it is reported with its
+    // measurements rather than guessed at here.
+    <View
+      style={[styles.root, { paddingTop: insets.top + 8, paddingRight: insets.right + 12, paddingLeft: insets.left + 12 }]}
+      pointerEvents="box-none"
+      accessibilityViewIsModal={true}
+    >
       <Pressable
         style={({ pressed }) => [styles.pill, pressed && styles.pillPressed]}
         onPress={skipTutorial}
@@ -80,8 +116,7 @@ const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1000,
-    paddingHorizontal: 12,
-    paddingTop: 8,
+    // ⚠ OTA-1799 — padding now comes from the safe-area insets at the call site.
     alignItems: 'flex-end',
     justifyContent: 'flex-start',
   },
