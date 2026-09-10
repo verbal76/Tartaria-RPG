@@ -30,6 +30,30 @@ name: CI
 #                            finding is the thing to fix before these can block.)
 # The source typecheck, the test-typecheck ratchet, AND the fast jest suite are the
 # three REQUIRED gates; the heavy-sim job is reported.
+#
+# ⚠⚠⚠ 2026-09-10 — CI IS THE AUTHORITY, AND PUBLICATION DEPENDS ON IT. Owner:
+# "Put the currently local-only gates under CI authority and make OTA
+# publication dependent on successful validation. Avoid unnecessarily running
+# the expensive fast surface twice."
+#   • gates                — the fifteen `check:*` ratchets that until now ran only
+#                            on a developer's machine (hunt stages, slice pins, verb
+#                            reach, chevrons, standing-at, the OTA stamp, quoted pins,
+#                            voice pools, guardian and mission claims, weapon names,
+#                            the store ceiling, the kit palette and exports, the test
+#                            split, the gold budget). Cheap, source-only, REQUIRED.
+#   • publish              — runs ONLY on a push to the trunk, ONLY after every
+#                            required job above is green, and ONLY when the push
+#                            touched the JS bundle. It does not publish itself: it
+#                            DISPATCHES eas-update-golem.yml for this exact commit
+#                            and hands it this run's id as the validation receipt.
+#                            The publisher then verifies that receipt against the
+#                            API before it touches a channel. The fast surface runs
+#                            once, here; the publisher never re-runs it.
+#   • concurrency          — a newer push still cancels an in-flight run on any
+#                            branch EXCEPT the trunk. On the trunk every push must
+#                            finish, because an [ota-hal] publish and its golem
+#                            catch-up land minutes apart and each one is owed its
+#                            own validation and its own publish.
 
 on:
   push:
@@ -39,7 +63,10 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # ⚠ Never on the trunk — see the header. Two trunk pushes minutes apart are
+  # two publishes, and cancelling the first would silently drop the one that
+  # carried the marker.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/golem-line' }}
 
 jobs:
   typecheck-source:
@@ -143,6 +170,51 @@ jobs:
       - name: Mission data claims what the engine can deliver (blocking)
         run: npm run check:missionclaims
 
+  gates:
+    name: source gates (ratchets · required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # ⚠⚠ Every `check:*` script in package.json runs here or in the lint job.
+      # A ratchet that only runs by hand is a comment (OTA-1582's lesson, and
+      # OTA-1386's before it). The suite ciPublicationDependsOnValidation holds
+      # that no check:* script is left out of CI.
+      - name: Hunt stages are reachable and well-formed (blocking)
+        run: npm run check:huntstages
+      - name: Fixed-window source pins may only shrink (blocking)
+        run: npm run check:slicepins
+      - name: Every verb is reachable or taught (blocking)
+        run: npm run check:verbreach
+      - name: Chevrons (blocking)
+        run: npm run check:chevrons
+      - name: Standing-at readers agree (blocking)
+        run: npm run check:standingat
+      - name: The OTA stamp matches the newest suite (blocking)
+        run: npm run check:otastamp
+      - name: Quoted source pins may only shrink (blocking)
+        run: npm run check:quotedpins
+      - name: Voice pools (blocking)
+        run: npm run check:voicepools
+      - name: Guardian data claims what the engine delivers (blocking)
+        run: npm run check:guardianclaims
+      - name: Weapon names resolve (blocking)
+        run: npm run check:weaponnames
+      - name: The store sits under its ceiling (blocking)
+        run: npm run check:storeceiling
+      - name: The kit palette is the palette (blocking)
+        run: npm run check:kitpalette
+      - name: The kit's export budget (blocking)
+        run: npm run check:kitexports
+      - name: The heavy/fast test split is a list, not a naming rule (blocking)
+        run: npm run check:testsplit
+      - name: The gold budget may only shrink (blocking)
+        run: npm run check:gold
+
   test:
     name: jest (fast · required)
     runs-on: ubuntu-latest
@@ -204,3 +276,63 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
         run: npm run test:ci:heavy -- --reporters=default
+
+  # ⚠⚠⚠ PUBLICATION DEPENDS ON VALIDATION — see the header. This job is the
+  # ONLY automatic route to a player channel: it runs after every required job
+  # is green, on the trunk, for a push that touched the bundle, and it hands
+  # the publisher this run's id as the receipt the publisher must verify.
+  publish:
+    name: publish (dispatch the OTA for a validated trunk commit)
+    runs-on: ubuntu-latest
+    needs: [typecheck-source, typecheck-tests, lint, gates, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/golem-line'
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Enough history to diff the push range; a trunk push is one or two commits.
+          fetch-depth: 50
+      # ⚠ The bundle-path filter that used to be the publisher's own
+      # `paths-ignore`. Native / build-config / tooling changes need a fresh
+      # binary, not an OTA; a Sentry inbox sync must never republish; and a
+      # test-only push ships nothing new to a phone (tests are not in the
+      # bundle — the old filter published those, wastefully).
+      - name: Did this push touch the JS bundle?
+        id: bundle
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
+            RANGE="${AFTER}^..${AFTER}"
+          else
+            RANGE="${BEFORE}..${AFTER}"
+          fi
+          TOUCHED=0
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              sentry-inbox/*|package.json|package-lock.json|app.json|app.config.js|eas.json|metro.config.js|babel.config.js|tsconfig.json|.github/*|*.md|docs/*|scripts/*|android/*|ios/*|desktop/*|web-stubs/*|__tests__/*|test-utils/*|jest.setup.js|jest.config.js|scratchpad/*) ;;
+              *) echo "bundle path changed: $f"; TOUCHED=1 ;;
+            esac
+          done < <(git diff --name-only "$RANGE")
+          echo "touched=$TOUCHED" >> "$GITHUB_OUTPUT"
+          [ "$TOUCHED" = "1" ] || echo "::notice::No JS-bundle path changed in $RANGE — nothing to publish."
+      - name: Dispatch the publisher for this validated commit
+        if: steps.bundle.outputs.touched == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # ⚠ `line` is advisory here: an automatic run re-derives the line from
+          # the commit TITLE inside the publisher ([ota-hal] → hal, else golem),
+          # so nothing unattended reaches a player — the same firewall as before,
+          # now behind validation. `validated_by` is the receipt it checks.
+          gh workflow run eas-update-golem.yml --ref golem-line \
+            -f sha="${{ github.sha }}" \
+            -f validated_by="${{ github.run_id }}" \
+            -f line=golem
+          echo "Dispatched eas-update-golem.yml for ${{ github.sha }} (validated by run ${{ github.run_id }})."

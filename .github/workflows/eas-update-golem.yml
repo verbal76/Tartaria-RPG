@@ -43,37 +43,36 @@ name: Publish · OTA (one line at a time)
 #     the marker `[ota-hal]` typed into a commit title. Both are somebody
 #     deciding. Neither can happen by accident.
 #
-# Trigger: a JS-bundle (app/**) push to the trunk. Native / build-config changes
-# are path-ignored here because they need a fresh binary, not an OTA.
+# ⚠⚠⚠ 2026-09-10 — PUBLICATION DEPENDS ON VALIDATION. Owner: "make OTA
+# publication dependent on successful validation. Avoid unnecessarily running
+# the expensive fast surface twice."
+#
+# Until now this workflow fired on every trunk push, in parallel with CI, and
+# published whether or not CI passed — twenty-one OTAs shipped red once
+# (OTA-1415) and nothing here could have known. It no longer listens to pushes
+# at all. It is DISPATCHED, two ways, and both are checked:
+#
+#   • BY CI. ci.yml's `publish` job runs after every required gate is green on a
+#     trunk push that touched the bundle, and dispatches this workflow for that
+#     exact commit with `validated_by` = its own run id. That is the automatic
+#     path, and it re-derives the line from the commit TITLE exactly as the push
+#     trigger did — [ota-hal] in the title reaches HAL, anything else reaches
+#     golem — so the firewall below is unchanged: NOTHING UNATTENDED REACHES A
+#     PLAYER, and now nothing unvalidated does either.
+#
+#   • BY A PERSON, from the Actions UI, choosing a line. Also checked: the
+#     commit must already carry a green CI run. A dispatch for an unvalidated
+#     commit is refused with the reason, not run on trust.
+#
+# Either way the first step asks the Actions API for a completed, successful CI
+# run at this commit's SHA and refuses without one. CI is the one place the
+# fast surface runs; this file never re-runs it.
 
 on:
-  push:
-    branches:
-      - golem-line
-    paths-ignore:
-      # Sentry inbox syncs (see sentry-inbox.yml) are diagnostics plumbing,
-      # not a game update — a synced log must never republish the bundle.
-      - 'sentry-inbox/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'app.json'
-      - 'app.config.js'
-      - 'eas.json'
-      - 'metro.config.js'
-      - 'babel.config.js'
-      - 'tsconfig.json'
-      - '.github/**'
-      - '**.md'
-      - 'docs/**'
-      - 'scripts/**'
-      - 'android/**'
-      - 'ios/**'
-      - 'desktop/**'
-      - 'web-stubs/**'
   workflow_dispatch:
     inputs:
       line:
-        description: 'Product line to publish to (golem = dev phone; hal reaches live testers)'
+        description: 'Product line to publish to (golem = dev phone; hal reaches live testers). Ignored on a CI-dispatched run, which derives the line from the commit title.'
         required: false
         default: 'golem'
         type: choice
@@ -82,9 +81,20 @@ on:
           - hal
           - steam
           - html
+      sha:
+        description: 'The exact trunk commit to publish (default: the head of the dispatched ref). Must carry a green CI run.'
+        required: false
+        default: ''
+        type: string
+      validated_by:
+        description: 'Set by ci.yml only — the CI run id that validated `sha`. Marks the run as automatic: the line comes from the commit title, never from the `line` input.'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   ota:
@@ -97,23 +107,69 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          # ⚠ The commit this run was dispatched FOR, not merely the ref's head:
+          # CI validated one SHA and this publishes that SHA.
+          ref: ${{ github.event.inputs.sha || github.sha }}
           # ⚠ Task #109 — the Sentry release step at the bottom walks git
           # history to hand the release its commits. A depth-1 checkout has
           # one commit to offer. 200 is enough for the gap between two OTAs
           # many times over, and far cheaper than the full history.
           fetch-depth: 200
 
+      # ⚠⚠⚠ THE VALIDATION RECEIPT. No green CI run at this SHA, no publish —
+      # whoever dispatched it. On the automatic path the receipt is the run id
+      # CI handed over, and it must be a successful CI run AT THIS SHA; a human
+      # dispatch is checked the same way against the newest CI run for the SHA.
+      - name: Require a green CI run for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_BY: ${{ github.event.inputs.validated_by }}
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          if [ -n "$VALIDATED_BY" ]; then
+            RUN=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${VALIDATED_BY}" --jq '[.name, .head_sha, .status, .conclusion] | @tsv')
+            IFS=$'\t' read -r R_NAME R_SHA R_STATUS R_CONCL <<< "$RUN"
+            if [ "$R_NAME" != "CI" ] || [ "$R_SHA" != "$SHA" ]; then
+              echo "::error::Refusing to publish — validated_by run ${VALIDATED_BY} is '${R_NAME}' at ${R_SHA}, not CI at ${SHA}."
+              exit 1
+            fi
+            # ⚠ CI dispatches this from INSIDE its own run, so that run is still
+            # in progress here; every job it `needs` had already passed or the
+            # publish job would not have run. Anything else is a failure.
+            if [ "$R_STATUS" = "completed" ] && [ "$R_CONCL" != "success" ]; then
+              echo "::error::Refusing to publish — CI run ${VALIDATED_BY} concluded '${R_CONCL}'."
+              exit 1
+            fi
+            echo "✓ validated by CI run ${VALIDATED_BY} at ${SHA} (${R_STATUS}${R_CONCL:+/$R_CONCL})"
+          else
+            OK=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${SHA}&per_page=10" \
+              --jq '[.workflow_runs[] | select(.status == "completed" and .conclusion == "success")] | length')
+            if [ "${OK:-0}" -lt 1 ]; then
+              echo "::error::Refusing to publish — no completed, successful CI run exists for ${SHA}. Push it (CI runs on every push) or run the CI workflow for it first."
+              exit 1
+            fi
+            echo "✓ ${SHA} carries a green CI run"
+          fi
+
       # ⚠ The line is resolved in its own step because a push can now select one
       # too, via a commit marker. Keeping the resolution visible and separate is
       # what lets the firewall assertion below be a simple comparison.
+      #
+      # ⚠⚠ THE COMMIT MESSAGE COMES FROM GIT, not from the event: a dispatch
+      # carries no head_commit, and the marker rule must read the commit that is
+      # actually being published.
       - name: Resolve which product line this run publishes
         id: line
         env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          VALIDATED_BY: ${{ github.event.inputs.validated_by }}
         run: |
           set -euo pipefail
+          COMMIT_MSG="$(git log -1 --format=%B)"
           DISPATCHED="${{ github.event.inputs.line }}"
-          if [ -n "$DISPATCHED" ]; then
+          if [ -z "$VALIDATED_BY" ] && [ -n "$DISPATCHED" ]; then
+            # A person pressed the button and chose. (An automatic run never
+            # takes this branch: its `line` input is advisory and ignored.)
             LINE="$DISPATCHED"
             HOW="dispatch"
           elif echo "${COMMIT_MSG:-}" | head -1 | grep -q '\[ota-hal\]'; then
@@ -177,9 +233,10 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
           TARTARIA_LINE: ${{ steps.line.outputs.line }}
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
+          COMMIT_MSG="$(git log -1 --format=%B)"
+          SHA="$(git rev-parse HEAD)"
 
           # ── HARD FENCE ────────────────────────────────────────────────
           # 1. Only ever from the trunk.
@@ -187,11 +244,11 @@ jobs:
             echo "::error::Refusing to publish — branch '${GITHUB_REF_NAME}' is not the trunk."
             exit 1
           fi
-          # 2. ⚠⚠ NOTHING UNATTENDED REACHES A PLAYER. An ordinary push — no
-          #    dispatch, no marker — may only publish golem. This is the whole
-          #    firewall now that the file knows more than one channel name.
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] \
-             && [ "${{ steps.line.outputs.how }}" = "default (automatic push)" ] \
+          # 2. ⚠⚠ NOTHING UNATTENDED REACHES A PLAYER. An automatic run — CI's
+          #    dispatch, no person choosing, no marker — may only publish golem.
+          #    This is the whole firewall now that the file knows more than one
+          #    channel name.
+          if [ "${{ steps.line.outputs.how }}" = "default (automatic push)" ] \
              && [ "$TARTARIA_LINE" != "golem" ]; then
             echo "::error::Refusing to publish — an unselected (automatic) run may only target golem, got '$TARTARIA_LINE'."
             exit 1
@@ -258,7 +315,7 @@ jobs:
             IOS_ONLY=false; ANDROID_ONLY=false
           fi
 
-          MSG="OTA ${TARTARIA_LINE} — ${GITHUB_REF_NAME}@${GITHUB_SHA::7} (run #${{ github.run_number }})"
+          MSG="OTA ${TARTARIA_LINE} — ${GITHUB_REF_NAME}@${SHA::7} (run #${{ github.run_number }})"
 
           echo "=== OTA — pre-flight ==="
           echo "Trigger:          ${{ github.event_name }} (${{ steps.line.outputs.how }})"
