@@ -30078,14 +30078,19 @@ export const OTA_BUILD_ID = '2026-09-10-1800-green-means-usable-now';
 // changed; no padding, height, border width, font size or touch target moved,
 // which is what keeps OTA-1799's viewport work untouched.
 //
-// ⚠ ONE DEVIATION FROM THE RULING, STATED RATHER THAN QUIETLY MADE: the owner
-// wrote "NORMAL/NEUTRAL WEAPON NAME" for the not-usable case. It ships AMBER
-// (#c9a86a), not neutral, because amber is already load-bearing: it is the
-// vocabulary's "cannot land from HERE" and OTA-930's rule that a control which
-// cannot act must not look like one that can. Painting it neutral would make
-// the unusable weapon read as an ordinary chip with nothing worth reporting,
-// which is the one thing it is not. Left amber and put to the owner as a
-// question rather than decided here.
+// ⚠ THE AMBER IS RULED, NOT OPEN. The first draft of this ruling said
+// "NORMAL/NEUTRAL WEAPON NAME" for the not-usable case; it was raised as a
+// deviation because amber is already load-bearing - it is the vocabulary's
+// "cannot land from HERE", and OTA-930 rules that a control which cannot act
+// must not look like one that can. Neutral would make an unusable weapon read
+// as an ordinary chip with nothing worth reporting, which is the one thing it
+// is not. Owner, on the evidence, 2026-09-10: "KEEP THE AMBER UNAVAILABLE-
+// WEAPON STATE... the earlier 'neutral' wording is superseded by the evidence."
+// So the language is final and closed:
+//     #1a1714 chassis      = equipped weapon, stable object identity
+//     #9ec96a rim + name   = actually usable now
+//     #c9a86a rim + name   = equipped but presently unavailable
+// Chassis and geometry are identical between readiness states. Do not reopen.
 //
 // ⚠ AND THE SIGNAL NOW COMES FROM THE GATE, WHICH IS THE REAL REPAIR. The
 // store refuses a swing for THREE reasons - reach, elevation (OTA-960/1517),
@@ -30103,6 +30108,25 @@ export const OTA_BUILD_ID = '2026-09-10-1800-green-means-usable-now';
 // the button loose from the authority and let it re-derive from range) passed
 // at first and exposed that the suite tested the predicate but never its
 // consumer - the connection tests exist because that control found the gap.
+//
+// ⚠⚠ THE BROADER CONTROL-DEPTH ROLLOUT WAS DELIBERATELY NOT PERFORMED, and the
+// trace is why, so a future session does not restart it from the same wrong
+// premise. The observation that opened this pass was that Character and Title
+// have more perceived depth than World and Combat. Half of that inverts:
+//   · TITLE's depth is REAL and is `TButton` - the only screen outside combat
+//     carrying shadowColor/Offset/Radius plus the rim and lit-face layers.
+//   · COMBAT already wears the governed language on EVERY chip via
+//     `tControlDepth`. It is one of only two files that consume it at all.
+//   · CHARACTER has NO depth construction whatsoever. Its buttons are flat
+//     (`replayBtn`: one ring, one ground, no highlight, no press transform) and
+//     its borderTopColor uses are hairline ROW SEPARATORS, not control edges.
+//     What reads as presence there is DENSITY and typographic structure.
+// So CharacterScreen is not evidence for a universal reusable depth authority,
+// and depth may not be the mechanism the observation was responding to.
+// Propagating a treatment across ~400 pressables was declined by the owner on
+// that basis. WorldScreen (9 controls, cards already carrying borderWidth 1) is
+// the recommended small experiment for a SEPARATE future visual pass - not part
+// of OTA-1800, and not to be started as a side effect of reading this.
 // OTA-1799 - nothing whose height comes from data may be unbounded. A physical
 // Android photograph: APPLY ACID FLASK lists every coatable weapon in the pack
 // as a PINNED action row, so the rows run past the card's own boundary, off the

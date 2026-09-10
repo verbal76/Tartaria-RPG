@@ -461,11 +461,16 @@ export function GatherModal({
    *  That reasoning is intact and the colour still carries it — what changed is
    *  WHERE the button lives, and the owner's physical evidence is why.
    *
-   *  ⚠⚠ ON HIS iPHONE SE, `⚒ SALVAGE ALL` WAS BELOW THE FOLD AND `IGNORE THE
-   *  REST` WAS PINNED. The audit measured it: with a room of two gear and eight
-   *  salvage lines the card's body is 383 pt of 619 at 375×667 and 535 of 619 at
-   *  390×844, so on the two commonest phones the constructive bulk action sat
-   *  off-window while the one that throws the room away had permanent standing.
+   *  ⚠⚠ `⚒ SALVAGE ALL` WAS BELOW THE FOLD AND `IGNORE THE REST` WAS PINNED —
+   *  AND THE SCOPE IS WIDER THAN THE SPECIMEN, WHICH IS THE HALF TO CARRY
+   *  FORWARD. The owner's iPhone SE screenshot is the DISCOVERY SPECIMEN: it is
+   *  how this was found and it earns its place in the record for that. It is
+   *  NOT the defect's scope. The audit measured it: with a room of two gear and
+   *  eight salvage lines the card's body is 383 pt of 619 at 375×667 AND 535 of
+   *  619 at 390×844, so on the two commonest phones — not on one unusually
+   *  small one — the constructive bulk action sat off-window while the one that
+   *  throws the room away had permanent standing. Any record still describing
+   *  this as an SE-only condition is wrong; amend it rather than inherit it.
    *  Nothing was unreachable — Phase 2 proved the sweep scrolls fully into view
    *  and owns its touch points — and that is exactly the point: this was never a
    *  reachability defect. It was a HIERARCHY defect, and hierarchy is decided by
