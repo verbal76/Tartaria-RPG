@@ -182,10 +182,16 @@ describe('OTA-1397 — nothing starts at import time', () => {
   });
 
   it('⚠ the starter still tears down before it re-arms, so a re-hydrate cannot stack timers', () => {
-    const i = watchdog.indexOf('export function startQwenWatchdog(');
-    const block = blockAt(watchdog, 'export function startQwenWatchdog(');
-    expect(block).toContain('clearTimeout(qwenWatchdogTimer);');
-    expect(block).toContain('qwenAppStateSub.remove();');
+    // OTA-1798 — the teardown is now a function of its own, stopQwenWatchdog,
+    // so App's unmount can call it too; the starter goes through it FIRST, before
+    // it resets any state, which is the same order the inline clears had.
+    const starter = blockAt(watchdog, 'export function startQwenWatchdog(');
+    expect(starter).toContain('stopQwenWatchdog();');
+    expect(starter.indexOf('stopQwenWatchdog();')).toBeLessThan(starter.indexOf('qwenReinitInFlightSince = 0;'));
+    const stop = blockAt(watchdog, 'export function stopQwenWatchdog(');
+    expect(stop).toContain('clearTimeout(qwenWatchdogTimer);');
+    expect(stop).toContain('qwenAppStateSub.remove();');
+    expect(stop).toContain('clearTimeout(qwenBackgroundSettleTimer);');
   });
 
   it('⚠⚠ and the desktop guard is still the FIRST thing the starter does', () => {

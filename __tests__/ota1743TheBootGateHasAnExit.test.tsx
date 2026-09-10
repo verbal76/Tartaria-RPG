@@ -148,6 +148,13 @@ const PRISTINE_STAGE = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: strin
 afterAll(() => {
   try { if (PRISTINE_HANDLER) errorUtils?.setGlobalHandler(PRISTINE_HANDLER); } catch { /* ignore */ }
   (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = PRISTINE_STAGE;
+  // ⚠ OTA-1798 — belt to App's braces: whatever a boot here started, this
+  // worker does not carry into the next suite. (App's unmount now stops both;
+  // this is the explicit statement for a boot that never reached an unmount.)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  (require('../app/diagnostics/runtimePressureWatch') as typeof import('../app/diagnostics/runtimePressureWatch')).stopRuntimePressureWatch();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  (require('../app/ai/qwenWatchdog') as typeof import('../app/ai/qwenWatchdog')).stopQwenWatchdog();
 });
 
 const mounted: Array<{ unmount(): void }> = [];

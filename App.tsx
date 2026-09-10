@@ -63,6 +63,9 @@ import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { setAliveBeatContext, startAliveBeat, stopAliveBeat } from './app/diagnostics/aliveBeat';
+// ⚠ OTA-1798 — the boot effect owns the teardown of the two instruments its hydrate→bootQwen path starts.
+import { stopRuntimePressureWatch } from './app/diagnostics/runtimePressureWatch';
+import { stopQwenWatchdog } from './app/ai/qwenWatchdog';
 // ⚠⚠⚠ BOOT-HANG-1741 — the screen a boot that never finished is allowed to have.
 import { BootTroubleScreen } from './app/components/BootTroubleScreen';
 import { initTTSManager } from './app/voice/TTSManager';
@@ -891,6 +894,17 @@ export default function App() {
       clearTimeout(otaGateSafetyCap);
       stopAudioController();
       stopTTSController();
+      // ⚠⚠ OTA-1798 — THE INSTRUMENTS STOP WHEN THE APP DOES. bootQwen (reached
+      // from the hydrate chain above) starts the Qwen watchdog and the runtime-
+      // pressure watch — a rescheduling timer, a requestAnimationFrame loop and
+      // two AppState subscriptions — and until now nothing on the unmount side
+      // stopped either. "Started forever, stopped never" (OTA-1176's words)
+      // was measured under jest as ~11,000 post-teardown timer firings per full
+      // surface run from the one suite that renders App; on a device it is the
+      // process lifetime, which is why it never showed there. Same owner, same
+      // teardown rules as the audio and TTS controllers beside it.
+      stopRuntimePressureWatch();
+      stopQwenWatchdog();
       void disposeAudio();
     };
   }, [hydrate, bootCognitive, bootQwen]);

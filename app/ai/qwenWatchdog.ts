@@ -362,26 +362,38 @@ export function runQwenHealthCheck(
 // from this function's opening — a long comment at the top of the body pushes
 // what they check out of reach and fails them for no behavioural reason. The
 // explanation lives out here where it costs those slices nothing.
-export function startQwenWatchdog(
-  get: () => GameStore,
-  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
-): void {
-  if (Platform.OS === 'web') return; // OTA-1228 — see the note above this function
+/** ⚠⚠ OTA-1798 — THE STOP THE START NEVER HAD. `startQwenWatchdog` cleared its
+ *  own timers on a restart and nothing else ever could: the rescheduling tick,
+ *  the AppState subscription and the background-settle timer all lived until the
+ *  process died. On a phone that is the app's own lifetime and it never showed.
+ *  Under jest it showed as the OTA-1743 suite's boot leaving a loop behind that
+ *  fired into a torn-down environment for the rest of the worker's life. The
+ *  owner of the boot (App's boot effect) now stops what it started. Idempotent;
+ *  safe before any start.
+ *  ⚠ OTA-1462 — the settle latch is a timer like the others, and a pending one
+ *  outliving the subscription would flip `trulyBackgrounded` for a listener
+ *  that no longer exists. Cleared with everything else it lives beside. */
+export function stopQwenWatchdog(): void {
   if (qwenWatchdogTimer !== null) {
     clearTimeout(qwenWatchdogTimer);
     qwenWatchdogTimer = null;
   }
   if (qwenAppStateSub) {
-    qwenAppStateSub.remove();
+    try { qwenAppStateSub.remove(); } catch { /* ignore */ }
     qwenAppStateSub = null;
   }
-  // ⚠ OTA-1462 — the settle latch is a timer like the others, and a pending one
-  // outliving the subscription would flip `trulyBackgrounded` for a listener
-  // that no longer exists. Cleared with everything else it lives beside.
   if (qwenBackgroundSettleTimer !== null) {
     clearTimeout(qwenBackgroundSettleTimer);
     qwenBackgroundSettleTimer = null;
   }
+}
+
+export function startQwenWatchdog(
+  get: () => GameStore,
+  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
+  if (Platform.OS === 'web') return; // OTA-1228 — see the note above this function
+  stopQwenWatchdog();
   qwenReinitInFlightSince = 0;
   qwenReinitAttempts = 0;
   qwenBackoffLevel = 0;

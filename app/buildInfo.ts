@@ -30062,7 +30062,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
 // SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
 // SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
-export const OTA_BUILD_ID = '2026-09-10-1797-the-word-beside-the-number';
+// SUPERSEDED: '2026-09-10-1797-the-word-beside-the-number'
+export const OTA_BUILD_ID = '2026-09-10-1798-the-instruments-stop-when-the-app-does';
+// OTA-1798 - the instruments stop when the app does. Owner ruling: "OTA-1743/
+// runtimePressureWatch: Repair next as its own package. Proven lifecycle/
+// test-isolation defect. Do not associate it with the SE freeze without
+// evidence." The defect: App's boot effect reaches bootQwen through the
+// hydrate chain, and bootQwen starts the Qwen watchdog and the runtime-
+// pressure watch - a rescheduling sample timer, a requestAnimationFrame frame
+// clock and two AppState subscriptions - and nothing on the unmount side ever
+// stopped either. startQwenWatchdog had no stop at all. Measured under jest,
+// where RN's requestAnimationFrame is a 16ms setTimeout: the one suite that
+// renders App (OTA-1743) left the frame loop running into a torn-down
+// environment for the rest of the worker's life - about 11,000 "Jest
+// environment has been torn down" firings per full surface run, 113,750 across
+// this session's ten runs. On a device the loop is the process lifetime, so it
+// never showed there, and NO connection to the SE freeze is claimed: this is
+// the lifecycle repaired on its own evidence. Repair: stopQwenWatchdog() exists
+// and the starter uses it; App's boot-effect cleanup stops both instruments
+// beside the audio and TTS controllers it already stops; the OTA-1743 suite
+// stops both by name in afterAll. Suite ota1798TheInstrumentsStopWhenTheAppDoes:
+// under fake timers, the watch and the watchdog leave no timers behind after
+// their stops; a start-stop-start is clean; App's unmount calls both stops
+// (spied), and a rendered-then-unmounted App leaves the timer count where it
+// found it.
 // golem catch-up 2026-09-10: markerless publish of OTA-1797.
 // OTA-1797 - the word beside the number. Owner ruling 2026-09-10 on the
 // relative-threat matrix (revision 2): thresholds set D' fitted to measured
