@@ -30061,7 +30061,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
 // SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
 // SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
-export const OTA_BUILD_ID = '2026-09-10-1796-the-store-reads-its-leaves';
+// SUPERSEDED: '2026-09-10-1796-the-store-reads-its-leaves'
+export const OTA_BUILD_ID = '2026-09-10-1797-the-word-beside-the-number';
+// OTA-1797 - the word beside the number. Owner ruling 2026-09-10 on the
+// relative-threat matrix (revision 2): thresholds set D' fitted to measured
+// win rates (LETHAL <0.65, SEVERE <0.95, DANGEROUS <1.20, RISKY <1.80,
+// MANAGEABLE from 1.80); companions half the substitute gain plus the soak;
+// the party gated to companions that can act in that encounter; publish the
+// matrix beside the rollout plan. D1-D5 stays the ground's own danger; the
+// word beside it stops being a second spelling of the number (CALM / UNEASY
+// / DANGEROUS / DEADLY / LETHAL by danger alone) and becomes the party's
+// durable readiness over what the ground spawns. threatWord.ts: the
+// reference is DERIVED - rarity-weighted mean enemy Power of the non-boss
+// pool under rarityCapForDanger, times expected bodies from encounter's
+// PACK_RULE (now one exported authority the spawner reads too), each extra
+// body 0.6 of a foe - and reproduces the page's 21.6 / 26.5 / 36.1 / 43.0 /
+// 46.2; the party is playerPowerScore plus the gated term (dog: with the
+// player, up, not benched at a climb, target not aerial; golem: present, up,
+// not at a climb; substitute credit is the better of the two since one is
+// commanded per turn; soak is the dog's and zero against a boss). Reads hpMax,
+// never hp: the header is not a health bar. The tone follows the word. Suite
+// ota1797TheWordBesideTheNumber: the bands, the derived reference against an
+// independent recomputation and the ruled figures, the matrix rows, the same
+// tile changing word as the character changes, hp not moving it, every gate,
+// the untrained golem worth nothing, and the header rendering the word.
 // golem catch-up 2026-09-10: markerless publish of OTA-1796.
 // OTA-1796 - the store reads its leaves. Owner ruling: "Web-line boot/module-
 // init cycle: Fix it, surgically, with a regression test." OTA-1756 found the

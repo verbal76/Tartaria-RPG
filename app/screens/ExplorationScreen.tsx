@@ -90,6 +90,7 @@ import { isOversized } from '../engine/portability';
 import { effectiveStats, playerHasScannerEquipped, RING_ID_KEYS } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
+import { threatReadout, participationFromScene, type ThreatWord } from '../engine/threatWord';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { PickpocketSheet } from '../components/PickpocketSheet';
@@ -145,10 +146,17 @@ function describeTime(hours: number): string {
  *  ⚠ VIS-3 — SAME TIER, STAMPED RATHER THAN NARRATED. `Danger 3 (Dangerous)`
  *  is a sentence about a number; on a header rail it wants to be a MARK. The
  *  tier and its word both survive — nothing was dropped, it stopped being
- *  prose. */
-function dangerStamp(danger: number): string {
+ *  prose.
+ *
+ *  ⚠⚠⚠ OTA-1797 — THE WORD IS THE PARTY'S, THE NUMBER IS THE GROUND'S. The
+ *  word used to be a second spelling of the number (CALM · UNEASY · DANGEROUS ·
+ *  DEADLY · LETHAL by danger alone), so "D3 DANGEROUS" read the same to a
+ *  fresh character and to one in Legendary plate. Owner's question: "how
+ *  dangerous is this place to my character right now?" The word now answers
+ *  it — durable readiness over what the ground spawns, from threatWord.ts on
+ *  the owner's ruled bands (set D′). The number does not move. */
+function dangerStamp(danger: number, tier: ThreatWord): string {
   const d = Math.max(1, Math.min(5, Math.round(danger || 1)));
-  const tier = d <= 1 ? 'CALM' : d === 2 ? 'UNEASY' : d === 3 ? 'DANGEROUS' : d === 4 ? 'DEADLY' : 'LETHAL';
   return `D${d} ${tier}`;
 }
 
@@ -157,10 +165,11 @@ function dangerStamp(danger: number): string {
  *  deadly tier takes the game's existing warning tone (#e07a5f, the same red
  *  the combat channel and the destructive control already use). ⚠ IT IS NEVER
  *  GOLD: gold on this screen now means a live obligation or a live process, and
- *  a danger tier is neither. */
-function dangerTone(danger: number): string {
-  const d = Math.max(1, Math.min(5, Math.round(danger || 1)));
-  return d <= 2 ? '#8b8578' : d === 3 ? '#cdbf99' : '#e07a5f';
+ *  a danger tier is neither.
+ *  ⚠ OTA-1797 — the tone follows the WORD, not the number: a MANAGEABLE D5 in
+ *  the warning red would be the header contradicting itself. */
+function dangerTone(tier: ThreatWord): string {
+  return tier === 'LETHAL' || tier === 'SEVERE' ? '#e07a5f' : tier === 'DANGEROUS' ? '#cdbf99' : '#8b8578';
 }
 
 /** Subtle background tint per time-of-day. Always darker than the base
@@ -244,6 +253,14 @@ export function ExplorationScreen() {
   // OTA-1059 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
   const talkToNpc = useGameStore((s) => s.talkToNpc);
   const currentScene = useGameStore((s) => s.currentScene);
+  // ⚠ OTA-1797 — the header's word: this party's readiness over this ground's
+  // spawns. Reads hpMax and gear, never hp, so it moves when the CHARACTER
+  // changes (a stat, a weapon, a companion able to act) and not when a fight
+  // goes badly — the header is not a health bar.
+  const threatWord = useMemo<ThreatWord>(
+    () => (player && currentScene ? threatReadout(player, currentScene.location.danger, participationFromScene(currentScene)).word : 'DANGEROUS'),
+    [player, currentScene],
+  );
   // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
   // real name before arrival/discovery.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
@@ -1442,8 +1459,8 @@ export function ExplorationScreen() {
                 {currentScene ? (currentScene.transitArea ?? currentScene.location.name) : 'No scene'}
               </Text>
               {currentScene ? (
-                <Text style={[styles.sceneDanger, { color: dangerTone(currentScene.location.danger) }]} numberOfLines={1}>
-                  {dangerStamp(currentScene.location.danger)}
+                <Text style={[styles.sceneDanger, { color: dangerTone(threatWord) }]} numberOfLines={1}>
+                  {dangerStamp(currentScene.location.danger, threatWord)}
                 </Text>
               ) : null}
               {/* ⚠⚠ OTA-1375 — THE MAP BUTTON IS GONE. Owner: *"since tapping on

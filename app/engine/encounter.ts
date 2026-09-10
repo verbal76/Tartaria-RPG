@@ -31,7 +31,9 @@ export function findEnemyByName(name: string): Enemy | null {
 interface LootEntry { name: string; rarity: Rarity }
 const loot = lootData as LootEntry[];
 
-const rarityWeights: Record<Rarity, number> = {
+/** The primary pick's rarity weights. Exported (OTA-1797) so the threat word's
+ *  reference power is derived from the SAME table the spawner rolls. */
+export const rarityWeights: Record<Rarity, number> = {
   Common: 10,
   Uncommon: 5,
   Rare: 2,
@@ -506,6 +508,19 @@ export function rarityCapForDanger(danger: number): Rarity {
 // of three types can't be answered by one coating) — the first half of the
 // "no 1-kit-fits-all" ask, before per-instance weakness randomization lands.
 
+/** ⚠ OTA-1797 — THE PACK RULE, STATED ONCE. `rollExtraPackMembers` rolls from
+ *  these and the threat word's reference power (threatWord.ts) derives its
+ *  expected body count from the same numbers, so the two cannot drift. */
+export const PACK_RULE = {
+  /** Pack chance = base + perDanger × danger: frontier ~10%, deep zone ~75%. */
+  base: 0.10,
+  perDanger: 0.13,
+  /** A second extra body is possible only from this danger... */
+  secondExtraFromDanger: 3,
+  /** ...and then only this often (the taper below). */
+  secondExtraChance: 0.45,
+} as const;
+
 /** Roll 0-2 additional, role-diverse foes to append to an existing single/small
  *  encounter. Pure; `rng` injectable for tests. */
 export function rollExtraPackMembers(
@@ -518,14 +533,14 @@ export function rollExtraPackMembers(
   if (existing.length === 0 || existing.length >= 3) return [];
   if (existing.some((e) => e.boss)) return [];            // never gang up onto a boss/Guardian
   // Pack chance climbs with danger: frontier ~10%, deep zone ~75%.
-  const packChance = 0.10 + danger * 0.13;
+  const packChance = PACK_RULE.base + danger * PACK_RULE.perDanger;
   if (rng() >= packChance) return [];
   const cap = rarityCapForDanger(danger);
   const pool = enemies.filter((e) => !e.boss && rarityRank(e.rarity) <= rarityRank(cap));
   if (pool.length === 0) return [];
   const usedTypes = new Set(existing.map((e) => (e.type ?? '').toLowerCase()));
   const usedNames = new Set(existing.map((e) => e.name.toLowerCase()));
-  const maxExtra = Math.min(3 - existing.length, danger >= 3 ? 2 : 1);
+  const maxExtra = Math.min(3 - existing.length, danger >= PACK_RULE.secondExtraFromDanger ? 2 : 1);
   const out: Enemy[] = [];
   for (let n = 0; n < maxExtra; n++) {
     // Prefer a DIFFERENT type than anything already in the pack (role/weakness
@@ -539,7 +554,7 @@ export function rollExtraPackMembers(
     usedNames.add(inst.name.toLowerCase());
     out.push(inst);
     // Taper: a second extra foe only ~45% of the time even when danger allows it.
-    if (rng() > 0.45) break;
+    if (rng() > PACK_RULE.secondExtraChance) break;
   }
   return out;
 }
