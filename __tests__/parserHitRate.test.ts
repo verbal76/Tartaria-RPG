@@ -23,7 +23,7 @@
 // Pass criteria (locked in below):
 //   - overall dictionary hit rate ≥ 85%
 //   - mis-routing ≤ 5% of evaluated phrases
-//   - the existing 108-example ActionReference contract still holds
+//   - the existing 111-example ActionReference contract still holds
 //     (we re-check a subset here so a single test failure surfaces
 //     the cross-reference issue without re-running the sibling file)
 
@@ -619,7 +619,8 @@ const ACTION_REFERENCE_EXAMPLES: Record<string, { phrases: string[]; allowed: In
   perform_action: { phrases: ['perform', 'sing', 'play a tune'], allowed: ['diplomacy'] },
   assist_action_combat: { phrases: ['help', 'assist the reclaimer'], allowed: ['help'] },
   hold_action: { phrases: ['ready', 'wait for an opening'], allowed: ['ready', 'wait'] },
-  flee_action: { phrases: ['flee', 'run away', 'retreat'], allowed: ['escape'] },
+  flee_action: { phrases: ['flee', 'run away', 'bolt'], allowed: ['escape'] },
+  retreat_action: { phrases: ['retreat', 'back off', 'step back'], allowed: ['retreat'] },
   classic_move: { phrases: ['walk', 'walk forward', 'move closer'], allowed: ['travel'] },
   difficult_terrain: { phrases: ['cross the mud', 'wade through the silt'], allowed: ['travel', 'swim'] },
   crawl: { phrases: ['crawl', 'crawl forward'], allowed: ['stealth', 'travel'] },
@@ -665,7 +666,7 @@ const ACTION_REFERENCE_EXAMPLES: Record<string, { phrases: string[]; allowed: In
   psychological_actions: { phrases: ['steady myself', 'calm down'], allowed: ['ready', 'wait', 'rest'] },
 };
 
-describe('Parser hit-rate — ActionReference EXAMPLES cross-reference (108 phrases)', () => {
+describe('Parser hit-rate — ActionReference EXAMPLES cross-reference (111 phrases)', () => {
   let totalPhrases = 0;
   for (const [cardId, { phrases, allowed }] of Object.entries(ACTION_REFERENCE_EXAMPLES)) {
     for (const phrase of phrases) {
@@ -677,10 +678,10 @@ describe('Parser hit-rate — ActionReference EXAMPLES cross-reference (108 phra
     }
   }
 
-  it('all 108 EXAMPLES enumerated', () => {
+  it('all 111 EXAMPLES enumerated', () => {
     let count = 0;
     for (const { phrases } of Object.values(ACTION_REFERENCE_EXAMPLES)) count += phrases.length;
-    expect(count).toBe(108);
-    expect(totalPhrases).toBe(108);
+    expect(count).toBe(111);
+    expect(totalPhrases).toBe(111);
   });
 });

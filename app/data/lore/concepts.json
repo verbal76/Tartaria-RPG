@@ -1104,6 +1104,7 @@
     {
       "id": "retreat_action",
       "keywords": [
+        "retreat",
         "back off",
         "back away",
         "pull back",
@@ -1112,7 +1113,7 @@
         "edge back"
       ],
       "title": "Give Ground",
-      "answer": "Give ground the same way you take it \u2014 one range band out, arm's reach to close, close to near, near to far. Opening the distance is how you break contact without leaving the fight. Say \"back off\", \"pull back\", \"step back\" or \"reposition\"; naming an enemy shifts your focus to them as you move. Weather and heavy armour slow the step. \u26a0 The word \"retreat\" is read as FLEEING the encounter outright, not as this \u2014 if you mean to stay in the fight and open the range, use one of the phrases above. If enemies are already on you and you need to break off cleanly, see Disengage."
+      "answer": "Give ground the same way you take it \u2014 one range band out, arm's reach to close, close to near, near to far. Opening the distance is how you break contact without leaving the fight. Say \"back off\", \"pull back\", \"step back\" or \"reposition\"; naming an enemy shifts your focus to them as you move. Weather and heavy armour slow the step. \"Retreat\" means exactly this \u2014 you give ground and stay in the fight. To leave the encounter outright, say \"flee\". If enemies are already on you and you need to break off cleanly, see Disengage."
     }
   ]
 }

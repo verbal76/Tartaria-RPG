@@ -61,9 +61,12 @@ describe('OTA-1724 — ⚠⚠⚠ the heading is a phrase too', () => {
 });
 
 describe('OTA-1724 — ⚠⚠ the owner-facing canon, pinned on both halves', () => {
-  it('RETREAT leaves the fight', () => {
-    // Owner, in the audit brief: "RETREAT = attempt to leave combat."
-    expect(parseInput('retreat', {}).intent).toBe('escape');
+  it('RETREAT gives ground (owner ruling 2026-09-10; supersedes the audit-brief canon)', () => {
+    // Owner, in the audit brief: "RETREAT = attempt to leave combat." Owner,
+    // 2026-09-10: "retreat: Give ground. Reserve flee for actually attempting
+    // to leave combat." OTA-1795 carries the later ruling; flee still leaves.
+    expect(parseInput('retreat', {}).intent).toBe('retreat');
+    expect(parseInput('flee', {}).intent).toBe('escape');
   });
 
   it('GIVE GROUND / BACK OFF open one range band', () => {

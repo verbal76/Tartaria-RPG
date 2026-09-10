@@ -23100,7 +23100,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             const hint = inCombat
               ? (get().currentScene?.elevatedOn
                 ? ' No parry up here — swing back, or try the flee again.'
-                : " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.")
+                : " Try 'dodge' to set a parry, 'attack' to commit, or 'flee' again to break contact.")
               : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
             get().appendLog(
               'world',

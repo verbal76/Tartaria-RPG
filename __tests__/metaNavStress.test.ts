@@ -89,7 +89,7 @@ const IN_PLAY_SCREENS: ScreenName[] = [
 // ids; we just need enough to exercise the cycle behavior.
 const ACTION_CARD_EXAMPLES: Record<string, string[]> = {
   move_action: ['walk', 'go north', 'head onward'],
-  flee_action: ['flee', 'run away', 'retreat'],
+  flee_action: ['flee', 'run away', 'bolt'],
   attack_action: ['attack the goblin', 'strike the sentinel', 'swing at it'],
   reload_action: ['reload', 'reload my rifle'],
   dodge_action: ['dodge', 'duck'],

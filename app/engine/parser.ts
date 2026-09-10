@@ -60,7 +60,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'reason', 'appeal', 'defuse', 'deescalate', 'de-escalate', 'reconcile', 'placate',
   ],
   escape: [
-    'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',
+    // ⚠ OTA-1795 — the word retreat moved to the retreat intent (owner ruling of
+    // 2026-09-10: "retreat: Give ground. Reserve flee for actually attempting
+    // to leave combat."). flee / run / bolt / scram still leave the fight.
+    'run', 'flee', 'escape', 'withdraw', 'bolt', 'scram',
     'abscond', 'fall back',
   ],
   investigate: [
@@ -242,6 +245,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // off" / "back away" / "pull back" / "edge back". Previously the
     // already-collapsed forms only fired when the player typed
     // "stepback" as one token, which nobody does.
+    // ⚠⚠ OTA-1795 — THE INTENT'S OWN NAME, AT LAST. `retreat` sat in the ESCAPE
+    // table since before this intent existed (OTA-1713 recorded the collision,
+    // OTA-1724 pinned it as the owner's canon of the day). Today's ruling
+    // reverses that: retreat GIVES GROUND — one band out, still in the fight —
+    // and flee is the word for leaving. The LLM path's canonical list
+    // (llmParser) has read `retreat` as this intent all along.
+    'retreat',
     'back off', 'back away', 'pull back', 'step back', 'reposition', 'recoil', 'edge back',
     'pace back', 'fall away', 'inch back',
     // ⚠⚠⚠ OTA-1724 — 'give ground' IS THE CARD'S OWN TITLE. OTA-1713 named this

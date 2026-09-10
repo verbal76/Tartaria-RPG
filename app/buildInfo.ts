@@ -30059,7 +30059,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
 // SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
 // SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
-export const OTA_BUILD_ID = '2026-09-10-1794-one-ceiling-per-tile';
+// SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
+export const OTA_BUILD_ID = '2026-09-10-1795-retreat-gives-ground';
+// OTA-1795 - retreat gives ground. Owner ruling 2026-09-10: "retreat: Give
+// ground. Reserve flee for actually attempting to leave combat." This REVERSES
+// the audit-brief canon OTA-1724 pinned ("RETREAT = attempt to leave combat")
+// and resolves the collision OTA-1713 recorded and left for the owner. The
+// word `retreat` moves from the escape table to the retreat intent's own -
+// which never held it: ten phrases for giving ground and not the word itself,
+// the same shape as OTA-1793's stealth. The LLM path's canonical list has read
+// `retreat` as this intent all along, so the typed and spoken paths now agree.
+// flee / run / escape / bolt / scram / withdraw / fall back still leave the
+// fight; the FLEE button still submits `flee`. The Give Ground card claims
+// `retreat` as its first keyword and its trap sentence is gone; the Flee card's
+// examples drop the word for `bolt`; the stranded-escape hint says 'flee'
+// again, not 'retreat'. Suite ota1795RetreatGivesGround; OTA-1724's canon claim
+// and OTA-1713's collision record re-aimed, both dated.
 // golem catch-up 2026-09-10: markerless publish of OTA-1794.
 // OTA-1794 - one ceiling per tile. The rarity ceiling a tile's danger allows
 // (0-1 Common, 2 Uncommon, 3 Rare, 4+ Legendary) was written three times in

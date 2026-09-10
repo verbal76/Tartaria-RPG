@@ -123,7 +123,7 @@ describe('OTA-1713 — every live verb is reachable or taught', () => {
     }
   });
 
-  it('⚠⚠⚠ "retreat" READS AS FLEEING — a collision recorded, not silently flipped', () => {
+  it('⚠⚠⚠ "retreat" READ AS FLEEING — a collision recorded here, resolved by OTA-1795', () => {
     // Found while checking the cards taught real phrases. The word `retreat`
     // sits, undocumented, in the ESCAPE synonym list — so typing the most
     // obvious word for the retreat intent leaves the encounter instead of
@@ -136,13 +136,18 @@ describe('OTA-1713 — every live verb is reachable or taught', () => {
     // for a way out — but which meaning the word should carry is the owner's
     // call. The card names the trap in the meantime, which costs nothing and is
     // what a reference screen is for.
+    //
+    // ⚠ OTA-1795 — THE OWNER CALLED IT (2026-09-10): "retreat: Give ground.
+    // Reserve flee for actually attempting to leave combat." The word left the
+    // escape table, the card claims it as a keyword, and the trap sentence is
+    // gone because there is no trap. The restraint above was right; the ruling
+    // is what moved it.
     const ps = src('app', 'engine', 'parser.ts');
     const escape = /escape: \[([\s\S]*?)\],/.exec(ps)![1]!;
-    expect(escape.includes("'retreat'")).toBe(true);
+    expect(escape.includes("'retreat'")).toBe(false);
     const card = concepts.concepts.find((c) => c.id === 'retreat_action')!;
-    expect(card.answer.includes('read as FLEEING the encounter outright')).toBe(true);
-    // And the card does not claim the word as its own keyword, because it isn't.
-    expect((card.keywords ?? []).includes('retreat')).toBe(false);
+    expect(card.answer.includes('read as FLEEING the encounter outright')).toBe(false);
+    expect((card.keywords ?? []).includes('retreat')).toBe(true);
   });
 
   it('and they are shown, beside the family they belong to', () => {

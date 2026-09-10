@@ -106,7 +106,9 @@ const EXAMPLES: Record<string, string[]> = {
   perform_action: ['perform', 'sing', 'play a tune'],
   assist_action_combat: ['help', 'assist the reclaimer'],
   hold_action: ['ready', 'wait for an opening'],
-  flee_action: ['flee', 'run away', 'retreat'],
+  flee_action: ['flee', 'run away', 'bolt'],
+  // OTA-1795 — retreat gives ground; the card's own word leads its examples.
+  retreat_action: ['retreat', 'back off', 'step back'],
   classic_move: ['walk', 'walk forward', 'move closer'],
   difficult_terrain: ['cross the mud', 'wade through the silt'],
   crawl: ['crawl', 'crawl forward'],
