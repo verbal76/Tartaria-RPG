@@ -436,14 +436,8 @@ export function GatherModal({
   /** ⚠⚠ A LANE IS A HEADING, ITS BLOCKS, AND ITS BUTTON — rendered together and
    *  in the same colour, because the whole redesign is that you should not have
    *  to work out which button owns which block. */
-  const renderLane = (
-    lane: GatherLane,
-    laneRows: GatherRow[],
-    buttonLabel: ((n: number) => string) | null,
-    onSweep: ((nouns: string[]) => void) | null,
-  ) => {
+  const renderLane = (lane: GatherLane, laneRows: GatherRow[]) => {
     if (laneRows.length === 0) return null;
-    const nouns = sweepable(laneRows);
     return (
       <View style={styles.lane} key={lane}>
         <Text style={[
@@ -456,10 +450,44 @@ export function GatherModal({
           {LANE_HEADING[lane]}
         </Text>
         <View>{laneRows.map((r) => renderRow(r, lane))}</View>
-        {/* ⚠⚠ OTA-1236 — THE LEAD LANE HAS NO BUTTON, and its absence is the
-            message. Every other colour here promises a matching button will
-            clear it; this colour promises nothing bulk will touch it. */}
-        {buttonLabel && onSweep && nouns.length > 0 && (
+      </View>
+    );
+  };
+
+  /** ⚠⚠⚠ OTA-1799 — THE SWEEP IS A PERSISTENT ACTION NOW, NOT A ROW IN THE LIST.
+   *
+   *  OTA-1236 put each lane's button directly under its blocks, in the lane's
+   *  own colour, so nobody has to work out which button clears which colour.
+   *  That reasoning is intact and the colour still carries it — what changed is
+   *  WHERE the button lives, and the owner's physical evidence is why.
+   *
+   *  ⚠⚠ ON HIS iPHONE SE, `⚒ SALVAGE ALL` WAS BELOW THE FOLD AND `IGNORE THE
+   *  REST` WAS PINNED. The audit measured it: with a room of two gear and eight
+   *  salvage lines the card's body is 383 pt of 619 at 375×667 and 535 of 619 at
+   *  390×844, so on the two commonest phones the constructive bulk action sat
+   *  off-window while the one that throws the room away had permanent standing.
+   *  Nothing was unreachable — Phase 2 proved the sweep scrolls fully into view
+   *  and owns its touch points — and that is exactly the point: this was never a
+   *  reachability defect. It was a HIERARCHY defect, and hierarchy is decided by
+   *  what the player can see without being told to look.
+   *
+   *  ⚠ OWNER RULING: the lane's primary bulk action gets persistent standing
+   *  ALONGSIDE the discard. So the sweeps move down to the action region and
+   *  keep their lane colour; there is still exactly ONE button per lane, and no
+   *  row, typeface or touch target got smaller to make room. The set is bounded
+   *  by the lanes themselves — three sweeps at the very most, and `lead` never
+   *  has one — so this region can never grow with the size of the room. */
+  const renderSweep = (
+    lane: GatherLane,
+    laneRows: GatherRow[],
+    buttonLabel: (n: number) => string,
+    onSweep: (nouns: string[]) => void,
+  ) => {
+    if (laneRows.length === 0) return null;
+    const nouns = sweepable(laneRows);
+    if (nouns.length === 0) return null;
+    return (
+      <React.Fragment key={`sweep-${lane}`}>
           <Pressable
             style={({ pressed }) => [
               styles.sweep,
@@ -491,8 +519,7 @@ export function GatherModal({
               {buttonLabel(nouns.length)}
             </Text>
           </Pressable>
-        )}
-      </View>
+      </React.Fragment>
     );
   };
 
@@ -531,32 +558,50 @@ export function GatherModal({
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.list}>
                   {/* ⚠⚠ ALL THREE LANES RENDER AT ONCE. Nothing waits on anything
                       — that was the complaint this redesign answers. */}
-                  {renderLane('gear', gear, (n) => `TAKE ALL GEAR (${n})`, onTakeAll)}
-                  {renderLane('items', items, (n) => `TAKE ALL ITEMS (${n})`, onTakeAll)}
-                  {renderLane(
-                    'scrap', scrap,
-                    // ⚠ It COUNTS what it will destroy rather than saying "all" —
-                    // a bulk action whose size you learn only after committing is
-                    // one players stop trusting.
-                    (n) => `⚒ SALVAGE ALL (${n})`,
-                    onSalvageAll,
-                  )}
+                  {renderLane('gear', gear)}
+                  {renderLane('items', items)}
+                  {renderLane('scrap', scrap)}
                   {/* ⚠⚠ LAST, ALWAYS. Owner: *"if it is there it should always be
                       the last thing listed so the next step is right there to
                       see."* The buttons sit at the bottom of the card, so the
                       last block is the one his thumb is already next to. */}
-                  {renderLane('lead', leads, null, null)}
+                  {renderLane('lead', leads)}
                 </ScrollView>
               )}
 
-              <Pressable
-                style={({ pressed }) => [styles.ignore, pressed && styles.rowPressed]}
-                onPress={onCancel}
-                accessibilityRole="button"
-                accessibilityLabel="Ignore the rest and leave"
-              >
-                <Text style={styles.ignoreText}>IGNORE THE REST</Text>
-              </Pressable>
+              {/* ⚠⚠⚠ OTA-1799 — THE ACTION REGION. Every bulk action the room
+                  offers, and the way out, in one place that the list can never
+                  scroll away from. See `renderSweep` for the owner's ruling and
+                  the measurements behind it. Bounded by construction: one button
+                  per lane, and there are only ever three lanes with a sweep.
+
+                  ⚠ THE RULE ABOVE IT IS NOT DECORATION. Once the list has a
+                  pinned region beneath it, a room with more rows than fit ends
+                  MID-ROW at the region's top edge — correct, and the standard
+                  "there is more below" cue, but with no boundary drawn the half
+                  row reads as a broken button rather than as a scroll. It is the
+                  card's own ornament, the same one under the title. */}
+              <View style={styles.rule} />
+              <View style={styles.actions}>
+                {renderSweep('gear', gear, (n) => `TAKE ALL GEAR (${n})`, onTakeAll)}
+                {renderSweep('items', items, (n) => `TAKE ALL ITEMS (${n})`, onTakeAll)}
+                {renderSweep(
+                  'scrap', scrap,
+                  // ⚠ It COUNTS what it will destroy rather than saying "all" —
+                  // a bulk action whose size you learn only after committing is
+                  // one players stop trusting.
+                  (n) => `⚒ SALVAGE ALL (${n})`,
+                  onSalvageAll,
+                )}
+                <Pressable
+                  style={({ pressed }) => [styles.ignore, pressed && styles.rowPressed]}
+                  onPress={onCancel}
+                  accessibilityRole="button"
+                  accessibilityLabel="Ignore the rest and leave"
+                >
+                  <Text style={styles.ignoreText}>IGNORE THE REST</Text>
+                </Pressable>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -715,6 +760,12 @@ const styles = StyleSheet.create({
   takeAllText: { fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   salvageAllText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
 
+  // ⚠ OTA-1799 — the persistent action region. `flexShrink: 0` is deliberate and
+  // is the opposite of the rule that governs a LIST: this region's height comes
+  // from the lanes, not from the room, so it is bounded at three sweeps plus the
+  // way out however much the player is standing on. It must not give ground —
+  // the scrolling list above it is what yields.
+  actions: { flexShrink: 0 },
   ignore: {
     borderWidth: 1, borderColor: IGNORE, backgroundColor: '#241210',
     borderRadius: 3, paddingVertical: 11, alignItems: 'center', marginTop: 6,
