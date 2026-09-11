@@ -88,7 +88,7 @@ import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engin
 import { findCatalogItem, itemIsShield } from '../engine/crafting'; // itemIsShield: OTA-1523 shield hint
 import { isOversized } from '../engine/portability';
 import { effectiveStats, playerHasScannerEquipped, RING_ID_KEYS } from '../engine/equipment';
-import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
+import { searchRequirementFor, inventoryHasGateFromItems } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { threatReadout, participationFromScene, type ThreatWord } from '../engine/threatWord';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
@@ -2501,8 +2501,12 @@ export function ExplorationScreen() {
               );
               const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
               const hasClimbable = sceneNouns.some((n) => isClimbable(n) && !isClimbCleared(n, marks));
-              const hasGate = inventoryHasGate(
-                player.inventory.map((i) => i.name),
+              // ⚠ OTA-1801 — the ITEM goes in, not its name. A fused instance
+              // answers for itself out of `uniqueStats` and grants no gate by
+              // name, so it is never put to the catalogs. This caller's own
+              // resolver order (gear → materials → exploration) is unchanged.
+              const hasGate = inventoryHasGateFromItems(
+                player.inventory,
                 'climb_steep',
                 [findGearByName, findMaterialByName, findExplorationItemByName],
               );

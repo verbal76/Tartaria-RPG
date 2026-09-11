@@ -228,6 +228,72 @@ export function findDogGearByName(name: string): CatalogDogGear | undefined {
 // etc. Don't try to unwrap.
 export const EXPLORATION = explorationData as CatalogExploration[];
 
+/* ⚠⚠⚠ OTA-1801 — THE CATALOGS ARE INDEXED ONCE, AND THE INDEX IS NOT A CACHE.
+ *
+ * Every `find*ByName` below used to open with a linear scan —
+ * `CATALOG.find((r) => r.name.toLowerCase() === t)` — and `isCataloguedElsewhere`
+ * ran up to EIGHT of those in a row on every miss. A measured attack tap at 400
+ * inventory rows spent ~281,000 row comparisons doing nothing but re-deriving
+ * what an item is, and a name that is in no catalog (a fused piece — legitimate
+ * content, see the Fusing Crucible) paid the worst price of all because it
+ * reached the end of every list.
+ *
+ * ⚠⚠ THIS IS AN INDEX, NOT A CACHE, AND THE DISTINCTION IS THE WHOLE SAFETY
+ * ARGUMENT. The catalogs are static JSON, frozen at build time. The maps are
+ * built once at module load from those same arrays and never written again:
+ * there is no invalidation, no eviction, no TTL, no observer, no per-screen or
+ * per-action memo, and nothing to go stale. A cache would need all of that; an
+ * index of immutable data needs none of it.
+ *
+ * ⚠ FIRST-WINS, BECAUSE `.find()` RETURNS THE FIRST MATCH. The loop below skips
+ * a key it has already seen, so a duplicate name inside one catalog resolves to
+ * exactly the row the scan would have returned. Keys are `name.toLowerCase()`
+ * with no trimming here — the callers trim their input, which is the same
+ * normalization the old comparisons used on both sides.
+ *
+ * ⚠ WHAT THIS DOES NOT TOUCH: precedence, inference, and the cross-catalog
+ * guard. Only the exact-match STEP is indexed. `isCataloguedElsewhere` still
+ * asks the same catalogs in the same order, `inferWeapon` / `inferArmor` /
+ * `inferAccessory` still run on the same misses, and every resolver still
+ * consults its own catalogs in its own order. A name that resolved to a row
+ * before resolves to that row now; a name that fell through to inference before
+ * still does. */
+function indexByName<T extends { name: string }>(rows: readonly T[]): ReadonlyMap<string, T> {
+  const m = new Map<string, T>();
+  for (const r of rows) {
+    const k = String(r.name).toLowerCase();
+    if (!m.has(k)) m.set(k, r); // first-wins — `.find()` semantics
+  }
+  return m;
+}
+const WEAPONS_BY_NAME = indexByName(WEAPONS);
+const ARMOR_BY_NAME = indexByName(ARMOR);
+const AMULETS_BY_NAME = indexByName(AMULETS);
+const RINGS_BY_NAME = indexByName(RINGS);
+const MATERIALS_BY_NAME = indexByName(MATERIALS);
+const EXPLORATION_BY_NAME = indexByName(EXPLORATION);
+const GEAR_BY_NAME = indexByName(GEAR);
+const DOG_GEAR_BY_NAME = indexByName(DOG_GEAR);
+
+/** ⚠ TEST-ONLY — the BUILDER itself, not just its outputs.
+ *
+ *  The first-wins rule above is unobservable on today's data: all 1,008 static
+ *  rows carry 1,008 distinct names, so no catalog has a duplicate and first-wins
+ *  and last-wins would build the same eight Maps. A negative control that
+ *  flipped the rule stayed GREEN against the real catalogs — the equivalence
+ *  test could not see it. Exporting the builder lets the regression feed it a
+ *  synthetic catalog that DOES contain a duplicate and prove the rule directly,
+ *  so the day an author lands a duplicate name the behaviour is already pinned. */
+export const _indexByNameForTest = indexByName;
+
+/** ⚠ TEST-ONLY. Lets a regression prove the index agrees with the scan it
+ *  replaced for every authored name, rather than trusting that it does. */
+export const _catalogIndexesForTest = {
+  weapons: WEAPONS_BY_NAME, armor: ARMOR_BY_NAME, amulets: AMULETS_BY_NAME,
+  rings: RINGS_BY_NAME, materials: MATERIALS_BY_NAME, exploration: EXPLORATION_BY_NAME,
+  gear: GEAR_BY_NAME, dogGear: DOG_GEAR_BY_NAME,
+} as const;
+
 const DEFAULT_DURABILITY = 25;
 
 export function lookupCraftedItem(resultName: string): {
@@ -827,27 +893,27 @@ export function maxCraftableCount(
 function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amulet' | 'ring'): boolean {
   const t = name.toLowerCase().trim();
   if (!t) return false;
-  if (exclude !== 'weapon' && WEAPONS.some((w) => w.name.toLowerCase() === t)) return true;
-  if (exclude !== 'armor' && ARMOR.some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'amulet' && AMULETS.some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'ring' && RINGS.some((r) => r.name.toLowerCase() === t)) return true;
-  if (MATERIALS.some((m) => m.name.toLowerCase() === t)) return true;
-  if (EXPLORATION.some((x) => x.name.toLowerCase() === t)) return true;
-  if (GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (exclude !== 'weapon' && WEAPONS_BY_NAME.has(t)) return true;
+  if (exclude !== 'armor' && ARMOR_BY_NAME.has(t)) return true;
+  if (exclude !== 'amulet' && AMULETS_BY_NAME.has(t)) return true;
+  if (exclude !== 'ring' && RINGS_BY_NAME.has(t)) return true;
+  if (MATERIALS_BY_NAME.has(t)) return true;
+  if (EXPLORATION_BY_NAME.has(t)) return true;
+  if (GEAR_BY_NAME.has(t)) return true;
   // OTA-133 — defensive add: DOG_GEAR is a separate catalog (4 vests
   // in OTA-122). Current vest names (Burlap / Riveted Leather /
   // Aetheric Padded / Reclaimer Pattern) don't trip the weapon/
   // armor inference regex today, but a future vest named e.g.
   // "Plated Vest" or "Bladed Harness" would slip past the guard.
   // Including DOG_GEAR closes that path before authoring opens it.
-  if (DOG_GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (DOG_GEAR_BY_NAME.has(t)) return true;
   return false;
 }
 
 export function findWeaponByName(name: string): CatalogWeapon | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const direct = WEAPONS_BY_NAME.get(t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'weapon')) return null;
   // Inference fallback — only fires for names that READ as a weapon,
@@ -952,7 +1018,7 @@ export function fusedArmorResistances(name: string, rarity: Rarity, resistance?:
 export function findArmorByName(name: string): CatalogArmor | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const direct = ARMOR_BY_NAME.get(t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'armor')) return null;
   return inferArmor(name);
@@ -961,7 +1027,7 @@ export function findArmorByName(name: string): CatalogArmor | null {
 export function findAmuletByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = AMULETS.find((a) => a.name.toLowerCase() === t);
+  const direct = AMULETS_BY_NAME.get(t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'amulet')) return null;
   if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(name)) {
@@ -973,7 +1039,7 @@ export function findAmuletByName(name: string): CatalogAccessory | null {
 export function findRingByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = RINGS.find((r) => r.name.toLowerCase() === t);
+  const direct = RINGS_BY_NAME.get(t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'ring')) return null;
   if (/\b(ring|band|signet)\b/i.test(name)) {
@@ -991,7 +1057,7 @@ export function findRingByName(name: string): CatalogAccessory | null {
 export function findExplorationItemByName(name: string): CatalogExploration | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return EXPLORATION.find((e) => e.name.toLowerCase() === t) ?? null;
+  return EXPLORATION_BY_NAME.get(t) ?? null;
 }
 
 /** Same for materials. The 13 orphan materials from the OTA 192
@@ -1000,7 +1066,7 @@ export function findExplorationItemByName(name: string): CatalogExploration | nu
 export function findMaterialByName(name: string): CatalogMaterial | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return MATERIALS.find((m) => m.name.toLowerCase() === t) ?? null;
+  return MATERIALS_BY_NAME.get(t) ?? null;
 }
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
@@ -1091,13 +1157,13 @@ export function canonicalItemRarity(
 export function findGearByName(name: string): CatalogGear | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return GEAR.find((g) => g.name.toLowerCase() === t) ?? null;
+  return GEAR_BY_NAME.get(t) ?? null;
 }
 
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const exact = WEAPONS_BY_NAME.get(t);
   if (exact) return exact;
   return WEAPONS.find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
 }
@@ -1105,7 +1171,7 @@ export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
 export function fuzzyFindArmor(text: string): CatalogArmor | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const exact = ARMOR_BY_NAME.get(t);
   if (exact) return exact;
   return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }

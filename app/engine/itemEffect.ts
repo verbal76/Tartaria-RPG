@@ -153,6 +153,84 @@ export function resolveItemEffect(name: string, resolvers: EffectResolver[]): It
   return null;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1801 — THE ITEM ANSWERS FOR ITSELF BEFORE ITS NAME IS ASKED TO.
+ *
+ * A FUSED piece is legitimate content, not a broken catalog row. The Fusing
+ * Crucible (OTA-193/194/195) exists precisely to give procedurally-named,
+ * catalog-absent objects a destiny, and such a piece carries its own authority:
+ * `uniqueStats` holds its kind, its slot, its dice, its resistances. Its display
+ * name is GENERATED and identifies nothing in any static catalog.
+ *
+ * ⚠⚠ SO ASKING THE CATALOGS ABOUT IT IS BOTH SLOW AND WRONG.
+ *
+ *  · SLOW, measured: a generated name misses every catalog, and each miss also
+ *    runs the cross-catalog guard, so one fused row cost more than any other
+ *    identity in the game — 75 ms per 400 rows against 1.0 ms for an item the
+ *    first resolver knows. Fused items were simultaneously the CHEAPEST identity
+ *    on the instance-aware path (`validSlotsForItem`, 1.7 ms) and the MOST
+ *    EXPENSIVE on this one. That asymmetry was the whole finding.
+ *
+ *  · WRONG, in principle: if a generated name ever collided with a catalog row,
+ *    the fused piece would inherit a stranger's effect. Owner ruling, 2026-09-11:
+ *    *"INSTANCE AUTHORITY WINS... Generated/display name is not authoritative
+ *    over explicit fused instance identity."* This is the rule `validSlotsForItem`
+ *    already applies (OTA-1408: what an item says it is beats what its name
+ *    sounds like); the passive path simply never learned it, because its caller
+ *    threw the object away one line before the lookup began.
+ *
+ * ⚠ AND THE COLLISION SURFACE WAS MEASURED BEFORE THE RULE CHANGED, not after.
+ * The deterministic namer's space is finite, so it was enumerated EXHAUSTIVELY:
+ * 1,144 generated names against 1,008 static rows across eight catalogs —
+ * ZERO exact collisions, and no static name appears in two catalogs. So this
+ * changes no behaviour reachable today; it closes a hole the unbounded
+ * forge-name space could otherwise walk into.
+ *
+ * ⚠ WHAT IS *NOT* CHANGED: an item WITHOUT `uniqueStats` resolves exactly as
+ * before, through the same resolvers in the same order. Stacking, the per-stat
+ * cap, and which catalog rows carry which effect are all untouched.
+ */
+export function itemCarriesOwnIdentity(item: { uniqueStats?: unknown } | null | undefined): boolean {
+  return !!item?.uniqueStats;
+}
+
+/** Inventory-passive sum that keeps the ITEM rather than reducing it to a name.
+ *  Behaviour-identical to `aggregateInventoryPassives` for every ordinary item;
+ *  fused/unique instances answer for themselves and never reach the catalogs. */
+export function aggregateInventoryPassivesFromItems(
+  items: ReadonlyArray<{ name: string; uniqueStats?: unknown }>,
+  resolvers: EffectResolver[],
+): Partial<Stats> {
+  const out: Partial<Record<StatKey, number>> = {};
+  for (const item of items) {
+    // ⚠ A fused piece's passive authority is its own `uniqueStats`, which carries
+    // no inventory-passive today. It contributes nothing and asks nothing.
+    if (itemCarriesOwnIdentity(item)) continue;
+    const fx = resolveItemEffect(item.name, resolvers);
+    if (!fx || fx.kind !== 'passive') continue;
+    const current = out[fx.stat] ?? 0;
+    if (current >= PASSIVE_STAT_CAP) continue;
+    const headroom = PASSIVE_STAT_CAP - current;
+    out[fx.stat] = current + Math.min(fx.bonus, headroom);
+  }
+  return out;
+}
+
+/** Gate ownership that keeps the ITEM. Same rule: a fused piece grants no gate
+ *  by name, so it is not asked. Ordinary items resolve exactly as before. */
+export function inventoryHasGateFromItems(
+  items: ReadonlyArray<{ name: string; uniqueStats?: unknown }>,
+  gate: GateKind,
+  resolvers: EffectResolver[],
+): boolean {
+  for (const item of items) {
+    if (itemCarriesOwnIdentity(item)) continue;
+    const fx = resolveItemEffect(item.name, resolvers);
+    if (fx?.kind === 'gate' && fx.unlocks === gate) return true;
+  }
+  return false;
+}
+
 /** Sum passive stat bonuses across the player's inventory, capped
  *  per stat at PASSIVE_STAT_CAP. Items with non-passive effects
  *  are skipped. Stacking is "first-found wins up to the cap":

@@ -19724,15 +19724,15 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         }
         const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { inventoryHasGate: ihg } = require('../engine/itemEffect');
+        const { inventoryHasGateFromItems: ihg } = require('../engine/itemEffect');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { findGearByName: fgbnC, findMaterialByName: fmbnC, findExplorationItemByName: feibC } =
           require('../engine/crafting');
-        const hasRope = ihg(
-          player.inventory.map((i: { name: string }) => i.name),
-          'climb_steep',
-          [fgbnC, fmbnC, feibC],
-        );
+        // ⚠ OTA-1801 — the ITEM goes in, not its name. A fused instance answers
+        // for itself out of `uniqueStats` and grants no gate by name, so it is
+        // never put to the catalogs. This caller's own resolver order
+        // (gear → materials → exploration) is passed through unchanged.
+        const hasRope = ihg(player.inventory, 'climb_steep', [fgbnC, fmbnC, feibC]);
         // OTA 23-007 — rope is now HARD-REQUIRED for climbing. The
         // old DEX vs DC 12 fallback branch is gone: no rope = no
         // climb attempt at all, no stamina spent. The Arbiter

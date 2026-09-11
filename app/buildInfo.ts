@@ -30065,7 +30065,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1797-the-word-beside-the-number'
 // SUPERSEDED: '2026-09-10-1798-the-instruments-stop-when-the-app-does'
 // SUPERSEDED: '2026-09-10-1799-nothing-from-data-is-unbounded'
-export const OTA_BUILD_ID = '2026-09-10-1800-green-means-usable-now';
+// SUPERSEDED: '2026-09-10-1800-green-means-usable-now'
+export const OTA_BUILD_ID = '2026-09-11-1801-asked-once';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat
 // looks substantially better with the DARK / BLACK fill than with the bright

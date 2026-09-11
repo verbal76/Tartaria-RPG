@@ -2,7 +2,7 @@ import type { InventoryItem, EquipSlot, PlayerCharacter, PlayerEquipped, Stats }
 import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName, itemIsShield } from './crafting';
 import { isWeaponCoatingItem } from './weaponCoating';
 import { itemIsThrowable } from './bandolierEligibility';
-import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
+import { aggregateInventoryPassivesFromItems, inventoryHasGateFromItems, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
 import { resolveDisplayArmorByName } from './itemResolution';
@@ -492,8 +492,10 @@ const EFFECT_RESOLVERS: EffectResolver[] = [
  *  Stackable items (e.g. 3 Communicators) contribute their effect
  *  per-stack-entry — the cap is the real ceiling. */
 export function aggregateInventoryPassiveStatBonuses(player: PlayerCharacter): Partial<Stats> {
-  const names = (player.inventory ?? []).map((i) => i.name);
-  return aggregateInventoryPassives(names, EFFECT_RESOLVERS);
+  // ⚠ OTA-1801 — the ITEM is passed, not its name. A fused piece carries its own
+  // identity and is not re-derived from a generated string; see the note on
+  // `aggregateInventoryPassivesFromItems`. Ordinary items resolve as before.
+  return aggregateInventoryPassivesFromItems(player.inventory ?? [], EFFECT_RESOLVERS);
 }
 
 /** OTA 192 — public helper for scene/travel code that needs to gate
@@ -513,8 +515,9 @@ export function aethericVisionEquipped(player: PlayerCharacter): boolean {
 }
 
 export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean {
-  const names = (player.inventory ?? []).map((i) => i.name);
-  return inventoryHasGate(names, gate, EFFECT_RESOLVERS);
+  // ⚠ OTA-1801 — same rule as the passive sum: keep the item, skip name
+  // reconstruction for instances that already know what they are.
+  return inventoryHasGateFromItems(player.inventory ?? [], gate, EFFECT_RESOLVERS);
 }
 
 /** OTA 193 — true iff the player has a scanner with the given

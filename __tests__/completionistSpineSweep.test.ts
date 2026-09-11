@@ -48,8 +48,9 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { LOST_CAPITAL_LOCATIONS, canStayAtTheNexus, ensureMainQuest } from '../app/engine/mainQuest';
-import { isCoreGuardian } from '../app/engine/coreGuardians';
+import { isCoreGuardian, CORE_SETTLE_HOURS } from '../app/engine/coreGuardians';
 import { STORY_MOTIVE_IDS } from '../app/engine/story';
+import { arrivalPos } from '../app/state/combatResolution';
 import type { MainQuestEnding } from '../app/engine/types';
 
 jest.setTimeout(1800000);
@@ -98,6 +99,12 @@ function seedKin() {
   });
 }
 
+/** OTA-1801 / STEP 11 — capital id → how many of the 180 games cleared it. */
+const CAPITAL_RECEIPT = new Map<string, number>();
+/** 9 factions × 5 motives × 4 endings. Derived, not hand-typed, so the receipt
+ *  cannot silently pass if the cross shrinks. */
+const EXPECTED_GAMES = getFactions().length * STORY_MOTIVE_IDS.length * 4;
+
 /** One complete game. Returns nothing; throws (via expect) where it breaks. */
 async function playTheSpine(factionId: string, motiveId: string, ending: MainQuestEnding, runTag: string) {
   await store.getState().hydrate();
@@ -138,14 +145,40 @@ async function playTheSpine(factionId: string, motiveId: string, ending: MainQue
         enemies: [], enemyHps: [], hooks: [], range: null, enemiesAtBase: false,
       },
     });
+    // ⚠ OTA-1801 / PKG-5 (second defect) — OTA-1471's PACING RULE: a Core will
+    // not answer a second summons until CORE_SETTLE_HOURS have passed since the
+    // last one ("one rest between seats"). The fixture teleports capital to
+    // capital with a frozen clock, so every summons after the first was refused
+    // with reason 'core_settling'. That was invisible until the reach defect
+    // above was repaired, because the run never survived capital #1.
+    //
+    // The clock is advanced by the SETTLE WINDOW ITSELF, read from production —
+    // not a hardcoded number — so if the pacing rule is ever retuned this
+    // fixture follows it instead of silently drifting out of date. A real
+    // player pays this and more: OTA-1496 put every capital pair ≥14 walking
+    // tiles apart, so the journey alone exceeds the window.
+    const beforeSummon = store.getState().player!;
+    useGameStore.setState({
+      player: { ...beforeSummon, hoursElapsed: (beforeSummon.hoursElapsed ?? 0) + CORE_SETTLE_HOURS },
+    });
     const res = store.getState().summonCoreGuardian();
     expect({ runTag, capital, summon: res.ok }).toEqual({ runTag, capital, summon: true });
     await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => isCoreGuardian(e)));
     const guardian = store.getState().currentScene!.enemies.find((e) => isCoreGuardian(e))!;
+    // ⚠ OTA-1801 / PKG-5 — the SAME stale assumption the outcome sweep carried and
+    // shed at the 2026-09-10 closeout. OTA-1506 moved reach to the BULLSEYE: the
+    // attack gate reads each enemy's own `pos` via enemyBandOf, and the legacy
+    // scene-level `range` is only a fallback for a body with no position. The
+    // summoned guardian stands up WITH a position (at mid), so `range: 'close'`
+    // here moved nothing — every swing below was refused for reach, no roll was
+    // ever armed, and the guardian sat at 1 HP for all eight rounds. Because
+    // asgardar is LOST_CAPITAL_LOCATIONS[0], all 180 identity-cross cases died on
+    // the first capital. TEST DEFECT / stale fixture; production untouched. The
+    // fixture now places him at close, exactly as the sibling sweep does.
     useGameStore.setState({
       currentScene: {
         ...store.getState().currentScene!,
-        enemies: [guardian], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+        enemies: [{ ...guardian, pos: arrivalPos('close', () => 0) }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
         enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
         enemyArmorShred: [0], enemyCorruptionStacks: [0], enemiesAtBase: false,
       },
@@ -159,7 +192,13 @@ async function playTheSpine(factionId: string, motiveId: string, ending: MainQue
     await settle(() => mq().coresRecovered.includes(capital));
     expect({ runTag, capital, core: mq().coresRecovered.includes(capital) })
       .toEqual({ runTag, capital, core: true });
+    CAPITAL_RECEIPT.set(capital, (CAPITAL_RECEIPT.get(capital) ?? 0) + 1);
   }
+  // ⚠ OTA-1801 / STEP 11 — a PER-CAPITAL RECEIPT. "180 green" on its own does not
+  // prove the nine capitals were each reached and each cleared: a loop that
+  // short-circuited, or a capital list that shrank, would still report green.
+  // This asserts the recovered SET is the full capital list, by name, every run.
+  expect([...mq().coresRecovered].sort()).toEqual([...LOST_CAPITAL_LOCATIONS].sort());
   expect(mq().phase).toBe('descent');
 
   if (ending === 'stay') seedKin();
@@ -176,6 +215,7 @@ async function playTheSpine(factionId: string, motiveId: string, ending: MainQue
 const ENDINGS: MainQuestEnding[] = ['seal', 'unleash', 'preserve', 'stay'];
 
 describe('COMPLETIONIST — the full identity cross: 9 factions × 5 motives × 4 endings, 180 complete games', () => {
+  const realLog = console.log;
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   const factions = getFactions();
@@ -188,4 +228,15 @@ describe('COMPLETIONIST — the full identity cross: 9 factions × 5 motives × 
       }
     }
   }
+
+  // ⚠ OTA-1801 / STEP 11 — THE PER-CAPITAL EXECUTION RECEIPT. This runs last and
+  // prints how many of the 180 games cleared EACH capital by name, then asserts
+  // every capital was cleared by every game. Without it, "180 green" is a claim
+  // about test results, not about coverage of the nine capitals.
+  it('RECEIPT — every one of the nine Lost Capitals was reached and cleared in every game', () => {
+    const rows = LOST_CAPITAL_LOCATIONS.map((c) => `    ${c.padEnd(12)} ${String(CAPITAL_RECEIPT.get(c) ?? 0).padStart(4)}`);
+    realLog(`\n  PER-CAPITAL RECEIPT — games that recovered each Core:\n${rows.join('\n')}\n`);
+    const expected = new Map(LOST_CAPITAL_LOCATIONS.map((c) => [c, EXPECTED_GAMES]));
+    expect(Object.fromEntries(CAPITAL_RECEIPT)).toEqual(Object.fromEntries(expected));
+  });
 });
