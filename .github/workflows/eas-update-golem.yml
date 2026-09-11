@@ -116,10 +116,30 @@ jobs:
           # many times over, and far cheaper than the full history.
           fetch-depth: 200
 
-      # ⚠⚠⚠ THE VALIDATION RECEIPT. No green CI run at this SHA, no publish —
-      # whoever dispatched it. On the automatic path the receipt is the run id
-      # CI handed over, and it must be a successful CI run AT THIS SHA; a human
-      # dispatch is checked the same way against the newest CI run for the SHA.
+      # ⚠⚠⚠ THE VALIDATION RECEIPT. No proof that every required gate passed
+      # AT THIS SHA, no publish — whoever dispatched it.
+      #
+      # ⚠⚠ 2026-09-11 — HARDENED (OTA latency audit, claim K confirmed). The
+      # old step accepted an IN-PROGRESS CI run on the automatic path: its only
+      # refusal was `status == completed && conclusion != success`, which is a
+      # no-op while the run is still going, and `validated_by` is a dispatch
+      # INPUT anyone can set. The `needs:` graph really did hold the line on
+      # the automatic path — but the receipt never carried that guarantee, and
+      # the "automatic" check was weaker than the "manual" one.
+      #
+      # Now ONE check governs BOTH paths — scripts/verify-ci-receipt.cjs:
+      #   • the run is the CI workflow FILE (.github/workflows/ci.yml), not a
+      #     display name; at THIS SHA; one run_attempt, captured;
+      #   • the required-job manifest is read from THE CHECKED-OUT SHA, so the
+      #     contract enforced is the one that applied to this commit;
+      #   • for every name in it: EXACTLY ONE job in the latest attempt, with
+      #     conclusion LITERALLY "success" — skipped, cancelled, timed_out,
+      #     neutral, action_required, startup_failure, stale, null all refuse;
+      #   • every job NOT in the manifest is ignored. The heavy simulations may
+      #     still be running, or red — they are reported, and stay so. The
+      #     run's overall status/conclusion is never consulted, for the same
+      #     reason.
+      # The only difference between the paths is how the run id is found.
       - name: Require a green CI run for this commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -128,29 +148,29 @@ jobs:
           set -euo pipefail
           SHA="$(git rev-parse HEAD)"
           if [ -n "$VALIDATED_BY" ]; then
-            RUN=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${VALIDATED_BY}" --jq '[.name, .head_sha, .status, .conclusion] | @tsv')
-            IFS=$'\t' read -r R_NAME R_SHA R_STATUS R_CONCL <<< "$RUN"
-            if [ "$R_NAME" != "CI" ] || [ "$R_SHA" != "$SHA" ]; then
-              echo "::error::Refusing to publish — validated_by run ${VALIDATED_BY} is '${R_NAME}' at ${R_SHA}, not CI at ${SHA}."
-              exit 1
-            fi
-            # ⚠ CI dispatches this from INSIDE its own run, so that run is still
-            # in progress here; every job it `needs` had already passed or the
-            # publish job would not have run. Anything else is a failure.
-            if [ "$R_STATUS" = "completed" ] && [ "$R_CONCL" != "success" ]; then
-              echo "::error::Refusing to publish — CI run ${VALIDATED_BY} concluded '${R_CONCL}'."
-              exit 1
-            fi
-            echo "✓ validated by CI run ${VALIDATED_BY} at ${SHA} (${R_STATUS}${R_CONCL:+/$R_CONCL})"
+            RUN_ID="$VALIDATED_BY"
           else
-            OK=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${SHA}&per_page=10" \
-              --jq '[.workflow_runs[] | select(.status == "completed" and .conclusion == "success")] | length')
-            if [ "${OK:-0}" -lt 1 ]; then
-              echo "::error::Refusing to publish — no completed, successful CI run exists for ${SHA}. Push it (CI runs on every push) or run the CI workflow for it first."
+            # A human dispatch: the NEWEST CI run for this SHA, by workflow
+            # file — the same receipt then decides. In-progress is refused by
+            # the receipt, not tolerated by this lookup.
+            RUN_ID=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${SHA}&per_page=20" \
+              --jq '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | .id // empty')
+            if [ -z "${RUN_ID:-}" ]; then
+              echo "::error::Refusing to publish — no CI run exists for ${SHA}. Push it (CI runs on every push) or run the CI workflow for it first."
               exit 1
             fi
-            echo "✓ ${SHA} carries a green CI run"
           fi
+          RECEIPT="$(mktemp -d)"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > "$RECEIPT/run.json"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?filter=latest&per_page=100" > "$RECEIPT/jobs.json"
+          # ⚠ The manifest and the verifier both come from the checkout — the
+          # SHA being published — never from the trunk head. Stock runner node,
+          # no dependencies: this gates the install, not the other way round.
+          node scripts/verify-ci-receipt.cjs \
+            --sha "$SHA" \
+            --run "$RECEIPT/run.json" \
+            --jobs "$RECEIPT/jobs.json" \
+            --manifest .github/required-jobs.json
 
       # ⚠ The line is resolved in its own step because a push can now select one
       # too, via a commit marker. Keeping the resolution visible and separate is

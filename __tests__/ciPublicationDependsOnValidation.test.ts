@@ -94,13 +94,24 @@ describe('publication depends on validation', () => {
     expect(receipt).toBeGreaterThan(0);
     expect(receipt).toBeLessThan(publish);
     const run = steps[receipt]!.run!;
-    // Automatic: the run id CI handed over must be CI, at this SHA, and not failed.
-    expect(run).toContain('actions/runs/${VALIDATED_BY}');
-    expect(run).toContain('[ "$R_NAME" != "CI" ] || [ "$R_SHA" != "$SHA" ]');
-    // Human: the newest CI runs for the SHA must include a completed success.
+    // ⚠⚠ 2026-09-11 — HARDENED. The two paths differ ONLY in how they find the
+    // run id; one verifier (scripts/verify-ci-receipt.cjs) then judges both.
+    // Automatic: the run id CI handed over.
+    expect(run).toContain('RUN_ID="$VALIDATED_BY"');
+    // Human: the NEWEST CI run for the SHA, by workflow FILE, not display name.
     expect(run).toContain('actions/workflows/ci.yml/runs?head_sha=${SHA}');
-    expect(run).toContain('.status == "completed" and .conclusion == "success"');
-    expect(run).toContain('Refusing to publish — no completed, successful CI run exists');
+    expect(run).toContain('select(.path == ".github/workflows/ci.yml")');
+    expect(run).toContain('Refusing to publish — no CI run exists');
+    // Both: the run and its LATEST-attempt jobs go to the verifier with the
+    // manifest read from the checkout — the SHA being published.
+    expect(run).toContain('actions/runs/${RUN_ID}"');
+    expect(run).toContain('actions/runs/${RUN_ID}/jobs?filter=latest&per_page=100');
+    expect(run).toContain('node scripts/verify-ci-receipt.cjs');
+    expect(run).toContain('--manifest .github/required-jobs.json');
+    // The in-progress short-circuit is gone. The old guard was a no-op while
+    // CI was still running, and validated_by is an input anyone can set.
+    expect(run).not.toContain('[ "$R_STATUS" = "completed" ]');
+    expect(run).not.toContain('.status == "completed" and .conclusion == "success"');
     expect(PUB.jobs.ota!.permissions ?? (PUB as unknown as { permissions: Record<string, string> }).permissions).toMatchObject({ actions: 'read' });
   });
 

@@ -1,0 +1,11 @@
+{
+  "$comment": "THE REQUIRED VALIDATION CONTRACT, BY JOB DISPLAY NAME. The publisher reads this file from the CHECKED-OUT SHA it is about to publish and refuses unless every name here appears EXACTLY ONCE in the latest attempt of the CI run at that SHA with conclusion === 'success' (scripts/verify-ci-receipt.cjs). Nothing else on the run is consulted, which is what keeps the deferred heavy simulations reported and non-blocking. This list MUST equal the display names of ci.yml's publish.needs — scripts/check-required-jobs.mjs fails the build if they drift apart. Adding a required gate means adding it in both places, in the same commit, or the gate refuses.",
+  "workflow": ".github/workflows/ci.yml",
+  "required": [
+    "typecheck (source · required)",
+    "typecheck (tests · ratchet)",
+    "lint (required)",
+    "source gates (ratchets · required)",
+    "jest (fast · required)"
+  ]
+}

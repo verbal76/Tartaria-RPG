@@ -222,6 +222,12 @@ jobs:
         run: npm run check:testsplit
       - name: The gold budget may only shrink (blocking)
         run: npm run check:gold
+      # ⚠⚠ The validation receipt names every gate the publish job waits for,
+      # and nothing else. .github/required-jobs.json and this file's
+      # publish.needs are two spellings of one contract; this fails if they
+      # ever say different things. See scripts/verify-ci-receipt.cjs.
+      - name: The publication receipt names every required gate (blocking)
+        run: npm run check:requiredjobs
 
   test:
     name: jest (fast · required)

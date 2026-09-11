@@ -37,7 +37,8 @@
     "check:storeceiling": "node scripts/check-store-ceiling.mjs",
     "check:kitpalette": "node scripts/check-kit-palette.mjs",
     "check:kitexports": "node scripts/check-kit-exports.mjs",
-    "check:testsplit": "node scripts/check-test-split.mjs"
+    "check:testsplit": "node scripts/check-test-split.mjs",
+    "check:requiredjobs": "node scripts/check-required-jobs.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
