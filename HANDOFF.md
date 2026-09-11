@@ -176,6 +176,44 @@ the one that takes an extra act, and the divergence branch became the freebie.**
 ⚠ So on bug-fix work `[ota-hal]` is not an exceptional step needing
 justification. It is part of shipping, and OMITTING it is what needs justifying.
 
+### Exact-SHA promotion — the `promotions` control plane (2026-09-11)
+
+The second way to reach HAL, for source that has ALREADY been validated and
+looked at on Golem: promote the exact SHA, with no new commit on the trunk.
+
+* **`golem-line` is the game-source trunk. Golem and HAL are distributions**
+  of exact SHAs from it, not branches. `HaL2001` is an archived branch, not
+  authority. `promotions` is a **control-plane ledger branch only** — it holds
+  one JSON record per promotion request and is never source authority, never
+  a Golem or HAL source branch, and never merged anywhere.
+* **The request is a file:** `promotions/promote-hal-<full-40-hex-sha>.json`
+  with `{ "target": "hal", "sha": "<the same sha>" }`, committed to
+  `promotions` and pushed (fast-forward). `promote.yml` runs on that push,
+  proves the record is canonical, that the SHA is an ancestor of current
+  `origin/golem-line`, that the record has NEVER been added before, and that
+  the SHA carries the Change-A contract files — then dispatches the existing
+  publisher with `sha=<exact sha> line=hal`. The publisher checks out that
+  exact SHA and runs the hardened receipt (`scripts/verify-ci-receipt.cjs`,
+  manifest read from the SHA's own checkout). **Change A's receipt is the sole
+  CI-validation authority; `promote.yml` decides intent and identity only.**
+* **One SHA → one record → one publication.** EAS publication is not
+  idempotent, so replay protection is the ledger's history: a record that was
+  ever added is consumed. Editing or deleting a record is refused; re-adding a
+  deleted one is refused as a replay. Do not delete the branch to "reset" it.
+* **The agent can create and fast-forward `promotions` but cannot delete it, or
+  any ref, or any tag** — measured 2026-09-11 (git and REST both 403 on
+  `refs/tags/*` and on ref deletion; `refs/heads/*` create/advance succeeded).
+  Design everything on that branch as append-only. The stranded branch
+  `probe/se2-branch-3c1bcea9` is residue of that measurement, not authority;
+  the owner removes it with a full-permission credential.
+* **`[ota-hal]` in a commit TITLE still publishes the HAL set** for fresh source
+  that goes straight to stable. The two paths end in the same publisher, the
+  same receipt, the same HAL targets. Neither requires the owner to click
+  anything: the agent needs the owner's AUTHORIZATION to publish, not the
+  owner's hands.
+* SHAs older than Change A (before `3c1bcea9`) do not carry the contract files
+  and are refused by both paths. Do not weaken the receipt to promote them.
+
 ⚠ **A branch being archived is not the product being retired.** The `HaL2001`
 git branch was archived into the trunk at OTA-1383 — its future *numbering*
 ended, not its role. HAL the product is live, at real players, and is the line

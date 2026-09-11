@@ -57,7 +57,14 @@ name: CI
 
 on:
   push:
-    branches: ['**']
+    # ⚠ `!promotions` — the ONE excluded branch. `promotions` is the HAL
+    # promotion control plane (see promote.yml): a ledger of exact-SHA
+    # requests, not game source. Running the full test surface there would
+    # validate a README, not a game. The SHA it promotes is validated by
+    # Change A's receipt inside the publisher, read from that SHA's own
+    # checkout. ciPromotionIsNotAMutation holds this list to exactly these
+    # two entries so the exclusion can never widen into a CI bypass.
+    branches: ['**', '!promotions']
   pull_request:
   workflow_dispatch:
 
