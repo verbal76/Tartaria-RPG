@@ -30066,6 +30066,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1798-the-instruments-stop-when-the-app-does'
 // SUPERSEDED: '2026-09-10-1799-nothing-from-data-is-unbounded'
 // SUPERSEDED: '2026-09-10-1800-green-means-usable-now'
+//
+// ⚠ STABLE-RING PROMOTION, 2026-09-11 — DESTINATION ONLY, NOT A NEW BUILD.
+// The stamp below is deliberately UNCHANGED. This revision carries no
+// behavioural delta from the commit CI already validated; the only edit in
+// this commit is the comment you are reading. The device must keep reporting
+// the same build id the owner is physically verifying, so bumping it here
+// would destroy the thing being checked.
+//
+// WHY A COMMIT EXISTS AT ALL: the publisher resolves the product line from
+// the commit TITLE. OTA-1799, 1800 and 1801 were each pushed without the
+// marker, so all three routed to the dev line and none reached the live
+// testers. The forensic audit proved the stable fan-out was never broken —
+// the omission was ours, three times running. A marker in this commit's
+// title is the documented mechanism that sends this same tree to the
+// stable ring. It promotes; it does not change what is promoted.
 export const OTA_BUILD_ID = '2026-09-11-1801-asked-once';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat
