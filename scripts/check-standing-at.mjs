@@ -83,7 +83,14 @@ const ANCHOR_PATTERNS = [
 const ALLOW = [
   {
     file: 'app/screens/MapScreen.tsx',
-    line: 663, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more
+    line: 665, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more; OTA-1802's Pressable + depth imports moved it two more
+    // ⚠⚠ THIS ENTRY HAS NOW DRIFTED THREE TIMES FOR THE SAME REASON — an import
+    // added ABOVE it — which says the ALLOWLIST KEY is the brittle part, not the
+    // code it exempts. A file+line key turns any unrelated import into a red gate
+    // on a line nobody touched, and the fix is always to edit this number, which
+    // is exactly the ritual that makes a gate decoration. Keying on the matched
+    // SOURCE TEXT would survive it. Recorded as named debt, deliberately NOT
+    // fixed here: widening a gate quietly inside a UI pass is its own bad habit.
     // RESOLVING THE CURRENT LOCATION'S RECORD, not testing a position. This is the
     // "which place's rules apply to me" question — it looks up the row for the last
     // named place so the screen can read its name, tags and description. Nothing

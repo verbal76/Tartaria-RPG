@@ -146,16 +146,16 @@ describe('OTA-1782 — the language is two colours and one settle', () => {
 
   it('resting puts the light on top and the shadow beneath', () => {
     const resting = tartariaKitStyles.controlResting as Record<string, unknown>;
-    expect(resting.borderTopColor).toBe(T.controlLit);
-    expect(resting.borderBottomColor).toBe(T.controlDark);
+    expect(resting.borderTopColor).toBe(T.controlRaisedLit);
+    expect(resting.borderBottomColor).toBe(T.controlRaisedDark);
   });
 
   /* ⚠⚠ PRESSED IS THE LIGHT MOVING. Not a new colour, not an opacity, not a
    * shadow that grows — the same two values, swapped, plus a settle. */
   it('pressed swaps them and settles the face toward the plane', () => {
     const pressed = tartariaKitStyles.controlPressed as Record<string, unknown>;
-    expect(pressed.borderTopColor).toBe(T.controlDark);
-    expect(pressed.borderBottomColor).toBe(T.controlLit);
+    expect(pressed.borderTopColor).toBe(T.controlRaisedDark);
+    expect(pressed.borderBottomColor).toBe(T.controlRaisedLit);
     const tf = pressed.transform as Array<{ translateY: number }>;
     expect(tf).toHaveLength(1);
     expect(tf[0]!.translateY).toBeGreaterThan(0);
@@ -207,7 +207,26 @@ describe('OTA-1782 — none of the forbidden treatments arrived with it', () => 
      * styles, and a `controlStrike` or a `controlGold` appearing anywhere in
      * this file fails it. */
     const names = new Set((codeOf(read(KIT)).match(/\bcontrol[A-Z]\w*/g) ?? []));
-    expect([...names].sort()).toEqual(['controlDark', 'controlLit', 'controlPressed', 'controlResting']);
+    /* ⚠⚠ OTA-1802 ADDED THE RAISED PAIR, AND THE RULE THIS TEST DEFENDS IS
+     * UNCHANGED. The language is still ONE pair per STRENGTH and still zero
+     * pairs per TONE. What 1802 established is that there are two strengths,
+     * not one: `controlLit`/`controlDark` are the INNER highlight `btnFace`
+     * wears inside a lit rim, and `controlRaisedLit`/`controlRaisedDark` are
+     * the STRUCTURAL edge a single-ring control wears when it has no rim to sit
+     * inside. Handing the inner strength to a ringless chip is the defect 1802
+     * fixed — 56/255 of gradient on a dark chip — so the two must be nameable
+     * apart. Four tokens, two styles, and the assertion below still fails on a
+     * `controlStrike` or a `controlGold` the moment one appears. */
+    expect([...names].sort()).toEqual([
+      'controlDark', 'controlLit', 'controlPressed', 'controlRaisedDark', 'controlRaisedLit', 'controlResting',
+    ]);
+    /* ⚠ THE INTENT, ASSERTED DIRECTLY rather than left to the list above: no
+     * token in this namespace may be named for a TONE. A per-tone depth is the
+     * one thing the language forbids, and a list of allowed names only catches
+     * it by accident. */
+    for (const n of names) {
+      expect(n).not.toMatch(/strike|defensive|ready|gold|sage|amber|red|green|blue|danger|unavailable/i);
+    }
   });
 });
 
@@ -220,8 +239,8 @@ describe('OTA-1782 — the four representative states, measured', () => {
    * which is the failure OTA-1569 documented when it hunted for one glyph
    * colour that read on both. */
   const rows = Object.entries(FACES).map(([name, face]) => {
-    const top = lum(over(T.controlLit, face));
-    const bottom = lum(over(T.controlDark, face));
+    const top = lum(over(T.controlRaisedLit, face));
+    const bottom = lum(over(T.controlRaisedDark, face));
     const base = lum(rgbOf(face));
     return { name, face, base, top, bottom, lift: top - base, drop: base - bottom, span: top - bottom };
   });
@@ -248,8 +267,8 @@ describe('OTA-1782 — the four representative states, measured', () => {
   /* ⚠ PRESSED, MEASURED: the gradient does not merely shrink, it INVERTS. That
    * is the difference between "settles toward the plane" and "dims a little". */
   it.each(rows)('$name inverts under press rather than fading', ({ face, span }) => {
-    const pressedTop = lum(over(T.controlDark, face));
-    const pressedBottom = lum(over(T.controlLit, face));
+    const pressedTop = lum(over(T.controlRaisedDark, face));
+    const pressedBottom = lum(over(T.controlRaisedLit, face));
     expect(pressedTop - pressedBottom).toBeCloseTo(-span, 5);
   });
 });

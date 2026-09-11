@@ -1,5 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
+/* ⚠ COMPLETE / ABANDON / DISCARD are discrete commands. They already used
+   `Pressable`, but their press feedback was a local `opacity: 0.7` on the WHOLE
+   control — the whole-control fade the depth language exists to replace, and
+   the same technique arb86 had to remove from the disabled state. Those two
+   local styles are gone; the shared authority owns the press now. */
+import { tControlDepth } from '../ui/tartariaKit';
 // ⚠⚠ OTA-1458 — "am I standing at X?" is a grid-cell question, asked once.
 import { standingAtLocation, stationedAtNamedLocation } from '../engine/standingAt';
 import { useGameStore } from '../state/gameStore';
@@ -297,7 +303,7 @@ export function ContractsScreen() {
     }
     return (
       <Pressable
-        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
         onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
         accessibilityRole="button"
       >
@@ -1060,7 +1066,7 @@ export function ContractsScreen() {
                   <Text style={styles.cardHint}>{r.note}</Text>
                   {r.onComplete && (
                     <Pressable
-                      style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                      style={({ pressed }) => [styles.completeBtn, tControlDepth(pressed)]}
                       onPress={r.onComplete}
                       accessibilityRole="button"
                       accessibilityLabel={`Complete ${r.title}`}
@@ -1124,7 +1130,7 @@ export function ContractsScreen() {
                     {!done && movesLine(c.locationId)}
                     {!done && !standingAtLocation(player, c.locationId) && (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => setPendingRoute({ id: c.locationId, name: safeLocName(c.locationId), climbId: c.id })}
                         accessibilityRole="button"
                       >
@@ -1507,7 +1513,7 @@ export function ContractsScreen() {
                     )}
                     {open && ready && (
                       <Pressable
-                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        style={({ pressed }) => [styles.completeBtn, tControlDepth(pressed)]}
                         onPress={() => completeContractFromUI('hunt', def.id)}
                         accessibilityRole="button"
                       >
@@ -1521,7 +1527,7 @@ export function ContractsScreen() {
                         the card is expanded. */}
                     {open && (
                       <Pressable
-                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                         onPress={() => abandonContract('hunt', def.id)}
                         accessibilityRole="button"
                       >
@@ -1595,7 +1601,7 @@ export function ContractsScreen() {
                     )}
                     {open && ready && (
                       <Pressable
-                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        style={({ pressed }) => [styles.completeBtn, tControlDepth(pressed)]}
                         onPress={() => completeContractFromUI('mystery', def.id)}
                         accessibilityRole="button"
                       >
@@ -1604,7 +1610,7 @@ export function ContractsScreen() {
                     )}
                     {open && (
                       <Pressable
-                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                         onPress={() => abandonContract('mystery', def.id)}
                         accessibilityRole="button"
                       >
@@ -1678,7 +1684,7 @@ export function ContractsScreen() {
                     )}
                     {open && ready && (
                       <Pressable
-                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        style={({ pressed }) => [styles.completeBtn, tControlDepth(pressed)]}
                         onPress={() => completeContractFromUI('storyline', def.id)}
                         accessibilityRole="button"
                       >
@@ -1687,7 +1693,7 @@ export function ContractsScreen() {
                     )}
                     {open && (
                       <Pressable
-                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                         onPress={() => abandonContract('storyline', def.id)}
                         accessibilityRole="button"
                       >
@@ -1769,7 +1775,7 @@ export function ContractsScreen() {
                       }
                       return (
                         <Pressable
-                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                           onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
                           accessibilityRole="button"
                         >
@@ -1858,7 +1864,7 @@ export function ContractsScreen() {
                     )}
                     {open && readyToTurnIn && (
                       <Pressable
-                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        style={({ pressed }) => [styles.completeBtn, tControlDepth(pressed)]}
                         onPress={() => completeContractFromUI('faction_quest', def.id)}
                         accessibilityRole="button"
                       >
@@ -1867,7 +1873,7 @@ export function ContractsScreen() {
                     )}
                     {open && (
                       <Pressable
-                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                         onPress={() => abandonContract('faction_quest', def.id)}
                         accessibilityRole="button"
                       >
@@ -1913,7 +1919,7 @@ export function ContractsScreen() {
                       {!inHand && movesLine(l.tileId)}
                       {!inHand && !here && (
                         <Pressable
-                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                           onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
                           accessibilityRole="button"
                         >
@@ -1935,7 +1941,7 @@ export function ContractsScreen() {
                 {movesLine('parley_ground')}
                 {!standingAtLocation(player, 'parley_ground') && (
                   <Pressable
-                    style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                    style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                     onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
                     accessibilityRole="button"
                   >
@@ -1944,7 +1950,7 @@ export function ContractsScreen() {
                 )}
                 {trackToggle('broker', 'broker', !brokerMission.paused)}
                 <Pressable
-                  style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                  style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                   onPress={() => abandonContract('broker', 'broker')}
                   accessibilityRole="button"
                 >
@@ -1988,7 +1994,7 @@ export function ContractsScreen() {
                     {movesLine(rec.targetLocationId)}
                     {route && !here && tracked && (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => {
                           setWhisperCourse(route.gridX, route.gridY, route.label);
                           setScreen('exploration');
@@ -2003,7 +2009,7 @@ export function ContractsScreen() {
                     )}
                     {trackToggle('whisper', rec.id, tracked)}
                     <Pressable
-                      style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                      style={({ pressed }) => [styles.abandonBtn, tControlDepth(pressed)]}
                       onPress={() => abandonContract('whisper', rec.id)}
                       accessibilityRole="button"
                     >
@@ -2063,7 +2069,7 @@ export function ContractsScreen() {
                     )}
                     {open && (
                       <Pressable
-                        style={({ pressed }) => [styles.discardBtn, pressed && styles.completeBtnPressed]}
+                        style={({ pressed }) => [styles.discardBtn, tControlDepth(pressed)]}
                         onPress={() => discardLead(q.id)}
                         accessibilityRole="button"
                       >
@@ -2110,7 +2116,7 @@ export function ContractsScreen() {
                     {!here && movesLine(sg.tileId)}
                     {here ? (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => turnInSigil(sg.item.id)}
                         accessibilityRole="button"
                       >
@@ -2118,7 +2124,7 @@ export function ContractsScreen() {
                       </Pressable>
                     ) : (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
                         accessibilityRole="button"
                       >
@@ -2691,14 +2697,19 @@ const styles = StyleSheet.create({
   expandedStageHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
   expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
   expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
+  /* ⚠ A RING SO THE DEPTH HAS SOMETHING TO RIDE, PAID FOR BY THE PADDING:
+     10 → 9 with a 1dp border is 10 again, so the outer height and the touch
+     rectangle are unchanged. The border colour is the fill colour, so the ring
+     is invisible until the governed depth edges ride on it. */
   completeBtn: {
     marginTop: 10,
     backgroundColor: '#9ec96a',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
     borderRadius: 3,
-    paddingVertical: 10,
+    paddingVertical: 9,
     alignItems: 'center',
   },
-  completeBtnPressed: { opacity: 0.7 },
   completeBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
   // OTA-458 — ROUTE TO TURN-IN button. Outlined parchment-blue, distinct from
   // the filled-green COMPLETE and the warning-red ABANDON; sits above both.
@@ -2711,7 +2722,6 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     alignItems: 'center',
   },
-  routeBtnPressed: { opacity: 0.7 },
   routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
   // OTA-1014 — refusal strip: amber warning treatment, distinct from the green route
@@ -2801,7 +2811,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
   },
-  abandonBtnPressed: { opacity: 0.7 },
   abandonBtnText: { color: '#e07a5f', fontWeight: '700', letterSpacing: 2, fontSize: 11 },
   discardBtn: {
     marginTop: 10,

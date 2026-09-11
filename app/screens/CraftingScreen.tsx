@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { tRowStyle, TTabBar } from '../ui/tartariaKit'; // OTA-1759 row chassis · OTA-1762 tab bar
 import { repairCostMaterials } from '../engine/scrapEngine';
@@ -665,15 +666,14 @@ export function CraftingScreen() {
         body={hint.body}
       />
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
+          style={({ pressed }) => [styles.backBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title} accessibilityRole="header">
           {tab === 'craft' ? 'CRAFTING'
             : tab === 'repair' ? 'REPAIR'
@@ -986,9 +986,8 @@ export function CraftingScreen() {
                   still the right tool for a pack full of loot — it is just not
                   the thing you reach for between fights. */}
               {repairEquippedInView.length > 0 && (
-                <TouchableOpacity
-                  style={styles.repairAllBtn}
-                  activeOpacity={0.7}
+                <Pressable
+                  style={({ pressed }) => [styles.repairAllBtn, tControlDepth(pressed)]}
                   onPress={() => repairKitNow()}
                   accessibilityRole="button"
                   accessibilityLabel={`Repair the ${repairEquippedInView.length} damaged ${repairEquippedInView.length === 1 ? 'piece' : 'pieces'} you have equipped, including your companions' gear`}
@@ -996,14 +995,13 @@ export function CraftingScreen() {
                   <Text style={styles.repairAllText}>
                     ⚒ REPAIR MY KIT ({repairEquippedInView.length}) — everything equipped
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {/* Only offered when it would actually do MORE than the kit button,
                   so the two never sit there as a redundant pair. */}
               {repairReadyInView.length > repairEquippedInView.length && (
-                <TouchableOpacity
-                  style={styles.repairSweepBtn}
-                  activeOpacity={0.7}
+                <Pressable
+                  style={({ pressed }) => [styles.repairSweepBtn, tControlDepth(pressed)]}
                   onPress={() => repairAllReady()}
                   accessibilityRole="button"
                   accessibilityLabel={`Also repair the ${repairReadyInView.length - repairEquippedInView.length} damaged pieces you are not using${repairQuery.trim() ? ', matching your search' : ''}`}
@@ -1011,7 +1009,7 @@ export function CraftingScreen() {
                   <Text style={styles.repairSweepText}>
                     ⚒ repair everything listed ({repairReadyInView.length}) — includes {repairReadyInView.length - repairEquippedInView.length} you are not wearing{repairQuery.trim() ? ' · matching search' : ''}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {/* ⚠⚠ AND WHEN THERE IS NO BUTTON, IT SAYS WHY. This whole row used
                   to render `null`: short on materials and the control simply was

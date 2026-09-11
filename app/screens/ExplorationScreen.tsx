@@ -25,7 +25,10 @@ import { AdventureFeed } from '../components/AdventureFeed';
  * it is the screen the player spends the game on. What it takes from the kit is
  * the PLANE LANGUAGE (a housing you can cut things into) and the ONE CONTROL
  * FAMILY — not a restyling of everything it contains. */
-import { TSurface, TButton, TGear, T } from '../ui/tartariaKit';
+import { TSurface, TButton, TGear, T, TCorners, tartariaKitStyles } from '../ui/tartariaKit';
+/* ⚠ OTA-1803 — the faction sigil behind the transcript. The player's own
+   `factionId` is the authority; this screen passes it and nothing else. */
+import { FactionWatermark } from '../components/FactionWatermark';
 import { renderLagAfterEngine } from '../diagnostics/renderClock'; // OTA-1696
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
@@ -1329,7 +1332,12 @@ export function ExplorationScreen() {
         <FirstTimeHint id={TEACH[screenTeaching].id} title={TEACH[screenTeaching].title} body={TEACH[screenTeaching].body} />
       )}
       <View style={styles.topRow}>
-        <TutorialTarget area="top-left-stats" style={styles.statsCol}>
+        {/* ⚠ PANEL A — the player block takes the structural frame. This is the
+            HUD-grouping language, NOT the button language: the panel is still
+            pressable (it opens the full sheet) and that pressability is still
+            said by the control inside it, not by this rim. */}
+        <TutorialTarget area="top-left-stats" style={[styles.statsCol, tartariaKitStyles.panelFrame]}>
+          <TCorners lit />
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
@@ -1346,7 +1354,9 @@ export function ExplorationScreen() {
             <StatsPanel player={player} enemyPower={inCombat && enemyViews[activeIdx] ? enemyPowerScore(enemyViews[activeIdx]!.enemy) : undefined} />
           </TouchableOpacity>
         </TutorialTarget>
-        <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
+        {/* ⚠ PANEL B — the enemy block, same frame, same reasoning. */}
+        <TutorialTarget area="top-right-enemy" style={[styles.rightCol, tartariaKitStyles.panelFrame]}>
+          <TCorners lit />
           {inCombat ? (
             <EnemyPanel
               enemies={enemyViews}
@@ -1451,8 +1461,15 @@ export function ExplorationScreen() {
           header, because the place is what the header is FOR.
           ⚠ NOTHING WAS DROPPED: place, danger tier + word, hazard, day-part and
           weather are all still here. They stopped being one sentence. */}
+      {/* ⚠ PANEL C — THE FRAME GOES ON THE HOUSING, NOT ON THE RAIL. The
+          owner asked for it around the ENTIRE location/conditions block,
+          "including both the location row and the weather/day/environment row".
+          `TSurface`'s rail is part of the housing rather than a panel stacked on
+          one, so putting the rim on the surface itself is exactly that — and it
+          is why this panel needed no new wrapper. */}
       <TutorialTarget area="scene-bar" style={styles.sceneBarSlot}>
         <TSurface
+          style={tartariaKitStyles.panelFrame}
           rail={(
             <View style={styles.sceneRail}>
               <Text style={styles.sceneName} numberOfLines={1} ellipsizeMode="tail">
@@ -1527,6 +1544,12 @@ export function ExplorationScreen() {
             ) : null}
           </View>
         </TSurface>
+        {/* ⚠ The corners sit on the SLOT, not inside the surface: `surfRim` is
+            `overflow: 'hidden'`, so marks drawn at its own edge would be clipped
+            away. `sceneBarSlot` is a bare wrapper with no padding, so it is
+            coincident with the surface and the registration lands exactly on the
+            panel's corners. */}
+        <TCorners lit />
       </TutorialTarget>
 
       {/* v2.4.1 (OTA 045) — Main Quest chip + entry to all Contracts.
@@ -2075,7 +2098,18 @@ export function ExplorationScreen() {
       {/* OTA-777 — the torch is a small quick-use button in the bottom action
           row (see InputBox `torch` QuickBtn), NOT a top banner. */}
 
-      <TutorialTarget area="feed" style={styles.feed}>
+      {/* ⚠⚠ PANEL D — THE TRANSCRIPT, AND THE ONE THAT CARRIES THE SIGIL.
+          The watermark is a SIBLING of the feed, not a child of it: `styles.feed`
+          is the panel box and `AdventureFeed` owns its own scroll inside it, so
+          an absolutely positioned layer here is fixed to the visible panel while
+          the text scrolls over it. That is the owner's stated intent — faction
+          identity embedded in the HUD panel, not printed onto the transcript —
+          and it costs the log no content height and no scroll extent.
+          ⚠ ORDER MATTERS: the watermark is rendered FIRST so it sits behind the
+          text; the corners are rendered LAST so the frame reads on top of both.
+          Both are `pointerEvents="none"`. */}
+      <TutorialTarget area="feed" style={[styles.feed, tartariaKitStyles.panelFrame]}>
+        <FactionWatermark factionId={player?.factionId} />
         <AdventureFeed
           entries={gameLog}
           enemyNames={currentScene?.enemies.map((e) => e.name)}
@@ -2126,6 +2160,7 @@ export function ExplorationScreen() {
             <Text style={styles.streamingPrefix}>The Arbiter is choosing their words…</Text>
           </View>
         )}
+        <TCorners lit />
       </TutorialTarget>
 
       {/* OTA-1547 — the SPEAK TO YULKA bar + its conversation sheet. Sits

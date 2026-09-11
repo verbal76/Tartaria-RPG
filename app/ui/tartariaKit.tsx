@@ -104,13 +104,79 @@ export const T = {
    * only; left and right keep the semantic `borderColor` the tone set. The ring
    * still says what the control means. */
   /** Depth: the upper edge of a PRESSABLE control, catching light. Warm white
-   *  rather than warm tan, so it lifts a light fill as well as a dark one. */
+   *  rather than warm tan, so it lifts a light fill as well as a dark one.
+   *  ⚠ THIS IS THE *INNER* HIGHLIGHT STRENGTH — `TButton`'s `btnFace`, which
+   *  already sits inside a lit rim. A single-ring control must NOT use it; see
+   *  the raised pair below. */
   controlLit: 'rgba(255,250,240,0.20)',
-  /** Depth: the lower edge of a PRESSABLE control, in its own shadow. */
+  /** Depth: the lower edge of a PRESSABLE control, in its own shadow. The inner
+   *  half of the pair above. */
   controlDark: 'rgba(0,0,0,0.45)',
+  /* ⚠⚠⚠ THE RAISED PAIR — THE STRUCTURAL STRENGTH, AND THE FIX FOR A REAL
+   * DEVICE OBSERVATION. Owner, on a physical Pixel 10 Pro XL: the combat
+   * controls *"still look flat."* The Codex census proved the construction was
+   * present and correctly wired — `QuickBtn` has applied `tControlDepth` since
+   * OTA-1782 — so this was never a missing-wiring bug. It was the wrong WEIGHT.
+   *
+   * ⚠ WHAT WENT WRONG, PRECISELY. `TButton` — the one control in the game that
+   * has always read as physical — carries the language on TWO layers:
+   *     btnRim   rgba(140,146,150,0.55) / rgba(0,0,0,0.75)   ← structural
+   *     btnFace  controlLit 0.20        / controlDark 0.45   ← inner highlight
+   * The rim does the work; the face is a secondary sheen INSIDE it. When
+   * OTA-1782 handed the language to flat single-ring controls, it handed them
+   * the FACE strength — the subordinate one — as their ONLY cue. A compact chip
+   * has no rim to sit inside, so 0.20/0.45 was all the physical separation it
+   * ever got, and on a dense dark chip that is a gradient of 56 out of 255.
+   *
+   * ⚠⚠ WHY EDGES AND NOT A SHADOW. A drop shadow would separate the chip from
+   * the ground behind it — which is exactly how `btnOuter` lifts `TButton` —
+   * but React Native renders `shadow*` on iOS only; on Android the same effect
+   * needs `elevation`, which draws a halo on ALL FOUR SIDES. That is the defect
+   * the dossier construction deliberately refused, and Android is the platform
+   * the owner is actually looking at. So the edges must carry it alone, which
+   * is why this pair is stronger than the rim it is modelled on.
+   *
+   * ⚠ MEASURED, Rec.709, resting — the same four surfaces the pair above was
+   * measured against, and the same arithmetic (top delta / bottom delta):
+   *     filled sage   #9ec96a   +32.7 / −138.7   gradient 171  (was  96)
+   *     filled gold   #c9a86a   +39.9 / −127.9   gradient 168  (was  93)
+   *     semantic rim  #1b2417  +108.6 /  −24.9   gradient 134  (was  58)
+   *     neutral rim   #1a1714  +113.5 /  −17.6   gradient 131  (was  56)
+   * The self-balancing property OTA-1782 relied on is untouched: on a LIGHT
+   * fill the shadow carries the depth, on a DARK fill the light does. Only the
+   * amplitude moved, and it moved on both halves so neither starts to dominate.
+   *
+   * ⚠ AND IT STILL NEVER TOUCHES MEANING. Top and bottom border colours only;
+   * left and right keep the semantic hue. Doubling the amplitude of a cue that
+   * is orthogonal to meaning leaves it orthogonal to meaning. */
+  controlRaisedLit: 'rgba(255,250,240,0.50)',
+  /** The lower edge of a raised single-ring control. `0.75` is `btnRim`'s own
+   *  shadow alpha — the strength the game already proved reads as structure. */
+  controlRaisedDark: 'rgba(0,0,0,0.75)',
   /** The brand gold. The one chromatic note; unchanged since the game began. */
   gold: '#C9A86A',
   goldDim: '#8E7548',
+  /* ⚠⚠⚠ THE PANEL FRAME — STRUCTURE, NOT PRESSABILITY, AND THE TWO MUST NOT
+   * MERGE. `tControlDepth` says "you can press this". These say "this is one
+   * region of the HUD". A control is a thing you touch; a panel is a thing you
+   * read. Giving a panel the button language would promise a press that never
+   * comes, and giving a button this ornament would bury the one cue a thumb
+   * needs. Separate names, separate jobs, and the suite asserts neither leaks
+   * into the other.
+   *
+   * ⚠⚠ DERIVED FROM `gold` BY OPACITY, WHICH IS THE OWNER'S INSTRUCTION: *"If an
+   * existing Tartaria gold token is too strong at full opacity, derive the frame
+   * through governed opacity rather than introducing arbitrary unrelated gold
+   * values."* Both are `#C9A86A` — 201,168,106 — at an alpha, so there is no
+   * fourth off-brand gold here and the hue can never drift from the brand.
+   *
+   * ⚠ AND THE MOCK-UP THAT WAS REJECTED IS WHY THE NUMBERS ARE LOW. Owner, on
+   * the strong-gold version: the frames *"popped too hard and competed with the
+   * information."* The rim is the quieter of the two so a long edge never
+   * out-shouts the text it surrounds; the corner brackets are the louder, and
+   * they are short, so the eye reads "constructed" from the corners and lets the
+   * edges recede. Aged brass catching a little light, not a neon outline. */
+  panelRim: 'rgba(201,168,106,0.26)',
   /** ⚠⚠⚠ THE CONVERSATION FRAME. Brighter than the brand gold, ON PURPOSE, and
    *  named here under an owner ruling rather than smuggled in as a literal.
    *
@@ -762,16 +828,31 @@ export function TScreenHeader({
   return (
     <View style={[kit.schRow, density === 'tight' && kit.schRowTight, style]}>
       {onBack ? (
-        <TouchableOpacity
+        /* ⚠⚠ THE SHARED BACK IS A DISCRETE COMMAND, AND IT IS THE HIGHEST-LEVERAGE
+           ONE IN THE GAME — every screen that takes this header gets whatever this
+           control says about pressability. The Codex census named it a proven
+           missed family: it had the chassis of a button (fill, ring, radius,
+           padding, 80dp floor) and none of the physical language.
+
+           ⚠ `Pressable`, NOT `TouchableOpacity`, for OTA-1782's reason rather
+           than as a tidy-up: `activeOpacity` fades the WHOLE control, fill
+           included, which is the technique the depth language exists to replace.
+           A settle moves the light; it does not make the control translucent.
+           `hitSlop`, the role, the label and the 80dp `minWidth` are carried
+           across untouched, so the logical target is the one it has always had. */
+        <Pressable
           onPress={onBack}
-          style={[kit.schBack, density === 'tight' && kit.schBackTight]}
+          style={({ pressed }) => [
+            kit.schBack,
+            density === 'tight' && kit.schBackTight,
+            tControlDepth(pressed),
+          ]}
           hitSlop={hitSlop}
-          activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel={accessibilityLabel}
         >
           <Text style={kit.schBackText}>{backLabel}</Text>
-        </TouchableOpacity>
+        </Pressable>
       ) : (
         <View style={kit.schSlot} />
       )}
@@ -1153,6 +1234,32 @@ export function tFilledGold(pressed: boolean | null = false): StyleProp<ViewStyl
   return pressed === null ? kit.filledGold : [kit.filledGold, tControlDepth(pressed)];
 }
 
+/* ⚠⚠⚠ THE PANEL FRAME — A SECOND LANGUAGE, AND IT MUST NEVER MERGE WITH THE
+ * FIRST. `tControlDepth` says THIS CAN BE PRESSED. The panel frame says THIS IS
+ * ONE REGION OF THE HUD. A panel is read, a control is touched, and the two
+ * cues answer different questions — a panel wearing the button language
+ * promises a press that never comes, and a button wearing this ornament buries
+ * the one cue a thumb needs. The suite asserts neither leaks into the other.
+ *
+ * ⚠⚠ IT IS A STYLESHEET ENTRY, NOT A HELPER, AND THAT IS THIS FILE'S OWN RULE:
+ * *"A HELPER exists only where something VARIES — a constant that never varies
+ * is a stylesheet entry, not an export."* The frame takes no argument and has
+ * no states, so it reaches its consumers through `tartariaKitStyles.panelFrame`
+ * and the export budget does not move. The first draft of this pass shipped it
+ * as `tPanelFrame()` and `check:kitexports` was right to refuse it.
+ *
+ * ⚠⚠⚠ AND THE CORNERS ARE `TCorners`, WHICH ALREADY EXISTED. That draft also
+ * added a `TPanelCorners` — an absolute-fill, `pointerEvents="none"` layer with
+ * four corner marks and a gold `rgba(201,168,106,…)`. That is `TCorners lit`,
+ * line for line, including the gold: `cornerLit` has shipped at
+ * `rgba(201,168,106,0.55)` since VIS-1. Two components for one shape is the
+ * exact drift the budget exists to catch, and it caught it.
+ *
+ * ⚠ IT IS AN EDGE TREATMENT, NOT A CONTAINER: a rim colour, a rim width and a
+ * radius. No padding, no margin, no background, no width, no height, no shadow
+ * and no Android elevation (which draws a halo on all four sides — the defect
+ * the dossier construction refused). Owning nothing is what lets it ride on
+ * panels that already have their own geometry without moving anything. */
 export function tRowStyle(state: TRowState = {}): StyleProp<ViewStyle> {
   return [
     kit.rowChassis,
@@ -1172,7 +1279,11 @@ const kit = StyleSheet.create({
    * already coloured; there is no `borderWidth` here because every control in
    * the family already has one, and setting it would be this style deciding a
    * control's weight rather than its depth. */
-  controlResting: { borderTopColor: T.controlLit, borderBottomColor: T.controlDark },
+  /* ⚠ THE PANEL FRAME'S OWN STYLES. A rim colour, a rim width, a radius — and
+   * nothing else, so the treatment can ride on a panel that already owns its
+   * geometry. See `tPanelFrame`. */
+  panelFrame: { borderWidth: 1, borderColor: T.panelRim, borderRadius: 3 },
+  controlResting: { borderTopColor: T.controlRaisedLit, borderBottomColor: T.controlRaisedDark },
   /* ⚠ OTA-1791 — the filled-gold primary's material: the brand gold as fill AND
    * ring. No `borderWidth` here for the same reason as the depth pair above —
    * every pill already has one in its own chassis. See `tFilledGold`. */
@@ -1182,8 +1293,8 @@ const kit = StyleSheet.create({
    * pushed INTO a surface actually looks like — and the face travels 1.5dp
    * down, the same distance `TButton` has settled since VIS-1. */
   controlPressed: {
-    borderTopColor: T.controlDark,
-    borderBottomColor: T.controlLit,
+    borderTopColor: T.controlRaisedDark,
+    borderBottomColor: T.controlRaisedLit,
     transform: [{ translateY: 1.5 }],
   },
   rowChassis: {

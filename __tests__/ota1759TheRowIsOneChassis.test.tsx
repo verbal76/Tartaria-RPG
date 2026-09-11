@@ -276,7 +276,14 @@ describe('the rows that did not converge were left alone', () => {
      * so its adoption needs a colour decision made in the open — and adopting a
      * fourth screen in a commit about two would put a visible 2px change under a
      * claim that nothing moves. */
-    expect(INVENTORY).not.toContain('tartariaKit');
+    /* ⚠⚠ OTA-1802 NARROWED THIS FROM THE FILE TO THE CLAIM. It read
+     * `not.toContain('tartariaKit')` — a proxy for "has not adopted the row
+     * chassis" that also forbade every other primitive in the kit. Inventory
+     * now imports `tControlDepth` for its group-action COMMANDS, which is a
+     * decision about buttons and says nothing about rows. The two row facts
+     * below are what this test is actually about, and the precise claim is
+     * stronger than the proxy was: adopting `tRowStyle` still fails here. */
+    expect(INVENTORY).not.toContain('tRowStyle');
     expect(INVENTORY).toMatch(/rowSelected: \{\n\s+borderColor: '#9c8348',/);
     expect(INVENTORY).toMatch(/marginBottom: 4,/);
   });

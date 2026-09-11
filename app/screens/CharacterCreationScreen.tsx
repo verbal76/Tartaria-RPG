@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { tControlDepth, tFilledGold } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import { getStoryMotives } from '../engine/story'; // OTA-1018
@@ -402,26 +403,34 @@ export function CharacterCreationScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.backBtn}
+        {/* ⚠ THE FOOTER IS COMMANDS, AND THE CARDS ABOVE IT ARE NOT. BACK / NEXT
+            / BEGIN execute; the sex, race, faction, motive and pressure cards
+            above SELECT. Only this row takes the physical language — see the
+            cards' own note at `optionCard`. */}
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, tControlDepth(pressed)]}
           onPress={goBack}
-          activeOpacity={0.7}
           hitSlop={8}
           accessibilityRole="button"
         >
           <Text style={styles.backBtnText}>← BACK</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.nextBtn, nextDisabled && styles.nextBtnDisabled]}
+        </Pressable>
+        {/* ⚠ NEXT/BEGIN is a filled-gold primary, so it takes the same governed
+            depth the ten modal pills take. `nextDisabled` is handed NO depth —
+            an inert control does not advertise readiness — and it keeps the
+            existing 0.35 dim as its own signal. */}
+        <Pressable
+          style={({ pressed }) => [styles.nextBtn,
+            nextDisabled ? tFilledGold(null) : tFilledGold(pressed),
+            nextDisabled && styles.nextBtnDisabled]}
           onPress={goNext}
           disabled={nextDisabled}
-          activeOpacity={0.7}
           hitSlop={8}
           accessibilityRole="button"
           accessibilityState={{ disabled: nextDisabled }}
         >
           <Text style={styles.nextBtnText}>{nextLabel}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -509,11 +518,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backBtnText: { color: '#c9a86a', fontSize: 13, letterSpacing: 2, fontWeight: '700' },
+  /* ⚠⚠ THE RING IS NEW AND THE BUTTON IS THE SAME SIZE. `tControlDepth` colours
+     the TOP and BOTTOM of a ring the control already has; this one had no ring
+     at all, so the depth would have been a silent no-op. A 1dp border is added
+     and `paddingVertical` pays for it exactly — 12 → 11, and 11 + 1 = 12 — so
+     the outer box, the row height and the touch rectangle are unchanged to the
+     pixel. The border colour is the fill colour, so the ring is invisible until
+     the depth edges ride on it, exactly as the ten filled-gold modal pills. */
+  /* ⚠ NO FILL AND NO RING COLOUR HERE ON PURPOSE. `tFilledGold` owns both —
+     it is the authority OTA-1791 built when ten modal pills had hand-copied the
+     same four lines — so this chassis carries only geometry. The 1dp border is
+     paid for by the padding (12 → 11, and 11 + 1 = 12), so the footer row is
+     the same height it has always been. */
   nextBtn: {
     flex: 1,
-    backgroundColor: '#c9a86a',
+    borderWidth: 1,
     borderRadius: 4,
-    paddingVertical: 12,
+    paddingVertical: 11,
     alignItems: 'center',
   },
   nextBtnText: { color: '#13110f', fontSize: 13, fontWeight: '800', letterSpacing: 2 },

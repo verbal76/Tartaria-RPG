@@ -61,7 +61,10 @@ describe('the back button no longer sits on the sentence above it', () => {
 
   test('⚠ the button is sized by its label instead of filling the column', () => {
     expect(VENDOR).toContain("placeholderBtn: { alignSelf: 'center' }");
-    expect(VENDOR).toContain('style={[styles.backBtn, styles.placeholderBtn]}');
+    /* ⚠ OTA-1802 — the control became a `Pressable` so it could carry the
+     * governed depth; `placeholderBtn` still sizes it by its label, which is
+     * the claim this test makes and the defect OTA-1760 fixed. */
+    expect(VENDOR).toContain('styles.backBtn, styles.placeholderBtn, tControlDepth(pressed)');
   });
 
   test('⚠⚠ the measurement that found it is written down, not just the fix', () => {

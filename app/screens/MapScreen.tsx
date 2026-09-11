@@ -26,8 +26,10 @@ import {
   PanResponder,
   ScrollView,
   Vibration,
+  Pressable,
   type GestureResponderEvent,
 } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore, playerGridCell } from '../state/gameStore';
 import { isTutorialLocked } from '../components/tutorialSteps'; // OTA-1700
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -983,40 +985,37 @@ export function MapScreen() {
     <View style={styles.container}>
       <FirstTimeHint id={TEACH.map_first_open.id} title={TEACH.map_first_open.title} body={TEACH.map_first_open.body} />
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
+          style={({ pressed }) => [styles.backBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
         {/* OTA-1344 — jump the view to the pulsing "you are here" marker.
             OTA-1355 — the outpost interior has a marker now too (the current
             room), so the button rides along inside. */}
-        <TouchableOpacity
+        <Pressable
           onPress={() => centerOnPlayer(playerFrac)}
-          style={styles.resetBtn}
+          style={({ pressed }) => [styles.resetBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel="Center the map on your position"
           testID="center-on-player"
         >
           <Text style={styles.resetText}>⌖ ME</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           onPress={resetTransform}
-          style={styles.resetBtn}
+          style={({ pressed }) => [styles.resetBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel="Reset map zoom and position"
         >
           <Text style={styles.resetText}>RESET</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <View

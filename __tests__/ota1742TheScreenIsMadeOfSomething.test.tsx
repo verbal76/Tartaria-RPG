@@ -835,7 +835,22 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * pinned (a fixed-width back pill that could not fit its own label, a tab
      * label missing its weight, and a fourth off-brand gold `check:gold` cannot
      * see). */
-    const off = ['CombatScreen', 'InventoryScreen'];
+    /* ⚠⚠⚠ OTA-1802 REMOVED `InventoryScreen`, AND THE DISTINCTION IS THE WHOLE
+     * REASON THE WIDENING IS ALLOWED. This screen sat here for `TRow` — its row
+     * disagrees on `marginBottom` (4 against 6) and carries a third border
+     * state, so adopting the shared CHASSIS would be a decision about its rows.
+     * That is still true, and its rows still do not take `TRow`.
+     *
+     * What it takes is `tControlDepth`, and ONLY that: the six group-action
+     * commands (EQUIP / TAKE OFF / DROP / SALVAGE / RESERVE / RELEASE) and the
+     * BACK control. Those are discrete commands and were the only family on the
+     * screen with an `onPress` and no physical language at all. The owner's
+     * pressable-surface directive names dense-screen execution commands
+     * explicitly, and names item ROWS as intentionally flat — so this widening
+     * adopts the BUTTON language and leaves the ROW question exactly where the
+     * OTA-1759 note left it. Two primitives, two decisions: this list now
+     * records the first and still withholds the second. */
+    const off = ['CombatScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
@@ -855,15 +870,37 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * Chosen because it had the worst gold density in the game (36 declarations,
      * now 0 bare) and no tabs or modals of its own to confound the result. It
      * takes `TScreenHeader` and routes its interface gold through `T.gold`. */
+    /* ⚠⚠⚠ FIVE ADDED BY OTA-1802, AND THEY ARRIVE FOR A DIFFERENT PRIMITIVE
+     * THAN EVERY ENTRY ABOVE THEM. The screens already on this list adopted
+     * LAYOUT components — `TScreenHeader`, `TTabBar`, `tRowStyle` — which is a
+     * decision about how a screen is built. These five import exactly one
+     * thing, `tControlDepth` (About also `tFilledGold`), which is a decision
+     * about what a BUTTON says. Nothing about their layout moved.
+     *
+     * The owner's pressable-surface directive named the families: the shared
+     * header BACK, Settings' session commands, Character Creation's footer,
+     * World's board commands, the dense-screen execution commands, and the two
+     * layout-sensitive pairs it asked to be classified rather than assumed
+     * (Map's BACK/ME/RESET, Ending's BACK TO TITLE/HEAD HOME). Each of the five
+     * carries one of those families and nothing else — so this is the named
+     * sequence arriving, which is the only kind of widening this test permits.
+     * ⚠ `CombatScreen` stays on the deny-list above and the combat chips are
+     * untouched: they have taken this language since OTA-1782, through
+     * `InputBox`, which is not a screen and never appears here. */
     expect(consumers).toEqual([
+      'AboutScreen.tsx',      // OTA-1802 — 15 session commands
       'ActionReferenceScreen.tsx',
+      'CharacterCreationScreen.tsx', // OTA-1802 — BACK / NEXT / BEGIN footer
       'CharacterScreen.tsx',
       'ContractsScreen.tsx',
       'CraftingScreen.tsx',
+      'EndingScreen.tsx',     // OTA-1802 — BACK TO TITLE / HEAD HOME, §18 classified
       'ExplorationScreen.tsx',
       'GuidanceScreen.tsx',   // OTA-1780 — cover first (1776), then migrate
+      'InventoryScreen.tsx',  // OTA-1802 — group-action commands + BACK; rows stay flat
       'LogScreen.tsx',        // OTA-1780
       'LoreScreen.tsx',       // OTA-1780
+      'MapScreen.tsx',        // OTA-1802 — toolbar BACK / ME / RESET, §18 classified
       'TitleScreen.tsx',
       'VendorScreen.tsx',
       'WorldScreen.tsx',      // OTA-1780 — title went gold → ink, by ruling

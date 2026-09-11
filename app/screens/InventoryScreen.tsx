@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
@@ -1714,15 +1715,14 @@ export function InventoryScreen() {
         <FirstTimeHint id={TEACH[packTeaching].id} title={TEACH[packTeaching].title} body={TEACH[packTeaching].body} />
       )}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
+          style={({ pressed }) => [styles.backBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title} accessibilityRole="header">INVENTORY</Text>
       </View>
 
@@ -1832,34 +1832,34 @@ export function InventoryScreen() {
                   SCRAP; putting EQUIP / UNEQUIP ahead of it means the reversible
                   thing is the one under your thumb. */}
               {equipPlan.equip.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('equip')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Equip ${equipPlan.equip.length} items`}>
+                <Pressable onPress={() => setInvGroupAction('equip')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Equip ${equipPlan.equip.length} items`}>
                   <Text style={styles.groupActText}>EQUIP {equipPlan.equip.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {unequippable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('unequip')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Take off ${unequippable.length} items`}>
+                <Pressable onPress={() => setInvGroupAction('unequip')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Take off ${unequippable.length} items`}>
                   <Text style={styles.groupActText}>TAKE OFF {unequippable.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {droppable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('drop')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Drop ${droppable.length} items`}>
+                <Pressable onPress={() => setInvGroupAction('drop')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Drop ${droppable.length} items`}>
                   <Text style={styles.groupActText}>DROP {droppable.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {scrappable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Salvage ${scrappable.length} items`}>
+                <Pressable onPress={() => setInvGroupAction('scrap')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Salvage ${scrappable.length} items`}>
                   <Text style={styles.groupActText}>SALVAGE {scrappable.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {reservable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('reserve')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Reserve ${reservable.length} items for fusion`}>
+                <Pressable onPress={() => setInvGroupAction('reserve')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Reserve ${reservable.length} items for fusion`}>
                   <Text style={styles.groupActText}>♡ RESERVE {reservable.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {releasable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('release')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Release ${releasable.length} items from fusion`}>
+                <Pressable onPress={() => setInvGroupAction('release')} style={({ pressed }) => [styles.groupActBtn, tControlDepth(pressed)]} accessibilityRole="button" accessibilityLabel={`Release ${releasable.length} items from fusion`}>
                   <Text style={styles.groupActText}>♥ RELEASE {releasable.length}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
             {/* Say what the group CAN'T do, rather than leaving the player to

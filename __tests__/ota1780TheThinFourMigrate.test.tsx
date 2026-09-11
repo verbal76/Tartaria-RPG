@@ -244,7 +244,9 @@ describe('the ratchet and the consumer list both moved as ACTS', () => {
     for (const n of THIN) expect([n, guard.includes(`'${n}.tsx',`)]).toEqual([n, true]);
     expect(guard).toContain('OTA-1780');
     // and Guidance is off the deny-list it used to sit on
-    expect(guard).toContain("const off = ['CombatScreen', 'InventoryScreen'];");
+    // ⚠ OTA-1802 — Inventory left the deny-list for `tControlDepth` (buttons,
+    // not rows); OTA-1742's own comment records the act. CombatScreen stays.
+    expect(guard).toContain("const off = ['CombatScreen'];");
   });
 });
 

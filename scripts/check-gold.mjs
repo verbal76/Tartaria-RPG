@@ -100,13 +100,22 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   ARE NOT THAT CONTROL and kept their own (Ending,
  *                   CraftQuantity, DifficultyCustom, MissionEncounterCard).
  *
+ *    293  OTA-1802  the pressable-surface affordance pass. Character
+ *                   Creation's NEXT/BEGIN and World's ACCEPT were filled-gold
+ *                   primaries with a hand-typed fill and NO ring at all, so the
+ *                   governed depth would have been a silent no-op on both. They
+ *                   took `tFilledGold` — the OTA-1791 authority — which owns the
+ *                   fill AND the ring, so two hand-typed declarations left and
+ *                   none arrived. The 1dp ring each gained is paid for by its
+ *                   own padding, so neither control changed size.
+ *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      290 interface · 4 semantic authorities · 1 kit
+ *      288 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 295;
+const BASELINE = 293;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

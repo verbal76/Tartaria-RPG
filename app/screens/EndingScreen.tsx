@@ -18,7 +18,8 @@
 // entrance instead of bouncing to title.
 
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated , Pressable } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
 import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1020
@@ -97,9 +98,9 @@ export function EndingScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.placeholder}>No ending recorded. Returning to title.</Text>
-        <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
+        <Pressable style={({ pressed }) => [styles.btn, tControlDepth(pressed)]} onPress={() => setScreen('title')} accessibilityRole="button">
           <Text style={styles.btnText}>BACK TO TITLE</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -213,17 +214,16 @@ export function EndingScreen() {
         </View>
 
         <View style={styles.btnRow}>
-          <TouchableOpacity style={styles.btn} onPress={() => setScreen('title')} activeOpacity={0.7} accessibilityRole="button">
+          <Pressable style={({ pressed }) => [styles.btn, tControlDepth(pressed)]} onPress={() => setScreen('title')} accessibilityRole="button">
             <Text style={styles.btnText}>BACK TO TITLE</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.btn, styles.btnPrimary]}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.btn, styles.btnPrimary, tControlDepth(pressed)]}
             onPress={() => setStage('homeward')}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.btnText}>HEAD HOME ▸</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </View>

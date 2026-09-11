@@ -59,8 +59,8 @@ describe('OTA-1791 — one filled-gold authority', () => {
     const s = flat(tFilledGold(false));
     expect(s.backgroundColor).toBe(T.gold);
     expect(s.borderColor).toBe(T.gold);
-    expect(s.borderTopColor).toBe(T.controlLit);
-    expect(s.borderBottomColor).toBe(T.controlDark);
+    expect(s.borderTopColor).toBe(T.controlRaisedLit);
+    expect(s.borderBottomColor).toBe(T.controlRaisedDark);
     expect(s.transform).toBeUndefined();
     // The default is the resting pill.
     expect(flat(tFilledGold())).toEqual(s);
@@ -69,8 +69,8 @@ describe('OTA-1791 — one filled-gold authority', () => {
   it('pressed: the light moves, the face settles — the SAME construction the combat chips use', () => {
     const s = flat(tFilledGold(true));
     expect(s.backgroundColor).toBe(T.gold);
-    expect(s.borderTopColor).toBe(T.controlDark);
-    expect(s.borderBottomColor).toBe(T.controlLit);
+    expect(s.borderTopColor).toBe(T.controlRaisedDark);
+    expect(s.borderBottomColor).toBe(T.controlRaisedLit);
     expect(s.transform).toEqual([{ translateY: 1.5 }]);
     // Not a second effect for a second colour: the depth half IS tControlDepth.
     expect(flat([tControlDepth(true)])).toEqual(expect.objectContaining({
@@ -150,11 +150,11 @@ describe('OTA-1791 — a rendered pill carries the depth under press', () => {
     const resting = flat(styleFn({ pressed: false }));
     const pressed = flat(styleFn({ pressed: true }));
     expect(resting.backgroundColor).toBe(T.gold);
-    expect(resting.borderTopColor).toBe(T.controlLit);
-    expect(resting.borderBottomColor).toBe(T.controlDark);
+    expect(resting.borderTopColor).toBe(T.controlRaisedLit);
+    expect(resting.borderBottomColor).toBe(T.controlRaisedDark);
     expect(resting.opacity).toBeUndefined(); // the fade is gone; depth replaced it
-    expect(pressed.borderTopColor).toBe(T.controlDark);
-    expect(pressed.borderBottomColor).toBe(T.controlLit);
+    expect(pressed.borderTopColor).toBe(T.controlRaisedDark);
+    expect(pressed.borderBottomColor).toBe(T.controlRaisedLit);
     expect(pressed.transform).toEqual([{ translateY: 1.5 }]);
     expect(pressed.opacity).toBeUndefined();
     // Layout preserved: the chassis is still the modal's own.

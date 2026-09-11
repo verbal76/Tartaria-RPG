@@ -144,3 +144,57 @@ export function visibleFraction(card: CardBox, place: FieldPlacement): number {
   const bottom = Math.min(card.height, place.top + place.height);
   return place.height > 0 ? Math.max(0, bottom - top) / place.height : 0;
 }
+
+/* ⚠⚠⚠ CONTAIN, WHICH IS NOT WHAT `placeCrestField` DOES — AND THE DIFFERENCE IS
+ * THE WHOLE REASON THIS EXISTS RATHER THAN A THIRD `FieldComposition`.
+ *
+ * The roster treatment is "cropped by the card's own edges": `placeCrestField`
+ * puts the artwork's measured focus on a composition point and lets the card
+ * clip whatever falls outside, which is why it can reason about a `coverage`
+ * MINIMUM and a bleed. The HUD watermark is the opposite instruction — *"CONTAIN
+ * the full sigil within the text window. Do not crop it merely to make it
+ * larger."* A focus-and-coverage placement cannot express that: the two rules
+ * disagree about what to do when the emblem does not fit, and quietly reusing
+ * the wrong one would crop the sigil on exactly the panels where it matters.
+ *
+ * ⚠ SO: SAME MEASURED DATA, DIFFERENT COMPOSITION. It reads `crestAspect` off
+ * the same `CrestArt` table — there is no second faction→asset mapping here and
+ * there must not be — and it ignores `focusX/focusY` on purpose. Focus is for
+ * deciding what survives a crop; nothing is cropped here, so the emblem is
+ * centred on the panel's geometric middle and the artwork's own off-centre
+ * weight is simply where it is.
+ *
+ * ⚠⚠ THE FIT IS BY THE TIGHTER DIMENSION, which is the owner's rule written as
+ * arithmetic: scale until ONE dimension approaches the interior boundary,
+ * whichever is reached first, preserving aspect. `inset` is the breathing room
+ * that keeps it off the frame.
+ *
+ * Returns `null` — never a guess — when the panel is unmeasured or the faction
+ * has no art. A faction without a sigil renders no watermark and keeps its
+ * panel, which is the required safe degradation. */
+export function containCrestField(
+  panel: CardBox,
+  art: CrestArt,
+  inset = 0.08,
+): FieldPlacement | null {
+  if (!(panel.width > 0) || !(panel.height > 0)) return null;
+  if (!(art.srcW > 0) || !(art.srcH > 0)) return null;
+  if (!(inset >= 0) || inset >= 0.5) return null;
+
+  const aspect = crestAspect(art);            // height ÷ width, from the file
+  const availW = panel.width * (1 - 2 * inset);
+  const availH = panel.height * (1 - 2 * inset);
+
+  // The tighter dimension wins. Width first, then clamp if that made it too
+  // tall — which is the same thing as `min`, written so the aspect is applied
+  // exactly once in each branch.
+  const width = Math.min(availW, availH / aspect);
+  const height = width * aspect;
+
+  return {
+    width,
+    height,
+    left: (panel.width - width) / 2,
+    top: (panel.height - height) / 2,
+  };
+}

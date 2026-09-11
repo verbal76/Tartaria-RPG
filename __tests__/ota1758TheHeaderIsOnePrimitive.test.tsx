@@ -128,7 +128,14 @@ describe('the header behaves the way the hand-rolled ones did', () => {
     const btn = t.root.findAll((n) => n.props.accessibilityRole === 'button')[0];
     expect(btn).toBeDefined();
     expect(btn!.props.accessibilityLabel).toBe('Go back');
-    expect(btn!.props.activeOpacity).toBe(0.7);      // ⚠ the shipped feedback
+    /* ⚠⚠ OTA-1802 — THE FEEDBACK CHANGED KIND, AND THAT IS THE POINT. This
+     * pinned `activeOpacity: 0.7`, the whole-control fade `TouchableOpacity`
+     * gives. The back control is a discrete command, so it now carries the
+     * governed depth instead: nothing goes translucent, the light moves and the
+     * face settles. Asserting the ABSENCE of the fade is the stronger claim —
+     * a silent regression to `TouchableOpacity` fails here. */
+    expect(btn!.props.activeOpacity).toBeUndefined();
+    expect(typeof btn!.props.style).toBe('function');
     await renderer.act(async () => { (btn!.props.onPress as () => void)(); });
     expect(hit).toBe(1);
     expect(hosts(t, (n) => n.props.accessibilityRole === 'header')).toHaveLength(1);

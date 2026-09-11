@@ -30081,7 +30081,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the omission was ours, three times running. A marker in this commit's
 // title is the documented mechanism that sends this same tree to the
 // stable ring. It promotes; it does not change what is promoted.
-export const OTA_BUILD_ID = '2026-09-11-1801-asked-once';
+// SUPERSEDED: '2026-09-11-1801-asked-once'
+// SUPERSEDED: '2026-09-11-1802-depth-says-pressable'
+export const OTA_BUILD_ID = '2026-09-11-1803-the-hud-belongs-to-tartaria';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat
 // looks substantially better with the DARK / BLACK fill than with the bright

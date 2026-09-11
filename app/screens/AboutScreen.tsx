@@ -1,5 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView, Platform, Linking } from 'react-native';
+/* ⚠ The session commands are discrete commands — SAVE, BACK UP CHARACTER,
+   RESTORE FROM BACKUP, SAVE & EXIT TO TITLE, REPORT A BUG, RESET TO DEFAULT,
+   SHOW ALL TIPS AGAIN, REPLAY TEACHING — so they take the governed physical
+   language rather than a local one. Every `sessionBtn` keeps its own chassis
+   and its own semantic variant (primary gold / secondary dark / danger red);
+   this only rides the two depth edges on top. A BUSY control (saving, backing
+   up, restoring) is handed NO depth, because an inert control must not
+   advertise readiness it does not have. */
+import { tControlDepth } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
@@ -915,10 +924,10 @@ export function AboutScreen() {
           {/* SAVE in place — keep playing. Separate from SAVE & EXIT so the
               player can checkpoint without leaving the run. Reports the real
               write result (a save can silently fail when storage is full). */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnPrimary, saveState === 'failed' && styles.sessionBtnDanger]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnPrimary, saveState === 'failed' && styles.sessionBtnDanger,
+              (saveState === 'saving') ? null : tControlDepth(pressed)]}
             onPress={() => { void handleSave(); }}
-            activeOpacity={0.7}
             disabled={saveState === 'saving'}
             accessibilityRole="button"
             accessibilityState={{ disabled: saveState === 'saving' }}
@@ -929,16 +938,16 @@ export function AboutScreen() {
                 : saveState === 'failed' ? '✗ SAVE FAILED'
                 : 'SAVE'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
           {/* OTA-1208 — the living character's backup door (title rows carry it
               only for the dead now). Saves first, then opens the share sheet
               with the fresh export; clipboard gets a copy either way. */}
           {player && (
-            <TouchableOpacity
-              style={[styles.sessionBtn, styles.sessionBtnSecondary, backupState === 'failed' && styles.sessionBtnDanger]}
+            <Pressable
+              style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, backupState === 'failed' && styles.sessionBtnDanger,
+              (backupState === 'busy') ? null : tControlDepth(pressed)]}
               onPress={() => { void handleBackUp(); }}
-              activeOpacity={0.7}
               disabled={backupState === 'busy'}
               accessibilityRole="button"
               accessibilityState={{ disabled: backupState === 'busy' }}
@@ -949,7 +958,7 @@ export function AboutScreen() {
                   : backupState === 'failed' ? '✗ BACKUP FAILED'
                   : 'BACK UP CHARACTER'}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
 
           {/* ⚠⚠ PHONE-FIX — RESTORE FROM BACKUP, arrived from the title screen.
@@ -957,10 +966,10 @@ export function AboutScreen() {
               reads what that wrote. It never overwrites — a restore always
               arrives as an ADDITIONAL character (OTA-1178), which is why it
               needs no confirm. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary,
+              (restoreBusy) ? null : tControlDepth(pressed)]}
             onPress={() => { void handleRestore(); }}
-            activeOpacity={0.7}
             disabled={restoreBusy}
             accessibilityRole="button"
             accessibilityState={{ disabled: restoreBusy }}
@@ -968,17 +977,17 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnSecondaryText}>
               {restoreBusy ? 'RESTORING…' : 'RESTORE FROM BACKUP (paste a backup first)'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           {restoreMsg ? <Text style={styles.sessionFootnote}>{restoreMsg}</Text> : null}
 
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnPrimary]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnPrimary,
+              tControlDepth(pressed)]}
             onPress={() => { void saveAndExitToTitle(); }}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           {/* OTA-1209 — the 90-second autosave's toggle (the autosave itself is
               OTA-368 and ships ON). Here beside SAVE so the player who lost a
@@ -1036,27 +1045,27 @@ export function AboutScreen() {
           {/* arb75 — REPORT A BUG. One report bundling voice + device + log
               (no more separate COPY VOICE / COPY LOG). Opens the same
               BugReportModal the Title screen uses. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 },
+              tControlDepth(pressed)]}
             onPress={() => setBugReportOpen(true)}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
-          </TouchableOpacity>
+          </Pressable>
           {/* ⚠ PHONE-FIX — INVITE PLAYTESTER, arrived from the title screen. It
               sits with REPORT A BUG because both are ways of reaching the people
               who make this, and neither is a thing a player does while playing. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed)]}
             onPress={() => setInviteOpen(true)}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnSecondaryText}>
               {inviteSent ? '✓ SENT' : 'INVITE A PLAYTESTER'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           {/* ⚠⚠⚠ OTA-1665 — SEND LOG IS GONE. Owner: *"I've removed the send
               log"*, and *"report a bug should be the button that pushed the
               log."* One button for this in the whole product, and it is the one
@@ -1126,8 +1135,9 @@ export function AboutScreen() {
               bootQwen's "already running" early-return doesn't swallow the call after
               a boot-time 'skipped'. No app restart needed — watch the label go to
               "✓ AI NARRATION LOADED". */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 },
+              tControlDepth(pressed)]}
             onPress={() => {
               setAiReset(true);
               void resetMLHealth().then(() => {
@@ -1135,7 +1145,6 @@ export function AboutScreen() {
                 void bootQwen();
               });
             }}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>
@@ -1146,7 +1155,7 @@ export function AboutScreen() {
                 : qwenStatus === 'loading' ? 'LOADING AI…'
                 : 'STARTING AI…'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.sessionFootnote}>
             Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
             {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
@@ -1164,17 +1173,17 @@ export function AboutScreen() {
               was wrong about two of its four buttons. What lives here now is
               the honest definition: the tools a DIAGNOSIS needs and ordinary
               play never does — collapsed by default so they cost nothing. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 14 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 14 },
+              tControlDepth(pressed)]}
             onPress={() => setAdvancedOpen((v) => !v)}
-            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityState={{ expanded: advancedOpen }}
           >
             <Text style={styles.sessionBtnSecondaryText}>
               {advancedOpen ? '▾ ADVANCED' : '▸ ADVANCED'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           {advancedOpen && (
             <>
               <Text style={styles.sessionHint}>
@@ -1190,10 +1199,10 @@ export function AboutScreen() {
                   25KB chunk cursor: chat clients truncate longer pastes
                   silently, which is how a hand-carried log arrives half-empty
                   and nobody notices. */}
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed)]}
                 onPress={() => { void handleCopyLog(); }}
-                activeOpacity={0.7}
                 accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
@@ -1217,7 +1226,7 @@ export function AboutScreen() {
                     return 'COPY LOG TO CLIPBOARD';
                   })()}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
               {/* ⚠⚠ COPY SAVE ALSO SURVIVED, AND MY FIRST AUDIT HAD IT WRONG. I
                   wrote it down as a strict duplicate of BACK UP CHARACTER and
                   then read both: BACK UP writes `encodeSaveExport` — a
@@ -1228,26 +1237,26 @@ export function AboutScreen() {
                   parses. Deleting it would have left IMPORT SAVE with no
                   documented partner. It is relabelled instead, so the pair
                   reads as a pair. */}
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed)]}
                 onPress={() => { void handleCopySave(); }}
-                activeOpacity={0.7}
                 accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (for IMPORT SAVE below)'}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              (importBusy) ? null : tControlDepth(pressed)]}
                 onPress={() => { void handleImportSave(); }}
-                activeOpacity={0.7}
                 disabled={importBusy}
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (paste a copied save)'}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
               {importMsg ? (
                 <Text style={styles.sessionFootnote}>{importMsg}</Text>
               ) : null}
@@ -1257,16 +1266,16 @@ export function AboutScreen() {
                   destructive erase of the exact evidence the button beside it
                   sends. It is at the bottom of a collapsed drawer now, and the
                   label names the consequence rather than the mechanism. */}
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed)]}
                 onPress={() => { void handleClearLog(); }}
-                activeOpacity={0.7}
                 accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {logCleared ? '✓ LOG ERASED' : 'ERASE THIS LOG (a report can no longer carry it)'}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </>
           )}
         </View>
@@ -1372,14 +1381,14 @@ export function AboutScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 },
+              tControlDepth(pressed)]}
             onPress={() => { void resetDisplaySettings(); }}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnSecondaryText}>RESET TO DEFAULT</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         )}
 
@@ -1413,31 +1422,31 @@ export function AboutScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 },
+              tControlDepth(pressed)]}
             onPress={() => {
               void resetAllFirstTimeHints();
               void setHintsDisabled(false);
               setTipsReset(true);
               setTimeout(() => setTipsReset(false), 2000);
             }}
-            activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnSecondaryText}>{tipsReset ? 'TIPS RESET ✓' : 'SHOW ALL TIPS AGAIN'}</Text>
-          </TouchableOpacity>
+          </Pressable>
           {/* ⚠ OTA-1738 — REPLAY TEACHING: every tutorial beat, every first-use card and
               the action reference, readable on purpose, tips on or off. Opening it
               writes no flag. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+          <Pressable
+            style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 },
+              tControlDepth(pressed)]}
             onPress={() => setScreen('guidance')}
-            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="Replay teaching"
           >
             <Text style={styles.sessionBtnSecondaryText}>REPLAY TEACHING</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         )}
 

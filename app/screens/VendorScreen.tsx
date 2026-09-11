@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity , Pressable } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { useTeachingSlot } from '../components/useFirstTimeHint'; // OTA-1738
@@ -256,14 +257,13 @@ export function VendorScreen() {
             in a header row and is sized by its label; here there is no header,
             so the container's default `stretch` blew it to the full 387pt
             column and it read as a banner rather than a control. */}
-        <TouchableOpacity
-          style={[styles.backBtn, styles.placeholderBtn]}
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, styles.placeholderBtn, tControlDepth(pressed)]}
           onPress={() => setScreen('exploration')}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.backText}>← DEAL WITH YOUR CHOICES</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   }
@@ -714,15 +714,14 @@ export function VendorScreen() {
         <FirstTimeHint id={TEACH[counterTeaching].id} title={TEACH[counterTeaching].title} body={TEACH[counterTeaching].body} />
       )}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
+          style={({ pressed }) => [styles.backBtn, tControlDepth(pressed)]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title} accessibilityRole="header">SHOP</Text>
         <TouchableOpacity
           onPress={openDismiss}
@@ -1264,17 +1263,16 @@ export function VendorScreen() {
               const plan = planCommonGearSale(bulkSellable);
               if (plan.count === 0) return null;
               return (
-                <TouchableOpacity
+                <Pressable
                   onPress={() => setPending({ mode: 'bulkSellCommonGear', count: plan.count, total: plan.total })}
-                  style={styles.bulkSellBtn}
-                  activeOpacity={0.7}
+                  style={({ pressed }) => [styles.bulkSellBtn, tControlDepth(pressed)]}
                   accessibilityRole="button"
                   accessibilityLabel={`Sell all ${plan.count} Common gear pieces for ${plan.total} coin`}
                 >
                   <Text style={styles.bulkSellText}>
                     SELL ALL COMMON GEAR — {plan.count} for {plan.total} TC
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })()}
             {/* ⚠⚠ OTA-1706 — SELL ALL LOOT, beside it. Owner: "add the sell all
@@ -1287,17 +1285,16 @@ export function VendorScreen() {
               const lootPlan = planLootSale(bulkSellable);
               if (lootPlan.count === 0) return null;
               return (
-                <TouchableOpacity
+                <Pressable
                   onPress={() => setPending({ mode: 'bulkSellLoot', count: lootPlan.count, total: lootPlan.total })}
-                  style={styles.bulkSellBtn}
-                  activeOpacity={0.7}
+                  style={({ pressed }) => [styles.bulkSellBtn, tControlDepth(pressed)]}
                   accessibilityRole="button"
                   accessibilityLabel={`Sell all ${lootPlan.count} loot pieces for ${lootPlan.total} coin`}
                 >
                   <Text style={styles.bulkSellText}>
                     SELL ALL LOOT — {lootPlan.count} for {lootPlan.total} TC
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })()}
             {/* OTA-1101 — the group bar moved OUT of this scrolling list and up

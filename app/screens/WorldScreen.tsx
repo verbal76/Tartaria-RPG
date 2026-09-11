@@ -6,7 +6,8 @@
 // tagged factions you already stood with; here you see the whole board.
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { tControlDepth, tFilledGold } from '../ui/tartariaKit';
 import { TScreenHeader } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
@@ -166,14 +167,13 @@ export function WorldScreen() {
                 return <Text style={styles.bountyCourseNote}>{bountyCourseLabel(cs)}</Text>;
               }
               return (
-                <TouchableOpacity
-                  style={styles.bountySecondaryBtn}
-                  activeOpacity={0.8}
+                <Pressable
+                  style={({ pressed }) => [styles.bountySecondaryBtn, tControlDepth(pressed)]}
                   onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
                   accessibilityRole="button"
                 >
                   <Text style={styles.bountySecondaryText}>{bountyCourseLabel(cs)}</Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })()}
           </View>
@@ -202,9 +202,17 @@ export function WorldScreen() {
                   then a pop-up that guides you down to that pause button." So the button
                   stays live and TELLS you — acceptBounty buzzes and raises the notice. A
                   disabled control that explains nothing is the OTA-1164 defect again. */}
-              <TouchableOpacity
-                style={[styles.bountyBtn, !frozen && styles.bountyBtnLocked]}
-                activeOpacity={0.8}
+              {/* ⚠ THE LOCKED STATE KEEPS ITS DEPTH, AND THAT IS THE RULE RATHER
+                  THAN AN OVERSIGHT. OTA-1165 made this control STAY LIVE when the
+                  board is running — it buzzes and explains instead of dying — so it
+                  is a tappable refusal, not a disabled control. A refusal that can
+                  be pressed must still read as pressable; what changes is the
+                  semantic tone (muted `#6b6152` ring, dimmed label), never the
+                  physical claim. Compare `nextBtnDisabled`, which really is inert
+                  and is handed no depth at all. */}
+              <Pressable
+                style={({ pressed }) => [styles.bountyBtn,
+                  frozen ? tFilledGold(pressed) : [styles.bountyBtnLocked, tControlDepth(pressed)]]}
                 onPress={() => {
                   const before = (useGameStore.getState().player?.activeBounties ?? []).length;
                   useGameStore.getState().acceptBounty(offer);
@@ -221,7 +229,7 @@ export function WorldScreen() {
                     ? '❄ FREEZE THE BOARD TO ACCEPT'
                     : activeBounties.length > 0 ? 'ACCEPT (STACK) ›' : 'ACCEPT & SET COURSE ›'}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ))
         ) : (
@@ -302,9 +310,9 @@ export function WorldScreen() {
                   not only building standing with them, you are making their enemies yours.
                   ⚠ It freezes the VIEW, never the simulation — the same heartbeat roams the
                   patrols that bring a bounty's quarry to you. */}
-              <TouchableOpacity
-                style={[styles.freezeBtn, frozen && styles.freezeBtnOn]}
-                activeOpacity={0.8}
+              <Pressable
+                style={({ pressed }) => [styles.freezeBtn, frozen && styles.freezeBtnOn,
+                  tControlDepth(pressed)]}
                 onPress={() => useGameStore.getState().toggleBoardFreeze()}
                 accessibilityRole="button"
                 accessibilityLabel={frozen
@@ -314,7 +322,7 @@ export function WorldScreen() {
                 <Text style={[styles.freezeBtnText, frozen && styles.freezeBtnTextOn]}>
                   {frozen ? '▮▮ BOARD HELD — TAP TO RUN' : '❄ FREEZE THE BOARD'}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
               <Text style={styles.freezeNote}>
                 {frozen
                   ? 'Held. These are the terms a contract will lock in — accepting releases it.'
@@ -434,7 +442,13 @@ const styles = StyleSheet.create({
   bountyFoot: { color: '#c98a6a', fontSize: 10, fontStyle: 'italic', marginTop: 6, lineHeight: 14 },
   // OTA-862 — "they don't like you, so it's a harder job" note on a low-standing offer.
   bountyWarn: { color: '#c98a6a', fontSize: 11, fontWeight: '700', marginTop: 5 },
-  bountyBtn: { marginTop: 10, backgroundColor: '#c9a86a', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
+  /* ⚠ A RING SO THE DEPTH HAS SOMETHING TO RIDE, PAID FOR BY THE PADDING:
+     9 → 8 with a 1dp border is 9 again, so the accept control's outer height is
+     unchanged. ⚠⚠ AND IT ENDS A 2dp JITTER THAT WAS ALREADY THERE: the locked
+     variant below adds a `borderWidth: 1` of its own, so the unfrozen control
+     has always stood 2dp TALLER than the frozen one and the card twitched when
+     the board froze. Both states are 8 + 1 now and the twitch is gone. */
+  bountyBtn: { marginTop: 10, borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center' },
   bountyBtnText: { color: '#13110f', fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
   // OTA-1165 — LOCKED, not disabled: still tappable, visibly not-yet-armed, and the tap
   // buzzes + explains. Muted fill so it reads as "do something first", not "broken".

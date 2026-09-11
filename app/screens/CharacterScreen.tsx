@@ -5,7 +5,8 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { tControlDepth } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { effectiveACBreakdown, playerArmorResistKinds, dogVestAcBonus } from '../state/combatResolution';
@@ -266,16 +267,19 @@ export function CharacterScreen() {
         title="CHARACTER"
         onBack={() => setScreen('exploration')}
         right={(
-          <TouchableOpacity
+          /* ⚠ REPLAY OPENING is a discrete command sitting in the header's
+             right slot, so it takes the same compact language the BACK control
+             beside it now takes. Its own chassis — the 80dp floor, the two-line
+             label, the 8dp hitSlop — is untouched. */
+          <Pressable
             onPress={() => replayStoryIntro()}
-            style={styles.replayBtn}
+            style={({ pressed }) => [styles.replayBtn, tControlDepth(pressed)]}
             hitSlop={8}
-            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="Replay the opening crawl"
           >
             <Text style={styles.replayText}>REPLAY{'\n'}OPENING</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       />
 
