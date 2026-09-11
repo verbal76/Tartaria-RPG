@@ -235,9 +235,43 @@ jobs:
       # ever say different things. See scripts/verify-ci-receipt.cjs.
       - name: The publication receipt names every required gate (blocking)
         run: npm run check:requiredjobs
+      # ⚠⚠ Every live required suite lands on exactly one shard. Live jest
+      # discovery is the authority; the weight file only balances. This proves
+      # union == discovery, intersection == empty, and no empty shard — every
+      # run, before any shard is trusted.
+      - name: The four shards cover the whole required surface, exactly once (blocking)
+        run: npm run check:shardcoverage
 
-  test:
-    name: jest (fast · required)
+  # ⚠⚠⚠ FOUR SHARDS, ONE SURFACE. The required Jest surface is not smaller than
+  # it was — it is DEALT ACROSS FOUR RUNNERS. Live `jest --listTests` discovery
+  # is the membership authority; scripts/suite-weights.json only balances the
+  # deal (deterministic LPT, scripts/shard-suites.cjs). `check:shardcoverage` in
+  # the gates job proves, every run, that the union of the four equals live
+  # discovery and that no suite appears twice. Each shard refuses to run at all
+  # if that reconciliation fails, so a shard can never quietly execute a subset.
+  #
+  # ⚠⚠ THE SUITE SET IS UNCHANGED: scripts/heavy-suites.mjs still decides what
+  # is deferred, `check:testsplit` still holds it, and OTA-1726's rule stands —
+  # membership comes from a LIST, never from a filename, and blocking is the
+  # default. The RNG determinism guards in jest.setup.js run per test FILE, so
+  # which runner a file lands on cannot change its result. The old-space bump is
+  # headroom, and a quarter of the surface is well inside it.
+  #
+  # ⚠⚠⚠ FOUR EXPLICIT JOBS, NOT A MATRIX — ON PURPOSE. Change A's receipt matches
+  # required jobs by EXACT DISPLAY NAME and demands exactly one current-attempt
+  # job per manifest entry. A `strategy.matrix` with a static `name:` gives every
+  # leg the SAME display name, which is precisely the ambiguity the receipt was
+  # hardened against; a matrix with an interpolated name would work but makes the
+  # contract depend on GitHub's naming behaviour rather than on a literal string
+  # this repo can read and assert. These four names are literals in this file,
+  # `check:requiredjobs` reads them structurally, and ciShardsCoverTheWholeSurface
+  # pins them. Correct receipt identity outranks YAML elegance.
+  #
+  # ⚠ The canonical unsharded authority is NOT replaced: `npm run test:ci:fast`
+  # still runs the entire surface in one process. It is the rollback, and it is
+  # how a developer or an auditor runs the real gate.
+  test-shard-1:
+    name: jest shard 1/4 (fast · required)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -248,27 +282,61 @@ jobs:
       - env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm ci --no-audit --no-fund
-      # The 1,188 deterministic unit/integration suites — the real regression
-      # ratchet, and BLOCKING.
-      #
-      # ⚠⚠⚠ OTA-1726 — MEMBERSHIP COMES FROM A LIST NOW, NOT FROM FILENAMES. This
-      # used to exclude by seven bare substrings (Stress/stressMode/Chaos/Probe/
-      # Smoke/Sweep/Sim) matched against the path, so a suite opted OUT of the ship
-      # gate by being NAMED. Two live OTA regression suites had been red and
-      # unwatched for exactly that reason — both instrument failures, both
-      # invisible, one for over two hundred OTAs. The set is
-      # scripts/heavy-suites.mjs, every entry carries a reason, and
-      # `check:testsplit` fails if it names a file that no longer exists or if
-      # these scripts go back to splitting by name. Blocking is the DEFAULT.
-      # After the RNG-flake fixes
-      # (incidental-weather chip pinned to calm in jest.setup.js; miscalibrated
-      # outcome-split band widened to ±5σ), it is
-      # stable enough to block a merge. The old-space bump is headroom, not a
-      # workaround — the fast suite is well inside it.
-      - name: Run fast test suite (blocking)
+      - name: Run required shard 1/4 (blocking)
         env:
           NODE_OPTIONS: '--max-old-space-size=3072'
-        run: npm run test:ci:fast -- --reporters=default
+        run: npm run test:ci:fast:shard -- 1
+
+  test-shard-2:
+    name: jest shard 2/4 (fast · required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+      - name: Run required shard 2/4 (blocking)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=3072'
+        run: npm run test:ci:fast:shard -- 2
+
+  test-shard-3:
+    name: jest shard 3/4 (fast · required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+      - name: Run required shard 3/4 (blocking)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=3072'
+        run: npm run test:ci:fast:shard -- 3
+
+  test-shard-4:
+    name: jest shard 4/4 (fast · required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+      - name: Run required shard 4/4 (blocking)
+        env:
+          NODE_OPTIONS: '--max-old-space-size=3072'
+        run: npm run test:ci:fast:shard -- 4
 
   test-heavy:
     name: jest (heavy sims · reported)
@@ -305,7 +373,7 @@ jobs:
   publish:
     name: publish (dispatch the OTA for a validated trunk commit)
     runs-on: ubuntu-latest
-    needs: [typecheck-source, typecheck-tests, lint, gates, test]
+    needs: [typecheck-source, typecheck-tests, lint, gates, test-shard-1, test-shard-2, test-shard-3, test-shard-4]
     if: github.event_name == 'push' && github.ref == 'refs/heads/golem-line'
     permissions:
       contents: read

@@ -60,6 +60,11 @@ const SHA = '257b583ed18ceaf6e363db91f3d7aa1995a0eee4';
 const OTHER_SHA = '9e7d33cd81c33033ce143fb6e2f3a765a6fdc530';
 const REQUIRED = MANIFEST.required;
 const HEAVY = 'jest (heavy sims · reported)';
+// ⚠ 2026-09-11 (Change C) — the single `jest (fast · required)` job became four
+// shards, so the controls below name ONE representative required shard rather
+// than the retired single job. Nothing about the receipt changed: it still
+// demands exactly one current-attempt job per manifest entry, literally green.
+const SHARD1 = 'jest shard 1/4 (fast · required)';
 
 /** A CI run exactly as the API returns it, with every required job green. */
 const greenRun = (over: Partial<Run> = {}): Run => ({
@@ -81,12 +86,17 @@ describe('1. the contract is the contract', () => {
     expect(MANIFEST.workflow).toBe(CI_WORKFLOW_PATH);
   });
 
-  it('⚠⚠ it names the five real gates, each exactly once, and nothing reported', () => {
-    expect(REQUIRED).toHaveLength(5);
-    expect(new Set(REQUIRED).size).toBe(5);
-    for (const n of ['typecheck (source · required)', 'typecheck (tests · ratchet)', 'lint (required)', 'source gates (ratchets · required)', 'jest (fast · required)']) {
+  it('⚠⚠ it names the eight real gates — four non-jest, four jest shards — each exactly once, and nothing reported', () => {
+    expect(REQUIRED).toHaveLength(8);
+    expect(new Set(REQUIRED).size).toBe(8);
+    for (const n of ['typecheck (source · required)', 'typecheck (tests · ratchet)', 'lint (required)', 'source gates (ratchets · required)']) {
       expect(REQUIRED).toContain(n);
     }
+    // ⚠⚠⚠ FOUR SHARDS, FOUR LITERAL NAMES. Not a matrix: a matrix with a static
+    // `name:` gives every leg the SAME display name, which is exactly the
+    // ambiguity this receipt exists to refuse. Each is its own required job.
+    for (const n of [1, 2, 3, 4]) expect(REQUIRED).toContain(`jest shard ${n}/4 (fast · required)`);
+    expect(REQUIRED).not.toContain('jest (fast · required)');
     expect(REQUIRED).not.toContain(HEAVY);
     // …and no manifest entry may be a job that cannot fail the run.
     for (const n of REQUIRED) {
@@ -178,8 +188,11 @@ describe('3. the verifier — positive controls', () => {
     // The fields the verifier reads are exactly the ones GitHub returns; this
     // pins the shape so a renamed field cannot make every receipt silently red.
     const run: Run = { id: 34632840636, name: 'CI', path: '.github/workflows/ci.yml', head_sha: SHA, run_attempt: 1, status: 'completed', conclusion: 'success' };
-    const rows = ['typecheck (source · required)', 'typecheck (tests · ratchet)', HEAVY, 'jest (fast · required)', 'lint (required)', 'source gates (ratchets · required)', 'publish (dispatch the OTA for a validated trunk commit)'].map((n) => job(n));
-    expect(verify({ total_count: 7, jobs: rows }, run).ok).toBe(true);
+    // The run object's values are verbatim from the real API; the job rows carry
+    // the CURRENT contract's names plus the two jobs a real run also returns and
+    // the manifest deliberately ignores (heavy, and publish itself).
+    const rows = [...REQUIRED, HEAVY, 'publish (dispatch the OTA for a validated trunk commit)'].map((n) => job(n));
+    expect(verify({ total_count: rows.length, jobs: rows }, run).ok).toBe(true);
   });
 });
 
@@ -191,9 +204,9 @@ describe('3. the verifier — negative controls (every one must REFUSE)', () => 
 
   it('NC-A1 — MISSING REQUIRED JOB', () => {
     const jobs = greenJobs();
-    jobs.jobs = jobs.jobs.filter((j) => j.name !== 'jest (fast · required)');
+    jobs.jobs = jobs.jobs.filter((j) => j.name !== SHARD1);
     jobs.total_count = jobs.jobs.length;
-    refuses(verify(jobs), /"jest \(fast · required\)" did not run/);
+    refuses(verify(jobs), /"jest shard 1\/4 \(fast · required\)" did not run/);
   });
 
   it('NC-A2 — SKIPPED REQUIRED JOB', () => {
@@ -210,13 +223,13 @@ describe('3. the verifier — negative controls (every one must REFUSE)', () => 
 
   it('NC-A4 — NULL / IN-PROGRESS REQUIRED JOB (the exact hole: jest still running)', () => {
     const jobs = greenJobs();
-    const jest = jobs.jobs.find((j) => j.name === 'jest (fast · required)')!;
+    const jest = jobs.jobs.find((j) => j.name === SHARD1)!;
     jest.status = 'in_progress'; jest.conclusion = null;
-    refuses(verify(jobs, greenRun({ status: 'in_progress', conclusion: null })), /"jest \(fast · required\)" is in_progress\/null/);
+    refuses(verify(jobs, greenRun({ status: 'in_progress', conclusion: null })), /"jest shard 1\/4 \(fast · required\)" is in_progress\/null/);
   });
 
   it('NC-A5 — DUPLICATE REQUIRED NAME: two current-attempt jobs, one green, one red → REFUSE (one green sibling proves nothing)', () => {
-    const jobs = greenJobs([job('jest (fast · required)', { conclusion: 'failure' })]);
+    const jobs = greenJobs([job(SHARD1, { conclusion: 'failure' })]);
     refuses(verify(jobs), /matched 2 jobs .* ambiguous/);
   });
 
@@ -239,12 +252,12 @@ describe('3. the verifier — negative controls (every one must REFUSE)', () => 
   it('NC-A8 — STALE RUN ATTEMPT: green in attempt 1, red or absent in attempt 2', () => {
     // Attempt 2 exists (a "re-run failed jobs"); jest is green only in attempt 1.
     const stale = greenJobs();
-    stale.jobs = stale.jobs.map((j) => (j.name === 'jest (fast · required)' ? { ...j, run_attempt: 1 } : { ...j, run_attempt: 2 }));
-    refuses(verify(stale, greenRun({ run_attempt: 2 })), /"jest \(fast · required\)" is absent from attempt 2 \(only found in attempt\(s\) 1\)/);
+    stale.jobs = stale.jobs.map((j) => (j.name === SHARD1 ? { ...j, run_attempt: 1 } : { ...j, run_attempt: 2 }));
+    refuses(verify(stale, greenRun({ run_attempt: 2 })), /"jest shard 1\/4 \(fast · required\)" is absent from attempt 2 \(only found in attempt\(s\) 1\)/);
     // …and green in attempt 1 beside RED in attempt 2 — the red one is the truth.
-    const both = greenJobs([job('jest (fast · required)', { run_attempt: 2, conclusion: 'failure' })]);
-    both.jobs = both.jobs.map((j) => (j.name !== 'jest (fast · required)' ? { ...j, run_attempt: 2 } : j));
-    refuses(verify(both, greenRun({ run_attempt: 2 })), /"jest \(fast · required\)" is completed\/failure/);
+    const both = greenJobs([job(SHARD1, { run_attempt: 2, conclusion: 'failure' })]);
+    both.jobs = both.jobs.map((j) => (j.name !== SHARD1 ? { ...j, run_attempt: 2 } : j));
+    refuses(verify(both, greenRun({ run_attempt: 2 })), /"jest shard 1\/4 \(fast · required\)" is completed\/failure/);
   });
 
   it('NC-A9 — REQUIRED FAILURE, literally', () => {

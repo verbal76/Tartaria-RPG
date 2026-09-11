@@ -44,20 +44,31 @@ describe('every local gate runs in CI', () => {
     }
   });
 
-  it('⚠⚠ the gates job is required by the publish job, alongside the three older required gates and lint', () => {
+  it('⚠⚠ the gates job is required by the publish job, alongside the older required gates, lint, and all four jest shards', () => {
     expect(CI.jobs.gates).toBeDefined();
     expect(CI.jobs.gates!['continue-on-error']).toBeUndefined();
-    expect([...(CI.jobs.publish!.needs ?? [])].sort()).toEqual(['gates', 'lint', 'test', 'typecheck-source', 'typecheck-tests']);
+    // ⚠ 2026-09-11 (Change C) — the single `test` job became four shards. All
+    // four are required; publication waits for every one. See
+    // ciShardsCoverTheWholeSurface for the coverage half of the contract.
+    expect([...(CI.jobs.publish!.needs ?? [])].sort()).toEqual(['gates', 'lint', 'test-shard-1', 'test-shard-2', 'test-shard-3', 'test-shard-4', 'typecheck-source', 'typecheck-tests']);
     // The heavy sims stay reported, and reported means not a publication gate.
     expect(CI.jobs['test-heavy']!['continue-on-error']).toBe(true);
     expect(CI.jobs.publish!.needs).not.toContain('test-heavy');
   });
 
-  it('the typecheck, lint and fast-suite gates are unchanged', () => {
+  it('the typecheck and lint gates are unchanged, and the fast surface runs as four required shards', () => {
     expect(CI_SRC).toContain('run: npm run typecheck:ci');
     expect(CI_SRC).toContain('run: npm run typecheck:tests');
     expect(CI_SRC).toContain('run: npm run lint');
-    expect(CI_SRC).toContain('run: npm run test:ci:fast -- --reporters=default');
+    // ⚠⚠ Change C: four shards, one surface. Each runs its quarter; together
+    // they run every suite `test:ci:fast` would, proven every run by
+    // check:shardcoverage against LIVE discovery.
+    for (const n of [1, 2, 3, 4]) expect(CI_SRC).toContain(`run: npm run test:ci:fast:shard -- ${n}`);
+    // ⚠⚠⚠ AND THE CANONICAL UNSHARDED AUTHORITY SURVIVES. It is the rollback
+    // and the way a developer runs the real gate; it must never be redefined
+    // to mean one shard.
+    expect(PKG.scripts['test:ci:fast']).toBe('jest --ci --testPathIgnorePatterns /node_modules/ "$(node scripts/heavy-suites.mjs --pattern)"');
+    expect(PKG.scripts['test:ci:fast']).not.toContain('shard');
   });
 });
 

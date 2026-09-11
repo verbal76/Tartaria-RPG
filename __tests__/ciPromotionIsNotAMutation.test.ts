@@ -273,7 +273,10 @@ describe('3. ci.yml — the exclusion is exactly `promotions`, and cannot widen'
     expect(CI.on.push as object).not.toHaveProperty('tags');
     expect(CI.on.push as object).not.toHaveProperty('paths-ignore');
     expect(CI.jobs.publish!.if).toBe("github.event_name == 'push' && github.ref == 'refs/heads/golem-line'");
-    expect([...(CI.jobs.publish!.needs ?? [])].sort()).toEqual(['gates', 'lint', 'test', 'typecheck-source', 'typecheck-tests']);
+    // ⚠ 2026-09-11 (Change C) — the single `test` job became four required
+    // shards. Change B is untouched by that: the promotion path still ends in
+    // the same publisher and the same Change-A receipt.
+    expect([...(CI.jobs.publish!.needs ?? [])].sort()).toEqual(['gates', 'lint', 'test-shard-1', 'test-shard-2', 'test-shard-3', 'test-shard-4', 'typecheck-source', 'typecheck-tests']);
   });
 
   it('no other workflow adopts the promotions branch as a source branch', () => {

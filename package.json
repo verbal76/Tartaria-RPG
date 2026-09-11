@@ -16,6 +16,7 @@
     "typecheck:tests": "node scripts/ci-typecheck-tests.mjs",
     "test:ci": "npm run test:ci:fast && npm run test:ci:heavy",
     "test:ci:fast": "jest --ci --testPathIgnorePatterns /node_modules/ \"$(node scripts/heavy-suites.mjs --pattern)\"",
+    "test:ci:fast:shard": "node scripts/shard-suites.cjs --run",
     "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"$(node scripts/heavy-suites.mjs --pattern)\"",
     "check:handoff": "node scripts/check-handoff-claims.mjs",
     "check:reachability": "node scripts/check-reachability.mjs",
@@ -38,7 +39,8 @@
     "check:kitpalette": "node scripts/check-kit-palette.mjs",
     "check:kitexports": "node scripts/check-kit-exports.mjs",
     "check:testsplit": "node scripts/check-test-split.mjs",
-    "check:requiredjobs": "node scripts/check-required-jobs.mjs"
+    "check:requiredjobs": "node scripts/check-required-jobs.mjs",
+    "check:shardcoverage": "node scripts/check-shard-coverage.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
