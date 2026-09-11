@@ -1,0 +1,122 @@
+name: Promote · exact SHA to HAL (control plane)
+
+# ⚠⚠⚠ THE PROMOTION CONTROL PLANE. This workflow runs ONLY when the persistent
+# branch `promotions` advances. That branch is a LEDGER, not source: it holds
+# one JSON record per requested HAL promotion and nothing else that matters.
+# It is not a HAL source branch, not a Golem source branch, and never becomes
+# executable authority. The shared game-source trunk is `golem-line`; Golem and
+# HAL are DISTRIBUTIONS of exact SHAs from that trunk.
+#
+# WHY A BRANCH AND NOT A TAG. The agent that operates releases can create and
+# fast-forward branch refs but cannot write tags, delete refs, or call the
+# GitHub REST/Actions API (measured 2026-09-11: refs/tags/* → 403 by git and
+# REST; refs/heads/* create/advance → 200; refs/heads/* delete → 403). A
+# persistent, append-only branch is the one durable ledger those permissions
+# can drive. It is created once and only ever advanced.
+#
+# WHAT THIS WORKFLOW PROVES — intent and identity, nothing else:
+#   • exactly one canonical record was ADDED in this push
+#     (promotions/promote-hal-<40 hex>.json, target "hal", sha == filename);
+#   • the ledger is append-only, the push is not forced, and the record has
+#     NEVER been added before — ONE SHA → ONE RECORD → ONE PUBLICATION, decided
+#     from the ledger's own history, because `eas update` is not idempotent;
+#   • the SHA is an ancestor of current origin/golem-line and carries the
+#     Change-A contract files.
+# It then DISPATCHES THE EXISTING PUBLISHER for that exact SHA with line=hal,
+# by the same GITHUB_TOKEN mechanism ci.yml's publish job already uses (proven:
+# publisher run 1357 was dispatched by github-actions[bot]).
+#
+# WHAT THIS WORKFLOW NEVER DOES: it never decides whether the SHA passed CI.
+# That is Change A's hardened receipt, scripts/verify-ci-receipt.cjs, which the
+# publisher runs on its manual path against the manifest read from the SHA's
+# own checkout. One validation authority. No `validated_by` is passed here, on
+# purpose — the publisher must find and verify the CI run itself.
+#
+# ⚠⚠ NO SOURCE IS TOUCHED. No commit, no cherry-pick, no merge, no marker, no
+# push to golem-line. The publisher checks out the exact requested SHA, as it
+# does for every dispatch. The [ota-hal] commit-title marker is untouched and
+# remains the path for fresh source that goes straight to HAL.
+#
+# ⚠ BOOTSTRAP IS INERT. The creation push of `promotions` has before=0000…;
+# the decision script treats that as inert (and refuses if a record rode along).
+# A push that adds no record — a README edit — is inert too. Nothing is
+# dispatched unless exactly one never-seen canonical record was added.
+#
+# ⚠ TWO COPIES, ONE TRUTH. GitHub executes the workflow file present on the
+# pushed ref, so this file must exist on `promotions`; the canonical, tested
+# copy lives on golem-line. The run refuses if the two differ, and all logic
+# lives in trunk/scripts/promote-hal.cjs, read from golem-line.
+
+on:
+  push:
+    branches:
+      - promotions
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  promote:
+    name: Promote one validated trunk SHA to HAL
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/promotions'
+    steps:
+      # The ledger — full history, because "has this record ever been added"
+      # is a question about history, not about the tip.
+      - name: Checkout the promotions ledger
+        uses: actions/checkout@v4
+        with:
+          ref: promotions
+          fetch-depth: 0
+          path: ledger
+
+      # The trunk — full history, because ancestry is a question about the
+      # whole of golem-line. The decision script comes from here, so the logic
+      # that judges a promotion is always the trunk's current, tested logic.
+      - name: Checkout the game-source trunk (golem-line)
+        uses: actions/checkout@v4
+        with:
+          ref: golem-line
+          fetch-depth: 0
+          path: trunk
+
+      - name: The executing workflow must equal the trunk's canonical copy
+        run: |
+          set -euo pipefail
+          if ! cmp -s ledger/.github/workflows/promote.yml trunk/.github/workflows/promote.yml; then
+            echo "::error::promotions/.github/workflows/promote.yml differs from golem-line's canonical copy — update the ledger's copy first."
+            exit 1
+          fi
+          echo "✓ executing promote.yml is byte-identical to golem-line's"
+
+      - name: Decide — intent, identity, ancestry, replay
+        id: decide
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          FORCED: ${{ github.event.forced }}
+        run: |
+          set -euo pipefail
+          node trunk/scripts/promote-hal.cjs \
+            --before "$BEFORE" --after "$AFTER" --forced "${FORCED:-false}" \
+            --ledger ledger --trunk trunk --out "$RUNNER_TEMP/promote.sha"
+          if [ -s "$RUNNER_TEMP/promote.sha" ]; then
+            echo "sha=$(cat "$RUNNER_TEMP/promote.sha")" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ⚠ The exact SHA, line=hal, and NO validated_by — the publisher takes its
+      # manual path and runs Change A's receipt against that SHA itself.
+      - name: Dispatch the publisher for the exact SHA, line hal
+        if: steps.decide.outputs.sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.decide.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh workflow run eas-update-golem.yml --ref golem-line \
+            -f sha="$SHA" \
+            -f line=hal
+          echo "Dispatched eas-update-golem.yml for ${SHA} → HAL (the publisher will verify the receipt)."
