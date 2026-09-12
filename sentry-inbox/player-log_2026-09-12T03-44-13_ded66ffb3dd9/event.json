@@ -1,0 +1,248 @@
+{
+  "id": "ded66ffb3dd94b59830e8f3245683f63",
+  "groupID": "7727458630",
+  "eventID": "ded66ffb3dd94b59830e8f3245683f63",
+  "projectID": "4511945117532160",
+  "size": 14103,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxuchum7a50 [inline 45/45]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-11-1803-the-hud-belongs-to-tartaria",
+  "message": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxuchum7a50 [inline 45/45]",
+  "title": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxuchum7a50 [inline 45/45]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9f:9ae1:ad2:ae57:505a:d520",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4ff1047673c4414db319636a358dcee1",
+      "span_id": "bd933a3831465a58",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MTJ-UMD-M6M-zU6-MjI-uNT-Y0W-l0g-W2R-lYn-VnX-SBv-dGE-6IG-Jvb-3Qg-Y2h-lY2-sgc-mVz-dWx-0ID-0gb-m9V-cGR-hdG-UKW-zIw-MjY-tMD-ktM-TJU-MDM-6Mz-U6M-jIu-NjM-5Wl-0gW-2Rl-YnV-nXS-B2b-2lj-ZTo-gZW-5na-W5l-PWJ-1bm-RsZ-WQg-dHR-zPW-9mZ-iB2-b2l-jZT-1hb-V9t-aWN-oYW-VsC-lsy-MDI-2LT-A5L-TEy-VDA-zOj-M1O-jIy-LjY-zOV-pdI-Ftk-ZWJ-1Z1-0gd-m9p-Y2U-6IG-J1b-mRs-ZWQ-gaW-RsZ-Qpb-MjA-yNi-0wO-S0x-MlQ-wMz-ozN-Toy-My4-wOT-laX-SBb-ZGV-idW-ddI-G5h-dGl-2ZS-1zZ-Gsg-dmV-yZG-ljd-Dog-bm9-uLW-Jvb-2xl-YW4-gKG-51b-Gwp-IOK-AlC-BuY-XRp-dmU-gc2-lkZ-SBo-YWQ-gbm-90I-HJl-c29-sdm-VkI-HRo-ZSB-sYX-N0I-HJ1-biB-5ZX-QK",
+      "WzI-wMj-YtM-Dkt-MTJ-UMD-M6M-zU6-MjM-uOT-A5W-l0g-W2R-lYn-VnX-SBz-ZW5-kLW-xvZ-zog-YnV-uZG-xlI-CNt-dGJ-oeW-Fxe-TBn-aTg-gYX-R0Z-W1w-dCA-yLz-UgZ-GVs-aXZ-lcm-VkI-HRv-IFN-lbn-Rye-SDi-gJQ-gY2-xlY-XJl-ZCB-mcm-9tI-GRp-c2s-KWz-IwM-jYt-MDk-tMT-JUM-DM6-MzU-6Mz-UuM-DU1-Wl0-gW2-RlY-nVn-XSB-hcH-Bzd-GF0-ZTo-gYW-N0a-XZl-IOK-Gki-BiY-WNr-Z3J-vdW-5kI-Ch3-YXM-gYW-N0a-XZl-IGZ-vci-AxM-jcx-OW1-zKQ-pbM-jAy-Ni0-wOS-0xM-lQw-Mzo-0ND-owN-C4z-MTF-aXS-BbZ-GVi-dWd-dIG-Fwc-HN0-YXR-lOi-BiY-WNr-Z3J-vdW-5kI-OKG-kiB-hY3-Rpd-mUg-KHd-hcy-BiY-WNr-Z3J-vdW-5kI-GZv-ciA-1MD-kyN-TBt-cyk-K",
+      "WzI-wMj-YtM-Dkt-MTJ-UMD-M6N-DQ6-MTI-uOD-c3W-l0g-W2R-lYn-VnX-SBP-VEE-gYX-Bwb-Gll-ZDo-gMj-AyN-i0w-OC0-yNy-0xN-TIw-LXR-oZS-1zY-3J1-YmJ-lci-10Y-Wtl-cy1-hLX-dob-2xl-LXZ-hbH-VlI-OKG-kiA-yMD-I2L-TA5-LTE-xLT-E4M-DMt-dGh-lLW-h1Z-C1i-ZWx-vbm-dzL-XRv-LXR-hcn-Rhc-mlh-Lgp-bMj-AyN-i0w-OS0-xMl-QwM-zo0-NDo-xMi-44N-zda-XSB-bZG-Vid-Wdd-IE9-UQS-BzZ-XNz-aW9-uIH-N0Y-XJ0-OiA-yMD-I2L-TA5-LTE-xLT-E4M-DMt-dGh-lLW-h1Z-C1i-ZWx-vbm-dzL-XRv-LXR-hcn-Rhc-mlh-Lgp-bMj-AyN-i0w-OS0-xMl-QwM-zo0-NDo-xMi-44N-zha-XSB-bd2-9yb-GRd-IFl-vdS-Bzd-GVw-IGJ-hY2-sga-W50-byB-UaG-UgT-W9u-YXJ-jaC-dzI-Fdh-eXN-0YX-Rpb-24u-IFR-oZS-B3b-3Js-ZCB-3YW-l0c-yBm-b3I-geW-91c-iBt-b3Z-lLg-o=",
+      "WzI-wMj-YtM-Dkt-MTJ-UMD-M6N-DQ6-MTI-uOD-c5W-l0g-W3d-vcm-xkX-SBN-dWQ-gTW-9uY-XJj-aCB-oZX-Jhb-GRz-IGx-lZn-QgY-SBz-aWd-pbC-1tY-XJr-IG9-uIG-Egc-3Rv-bmU-geW-91I-GRv-bid-0IH-Jlb-WVt-YmV-yIG-Jla-W5n-IG1-hcm-tlZ-C4g-VGh-lIG-ZhY-3Rp-b24-gaX-Mgc-GF5-aW5-nIG-F0d-GVu-dGl-vbi-4KW-zIw-MjY-tMD-ktM-TJU-MDM-6ND-Q6M-TIu-ODk-3Wl-0gW-2Fy-Yml-0ZX-JdI-FRo-ZSB-Bcm-Jpd-GVy-IHN-ldH-Mgd-Ghl-IHF-1aW-V0I-GFz-aWR-lLi-AiV-2Vs-Y29-tZS-BiY-WNr-LCB-DaW-5kZ-XJi-b3V-uZC-4gS-SBr-ZXB-0IH-dhd-GNo-IHd-oaW-xlI-Hlv-dSB-3ZX-JlI-Gdv-bmU-uIF-RoZ-SB3-YXN-0ZS-Bka-WQg-bm9-0IH-NsZ-WVw-IHd-oaW-xlI-Hlv-dSB-3ZX-JlI-Gdv-bmU-g4o-CUI-GJs-b29-kIH-dhc-yBz-cGl-sbG-VkI-GFu-ZCB-ncm-91b-mQg-Y2h-hbm-dlZ-CBo-YW5-kcy-4gU-mVh-ZCB-0aG-UgV-29y-bGQ-gZm-9yI-HRo-ZSB-hY2-Nv",
+      "dW5-0Li-IKC-j09-PSB-FTk-QgT-E9H-IMK-3ID-MyN-Dk3-MyB-DSE-FSU-yA9-PT0-KCl-Rhc-nRh-cml-hIF-JlY-Wxt-cwo-KRG-V2a-WNl-CiA-gTm-FtZ-Tog-UGl-4ZW-wgM-TAg-UHJ-vIF-hMC-iAg-UGx-hdG-Zvc-m06-IGF-uZH-Jva-WQg-Mzc-KIC-BIZ-XJt-ZXM-6IH-llc-wog-IEx-vY2-FsZ-Tog-ZW4-tVV-MKI-CBU-aW1-lem-9uZ-Tog-QW1-lcm-ljY-S9O-ZXd-fWW-9ya-wog-IFN-jcm-Vlb-jog-d2l-uZG-93I-DQ0-M8O-XOT-g2I-C8g-c2N-yZW-VuI-DQ0-M8O-XOT-g2I-EAg-Mi4-0Mz-c1e-CBk-ZW5-zaX-R5C-iAg-Q2F-wdH-VyZ-WQg-YXQ-6ID-IwM-jYt-MDk-tMT-JUM-DM6-NDQ-6MT-MuM-TA1-Wgo-KSW-5zd-GFs-bAo-gIE-Fwc-CBJ-RDo-gY2-9tL-mhv-dGF-0dG-ljZ-2Ft-ZXM-udG-Fyd-GFy-cHJ-pbS-5nb-2xl-bQo-gIE-Fwc-CB2-ZXJ-zaW-9uO-iA0-LjM-yLj-ExC-iAg-QVB-LIG-J1a-Wxk-IHZ-lcn-Npb-246-IDI-uNC-4xC-iAg-QVB-LIG-J1a-Wxk-OiA-yOT-kK",
+      "ICB-BQU-I6I-Chi-dWl-sZC-AyO-Tkp-CiA-gT1-RBO-iAo-MjA-yNi-0wO-S0x-MS0-xOD-AzL-XRo-ZS1-odW-QtY-mVs-b25-ncy-10b-y10-YXJ-0YX-JpY-SkK-ICB-Cb2-90I-HN0-YWd-lOi-Bxd-2Vu-OmR-lZm-Vyc-mVk-Cgp-NTC-Byd-W50-aW1-lIG-hlY-Wx0-aAo-gIF-N0Y-XR1-czo-gYW-N0a-XZl-ICh-uby-Bjc-mFz-aGV-zIG-Rld-GVj-dGV-kKQ-ogI-ENy-YXN-oIG-Nvd-W50-OiA-wCi-AgT-GFz-dCB-pbm-l0I-GF0-dGV-tcH-Q6I-DIw-MjY-tMD-ktM-TJU-MDM-6Mz-U6M-jIu-NjE-0Wg-ogI-Exh-c3Q-gaW-5pd-CBz-dWN-jZX-NzO-iAy-MDI-2LT-A5L-TEy-VDA-zOj-M1O-jIz-LjM-2M1-oKI-CBD-cmF-zaG-VzL-WJl-Zm9-yZS-1ka-XNh-Ymx-lIH-Roc-mVz-aG9-sZD-ogM-gog-IFF-3ZW-4gY-29t-cGx-ldG-lvb-iBn-dWF-yZD-ogY-2xl-YW4-gKG-5vI-GNv-bXB-sZX-Rpb-24g-Y3J-hc2-hlc-ykK",
+      "ICB-Rd2-VuI-Gtl-cm5-lbC-B2Y-XJp-YW5-0Oi-Byb-mxs-YW1-hX3-Y4X-zJf-ZnA-xNl-9kb-3Rw-cm9-kCi-AgU-Xdl-biB-DUF-UvU-29D-OiB-2YX-JpY-W50-PXJ-ubG-xhb-WFf-djh-fMl-9mc-DE2-X2R-vdH-Byb-2Qg-c3Z-lUm-F3P-XRy-dWU-gc3-ZlV-XNl-ZD1-mYW-xzZ-SBp-OG1-tPX-Ryd-WUg-djg-0cm-F3P-XRy-dWU-gdj-g0d-XNl-ZD1-mYW-xzZ-SBi-bG9-ja2-xpc-3Rl-ZD1-mYW-xzZ-SBx-d2V-uU2-FmZ-Utl-cm5-lbD-10c-nVl-IHN-vYz-1UZ-W5z-b3I-gRz-Uga-Hc9-bXV-zdG-FuZ-yBt-b2R-lbD-1Qa-Xhl-bCA-xMC-BQc-m8g-WEw-gc2-RrP-TM3-IGt-lcm-5lb-D02-LjY-uMT-E4L-WFu-ZHJ-vaW-QxN-S04-LWc-xOD-MxY-zJh-NDV-kOW-ItY-WIx-NTc-zOT-cwN-i00-awo-gIF-Zva-WNl-ICh-UVF-MpI-Gd1-YXJ-kOi-Bjb-GVh-biA-obm-8gd-m9p-Y2U-gY3-Jhc-2hl-cyB-vbi-B0a-Glz-IGJ-1aW-xkK-QpT-YXZ-lLW-xvY-WQg-aGV-hbH-RoC-g==",
+      "ICB-TdG-F0d-XM6-IGN-sZW-FuI-Chu-byB-sb2-FkL-WNy-YXN-oIG-ZsY-Wdz-KQp-MYX-N0I-EpT-IGN-yYX-NoC-iAg-U3R-hdH-VzO-iBu-b25-lIH-JlY-29y-ZGV-kCl-Roa-XMg-bGF-1bm-NoC-iAg-TGl-mZT-ogY-m10-eHU-xND-gxb-28g-wrc-gc3-Rhc-nRl-ZCA-yMD-I2L-TA5-LTE-yVD-AzO-jM1-OjI-yLj-I3M-1oK-ICB-Db2-xkI-HN0-YXJ-0IO-KAl-CB0-aGl-zIG-Jvb-3Qg-ZGl-kIG-5vd-CBm-b2x-sb3-cgY-W4g-T1R-BIG-Fwc-Gx5-CkN-yYX-NoI-Gxl-ZGd-lci-Dig-JQg-OSB-yZW-Nvc-mRl-ZCA-obm-V3Z-XN0-IGx-hc3-QpC-iAg-4oC-iID-IwM-jYt-MDg-tMj-FUM-TI6-NTk-6NT-MuO-Dcz-WiA-oMz-ExM-jRt-IGF-nby-kg4-oCU-IFB-ST0-NFU-1Mg-S0l-MTE-VEI-OKA-lCB-uby-BKU-yBy-YW4-K",
+      "ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-IMK-3ID-IwM-jYt-MDg-tMj-AtM-TM5-My1-zbG-ljZ-S10-d28-tdG-hlL-WVu-Z2l-uZX-Mtb-W92-ZS1-kb3-duI-MK3-IHN-0YW-dlI-GN0-eC1-yZW-xlY-XNl-LWR-vbm-UKI-CAg-ICA-gUH-JvY-2Vz-cyB-kaW-VkI-Hdp-dGg-gbm-8gb-3Jk-ZXJ-seS-Ble-Gl0-IHd-oaW-xlO-iAo-bm8-gYW-N0a-W9u-IHl-ldC-kKI-CAg-ICA-gZG-9pb-mc6-ICh-uby-BhY-3Rp-b24-geW-V0K-SDC-tyB-yb2-9tI-D8g-wrc-gc2-NyZ-WVu-ID8-KIC-AgI-CAg-bGF-zdC-Bja-GVj-a3B-vaW-50O-iBj-dHg-tcm-VsZ-WFz-ZS1-kb2-5lI-MK3-IDg-3OT-Btc-yBp-bnR-vIH-RoZ-SBh-Y3R-pb2-4KI-CDi-gKI-gMj-AyN-i0w-OC0-yNF-QxN-zo0-OTo-0OS-41M-zJa-ICg-yNj-UxN-G0g-YWd-vKS-Dig-JQg-UFJ-PQ0-VTU-yBL-SUx-MRU-Qg4-oCU-IG5-vIE-pTI-HJh-bgo-=",
+      "ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-MSD-Cty-AyM-DI2-LTA-4LT-I0L-TE0-OTE-tdH-dvL-XRh-cHM-tdG-8tb-G9h-ZCD-Cty-Bzd-GFn-ZSB-yZW-5kZ-XJl-ZAo-gIC-AgI-CBQ-cm9-jZX-NzI-GRp-ZWQ-gd2-l0a-CBu-byB-vcm-Rlc-mx5-IGV-4aX-Qgd-2hp-bGU-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KQo-gIC-AgI-CBk-b2l-uZz-ogK-G5v-IGF-jdG-lvb-iB5-ZXQ-pIM-K3I-HJv-b20-gPy-DCt-yBz-Y3J-lZW-4gP-wog-ICA-gIC-BsY-XN0-IGN-oZW-Nrc-G9p-bnQ-6IH-Jlb-mRl-cmV-kIM-K3I-DM3-MDA-4bX-Mga-W50-byB-0aG-UgY-WN0-aW9-uCi-Ag4-oCi-IDI-wMj-YtM-Dgt-MjV-UMj-M6M-TA6-NTY-uNj-MwW-iAo-MjQ-3NT-NtI-GFn-byk-g4o-CUI-FBS-T0N-FU1-MgS-0lM-TEV-EIO-KAl-CBu-byB-KUy-ByY-W4K-ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-MSD-Cty-AyM-DI2-LTA-4LT-I1L-TE1-MDI-tdG-hlL-XN3-aXB-lLW-lzL-XRo-ZS1-zZW-xlY-3Rv-ciD-Cty-Bzd-GFn-ZSB-yZW-5kZ-XJl-ZAo-=",
+      "ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiA-obm-8gY-WN0-aW9-uIH-lld-CkK-ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uID-8KI-CAg-ICA-gbG-Fzd-CBj-aGV-ja3-Bva-W50-OiB-yZW-5kZ-XJl-ZCD-Cty-Awb-XMg-aW5-0by-B0a-GUg-YWN-0aW-9uC-iAg-4oC-iID-IwM-jYt-MDg-tMj-VUM-jM6-MzE-6ND-AuM-jU4-WiA-oMj-Q3M-zNt-IGF-nby-kg4-oCU-IFB-ST0-NFU-1Mg-S0l-MTE-VEI-OKA-lCB-uby-BKU-yBy-YW4-KIC-AgI-CAg-YnV-pbG-QgN-C4z-Mi4-xMS-DCt-yAy-MDI-2LT-A4L-TI1-LTE-1MD-Mtd-Ghl-LWJ-1bG-xzZ-Xll-LWl-zLX-RoZ-S10-cnV-0aC-DCt-yBz-dGF-nZS-ByZ-W5k-ZXJ-lZA-ogI-CAg-ICB-Qcm-9jZ-XNz-IGR-pZW-Qgd-2l0-aCB-uby-Bvc-mRl-cmx-5IG-V4a-XQg-d2h-pbG-U6I-Chu-byB-hY3-Rpb-24g-eWV-0KQ-o=",
+      "ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uID-8KI-CAg-ICA-gbG-Fzd-CBj-aGV-ja3-Bva-W50-OiB-yZW-5kZ-XJl-ZCD-Cty-Awb-XMg-aW5-0by-B0a-GUg-YWN-0aW-9uC-iAg-4oC-iID-IwM-jYt-MDg-tMj-dUM-DE6-NDA-6ND-AuM-TQ2-WiA-oMj-MxN-jRt-IGF-nby-kg4-oCU-IFB-ST0-NFU-1Mg-S0l-MTE-VEI-OKA-lCB-uby-BKU-yBy-YW4-KIC-AgI-CAg-YnV-pbG-QgN-C4z-Mi4-xMS-DCt-yAy-MDI-2LT-A4L-TI3-LTE-1MT-ctd-Ghl-LWd-yZW-VuL-WJ1-dHR-vbi-1jY-W4t-cmV-hY2-ggw-rcg-c3R-hZ2-Ugc-mVu-ZGV-yZW-QKI-CAg-ICA-gUH-JvY-2Vz-cyB-kaW-VkI-Hdp-dGg-gbm-8gb-3Jk-ZXJ-seS-Ble-Gl0-IHd-oaW-xlO-iAo-bm8-gYW-N0a-W9u-IHl-ldC-kKI-CAg-ICA-gZG-9pb-mc6-ICh-uby-BhY-3Rp-b24-geW-V0K-SDC-tyB-yb2-9tI-D8g-wrc-gc2-NyZ-WVu-ID8-K",
+      "ICA-gIC-Agb-GFz-dCB-jaG-Vja-3Bv-aW5-0Oi-ByZ-W5k-ZXJ-lZC-DCt-yA1-ODl-tcy-Bpb-nRv-IHR-oZS-BhY-3Rp-b24-KIC-Dig-KIg-MjA-yNi-0wO-C0y-N1Q-wMj-owM-jow-Mi4-zOT-ZaI-Cgy-MzE-0Mm-0gY-Wdv-KSD-igJ-QgU-FJP-Q0V-TUy-BLS-UxM-RUQ-g4o-CUI-G5v-IEp-TIH-Jhb-gog-ICA-gIC-Bid-Wls-ZCA-0Lj-MyL-jEx-IMK-3ID-IwM-jYt-MDg-tMj-ctM-TUx-OC1-0aG-UtY-mVh-Y29-uLW-dvZ-XMt-Zml-yc3-Qgw-rcg-c3R-hZ2-Ugc-mVu-ZGV-yZW-QKI-CAg-ICA-gUH-JvY-2Vz-cyB-kaW-VkI-Hdp-dGg-gbm-8gb-3Jk-ZXJ-seS-Ble-Gl0-IHd-oaW-xlO-iAo-bm8-gYW-N0a-W9u-IHl-ldC-kKI-CAg-ICA-gZG-9pb-mc6-ICh-uby-BhY-3Rp-b24-geW-V0K-SDC-tyB-yb2-9tI-D8g-wrc-gc2-NyZ-WVu-ID8-KIC-AgI-CAg-bGF-zdC-Bja-GVj-a3B-vaW-50O-iBy-ZW5-kZX-JlZ-CDC-tyA-1NT-Btc-yBp-bnR-vIH-RoZ-SBh-Y3R-pb2-4K",
+      "ICD-igK-IgM-jAy-Ni0-wOC-0yN-1Qw-Mjo-zMj-o1M-C43-Mjl-aIC-gyM-zEx-MW0-gYW-dvK-SDi-gJQ-gUF-JPQ-0VT-UyB-LSU-xMR-UQg-4oC-UIG-5vI-EpT-IHJ-hbg-ogI-CAg-ICB-idW-lsZ-CA0-LjM-yLj-ExI-MK3-IDI-wMj-YtM-Dgt-Mjc-tMT-UxO-S10-aGU-tYX-R0Y-WNo-bWV-udC-13Y-XMt-dGh-lLW-Zhd-Wx0-IMK-3IH-N0Y-Wdl-IHJ-lbm-Rlc-mVk-CiA-gIC-AgI-FBy-b2N-lc3-MgZ-Gll-ZCB-3aX-RoI-G5v-IG9-yZG-Vyb-Hkg-ZXh-pdC-B3a-Gls-ZTo-gKG-5vI-GFj-dGl-vbi-B5Z-XQp-CiA-gIC-AgI-GRv-aW5-nOi-Aob-m8g-YWN-0aW-9uI-Hll-dCk-gwr-cgc-m9v-bSA-/IM-K3I-HNj-cmV-lbi-A/C-iAg-ICA-gIG-xhc-3Qg-Y2h-lY2-twb-2lu-dDo-gcm-VuZ-GVy-ZWQ-gwr-cgO-Dg0-bXM-gaW-50b-yB0-aGU-gYW-N0a-W9u-CiA-g4o-CiI-DIw-MjY-tMD-gtM-jdU-MDM-6MD-M6N-DYu-MDI-2Wi-AoM-jMw-ODB-tIG-Fnb-ykg-4oC-UIF-BST-0NF-U1M-gS0-lMT-EVE-IOK-AlC-Bub-yBK-UyB-yYW-4K",
+      "ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-MSD-Cty-AyM-DI2-LTA-4LT-I3L-TE1-MjA-tdG-hlL-XNj-cnV-iYm-VyL-XRh-a2V-zLW-Etd-2hv-bGU-tdm-Fsd-WUg-wrc-gc3-RhZ-2Ug-cmV-uZG-VyZ-WQK-ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiA-obm-8gY-WN0-aW9-uIH-lld-CkK-ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uID-8KI-CAg-ICA-gbG-Fzd-CBj-aGV-ja3-Bva-W50-OiB-yZW-5kZ-XJl-ZCD-Cty-A0O-TQ5-bXM-gaW-50b-yB0-aGU-gYW-N0a-W9u-CiA-g4o-CiI-DIw-MjY-tMD-gtM-jdU-MTI-6Mj-Y6M-TUu-ODc-xWi-AoM-jI1-MTh-tIG-Fnb-ykg-4oC-UIF-BST-0NF-U1M-gS0-lMT-EVE-IOK-AlC-Bub-yBK-UyB-yYW-4K",
+      "ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-MSD-Cty-AyM-DI2-LTA-4LT-I3L-TE1-MjA-tdG-hlL-XNj-cnV-iYm-VyL-XRh-a2V-zLW-Etd-2hv-bGU-tdm-Fsd-WUg-wrc-gc3-RhZ-2Ug-cmV-uZG-VyZ-WQK-ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiA-obm-8gY-WN0-aW9-uIH-lld-CkK-ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uID-8KI-CAg-ICA-gbG-Fzd-CBj-aGV-ja3-Bva-W50-OiB-yZW-5kZ-XJl-ZCD-Cty-Awb-XMg-aW5-0by-B0a-GUg-YWN-0aW-9uC-kNy-YXN-oIG-Rlb-Gl2-ZXJ-5Oi-BPT-iDi-gJQ-gcm-Vwb-3J0-cyB-nby-B0b-yBT-ZW5-0cn-kgd-2hl-biB-5b3-UgY-3Jh-c2g-uCl-J1b-nRp-bWU-gcH-Jlc-3N1-cmU-KIC-BNZ-W1v-cnk-gd2-Fyb-mlu-Z3M-6IG-5vb-mUg-dGh-pcy-BzZ-XNz-aW9-uCg-==",
+      "ICB-Gcm-Vle-mUg-d2F-0Y2-g6I-G5v-IHN-0YW-xsc-yBz-ZWV-uIC-hKU-yBj-bG9-ja3-Mgb-25s-eSD-igJ-Qgc-2Vl-IHR-oZS-BuY-XRp-dmU-gcX-Vld-WUg-YmV-sb3-cpC-iAg-TmF-0aX-ZlI-HF1-ZXV-lOi-B3b-3Jz-dCB-3YW-l0I-DAu-MHM-gwr-cgM-CBq-b2I-ga2-luZ-HMg-cXV-ldW-VkI-D4z-cyD-Cty-B3b-3Jz-dCA-wLj-Btc-y9w-cm9-tcH-Qtd-G9r-ZW4-KIC-BOY-XRp-dmU-gcX-Vld-WUg-YWR-taX-Nza-W9u-OiA-yOC-Bqb-2Jz-IMK-3IH-dvc-nN0-IHd-haX-QgM-C4w-cyD-Cty-AwI-HBh-c3Q-gM3-MKI-CBB-cHA-gc3-Rhd-GUg-dHJ-haW-w6I-GJh-Y2t-ncm-91b-mQg-4oa-SIG-Fjd-Gl2-ZQp-Nb2-Rlb-CBj-b25-0ZX-h0c-wog-IEx-pdm-Ugb-m93-OiA-wCi-AgT-3Bl-bmV-kOi-AwI-MK3-IFJ-lbG-Vhc-2Vk-OiA-wIM-K3I-FBl-YWs-gbG-l2Z-Tog-MAo-gIE-5hc-nJh-dGl-vbi-Blb-mdp-bmU-6IG-lkb-GUK"
+    ],
+    "chunkChars": 6131,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxuchum7a50 [inline 45/45]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtxuchum7a50"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-11-1803-the-hud-belongs-to-tartaria"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "45"
+    },
+    {
+      "key": "parts",
+      "value": "45"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9f:9ae1:ad2:ae57:505a:d520",
+      "query": "user.ip:\"2607:fb90:db9f:9ae1:ad2:ae57:505a:d520\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-12T03:44:12.166676Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-12T03:44:13.321000Z",
+  "fingerprints": [
+    "c6a3a8c9286aa5fab605b35352547fbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1968105438,
+    "commitCount": 7,
+    "data": {},
+    "dateCreated": "2026-09-11T18:35:23.043894Z",
+    "dateReleased": "2026-09-12T03:44:28.434790Z",
+    "deployCount": 3,
+    "ref": null,
+    "lastCommit": {
+      "id": "5037113b93f38facfffe0979673b8d727fe01ddd",
+      "message": "Visual language phase 2 \u2014 the third plane, the docked tab, and the lifted board\n\nPhase 1 established the grammar and proved it on one screen. The Game Director\ninspected it on the device and returned a verdict that separated the two\nquestions cleanly: *\"THE GRAMMAR IS RIGHT. THE VISUAL SIGNAL IS TOO QUIET.\"*\nSo nothing here is a redesign. It is the same construction, made loud enough to\nread at arm's length, and then propagated past the specimen.\n\nTWO PLANES BECAME THREE, AND THAT IS THE WHOLE ANSWER TO \"TOO QUIET\".\nRaising alpha again was ruled out by name in Phase 1 \u2014 past a point, more\ncontrast on a 1dp line is glow, not depth. The defect was that the sidewall sat\nFLUSH against the dark rim, so the side of the key and the shadow beneath it\nwere the same line, and one line is an edge no matter how dark you make it. The\nsidewall now runs 3dp and is LIFTED 1dp off the bottom, leaving room for a\nnear-black contact band underneath it. Top to bottom a chip reads\n\n    lit rim \u00b7 face light \u00b7 FACE \u00b7 SIDEWALL \u00b7 CONTACT \u00b7 dark rim\n\nA side, and below it the dark where the object MEETS the surface it stands on.\nThe token values rose as well (face 0.16 \u2192 0.30, sidewall 0.38 \u2192 0.58) but the\ngeometry is what the eye is actually reading.\n\nPRESSED IS NOW A GEOMETRY CHANGE, NOT A COLOUR SWAP. Owner: *\"reduce apparent\nheight; compress/remove some lower sidewall; move the face toward the substrate;\nreduce contact shadow\u2026 Opacity-only press feedback is insufficient.\"* On press\nthe sidewall COLLAPSES 3dp \u2192 1dp, the contact band is not drawn at all \u2014 a key\npushed home is no longer standing on anything, and that absence IS the reduced\ncontact shadow \u2014 the shaded side moves above the face, and travel goes 1.5 \u2192 2dp\nbecause 1.5 was inside the noise on a dense row. The key visibly loses height.\n\nTHE TAB LANGUAGE, DEFERRED IN PHASE 1, IS IMPLEMENTED \u2014 AND NO CONSUMER MOVED.\nOwner: *\"NO arbitrary color-only selected state. Selected state must be\nphysically legible.\"* An INACTIVE tab wears the raised family's three planes and\nstands proud of the row. An ACTIVE tab has no side and no contact at all, opens\nits bottom border, and pushes `tabMouth` \u2014 its own material \u2014 2dp PAST the row\nbaseline, so its body is continuous with the region it controls. Two objects,\nnot two colours: a key, and a key that has been pressed home.\n\nThe brief's drawing wants a panel with a visible top edge to dock INTO, and none\nof TTabBar's three consumers render one. Rather than edit three screens, the\ncomponent owns the docking itself. `paddingBottom: 9` repays the 1dp the opened\nborder gives back, so the row's height cannot move. Crafting, Guidance and\nVendor are byte-identical.\n\nA BOARD IS ABOVE THE GAME, AND UNTIL NOW IT DID NOT SAY SO. `modalCard` and\n`momentCard` were a fill, a 1dp rim and a radius \u2014 the same construction as a\npanel the player cannot touch. `boardLift` is shadow + elevation, and this is\nthe ONE place Android `elevation` is correct: the dossier construction refused\nit because a four-sided halo is wrong on a compact chip standing on a plate, but\na board laid over the whole screen IS lifted on every side. Both are paint, so\nall fourteen dialogs keep their exact geometry \u2014 asserted, not asserted-ish.\n\nTHE HEADER SEPARATES THE CONTROL FROM THE LABEL. Owner: *\"BACK = interactive\nphysical control. TITLE = structural/read-only information.\"* BACK becomes a\nrender-prop Pressable carrying the full face/sidewall/contact construction and\ncollapsing under a thumb. The title deliberately gets nothing. Seven screens take\nthis header, so what BACK says about pressability is what most of Tartaria says.\n\nWHAT THE GRAMMAR NOW REACHES, COUNTED\n    tControlDepth \u00b7\u00b7\u00b7\u00b7\u00b7 61 call sites across 11 files   (2dp travel)\n    tFilledGold \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7 13 further files                (same, via the above)\n    TScreenHeader \u00b7\u00b7\u00b7\u00b7\u00b7 7 screens\n    tModalCard \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7 19 call sites, 9 modals\n    tMomentCard \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7 5 modals\n    TTabBar \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7 3 screens, zero consumer edits\n    TButton/btnFace \u00b7\u00b7\u00b7 5 sites, 3 files\nTen lines of production code outside the kit. The rest is authority.\n\n`btnFace` moved onto the chips' own tokens. It had carried `controlLit`/\n`controlDark` since VIS-1, tuned when it was the only face treatment in the\ngame; beside chips drawing a 3dp side and a contact band, the one control that\nwas always the most physical had become the least.\n\nSTILL NO LAYOUT, WHICH IS STILL THE LICENCE. Every plane is an absolutely\npositioned, `pointerEvents=\"none\"` child inside a box the control already owns.\n`boardLift` is shadow and elevation only \u2014 a test names 23 layout properties it\nmust not declare. 320\u00d7568 unchanged. The recess takes no raised plane, the\nread-only frame takes none of it, and the chassis stays strictly shallower than\na command: same grammar, lower voice.\n\nTHE ENEMY CHAIN IS UNTOUCHED AND STILL ASSERTED. OTA-1514/arb146 records what a\nnew ancestor costs: the parent wins the responder on a vertical drag and the\ncard is capped with no way to scroll. ScrollView still owns the pan, the\nTouchable still sits INSIDE it, the planes are inert children of the Touchable\nthat already owns the tap. The player panel keeps its whole-panel touch contract\nand its `accessibilityLabel=\"Open player sheet\"`, byte-identical.\n\nNO NEW KIT EXPORT. 13/13 components, 10/10 helpers, 23/23 total, unmoved. Every\nnew style reaches its consumers as a `tartariaKitStyles` entry \u2014 the route\n`panelFrame` takes.\n\nEVIDENCE\n  visualPhase2ThePhysicalPanel             30/30 (6 describes)\n  23 negative controls, each applied \u2192 a NAMED guard red \u2192 restored\n    byte-identical: sidewall deleted \u00b7 contact removed \u00b7 pressed stops\n    collapsing \u00b7 travel reverts to 1.5 \u00b7 inactive tab goes flat \u00b7 active tab\n    loses its tongue \u00b7 active tab keeps its border closed \u00b7 dialogs lose\n    elevation \u00b7 boardLift grows a margin \u00b7 header BACK loses its planes \u00b7\n    read-only frame takes the lift \u00b7 input well grows a sidewall \u00b7 card\n    becomes as loud as a key \u00b7 a second player-panel touch owner \u00b7 a plane\n    becomes interactive \u00b7 the arb146 responder inversion \u00b7 TButton drifts\n    off-family \u00b7 a nineteenth export \u00b7 the phase leaks into the engine \u00b7\n    tModalCard drops the lift \u00b7 tMomentCard drops the lift \u00b7 the selected\n    chip fill reverts to #221d15\n  full required surface   1,298 suites \u00b7 13,974 tests (3 skipped) \u00b7 498.2 s\n  22/22 check:* gates \u00b7 typecheck:ci clean \u00b7 typecheck:tests at baseline 201 \u00b7\n    lint clean \u00b7 kit 13/13 \u00b7 10/10 \u00b7 23/23\n\nTHE FIRST FULL SURFACE WAS RED, AND MY OWN CONTROLS COULD NOT HAVE FOUND IT.\nThree shipped suites, four assertions: OTA-1765's and OTA-1777's byte-for-byte\nflatten pins broke on `boardLift`, and OTA-1776's whole-line `tabChipOn` pin\nbroke on the docking. Nineteen negative controls had all run against this pass's\nown suite and the four it had amended, so none of them reached these. OTA-1776's\nown header says exactly this in prose \u2014 *\"the argument for running the whole\nsurface rather than the pass's own tests\"* \u2014 and it was right.\n\nNone of the four was weakened. The flatten pins now assert the ORIGINAL geometry\nbyte-for-byte AND that the addition is exactly five paint keys AND that\n`boardLift` declares none of 23 named layout properties; a future pass slipping a\nmargin into the lift fails even if it updated the literal. OTA-1776's pin moved\nfrom a line spelling to the style block's actual fill and rim, which is what\nDEFECT 3 was ever about. Four further negative controls prove none of the\namendments is vacuous.\n\nA SUPERSEDED GUARD WAS REPLACED, NOT DELETED. OTA-1802's flat-tab assertion had\nbecome VACUOUS: once the planes arrived as child Views rather than border\ncolours it would have passed on a fully raised tab. It is now a structural\ncontract on what a tab IS in both states.\n\nOTA_BUILD_ID is NOT bumped by this commit. The device will still report\n2026-09-11-1803; the identity of this build is its SHA.\n\nTests prove none of the aesthetics. Whether a chip now reads as a key, whether a\ndocked tab reads as engaged, whether a dialog reads as lifted \u2014 that is the\ndevice and the owner's eye. This goes to the Golem development/test distribution\nfor exactly that.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-12T03:38:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+          "shortVersion": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-12T03:44:28.434790Z",
+          "dateCreated": "2026-09-11T18:35:23.043894Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "157848802",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-12T03:44:28.688235Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-11-1803-the-hud-belongs-to-tartaria",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-11-1803-the-hud-belongs-to-tartaria)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e64a444ebc6f40b9bfb8398494b3c3e1",
+  "previousEventID": "dbeaf9bce4bc47a789d771b5ef446911"
+}
