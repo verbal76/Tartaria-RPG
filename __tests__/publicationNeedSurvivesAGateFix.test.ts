@@ -318,6 +318,63 @@ describe('7. receipt verification is still mandatory, and this change did not to
     expect(Number((checkout.with as { 'fetch-depth': number })['fetch-depth'])).toBeGreaterThanOrEqual(200);
   });
 
+  /* ⚠⚠⚠ AND THE CLI ITSELF RUNS, BECAUSE THE UNIT TESTS STRUCTURALLY CANNOT
+   * CATCH A WIRING DEFECT. CI 2129 resolved the anchor perfectly and then died
+   * on `TypeError: isAncestorOf is not a function` — the CLI's object literal
+   * said `isAncestor`. Every test above injects the CORRECT key by
+   * construction, so none of them could see it; and the local smoke run had no
+   * `gh`, so the anchor came back null and `olderOf` returned before it ever
+   * called the function. The gap was that NOTHING EXECUTED THE CLI.
+   * This does: a throwaway git repo with a real ancestry, and a stub `gh` on
+   * PATH serving fixture JSON, so the anchor is FOUND and the widening path —
+   * the one that crashed — actually runs. */
+  it('⚠⚠ END TO END — the CLI resolves an anchor and widens the range without crashing', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { execFileSync, execSync } = require('node:child_process') as typeof import('node:child_process');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require('node:fs') as typeof import('node:fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const os = require('node:os') as typeof import('node:os');
+
+    const tmp = fs.mkdtempSync(join(os.tmpdir(), 'pub-anchor-'));
+    const repo = join(tmp, 'repo');
+    const bin = join(tmp, 'bin');
+    fs.mkdirSync(repo); fs.mkdirSync(bin);
+    const g = (cmd: string) => execSync(`git ${cmd}`, { cwd: repo, stdio: 'pipe' });
+    g('init -q -b golem-line');
+    g('config user.email t@t.t'); g('config user.name t');
+    // Three commits: published → bundle change → gate-only repair.
+    fs.writeFileSync(join(repo, 'a.txt'), '1'); g('add -A'); g('commit -qm published');
+    const published = String(g('rev-parse HEAD')).trim();
+    fs.mkdirSync(join(repo, 'app')); fs.writeFileSync(join(repo, 'app/x.ts'), 'x'); g('add -A'); g('commit -qm "bundle change"');
+    const bundle = String(g('rev-parse HEAD')).trim();
+    fs.mkdirSync(join(repo, 'scripts')); fs.writeFileSync(join(repo, 'scripts/g.mjs'), 'g'); g('add -A'); g('commit -qm "gate repair"');
+    const head = String(g('rev-parse HEAD')).trim();
+
+    // A stub `gh` that answers both API shapes the CLI asks for.
+    const runsJson = JSON.stringify({ workflow_runs: [{ id: 99, run_number: 99, head_sha: published }] });
+    const jobsJson = JSON.stringify({ jobs: [{ name: 'publish (dispatch the OTA for a validated trunk commit)', steps: [{ name: DISPATCH_STEP, conclusion: 'success' }] }] });
+    fs.writeFileSync(join(bin, 'gh'), `#!/bin/sh\ncase "$*" in\n  *"/jobs"*) cat <<'J'\n${jobsJson}\nJ\n  ;;\n  *) cat <<'R'\n${runsJson}\nR\n  ;;\nesac\n`, { mode: 0o755 });
+
+    const out = execFileSync(process.execPath, [
+      join(__dirname, '..', 'scripts/publication-anchor.cjs'),
+      '--after', head, '--before', bundle, '--repo', repo, '--repository', 'o/r', '--head-run-id', '100',
+    ], { encoding: 'utf8', env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, GITHUB_OUTPUT: '' } });
+
+    // The anchor was found, and the range was WIDENED past the push base to it.
+    expect(out).toContain('run 99 dispatched a markerless publish');
+    expect(out).toContain('the stranded-bundle case');
+    expect(out).toContain(`from=${published}`);
+    expect(out).toContain('publish=0');
+    // And that is the whole point: app/x.ts is inside published..head but NOT
+    // inside the old bundle..head range, so only the new anchor sees it.
+    const widened = String(execSync(`git diff --name-only ${published}..${head}`, { cwd: repo })).trim().split('\n');
+    const oldRange = String(execSync(`git diff --name-only ${bundle}..${head}`, { cwd: repo })).trim().split('\n');
+    expect(bundleTouched(widened)).toBe(true);
+    expect(bundleTouched(oldRange)).toBe(false);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
   it('the dispatch step is still gated on the filter, and the step name the anchor reads is the real one', () => {
     const dispatch = CI.jobs.publish!.steps.find((s) => (s.run ?? '').includes('gh workflow run'))!;
     expect(dispatch.if).toBe("steps.bundle.outputs.touched == '1'");

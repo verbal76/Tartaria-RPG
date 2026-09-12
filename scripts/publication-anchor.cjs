@@ -187,7 +187,16 @@ function cli(argv) {
   }
   console.log(`anchor: ${anchorWhy}`);
 
-  const r = chooseRangeStart({ before: opt.before, anchor, hasCommit, isAncestor });
+  // ⚠⚠⚠ THE KEY NAME IS `isAncestorOf`, AND GETTING IT WRONG COST A RUN.
+  // CI 2129 resolved the anchor correctly and then died on
+  // `TypeError: isAncestorOf is not a function`, because this literal said
+  // `isAncestor`. Nothing caught it: the local smoke test had no `gh`, so the
+  // anchor came back null and `olderOf` returned early without ever calling the
+  // function; and the unit tests inject the CORRECT name by construction, so
+  // they can never see a wiring defect here. The end-to-end CLI test added
+  // alongside this (a stub `gh` on PATH over a throwaway git repo) is what
+  // actually executes this line.
+  const r = chooseRangeStart({ before: opt.before, anchor, hasCommit, isAncestorOf: isAncestor });
   console.log(r.why);
   const out = process.env.GITHUB_OUTPUT;
   const lines = `from=${r.from ?? ''}\npublish=${r.publishAnyway ? '1' : '0'}\n`;
