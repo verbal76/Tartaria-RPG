@@ -83,14 +83,25 @@ const ANCHOR_PATTERNS = [
 const ALLOW = [
   {
     file: 'app/screens/MapScreen.tsx',
-    line: 665, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more; OTA-1802's Pressable + depth imports moved it two more
-    // ⚠⚠ THIS ENTRY HAS NOW DRIFTED THREE TIMES FOR THE SAME REASON — an import
-    // added ABOVE it — which says the ALLOWLIST KEY is the brittle part, not the
-    // code it exempts. A file+line key turns any unrelated import into a red gate
-    // on a line nobody touched, and the fix is always to edit this number, which
-    // is exactly the ritual that makes a gate decoration. Keying on the matched
-    // SOURCE TEXT would survive it. Recorded as named debt, deliberately NOT
-    // fixed here: widening a gate quietly inside a UI pass is its own bad habit.
+    line: 684, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more; OTA-1802's Pressable + depth imports moved it two more; OTA-1804 moved it NINETEEN more
+    // ⚠⚠ THIS ENTRY HAS NOW DRIFTED FOUR TIMES FOR THE SAME REASON — code added
+    // ABOVE it — which says the ALLOWLIST KEY is the brittle part, not the code it
+    // exempts. A file+line key turns any unrelated import into a red gate on a line
+    // nobody touched, and the fix is always to edit this number, which is exactly
+    // the ritual that makes a gate decoration. Keying on the matched SOURCE TEXT
+    // would survive it. Recorded as named debt, deliberately NOT fixed here:
+    // widening a gate quietly inside a UI pass is its own bad habit.
+    //
+    // ⚠⚠⚠ AND THE FOURTH DRIFT IS THE ONE THAT PROVED THE POINT, so record the
+    // provenance exactly. OTA-1804 (visual language phase 3) added a ROW_PLANES
+    // fragment and widened the kit import in MapScreen — net +19 lines ABOVE this
+    // statement, none of them within a hundred lines of it and none of them about
+    // location at all. 665 + 19 = 684. The exempted statement is BYTE-IDENTICAL
+    // across that commit (verified: md5 7614f6948a93f4ea13e5ff102dcf43c4 at both
+    // 7bfd774d:665 and 3f840c10:684), MapScreen's behaviour is unchanged, and the
+    // gate went red on a purely additive visual pass that never read
+    // currentLocationId. This re-pin is MAINTENANCE OF A STANDING EXCEPTION on
+    // owner ruling — not a new exception, and not authorisation for one.
     // RESOLVING THE CURRENT LOCATION'S RECORD, not testing a position. This is the
     // "which place's rules apply to me" question — it looks up the row for the last
     // named place so the screen can read its name, tags and description. Nothing
