@@ -144,7 +144,7 @@ export function WandererEncounterModal() {
 
             <Pressable
               onPress={speak}
-              style={[kit.ctl, styles.primaryBtn]}
+              style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel={`Speak with ${wanderer.name}`}
             >
@@ -153,7 +153,7 @@ export function WandererEncounterModal() {
             </Pressable>
             <Pressable
               onPress={dismiss}
-              style={[kit.ctl, styles.secondaryBtn]}
+              style={({ pressed }) => [kit.ctl, styles.secondaryBtn, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel="Walk on without speaking"
             >

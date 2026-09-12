@@ -346,21 +346,21 @@ export function FusionPickerModal() {
 
                   <Text style={styles.catLabel}>{isUpgrade ? 'Mode' : 'Forge as'}</Text>
                   <View style={styles.kindRow}>
-                    <Pressable onPress={() => setKind('weapon')} style={[kit.ctl, styles.kindBtn, kind === 'weapon' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
+                    <Pressable onPress={() => setKind('weapon')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'weapon' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
                       <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
                       {CTL_PLANES}
                     </Pressable>
-                    <Pressable onPress={() => setKind('armor')} style={[kit.ctl, styles.kindBtn, kind === 'armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
+                    <Pressable onPress={() => setKind('armor')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'armor' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
                       <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
                       {CTL_PLANES}
                     </Pressable>
                     {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. */}
-                    <Pressable onPress={() => setKind('dog_armor')} style={[kit.ctl, styles.kindBtn, kind === 'dog_armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
+                    <Pressable onPress={() => setKind('dog_armor')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'dog_armor' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
                       <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
                       {CTL_PLANES}
                     </Pressable>
                     {/* OTA-873 — fourth mode: upgrade an existing weapon with a 2nd coating slot. */}
-                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[kit.ctl, styles.kindBtn, kind === 'upgrade' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
+                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'upgrade' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
                       <Text style={[styles.kindTxt, kind === 'upgrade' && styles.kindTxtOn]}>⬆ Upgrade</Text>
                       {CTL_PLANES}
                     </Pressable>

@@ -90,7 +90,7 @@ export function StoryRevealOverlay() {
           </Text>
 
           <Pressable
-            style={[kit.ctl, styles.btn]}
+            style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]}
             onPress={dismiss}
             accessibilityRole="button"
             accessibilityLabel="Close the story"

@@ -70,7 +70,7 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
                 <Pressable
                   onPress={() => setCount((c) => clamp(c - 1))}
                   disabled={atMin}
-                  style={[kit.ctl, styles.step, atMin && styles.stepOff]}
+                  style={({ pressed }) => [kit.ctl, styles.step, atMin && styles.stepOff, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel="One fewer"
                   accessibilityState={{ disabled: atMin }}
@@ -84,7 +84,7 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
                 <Pressable
                   onPress={() => setCount((c) => clamp(c + 1))}
                   disabled={atMax}
-                  style={[kit.ctl, styles.step, atMax && styles.stepOff]}
+                  style={({ pressed }) => [kit.ctl, styles.step, atMax && styles.stepOff, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel="One more"
                   accessibilityState={{ disabled: atMax }}
@@ -96,7 +96,7 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
                 <Pressable
                   onPress={() => setCount(capped)}
                   disabled={atMax}
-                  style={[kit.ctl, styles.maxBtn, atMax && styles.stepOff]}
+                  style={({ pressed }) => [kit.ctl, styles.maxBtn, atMax && styles.stepOff, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel={`Craft the maximum, ${capped}`}
                   accessibilityState={{ disabled: atMax }}
@@ -107,13 +107,13 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
               </View>
 
               <View style={styles.actions}>
-                <Pressable onPress={onCancel} style={[kit.ctl, styles.btn]} accessibilityRole="button">
+                <Pressable onPress={onCancel} style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]} accessibilityRole="button">
                   <Text style={styles.btnText}>CANCEL</Text>
                   {CTL_PLANES}
                 </Pressable>
                 <Pressable
                   onPress={() => onConfirm(count)}
-                  style={[kit.ctl, styles.btn, styles.btnPrimary]}
+                  style={({ pressed }) => [kit.ctl, styles.btn, styles.btnPrimary, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel={`Craft ${count} ${recipeName}`}
                 >

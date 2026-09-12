@@ -130,7 +130,7 @@ export function GolemNamingModal() {
               />
               <Pressable
                 onPress={() => setName(suggestGolemName())}
-                style={[kit.ctl, styles.rollBtn]}
+                style={({ pressed }) => [kit.ctl, styles.rollBtn, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
@@ -141,7 +141,7 @@ export function GolemNamingModal() {
 
             <Pressable
               onPress={seal}
-              style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !name.trim() && kit.ctlDead]}
+              style={({ pressed }) => [kit.ctl, styles.confirmBtn, kit.ctlOn, !name.trim() && kit.ctlDead, pressed && kit.controlPressed]}
               disabled={!name.trim()}
               accessibilityRole="button"
               accessibilityLabel="Seal the name"
@@ -149,7 +149,7 @@ export function GolemNamingModal() {
               <Text style={[styles.confirmText, !name.trim() && styles.confirmTextDisabled]}>SEAL THE NAME</Text>
               {CTL_PLANES}
             </Pressable>
-            <Pressable onPress={keep} style={[kit.ctl, styles.keepBtn]} accessibilityRole="button" accessibilityLabel="Keep its making">
+            <Pressable onPress={keep} style={({ pressed }) => [kit.ctl, styles.keepBtn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Keep its making">
               <Text style={styles.keepText}>KEEP ITS MAKING</Text>
               {CTL_PLANES}
             </Pressable>

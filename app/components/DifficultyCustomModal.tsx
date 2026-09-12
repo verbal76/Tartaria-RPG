@@ -110,7 +110,7 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
               <Pressable
                 key={id}
                 onPress={() => setIntensity(id)}
-                style={[kit.ctl, styles.intensityChip, intensity === id && styles.intensityChipOn]}
+                style={({ pressed }) => [kit.ctl, styles.intensityChip, intensity === id && styles.intensityChipOn, pressed && kit.controlPressed]}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: intensity === id }}
                 accessibilityLabel={PRESSURE_PROFILES[id].label}
@@ -157,13 +157,13 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
           </Text>
 
           <View style={styles.buttons}>
-            <Pressable onPress={onCancel} style={[kit.ctl, styles.btn]} accessibilityRole="button" accessibilityLabel="Cancel">
+            <Pressable onPress={onCancel} style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Cancel">
               <Text style={styles.btnText}>CANCEL</Text>
               {CTL_PLANES}
             </Pressable>
             <Pressable
               onPress={() => onConfirm({ intensity, systems })}
-              style={[kit.ctl, styles.btn, styles.btnPrimary]}
+              style={({ pressed }) => [kit.ctl, styles.btn, styles.btnPrimary, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel="Confirm custom difficulty"
             >

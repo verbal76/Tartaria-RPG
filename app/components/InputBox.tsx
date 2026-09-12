@@ -1227,12 +1227,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           fix from arb143 stays; only the picker presentation is reverted. */}
       {dog && dog.hp > 0 && dogPickerOpen ? (
         <View style={styles.dogPicker}>
-          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={[tartariaKitStyles.ctl, styles.dogPickerBtn]}>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={({ pressed }) => [tartariaKitStyles.ctl, styles.dogPickerBtn, pressed && tartariaKitStyles.controlPressed]}>
             <Text style={styles.dogPickerLabel}>BITE</Text>
             <Text style={styles.dogPickerHint}>{dog.name} lunges in</Text>
             {CTL_PLANES}
           </Pressable>
-          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={[tartariaKitStyles.ctl, styles.dogPickerBtn]}>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={({ pressed }) => [tartariaKitStyles.ctl, styles.dogPickerBtn, pressed && tartariaKitStyles.controlPressed]}>
             <Text style={styles.dogPickerLabel}>DISTRACT</Text>
             <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +4 atk next swing</Text>
             {CTL_PLANES}
@@ -1267,7 +1267,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <Pressable
                 key={it.id}
                 onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name, it.id); }}
-                style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange]}
+                style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange, pressed && tartariaKitStyles.controlPressed]}
               >
                 <Text style={[styles.bandolierPickerLabel, inRange ? null : styles.bandolierOutOfRangeLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
                 <Text style={styles.bandolierPickerHint}>{inRange ? 'hurl' : 'too far'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
@@ -1323,7 +1323,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 setMedkitOpen(false);
                 useGameStore.getState().useHealBatch(it.name, 'self', 1);
               }}
-              style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+              style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
             >
               <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
               <Text style={styles.bandolierPickerHint}>
@@ -1352,7 +1352,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <>
                 <Pressable
                   onPress={() => heal('self')}
-                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>YOU</Text>
                   <Text style={styles.bandolierPickerHint}>{it.name.toLowerCase()}</Text>
@@ -1360,7 +1360,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 </Pressable>
                 <Pressable
                   onPress={() => heal('dog')}
-                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>
                     {medkitDog!.name.toUpperCase()}
@@ -1370,7 +1370,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 </Pressable>
                 <Pressable
                   onPress={() => setMedkitPick(null)}
-                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>BACK</Text>
                   <Text style={styles.bandolierPickerHint}>pick another</Text>

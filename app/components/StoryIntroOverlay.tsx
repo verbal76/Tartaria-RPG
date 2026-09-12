@@ -74,7 +74,7 @@ export function StoryIntroOverlay() {
       <Pressable style={styles.backdrop} onPress={advance} accessibilityRole="button" accessibilityLabel="Continue">
         <View style={styles.topRow}>
           <Text style={styles.pageCount}>{page + 1} / {pages.length}</Text>
-          <Pressable onPress={dismiss} style={[kit.ctl, styles.skipBtn]} accessibilityRole="button" accessibilityLabel="Skip opening">
+          <Pressable onPress={dismiss} style={({ pressed }) => [kit.ctl, styles.skipBtn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Skip opening">
             <Text style={styles.skipText}>SKIP</Text>
             {CTL_PLANES}
           </Pressable>

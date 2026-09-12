@@ -73,7 +73,7 @@ export function SexPickerModal() {
                 <Pressable
                   key={sx}
                   onPress={() => setSelected(sx)}
-                  style={[kit.ctl, styles.signCard, isSel && kit.ctlOn]}
+                  style={({ pressed }) => [kit.ctl, styles.signCard, isSel && kit.ctlOn, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isSel }}
                   accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
@@ -92,7 +92,7 @@ export function SexPickerModal() {
           <Pressable
             onPress={() => { if (selected) confirm(selected); }}
             disabled={!selected}
-            style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !selected && kit.ctlDead]}
+            style={({ pressed }) => [kit.ctl, styles.confirmBtn, kit.ctlOn, !selected && kit.ctlDead, pressed && kit.controlPressed]}
             accessibilityRole="button"
             accessibilityState={{ disabled: !selected }}
             accessibilityLabel="Confirm"

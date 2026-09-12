@@ -65,7 +65,7 @@ export function FusionBlockedModal() {
               {!!notice.hint && <Text style={styles.hint}>{notice.hint}</Text>}
               <Pressable
                 onPress={clear}
-                style={[kit.ctl, styles.btn]}
+                style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 accessibilityLabel="Close the Crucible"
               >

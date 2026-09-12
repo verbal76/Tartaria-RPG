@@ -2225,7 +2225,7 @@ export function ContractsScreen() {
             </Text>
             <View style={styles.routeBtnRow}>
               <Pressable
-                style={[kit.ctl, styles.routeBtnNeutral]}
+                style={({ pressed }) => [kit.ctl, styles.routeBtnNeutral, pressed && kit.controlPressed]}
                 onPress={() => setPendingRoute(null)}
                 accessibilityRole="button"
               >
@@ -2233,7 +2233,7 @@ export function ContractsScreen() {
                 {CTL_PLANES}
               </Pressable>
               <Pressable
-                style={[kit.ctl, styles.routeBtnPrimary]}
+                style={({ pressed }) => [kit.ctl, styles.routeBtnPrimary, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 onPress={() => {
                   if (!pendingRoute || !player) return;

@@ -168,7 +168,7 @@ export function DogOnboardingModal() {
               />
               <Pressable
                 onPress={() => setName(defaultDogName())}
-                style={[kit.ctl, styles.rollBtn]}
+                style={({ pressed }) => [kit.ctl, styles.rollBtn, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
@@ -183,7 +183,7 @@ export function DogOnboardingModal() {
                 <Pressable
                   key={s}
                   onPress={() => setSex(s)}
-                  style={[kit.ctl, styles.pill, sex === s && kit.ctlOn]}
+                  style={({ pressed }) => [kit.ctl, styles.pill, sex === s && kit.ctlOn, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel={s === 'boy' ? 'Boy' : 'Girl'}
                 >
@@ -195,7 +195,7 @@ export function DogOnboardingModal() {
 
             <Pressable
               onPress={commit}
-              style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !sex && kit.ctlDead]}
+              style={({ pressed }) => [kit.ctl, styles.confirmBtn, kit.ctlOn, !sex && kit.ctlDead, pressed && kit.controlPressed]}
               disabled={!sex}
               accessibilityRole="button"
               accessibilityLabel="Take them with you"

@@ -51,7 +51,7 @@ export function MotivePickerModal() {
               <Pressable
                 key={m.id}
                 onPress={() => setSelected(m.id)}
-                style={[kit.ctl, styles.card, isSel && kit.ctlOn]}
+                style={({ pressed }) => [kit.ctl, styles.card, isSel && kit.ctlOn, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 accessibilityLabel={`${m.title}. ${m.blurb}`}
               >
@@ -64,7 +64,7 @@ export function MotivePickerModal() {
               </Pressable>
             );
           })}
-          <Pressable onPress={commit} style={[kit.ctl, styles.confirmBtn, kit.ctlOn]} accessibilityRole="button" accessibilityLabel="Confirm motive">
+          <Pressable onPress={commit} style={({ pressed }) => [kit.ctl, styles.confirmBtn, kit.ctlOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Confirm motive">
             <Text style={styles.confirmText}>THIS IS WHY I CAME DOWN</Text>
             {CTL_PLANES}
           </Pressable>

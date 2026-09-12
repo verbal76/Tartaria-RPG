@@ -120,7 +120,7 @@ export function CrucibleGuardModal() {
               </Pressable>
 
               <Pressable
-                style={[kit.ctl, styles.saveSome, (noneTicked || allTicked) && styles.dim]}
+                style={({ pressed }) => [kit.ctl, styles.saveSome, (noneTicked || allTicked) && styles.dim, pressed && kit.controlPressed]}
                 disabled={noneTicked || allTicked}
                 onPress={() => resolve('save', ticked)}
               >
@@ -131,11 +131,11 @@ export function CrucibleGuardModal() {
               </Pressable>
 
               <View style={styles.footRow}>
-                <Pressable style={[kit.ctl, styles.cancel]} onPress={close}>
+                <Pressable style={({ pressed }) => [kit.ctl, styles.cancel, pressed && kit.controlPressed]} onPress={close}>
                   <Text style={styles.cancelText}>CANCEL</Text>
                   {CTL_PLANES}
                 </Pressable>
-                <Pressable style={[kit.ctl, styles.spend]} onPress={() => resolve('spend')}>
+                <Pressable style={({ pressed }) => [kit.ctl, styles.spend, pressed && kit.controlPressed]} onPress={() => resolve('spend')}>
                   <Text style={styles.spendText}>SPEND IT ALL</Text>
                   {CTL_PLANES}
                 </Pressable>

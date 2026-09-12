@@ -103,7 +103,7 @@ export function MissionCompleteModal() {
           </ScrollView>
           <Pressable
             onPress={clear}
-            style={[kit.ctl, styles.btn, victory && styles.btnVictory]}
+            style={({ pressed }) => [kit.ctl, styles.btn, victory && styles.btnVictory, pressed && kit.controlPressed]}
             accessibilityRole="button"
             accessibilityLabel={victory
               ? `Dismiss. Victory: ${notice.title} defeated.`
