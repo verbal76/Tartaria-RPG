@@ -60,9 +60,38 @@ name: Publish · OTA (one line at a time)
 #     golem — so the firewall below is unchanged: NOTHING UNATTENDED REACHES A
 #     PLAYER, and now nothing unvalidated does either.
 #
-#   • BY A PERSON, from the Actions UI, choosing a line. Also checked: the
-#     commit must already carry a green CI run. A dispatch for an unvalidated
-#     commit is refused with the reason, not run on trust.
+#   • BY A PERSON, choosing a line. Also checked: the commit must already carry
+#     a green CI run. A dispatch for an unvalidated commit is refused with the
+#     reason, not run on trust.
+#
+#     ⚠⚠⚠ BUT NOT "FROM THE ACTIONS UI" — THAT PROMISE WAS FALSE, and it was
+#     believed for two days. GitHub renders the "Run workflow" control only for
+#     a workflow_dispatch file that exists on the repository's DEFAULT branch.
+#     The default branch is `main`, which carries build-ios-native.yml,
+#     sentry-inbox.yml and submit-ios.yml and NOT this file — the OTA pipeline
+#     lives on the trunk. Measured 2026-09-12. So there has never been a button
+#     to press, while this header said there was, and OTA-1804 is what it cost:
+#     the documented recovery path for a stranded publication did not exist.
+#     The recovery paths that DO exist:
+#
+#       1. `gh workflow run eas-update-golem.yml --ref golem-line \
+#             -f sha=<40 hex> -f line=golem` — or the equivalent REST dispatch.
+#          Addressing the workflow by FILE NAME with an explicit --ref works for
+#          a file absent from the default branch; it is the UI control, not the
+#          API, that requires the default branch. Needs actions:write.
+#       2. For HAL, the `promotions` ledger (promote.yml) — a branch PUSH, no
+#          Actions API and no button, which is exactly why it exists: the agent
+#          that operates releases can advance a branch ref but cannot call the
+#          Actions API (measured 2026-09-11, and again 2026-09-12: a workflow
+#          dispatch returned 403 "Resource not accessible by integration").
+#
+#     ⚠ AND THE AUTOMATIC PATH IS NOW THE PRIMARY RECOVERY, which is the real
+#     repair. ci.yml's publish job used to ask "did THIS PUSH touch the bundle",
+#     so a bundle change that failed CI and was then repaired by a gate-only
+#     follow-up was stranded — no future push's range contained it. It now
+#     anchors the diff on the last commit golem actually received
+#     (scripts/publication-anchor.cjs), so the repair's own green run picks the
+#     stranded bundle up. Nobody has to dispatch anything by hand for that case.
 #
 # Either way the first step asks the Actions API for a completed, successful CI
 # run at this commit's SHA and refuses without one. CI is the one place the

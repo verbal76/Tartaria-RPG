@@ -381,25 +381,57 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Enough history to diff the push range; a trunk push is one or two commits.
-          fetch-depth: 50
+          # ⚠ 200, not 50 — the diff no longer starts at the previous push but at
+          # the last commit golem actually received, which can be several pushes
+          # back when a bundle change failed CI and was repaired. 200 is what the
+          # publisher already fetches, and far cheaper than full history.
+          fetch-depth: 200
+      # ⚠⚠⚠ WHERE THE DIFF STARTS IS ITS OWN QUESTION — see
+      # scripts/publication-anchor.cjs for the stranded-bundle bug this repairs.
+      # Short version: `github.event.before..github.sha` asks "did THIS PUSH
+      # touch the bundle", and that is not the same question as "does golem have
+      # the bundle". OTA-1804 proved the gap — Phase 3's app/ change failed CI on
+      # an unrelated line-number gate, the one-integer repair that followed was
+      # scripts-only, and the validated bundle was stranded with no future push
+      # whose range would ever contain it again. The anchor is now the last
+      # commit this pipeline published to GOLEM, so a gate-only follow-up cannot
+      # erase the publication need created behind it.
+      - name: Where did golem last get a bundle?
+        id: anchor
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          node scripts/publication-anchor.cjs \
+            --after "${{ github.sha }}" \
+            --before "${{ github.event.before }}" \
+            --repo .
       # ⚠ The bundle-path filter that used to be the publisher's own
       # `paths-ignore`. Native / build-config / tooling changes need a fresh
       # binary, not an OTA; a Sentry inbox sync must never republish; and a
       # test-only push ships nothing new to a phone (tests are not in the
-      # bundle — the old filter published those, wastefully).
+      # bundle — the old filter published those, wastefully). THE FILTER IS
+      # UNCHANGED; only the commit it measures from moved.
       - name: Did this push touch the JS bundle?
         id: bundle
         env:
-          BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
+          FROM: ${{ steps.anchor.outputs.from }}
+          PUBLISH_ANYWAY: ${{ steps.anchor.outputs.publish }}
         run: |
           set -euo pipefail
-          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
-            RANGE="${AFTER}^..${AFTER}"
-          else
-            RANGE="${BEFORE}..${AFTER}"
+          # No defensible anchor (a fresh trunk, a shallow history, an API
+          # outage) means publish rather than silently skip: the automatic path
+          # reaches golem only, so a needless dev-phone OTA is the cheap error
+          # and a missed one is the expensive error.
+          if [ "${PUBLISH_ANYWAY:-0}" = "1" ] || [ -z "${FROM:-}" ]; then
+            echo "touched=1" >> "$GITHUB_OUTPUT"
+            echo "::notice::No usable publication anchor — treating ${AFTER} as publication-worthy."
+            exit 0
           fi
+          RANGE="${FROM}..${AFTER}"
           TOUCHED=0
           while IFS= read -r f; do
             [ -z "$f" ] && continue
