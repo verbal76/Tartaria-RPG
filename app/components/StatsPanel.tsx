@@ -19,6 +19,9 @@ import {
   GOLEM_ARMED_GLYPH, DOG_ARMORED_GLYPH, golemIsArmed, dogIsArmored,
   golemWeapon, dogVestInstance, gearCondition,
 } from '../engine/companionGear';
+/* ⚠ VISUAL LANGUAGE PHASE 1 — chassis planes as kit STYLESHEET entries; the kit
+   export budget (13/13, 10/10) is deliberately not spent here. */
+import { tartariaKitStyles } from '../ui/tartariaKit';
 import { useReduceMotion } from '../state/accessibility';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -402,6 +405,29 @@ export function StatsPanel({ player, enemyPower }: Props) {
           handler lives on the parent TouchableOpacity in
           ExplorationScreen.tsx; this is the visual cue. */}
       <Text style={styles.tapHint}>tap for full sheet ›</Text>
+      {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE PLAYER CHASSIS SAYS SO PHYSICALLY, AND
+          THE TOUCH CONTRACT DOES NOT MOVE. Owner ruling on the Phase-1 map, after
+          source inspection overturned the audit's assumption: the whole
+          StatsPanel is the press target and STAYS the press target — *"DO NOT
+          shrink this interaction to the portrait. DO NOT change the existing
+          touch target."* What changes is only that the card now LOOKS like the
+          thing it already is.
+          ⚠⚠ SO THE SEMANTICS LAND WHERE THE RULING PUT THEM:
+              OUTER HUD BOUNDARY   Exploration's `panelFrame`   structural, read
+              INNER PLAYER CHASSIS this card                    interactive, touch
+          which is the same relationship the enemy side now has — a fixed frame
+          with a touchable object inside it. The card takes the CHASSIS weight of
+          the sidewall language, not the command weight: opening your sheet is not
+          striking a key.
+          ⚠ IT OWNS NO INTERACTION OF ITS OWN. These are inert children of the
+          existing card: `pointerEvents="none"`, absolutely positioned, no
+          accessibility identity. The handler and `accessibilityLabel="Open player
+          sheet"` stay exactly where they have always been — on the parent
+          TouchableOpacity in ExplorationScreen — and no second, competing touch
+          owner is introduced anywhere in this panel. The container's own
+          `overflow: 'hidden'` clips them, as it already does the damage pulse. */}
+      <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
+      <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
     </Animated.View>
   );
 }

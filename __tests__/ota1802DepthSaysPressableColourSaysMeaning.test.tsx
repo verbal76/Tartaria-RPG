@@ -258,7 +258,16 @@ describe('OTA-1802 — the negative boundary holds', () => {
     const fs = require('fs') as typeof import('fs');
     const path = require('path') as typeof import('path');
     const root = path.join(__dirname, '..', 'app');
-    const literals = [T.controlRaisedLit, T.controlRaisedDark];
+    /* ⚠ VISUAL LANGUAGE PHASE 1 — the second plane's four values join the list.
+     * Same rule, wider: the sidewall and the chassis weight are depth, so a
+     * hand-copied `rgba(0,0,0,0.38)` in a screen is the same drift a
+     * hand-copied `rgba(255,250,240,0.50)` would be. Extending this list
+     * STRENGTHENS the claim — six literals with one home instead of two. */
+    const literals = [
+      T.controlRaisedLit, T.controlRaisedDark,
+      T.controlFaceLit, T.controlSidewall,
+      T.chassisFaceLit, T.chassisSidewall,
+    ];
     const offenders: string[] = [];
     const walk = (dir: string) => {
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

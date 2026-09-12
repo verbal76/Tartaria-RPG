@@ -153,6 +153,91 @@ export const T = {
   /** The lower edge of a raised single-ring control. `0.75` is `btnRim`'s own
    *  shadow alpha — the strength the game already proved reads as structure. */
   controlRaisedDark: 'rgba(0,0,0,0.75)',
+  /* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE SECOND PLANE, AND IT IS A DIFFERENT FIX
+   * FROM A LOUDER EDGE. Owner, on the physical build: the compact controls are
+   * *"technically raised"* but still read as *"another framed rectangle."* The
+   * amplitude was already raised — `controlRaisedLit`/`Dark` above doubled it in
+   * OTA-1802 and the press travel has been 1.5dp since VIS-1 — so turning those
+   * numbers up again is the one move guaranteed not to work. Past a point more
+   * contrast on a 1dp ring is glow, which the brief forbids by name.
+   *
+   * ⚠⚠ WHAT `TButton` HAS THAT A CHIP DOES NOT, STATED AS GEOMETRY. The one
+   * control in this game that reads physical draws THREE planes:
+   *     btnOuter   a shadow                     → it sits off the ground
+   *     btnRim     a 1dp ring, `T.well` behind  → the SIDEWALL
+   *     btnFace    an inset face with its own
+   *                top/bottom edges             → the FACE
+   * A single-ring chip draws ONE plane and recolours two edges OF THAT SAME
+   * RING. There is no face-versus-sidewall relationship available to read, so
+   * the eye reports a frame — correctly. The defect was never the weight of the
+   * cue; it was that the cue had nothing to be a cue ABOUT.
+   *
+   * ⚠⚠ SO THE FACE GETS ITS OWN EDGES, DRAWN INSIDE THE RING. Two absolutely
+   * positioned hairlines, `pointerEvents="none"`, inside the control's existing
+   * box: a light catch just under the lit rim, and a SIDEWALL band just above
+   * the dark one. Top to bottom a chip now reads
+   *     lit rim · face light · FACE · sidewall · dark rim
+   * which is five values where there were three, and the extra two are the ones
+   * that say "this object has a side". It costs no layout — absolute children
+   * take part in none — no wrapper, no padding, no `elevation` (a four-sided
+   * halo, refused by the dossier construction and by the brief), and no shadow
+   * (`shadow*` is iOS-only and the owner is looking at Android).
+   *
+   * ⚠ THE SIDEWALL IS TRANSLUCENT BLACK, WHICH IS WHY ONE VALUE COVERS THE
+   * FAMILY. The family holds `quickStrike`'s near-black beside the filled gold
+   * and the light sage; an opaque band tuned for one is invisible on another.
+   * A black at 0.38 composites DOWN from whatever fill is behind it, so it is a
+   * shaded side on every member — the same self-balancing property the edge pair
+   * above relies on, applied to a band instead of a line.
+   *
+   * ⚠ AND IT STILL NEVER TOUCHES MEANING. These draw inside the ring; the ring's
+   * left and right keep the semantic `borderColor`, the fill is untouched and the
+   * label colour is untouched. Depth remains orthogonal to what a control MEANS. */
+  /** The catch of light on a pressable control's own FACE, just inside its lit
+   *  rim. Quieter than `controlRaisedLit` on purpose: the rim is the structure,
+   *  this is the face turning up to the light beneath it. */
+  controlFaceLit: 'rgba(255,250,240,0.16)',
+  /** The SIDEWALL — the side of the key, in its own shadow, above the dark rim.
+   *  2dp rather than a hairline, because a side has thickness and an edge does
+   *  not; that thickness is the whole difference between a raised object and a
+   *  drawn frame. */
+  controlSidewall: 'rgba(0,0,0,0.38)',
+  /* ⚠⚠⚠ THE SAME CONSTRUCTION AT CHASSIS WEIGHT — AND THE GAP BETWEEN THE TWO IS
+   * THE POINT, NOT A SHADE. Owner: a large tappable card *"is NOT the same thing
+   * as a command button… less key-like protrusion than a discrete command."* A
+   * key is a thing you strike; a card is a thing you open. If both wore the same
+   * plane there would be no hierarchy left to read on a screen that contains
+   * both — which Exploration does, side by side, in every frame.
+   *
+   * ⚠ SO IT IS THE SAME LANGUAGE, HALVED AND THINNED: the same two translucent
+   * values at roughly half strength, and the sidewall drops from 2dp to 1dp.
+   * Same grammar, lower voice. A card still says "you can touch me"; it no
+   * longer says "strike me". */
+  chassisFaceLit: 'rgba(255,250,240,0.07)',
+  chassisSidewall: 'rgba(0,0,0,0.20)',
+  /* ⚠⚠⚠ THE RECESS — AND THE DEFECT IT ANSWERS IS THAT A FIELD AND A BUTTON ARE
+   * CURRENTLY THE SAME OBJECT. Measured on this tree before touching anything:
+   *     styles.quick            (a COMMAND)  #1a1714 · #3a342c 1dp · radius 4
+   *     InputBox.inputWrap      (a FIELD)    #1a1714 · 1dp        · radius 4
+   *     KeyboardInputBar.input  (a FIELD)    #1a1714 · #3a342c 1dp · radius 4
+   * Three objects, one material, two opposite meanings. No amount of depth on
+   * the button fixes that, because the field is wearing the button's ground.
+   *
+   * ⚠⚠ THE ANSWER ALREADY EXISTED AND WAS SIMPLY NOT SPENT HERE. `T.glass` is
+   * this file's declared *"inset technical surface… a readout is a HOLE in the
+   * chassis, not a plate on it"*, and its alpha is the highest in the material
+   * family precisely so a recess stays the darkest plane on any player-tuned
+   * background — the ordering `composite ≤ coating ≤ glass` that the OTA-1746
+   * suite already asserts. An input is a readout you write into.
+   *
+   * ⚠ THE EDGES INVERT, WHICH IS WHAT MAKES IT A HOLE. On a raised control the
+   * light catches the TOP and the shadow falls at the bottom. Cut a well into
+   * the same surface and it is the other way round: the near lip throws shadow
+   * DOWN into the recess, and the far lip catches a little light. These are the
+   * two values `panelRimRecessed` has shipped with since VIS-3, reused rather
+   * than re-invented so the game has ONE recess vocabulary and not two. */
+  recessTop: 'rgba(0,0,0,0.55)',
+  recessLip: 'rgba(214,190,140,0.10)',
   /** The brand gold. The one chromatic note; unchanged since the game began. */
   gold: '#C9A86A',
   goldDim: '#8E7548',
@@ -176,7 +261,16 @@ export const T = {
    * out-shouts the text it surrounds; the corner brackets are the louder, and
    * they are short, so the eye reads "constructed" from the corners and lets the
    * edges recede. Aged brass catching a little light, not a neon outline. */
-  panelRim: 'rgba(201,168,106,0.26)',
+  /* ⚠ VISUAL LANGUAGE PHASE 1 — 0.26 → 0.30. Owner, on the physical build: the
+   * structural frame is *"approximately 15% too restrained."* This is that 15%
+   * and nothing else — the SAME `#C9A86A` at a higher alpha, so no fourth gold
+   * enters the file, the hue cannot drift from the brand, and the frame is still
+   * far below the rejected strong-gold mock-up that *"popped too hard and
+   * competed with the information."* The token reaches exactly one style
+   * (`kit.panelFrame`) and therefore exactly four consumers, all in Exploration.
+   * `kit.panelRim` below is a DIFFERENT thing — TPanel's own ring, which reads
+   * `T.rim` — and is untouched. */
+  panelRim: 'rgba(201,168,106,0.30)',
   /** ⚠⚠⚠ THE CONVERSATION FRAME. Brighter than the brand gold, ON PURPOSE, and
    *  named here under an owner ruling rather than smuggled in as a literal.
    *
@@ -1283,6 +1377,83 @@ const kit = StyleSheet.create({
    * nothing else, so the treatment can ride on a panel that already owns its
    * geometry. See `tPanelFrame`. */
   panelFrame: { borderWidth: 1, borderColor: T.panelRim, borderRadius: 3 },
+  /* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE SECOND PLANE'S STYLES, AND THEY ARE
+   * STYLESHEET ENTRIES BY OWNER RULING, NOT EXPORTS. The kit sits at 13/13
+   * components, 10/10 helpers and 23/23 total; the owner's ruling on the Phase-1
+   * map is explicit — *"Use central StyleSheet entries for the sidewall/recess
+   * material without introducing a new exported helper/component… Do not spend
+   * that API budget during the physical-specimen phase."* So they reach their
+   * consumers through `tartariaKitStyles`, exactly as `panelFrame` does, and
+   * `check:kitexports` does not move. If game-wide propagation later proves these
+   * need to be first-class primitives, that is a separate owner decision.
+   *
+   * ⚠⚠ EVERY ONE OF THESE IS DRAWN BY AN ABSOLUTELY POSITIONED CHILD WITH
+   * `pointerEvents="none"`. That is the whole reason the construction is legal
+   * under the 320×568 contract: an absolute child takes part in no layout, so a
+   * control wearing a sidewall is the same height, the same width and the same
+   * touch target as one without. No padding, no margin, no minHeight, no
+   * wrapper, no `elevation`, no shadow.
+   *
+   * ⚠ THE RADII ARE NOT DECORATION. Most hosts (`quick`, `placeChip`,
+   * StatsPanel's card) already clip with `overflow: 'hidden'`, where these are a
+   * no-op. `objectiveChip` does not, and a square band would poke past its
+   * rounded corner. 3 against the hosts' 4 keeps the band just inside the curve
+   * either way, and it costs nothing on the hosts that clip. */
+  /** The face's own catch of light, just inside a pressable control's lit rim. */
+  controlPlaneTop: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.controlFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
+  },
+  /** The SIDEWALL: the side of the key, above its dark rim. 2dp — a side has
+   *  thickness; an edge does not. */
+  controlPlaneBottom: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
+    backgroundColor: T.controlSidewall, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+  },
+  /* ⚠⚠ PRESSED IS THE OBJECT GOING IN, SO THE SIDE CHANGES SIDES. Push a key into
+   * its housing and the face you were looking down at tips away: the shaded side
+   * is now ABOVE the face and the light catches BELOW it. That is the same
+   * inversion `controlPressed` already performs on the ring, applied to the
+   * planes, so the two layers agree instead of contradicting each other. The
+   * 1.5dp travel is unchanged and still lives on the ring, where it always has. */
+  controlPlaneTopPressed: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+    backgroundColor: T.controlSidewall, borderTopLeftRadius: 3, borderTopRightRadius: 3,
+  },
+  controlPlaneBottomPressed: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.controlFaceLit, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+  },
+  /* ⚠⚠ CHASSIS WEIGHT — HALF THE VALUE, HALF THE SIDEWALL, AND NO PRESSED PAIR.
+   * A card is a thing you open, not a thing you strike. It gets the affordance
+   * (you can touch this) without the protrusion (strike this), and it does not
+   * invert on press because a card does not travel — its own `activeOpacity`
+   * already answers the touch. Keeping the pressed pair off the chassis is what
+   * stops "interactive chassis" quietly becoming a second command family. */
+  chassisPlaneTop: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.chassisFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
+  },
+  chassisPlaneBottom: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.chassisSidewall, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+  },
+  /* ⚠⚠⚠ THE RECESS MATERIAL. Ground and ring only — NO geometry, for the same
+   * reason `panelFrame` owns none: it has to ride on two fields that already own
+   * their own padding, radius, height and flex, and it must not move either of
+   * them. `glass` is the darkest plane in the material family on any player-tuned
+   * background; the inverted edges make it a hole rather than a dark plate.
+   *
+   * ⚠ IT MUST NOT CARRY `overflow: 'hidden'`. InputBox's tutorial pulse is an
+   * absolute overlay at top/left/right/bottom: -1 — it reaches back OVER the
+   * border on purpose — and clipping the wrap would silently delete the one cue
+   * the name and rope beats depend on. */
+  recess: {
+    backgroundColor: T.glass,
+    borderColor: T.glassRim,
+    borderTopColor: T.recessTop,
+    borderBottomColor: T.recessLip,
+  },
   controlResting: { borderTopColor: T.controlRaisedLit, borderBottomColor: T.controlRaisedDark },
   /* ⚠ OTA-1791 — the filled-gold primary's material: the brand gold as fill AND
    * ring. No `borderWidth` here for the same reason as the depth pair above —

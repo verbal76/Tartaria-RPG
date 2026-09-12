@@ -217,8 +217,24 @@ describe('OTA-1782 — none of the forbidden treatments arrived with it', () => 
      * fixed — 56/255 of gradient on a dark chip — so the two must be nameable
      * apart. Four tokens, two styles, and the assertion below still fails on a
      * `controlStrike` or a `controlGold` the moment one appears. */
+    /* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 ADDED THE SECOND PLANE, AND THE RULE THIS TEST
+     * DEFENDS IS STILL UNCHANGED. Owner, on the physical build: the chips are
+     * *"technically raised"* and still read as *"another framed rectangle"* — and
+     * the ruling that followed was explicit that the answer is NOT more alpha:
+     * *"Do NOT merely increase the existing controlRaisedLit/controlRaisedDark
+     * alpha… Implement the proposed additional physical plane/sidewall
+     * construction."* A single-ring chip recolours two sides of ONE plane;
+     * `TButton` draws a rim AND a face with its own edges. `controlFaceLit` and
+     * `controlSidewall` are that second plane, and the four `controlPlane*`
+     * styles are its resting and pressed halves.
+     * ⚠ SO THE COUNT MOVED AND THE CLAIM DID NOT: still one set per STRENGTH,
+     * still ZERO per TONE, and the per-tone assertion below — which is the real
+     * rule — is unchanged and still bites on a `controlStrike` or a `controlGold`
+     * the moment one appears. This list is the spelling; that loop is the law. */
     expect([...names].sort()).toEqual([
-      'controlDark', 'controlLit', 'controlPressed', 'controlRaisedDark', 'controlRaisedLit', 'controlResting',
+      'controlDark', 'controlFaceLit', 'controlLit',
+      'controlPlaneBottom', 'controlPlaneBottomPressed', 'controlPlaneTop', 'controlPlaneTopPressed',
+      'controlPressed', 'controlRaisedDark', 'controlRaisedLit', 'controlResting', 'controlSidewall',
     ]);
     /* ⚠ THE INTENT, ASSERTED DIRECTLY rather than left to the list above: no
      * token in this namespace may be named for a TONE. A per-tone depth is the
@@ -278,7 +294,23 @@ describe('OTA-1782 — the combat chips adopt it, and the inert ones do not', ()
 
   it('the chip family reads the kit helper rather than styling itself', () => {
     expect(code).toContain('tControlDepth');
-    expect(code).toMatch(/import \{ tControlDepth \} from '\.\.\/ui\/tartariaKit'/);
+    /* ⚠ THE CLAIM IS THE AUTHORITY, NOT THE SPELLING OF ONE IMPORT LINE. Phase 1
+     * adds the sidewall planes, which reach this file through `tartariaKitStyles`
+     * — the same route `panelFrame` already takes, and a STYLESHEET entry rather
+     * than a new export because the kit sits at 13/13 and 10/10 and the owner
+     * ruled the API budget is not spent during the specimen phase. So the import
+     * now names three things instead of one. What must stay true is that every
+     * one of them comes FROM THE KIT: the assertions below prove the chip owns no
+     * depth colour or transform of its own, which is the rule OTA-1782 exists for
+     * and is strictly harder to satisfy now than when it was one import. */
+    expect(code).toMatch(/import \{[^}]*\btControlDepth\b[^}]*\} from '\.\.\/ui\/tartariaKit'/);
+    expect(code).toMatch(/import \{[^}]*\btartariaKitStyles\b[^}]*\} from '\.\.\/ui\/tartariaKit'/);
+    /* ⚠⚠ AND THE DEPTH LITERALS STILL LIVE IN THE KIT. A hand-copied rgba in this
+     * file is the eleventh-copy drift OTA-1791 had to clean up; ota1802's
+     * one-file test covers the raised pair, and this covers the new plane. */
+    for (const lit of ['rgba(255,250,240,0.16)', 'rgba(0,0,0,0.38)']) {
+      expect(code).not.toContain(lit);
+    }
   });
 
   /* ⚠⚠ DEPTH IS APPLIED LAST, AND THE ORDER IS THE DESIGN. The tone styles set

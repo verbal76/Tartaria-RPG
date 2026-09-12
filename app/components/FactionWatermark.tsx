@@ -32,8 +32,21 @@ import { containCrestField } from '../ui/crestField';
  *  combat text must stay unquestionably dominant, so this starts low: visible
  *  against the dark panel when you look for it, gone when you are reading. It
  *  is a single named number rather than an inline literal so a device review
- *  can move it in one place. */
-export const WATERMARK_OPACITY = 0.055;
+ *  can move it in one place.
+ *
+ *  ⚠⚠ VISUAL LANGUAGE PHASE 1 — 0.055 → 0.10, AND THIS IS THAT DEVICE REVIEW
+ *  DOING EXACTLY WHAT THE NUMBER WAS NAMED FOR. Owner, on the physical build:
+ *  the sigil was *"effectively invisible."* 0.055 was a guess made without a
+ *  phone in hand and it guessed low; this is the same claim at a strength that
+ *  can actually be recognised. It is still under a tenth, still an insignia
+ *  DISCOVERED rather than announced, and the transcript is still unquestionably
+ *  the dominant thing in the panel. Nothing else about the layer moves: same
+ *  containment, same inset, same absolute placement, same silence.
+ *
+ *  ⚠ WHETHER 0.10 IS RIGHT IS NOT A QUESTION A TEST CAN ANSWER. The suite bounds
+ *  it (above zero, below 0.12) because a bound is a real claim; where inside
+ *  that band it belongs is the owner's eye on the device. */
+export const WATERMARK_OPACITY = 0.10;
 
 /** ⚠ Breathing room so the sigil never touches the frame — the owner asked for
  *  it explicitly, and it is a FRACTION of the measured panel rather than a dp

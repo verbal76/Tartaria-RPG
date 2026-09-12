@@ -51,6 +51,10 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
+/* ⚠ VISUAL LANGUAGE PHASE 1 — the recess/sidewall material arrives as kit
+   STYLESHEET entries, not new exports (owner ruling: the kit is at 13/13
+   components and 10/10 helpers and the API budget is not spent here). */
+import { T, tartariaKitStyles } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { keyboardPollAction } from '../engine/keyboardPoll';
 
@@ -435,7 +439,15 @@ export function KeyboardInputBar() {
       <View style={styles.row}>
         <TextInput
           ref={inputRef}
-          style={styles.input}
+          /* ⚠⚠ VISUAL LANGUAGE PHASE 1 — THE FLOATING FIELD IS A WELL TOO, and it
+             has to be, because this bar and InputBox share ONE draft (OTA-1270):
+             the player types into whichever is up, so a field that read as a
+             recess in one place and as a button in the other would teach a
+             difference that does not exist. Same `tartariaKitStyles.recess`, same
+             glass ground, same inverted lip. Nothing behavioural moves — the
+             geometry, `multiline`, `blurOnSubmit`, `scrollEnabled`, the autoFocus
+             and the blur-retract all stay exactly as they are. */
+          style={[styles.input, tartariaKitStyles.recess]}
           value={text}
           onChangeText={setText}
           placeholder="What do you do?"
@@ -483,8 +495,14 @@ export function KeyboardInputBar() {
           autoComplete="off"
           textContentType="none"
         />
+        {/* ⚠⚠ VISUAL LANGUAGE PHASE 1 — this Act joins the same command family as
+            InputBox's, for the same reason and with the same restraint: a 1dp ring
+            PAID FOR out of the padding so the outer box does not move, the resting
+            plane, and no change to the handler, the role or the press feedback. */}
         <TouchableOpacity accessibilityRole="button" style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
+          <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+          <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
         </TouchableOpacity>
       </View>
     </View>
@@ -524,11 +542,18 @@ const styles = StyleSheet.create({
     minHeight: 38,
     maxHeight: 96,
   },
+  /* ⚠ VISUAL LANGUAGE PHASE 1 — ring paid for out of the padding (14+0 -> 13+1,
+   * 9+0 -> 8+1) so the outer box is byte-identical and this absolutely
+   * positioned bar's geometry cannot move. `overflow: 'hidden'` clips the planes
+   * to the radius. Fill and label colour untouched: depth is not meaning. */
   send: {
     backgroundColor: '#3a342c',
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    borderColor: T.rimAlloy,
+    borderWidth: 1,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     borderRadius: 4,
+    overflow: 'hidden',
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
 });

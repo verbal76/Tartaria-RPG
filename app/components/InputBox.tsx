@@ -49,7 +49,11 @@ import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '.
 /* ⚠ OTA-1782 — the combat chips are the first adopters of the kit's governed
  * control-depth language. This is the ONLY thing InputBox takes from the kit;
  * every colour on these chips is still the combat vocabulary's own. */
-import { tControlDepth } from '../ui/tartariaKit';
+/* ⚠ VISUAL LANGUAGE PHASE 1 — the sidewall/recess material reaches this file as
+   STYLESHEET entries rather than new exports, by owner ruling: the kit sits at
+   13/13 components and 10/10 helpers, and the API budget is not to be spent
+   during the physical-specimen phase. Same route `panelFrame` already takes. */
+import { T, tControlDepth, tartariaKitStyles } from '../ui/tartariaKit';
 import { armLoreJump } from '../ui/loreJump';
 import { utilityArt, UTILITY_ART_SIZE } from '../engine/utilityGlyphArt';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
@@ -1352,7 +1356,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
-        <View style={[styles.inputWrap, { borderColor: inputBorderColor }]}>
+        {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE COMMAND FIELD BECOMES A WELL, AND THE
+            DEFECT IT FIXES IS THAT A FIELD AND A BUTTON WERE THE SAME OBJECT.
+            Measured on this tree before any edit: `styles.quick` (a COMMAND) and
+            `styles.inputWrap` (a FIELD) were both `#1a1714` behind a 1dp `#3a342c`
+            ring at radius 4 — identical material, opposite meanings. No amount of
+            depth on the button repairs that while the field wears the button's
+            ground. `tartariaKitStyles.recess` is the kit's existing `glass`
+            vocabulary — the darkest plane in the material family on any tuned
+            background — with the edges INVERTED, which is what makes it a hole
+            rather than a dark plate.
+            ⚠ THE PULSE STILL WINS WHEN IT RUNS. `inputBorderColor` is only ever
+            meaningful during the name and rope beats, so it is applied AFTER the
+            recess and ONLY while pulsing; at rest the well keeps its own ring.
+            Reduce-motion's static `#ffe28a` highlight still lands, because it
+            comes down the same branch.
+            ⚠ AND NO `overflow: 'hidden'` HERE, EVER. `inputPulseOverlay` sits at
+            top/left/right/bottom: -1 and reaches back OVER this border on purpose;
+            clipping the wrap would silently delete the tutorial's only input cue. */}
+        <View style={[styles.inputWrap, tartariaKitStyles.recess, inputPulse ? { borderColor: inputBorderColor } : null]}>
           {/* OTA-1442 — the pulse itself: bright border fading in and out on
               the NATIVE driver, over the static dim border above. */}
           {inputPulse && !reduceMotion ? (
@@ -1422,8 +1444,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <Text style={styles.kbDismissText}>▼</Text>
           </TouchableOpacity>
         ) : null}
+        {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — ACT JOINS THE COMMAND FAMILY. It is the
+            one control on this row that commits a sentence, and it was the only
+            thing here that was not a member of any family at all: a flat
+            `#3a342c` block with no ring, no depth and no plane. Beside a row of
+            chips that now read as keys, the button you actually press to act read
+            as the least physical object on the screen.
+            ⚠ THE OUTER BOX IS BYTE-IDENTICAL — the 1dp ring is PAID FOR out of the
+            padding (14/9 → 13/8), the same trade OTA-1802 made for three ringless
+            controls so their outer height did not move. Nothing on this row
+            reflows, at any width.
+            ⚠ BEHAVIOUR IS UNTOUCHED, DELIBERATELY. It stays a `TouchableOpacity`
+            with the same `handleSubmit` and the same fade — the owner authorised
+            it to join the family *"without changing their behavior"*, so it takes
+            the RESTING plane and not the pressed inversion. Press travel here is a
+            separate call for the device review to make. */}
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
+          <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+          <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
         </TouchableOpacity>
       </TutorialTarget>
     </View>
@@ -1725,6 +1764,7 @@ function QuickBtn({
         : label}
       accessibilityState={{ disabled: !!blocked }}
     >
+      {({ pressed }) => (<>
       {/* ⚠ OTA-1170 — THE RECHARGE BAR, behind the label. Owner: "have it turn red and
           slowly fill back to blue… make the color fill left to right with no fade."
           Two absolute layers: red across the whole chip, then blue laid over it from the
@@ -1823,6 +1863,36 @@ function QuickBtn({
           <Text style={[textStyle, weapon ? styles.quickWeaponName : null]}>{label.toUpperCase()}</Text>
         </View>
       )}
+      {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE CHIP'S OWN FACE EDGES, DRAWN INSIDE ITS
+          RING. Owner, on the physical build: the combat controls are *"technically
+          raised"* but still read as *"another framed rectangle."* They were not
+          missing the depth language — they have carried `tControlDepth` since
+          OTA-1782 and the RAISED pair since OTA-1802. What they were missing is a
+          SECOND PLANE for that language to be ABOUT: `TButton` draws a rim AND a
+          face with its own edges; a compact chip drew one ring and recoloured two
+          sides of it. These two hairlines are that second plane — a catch of light
+          under the lit rim, and a 2dp SIDEWALL above the dark one — so the chip
+          reads face/side/ground instead of frame-inside-frame.
+          ⚠ LAST, SO THEY ARE THE CHIP'S OUTERMOST EDGES. The cooldown bar is a
+          full-bleed absolute fill; drawn after it, the sidewall stays the chip's
+          own boundary instead of being painted over by a recharge state. They sit
+          in the 6dp of vertical padding, so they never touch the label.
+          ⚠ ZERO LAYOUT, BY CONSTRUCTION. Absolutely positioned, so the chip keeps
+          the same height, width and touch target; `styles.quick`'s own
+          `overflow: 'hidden'` clips them to its radius, exactly as it already does
+          for the cooldown fill. `pointerEvents="none"` because they cover a
+          control, and they carry no accessibility identity of their own.
+          ⚠ AND A BLOCKED CHIP GETS NEITHER. Owner, OTA-1782, unchanged here:
+          *"DISABLED / INERT must not falsely advertise the same physical
+          readiness."* The ring already goes flat when `blocked`; the planes follow
+          it, so an inert chip makes no physical claim on either layer. */}
+      {blocked ? null : (
+        <>
+          <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+          <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+        </>
+      )}
+      </>)}
     </Pressable>
   );
 }
@@ -2284,11 +2354,18 @@ const styles = StyleSheet.create({
     minHeight: 38,
     maxHeight: 96,
   },
+  /* ⚠ VISUAL LANGUAGE PHASE 1 — the ring is paid for out of the padding so the
+   * outer box does not move: 14+0 → 13+1 horizontally, 9+0 → 8+1 vertically.
+   * `overflow: 'hidden'` clips the planes to the radius, exactly as `quick` does.
+   * The fill and the label colour are untouched — depth is not meaning. */
   send: {
     backgroundColor: '#3a342c',
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    borderColor: T.rimAlloy,
+    borderWidth: 1,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     borderRadius: 4,
+    overflow: 'hidden',
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
   kbDismiss: {

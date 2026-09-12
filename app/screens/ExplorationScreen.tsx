@@ -1682,6 +1682,7 @@ export function ExplorationScreen() {
                 </TouchableOpacity>
               )}
             </View>
+            {CHASSIS_PLANES}
           </TouchableOpacity>
           </TutorialTarget>
         );
@@ -1880,6 +1881,7 @@ export function ExplorationScreen() {
           >
             <Text style={styles.vendorChipX}>✕</Text>
           </TouchableOpacity>
+          {CHASSIS_PLANES}
         </TouchableOpacity>
       )}
 
@@ -1914,6 +1916,7 @@ export function ExplorationScreen() {
             </Text>
           </View>
           <Text style={styles.placeChipArrow}>›</Text>
+          {CHASSIS_PLANES}
         </TouchableOpacity>
       )}
 
@@ -1955,6 +1958,7 @@ export function ExplorationScreen() {
             <Text style={styles.placeChipTalkText}>GIFT</Text>
           </TouchableOpacity>
           <Text style={styles.placeChipArrow}>›</Text>
+          {CHASSIS_PLANES}
         </TouchableOpacity>
       )}
 
@@ -2090,6 +2094,7 @@ export function ExplorationScreen() {
           >
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
+          {CHASSIS_PLANES}
         </TouchableOpacity>
         );
       })()}
@@ -3450,6 +3455,38 @@ export function ExplorationScreen() {
  * move. The touch target never depended on either: it is the socket plus
  * `hitSlop={8}`. */
 const SCENE_GEAR_SIZE = 14;
+
+/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE INTERACTIVE-CHASSIS PLANES, DECLARED ONCE.
+ *
+ * Exploration holds both semantic families side by side in every frame: a
+ * structural HUD frame you READ, and cards inside it you TOUCH. Until now both
+ * were a border and nothing else, so the difference had to be learned instead of
+ * seen. These two inert hairlines are the CHASSIS weight of the kit's sidewall
+ * language — roughly half a command chip's value, with a 1dp side instead of 2dp
+ * — because a card is a thing you OPEN and a key is a thing you STRIKE. If both
+ * wore the same plane there would be no hierarchy left to read.
+ *
+ * ⚠⚠ ONE ELEMENT, FIVE CARDS, AND THE VALUES LIVE IN THE KIT. Owner rule 8:
+ * *"Do not copy/paste depth colors or transforms into individual screens when a
+ * shared authority can own them."* The colours and geometry are
+ * `tartariaKitStyles.chassisPlane*`; this constant is only the shape of the
+ * adoption, so five call sites cannot drift apart from each other.
+ *
+ * ⚠ IT IS NOT A WRAPPER AND IT OWNS NO INTERACTION. Each card keeps its exact
+ * existing handler, role and label; these render as inert LAST CHILDREN inside
+ * the card that already owns the press. `pointerEvents="none"` keeps them out of
+ * the responder chain entirely — which is what stops them stealing a tap from a
+ * nested STORE / TALK / GIFT / ✕ action, every one of which keeps its own
+ * `onPress`, its own `hitSlop` and its own `stopPropagation` untouched. They
+ * carry no accessibility identity, so the screen gains no new elements. And they
+ * consume no layout: absolutely positioned, no width, no padding, no margin, so
+ * every card is the same size and the same touch target it was at every width. */
+const CHASSIS_PLANES = (
+  <>
+    <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
+    <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
+  </>
+);
 
 const styles = StyleSheet.create({
   // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.

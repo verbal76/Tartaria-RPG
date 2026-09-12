@@ -22,6 +22,9 @@ import { enemyTypeDefenses } from '../engine/crafting';
 // `defensesFor` below.
 import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS, COATING_GLYPH, COATING_GLYPH_COLOR } from '../engine/weaponGlyphs';
 import { enemyDamageType } from '../engine/damageTypes';
+/* ⚠ VISUAL LANGUAGE PHASE 1 — chassis planes as kit STYLESHEET entries; no new
+   kit export is spent during the physical-specimen phase (owner ruling). */
+import { tartariaKitStyles } from '../ui/tartariaKit';
 import { BrandedModal } from './BrandedModal';
 
 /** OTA-401 — a single active status (coating DOT / infection) on an
@@ -287,8 +290,27 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
       nestedScrollEnabled
       keyboardShouldPersistTaps="handled"
     >
+      {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE CARD IS AN INTERACTIVE CHASSIS, AND THE
+          FRAME AROUND IT IS NOT. Exploration's `panelFrame` says "this is one
+          region of the HUD"; the card inside says "this object opens." Until now
+          both were drawn with a border and nothing else, so the boundary between
+          reading and touching had to be learned rather than seen. The two
+          hairlines below are the CHASSIS weight of the sidewall language — half
+          the value of a command chip and a 1dp side instead of 2dp, because a
+          card is a thing you open and a key is a thing you strike.
+          ⚠⚠ AND THEY GO *INSIDE* THE EXISTING TOUCHABLE, WHICH IS THE ONE RULE
+          THIS FILE CANNOT BREAK. OTA-1514 records what happens otherwise: arb146
+          wrapped this ScrollView in a Touchable, the parent won the responder on
+          every vertical drag, and the card was capped with no way to scroll. So
+          nothing here gains an ancestor — the ScrollView still owns the pan, this
+          Touchable still owns the tap, and the planes are inert children of it.
+          `pointerEvents="none"` so they cannot enter the responder chain at all,
+          and no width, padding or margin so the measured `cardWidth` that drives
+          `snapToInterval` is untouched. */}
       <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={onPress}>
         {card}
+        <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
+        <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
       </TouchableOpacity>
     </ScrollView>
   );
