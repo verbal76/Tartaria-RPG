@@ -6,7 +6,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { effectiveACBreakdown, playerArmorResistKinds, dogVestAcBonus } from '../state/combatResolution';
@@ -103,6 +103,25 @@ const SLOT_LABEL: Record<string, string> = {
   // and no reader can fall behind the type again.
   ...Object.fromEntries(RING_SLOTS.map((slot, i) => [slot, i === 0 ? 'Ring' : `Ring ${i + 1}`])),
 };
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function CharacterScreen() {
   const player = useGameStore((s) => s.player);
@@ -917,7 +936,7 @@ export function CharacterScreen() {
               {sectionHeader('companion', 'COMPANION')}
               {!collapsed.companion && (
               <TouchableOpacity
-                style={styles.card}
+                style={[tRowStyle(), styles.card]}
                 onPress={() => useGameStore.getState().openCallDogModal()}
                 activeOpacity={0.8}
                 accessibilityRole="button"
@@ -976,6 +995,7 @@ export function CharacterScreen() {
                   </View>
                 </View>
                 <Text style={styles.contractTap}>tap to call ›</Text>
+                {ROW_PLANES}
               </TouchableOpacity>
               )}
             </>
@@ -1118,7 +1138,7 @@ export function CharacterScreen() {
           <>
             {sectionHeader('contracts', 'ACTIVE CONTRACTS')}
             {!collapsed.contracts && (
-            <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8} accessibilityRole="button">
+            <TouchableOpacity style={[tRowStyle(), styles.card]} onPress={() => setScreen('contracts')} activeOpacity={0.8} accessibilityRole="button">
               {(player.activeFactionQuestIds ?? []).map((id) => {
                 const q = findFactionQuestById(id);
                 if (!q) return null;
@@ -1148,6 +1168,7 @@ export function CharacterScreen() {
                 );
               })}
               <Text style={styles.contractTap}>tap to open full contract board ›</Text>
+              {ROW_PLANES}
             </TouchableOpacity>
             )}
           </>

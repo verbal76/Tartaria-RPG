@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { tRowStyle, TTabBar } from '../ui/tartariaKit'; // OTA-1759 row chassis · OTA-1762 tab bar
 import { repairCostMaterials } from '../engine/scrapEngine';
@@ -313,6 +313,21 @@ export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }
   recipes: { id: TEACH.crafting_tab_recipes.id, title: TEACH.crafting_tab_recipes.title, body: TEACH.crafting_tab_recipes.body },
   aetheric: { id: TEACH.crafting_tab_aetheric_v2.id, title: TEACH.crafting_tab_aetheric_v2.title, body: TEACH.crafting_tab_aetheric_v2.body },
 };
+
+/* ⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH. `kit.ctl` is only the material: the
+ * face, the rim and the radius. The catch of light on the top edge, the
+ * sidewall and the contact shadow under it are hand-placed children, absolutely
+ * positioned inside a box the control already owns, so adopting them moves
+ * nothing by a pixel. Semantic colour a call site already carries layers on
+ * top and still wins — construction is what the object IS, not what state it
+ * is in. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
@@ -764,7 +779,7 @@ export function CraftingScreen() {
                 <Pressable
                   key={d.id}
                   accessibilityRole="button"
-                  style={({ pressed }) => [
+                  style={({ pressed }) => [kit.ctl, 
                     styles.aetherCard,
                     pressed && styles.aetherCardPressed,
                   ]}
@@ -817,7 +832,7 @@ export function CraftingScreen() {
                           <Pressable
                             key={g.kind}
                             accessibilityRole="button"
-                            style={({ pressed }) => [
+                            style={({ pressed }) => [kit.ctl, 
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
                             ]}
@@ -831,6 +846,7 @@ export function CraftingScreen() {
                               <Text style={c.afford ? styles.fuelHave : undefined}>{c.fuel}</Text>
                             </Text>
                             <Text style={styles.golemVariantPhrase}>tap to summon →</Text>
+                            {CTL_PLANES}
                           </Pressable>
                         );
                       })}
@@ -848,6 +864,7 @@ export function CraftingScreen() {
                     </Text>
                     {d.examples.map((ex) => `"${ex}"`).join(' · ')}
                   </Text>
+                  {CTL_PLANES}
                 </Pressable>
               );
             })}
@@ -877,7 +894,7 @@ export function CraftingScreen() {
                   key={t.id}
                   accessibilityRole="button"
                   disabled={!known}
-                  style={({ pressed }) => [
+                  style={({ pressed }) => [kit.ctl, 
                     styles.aetherCard,
                     !known && styles.techCardLocked,
                     known && pressed && styles.aetherCardPressed,
@@ -902,6 +919,7 @@ export function CraftingScreen() {
                       ? `"channel ${t.name.toLowerCase()}"`
                       : 'a faction whose rapport you have earned sells this procedure.'}
                   </Text>
+                  {CTL_PLANES}
                 </Pressable>
               );
             })}
@@ -949,12 +967,13 @@ export function CraftingScreen() {
                 </Text>
                 <TouchableOpacity
                   onPress={exitRepairSelect}
-                  style={styles.groupBarCancel}
+                  style={[kit.ctl, styles.groupBarCancel]}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel="Cancel the group and go back to repairing one at a time"
                 >
                   <Text style={styles.groupBarCancelText}>CANCEL</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
               </View>
               {/* The running bill. This is the number the dimming is derived
@@ -968,13 +987,14 @@ export function CraftingScreen() {
               <TouchableOpacity
                 onPress={() => setRepairGroupConfirm(true)}
                 disabled={repairPlan.picked.length === 0}
-                style={[styles.groupBarGo, repairPlan.picked.length === 0 && styles.groupBarGoOff]}
+                style={[kit.ctl, styles.groupBarGo, repairPlan.picked.length === 0 && styles.groupBarGoOff]}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ disabled: repairPlan.picked.length === 0 }}
                 accessibilityLabel={`Repair the group of ${repairPlan.picked.length}`}
               >
                 <Text style={styles.groupBarGoText}>⚒ REPAIR GROUP ({repairPlan.picked.length})</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
           ) : (

@@ -1,5 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
+ * label, hitSlop and geometry unchanged; only the material moved to the kit. */
+const ctlPlanes = (pressed: boolean) => (
+  <>
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+  </>
+);
 
 interface Props {
   value: number;
@@ -72,9 +83,12 @@ export function NumberStepper({
         accessibilityRole="button"
         accessibilityLabel="Decrease"
         onPress={() => bump(-step)}
-        style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+        style={({ pressed }) => [kit.ctl, styles.btn, tControlDepth(pressed)]}
       >
-        <Text style={styles.btnText}>−</Text>
+        {({ pressed }) => (<>
+          <Text style={styles.btnText}>−</Text>
+          {ctlPlanes(pressed)}
+        </>)}
       </Pressable>
 
       {editing ? (
@@ -90,7 +104,7 @@ export function NumberStepper({
           selectTextOnFocus
         />
       ) : (
-        <Pressable accessibilityRole="button" onPress={onPressNumber} style={styles.display}>
+        <Pressable accessibilityRole="button" onPress={onPressNumber} style={[kit.recess, styles.display]}>
           <Text style={styles.displayText}>
             {value.toFixed(decimals)}{suffix}
           </Text>
@@ -101,9 +115,12 @@ export function NumberStepper({
         accessibilityRole="button"
         accessibilityLabel="Increase"
         onPress={() => bump(step)}
-        style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+        style={({ pressed }) => [kit.ctl, styles.btn, tControlDepth(pressed)]}
       >
-        <Text style={styles.btnText}>+</Text>
+        {({ pressed }) => (<>
+          <Text style={styles.btnText}>+</Text>
+          {ctlPlanes(pressed)}
+        </>)}
       </Pressable>
     </View>
   );
@@ -115,16 +132,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  btn: {
-    width: 38,
-    height: 32,
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` owns the material; no box moved.
+  btn: { width: 38, height: 32, borderRadius: 3, alignItems: 'center', justifyContent: 'center' },
   btnPressed: {
     opacity: 0.6,
   },
@@ -134,11 +143,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 22,
   },
+  /* ⚠⚠⚠ A DOCUMENTED INTENTIONAL EXCEPTION: this one is NOT a raised key.
+   * Tapping the number swaps it for a `TextInput`, so what the object IS is a
+   * FIELD — and the recess is the family for "enter something here". Giving it
+   * the command construction would promise a key that turns into a well the
+   * moment it is touched. It takes `kit.recess`, keeps its own geometry, and
+   * deliberately draws no plane. */
   display: {
     minWidth: 76,
     height: 32,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 3,
     alignItems: 'center',

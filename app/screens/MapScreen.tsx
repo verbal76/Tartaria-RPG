@@ -29,7 +29,7 @@ import {
   Pressable,
   type GestureResponderEvent,
 } from 'react-native';
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { useGameStore, playerGridCell } from '../state/gameStore';
 import { isTutorialLocked } from '../components/tutorialSteps'; // OTA-1700
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -238,6 +238,25 @@ function touchesOf(e: GestureResponderEvent): Array<{ x: number; y: number }> {
   const touches = e.nativeEvent.touches ?? [];
   return touches.map((t) => ({ x: t.pageX, y: t.pageY }));
 }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function MapScreen() {
   const player = useGameStore((s) => s.player);
@@ -1225,7 +1244,7 @@ export function MapScreen() {
                 return (
                   <TouchableOpacity
                     key={cm.key}
-                    style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
+                    style={[tRowStyle(), styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     onPress={() => {
@@ -1291,6 +1310,7 @@ export function MapScreen() {
                       )}
                       {!isHere && <Text style={styles.placeArrow}>▸</Text>}
                     </View>
+                    {ROW_PLANES}
                   </TouchableOpacity>
                 );
               })}
@@ -1316,7 +1336,7 @@ export function MapScreen() {
             return (
               <TouchableOpacity
                 key={p.id}
-                style={[styles.placeRow, isHere && styles.placeRowHere]}
+                style={[tRowStyle(), styles.placeRow, isHere && styles.placeRowHere]}
                 activeOpacity={isHere ? 1 : 0.7}
                 disabled={isHere}
                 accessibilityRole="button"
@@ -1358,6 +1378,7 @@ export function MapScreen() {
                     <Text style={styles.placeArrow}>▸</Text>
                   )}
                 </View>
+                {ROW_PLANES}
               </TouchableOpacity>
             );
           })}

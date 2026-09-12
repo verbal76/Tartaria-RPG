@@ -207,19 +207,19 @@ export const T = {
    * stops being one dark edge and becomes a side with a shadow under it. Two
    * planes became three; that is geometry, and it is what the eye reads at
    * arm's length on a phone. */
-  controlFaceLit: 'rgba(255,250,240,0.30)',
+  controlFaceLit: 'rgba(255,250,240,0.38)',
   /** The SIDEWALL — the side of the key, in its own shadow, above the dark rim.
    *  2dp rather than a hairline, because a side has thickness and an edge does
    *  not; that thickness is the whole difference between a raised object and a
    *  drawn frame. */
-  controlSidewall: 'rgba(0,0,0,0.58)',
+  controlSidewall: 'rgba(0,0,0,0.66)',
   /** ⚠ THE CONTACT SHADOW — the dark line where the key meets the surface it
    *  stands on, drawn INSIDE the control's own box because Android `elevation`
    *  would halo all four sides and iOS `shadow*` does not exist on Android at
    *  all. One near-black hairline under the sidewall is what separates "a side"
    *  from "a side resting on something". It is the cheapest real plane in the
    *  language and the one Phase 1 did not have. */
-  controlContact: 'rgba(0,0,0,0.82)',
+  controlContact: 'rgba(0,0,0,0.88)',
   /* ⚠⚠⚠ THE SAME CONSTRUCTION AT CHASSIS WEIGHT — AND THE GAP BETWEEN THE TWO IS
    * THE POINT, NOT A SHADE. Owner: a large tappable card *"is NOT the same thing
    * as a command button… less key-like protrusion than a discrete command."* A
@@ -231,8 +231,8 @@ export const T = {
    * values at roughly half strength, and the sidewall drops from 2dp to 1dp.
    * Same grammar, lower voice. A card still says "you can touch me"; it no
    * longer says "strike me". */
-  chassisFaceLit: 'rgba(255,250,240,0.13)',
-  chassisSidewall: 'rgba(0,0,0,0.34)',
+  chassisFaceLit: 'rgba(255,250,240,0.16)',
+  chassisSidewall: 'rgba(0,0,0,0.38)',
   /** The chassis contact. Present, so a card reads as RESTING on the panel —
    *  and weaker than a command's, so a card never reads as a key. */
   chassisContact: 'rgba(0,0,0,0.46)',
@@ -1475,8 +1475,11 @@ const kit = StyleSheet.create({
    * rounded corner. 3 against the hosts' 4 keeps the band just inside the curve
    * either way, and it costs nothing on the hosts that clip. */
   /** The face's own catch of light, just inside a pressable control's lit rim. */
+  /* ⚠⚠ PHASE 3 — 1dp → 2dp. A hairline is an EDGE; a 2dp band is the top
+   * PLANE of a key seen slightly from above, which is what lets the face read as
+   * sitting above its mounting surface. Still absolute, still zero layout. */
   controlPlaneTop: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
     backgroundColor: T.controlFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
   /* ⚠⚠ PHASE 2 — THE SIDEWALL GOES TO 3dp AND STOPS TOUCHING THE GROUND.
@@ -1486,8 +1489,12 @@ const kit = StyleSheet.create({
    * now has a SIDE and, below that, the dark where it MEETS the surface — which
    * is the difference between a drawn rectangle and an object standing on
    * something. Still absolute, still zero layout. */
+  /* ⚠⚠⚠ PHASE 3 — 3dp → 4dp. With the 1dp contact beneath it the visible
+   * stack goes 5dp → 6dp, about a fifth more apparent height, which is the
+   * owner's *"15–20% more PERCEIVED ELEVATION"* and no more. A LOW-PROFILE
+   * industrial key mounted on a panel — not an arcade button. */
   controlPlaneBottom: {
-    position: 'absolute', bottom: 1, left: 0, right: 0, height: 3,
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 4,
     backgroundColor: T.controlSidewall,
   },
   /** The contact shadow: the near-black hairline where the key meets its
@@ -1510,7 +1517,7 @@ const kit = StyleSheet.create({
    * contact band is not drawn at all, the shaded side moves ABOVE the face, and
    * the whole control travels 2dp (up from 1.5). The key visibly loses height. */
   controlPlaneTopPressed: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
     backgroundColor: T.controlSidewall, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
   controlPlaneBottomPressed: {
@@ -1532,7 +1539,7 @@ const kit = StyleSheet.create({
    * card now visibly RESTS on the panel; it still does not read as a key, which
    * is the boundary the whole family split exists to hold. */
   chassisPlaneBottom: {
-    position: 'absolute', bottom: 1, left: 0, right: 0, height: 2,
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 3,
     backgroundColor: T.chassisSidewall,
   },
   chassisPlaneContact: {
@@ -1571,6 +1578,50 @@ const kit = StyleSheet.create({
    * ring. No `borderWidth` here for the same reason as the depth pair above —
    * every pill already has one in its own chassis. See `tFilledGold`. */
   filledGold: { backgroundColor: T.gold, borderColor: T.gold },
+  /* ⚠⚠⚠ PHASE 3 — THE ONE CONTROL MATERIAL, AND WHY IT OWNS NO GEOMETRY.
+   * The census found a DEPRECATED DIALECT on 79 interactive styles across 41
+   * files: a 1dp literal-gold outline, radius 4, a cold blue-grey label, and
+   * selection expressed by swapping the rim to gold and flooding the body with
+   * a brown fill. That is a second control language, and the owner has ruled it
+   * dead: *"Kill the FAMILY, not the three specimens."*
+   *
+   * ⚠⚠ IT IS MATERIAL ONLY — no padding, no flex, no width, no alignment. Every
+   * one of those controls already owns its own geometry, and the migration must
+   * not move a single box: the local style keeps its padding and layout, `ctl`
+   * supplies the face, the rim and the directional pair. That division is what
+   * lets 79 call sites adopt one language without a layout audit each.
+   *
+   * ⚠ AND IT IS NOT A NEW EXPORT. Same route `panelFrame` and the planes take —
+   * a `tartariaKitStyles` entry — so the budget stays 13/13 · 10/10 · 23/23. */
+  ctl: {
+    backgroundColor: T.face,
+    borderWidth: 1,
+    borderColor: T.rim,
+    borderRadius: 4,
+    borderTopColor: T.controlRaisedLit,
+    borderBottomColor: T.controlRaisedDark,
+  },
+  /* ⚠⚠⚠ SELECTED IS THE SAME OBJECT, MARKED — NOT A DIFFERENT OBJECT. The
+   * deprecated dialect REPLACED the control when it was chosen: a cold outlined
+   * tile became a filled slab, so MALE and FEMALE read as two different species
+   * of thing. Owner: *"A selected choice must remain recognizably the same
+   * physical object it was before selection."*
+   *
+   * ⚠⚠ SO ONLY THE RIM AND THE FACE MOVE. Gold takes the left and right edges;
+   * the face lifts one step. Top and bottom stay on the SAME directional pair
+   * as an unselected control — RN resolves `borderTopColor` over the blanket
+   * `borderColor` — so the lit-above/dark-below construction, the three planes
+   * and the press travel all survive being chosen. Semantic state is a layer ON
+   * the physical control, never a replacement for it. */
+  ctlOn: {
+    borderColor: T.gold,
+    borderTopColor: T.controlRaisedLit,
+    borderBottomColor: T.controlRaisedDark,
+    backgroundColor: T.faceLit,
+  },
+  /** Unavailable: the whole object dims. It keeps its construction, because a
+   *  dead control is still the same key — it just cannot be struck. */
+  ctlDead: { opacity: 0.38 },
   /* ⚠⚠ PRESSED IS THE LIGHT MOVING, NOT A NEW COLOUR. The catch of light goes
    * to the bottom edge and the shadow to the top — which is what an object
    * pushed INTO a surface actually looks like — and the face travels 1.5dp
@@ -1581,7 +1632,7 @@ const kit = StyleSheet.create({
     /* ⚠ PHASE 2 — 1.5 → 2. The travel is the one cue that survives being looked
      * at from a distance, and 1.5dp was inside the noise on a dense row. Still a
      * transform, so no sibling reflows and the touch target does not move. */
-    transform: [{ translateY: 2 }],
+    transform: [{ translateY: 3 }],
   },
   rowChassis: {
     flexDirection: 'row',
@@ -1808,11 +1859,11 @@ const kit = StyleSheet.create({
    * family."* What keeps a tab from BEING a command is not a weaker plane — it
    * is that its engaged state docks instead of travelling. */
   tabPlaneTop: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
     backgroundColor: T.controlFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
   tabPlaneBottom: {
-    position: 'absolute', bottom: 1, left: 0, right: 0, height: 3,
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 4,
     backgroundColor: T.controlSidewall,
   },
   tabPlaneContact: {

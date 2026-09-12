@@ -11,7 +11,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
 
-import { TScreenHeader } from '../ui/tartariaKit';
+import { TScreenHeader, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 interface Concept {
   id: string;
   title: string;
@@ -274,6 +274,25 @@ const EXPLORE_SECTIONS = new Set([
  *  (Settings → GUIDANCE → REPLAY TEACHING → REFERENCE) now hosts it, so there
  *  is one reference and one door. The standalone screen wrapper stays for the
  *  route table. */
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function ActionReferenceBody() {
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   // arb88 — drives the context-first ordering of the reference.
@@ -325,7 +344,7 @@ export function ActionReferenceBody() {
     return (
       <Pressable
         key={id}
-        style={({ pressed }) => [
+        style={({ pressed }) => [tRowStyle(), 
           styles.card,
           pressed && styles.cardPressed,
           queued && styles.cardQueued,
@@ -347,6 +366,7 @@ export function ActionReferenceBody() {
             {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
           </Text>
         )}
+        {ROW_PLANES}
       </Pressable>
     );
   };

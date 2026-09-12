@@ -109,6 +109,19 @@ const STAGE_SCROLL_MAX_HEIGHT = Math.max(
   Math.floor(Dimensions.get('window').height - 320),
 );
 
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function HookContinueModal({
   visible,
   noun,
@@ -218,19 +231,21 @@ export function HookContinueModal({
                     </Pressable>
                     {vendorName && onTrade ? (
                       <Pressable
-                        style={({ pressed }) => [styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
                         onPress={onTrade}
                         accessibilityRole="button"
                       >
                         <Text style={styles.btnTextTrade}>TRADE NOW</Text>
+                        {CTL_PLANES}
                       </Pressable>
                     ) : null}
                     <Pressable
-                      style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                      style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
                       onPress={onAbandon}
                       accessibilityRole="button"
                     >
                       <Text style={styles.btnTextNeutral}>ABANDON</Text>
+                      {CTL_PLANES}
                     </Pressable>
                   </>
                 )}
@@ -290,7 +305,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   // OTA-284 — TRADE NOW button. Distinct treatment so it reads as
   // "alternative path" not "primary action" (CONTINUE is primary).
   // Olive/sage outline matches the existing vendor-banner accent on

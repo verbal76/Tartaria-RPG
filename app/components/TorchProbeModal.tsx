@@ -33,6 +33,19 @@ interface Props {
 // WHICH lead to reveal + take over. Picking one charges it: when the player
 // then works that lead, it pays out an upgraded Rare/Legendary drop. Cloned
 // from ClimbModal's list-picker shape.
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
   return (
     <Modal
@@ -63,12 +76,13 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
                   {leads.map((lead, i) => (
                     <Pressable
                       key={`lead-${lead.id}-${i}`}
-                      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                      style={({ pressed }) => [kit.ctl, styles.row, pressed && styles.rowPressed]}
                       onPress={() => onSubmit(lead.id)}
                       accessibilityRole="button"
                     >
                       <Text style={styles.rowName} numberOfLines={1}>{lead.noun}</Text>
                       <Text style={styles.rowTag}>AIM ›</Text>
+                      {CTL_PLANES}
                     </Pressable>
                   ))}
                 </ScrollView>
@@ -76,11 +90,12 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
 
               <View style={styles.btnRow}>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
                   onPress={onCancel}
                   accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
             </View>
@@ -121,6 +136,5 @@ const styles = StyleSheet.create({
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

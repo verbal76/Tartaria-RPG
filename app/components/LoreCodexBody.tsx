@@ -43,6 +43,7 @@ import {
   myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
 } from '../engine/fallenLedgerStore';
 
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
 // in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
 // concepts bank (the "massive lore document" that lived in the files but was never
@@ -106,6 +107,39 @@ interface CodexEnemy {
   flavor?: string;
 }
 interface LoreConcept { id: string; title: string; answer: string }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const TAB_PLANES = (
+  <>
+    <View style={kit.tabPlaneTop} pointerEvents="none" />
+    <View style={kit.tabPlaneBottom} pointerEvents="none" />
+    <View style={kit.tabPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
   // ⚠⚠ OTA-1376 — THE CODEX OPENS ON THE TAB YOU CAME FOR. Owner: *"when we
@@ -364,13 +398,14 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
-            style={[styles.tab, section === s && styles.tabActive]}
+            style={[kit.ctl, styles.tab, section === s && styles.tabActive]}
             accessibilityRole="button"
             accessibilityState={{ selected: section === s }}
           >
             <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
               {TAB_LABEL[s]}
             </Text>
+            {TAB_PLANES}
           </TouchableOpacity>
         ))}
       </View>
@@ -438,12 +473,13 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
           return (
             <TouchableOpacity
               key={l.id}
-              style={styles.entry}
+              style={[tRowStyle(), styles.entry]}
               activeOpacity={0.7}
               onPress={() => setPendingRoute(l)}
               accessibilityRole="button"
             >
               {content}
+              {ROW_PLANES}
             </TouchableOpacity>
           );
         })}
@@ -641,20 +677,22 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
           ))}
           <View style={styles.exchangeRow}>
             <TouchableOpacity
-              style={styles.exchangeBtn}
+              style={[kit.ctl, styles.exchangeBtn]}
               onPress={() => { void sendRequest(); }}
               accessibilityRole="button"
               disabled={busy}
             >
               <Text style={styles.exchangeBtnText}>SEND REQUEST</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.exchangeBtn}
+              style={[kit.ctl, styles.exchangeBtn]}
               onPress={() => { void acceptRequest(); }}
               accessibilityRole="button"
               disabled={busy}
             >
               <Text style={styles.exchangeBtnText}>ACCEPT REQUEST</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
           <TextInput
@@ -668,20 +706,22 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
           />
           <View style={styles.exchangeRow}>
             <TouchableOpacity
-              style={styles.exchangeBtn}
+              style={[kit.ctl, styles.exchangeBtn]}
               onPress={() => { void shareMyDead(); }}
               accessibilityRole="button"
               disabled={busy}
             >
               <Text style={styles.exchangeBtnText}>SEND MY DEAD</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.exchangeBtn}
+              style={[kit.ctl, styles.exchangeBtn]}
               onPress={() => { void importTheirDead(); }}
               accessibilityRole="button"
               disabled={busy}
             >
               <Text style={styles.exchangeBtnText}>TAKE IN THEIRS</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
           <TextInput
@@ -743,20 +783,22 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
             </Text>
             <View style={styles.modalRow}>
               <TouchableOpacity
-                style={[styles.modalBtn, styles.modalBtnGhost]}
+                style={[kit.ctl, styles.modalBtn, styles.modalBtnGhost]}
                 onPress={() => setPendingRoute(null)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGhostText}>CANCEL</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalBtn, styles.modalBtnGo]}
+                style={[kit.ctl, styles.modalBtn, styles.modalBtnGo]}
                 onPress={confirmRoute}
                 activeOpacity={0.7}
                 accessibilityRole="button"
               >
                 <Text style={styles.modalBtnGoText}>SET COURSE</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
           </View>

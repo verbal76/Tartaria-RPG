@@ -44,8 +44,16 @@ describe('OTA-1453 — the STORE button', () => {
     // The defect this replaces would be a STORE button that opened something
     // subtly different from the banner. Both handlers are read out of the source
     // and compared, so they cannot drift into two answers.
-    const chipOpen = between(EXPL, 'style={[styles.placeChip, styles.vendorChip]}', 'activeOpacity');
-    const storeOpen = between(EXPL, 'style={[styles.placeChipTalk, styles.placeChipStore]}', 'hitSlop');
+    /* ⚠⚠ RE-ANCHORED IN PHASE 3, AND THE OLD ANCHOR'S SHAPE WAS THE PROBLEM. It
+     * pinned the WHOLE style array — `style={[styles.placeChip,
+     * styles.vendorChip]}` — so when both chips adopted the kit's construction
+     * and the array grew a `tartariaKitStyles.ctl` at the front, the anchor
+     * stopped matching and this suite went red over a change it does not care
+     * about. Nothing it ASSERTS involves styling: it compares two handlers. So
+     * it now anchors on the one SEMANTIC key naming each control, which
+     * survives anything prepended to or appended to the array. */
+    const chipOpen = between(EXPL, 'styles.vendorChip', 'activeOpacity');
+    const storeOpen = between(EXPL, 'styles.placeChipStore', 'hitSlop');
     const handlerOf = (s: string) => /onPress=\{([^}]*)\}/.exec(s)?.[1]?.trim();
     expect(handlerOf(chipOpen)).toBe("() => setScreen('vendor')");
     expect(handlerOf(storeOpen)).toBe(handlerOf(chipOpen));

@@ -12,6 +12,7 @@ import { useGameStore } from '../state/gameStore';
 import { availableFactionQuests, neutralBoardPostings } from '../engine/factionQuests';
 import { getStanding, FACTIONS } from '../engine/factions';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -26,6 +27,25 @@ interface Props {
 // acceptFactionQuest(title) the typed path uses; availableFactionQuests already
 // filters out anything active/completed, so an accepted posting drops off the
 // list immediately and the modal stays open to take more.
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function MissionBoardModal({ visible, onClose }: Props) {
   const board = useGameStore((s) => s.currentScene?.missionBoard ?? null);
   // Raw selects (NO `?? []` inside the selector — that returns a fresh array
@@ -111,12 +131,13 @@ export function MissionBoardModal({ visible, onClose }: Props) {
                                 ✦ {q.reward.tc} TC · +{q.reward.rep} rep{neutral ? ` · ${g.factionName}` : ''}
                               </Text>
                               <Pressable
-                                style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
+                                style={({ pressed }) => [kit.ctl, styles.acceptBtn, pressed && styles.btnPressed]}
                                 onPress={() => acceptFactionQuest(q.title)}
                                 accessibilityRole="button"
                                 accessibilityLabel={`Accept ${q.title}${neutral ? ` for the ${g.factionName}` : ''}`}
                               >
                                 <Text style={styles.acceptBtnText}>ACCEPT</Text>
+                                {CTL_PLANES}
                               </Pressable>
                             </View>
                           </View>
@@ -127,11 +148,12 @@ export function MissionBoardModal({ visible, onClose }: Props) {
                 </>
               )}
               <Pressable
-                style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
+                style={({ pressed }) => [kit.ctl, styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
                 accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
           </TouchableWithoutFeedback>

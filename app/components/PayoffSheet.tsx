@@ -15,7 +15,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
+ * label, hitSlop and geometry unchanged; only the material moved to the kit. */
+const ctlPlanes = (pressed: boolean) => (
+  <>
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+  </>
+);
 
 export function PayoffSheet() {
   const ctx = useGameStore((s) => s.pendingPayoff);
@@ -36,7 +46,7 @@ export function PayoffSheet() {
       </Text>
 
       <Pressable
-        style={({ pressed }) => [styles.payBtn, pressed && styles.btnPressed]}
+        style={({ pressed }) => [kit.ctl, styles.payBtn, kit.ctlOn, tControlDepth(pressed)]}
         onPress={() => resolve(true)}
         accessibilityRole="button"
         accessibilityLabel={`Pay ${ctx.amount} TC`}
@@ -46,13 +56,14 @@ export function PayoffSheet() {
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [styles.fightBtn, pressed && styles.btnPressed]}
+        style={({ pressed }) => [kit.ctl, styles.fightBtn, tControlDepth(pressed)]}
         onPress={() => resolve(false)}
         accessibilityRole="button"
         accessibilityLabel="Refuse and fight"
       >
         <Text style={styles.fightText}>FIGHT</Text>
         <Text style={styles.fightHint}>"Thief!" — steel comes out, and the factions hear of it.</Text>
+        {ctlPlanes(false)}
       </Pressable>
     </View>
   );
@@ -83,15 +94,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
-  payBtn: {
-    borderColor: '#6b5c3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#2a1f12',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    gap: 2,
-  },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` owns the material; no box moved.
+  payBtn: { paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
   payText: {
     color: '#e0c179',
     fontSize: 14,
@@ -103,11 +107,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontStyle: 'italic',
   },
+  /* ⚠⚠ SEMANTIC OVER CONSTRUCTION, AND THIS ONE SHOWS WHY THE RULE IS WORTH
+   * HAVING. Refusing a shakedown is the dangerous half of this sheet, so the rim
+   * stays rust — that is MEANING. The face, the radius and the lit/shadow pair
+   * come from `kit.ctl` underneath it, and RN resolves the specific
+   * `borderColor` over the kit's neutral one, so FIGHT is the same species of
+   * key as PAY and merely wears a warning. */
   fightBtn: {
     borderColor: '#a85a3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#17150f',
     paddingVertical: 10,
     paddingHorizontal: 12,
     gap: 2,

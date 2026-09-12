@@ -72,7 +72,7 @@ import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; 
 const ROSTER_MIN_HEIGHT = 148;
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
-import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata } from '../ui/tartariaKit';
+import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { factionCrest, crestArt } from '../engine/factionCrests';
 import { placeCrestField, type CardBox, type FieldComposition } from '../ui/crestField';
 
@@ -240,6 +240,32 @@ function DossierField({
     </View>
   );
 }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function TitleScreen() {
   // The title screen renders directly on the player's tuned background (the
@@ -848,7 +874,7 @@ export function TitleScreen() {
         {item.dead && (
           <View style={styles.deadActions}>
             <TouchableOpacity
-              style={styles.shareLogBtn}
+              style={[kit.ctl, styles.shareLogBtn]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void backUpSlot(item);
@@ -860,6 +886,7 @@ export function TitleScreen() {
               <Text style={styles.shareLogText}>
                 {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         )}
@@ -871,7 +898,7 @@ export function TitleScreen() {
           // truncate large pastes get the full payload anyway.
           <View style={styles.deadActions}>
             <TouchableOpacity
-              style={styles.copyLogBtn}
+              style={[kit.ctl, styles.copyLogBtn]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void copyDeadLog(item);
@@ -898,9 +925,10 @@ export function TitleScreen() {
                   return 'COPY LOG';
                 })()}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.shareLogBtn}
+              style={[kit.ctl, styles.shareLogBtn]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void shareDeadLog(item);
@@ -911,6 +939,7 @@ export function TitleScreen() {
               <Text style={styles.shareLogText}>
                 {sharedSlotId === item.slotId ? '✓ SHARED' : 'SHARE'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         )}
@@ -1097,11 +1126,12 @@ export function TitleScreen() {
                 <Text style={styles.playStoreNagPrimaryText}>OPEN PLAY STORE</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.playStoreNagDismiss}
+                style={[kit.ctl, styles.playStoreNagDismiss]}
                 onPress={() => setPlayStoreNagDismissed(true)}
                 accessibilityRole="button"
               >
                 <Text style={styles.playStoreNagDismissText}>later</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
           </View>
@@ -1155,7 +1185,7 @@ export function TitleScreen() {
             </Text>
 
             <TouchableOpacity
-              style={styles.apkBannerCopyBtn}
+              style={[kit.ctl, styles.apkBannerCopyBtn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               onPress={() => {
@@ -1168,6 +1198,7 @@ export function TitleScreen() {
               <Text style={styles.apkBannerCopyText}>
                 {copied ? '✓ COPIED' : 'COPY URL'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         );
@@ -1175,7 +1206,7 @@ export function TitleScreen() {
 
       {pendingOTAUpdate && (
         <TouchableOpacity
-          style={styles.updateBanner}
+          style={[tRowStyle(), styles.updateBanner]}
           activeOpacity={0.8}
           disabled={applyingOTA !== null}
           accessibilityRole="button"
@@ -1197,6 +1228,7 @@ export function TitleScreen() {
               ? 'Tearing down audio + AI handles before the reload. One moment.'
               : 'A new build is ready. It applies automatically the next time you open the app — or tap to apply it now.'}
           </Text>
+          {ROW_PLANES}
         </TouchableOpacity>
       )}
 
@@ -1345,7 +1377,7 @@ export function TitleScreen() {
           KEY. Everything else the rule refuses still stands, and Exploration's
           scene header is still stripped of it. */}
       <TouchableOpacity
-        style={styles.cornerGear}
+        style={[kit.ctl, styles.cornerGear]}
         onPress={() => setScreen('about')}
         activeOpacity={0.7}
         hitSlop={10}
@@ -1353,6 +1385,7 @@ export function TitleScreen() {
         accessibilityLabel="Settings"
       >
         <TGear size={20} color={T.gold} />
+        {CTL_PLANES}
       </TouchableOpacity>
       {/* ⚠⚠⚠ PHONE-FIX — THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN.
           Owner: remove RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE

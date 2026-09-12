@@ -12,6 +12,33 @@ import { coatedDisplayName } from '../engine/weaponCoating';
 import { wornInstanceIds, equippedInstanceIds } from '../engine/equipment';
 import { itemIsDogArmor } from '../engine/dogCompanion';
 import type { InventoryItem } from '../engine/types';
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+
+/* ⚠⚠⚠ PHASE 3 — FUSIBLE LINK HAD ITS OWN DIALECT, AND IT USED TWO FAMILIES AT
+ * ONCE. The four kind buttons (WEAPON / ARMOR / DOG ARMOR / UPGRADE) are KEYS —
+ * you strike them — so they take the raised command construction. The pick
+ * rows below are an interactive CHASSIS — you select one — so they take the
+ * row chassis and the shallower chassis planes. Giving a full-width list row
+ * the command key's sidewall would be the same category error in the other
+ * direction, and the kit has carried both languages since Phase 2.
+ *
+ * ⚠⚠ THE BLOCKED ROW AT THE TOP OF THE LIST IS A `<View>`, NOT A CONTROL, AND
+ * IT STAYS FLAT. The interaction contract decides the physical family — not the
+ * style key, which `row` shares with three pressables. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 const MIN_PICK = 3;
 const MAX_PICK = 5;
@@ -224,7 +251,7 @@ export function FusionPickerModal() {
                               ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
                               : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
                             return (
-                              <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
+                              <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[tRowStyle(), styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
                                 <View style={styles.rowNameWrap}>
                                   <Text style={[styles.rowName, styles.rowNameTight]} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
                                   {worn ? (
@@ -232,6 +259,7 @@ export function FusionPickerModal() {
                                   ) : null}
                                 </View>
                                 <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
+                                {ROW_PLANES}
                               </Pressable>
                             );
                           })}
@@ -286,11 +314,12 @@ export function FusionPickerModal() {
                         // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
                         // type is the info the player actually picks on; rarity is secondary.
                         return (
-                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]} accessibilityRole="button" accessibilityState={{ selected: on, disabled: dim }}>
+                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[tRowStyle(), styles.row, on && styles.rowOn, dim && styles.rowDim]} accessibilityRole="button" accessibilityState={{ selected: on, disabled: dim }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
                             <Text style={styles.rowMeta}>{it.rarity}</Text>
+                            {ROW_PLANES}
                           </Pressable>
                         );
                       })}
@@ -304,10 +333,11 @@ export function FusionPickerModal() {
                       {catalysts.map((c) => {
                         const on = catalystId === c.id;
                         return (
-                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]} accessibilityRole="button" accessibilityState={{ selected: on }}>
+                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[tRowStyle(), styles.row, on && styles.rowOn]} accessibilityRole="button" accessibilityState={{ selected: on }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
+                            {ROW_PLANES}
                           </Pressable>
                         );
                       })}
@@ -316,19 +346,23 @@ export function FusionPickerModal() {
 
                   <Text style={styles.catLabel}>{isUpgrade ? 'Mode' : 'Forge as'}</Text>
                   <View style={styles.kindRow}>
-                    <Pressable onPress={() => setKind('weapon')} style={[styles.kindBtn, kind === 'weapon' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
+                    <Pressable onPress={() => setKind('weapon')} style={[kit.ctl, styles.kindBtn, kind === 'weapon' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
                       <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
+                      {CTL_PLANES}
                     </Pressable>
-                    <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
+                    <Pressable onPress={() => setKind('armor')} style={[kit.ctl, styles.kindBtn, kind === 'armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
                       <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
+                      {CTL_PLANES}
                     </Pressable>
                     {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. */}
-                    <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
+                    <Pressable onPress={() => setKind('dog_armor')} style={[kit.ctl, styles.kindBtn, kind === 'dog_armor' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
                       <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
+                      {CTL_PLANES}
                     </Pressable>
                     {/* OTA-873 — fourth mode: upgrade an existing weapon with a 2nd coating slot. */}
-                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[styles.kindBtn, kind === 'upgrade' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
+                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[kit.ctl, styles.kindBtn, kind === 'upgrade' && styles.kindOn]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
                       <Text style={[styles.kindTxt, kind === 'upgrade' && styles.kindTxtOn]}>⬆ Upgrade</Text>
+                      {CTL_PLANES}
                     </Pressable>
                   </View>
 

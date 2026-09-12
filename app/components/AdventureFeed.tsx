@@ -17,6 +17,7 @@ import { CombatStrip, RewardCluster, STRIP_METRICS } from './CombatStrip';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 interface Props {
   entries: GameLogEntry[];
   /** Names of enemies currently on the field, used to highlight enemy
@@ -266,6 +267,25 @@ const FeedRow = React.memo(function FeedRow({ entry, names, event }: { entry: Ga
         );
 });
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   /* ⚠⚠⚠ OTA-1790 — MEMOISED, AND IT HAS TO BE NOW. This was recomputed on every
@@ -350,7 +370,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
       {actionChipLabel ? (
         <View style={styles.chipRow}>
           <TouchableOpacity
-            style={styles.chip}
+            style={[kit.ctl, styles.chip]}
             activeOpacity={0.7}
             onPress={onActionChipPress}
             accessibilityRole="button"
@@ -358,6 +378,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
             testID="feed-action-chip"
           >
             <Text style={styles.chipText}>{actionChipLabel}</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
       ) : null}
@@ -367,7 +388,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
       {actionChipLabel && packChipLabel ? (
         <View style={styles.chipRow}>
           <TouchableOpacity
-            style={styles.packChip}
+            style={[kit.ctl, styles.packChip]}
             activeOpacity={0.7}
             onPress={onPackChipPress}
             accessibilityRole="button"
@@ -375,6 +396,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
             testID="feed-pack-chip"
           >
             <Text style={styles.packChipText}>{packChipLabel}</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
       ) : null}

@@ -13,7 +13,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 const PAGE_IN_MS = 1400;
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function StoryIntroOverlay() {
   const pages = useGameStore((s) => s.storyIntro);
@@ -54,8 +74,9 @@ export function StoryIntroOverlay() {
       <Pressable style={styles.backdrop} onPress={advance} accessibilityRole="button" accessibilityLabel="Continue">
         <View style={styles.topRow}>
           <Text style={styles.pageCount}>{page + 1} / {pages.length}</Text>
-          <Pressable onPress={dismiss} style={styles.skipBtn} accessibilityRole="button" accessibilityLabel="Skip opening">
+          <Pressable onPress={dismiss} style={[kit.ctl, styles.skipBtn]} accessibilityRole="button" accessibilityLabel="Skip opening">
             <Text style={styles.skipText}>SKIP</Text>
+            {CTL_PLANES}
           </Pressable>
         </View>
         <Animated.View

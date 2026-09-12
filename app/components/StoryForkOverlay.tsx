@@ -18,7 +18,27 @@ import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 const CARD_IN_MS = 900;
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function StoryForkOverlay() {
   const fork = useGameStore((s) => s.pendingFork);
@@ -56,13 +76,14 @@ export function StoryForkOverlay() {
             {fork.options.map((o) => (
               <Pressable
                 key={o.id}
-                style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+                style={({ pressed }) => [kit.ctl, styles.option, pressed && styles.optionPressed]}
                 onPress={() => answer(o.id)}
                 accessibilityRole="button"
                 accessibilityLabel={`${o.label}. ${o.hint}`}
               >
                 <Text style={styles.optionLabel}>{o.label}</Text>
                 <Text style={styles.optionHint}>{o.hint}</Text>
+                {CTL_PLANES}
               </Pressable>
             ))}
             <Text style={styles.footnote}>There is no going back from this one.</Text>

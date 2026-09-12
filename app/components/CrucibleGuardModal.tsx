@@ -22,6 +22,33 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function CrucibleGuardModal() {
   const prompt = useGameStore((s) => s.crucibleGuardPrompt);
   const resolve = useGameStore((s) => s.resolveCrucibleGuard);
@@ -68,7 +95,7 @@ export function CrucibleGuardModal() {
                     <Pressable
                       key={a.id}
                       onPress={() => toggle(a.id)}
-                      style={[styles.row, on && styles.rowOn]}
+                      style={[tRowStyle(), styles.row, on && styles.rowOn]}
                     >
                       <Text style={[styles.box, on && styles.boxOn]}>{on ? '♥' : '☐'}</Text>
                       <View style={styles.rowText}>
@@ -77,6 +104,7 @@ export function CrucibleGuardModal() {
                           {a.quantity} would be spent{a.held > a.quantity ? ` · you hold ${a.held}` : ''}
                         </Text>
                       </View>
+                      {ROW_PLANES}
                     </Pressable>
                   );
                 })}
@@ -92,21 +120,24 @@ export function CrucibleGuardModal() {
               </Pressable>
 
               <Pressable
-                style={[styles.saveSome, (noneTicked || allTicked) && styles.dim]}
+                style={[kit.ctl, styles.saveSome, (noneTicked || allTicked) && styles.dim]}
                 disabled={noneTicked || allTicked}
                 onPress={() => resolve('save', ticked)}
               >
                 <Text style={styles.saveSomeText}>
                   SAVE TICKED ({ticked.length}) · SPEND THE REST
                 </Text>
+                {CTL_PLANES}
               </Pressable>
 
               <View style={styles.footRow}>
-                <Pressable style={styles.cancel} onPress={close}>
+                <Pressable style={[kit.ctl, styles.cancel]} onPress={close}>
                   <Text style={styles.cancelText}>CANCEL</Text>
+                  {CTL_PLANES}
                 </Pressable>
-                <Pressable style={styles.spend} onPress={() => resolve('spend')}>
+                <Pressable style={[kit.ctl, styles.spend]} onPress={() => resolve('spend')}>
                   <Text style={styles.spendText}>SPEND IT ALL</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
             </View>

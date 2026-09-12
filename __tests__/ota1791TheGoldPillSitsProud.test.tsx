@@ -135,7 +135,18 @@ describe('OTA-1791 — the ten consumers read the authority, and only the author
     // pill in its button row takes the pressed state directly.
     const branded = codeOf(read('app', 'components', 'BrandedModal.tsx'));
     expect(branded).toMatch(/case 'primary': return tFilledGold\(null\)/);
-    expect(branded).toMatch(/b\.tone === 'primary' \? tFilledGold\(pressed\)/);
+    /* ⚠ WHITESPACE-TOLERANT, AND THE RELAXATION IS DELIBERATE. This pinned the
+     * ternary as one exact line, so Phase 3 broke it merely by wrapping the
+     * expression over three — a red suite over a change it does not care about.
+     * The CLAIM is which helper each tone reaches, not where the breaks fall. */
+    expect(branded).toMatch(/b\.tone === 'primary'\s*\?\s*tFilledGold\(pressed\)/);
+    /* ⚠⚠ AND THE OTHER ARM IS PINNED NOW, WHICH THIS TEST NEVER DID — the
+     * omission is exactly where a real defect lived. Every branded modal in the
+     * game draws its action row here, and only the PRIMARY reached an
+     * authority: `destructive` and `neutral` got `toneStyle` alone, a rim and a
+     * fill and no construction, so CANCEL sat beside a built key as a flat
+     * outline. Tone is what a button MEANS; `kit.ctl` is what it IS. */
+    expect(branded).toMatch(/:\s*\[kit\.ctl,\s*toneStyle\(b\.tone\)/);
   });
 });
 

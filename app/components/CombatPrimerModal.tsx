@@ -30,7 +30,18 @@
 // is the noise that gets tips switched off.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
+ * its handler, role, label and geometry; only the material changed, and the
+ * press now collapses the sidewall instead of only shifting a colour. */
+const ctlPlanes = (pressed: boolean) => (
+  <>
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+  </>
+);
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -163,12 +174,15 @@ export function CombatPrimerModal({
             <Text style={styles.turnOffText}>Turn off tips</Text>
           </Pressable>
           <Pressable
-            style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+            style={({ pressed }) => [kit.ctl, styles.btn, tControlDepth(pressed)]}
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel="Close the combat guide and fight"
           >
-            <Text style={styles.btnText}>FIGHT</Text>
+            {({ pressed }) => (<>
+              <Text style={styles.btnText}>FIGHT</Text>
+              {ctlPlanes(pressed)}
+            </>)}
           </Pressable>
         </View>
       </View>
@@ -193,10 +207,7 @@ const styles = StyleSheet.create({
   footnote: { color: '#a2977b', fontSize: 12, lineHeight: 18, fontStyle: 'italic', marginTop: 2 },
   turnOffBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12, marginTop: 4 },
   turnOffText: { color: '#8aa0a4', fontSize: 12, letterSpacing: 0.6, textDecorationLine: 'underline' },
-  btn: {
-    alignSelf: 'flex-end', marginTop: 18, paddingVertical: 10, paddingHorizontal: 22,
-    borderWidth: 1, borderColor: '#c9a86a', borderRadius: 4,
-  },
+  btn: { alignSelf: 'flex-end', marginTop: 18, paddingVertical: 10, paddingHorizontal: 22 },
   btnPressed: { backgroundColor: '#1f1b12' },
   btnText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
 });

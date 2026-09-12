@@ -75,6 +75,14 @@ interface Props {
 // Branded confirmation modal — matches the game's dark + amber palette and
 // optionally shows an item preview (kind / rarity / stats / description)
 // so the player knows what they're committing to.
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function BrandedModal({
   visible,
   title,
@@ -203,12 +211,25 @@ export function BrandedModal({
             key={b.label}
             style={({ pressed }) => [
               styles.btn,
-              b.tone === 'primary' ? tFilledGold(pressed) : [toneStyle(b.tone), pressed && styles.btnPressed],
+              /* ⚠⚠⚠ PHASE 3 — THE SHARED MODAL'S OWN SIBLING ESCAPE, AND IT WAS
+               * THE LAST ONE FOUND. Every branded modal in the game draws its
+               * action row here, and only the PRIMARY button reached a physical
+               * authority: `destructive` and `neutral` got `toneStyle` — a rim
+               * and a fill and nothing else — so in one row, on one card, the
+               * confirm was a constructed key and CANCEL beside it was a flat
+               * outline. No colour census could see it (the tones are correct
+               * semantics) and no key-level scan could either (`btn` reaches
+               * the kit at the primary site). Tone is what the object MEANS;
+               * `kit.ctl` is what it IS, and now both arms are built. */
+              b.tone === 'primary'
+                ? tFilledGold(pressed)
+                : [kit.ctl, toneStyle(b.tone), pressed && kit.controlPressed],
             ]}
             onPress={b.onPress}
             accessibilityRole="button"
           >
             <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
+            {CTL_PLANES}
           </Pressable>
         ))}
       </ScrollView>

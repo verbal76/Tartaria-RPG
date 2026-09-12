@@ -19,6 +19,18 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
+ * its handler, role, label and geometry; only the material changed, and the
+ * press now collapses the sidewall instead of only shifting a colour. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 import { useFirstTimeHint, setHintsDisabled } from './useFirstTimeHint';
 
 interface Props {
@@ -59,8 +71,9 @@ export function FirstTimeHint({ id, title, body }: Props) {
             <Text style={styles.linkText}>Turn off tips</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
-          <TouchableOpacity accessibilityRole="button" onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" onPress={dismiss} style={[kit.ctl, styles.btn]} activeOpacity={0.7}>
             <Text style={styles.btnText}>Got it</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
       </View>
@@ -104,13 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  btn: {
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-  },
+  btn: { paddingVertical: 8, paddingHorizontal: 18 },
   btnText: {
     color: '#c9a86a',
     fontSize: 12,

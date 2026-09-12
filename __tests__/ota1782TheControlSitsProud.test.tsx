@@ -156,10 +156,21 @@ describe('OTA-1782 — the language is two colours and one settle', () => {
     const pressed = tartariaKitStyles.controlPressed as Record<string, unknown>;
     expect(pressed.borderTopColor).toBe(T.controlRaisedDark);
     expect(pressed.borderBottomColor).toBe(T.controlRaisedLit);
+    /* ⚠⚠⚠ THE CEILING MOVED 2 → 3 BY OWNER RULING, AND IT IS STILL A CEILING.
+     * OTA-1782 capped the settle at 2dp so a press could never become a leap.
+     * Phase 3's ruling asks for the face to *"visibly settle toward the
+     * sidewall/mounting surface … mechanically depressed, not merely
+     * recolored"*, against a sidewall that grew 3dp → 4dp in the same pass — a
+     * 2dp travel under a 4dp side no longer reads as the key going home.
+     *
+     * ⚠⚠ WHAT THIS STILL REFUSES IS WHAT IT WAS BUILT TO REFUSE: more than one
+     * transform, a travel of zero, a travel that is not downward, and anything
+     * past 3dp. The bound is what makes this a settle rather than a bounce, and
+     * the bound is still here — a ruling moved the NUMBER, not the rule. */
     const tf = pressed.transform as Array<{ translateY: number }>;
     expect(tf).toHaveLength(1);
     expect(tf[0]!.translateY).toBeGreaterThan(0);
-    expect(tf[0]!.translateY).toBeLessThanOrEqual(2);
+    expect(tf[0]!.translateY).toBeLessThanOrEqual(3);
   });
 
   it('the helper returns the two halves and nothing else', () => {
@@ -338,16 +349,27 @@ describe('OTA-1782 — the combat chips adopt it, and the inert ones do not', ()
     }
   });
 
-  /* ⚠⚠⚠ THE INERT CASE, AND IT IS AN ABSENCE RATHER THAN A THIRD VARIANT.
-   * Owner: *"DISABLED / INERT must not falsely advertise the same physical
-   * readiness if existing semantics support distinguishing it."* A blocked chip
-   * buzzes and returns — it is not a control at that moment — so it gets no
-   * depth and keeps a flat, even ring. Note this is `blocked` alone: an
-   * `unavailable` or out-of-range chip IS still tappable (OTA-1591 made those
-   * refusals speak), so it stays proud. */
-  it('a blocked chip is given no depth at all', () => {
+  /* ⚠⚠⚠ REVERSED BY OWNER RULING IN VISUAL LANGUAGE PHASE 3, AND THE TEST IS
+   * INVERTED RATHER THAN DELETED. OTA-1782 read the inert case as an ABSENCE:
+   * a blocked chip got no depth, on the rule that *"DISABLED / INERT must not
+   * falsely advertise the same physical readiness."* On the device that made
+   * PICKPOCKET a stray grey rectangle belonging to no family — the owner's own
+   * word for it was "orphaned".
+   *
+   * ⚠⚠ THE GOVERNING RULE IS NOW ONE LINE: physical construction is what the
+   * object IS; semantic treatment is what state it is IN. Disabled is a state.
+   * So a blocked chip KEEPS the depth pair and is muted by `quickDisabled`, and
+   * this test now asserts exactly that — the depth is unconditional, and the
+   * dim is what carries "you cannot strike this". The behaviour is untouched:
+   * a blocked tap still buzzes and returns. */
+  it('a blocked chip keeps its construction and is carried by the dim instead', () => {
     const block = code.match(/const containerStyle = \(pressed: boolean\) => \[[\s\S]*?\];/)?.[0] ?? '';
-    expect(block).toMatch(/blocked \? null : tControlDepth\(pressed\)/);
+    expect(block).not.toBe('');
+    // the depth is no longer conditional on `blocked`
+    expect(block).not.toMatch(/blocked \? null : tControlDepth/);
+    expect(block).toMatch(/tControlDepth\(pressed\)/);
+    // and the state is still expressed — by the mute, not by removal
+    expect(block).toMatch(/blocked && styles\.quickDisabled/);
   });
 
   /* ⚠ THE PRESSED STATE HAD TO BECOME REACHABLE. `TouchableOpacity`'s only

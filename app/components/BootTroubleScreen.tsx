@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 /* ⚠⚠⚠ BOOT-HANG-1741 — THE SPINNER MUST NOT BE A DEAD END.
  *
  * The failure this exists for: OTA-1741 put `Promise.allSettled` on the launch
@@ -44,6 +45,25 @@ export interface BootTroubleProps {
   onCopyDiagnostic: () => void;
 }
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function BootTroubleScreen({
   stage, message, stalled, onRetry, onCheckForUpdate, onCopyDiagnostic,
 }: BootTroubleProps) {
@@ -76,18 +96,19 @@ export function BootTroubleScreen({
         ) : null}
 
         <TouchableOpacity
-          style={styles.primaryBtn}
+          style={[kit.ctl, styles.primaryBtn]}
           onPress={() => { setNote(null); onRetry(); }}
           accessibilityRole="button"
           activeOpacity={0.75}
         >
           <Text style={styles.primaryBtnText}>TRY STARTING AGAIN</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
 
         {/* ⚠ THE REPAIR DOOR. A build that cannot boot cannot reach the update
             check on its own — that check is chained after hydration. */}
         <TouchableOpacity
-          style={[styles.secondaryBtn, busy && styles.btnDisabled]}
+          style={[kit.ctl, styles.secondaryBtn, busy && styles.btnDisabled]}
           disabled={busy}
           accessibilityRole="button"
           accessibilityState={{ disabled: busy }}
@@ -108,10 +129,11 @@ export function BootTroubleScreen({
           }}
         >
           <Text style={styles.secondaryBtnText}>CHECK FOR AN UPDATE</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryBtn}
+          style={[kit.ctl, styles.secondaryBtn]}
           accessibilityRole="button"
           activeOpacity={0.75}
           onPress={() => { onCopyDiagnostic(); setCopied(true); }}
@@ -119,6 +141,7 @@ export function BootTroubleScreen({
           <Text style={styles.secondaryBtnText}>
             {copied ? '✓ COPIED — PASTE IT TO THE DEV' : 'COPY DIAGNOSTIC'}
           </Text>
+          {CTL_PLANES}
         </TouchableOpacity>
 
         {note ? <Text style={styles.note}>{note}</Text> : null}

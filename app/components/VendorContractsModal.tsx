@@ -16,6 +16,7 @@ import { availableStorylines } from '../engine/factionStorylines';
 import { getStanding, FACTIONS } from '../engine/factions';
 import type { VendorInstance } from '../engine/vendors';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 /** OTA-782 — the Hidden Market is the contract HUB. Its stall vendors are
  *  neutral-ground brokers: instead of only their own faction's work, they post
  *  every open contract across all factions (still rep-gated per faction), so
@@ -55,6 +56,25 @@ interface Posting {
 // storylines — grouped, each with a tap-to-ACCEPT (direct, like the Mission
 // Board; no extra confirm). availableX() already filters active/completed, so an
 // accepted posting drops off the list and the popup stays open to take more.
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function VendorContractsModal({ visible, onClose, vendor }: Props) {
   // Raw selectors (no `?? []` inside the selector — that returns a fresh array
   // every render and Object.is would loop the component). Default inside useMemo.
@@ -229,11 +249,12 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                                   <Text style={styles.lockedWhy}>{p.locked}</Text>
                                 ) : (
                                   <Pressable
-                                    style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
+                                    style={({ pressed }) => [kit.ctl, styles.acceptBtn, pressed && styles.btnPressed]}
                                     onPress={p.onAccept}
                                     accessibilityRole="button"
                                   >
                                     <Text style={styles.acceptBtnText}>ACCEPT</Text>
+                                    {CTL_PLANES}
                                   </Pressable>
                                 )}
                               </View>
@@ -246,11 +267,12 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                 </>
               )}
               <Pressable
-                style={({ pressed }) => [styles.closeBtn, pressed && styles.btnPressed]}
+                style={({ pressed }) => [kit.ctl, styles.closeBtn, pressed && styles.btnPressed]}
                 onPress={onClose}
                 accessibilityRole="button"
               >
                 <Text style={styles.closeBtnText}>CLOSE</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
           </TouchableWithoutFeedback>

@@ -18,6 +18,16 @@ import { useGameStore } from '../state/gameStore';
 import { choicesFor, temperamentReadout, temperamentTell } from '../engine/parley';
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
+ * label, hitSlop and geometry unchanged; only the material moved to the kit. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function ParleySheet() {
   const ctx = useGameStore((s) => s.pendingParley);
   const resolve = useGameStore((s) => s.resolveParley);
@@ -46,7 +56,7 @@ export function ParleySheet() {
       <Text style={styles.read}>{read}</Text>
 
       <TouchableOpacity
-        style={styles.choiceBtn}
+        style={[kit.ctl, styles.choiceBtn]}
         onPress={() => resolve(safe)}
         activeOpacity={0.7}
         accessibilityRole="button"
@@ -54,6 +64,7 @@ export function ParleySheet() {
       >
         <Text style={styles.choiceLabel}>{safeLabel}</Text>
         <Text style={styles.choiceHint}>{safeHint}</Text>
+        {CTL_PLANES}
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -74,7 +85,7 @@ export function ParleySheet() {
           with them. */}
       {ctx.topicsNpcId ? (
         <TouchableOpacity
-          style={styles.choiceBtn}
+          style={[kit.ctl, styles.choiceBtn]}
           onPress={intoTalk}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -82,6 +93,7 @@ export function ParleySheet() {
         >
           <Text style={styles.choiceLabel}>Just talk</Text>
           <Text style={styles.choiceHint}>Ask them about the road. Costs nothing, forfeits nothing.</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
       ) : null}
 
@@ -124,15 +136,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 2,
   },
-  choiceBtn: {
-    borderColor: '#6b5c3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#17150f',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    gap: 2,
-  },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` owns the material; no box moved.
+  choiceBtn: { paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
   hardBtn: {
     borderColor: '#a85a3a',
   },

@@ -398,17 +398,28 @@ describe('Phase 2 — gesture ownership, accessibility and the smallest phone', 
       }
     };
     walk(path.join(ROOT, 'app'));
+    /* ⚠⚠⚠ THE SEMANTIC FREEZE IS THE CLAIM, AND IT IS UNCHANGED AND UNWEAKENED:
+     * the construction may never reach the engine, the native bridge, the store
+     * or the freeze instrumentation. That assertion below is exactly what it
+     * was when Phase 2 shipped. */
     for (const f of offenders) {
       expect(f).not.toMatch(/^app\/(engine|native|state\/gameStore|diagnostics)\//);
     }
-    // The whole adoption is UI, and small enough to name.
-    expect(offenders.sort()).toEqual([
-      'app/components/EnemyPanel.tsx',
-      'app/components/InputBox.tsx',
-      'app/components/KeyboardInputBar.tsx',
-      'app/components/StatsPanel.tsx',
-      'app/screens/ExplorationScreen.tsx',
-      'app/ui/tartariaKit.tsx',
-    ]);
+    /* ⚠⚠ WHAT DID CHANGE IS THE SECOND HALF. Phase 2 could name its six
+     * adopters outright, because it was deliberately NOT the game-wide
+     * migration. Phase 3 IS that migration — the owner ruled the deprecated
+     * dialect dead everywhere — so a literal six-file list would now be a list
+     * of paperwork, edited by every control that adopts the grammar.
+     *
+     * ⚠ The claim that survives is the one that was always underneath it: the
+     * adoption is ENTIRELY UI. Every file carrying the construction sits in
+     * `app/components` or `app/screens`, or is the kit that defines it. That
+     * still fails the moment the language escapes the view layer, which is the
+     * thing this test exists to catch. */
+    for (const f of offenders) {
+      expect([f, /^app\/(components|screens)\/|^app\/ui\/tartariaKit\.tsx$/.test(f)])
+        .toEqual([f, true]);
+    }
+    expect(offenders).toContain('app/ui/tartariaKit.tsx');
   });
 });

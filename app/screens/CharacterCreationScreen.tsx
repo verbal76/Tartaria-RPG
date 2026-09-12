@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import { tControlDepth, tFilledGold } from '../ui/tartariaKit';
+import { tControlDepth, tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import { getStoryMotives } from '../engine/story'; // OTA-1018
@@ -49,6 +49,25 @@ const STEP_TITLE: Record<Step, string> = {
   // first-person tier names and their plain subtitles below.
   pressure: 'CHOOSE YOUR DIFFICULTY',
 };
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function CharacterCreationScreen() {
   const startNewGame = useGameStore((s) => s.startNewGame);
@@ -183,7 +202,7 @@ export function CharacterCreationScreen() {
             {(['male', 'female'] as const).map((sx) => (
               <TouchableOpacity
                 key={sx}
-                style={[styles.sexCard, sex === sx && styles.optionSelected]}
+                style={[kit.ctl, styles.sexCard, sex === sx && styles.optionSelected]}
                 onPress={() => setSex(sx)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
@@ -194,6 +213,7 @@ export function CharacterCreationScreen() {
                   {sx === 'male' ? '\u2642' : '\u2640'}
                 </Text>
                 <Text style={styles.optionName}>{sx === 'male' ? 'MALE' : 'FEMALE'}</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             ))}
             <View style={styles.beginBlock}>
@@ -211,7 +231,7 @@ export function CharacterCreationScreen() {
           return (
             <TouchableOpacity
               key={r.id}
-              style={[styles.option, raceId === r.id && styles.optionSelected]}
+              style={[kit.ctl, styles.option, raceId === r.id && styles.optionSelected]}
               onPress={() => setRaceId(r.id)}
               activeOpacity={0.7}
               accessibilityRole="button"
@@ -243,6 +263,7 @@ export function CharacterCreationScreen() {
               {raceId === r.id && r.flavor && (
                 <Text style={styles.optionFlavor}>{r.flavor}</Text>
               )}
+              {CTL_PLANES}
             </TouchableOpacity>
           );
         })}
@@ -268,7 +289,7 @@ export function CharacterCreationScreen() {
             {factions.map((f) => (
               <TouchableOpacity
                 key={f.id}
-                style={[styles.option, factionId === f.id && styles.optionSelected]}
+                style={[kit.ctl, styles.option, factionId === f.id && styles.optionSelected]}
                 onPress={() => setFactionId(f.id)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
@@ -280,6 +301,7 @@ export function CharacterCreationScreen() {
                 {factionId === f.id && f.flavor && (
                   <Text style={styles.optionFlavor}>{f.flavor}</Text>
                 )}
+                {CTL_PLANES}
               </TouchableOpacity>
             ))}
             {/* ⚠ OTA-1431 — rendered INSIDE the faction step, so leaving the
@@ -320,7 +342,7 @@ export function CharacterCreationScreen() {
             {motives.map((m) => (
               <TouchableOpacity
                 key={m.id}
-                style={[styles.option, motiveId === m.id && styles.optionSelected]}
+                style={[kit.ctl, styles.option, motiveId === m.id && styles.optionSelected]}
                 onPress={() => setMotiveId(m.id)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
@@ -331,6 +353,7 @@ export function CharacterCreationScreen() {
                 {motiveId === m.id && (
                   <Text style={styles.optionFlavor}>{m.pages[0]?.split('\n')[0] ?? ''}</Text>
                 )}
+                {CTL_PLANES}
               </TouchableOpacity>
             ))}
           </>
@@ -349,7 +372,7 @@ export function CharacterCreationScreen() {
               return (
                 <TouchableOpacity
                   key={id}
-                  style={[styles.option, pressure === id && styles.optionSelected]}
+                  style={[kit.ctl, styles.option, pressure === id && styles.optionSelected]}
                   onPress={() => setPressure(id)}
                   activeOpacity={0.7}
                   accessibilityRole="button"
@@ -358,6 +381,7 @@ export function CharacterCreationScreen() {
                 >
                   <Text style={styles.optionName}>{prof.label}</Text>
                   <Text style={styles.optionDesc}>{prof.subtitle}</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
               );
             })}
@@ -366,7 +390,7 @@ export function CharacterCreationScreen() {
                 worst discoverability, so the presets stay the front door and
                 this is the advanced option behind it. */}
             <TouchableOpacity
-              style={[styles.option, pressure === 'custom' && styles.optionSelected]}
+              style={[kit.ctl, styles.option, pressure === 'custom' && styles.optionSelected]}
               onPress={() => setCustomOpen(true)}
               activeOpacity={0.7}
               accessibilityRole="button"
@@ -379,6 +403,7 @@ export function CharacterCreationScreen() {
                   ? `${pressureCustom.systems.length} of ${DIFFICULTY_SYSTEMS.length} systems · tap to change`
                   : 'Pick how hard, then pick exactly which systems it is allowed to touch.'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
             <DifficultyCustomModal
               visible={customOpen}

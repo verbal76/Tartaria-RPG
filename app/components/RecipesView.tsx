@@ -10,6 +10,7 @@ import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
 
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 // OTA-087 — rarity rank for sorting. Mirrors the table in
 // InventoryScreen. Common = lowest, Legendary = highest.
 const RECIPE_RARITY_RANK: Record<string, number> = {
@@ -91,6 +92,25 @@ export interface RecipesViewProps {
 // they could plan what to chase. Now the view shows ALL recipes
 // matching the kindFilter, sorts craftable to the top, and displays
 // the missing-piece list for everything else so the goal is legible.
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function RecipesView({
   onAfterCraft,
   onCraftRefused,
@@ -233,7 +253,7 @@ export function RecipesView({
                 key={e.recipe.result}
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !e.available }}
-                style={[styles.recipeRow, !e.available && styles.recipeRowMuted]}
+                style={[tRowStyle(), styles.recipeRow, !e.available && styles.recipeRowMuted]}
                 activeOpacity={e.available ? 0.7 : 1}
                 disabled={!e.available}
                 onPress={() => handleCraft(e.recipe)}
@@ -313,6 +333,7 @@ export function RecipesView({
                     </Text>
                   )}
                 </View>
+                {ROW_PLANES}
               </TouchableOpacity>
             );
   };
@@ -365,13 +386,14 @@ export function RecipesView({
                 <TouchableOpacity
                   accessibilityRole="button"
                   accessibilityState={{ expanded: !isCollapsed }}
-                  style={styles.catBanner}
+                  style={[tRowStyle(), styles.catBanner]}
                   activeOpacity={0.7}
                   onPress={() => setCollapsed((c) => ({ ...c, [g.key]: !(c[g.key] ?? true) }))}
                 >
                   <Text style={styles.catChevron}>{isCollapsed ? '▸' : '▾'}</Text>
                   <Text style={styles.catLabel}>{g.label}</Text>
                   <Text style={styles.catCount}>{readyN} ready · {g.items.length}</Text>
+                  {ROW_PLANES}
                 </TouchableOpacity>
                 {!isCollapsed && g.items.map((e) => renderRow(e))}
               </View>

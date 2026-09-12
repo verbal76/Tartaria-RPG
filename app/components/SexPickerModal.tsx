@@ -20,6 +20,31 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { T, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠⚠ PHASE 3 — THIS DIALOG WAS THE CLEAREST SPECIMEN OF THE DEPRECATED
+ * CONTROL DIALECT, and the owner ruled the whole family dead. What shipped
+ * here: MALE was a cold blue-grey outlined tile, FEMALE-selected became a
+ * filled brown-gold slab, and SO MARK THE RECORD was a third treatment again —
+ * three different species of object in one 80-line dialog, none of them the
+ * Tartaria control. Physical construction and semantic state were conflated.
+ *
+ * ⚠⚠ NOW ALL THREE ARE ONE OBJECT. `kit.ctl` supplies the face, rim and
+ * directional pair; the three planes give the face a side and a contact
+ * shadow; `kit.ctlOn` marks the chosen one with gold on its left and right
+ * WITHOUT taking away its construction. Unselected and selected are the same
+ * key — one of them is marked.
+ *
+ * ⚠ BEHAVIOUR IS UNTOUCHED: the same handlers, the same `disabled` on an
+ * unmade choice, the same roles, labels and `accessibilityState`, the same
+ * postpone-on-back. Only the material changed. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function SexPickerModal() {
   const player = useGameStore((s) => s.player);
@@ -48,7 +73,7 @@ export function SexPickerModal() {
                 <Pressable
                   key={sx}
                   onPress={() => setSelected(sx)}
-                  style={[styles.signCard, isSel && styles.signCardSel]}
+                  style={[kit.ctl, styles.signCard, isSel && kit.ctlOn]}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isSel }}
                   accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
@@ -59,6 +84,7 @@ export function SexPickerModal() {
                   <Text style={[styles.signWord, isSel && styles.signWordSel]}>
                     {sx === 'male' ? 'MALE' : 'FEMALE'}
                   </Text>
+                  {CTL_PLANES}
                 </Pressable>
               );
             })}
@@ -66,12 +92,13 @@ export function SexPickerModal() {
           <Pressable
             onPress={() => { if (selected) confirm(selected); }}
             disabled={!selected}
-            style={[styles.confirmBtn, !selected && styles.confirmBtnDead]}
+            style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !selected && kit.ctlDead]}
             accessibilityRole="button"
             accessibilityState={{ disabled: !selected }}
             accessibilityLabel="Confirm"
           >
             <Text style={styles.confirmText}>SO MARK THE RECORD</Text>
+            {CTL_PLANES}
           </Pressable>
           <Text style={styles.hint}>Asked once, kept forever. It changes how strangers address you — nothing else.</Text>
         </View>
@@ -88,34 +115,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: { paddingVertical: 20 },
-  kicker: { color: '#8aa0a4', fontSize: 11, letterSpacing: 5, fontWeight: '700', textAlign: 'center' },
-  title: { color: '#d8cfc0', fontSize: 22, letterSpacing: 2, fontWeight: '800', textAlign: 'center', marginTop: 8 },
-  sub: { color: '#a2977b', fontSize: 13, lineHeight: 20, textAlign: 'center', marginTop: 12, marginBottom: 18 },
+  // ⚠ PHASE 3 — the cold blue-grey text belonged to the deprecated dialect and
+  // is what made this dialog read as a different game. The words now take the
+  // kit's own ink, exactly as every other Tartaria surface does.
+  kicker: { color: T.inkDim, fontSize: 11, letterSpacing: 5, fontWeight: '700', textAlign: 'center' },
+  title: { color: T.ink, fontSize: 22, letterSpacing: 2, fontWeight: '800', textAlign: 'center', marginTop: 8 },
+  sub: { color: T.inkDim, fontSize: 13, lineHeight: 20, textAlign: 'center', marginTop: 12, marginBottom: 18 },
   row: { flexDirection: 'row', gap: 10 },
-  signCard: {
-    flex: 1,
-    borderColor: '#3a4448',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 22,
-    alignItems: 'center',
-    backgroundColor: 'rgba(20, 24, 26, 0.6)',
-  },
-  signCardSel: { borderColor: '#c9a86a', backgroundColor: 'rgba(42, 31, 18, 0.75)' },
-  signGlyph: { color: '#8aa0a4', fontSize: 52, lineHeight: 56 },
-  signGlyphSel: { color: '#c9a86a' },
-  signWord: { color: '#8aa0a4', fontSize: 13, letterSpacing: 3, fontWeight: '700', marginTop: 6 },
-  signWordSel: { color: '#c9a86a' },
-  confirmBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 14,
-    backgroundColor: '#2a1f12',
-  },
-  confirmBtnDead: { opacity: 0.35 },
-  confirmText: { color: '#c9a86a', fontSize: 13, letterSpacing: 2, fontWeight: '700' },
-  hint: { color: '#5a6a6e', fontSize: 11, textAlign: 'center', marginTop: 14 },
+  /* ⚠⚠ GEOMETRY ONLY. The face, the rim, the radius and the directional pair
+   * all come from `kit.ctl`; `kit.ctlOn` marks the chosen sign. Nothing here
+   * moves a box, so the dialog's layout is byte-identical to what shipped. */
+  signCard: { flex: 1, paddingVertical: 22, alignItems: 'center' },
+  signGlyph: { color: T.inkDim, fontSize: 52, lineHeight: 56 },
+  signGlyphSel: { color: T.gold },
+  signWord: { color: T.inkDim, fontSize: 13, letterSpacing: 3, fontWeight: '700', marginTop: 6 },
+  signWordSel: { color: T.gold },
+  confirmBtn: { paddingVertical: 14, alignItems: 'center', marginTop: 14 },
+  confirmText: { color: T.gold, fontSize: 13, letterSpacing: 2, fontWeight: '700' },
+  hint: { color: T.inkQuiet, fontSize: 11, textAlign: 'center', marginTop: 14 },
 });

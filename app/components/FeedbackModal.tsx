@@ -45,7 +45,7 @@ import {
 } from 'react-native';
 import { KeyboardSafeCard } from './KeyboardSafeCard';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
-import { tFilledGold } from '../ui/tartariaKit';
+import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 // ⚠ OTA-1718 — the DONE bar's id for the multiline note field. iOS only.
 const NOTE_ACCESSORY = 'designerNoteAccessory';
@@ -55,6 +55,19 @@ interface Props {
   onSubmit: (text: string) => void;
   onCancel: () => void;
 }
+
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   const [text, setText] = useState('');
@@ -214,11 +227,12 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
       footer={(
         <View style={styles.btnRow}>
           <Pressable
-            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
             onPress={handleCancel}
             accessibilityRole="button"
           >
             <Text style={styles.btnTextNeutral}>CANCEL</Text>
+            {CTL_PLANES}
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -345,7 +359,6 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

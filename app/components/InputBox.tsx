@@ -105,6 +105,25 @@ import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/type
  * readiness from range alone left the suite fully green, because the suite was
  * exercising the predicate and nobody was exercising the consumer. A rule with
  * no reader is not enforced. This is the reader, and now it is reachable. */
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function weaponTone(
   player: PlayerCharacter | null,
   hand: 'main' | 'off' | null,
@@ -1208,13 +1227,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           fix from arb143 stays; only the picker presentation is reverted. */}
       {dog && dog.hp > 0 && dogPickerOpen ? (
         <View style={styles.dogPicker}>
-          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={styles.dogPickerBtn}>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={[tartariaKitStyles.ctl, styles.dogPickerBtn]}>
             <Text style={styles.dogPickerLabel}>BITE</Text>
             <Text style={styles.dogPickerHint}>{dog.name} lunges in</Text>
+            {CTL_PLANES}
           </Pressable>
-          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={styles.dogPickerBtn}>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={[tartariaKitStyles.ctl, styles.dogPickerBtn]}>
             <Text style={styles.dogPickerLabel}>DISTRACT</Text>
             <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +4 atk next swing</Text>
+            {CTL_PLANES}
           </Pressable>
         </View>
       ) : null}
@@ -1246,10 +1267,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <Pressable
                 key={it.id}
                 onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name, it.id); }}
-                style={[styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange]}
+                style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange]}
               >
                 <Text style={[styles.bandolierPickerLabel, inRange ? null : styles.bandolierOutOfRangeLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
                 <Text style={styles.bandolierPickerHint}>{inRange ? 'hurl' : 'too far'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
+                {CTL_PLANES}
               </Pressable>
             );
           })}
@@ -1301,7 +1323,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 setMedkitOpen(false);
                 useGameStore.getState().useHealBatch(it.name, 'self', 1);
               }}
-              style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+              style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
             >
               <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
               <Text style={styles.bandolierPickerHint}>
@@ -1309,6 +1331,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   ? `→ ${medkitGolem?.name ?? 'golem'}`
                   : medkitDog ? 'who?' : 'use'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}
               </Text>
+              {CTL_PLANES}
             </Pressable>
           )) : (() => {
             const it = medkitItems.find((m) => m.id === medkitPick);
@@ -1329,26 +1352,29 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <>
                 <Pressable
                   onPress={() => heal('self')}
-                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>YOU</Text>
                   <Text style={styles.bandolierPickerHint}>{it.name.toLowerCase()}</Text>
+                  {CTL_PLANES}
                 </Pressable>
                 <Pressable
                   onPress={() => heal('dog')}
-                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>
                     {medkitDog!.name.toUpperCase()}
                   </Text>
                   <Text style={styles.bandolierPickerHint}>{medkitDog!.hp}/{medkitDog!.hpMax}</Text>
+                  {CTL_PLANES}
                 </Pressable>
                 <Pressable
                   onPress={() => setMedkitPick(null)}
-                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                  style={[tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn]}
                 >
                   <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>BACK</Text>
                   <Text style={styles.bandolierPickerHint}>pick another</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </>
             );
@@ -1437,11 +1463,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         </View>
         {Platform.OS === 'ios' ? (
           <TouchableOpacity
-            style={styles.kbDismiss}
+            style={[tartariaKitStyles.ctl, styles.kbDismiss]}
             onPress={() => Keyboard.dismiss()}
             accessibilityLabel="Hide keyboard"
           >
             <Text style={styles.kbDismissText}>▼</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         ) : null}
         {/* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — ACT JOINS THE COMMAND FAMILY. It is the
@@ -1459,11 +1486,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             it to join the family *"without changing their behavior"*, so it takes
             the RESTING plane and not the pressed inversion. Press travel here is a
             separate call for the device review to make. */}
-        <TouchableOpacity style={styles.send} onPress={handleSubmit}>
+        <TouchableOpacity style={[tartariaKitStyles.ctl, styles.send]} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
           <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+          {CTL_PLANES}
         </TouchableOpacity>
       </TutorialTarget>
     </View>
@@ -1686,7 +1714,9 @@ function QuickBtn({
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
     blocked && styles.quickDisabled,
-    blocked ? null : tControlDepth(pressed),
+    // ⚠ PHASE 3 — a dead key is still a key: it keeps the depth pair and is
+    // muted by `quickDisabled` above, not stripped of its construction.
+    tControlDepth(pressed),
   ];
   const textStyle = [
     styles.quickText,
@@ -1883,11 +1913,20 @@ function QuickBtn({
           `overflow: 'hidden'` clips them to its radius, exactly as it already does
           for the cooldown fill. `pointerEvents="none"` because they cover a
           control, and they carry no accessibility identity of their own.
-          ⚠ AND A BLOCKED CHIP GETS NEITHER. Owner, OTA-1782, unchanged here:
-          *"DISABLED / INERT must not falsely advertise the same physical
-          readiness."* The ring already goes flat when `blocked`; the planes follow
-          it, so an inert chip makes no physical claim on either layer. */}
-      {blocked ? null : (
+          ⚠⚠⚠ PHASE 3 REVERSES OTA-1782 ON THE BLOCKED CHIP, BY OWNER RULING.
+          The old rule — *"DISABLED / INERT must not falsely advertise the same
+          physical readiness"* — took the ring AND the planes away, so PICKPOCKET
+          stopped being a key at all and read as a stray grey rectangle belonging
+          to nothing. The owner, looking at exactly that on the device: a
+          disabled control *"remains physically constructed as a button. Its
+          semantic state may dim/mute it, but it must not lose the physical
+          button construction."*
+          ⚠⚠ SO THE CONSTRUCTION STAYS AND THE DIM CARRIES THE STATE. The chip
+          keeps its face, side and contact; `quickDisabled` mutes it. The
+          governing rule is now one line: PHYSICAL CONSTRUCTION IS WHAT THE
+          OBJECT IS, SEMANTIC TREATMENT IS WHAT STATE IT IS IN. A blocked chip
+          still buzzes and returns — the behaviour is untouched. */}
+      {(
         <>
           <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
@@ -1973,7 +2012,7 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
   return (
     <TouchableOpacity
       testID={testID}
-      style={[styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && styles.travelBtnActive]}
+      style={[tartariaKitStyles.ctl, styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && tartariaKitStyles.ctlOn]}
       onPressIn={noteTouchDown}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
@@ -1990,6 +2029,16 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
       >
         {active ? `▸ ${label}` : label}
       </Text>
+      {/* ⚠⚠⚠ PHASE 3 — THE ROOM DOORS ARE KEYS TOO. This one component draws the
+          travel row for EVERY interior — the shed, the shack, the outposts, the
+          flooded house — so it was the single largest run of controls still
+          reading as outlined rectangles. It kept a `'#5a4a2e'` rim, which is
+          why the colour-fingerprint census missed it and the structural one
+          caught it. Same three planes as every other command; `blocked`/`spent`
+          still dim the whole key rather than stripping its construction. */}
+      <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+      <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+      <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
     </TouchableOpacity>
   );
 }
@@ -2046,15 +2095,13 @@ const styles = StyleSheet.create({
   // read"). The row now wraps onto a second line once buttons would drop
   // under ~92pt, and the shrink floor is raised so text stays legible.
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' },
+  // ⚠ GEOMETRY ONLY — `tartariaKitStyles.ctl` owns the face, rim, radius and
+  // directional pair, so the row's boxes are the exact size they shipped at.
   travelBtn: {
     flexGrow: 1, // OTA-1025 — grow to fill, but never below minWidth (wrap instead)
     flexBasis: '22%',
     minWidth: 92,
-    backgroundColor: '#1a1714',
-    borderColor: '#5a4a2e',
-    borderWidth: 1,
     paddingVertical: 10,
-    borderRadius: 4,
     alignItems: 'center',
   },
   // letterSpacing kept low (1) so longer room names ("GRAND HALL",
@@ -2069,7 +2116,6 @@ const styles = StyleSheet.create({
   travelBtnDest: { paddingVertical: 8 },
   travelBtnBlocked: { borderColor: '#2a2620', backgroundColor: '#141210', opacity: 0.5 },
   // you-are-here: the room the player currently stands in, inside a building.
-  travelBtnActive: { borderColor: '#c9a86a', backgroundColor: '#2a2418' },
   travelBtnTextActive: { color: '#f0dca8' },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   movesBadge: {

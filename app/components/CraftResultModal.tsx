@@ -62,6 +62,19 @@ const ITEM_SCROLL_MAX_HEIGHT = Math.max(
   Math.floor(Dimensions.get('window').height - 380),
 );
 
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function CraftResultModal({ visible, items, onContinue, onClose }: Props) {
   return (
     <Modal
@@ -104,11 +117,12 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
                   <Text style={styles.btnTextPrimary}>CONTINUE CRAFTING</Text>
                 </Pressable>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
                   onPress={onClose}
                   accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CLOSE MENU</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
             </View>
@@ -154,7 +168,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 1.5, fontSize: 11 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 1.5, fontSize: 11 },
 });

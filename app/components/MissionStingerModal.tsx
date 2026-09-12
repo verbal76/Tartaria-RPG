@@ -30,7 +30,18 @@
 // goes. Same component, same palette: one curtain for the missions.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
-import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
+ * its handler, role, label and geometry; only the material changed, and the
+ * press now collapses the sidewall instead of only shifting a colour. */
+const ctlPlanes = (pressed: boolean) => (
+  <>
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+  </>
+);
 
 // ⚠⚠⚠ OTA-1622 — EVERY CLOSE COMES THROUGH HERE NOW, and the card carries what
 // the close handed over (`granted`) above the next line. Owner: *"I spent so
@@ -56,12 +67,15 @@ export function MissionStingerModal({
             : null}
           {stinger?.next ? <Text style={styles.next}>{stinger.next}</Text> : null}
           <Pressable
-            style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+            style={({ pressed }) => [kit.ctl, styles.btn, tControlDepth(pressed)]}
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={cta === 'FIGHT' ? 'Close and fight' : 'Continue the mission'}
           >
-            <Text style={styles.btnText}>{cta}</Text>
+            {({ pressed }) => (<>
+              <Text style={styles.btnText}>{cta}</Text>
+              {ctlPlanes(pressed)}
+            </>)}
           </Pressable>
         </View>
       </View>
@@ -87,10 +101,7 @@ const styles = StyleSheet.create({
   next: { color: '#c9a86a', fontSize: 13, lineHeight: 19, marginTop: 14 },
   // OTA-1622 — the receipt: what this close put in the pack.
   granted: { color: '#e6d7a8', fontSize: 14, lineHeight: 20, marginTop: 12 },
-  btn: {
-    alignSelf: 'flex-end', marginTop: 22, paddingVertical: 10, paddingHorizontal: 22,
-    borderWidth: 1, borderColor: '#c9a86a', borderRadius: 4,
-  },
+  btn: { alignSelf: 'flex-end', marginTop: 22, paddingVertical: 10, paddingHorizontal: 22 },
   btnPressed: { backgroundColor: '#1f1b12' },
   btnText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
 });

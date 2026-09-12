@@ -95,6 +95,25 @@ let bottomLoggedFor = '';
  */
 let sessionMaxHeight = 0;
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
   const submit = useGameStore((s) => s.submitPlayerAction);
@@ -499,11 +518,12 @@ export function KeyboardInputBar() {
             InputBox's, for the same reason and with the same restraint: a 1dp ring
             PAID FOR out of the padding so the outer box does not move, the resting
             plane, and no change to the handler, the role or the press feedback. */}
-        <TouchableOpacity accessibilityRole="button" style={styles.send} onPress={handleSubmit}>
+        <TouchableOpacity accessibilityRole="button" style={[tartariaKitStyles.ctl, styles.send]} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
           <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+          {CTL_PLANES}
         </TouchableOpacity>
       </View>
     </View>

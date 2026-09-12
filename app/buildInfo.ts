@@ -30083,7 +30083,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stable ring. It promotes; it does not change what is promoted.
 // SUPERSEDED: '2026-09-11-1801-asked-once'
 // SUPERSEDED: '2026-09-11-1802-depth-says-pressable'
-export const OTA_BUILD_ID = '2026-09-11-1803-the-hud-belongs-to-tartaria';
+// SUPERSEDED: '2026-09-11-1803-the-hud-belongs-to-tartaria'
+//
+// ⚠⚠⚠ VISUAL LANGUAGE PHASE 3 — ONE CONTROL LANGUAGE. THIS IS A PHYSICAL-REVIEW
+// CANDIDATE, AND THIS STAMP IS THE ONLY THING THAT TELLS THE OWNER WHICH TREE
+// HIS THUMB IS ON. Phase 2 shipped as `…-1803`; Phase 3 is a different tree
+// entirely — 62 production files — so the device MUST report a different build
+// id or the review cannot tell the two apart at all.
+//
+// ⚠⚠ THREE IDENTITIES STAY SEPARABLE, and this stamp is one of the marks that
+// keeps them apart:
+//   A  5037113b — the tree Phase 3 was AUDITED and tested on (1299/1299 suites,
+//                 13,998 passed, 488 s). That executed result belongs to A.
+//   B  7bfd774d — Phase 2 plus a data-only Sentry player-log sync. The bundle
+//                 filter ignores `sentry-inbox/*`, which is why B never
+//                 republished and why the device still shows `…-1803`.
+//   C  this commit — Phase 3 rebased onto B and stamped below, carrying its OWN
+//                 fresh verification. A's result is NOT transferable to C, and
+//                 the owner ruled explicitly that it must never be restated
+//                 against a base it did not run on.
+export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat
 // looks substantially better with the DARK / BLACK fill than with the bright

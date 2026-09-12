@@ -26,7 +26,22 @@
 //      MissionCompleteModal, which is the house reference.
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { T, tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠⚠ PHASE 3 — the dog's naming card spoke the same deprecated dialect as the
+ * golem's and the ♂/♀ ask: a literal-gold 1dp outline, a cold blue-grey label,
+ * and BOY/GIRL selection that swapped the pill's whole fill so a chosen pill was
+ * a different object from an unchosen one. ROLL, BOY/GIRL and TAKE THEM WITH YOU
+ * are Tartaria controls now. Handlers, the disabled rule until a sex is picked,
+ * hitSlop, roles and labels are untouched — `turnOffBtn` stays a plain text
+ * affordance, because that is what it is. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -153,11 +168,12 @@ export function DogOnboardingModal() {
               />
               <Pressable
                 onPress={() => setName(defaultDogName())}
-                style={styles.rollBtn}
+                style={[kit.ctl, styles.rollBtn]}
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
                 <Text style={styles.rollText}>⚄ ROLL</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
 
@@ -167,23 +183,25 @@ export function DogOnboardingModal() {
                 <Pressable
                   key={s}
                   onPress={() => setSex(s)}
-                  style={[styles.pill, sex === s && styles.pillSel]}
+                  style={[kit.ctl, styles.pill, sex === s && kit.ctlOn]}
                   accessibilityRole="button"
                   accessibilityLabel={s === 'boy' ? 'Boy' : 'Girl'}
                 >
                   <Text style={[styles.pillText, sex === s && styles.pillTextSel]}>{s.toUpperCase()}</Text>
+                  {CTL_PLANES}
                 </Pressable>
               ))}
             </View>
 
             <Pressable
               onPress={commit}
-              style={[styles.confirmBtn, !sex && styles.confirmBtnDisabled]}
+              style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !sex && kit.ctlDead]}
               disabled={!sex}
               accessibilityRole="button"
               accessibilityLabel="Take them with you"
             >
               <Text style={[styles.confirmText, !sex && styles.confirmTextDisabled]}>TAKE THEM WITH YOU</Text>
+              {CTL_PLANES}
             </Pressable>
             <Text style={styles.hint}>
               A blank breed or name is fine — the mud fills in. Boy or girl needs an answer.
@@ -257,41 +275,17 @@ const styles = StyleSheet.create({
   },
   nameRow: { flexDirection: 'row', gap: 8 },
   nameInput: { flex: 1 },
-  rollBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-    backgroundColor: '#241d10',
-  },
-  rollText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` owns the material, so no box moved.
+  rollBtn: { paddingHorizontal: 12, justifyContent: 'center' },
+  rollText: { color: T.gold, fontSize: 12, letterSpacing: 1.5 },
   pillRow: { flexDirection: 'row', gap: 10 },
-  pill: {
-    flex: 1,
-    borderColor: '#6b5c3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#0f0d09',
-  },
-  pillSel: { borderColor: '#c9a86a', backgroundColor: '#2a1f12' },
-  pillText: { color: '#8aa0a4', fontSize: 13, letterSpacing: 2 },
-  pillTextSel: { color: '#c9a86a' },
-  confirmBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 18,
-    backgroundColor: '#2a1f12',
-  },
-  confirmBtnDisabled: { borderColor: '#4a412c', backgroundColor: '#15130d' },
-  confirmText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
-  confirmTextDisabled: { color: '#6b5c3a' },
+  pill: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  pillText: { color: T.inkDim, fontSize: 13, letterSpacing: 2 },
+  pillTextSel: { color: T.gold },
+  confirmBtn: { paddingVertical: 14, alignItems: 'center', marginTop: 18 },
+  confirmText: { color: T.gold, fontSize: 12, letterSpacing: 1.5 },
+  confirmTextDisabled: { color: T.goldDim },
   turnOffBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12, marginTop: 6 },
-  turnOffText: { color: '#8aa0a4', fontSize: 11, letterSpacing: 0.6, textDecorationLine: 'underline', textAlign: 'center' },
-  hint: { color: '#8aa0a4', fontSize: 10, letterSpacing: 1, textAlign: 'center', marginTop: 12 },
+  turnOffText: { color: T.inkDim, fontSize: 11, letterSpacing: 0.6, textDecorationLine: 'underline', textAlign: 'center' },
+  hint: { color: T.inkDim, fontSize: 10, letterSpacing: 1, textAlign: 'center', marginTop: 12 },
 });

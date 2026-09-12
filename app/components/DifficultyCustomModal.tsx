@@ -35,6 +35,7 @@ import {
   type PressureCustom,
 } from '../engine/pressure';
 
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 const KIND_LABEL: Record<string, string> = {
   multiplier: 'AMOUNT',
   rule: 'RULE',
@@ -48,6 +49,39 @@ export interface DifficultyCustomModalProps {
   onCancel: () => void;
   onConfirm: (custom: PressureCustom) => void;
 }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const TAB_PLANES = (
+  <>
+    <View style={kit.tabPlaneTop} pointerEvents="none" />
+    <View style={kit.tabPlaneBottom} pointerEvents="none" />
+    <View style={kit.tabPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }: DifficultyCustomModalProps) {
   const [intensity, setIntensity] = useState<Exclude<PressureTier, 'custom'>>(
@@ -76,7 +110,7 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
               <Pressable
                 key={id}
                 onPress={() => setIntensity(id)}
-                style={[styles.intensityChip, intensity === id && styles.intensityChipOn]}
+                style={[kit.ctl, styles.intensityChip, intensity === id && styles.intensityChipOn]}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: intensity === id }}
                 accessibilityLabel={PRESSURE_PROFILES[id].label}
@@ -84,6 +118,7 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
                 <Text style={[styles.intensityText, intensity === id && styles.intensityTextOn]}>
                   {PRESSURE_PROFILES[id].label.replace(/^"|"$/g, '')}
                 </Text>
+                {TAB_PLANES}
               </Pressable>
             ))}
           </View>
@@ -96,7 +131,7 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
                 <Pressable
                   key={sys.id}
                   onPress={() => toggle(sys.id)}
-                  style={[styles.row, on && styles.rowOn]}
+                  style={[tRowStyle(), styles.row, on && styles.rowOn]}
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: on }}
                   accessibilityLabel={`${sys.label}. ${sys.blurb}`}
@@ -109,6 +144,7 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
                     </View>
                     <Text style={styles.rowBlurb}>{sys.blurb}</Text>
                   </View>
+                  {ROW_PLANES}
                 </Pressable>
               );
             })}
@@ -121,16 +157,18 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
           </Text>
 
           <View style={styles.buttons}>
-            <Pressable onPress={onCancel} style={styles.btn} accessibilityRole="button" accessibilityLabel="Cancel">
+            <Pressable onPress={onCancel} style={[kit.ctl, styles.btn]} accessibilityRole="button" accessibilityLabel="Cancel">
               <Text style={styles.btnText}>CANCEL</Text>
+              {CTL_PLANES}
             </Pressable>
             <Pressable
               onPress={() => onConfirm({ intensity, systems })}
-              style={[styles.btn, styles.btnPrimary]}
+              style={[kit.ctl, styles.btn, styles.btnPrimary]}
               accessibilityRole="button"
               accessibilityLabel="Confirm custom difficulty"
             >
               <Text style={[styles.btnText, styles.btnTextPrimary]}>USE THIS</Text>
+              {CTL_PLANES}
             </Pressable>
           </View>
         </View>

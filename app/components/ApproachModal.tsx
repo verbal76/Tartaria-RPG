@@ -11,7 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from 'react-native';
-import { tFilledGold } from '../ui/tartariaKit';
+import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -77,6 +77,19 @@ interface Props {
 // runs the intra-scene move-toward narration ("you move across the
 // ground to the X, close enough now to act on it"). Same UI shape
 // as SearchModal so it feels consistent.
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function ApproachModal({
   visible,
   enemyHints,
@@ -169,11 +182,12 @@ export function ApproachModal({
                     {enemies.map((e) => (
                       <Pressable
                         key={`enemy-${e}`}
-                        style={({ pressed }) => [styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(e)}
                         accessibilityRole="button"
                       >
                         <Text style={styles.chipTextEnemy} numberOfLines={1}>{e}</Text>
+                        {CTL_PLANES}
                       </Pressable>
                     ))}
                   </ScrollView>
@@ -191,21 +205,23 @@ export function ApproachModal({
                     {vendorName && (
                       <Pressable
                         key={`vendor-${vendorName}`}
-                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(vendorName)}
                         accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{vendorName}</Text>
+                        {CTL_PLANES}
                       </Pressable>
                     )}
                     {scene.map((h) => (
                       <Pressable
                         key={`scene-${h}`}
-                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed]}
                         onPress={() => tapToApproach(h)}
                         accessibilityRole="button"
                       >
                         <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
+                        {CTL_PLANES}
                       </Pressable>
                     ))}
                   </ScrollView>
@@ -217,22 +233,24 @@ export function ApproachModal({
                 {commonHints.map((h) => (
                   <Pressable
                     key={`common-${h}`}
-                    style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
+                    style={({ pressed }) => [kit.ctl, styles.chip, pressed && styles.btnPressed]}
                     onPress={() => tapToApproach(h)}
                     accessibilityRole="button"
                   >
                     <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
+                    {CTL_PLANES}
                   </Pressable>
                 ))}
               </View>
 
               <View style={styles.btnRow}>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
                   onPress={onCancel}
                   accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
+                  {CTL_PLANES}
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [
@@ -275,7 +293,6 @@ const styles = StyleSheet.create({
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

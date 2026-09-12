@@ -21,7 +21,20 @@
 //      player who reached for the same affordance found empty space.
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { T, tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠⚠ PHASE 3 — the naming flow spoke the deprecated control dialect: a 1dp
+ * literal-gold outline with a cold blue-grey label, which is a different UI kit
+ * from the one the rest of Tartaria now uses. ROLL, SEAL THE NAME and KEEP ITS
+ * MAKING are all ordinary Tartaria controls and now say so. Handlers, the
+ * disabled rule on an empty name, roles and labels are untouched. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -117,25 +130,28 @@ export function GolemNamingModal() {
               />
               <Pressable
                 onPress={() => setName(suggestGolemName())}
-                style={styles.rollBtn}
+                style={[kit.ctl, styles.rollBtn]}
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
                 <Text style={styles.rollText}>⚄ ROLL</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
 
             <Pressable
               onPress={seal}
-              style={[styles.confirmBtn, !name.trim() && styles.confirmBtnDisabled]}
+              style={[kit.ctl, styles.confirmBtn, kit.ctlOn, !name.trim() && kit.ctlDead]}
               disabled={!name.trim()}
               accessibilityRole="button"
               accessibilityLabel="Seal the name"
             >
               <Text style={[styles.confirmText, !name.trim() && styles.confirmTextDisabled]}>SEAL THE NAME</Text>
+              {CTL_PLANES}
             </Pressable>
-            <Pressable onPress={keep} style={styles.keepBtn} accessibilityRole="button" accessibilityLabel="Keep its making">
+            <Pressable onPress={keep} style={[kit.ctl, styles.keepBtn]} accessibilityRole="button" accessibilityLabel="Keep its making">
               <Text style={styles.keepText}>KEEP ITS MAKING</Text>
+              {CTL_PLANES}
             </Pressable>
           </View>
         </ScrollView>
@@ -177,35 +193,13 @@ const styles = StyleSheet.create({
   },
   nameRow: { flexDirection: 'row', gap: 8 },
   nameInput: { flex: 1 },
-  rollBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-    backgroundColor: '#241d10',
-  },
-  rollText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
-  confirmBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 18,
-    backgroundColor: '#2a1f12',
-  },
-  confirmBtnDisabled: { borderColor: '#4a412c', backgroundColor: '#15130d' },
-  confirmText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
-  confirmTextDisabled: { color: '#6b5c3a' },
-  keepBtn: {
-    borderColor: '#6b5c3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    backgroundColor: '#0f0d09',
-  },
-  keepText: { color: '#8aa0a4', fontSize: 12, letterSpacing: 1.5 },
+  // ⚠ GEOMETRY ONLY — face, rim, radius and the directional pair come from
+  // `kit.ctl`, so these boxes are the exact size they shipped at.
+  rollBtn: { paddingHorizontal: 12, justifyContent: 'center' },
+  rollText: { color: T.gold, fontSize: 12, letterSpacing: 1.5 },
+  confirmBtn: { paddingVertical: 14, alignItems: 'center', marginTop: 18 },
+  confirmText: { color: T.gold, fontSize: 12, letterSpacing: 1.5 },
+  confirmTextDisabled: { color: T.goldDim },
+  keepBtn: { paddingVertical: 12, alignItems: 'center', marginTop: 10 },
+  keepText: { color: T.inkDim, fontSize: 12, letterSpacing: 1.5 },
 });

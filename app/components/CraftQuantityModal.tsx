@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 interface Props {
   visible: boolean;
   /** Result name of the recipe being made — the modal's title. */
@@ -21,6 +22,25 @@ interface Props {
   onConfirm: (count: number) => void;
   onCancel: () => void;
 }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCancel }: Props) {
   const [count, setCount] = useState(1);
@@ -50,12 +70,13 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
                 <Pressable
                   onPress={() => setCount((c) => clamp(c - 1))}
                   disabled={atMin}
-                  style={[styles.step, atMin && styles.stepOff]}
+                  style={[kit.ctl, styles.step, atMin && styles.stepOff]}
                   accessibilityRole="button"
                   accessibilityLabel="One fewer"
                   accessibilityState={{ disabled: atMin }}
                 >
                   <Text style={[styles.stepText, atMin && styles.stepTextOff]}>−</Text>
+                  {CTL_PLANES}
                 </Pressable>
 
                 <Text style={styles.count} accessibilityLabel={`Crafting ${count}`}>{count}</Text>
@@ -63,39 +84,43 @@ export function CraftQuantityModal({ visible, recipeName, max, onConfirm, onCanc
                 <Pressable
                   onPress={() => setCount((c) => clamp(c + 1))}
                   disabled={atMax}
-                  style={[styles.step, atMax && styles.stepOff]}
+                  style={[kit.ctl, styles.step, atMax && styles.stepOff]}
                   accessibilityRole="button"
                   accessibilityLabel="One more"
                   accessibilityState={{ disabled: atMax }}
                 >
                   <Text style={[styles.stepText, atMax && styles.stepTextOff]}>+</Text>
+                  {CTL_PLANES}
                 </Pressable>
 
                 <Pressable
                   onPress={() => setCount(capped)}
                   disabled={atMax}
-                  style={[styles.maxBtn, atMax && styles.stepOff]}
+                  style={[kit.ctl, styles.maxBtn, atMax && styles.stepOff]}
                   accessibilityRole="button"
                   accessibilityLabel={`Craft the maximum, ${capped}`}
                   accessibilityState={{ disabled: atMax }}
                 >
                   <Text style={[styles.maxText, atMax && styles.stepTextOff]}>MAX</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
 
               <View style={styles.actions}>
-                <Pressable onPress={onCancel} style={styles.btn} accessibilityRole="button">
+                <Pressable onPress={onCancel} style={[kit.ctl, styles.btn]} accessibilityRole="button">
                   <Text style={styles.btnText}>CANCEL</Text>
+                  {CTL_PLANES}
                 </Pressable>
                 <Pressable
                   onPress={() => onConfirm(count)}
-                  style={[styles.btn, styles.btnPrimary]}
+                  style={[kit.ctl, styles.btn, styles.btnPrimary]}
                   accessibilityRole="button"
                   accessibilityLabel={`Craft ${count} ${recipeName}`}
                 >
                   <Text style={[styles.btnText, styles.btnTextPrimary]}>
                     CRAFT{count > 1 ? ` ×${count}` : ''}
                   </Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
             </View>

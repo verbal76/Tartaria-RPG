@@ -7,6 +7,19 @@
 // confirms the current selection rather than wedging the save in limbo.
 import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { T, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect (a 1dp literal-gold
+ * or cold-grey outline with no face, side or contact). The control is now the
+ * one Tartaria physical control; its handler, role, label and geometry are
+ * unchanged. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 import { useGameStore } from '../state/gameStore';
 import { getStoryMotives } from '../engine/story';
 
@@ -38,7 +51,7 @@ export function MotivePickerModal() {
               <Pressable
                 key={m.id}
                 onPress={() => setSelected(m.id)}
-                style={[styles.card, isSel && styles.cardSel]}
+                style={[kit.ctl, styles.card, isSel && kit.ctlOn]}
                 accessibilityRole="button"
                 accessibilityLabel={`${m.title}. ${m.blurb}`}
               >
@@ -47,11 +60,13 @@ export function MotivePickerModal() {
                   {m.id === dealt && <Text style={styles.guessTag}>THE MUD'S GUESS</Text>}
                 </View>
                 <Text style={styles.cardBlurb}>{m.blurb}</Text>
+                {CTL_PLANES}
               </Pressable>
             );
           })}
-          <Pressable onPress={commit} style={styles.confirmBtn} accessibilityRole="button" accessibilityLabel="Confirm motive">
+          <Pressable onPress={commit} style={[kit.ctl, styles.confirmBtn, kit.ctlOn]} accessibilityRole="button" accessibilityLabel="Confirm motive">
             <Text style={styles.confirmText}>THIS IS WHY I CAME DOWN</Text>
+            {CTL_PLANES}
           </Pressable>
           <Text style={styles.hint}>You can read your opening any time: tap your portrait → REPLAY OPENING.</Text>
         </ScrollView>
@@ -70,29 +85,14 @@ const styles = StyleSheet.create({
   kicker: { color: '#8aa0a4', fontSize: 11, letterSpacing: 5, fontWeight: '700', textAlign: 'center' },
   title: { color: '#d8cfc0', fontSize: 22, letterSpacing: 2, fontWeight: '800', textAlign: 'center', marginTop: 8 },
   sub: { color: '#a2977b', fontSize: 13, lineHeight: 20, textAlign: 'center', marginTop: 12, marginBottom: 18 },
-  card: {
-    borderColor: '#3a4448',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-    marginBottom: 10,
-    backgroundColor: 'rgba(20, 24, 26, 0.6)',
-  },
-  cardSel: { borderColor: '#c9a86a', backgroundColor: 'rgba(42, 31, 18, 0.75)' },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` / `kit.ctlOn` carry the material.
+  card: { padding: 14, marginBottom: 10 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardTitle: { color: '#8aa0a4', fontSize: 13, letterSpacing: 3, fontWeight: '700' },
-  cardTitleSel: { color: '#c9a86a' },
+  cardTitle: { color: T.inkDim, fontSize: 13, letterSpacing: 3, fontWeight: '700' },
+  cardTitleSel: { color: T.gold },
   guessTag: { color: '#7c8f6a', fontSize: 9, letterSpacing: 2, fontWeight: '700' },
   cardBlurb: { color: '#c9bfa4', fontSize: 13, lineHeight: 19, marginTop: 6 },
-  confirmBtn: {
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 10,
-    backgroundColor: '#2a1f12',
-  },
+  confirmBtn: { paddingVertical: 14, alignItems: 'center', marginTop: 10 },
   confirmText: { color: '#c9a86a', fontSize: 13, letterSpacing: 2, fontWeight: '700' },
   hint: { color: '#5a6a6e', fontSize: 11, textAlign: 'center', marginTop: 14 },
 });

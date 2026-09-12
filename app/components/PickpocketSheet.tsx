@@ -16,7 +16,17 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
+ * label, hitSlop and geometry unchanged; only the material moved to the kit. */
+const ctlPlanes = (pressed: boolean) => (
+  <>
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+  </>
+);
 
 interface Props {
   /** People in the scene with pockets worth trying — vendor and/or wanderer
@@ -46,7 +56,7 @@ export function PickpocketSheet({ marks, onPick, onCancel }: Props) {
       {marks.map((m) => (
         <Pressable
           key={m}
-          style={({ pressed }) => [styles.markBtn, pressed && styles.btnPressed]}
+          style={({ pressed }) => [kit.ctl, styles.markBtn, tControlDepth(pressed)]}
           onPress={() => onPick(m)}
           accessibilityRole="button"
           accessibilityLabel={`Pickpocket ${m}`}
@@ -86,15 +96,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
-  markBtn: {
-    borderColor: '#6b5c3a',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#17150f',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    gap: 2,
-  },
+  // ⚠ GEOMETRY ONLY — `kit.ctl` owns the material; no box moved.
+  markBtn: { paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
   markText: {
     color: '#e6d8b3',
     fontSize: 14,

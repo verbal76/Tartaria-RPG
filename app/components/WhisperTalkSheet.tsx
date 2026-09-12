@@ -44,7 +44,33 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'rea
 import { useGameStore } from '../state/gameStore';
 import { findChain, pronounForms, whisperRouteTarget } from '../engine/whispers';
 import { playerGridCell } from '../state/playerGrid';
-import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
@@ -120,13 +146,14 @@ export function WhisperTalkSheet() {
               ))}
             </ScrollView>
             <TouchableOpacity
-              style={styles.primaryBtn}
+              style={[kit.ctl, styles.primaryBtn]}
               onPress={() => { setFarewell(null); setOpen(false); }}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Close"
             >
               <Text style={styles.primaryText}>CLOSE</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         </View>
@@ -151,7 +178,7 @@ export function WhisperTalkSheet() {
 
   const bar = (
     <TouchableOpacity
-      style={[styles.bar, deciding || handing ? styles.barDeciding : styles.barQuiet]}
+      style={[tRowStyle(), styles.bar, deciding || handing ? styles.barDeciding : styles.barQuiet]}
       onPress={() => setOpen(true)}
       activeOpacity={0.7}
       accessibilityRole="button"
@@ -167,6 +194,7 @@ export function WhisperTalkSheet() {
           {handing ? `${c.goodsShort} in hand` : waitingWord}
         </Text>
       )}
+      {ROW_PLANES}
     </TouchableOpacity>
   );
 
@@ -216,13 +244,14 @@ export function WhisperTalkSheet() {
                 <Text style={styles.npcName}>{c.npcName}</Text>
               </View>
               <TouchableOpacity
-                style={styles.closeBtn}
+                style={[kit.ctl, styles.closeBtn]}
                 onPress={() => setOpen(false)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Step back — the conversation keeps"
               >
                 <Text style={styles.closeText}>▾</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
 
@@ -253,13 +282,14 @@ export function WhisperTalkSheet() {
                 closing. Filled, like the SPEAK chip: a thing you can use now. */}
             {route && !here && (
               <TouchableOpacity
-                style={styles.routeBtn}
+                style={[kit.ctl, styles.routeBtn]}
                 onPress={takeCourse}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Set course to ${route.label}`}
               >
                 <Text style={styles.routeBtnText}>▸ SET COURSE TO {route.label.toUpperCase()}</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             )}
 
@@ -271,13 +301,14 @@ export function WhisperTalkSheet() {
                     with a button, not something arrival does to you, and the
                     reply lands in this transcript rather than the world feed. */}
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[kit.ctl, styles.primaryBtn]}
                   onPress={giveItBack}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel={`Hand over ${c.goodsLong}`}
                 >
                   <Text style={styles.primaryText}>HAND OVER {c.goodsShort.toUpperCase()}</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.stepBackBtn}
@@ -292,33 +323,36 @@ export function WhisperTalkSheet() {
             ) : deciding ? (
               <>
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={[kit.ctl, styles.primaryBtn]}
                   onPress={() => choose('accept')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel="Take the fetch job"
                 >
                   <Text style={styles.primaryText}>{c.acceptBtnLabel}</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 {c.buy && c.buyBtnLabel && (
                   <TouchableOpacity
-                    style={styles.secondaryBtn}
+                    style={[kit.ctl, styles.secondaryBtn]}
                     onPress={() => choose('buy')}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={`Buy for ${c.buy.costTc} TC`}
                   >
                     <Text style={styles.secondaryText}>{c.buyBtnLabel}</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
-                  style={styles.secondaryBtn}
+                  style={[kit.ctl, styles.secondaryBtn]}
                   onPress={() => choose('leave')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel="Walk away from her fire"
                 >
                   <Text style={styles.secondaryText}>WALK AWAY</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.stepBackBtn}
@@ -332,13 +366,14 @@ export function WhisperTalkSheet() {
               </>
             ) : (
               <TouchableOpacity
-                style={styles.primaryBtn}
+                style={[kit.ctl, styles.primaryBtn]}
                 onPress={() => setOpen(false)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Close"
               >
                 <Text style={styles.primaryText}>CLOSE</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             )}
           </View>

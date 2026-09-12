@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import { tControlDepth, tFilledGold } from '../ui/tartariaKit';
+import { tControlDepth, tFilledGold, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { TScreenHeader } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
@@ -24,6 +24,25 @@ import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { getLocationById } from '../engine/encounter';
 import { topGrudges, topAlliances, relationLabel } from '../engine/factionRelations';
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function WorldScreen() {
   const player = useGameStore((s) => s.player);
   const worldMemory = useGameStore((s) => s.worldMemory);
@@ -34,10 +53,11 @@ export function WorldScreen() {
   // collapsed (the feed is the point); tap a header to fold/unfold, like the inventory.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({ power: true, grudges: true });
   const sectionHeader = (key: string, label: string) => (
-    <TouchableOpacity style={styles.secHeader} activeOpacity={0.6} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))} accessibilityRole="button" accessibilityState={{ expanded: !collapsed[key] }}>
+    <TouchableOpacity style={[tRowStyle(), styles.secHeader]} activeOpacity={0.6} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))} accessibilityRole="button" accessibilityState={{ expanded: !collapsed[key] }}>
       <Text style={styles.secChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
       <Text style={styles.secHeaderLabel}>{label}</Text>
       <Text style={styles.secHeaderHint}>{collapsed[key] ? 'tap to show' : 'tap to hide'}</Text>
+      {ROW_PLANES}
     </TouchableOpacity>
   );
 

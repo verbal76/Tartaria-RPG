@@ -47,6 +47,25 @@ import { setHintsDisabled, useHintsDisabled } from './useFirstTimeHint';
  *  to the beat that taught it. */
 export const WANDERER_CARD_DWELL_MS = 1200;
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function WandererEncounterModal() {
   const wanderer = useGameStore((s) => s.currentScene?.wanderer);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
@@ -125,19 +144,21 @@ export function WandererEncounterModal() {
 
             <Pressable
               onPress={speak}
-              style={styles.primaryBtn}
+              style={[kit.ctl, styles.primaryBtn]}
               accessibilityRole="button"
               accessibilityLabel={`Speak with ${wanderer.name}`}
             >
               <Text style={styles.primaryText}>SPEAK WITH THEM</Text>
+              {CTL_PLANES}
             </Pressable>
             <Pressable
               onPress={dismiss}
-              style={styles.secondaryBtn}
+              style={[kit.ctl, styles.secondaryBtn]}
               accessibilityRole="button"
               accessibilityLabel="Walk on without speaking"
             >
               <Text style={styles.secondaryText}>WALK ON</Text>
+              {CTL_PLANES}
             </Pressable>
             {/* ⚠ The same escape hatch every other card offers (OTA-1524), in the
                 same words and writing the same global flag. It silences the

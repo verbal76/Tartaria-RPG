@@ -36,7 +36,7 @@ import { KeyboardSafeCard } from './KeyboardSafeCard';
 const DESCRIBE_ACCESSORY = 'bugReportDescribeAccessory';
 import type { SlotSummary } from '../engine/saveSystem';
 import type { BugReportMode } from '../diagnostics/bugReport';
-import { tFilledGold } from '../ui/tartariaKit';
+import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -84,6 +84,19 @@ export interface ReportScreenState {
  *  send full log for analysis; in there there really shouldn't be a text box."*
  *  Real slot IDs are slot_{base36}, so neither sentinel can collide with one. */
 const FULL_LOG = 'fulllog';
+
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend }: Props) {
   // 'general' sentinel for the "no character" option. Real slot IDs
@@ -162,16 +175,24 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
         // the player scrolling at all.
         <View style={styles.buttonRow}>
           <Pressable
-            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
             onPress={onCancel}
             accessibilityRole="button"
           >
             <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
+            {CTL_PLANES}
           </Pressable>
           <Pressable
             style={({ pressed }) => [
               styles.btn,
-              canSend ? tFilledGold(pressed) : styles.btnDisabled,
+              /* ⚠⚠ PHASE 3 — NOT READY IS A STATE, NOT A DIFFERENT OBJECT. The
+               * unready arm used to hand back `styles.btnDisabled`, which was
+               * `{ backgroundColor: 'transparent', borderColor: '#3a342c' }` —
+               * the very legacy neutral outline this pass deleted everywhere
+               * else. So the button stopped being filled gold and became a
+               * specimen of the dead dialect the moment it could not be used.
+               * It keeps its construction now and the mute carries readiness. */
+              canSend ? tFilledGold(pressed) : [tFilledGold(null), kit.ctlDead],
             ]}
             onPress={handleSend}
             disabled={!canSend}
@@ -430,8 +451,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   btnTextPrimary: { color: '#13110f' },
   btnTextDisabled: { color: '#5c5345' },

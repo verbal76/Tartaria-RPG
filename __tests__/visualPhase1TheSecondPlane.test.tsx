@@ -342,12 +342,16 @@ describe('Phase 1 — the inputs keep every behavioural contract', () => {
     expect((chip.match(/pointerEvents="none"/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  /** ⚠ AN INERT CHIP MAKES NO PHYSICAL CLAIM ON EITHER LAYER. The ring already
-   *  went flat for `blocked`; the planes must follow it, or a tutorial-locked
-   *  control would advertise a readiness it does not have. */
-  it('a blocked chip is handed neither the ring depth nor the planes', () => {
-    expect(INPUT_BOX).toMatch(/blocked\s*\?\s*null\s*:\s*tControlDepth\(pressed\)/);
-    expect(INPUT_BOX).toMatch(/\{blocked\s*\?\s*null\s*:\s*\(/);
+  /* ⚠⚠⚠ REVERSED BY OWNER RULING IN PHASE 3 — see the twin in OTA-1782. Phase 1
+   * asserted that an inert chip made no physical claim on EITHER layer. The
+   * device showed what that costs: a disabled PICKPOCKET stopped looking like a
+   * control at all. A dead key is still a key; the mute says it cannot be
+   * struck. Both layers are now unconditional, and the guard says so. */
+  it('a blocked chip keeps both layers and is muted, not stripped', () => {
+    expect(INPUT_BOX).not.toMatch(/blocked\s*\?\s*null\s*:\s*tControlDepth\(pressed\)/);
+    expect(INPUT_BOX).not.toMatch(/\{blocked\s*\?\s*null\s*:\s*\(/);
+    expect(INPUT_BOX).toMatch(/blocked && styles\.quickDisabled/);
+    expect(INPUT_BOX).toMatch(/blocked && styles\.quickDisabledText/);
   });
 });
 
@@ -554,32 +558,55 @@ describe('Phase 1 — the smallest phone, and the scope firewall', () => {
     expect(chip).not.toMatch(/controlPlane|chassisPlane/);
   });
 
-  /** ⚠ THE SPECIMEN IS EXPLORATION. If a plane appeared on another screen this
-   *  would have become the broad migration Phase 1 exists to NOT be. */
-  it('no screen outside the Exploration specimen consumed the new planes', () => {
+  /* ⚠⚠⚠ SUPERSEDED BY VISUAL LANGUAGE PHASE 3, AND REPLACED RATHER THAN
+   * DELETED. This was Phase 1's SCOPE FIREWALL: the planes were proven on ONE
+   * acceptance specimen, so any other file drawing them was a leak, and the
+   * guard named the six files allowed to have them. The owner has since ruled
+   * the opposite — the deprecated dialect is to be destroyed everywhere and the
+   * construction propagated across the game's controls — so an allow-list of
+   * six files is now the wrong SHAPE of claim: every migration would have to
+   * edit it, which makes it paperwork rather than a guard.
+   *
+   * ⚠⚠ WHAT REPLACES IT IS STRICTLY STRONGER. The boundary that actually
+   * matters was never "which files" — it is that the raised language marks
+   * things you can TOUCH. So a plane may only appear in a file that owns at
+   * least one `onPress`. A structural, read-only surface acquiring button depth
+   * now fails here no matter which file it lives in, which the old allow-list
+   * could not express at all. */
+  it('the planes only ever land on control-bearing files', () => {
     const fs = require('fs') as typeof import('fs');
     const path = require('path') as typeof import('path');
-    const allowed = new Set([
-      'app/ui/tartariaKit.tsx',
-      'app/screens/ExplorationScreen.tsx',
-      'app/components/InputBox.tsx',
-      'app/components/KeyboardInputBar.tsx',
-      'app/components/EnemyPanel.tsx',
-      'app/components/StatsPanel.tsx',
-    ]);
-    const offenders: string[] = [];
+    const onStructural: string[] = [];
     const walk = (dir: string) => {
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, e.name);
         if (e.isDirectory()) { walk(p); continue; }
         if (!/\.(ts|tsx)$/.test(e.name)) continue;
         const rel = path.relative(ROOT, p).split(path.sep).join('/');
-        if (allowed.has(rel)) continue;
-        const src = fs.readFileSync(p, 'utf8');
-        if (/(controlPlane|chassisPlane|tartariaKitStyles\.recess)/.test(codeOf(src))) offenders.push(rel);
+        const code = codeOf(fs.readFileSync(p, 'utf8'));
+        if (!/(controlPlane|chassisPlane|tartariaKitStyles\.recess)/.test(code)) continue;
+        // The kit DEFINES them; every other file must be handing them to a control.
+        if (rel === 'app/ui/tartariaKit.tsx') continue;
+        /* ⚠⚠⚠ THE ONE FILE WHOSE TOUCH OWNER IS ITS PARENT, AND IT IS A RULING,
+         * not an exemption of convenience. OTA-1443 / Phase 1 C-1: the WHOLE
+         * StatsPanel is wrapped by a single `TouchableOpacity` in
+         * ExplorationScreen carrying `accessibilityLabel="Open player sheet"`,
+         * so the panel itself is deliberately touch-silent and must stay that
+         * way — shrinking the target to a portrait was refused by name. It is
+         * still an INTERACTIVE CHASSIS, so it still wears the chassis planes.
+         * The exception is named, and the reason it is safe is asserted just
+         * below rather than taken on trust. */
+        if (rel === 'app/components/StatsPanel.tsx') continue;
+        if (!/onPress/.test(code)) onStructural.push(rel);
       }
     };
     walk(path.join(ROOT, 'app'));
-    expect(offenders).toEqual([]);
+    expect(onStructural).toEqual([]);
+
+    // The chassis above is only legitimate while its parent really does own the tap.
+    const expl = codeOf(fs.readFileSync(path.join(ROOT, 'app/screens/ExplorationScreen.tsx'), 'utf8'));
+    expect(expl).toContain('Open player sheet');
+    const stats = codeOf(fs.readFileSync(path.join(ROOT, 'app/components/StatsPanel.tsx'), 'utf8'));
+    expect(stats).not.toMatch(/onPress|accessibilityRole/);
   });
 });

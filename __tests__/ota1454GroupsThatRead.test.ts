@@ -223,12 +223,27 @@ describe('OTA-1454 — the way out stops looking like a door', () => {
     expect(row).toContain('🚪 EXIT');
   });
 
+  /* ⚠⚠⚠ RE-POINTED BY VISUAL LANGUAGE PHASE 3, AND THE CLAIM IS UNCHANGED. This
+   * test used to read a literal hex out of `travelBtn` and `travelBtnActive`.
+   * Phase 3 collapsed the whole travel row onto the kit — the room chip's
+   * material is now `kit.ctl` and the you-are-here chip's is `kit.ctlOn` — so
+   * there is no local hex left to read and the old regex died on a null match.
+   *
+   * ⚠⚠ THE THING OTA-1454 ACTUALLY PROVED IS STILL WORTH PROVING: three
+   * meanings on one row must stay three visibly different things. So it now
+   * resolves each rim from wherever it really comes from and asserts the same
+   * three-way distinctness. The way out keeps its own cool rim — leaving is not
+   * the same kind of act as stepping next door — which is exactly the semantic
+   * layer sitting ON TOP of a shared physical construction. */
   it('⚠⚠ its chip is VISUALLY distinct from the room chips beside it', () => {
+    const { T, tartariaKitStyles } = require('../app/ui/tartariaKit');
     const wayOut = /borderColor:\s*'(#[0-9a-fA-F]{6})'/.exec(styleOf('travelBtnWayOut'))![1]!.toLowerCase();
-    const room = /borderColor:\s*'(#[0-9a-fA-F]{6})'/.exec(styleOf('travelBtn'))![1]!.toLowerCase();
-    const here = /borderColor:\s*'(#[0-9a-fA-F]{6})'/.exec(styleOf('travelBtnActive'))![1]!.toLowerCase();
+    const room = String((tartariaKitStyles.ctl as Record<string, unknown>).borderColor).toLowerCase();
+    const here = String((tartariaKitStyles.ctlOn as Record<string, unknown>).borderColor).toLowerCase();
     expect(wayOut).not.toBe(room);
     expect(wayOut).not.toBe(here);   // nor the you-are-here room
+    expect(room).not.toBe(here);     // and the two kit states stay distinct too
+    expect(here).toBe(String(T.gold).toLowerCase());
   });
 
   it('⚠⚠ the glyph MATCHES THE MAP — one symbol for one meaning, on both surfaces', () => {

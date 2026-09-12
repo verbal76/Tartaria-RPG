@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
@@ -149,6 +149,40 @@ function sortInventoryItems(
 // 2026-05-26 OTA-059 — RECIPES tab moved to CraftingScreen as its
 // 3rd tab (CRAFT / REPAIR / RECIPES). InventoryScreen is now a
 // single ITEMS view — no tabs needed.
+
+/* ⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH. `kit.ctl` is only the material: the
+ * face, the rim and the radius. The catch of light on the top edge, the
+ * sidewall and the contact shadow under it are hand-placed children, absolutely
+ * positioned inside a box the control already owns, so adopting them moves
+ * nothing by a pixel. Semantic colour a call site already carries layers on
+ * top and still wins — construction is what the object IS, not what state it
+ * is in. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
@@ -1695,7 +1729,7 @@ export function InventoryScreen() {
       {giftMode && (
         <Pressable
           onPress={cancelGiftMode}
-          style={({ pressed }) => [styles.giftModeBar, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [kit.ctl, styles.giftModeBar, pressed && { opacity: 0.7 }]}
           accessibilityRole="button"
           accessibilityLabel={`Giving to ${giftMode.toName}. Tap to cancel.`}
         >
@@ -1703,6 +1737,7 @@ export function InventoryScreen() {
           <Text style={styles.giftModeHint}>
             tap an item to offer it · worn, racked and contract-bound things cannot be given · tap here to cancel
           </Text>
+          {CTL_PLANES}
         </Pressable>
       )}
       {/* OTA-230 — first-time inventory hint. Pops once per install
@@ -1781,8 +1816,9 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a throwable below to rack it on your bandolier.
             </Text>
-            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
+            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={[kit.ctl, styles.pouchFilterCancel]} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         )}
@@ -1795,8 +1831,9 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a tool below to stow it on your belt.
             </Text>
-            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel} accessibilityRole="button">
+            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={[kit.ctl, styles.pouchFilterCancel]} accessibilityRole="button">
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         )}
@@ -1822,8 +1859,9 @@ export function InventoryScreen() {
           <View style={styles.groupBar}>
             <View style={styles.groupBarHead}>
               <Text style={styles.groupBarCount}>☑ {selectedItems.length} picked</Text>
-              <TouchableOpacity onPress={exitInvSelect} style={styles.groupBarCancel} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Cancel the group">
+              <TouchableOpacity onPress={exitInvSelect} style={[kit.ctl, styles.groupBarCancel]} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Cancel the group">
                 <Text style={styles.groupBarCancelText}>CANCEL</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
             <View style={styles.groupBarActions}>
@@ -1953,7 +1991,7 @@ export function InventoryScreen() {
                   if (sel.eligible === 0) return null;
                   return (
                     <TouchableOpacity
-                      style={[styles.selectAllBtn, sel.allSelected && styles.selectAllBtnOn]}
+                      style={[kit.ctl, styles.selectAllBtn, sel.allSelected && styles.selectAllBtnOn]}
                       activeOpacity={0.7}
                       onPress={() => reserveManyForFusion(sel.ids, !sel.allSelected)}
                       accessibilityRole="button"
@@ -1964,6 +2002,7 @@ export function InventoryScreen() {
                       <Text style={[styles.selectAllText, sel.allSelected && styles.selectAllTextOn]}>
                         {sel.allSelected ? `♥ CLEAR ${sel.eligible}` : `♡ ALL ${sel.eligible}`}
                       </Text>
+                      {CTL_PLANES}
                     </TouchableOpacity>
                   );
                 })()}
@@ -2997,6 +3036,7 @@ const ItemRow = React.memo(function ItemRow({
           );
         })()}
       </View>
+      {ROW_PLANES}
     </TouchableOpacity>
   );
 });

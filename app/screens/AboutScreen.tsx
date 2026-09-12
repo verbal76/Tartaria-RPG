@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView, Platfo
    this only rides the two depth edges on top. A BUSY control (saving, backing
    up, restoring) is handed NO depth, because an inert control must not
    advertise readiness it does not have. */
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
@@ -95,6 +95,32 @@ import {
 import type * as Speech from 'expo-speech';
 import { resetMLHealth, mlHealthSummary } from '../diagnostics/mlHealth';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const TAB_PLANES = (
+  <>
+    <View style={kit.tabPlaneTop} pointerEvents="none" />
+    <View style={kit.tabPlaneBottom} pointerEvents="none" />
+    <View style={kit.tabPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -828,13 +854,14 @@ export function AboutScreen() {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen(player ? 'exploration' : 'title')}
-          style={styles.backBtn}
+          style={[kit.ctl, styles.backBtn]}
           hitSlop={12}
           activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
           <Text style={styles.back}>← BACK</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">SETTINGS</Text>
         <View style={{ width: 80 }} />
@@ -858,7 +885,7 @@ export function AboutScreen() {
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
-            style={[styles.tabBtn, tab === id && styles.tabBtnActive]}
+            style={[kit.ctl, styles.tabBtn, tab === id && styles.tabBtnActive]}
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityState={{ selected: tab === id }}
@@ -871,6 +898,7 @@ export function AboutScreen() {
             >
               {id === 'notices' ? 'ABOUT' : id.toUpperCase()}
             </Text>
+            {TAB_PLANES}
           </TouchableOpacity>
         ))}
       </View>
@@ -926,7 +954,13 @@ export function AboutScreen() {
               write result (a save can silently fail when storage is full). */}
           <Pressable
             style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnPrimary, saveState === 'failed' && styles.sessionBtnDanger,
-              (saveState === 'saving') ? null : tControlDepth(pressed)]}
+
+              /* ⚠⚠ PHASE 3 — BUSY IS A STATE, NOT A DIFFERENT OBJECT. This read
+               * `… ? null : tControlDepth(pressed)`, so the moment the button
+               * went to work it stopped being built like a button at all. Owner
+               * ruling: physical construction is identity, semantic state is
+               * readiness. It keeps the depth and the mute carries the wait. */
+              tControlDepth(pressed), (saveState === 'saving') && kit.ctlDead]}
             onPress={() => { void handleSave(); }}
             disabled={saveState === 'saving'}
             accessibilityRole="button"
@@ -946,7 +980,7 @@ export function AboutScreen() {
           {player && (
             <Pressable
               style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, backupState === 'failed' && styles.sessionBtnDanger,
-              (backupState === 'busy') ? null : tControlDepth(pressed)]}
+              tControlDepth(pressed), (backupState === 'busy') && kit.ctlDead]}
               onPress={() => { void handleBackUp(); }}
               disabled={backupState === 'busy'}
               accessibilityRole="button"
@@ -968,7 +1002,7 @@ export function AboutScreen() {
               needs no confirm. */}
           <Pressable
             style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary,
-              (restoreBusy) ? null : tControlDepth(pressed)]}
+              tControlDepth(pressed), (restoreBusy) && kit.ctlDead]}
             onPress={() => { void handleRestore(); }}
             disabled={restoreBusy}
             accessibilityRole="button"
@@ -997,7 +1031,7 @@ export function AboutScreen() {
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={() => { void setAutosaveDisabled(!autosaveDisabled); }}
-              style={[styles.musicToggle, !autosaveDisabled && styles.musicToggleOn]}
+              style={[kit.ctl, styles.musicToggle, !autosaveDisabled && styles.musicToggleOn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Autosave"
@@ -1006,6 +1040,7 @@ export function AboutScreen() {
               <Text style={[styles.musicToggleText, !autosaveDisabled && styles.musicToggleTextOn]}>
                 {autosaveDisabled ? 'OFF' : 'ON'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
           <Text style={styles.sessionHint}>
@@ -1110,7 +1145,7 @@ export function AboutScreen() {
               </Text>
             </View>
             <TouchableOpacity
-              style={[styles.crashOptBtn, crashOptIn && styles.crashOptBtnOn,
+              style={[kit.ctl, styles.crashOptBtn, crashOptIn && styles.crashOptBtnOn,
                       !crashConfigured && styles.crashOptBtnDead]}
               onPress={() => {
                 const next = !crashOptIn;
@@ -1125,6 +1160,7 @@ export function AboutScreen() {
               <Text style={[styles.crashOptBtnText, crashOptIn && styles.crashOptBtnTextOn]}>
                 {crashOptIn ? 'ON' : 'OFF'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
           <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">AI</Text>
@@ -1249,7 +1285,7 @@ export function AboutScreen() {
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
-              (importBusy) ? null : tControlDepth(pressed)]}
+              tControlDepth(pressed), (importBusy) && kit.ctlDead]}
                 onPress={() => { void handleImportSave(); }}
                 disabled={importBusy}
               >
@@ -1304,7 +1340,7 @@ export function AboutScreen() {
               <TouchableOpacity
                 key={s2}
                 onPress={() => { void setUiScale(s2); }}
-                style={[styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
+                style={[kit.ctl, styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Display size ${s2}`}
@@ -1313,6 +1349,7 @@ export function AboutScreen() {
                 <Text style={[styles.musicToggleText, uiScale === s2 && styles.musicToggleTextOn]}>
                   {s2 === 'small' ? 'S' : s2 === 'medium' ? 'M' : 'L'}
                 </Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             ))}
           </View>
@@ -1410,7 +1447,7 @@ export function AboutScreen() {
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={() => { void setHintsDisabled(!hintsDisabled); }}
-              style={[styles.musicToggle, !hintsDisabled && styles.musicToggleOn]}
+              style={[kit.ctl, styles.musicToggle, !hintsDisabled && styles.musicToggleOn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="First-time tips"
@@ -1419,6 +1456,7 @@ export function AboutScreen() {
               <Text style={[styles.musicToggleText, !hintsDisabled && styles.musicToggleTextOn]}>
                 {hintsDisabled ? 'OFF' : 'ON'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
 
@@ -1475,7 +1513,7 @@ export function AboutScreen() {
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={() => setReduceMotion(!reduceMotion)}
-              style={[styles.musicToggle, reduceMotion && styles.musicToggleOn]}
+              style={[kit.ctl, styles.musicToggle, reduceMotion && styles.musicToggleOn]}
               activeOpacity={0.7}
               accessibilityRole="switch"
               accessibilityLabel="Reduce motion"
@@ -1484,6 +1522,7 @@ export function AboutScreen() {
               <Text style={[styles.musicToggleText, reduceMotion && styles.musicToggleTextOn]}>
                 {reduceMotion ? 'ON' : 'OFF'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         </View>
@@ -1495,7 +1534,7 @@ export function AboutScreen() {
             <Text style={styles.musicTitle} accessibilityRole="header">MUSIC</Text>
             <TouchableOpacity
               onPress={toggleMusic}
-              style={[styles.musicToggle, audio.enabled && styles.musicToggleOn]}
+              style={[kit.ctl, styles.musicToggle, audio.enabled && styles.musicToggleOn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Music"
@@ -1504,6 +1543,7 @@ export function AboutScreen() {
               <Text style={[styles.musicToggleText, audio.enabled && styles.musicToggleTextOn]}>
                 {audio.enabled ? 'ON' : 'OFF'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
           <View style={styles.musicRow}>
@@ -1543,7 +1583,7 @@ export function AboutScreen() {
             </View>
           </View>
           <TouchableOpacity
-            style={[styles.applyBtn, applyFlash && styles.applyBtnFlash]}
+            style={[kit.ctl, styles.applyBtn, applyFlash && styles.applyBtnFlash]}
             onPress={applyMusic}
             activeOpacity={0.7}
             accessibilityRole="button"
@@ -1551,6 +1591,7 @@ export function AboutScreen() {
             <Text style={[styles.applyBtnText, applyFlash && styles.applyBtnTextFlash]}>
               {applyFlash ? 'APPLIED' : 'APPLY'}
             </Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
         )}
@@ -1570,7 +1611,7 @@ export function AboutScreen() {
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={toggleTTS}
-              style={[styles.musicToggle, voice.ttsEnabled && styles.musicToggleOn]}
+              style={[kit.ctl, styles.musicToggle, voice.ttsEnabled && styles.musicToggleOn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Read aloud (TTS)"
@@ -1579,6 +1620,7 @@ export function AboutScreen() {
               <Text style={[styles.musicToggleText, voice.ttsEnabled && styles.musicToggleTextOn]}>
                 {voice.ttsEnabled ? 'ON' : 'OFF'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
 
@@ -1607,23 +1649,25 @@ export function AboutScreen() {
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                   <TouchableOpacity
                     onPress={() => switchEngine('system')}
-                    style={[styles.musicToggle, voice.engine === 'system' && styles.musicToggleOn]}
+                    style={[kit.ctl, styles.musicToggle, voice.engine === 'system' && styles.musicToggleOn]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel="System voice engine"
                     accessibilityState={{ selected: voice.engine === 'system' }}
                   >
                     <Text style={[styles.musicToggleText, voice.engine === 'system' && styles.musicToggleTextOn]}>SYSTEM</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => switchEngine('bundled')}
-                    style={[styles.musicToggle, voice.engine === 'bundled' && styles.musicToggleOn]}
+                    style={[kit.ctl, styles.musicToggle, voice.engine === 'bundled' && styles.musicToggleOn]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel="Bundled voice engine"
                     accessibilityState={{ selected: voice.engine === 'bundled' }}
                   >
                     <Text style={[styles.musicToggleText, voice.engine === 'bundled' && styles.musicToggleTextOn]}>BUNDLED</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                   {/* Third button — kicks the Kokoro install / re-check.
                       Independent of the engine toggle so a player can
@@ -1631,7 +1675,7 @@ export function AboutScreen() {
                       SYSTEM is active. Label adapts to install state. */}
                   <TouchableOpacity
                     onPress={handleEngineThirdBtn}
-                    style={[styles.musicToggle, kokoroState.phase === 'ready' && styles.musicToggleOn]}
+                    style={[kit.ctl, styles.musicToggle, kokoroState.phase === 'ready' && styles.musicToggleOn]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel="Download or update bundled voice"
@@ -1643,6 +1687,7 @@ export function AboutScreen() {
                        kokoroState.phase === 'error' ? 'RETRY' :
                        'DOWNLOAD'}
                     </Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1667,7 +1712,7 @@ export function AboutScreen() {
                   </Text>
                   <TouchableOpacity
                     onPress={testKokoro}
-                    style={[styles.applyBtn, { marginTop: 4 }]}
+                    style={[kit.ctl, styles.applyBtn, { marginTop: 4 }]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                   >
@@ -1676,6 +1721,7 @@ export function AboutScreen() {
                        kokoroState.phase === 'downloading' || kokoroState.phase === 'loading' ? 'WORKING…' :
                        'TEST VOICE (downloads on first tap)'}
                     </Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                   {/* OTA 23-018 — manual recovery for the "downloaded
                       but failed to load" case where a prior partial
@@ -1686,26 +1732,29 @@ export function AboutScreen() {
                       tap re-downloads from scratch. */}
                   <TouchableOpacity
                     onPress={handleClearKokoroCache}
-                    style={[styles.applyBtn, { marginTop: 4, backgroundColor: 'transparent', borderColor: '#5a3a2a', borderWidth: 1 }]}
+                    style={[kit.ctl, styles.applyBtn, { marginTop: 4, backgroundColor: 'transparent', borderColor: '#5a3a2a', borderWidth: 1 }]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                   >
                     <Text style={[styles.applyBtnText, { color: '#c9a26a' }]}>
                       {kokoroCacheCleared ? 'CACHE CLEARED — TAP TEST VOICE' : 'CLEAR BUNDLED VOICE CACHE'}
                     </Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                   <View style={styles.musicRow}>
                     <Text style={styles.musicLabel}>Voice</Text>
-                    <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Previous voice">
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={[kit.ctl, styles.voiceCycleBtn]} accessibilityRole="button" accessibilityLabel="Previous voice">
                       <Text style={styles.voiceCycleText}>◀</Text>
+                      {CTL_PLANES}
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: 6 }}>
                       <Text style={styles.voicePickerLabel} numberOfLines={1}>
                         {voice.kokoroVoice.toUpperCase().replace(/_/g, ' ')}
                       </Text>
                     </View>
-                    <TouchableOpacity onPress={() => cycleKokoroVoice(1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Next voice">
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(1)} style={[kit.ctl, styles.voiceCycleBtn]} accessibilityRole="button" accessibilityLabel="Next voice">
                       <Text style={styles.voiceCycleText}>▶</Text>
+                      {CTL_PLANES}
                     </TouchableOpacity>
                   </View>
                 </>
@@ -1774,14 +1823,16 @@ export function AboutScreen() {
               {voice.engine === 'system' && (
                 <View style={styles.musicRow}>
                   <Text style={styles.musicLabel}>Voice</Text>
-                  <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Previous voice">
+                  <TouchableOpacity onPress={() => cycleVoice(-1)} style={[kit.ctl, styles.voiceCycleBtn]} accessibilityRole="button" accessibilityLabel="Previous voice">
                     <Text style={styles.voiceCycleText}>◀</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                   <View style={{ flex: 1, paddingHorizontal: 6 }}>
                     <Text style={styles.voicePickerLabel} numberOfLines={1}>{currentVoiceLabel}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn} accessibilityRole="button" accessibilityLabel="Next voice">
+                  <TouchableOpacity onPress={() => cycleVoice(1)} style={[kit.ctl, styles.voiceCycleBtn]} accessibilityRole="button" accessibilityLabel="Next voice">
                     <Text style={styles.voiceCycleText}>▶</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                 </View>
               )}
@@ -1799,11 +1850,12 @@ export function AboutScreen() {
               the full About dump. */}
           <TouchableOpacity
             onPress={handleVoiceCopy}
-            style={[styles.applyBtn, { marginTop: 8 }]}
+            style={[kit.ctl, styles.applyBtn, { marginTop: 8 }]}
             activeOpacity={0.7}
             accessibilityRole="button"
           >
             <Text style={styles.applyBtnText}>{voiceCopied ? 'COPIED' : 'COPY VOICE INFO'}</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
         )}

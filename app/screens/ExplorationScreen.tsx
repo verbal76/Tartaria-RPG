@@ -131,6 +131,28 @@ import { useBackAction } from '../ui/desktopBack'; // OTA-1229 — right-click /
 // engine's rescue dispatch and the bulk-salvage guard. See engine/storyNouns.ts.
 import { isLeadNoun, orderByStoryTier } from '../engine/storyNouns';
 
+/* ⚠⚠⚠ PHASE 3 — THIS SCREEN HAD ITS OWN CONTROL DIALECT, AND SUMMON WAS IN IT.
+ * Every chip here — the place chips, the talk/store chips, the objective chip,
+ * the did-you-mean chip and the SUMMON chip the owner asked about by name —
+ * drew its own rim, fill and radius and reached no kit authority. They now take
+ * the kit's construction with their SEMANTIC rims layered on top: the vendor's
+ * amber, the mission board's parchment, the unspoken-dialogue green and the
+ * settling seat's muted rim all still say what they said, over a key that is
+ * now built the same way as every other key in the game.
+ *
+ * ⚠⚠ THE PLANES ARE THE DEPTH; `ctl` IS ONLY THE MATERIAL. `tControlDepth`
+ * returns two border colours and nothing else, which is why propagation stalled
+ * across this file for two phases — the face, the sidewall and the contact are
+ * hand-placed children, absolutely positioned inside a box the control already
+ * owns, so nothing moves by a pixel. */
+const CTL_PLANES = (
+  <>
+    <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+    <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
   const hourOfDay = Math.floor(hours % 24);
@@ -1515,11 +1537,12 @@ export function ExplorationScreen() {
                 <TouchableOpacity
                   onPress={() => setScreen('about')}
                   hitSlop={8}
-                  style={styles.sceneBarBtn}
+                  style={[tartariaKitStyles.ctl, styles.sceneBarBtn]}
                   accessibilityRole="button"
                   accessibilityLabel="Settings"
                 >
                   <TGear size={SCENE_GEAR_SIZE} color={T.gold} />
+                  {CTL_PLANES}
                 </TouchableOpacity>
               </View>
               {/* v2.4.1 (OTA 045) — QUESTS button removed per player
@@ -1641,7 +1664,7 @@ export function ExplorationScreen() {
         return (
           <TutorialTarget area="objective-chip">
           <TouchableOpacity
-            style={styles.objectiveChip}
+            style={[tartariaKitStyles.ctl, styles.objectiveChip]}
             accessibilityRole="button"
             onPress={() => {
               // Tungsten Spire — advance the main_quest tutorial beat
@@ -1664,7 +1687,7 @@ export function ExplorationScreen() {
               </Text>
               {atUnrecovered && (
                 <TouchableOpacity
-                  style={[styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait]}
+                  style={[tartariaKitStyles.ctl, styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait]}
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
                   activeOpacity={0.7}
                   hitSlop={8}
@@ -1679,10 +1702,12 @@ export function ExplorationScreen() {
                       ? '★ FIGHT FIRST'
                       : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                   </Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
               )}
             </View>
             {CHASSIS_PLANES}
+            {CTL_PLANES}
           </TouchableOpacity>
           </TutorialTarget>
         );
@@ -1728,7 +1753,7 @@ export function ExplorationScreen() {
                 {`${climb.noun} — ${climb.tiers} tiers`}
               </Text>
               <TouchableOpacity
-                style={styles.objectiveChipSummon}
+                style={[tartariaKitStyles.ctl, styles.objectiveChipSummon]}
                 // ⚠ Submits the canonical noun rather than calling a private climb entry
                 // point. That is deliberate: it walks the SAME parser → climb path a
                 // player typing the name walks, so the button cannot drift away from the
@@ -1740,6 +1765,7 @@ export function ExplorationScreen() {
                 accessibilityRole="button"
               >
                 <Text style={styles.objectiveChipSummonText}>★ CLIMB</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             </View>
           </View>
@@ -1771,7 +1797,7 @@ export function ExplorationScreen() {
           Typing "gift" always reached them; the affordance never did. */}
       {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && (
         <TouchableOpacity
-          style={[styles.placeChip, styles.vendorChip]}
+          style={[tartariaKitStyles.ctl, styles.placeChip, styles.vendorChip]}
           onPress={() => setScreen('vendor')}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -1809,7 +1835,7 @@ export function ExplorationScreen() {
               not. Nested touchables do not bubble in RN, so tapping it navigates
               exactly once. */}
           <TouchableOpacity
-            style={[styles.placeChipTalk, styles.placeChipStore]}
+            style={[tartariaKitStyles.ctl, styles.placeChipTalk, styles.placeChipStore]}
             onPress={() => setScreen('vendor')}
             hitSlop={8}
             activeOpacity={0.7}
@@ -1817,6 +1843,7 @@ export function ExplorationScreen() {
             accessibilityLabel={`Open ${currentScene.vendor.name}'s store, ${currentScene.vendor.offers.length} offers`}
           >
             <Text style={[styles.placeChipTalkText, styles.placeChipStoreText]}>STORE</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
           {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
             // OTA-1079 — the glow means "something NEW to hear": green while
@@ -1824,7 +1851,7 @@ export function ExplorationScreen() {
             // the player has heard them all. Same spent-math as the sheet's
             // "(asked)" marks, via hasUnspokenTalk.
             <TouchableOpacity
-              style={[styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken]}
+              style={[tartariaKitStyles.ctl, styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken]}
               onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}
               hitSlop={8}
               activeOpacity={0.7}
@@ -1836,13 +1863,14 @@ export function ExplorationScreen() {
               }
             >
               <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           ) : null}
           {/* OTA-1083 — GIFT beside TALK. The verb existed since OTA-1060 but
               only as typed input ("I didn't see a gift button" — owner). Same
               quiet affordance as TALK; opens the OTA-1060 picker. */}
           <TouchableOpacity
-            style={styles.placeChipTalk}
+            style={[tartariaKitStyles.ctl, styles.placeChipTalk]}
             onPress={() => useGameStore.getState().openGift()}
             hitSlop={8}
             activeOpacity={0.7}
@@ -1850,6 +1878,7 @@ export function ExplorationScreen() {
             accessibilityLabel={`Give a gift`}
           >
             <Text style={styles.placeChipTalkText}>GIFT</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
           {/* OTA-1029 — ✕ on the trader, matching the Crucible's. Nested touchable
               handles its own tap (doesn't open the stall). Hides the chip for this
@@ -1882,6 +1911,7 @@ export function ExplorationScreen() {
             <Text style={styles.vendorChipX}>✕</Text>
           </TouchableOpacity>
           {CHASSIS_PLANES}
+          {CTL_PLANES}
         </TouchableOpacity>
       )}
 
@@ -1896,7 +1926,7 @@ export function ExplorationScreen() {
           so a brand-new character has an immediate quest on-ramp. */}
       {currentScene?.missionBoard && missionBoardHasPostings && (
         <TouchableOpacity
-          style={[styles.placeChip, styles.missionBoardChip]}
+          style={[tartariaKitStyles.ctl, styles.placeChip, styles.missionBoardChip]}
           onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -1917,6 +1947,7 @@ export function ExplorationScreen() {
           </View>
           <Text style={styles.placeChipArrow}>›</Text>
           {CHASSIS_PLANES}
+          {CTL_PLANES}
         </TouchableOpacity>
       )}
 
@@ -1926,7 +1957,7 @@ export function ExplorationScreen() {
           standing nudge). Hidden in combat. */}
       {currentScene?.wanderer && !inCombat && (
         <TouchableOpacity
-          style={[styles.placeChip, styles.wandererChip]}
+          style={[tartariaKitStyles.ctl, styles.placeChip, styles.wandererChip]}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -1948,7 +1979,7 @@ export function ExplorationScreen() {
               shopkeepers and nobody else. Stops propagation so the chip's own
               tap-to-speak does not also fire. */}
           <TouchableOpacity
-            style={styles.placeChipTalk}
+            style={[tartariaKitStyles.ctl, styles.placeChipTalk]}
             onPress={(e) => { e.stopPropagation(); useGameStore.getState().openGift(); }}
             hitSlop={8}
             activeOpacity={0.7}
@@ -1956,9 +1987,11 @@ export function ExplorationScreen() {
             accessibilityLabel={`Give a gift to ${currentScene.wanderer.name}`}
           >
             <Text style={styles.placeChipTalkText}>GIFT</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
           <Text style={styles.placeChipArrow}>›</Text>
           {CHASSIS_PLANES}
+          {CTL_PLANES}
         </TouchableOpacity>
       )}
 
@@ -2059,7 +2092,7 @@ export function ExplorationScreen() {
             : 'tap to fuse · spends ♥ items';
         return (
         <TouchableOpacity
-          style={[styles.placeChip, styles.fusionChip]}
+          style={[tartariaKitStyles.ctl, styles.placeChip, styles.fusionChip]}
           onPress={fireCrucible}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -2095,6 +2128,7 @@ export function ExplorationScreen() {
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
           {CHASSIS_PLANES}
+          {CTL_PLANES}
         </TouchableOpacity>
         );
       })()}
@@ -2224,12 +2258,13 @@ export function ExplorationScreen() {
               {parseSuggestions.map((s) => (
                 <TouchableOpacity
                   key={s}
-                  style={styles.didYouMeanChip}
+                  style={[tartariaKitStyles.ctl, styles.didYouMeanChip]}
                   activeOpacity={0.7}
                   onPress={() => submit(s)}
                   accessibilityRole="button"
                 >
                   <Text style={styles.didYouMeanChipText}>{s}</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
               ))}
             </View>

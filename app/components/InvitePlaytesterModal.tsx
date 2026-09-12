@@ -8,7 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { KeyboardSafeCard } from './KeyboardSafeCard';
-import { tFilledGold } from '../ui/tartariaKit';
+import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -31,6 +31,19 @@ function isValidGmail(raw: string): boolean {
   if (trimmed.length === 0 || trimmed.length > 254) return false;
   return GMAIL_PATTERN.test(trimmed);
 }
+
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
   const [gmail, setGmail] = useState('');
@@ -75,16 +88,24 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
       footer={(
         <View style={styles.buttonRow}>
           <Pressable
-            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
             onPress={onCancel}
             accessibilityRole="button"
           >
             <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
+            {CTL_PLANES}
           </Pressable>
           <Pressable
             style={({ pressed }) => [
               styles.btn,
-              valid ? tFilledGold(pressed) : styles.btnDisabled,
+              /* ⚠⚠ PHASE 3 — NOT READY IS A STATE, NOT A DIFFERENT OBJECT. The
+               * unready arm used to hand back `styles.btnDisabled`, which was
+               * `{ backgroundColor: 'transparent', borderColor: '#3a342c' }` —
+               * the very legacy neutral outline this pass deleted everywhere
+               * else. So the button stopped being filled gold and became a
+               * specimen of the dead dialect the moment it could not be used.
+               * It keeps its construction now and the mute carries readiness. */
+              valid ? tFilledGold(pressed) : [tFilledGold(null), kit.ctlDead],
             ]}
             onPress={handleSend}
             disabled={!valid}
@@ -184,8 +205,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   btnTextPrimary: { color: '#13110f' },
   btnTextDisabled: { color: '#5c5345' },

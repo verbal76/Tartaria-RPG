@@ -60,6 +60,19 @@ interface Props {
 // for. The submitted text is routed to the investigate intent with the
 // target — letting the engine try hook, ambient noun, item, then
 // re-prompt if nothing matches.
+/* ⚠⚠ PHASE 3 — THE SIBLING ESCAPE. This row's PRIMARY reached `tFilledGold`
+ * in an earlier pass and its SECONDARY did not, so on the device a constructed
+ * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
+ * scored `btn` as migrated, because one of its two call sites had adopted the
+ * kit. Construction is what the object IS; "secondary" is what it is FOR. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateAll, leadNouns }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -224,7 +237,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                       return (
                         <Pressable
                           key={`scene-${c.noun}`}
-                          style={({ pressed }) => [
+                          style={({ pressed }) => [kit.ctl, 
                             styles.chipFull,
                             styles.chipFullScene,
                             grayed && styles.chipFullConsumed,
@@ -256,6 +269,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                               {c.consumed ? '✓ done' : '→ investigate'}
                             </Text>
                           )}
+                          {CTL_PLANES}
                         </Pressable>
                       );
                     })}
@@ -284,15 +298,23 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
               {/* 2026-05-25 OTA-038 — button row matches SalvageModal /
                   BrandedModal convention: primary action on the LEFT,
                   CANCEL on the right. Was reversed; playtester flagged
-                  the inconsistency. The primary button also flips to
-                  the ghost / neutral style when the text input is
-                  empty so the disabled state doesn't read as a washed-
-                  out tan rectangle — it reads as "not yet ready". */}
+                  the inconsistency.
+
+                  ⚠⚠ PHASE 3 REVERSES THE SECOND HALF OF THIS NOTE. It used to
+                  say the primary "flips to the ghost / neutral style when the
+                  text input is empty so the disabled state doesn't read as a
+                  washed-out tan rectangle". That solved the right problem the
+                  wrong way: it swapped the OBJECT to express a STATE, so an
+                  unready button stopped being the same button. Owner ruling —
+                  physical construction is what the object IS, semantic
+                  treatment is what state it is IN. It now keeps the filled-gold
+                  construction and dims, which still does not read as a
+                  washed-out rectangle because `ctlDead` mutes the whole key. */}
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [
                     styles.btn,
-                    text.trim() ? tFilledGold(pressed) : styles.btnNeutral,
+                    text.trim() ? tFilledGold(pressed) : [tFilledGold(null), kit.ctlDead],
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
@@ -304,11 +326,12 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
                   onPress={onCancel}
                   accessibilityRole="button"
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
+                  {CTL_PLANES}
                 </Pressable>
               </View>
             </View>
@@ -395,7 +418,6 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

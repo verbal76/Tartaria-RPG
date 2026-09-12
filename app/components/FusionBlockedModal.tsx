@@ -19,6 +19,19 @@
 // safety so it can never trap the screen.
 import React, { useEffect } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect (a 1dp literal-gold
+ * or cold-grey outline with no face, side or contact). The control is now the
+ * one Tartaria physical control; its handler, role, label and geometry are
+ * unchanged. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 import { useGameStore } from '../state/gameStore';
 
 /** Safety net only — the player is expected to tap. Long enough to read two
@@ -52,11 +65,12 @@ export function FusionBlockedModal() {
               {!!notice.hint && <Text style={styles.hint}>{notice.hint}</Text>}
               <Pressable
                 onPress={clear}
-                style={styles.btn}
+                style={[kit.ctl, styles.btn]}
                 accessibilityRole="button"
                 accessibilityLabel="Close the Crucible"
               >
                 <Text style={styles.btnText}>UNDERSTOOD</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
           </TouchableWithoutFeedback>
@@ -92,14 +106,6 @@ const styles = StyleSheet.create({
   },
   body: { color: '#cdbf99', fontSize: 14, lineHeight: 21 },
   hint: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginTop: 10, fontStyle: 'italic' },
-  btn: {
-    marginTop: 20,
-    alignSelf: 'flex-end',
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderWidth: 1,
-    borderColor: '#6b5c3a',
-    borderRadius: 4,
-  },
+  btn: { marginTop: 20, alignSelf: 'flex-end', paddingVertical: 10, paddingHorizontal: 18 },
   btnText: { color: '#e0c179', fontSize: 12, letterSpacing: 1.5 },
 });

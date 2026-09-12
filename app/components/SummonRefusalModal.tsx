@@ -14,6 +14,18 @@
 // modal owns the FRAME — heading, tone, the one button — and nothing else.
 import React from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
+import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
+ * its handler, role, label and geometry; only the material changed, and the
+ * press now collapses the sidewall instead of only shifting a colour. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 interface Props {
   /** The engine's refusal narration, or null when nothing is owed. */
@@ -34,13 +46,14 @@ export function SummonRefusalModal({ message, onDismiss }: Props) {
             Finish the fight in front of you before you call down more punishment. The seat keeps.
           </Text>
           <TouchableOpacity
-            style={styles.btn}
+            style={[styles.btn, tFilledGold(false)]}
             onPress={onDismiss}
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="Back to the fight"
           >
             <Text style={styles.btnText}>BACK TO THE FIGHT</Text>
+            {CTL_PLANES}
           </TouchableOpacity>
         </View>
       </Pressable>
@@ -64,9 +77,8 @@ const styles = StyleSheet.create({
   rule: { height: 1, backgroundColor: '#3a342c', marginVertical: 14 },
   body: { color: '#d8cfc0', fontSize: 15, lineHeight: 23 },
   aside: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginTop: 10, fontStyle: 'italic' },
-  btn: {
-    marginTop: 18, backgroundColor: '#c9a86a', borderRadius: 3,
-    paddingVertical: 11, alignItems: 'center',
-  },
+  // ⚠ GEOMETRY ONLY — this is a FILLED gold primary, so its material is the
+  // kit's own `tFilledGold`, the same authority OTA-1791 gave the gold pills.
+  btn: { marginTop: 18, borderRadius: 3, paddingVertical: 11, alignItems: 'center', borderWidth: 1 },
   btnText: { color: '#13110f', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
 });

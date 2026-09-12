@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal,
    control — the whole-control fade the depth language exists to replace, and
    the same technique arb86 had to remove from the disabled state. Those two
    local styles are gone; the shared authority owns the press now. */
-import { tControlDepth } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 // ⚠⚠ OTA-1458 — "am I standing at X?" is a grid-cell question, asked once.
 import { standingAtLocation, stationedAtNamedLocation } from '../engine/standingAt';
 import { useGameStore } from '../state/gameStore';
@@ -67,7 +67,21 @@ function MilestoneStat({
   active?: boolean;
 }) {
   const toNext = next - (value % next);
-  const body = (
+  /* ⚠⚠⚠ PHASE 3 — THE ONE INLINE-STYLED INTERACTIVE ESCAPE IN THE GAME, AND THE
+   * STYLE SCANS COULD NOT SEE IT: the pressable wears `style={{ flex: 1 }}`, an
+   * inline object with no `styles.` key to find. It is also the one control
+   * whose construction does NOT belong on the pressable — that TouchableOpacity
+   * is a bare layout wrapper, and the object the player actually sees is the
+   * cell below it.
+   *
+   * ⚠⚠ AND THE SAME CELL IS RETURNED WITH NO HANDLER AT ALL (`if (!onPress)
+   * return body(false)`), where it is a read-only figure and must stay flat.
+   * One renderer, two contracts — so the construction is a parameter, decided
+   * by whether this thing can be pressed, which is the interaction contract
+   * deciding the physical family exactly as the ruling requires. Its contract
+   * when pressable is DISCLOSURE (▸ tap to list / ▾ tap to close), so it takes
+   * the row chassis, not the command key. */
+  const body = (interactive: boolean) => (
     <View style={[milestoneStyles.cell, active && milestoneStyles.cellActive]}>
       <Text style={milestoneStyles.value}>{value}</Text>
       <Text style={milestoneStyles.label}>{label}</Text>
@@ -76,18 +90,19 @@ function MilestoneStat({
           accordion in the app. The words carry the affordance; the glyph carries
           the state, so the two are not competing to say the same thing. */}
       {onPress ? <Text style={milestoneStyles.tapHint}>{active ? '▾ tap to close' : '▸ tap to list'}</Text> : null}
+      {interactive ? ROW_PLANES : null}
     </View>
   );
-  if (!onPress) return body;
+  if (!onPress) return body(false);
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }} accessibilityRole="button" accessibilityState={{ selected: active }}>
-      {body}
+      {body(true)}
     </TouchableOpacity>
   );
 }
 
 const milestoneStyles = StyleSheet.create({
-  cell: { flex: 1, alignItems: 'center', paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
+  cell: { flex: 1, alignItems: 'center', paddingVertical: 4, borderRadius: 4, borderWidth: 1 },
   cellActive: { borderColor: '#c9a86a', backgroundColor: '#1a1714' },
   value: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   label: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
@@ -106,6 +121,39 @@ function safeLocName(id: string): string {
 }
 
 type Tab = 'contracts' | 'collectables';
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+const TAB_PLANES = (
+  <>
+    <View style={kit.tabPlaneTop} pointerEvents="none" />
+    <View style={kit.tabPlaneBottom} pointerEvents="none" />
+    <View style={kit.tabPlaneContact} pointerEvents="none" />
+  </>
+);
+const ROW_PLANES = (
+  <>
+    <View style={kit.chassisPlaneTop} pointerEvents="none" />
+    <View style={kit.chassisPlaneBottom} pointerEvents="none" />
+    <View style={kit.chassisPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
@@ -384,7 +432,7 @@ export function ContractsScreen() {
     tracked: boolean,
   ) => (
     <Pressable
-      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
       onPress={() => setContractActive(kind, id, !tracked)}
       accessibilityRole="button"
       accessibilityState={{ selected: tracked }}
@@ -392,6 +440,7 @@ export function ContractsScreen() {
       <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
         {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
       </Text>
+      {CTL_PLANES}
     </Pressable>
   );
 
@@ -719,7 +768,7 @@ export function ContractsScreen() {
           : { blocked: false, count: 0, names: [] as string[] };
         return (
           <TouchableOpacity
-            style={styles.mainQuestCard}
+            style={[styles.mainQuestCard]}
             onPress={() => setMqExpanded((v) => !v)}
             activeOpacity={0.85}
             accessibilityRole="button"
@@ -759,7 +808,7 @@ export function ContractsScreen() {
             )}
             {atCapitalForSummon && (
               <TouchableOpacity
-                style={[styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait]}
+                style={[kit.ctl, styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait]}
                 onPress={() => useGameStore.getState().summonCoreGuardian()}
                 activeOpacity={0.7}
                 hitSlop={6}
@@ -775,6 +824,7 @@ export function ContractsScreen() {
                     ? '★ FIGHT FIRST'
                     : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                 </Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             )}
             {mqExpanded && (
@@ -790,13 +840,14 @@ export function ContractsScreen() {
                   <Pressable
                     onPress={() => pickSort('distance')}
                     hitSlop={6}
-                    style={({ pressed }) => [styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
+                    style={({ pressed }) => [kit.ctl, styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sortByDistance }}
                   >
                     <Text style={[styles.mqSortText, sortByDistance && styles.sortBarTextOn]}>
                       ◈ {sortByDistance ? 'BY DISTANCE' : 'SORT'}
                     </Text>
+                    {TAB_PLANES}
                   </Pressable>
                 </View>
                 {/* arb148 — the Primary Objective card sits in the FIXED region
@@ -880,28 +931,31 @@ export function ContractsScreen() {
             {mq.phase === 'choice' && (
               <View style={styles.mainQuestChoiceRow}>
                 <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
+                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>SEAL</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
+                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
+                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
                 >
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
+                  {CTL_PLANES}
                 </TouchableOpacity>
                 {/* ⚠⚠ OTA-1225 — THE EARNED FOURTH. Rendered only when the run
                     earned it, and NEVER as a disabled or greyed row: a player
@@ -909,12 +963,13 @@ export function ContractsScreen() {
                     open. The three above are unconditional and always will be. */}
                 {canStay && (
                   <TouchableOpacity
-                    style={[styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }]}
+                    style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }]}
                     onPress={() => useGameStore.getState().chooseEndingMainQuest('stay')}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                   >
                     <Text style={styles.mainQuestChoiceText}>STAY</Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                 )}
               </View>
@@ -924,6 +979,7 @@ export function ContractsScreen() {
                 Ending recorded: {mq.ending.toUpperCase()}.
               </Text>
             )}
+            {ROW_PLANES}
           </TouchableOpacity>
         );
       })()}
@@ -941,13 +997,14 @@ export function ContractsScreen() {
             <TouchableOpacity
               key={key}
               onPress={() => setSlate(key)}
-              style={[styles.slateBtn, slate === key && styles.slateBtnOn]}
+              style={[kit.ctl, styles.slateBtn, slate === key && styles.slateBtnOn]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityState={{ selected: slate === key }}
               accessibilityLabel={`Show ${label}`}
             >
               <Text style={[styles.slateBtnText, slate === key && styles.slateBtnTextOn]}>{label}</Text>
+              {TAB_PLANES}
             </TouchableOpacity>
           ))}
         </View>
@@ -1004,6 +1061,7 @@ export function ContractsScreen() {
         >
           <Text style={styles.contractsNoticeText}>{contractsNotice.text}</Text>
           <Text style={styles.contractsNoticeDismiss}>TAP TO DISMISS</Text>
+          {ROW_PLANES}
         </Pressable>
       ) : null}
 
@@ -1018,7 +1076,7 @@ export function ContractsScreen() {
         <View style={styles.sortRow}>
           <Pressable
             onPress={() => pickSort('distance')}
-            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'distance' && styles.sortBarOn, pressed && styles.sortBarPressed]}
+            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, sortMode === 'distance' && styles.sortBarOn, pressed && styles.sortBarPressed]}
             accessibilityRole="button"
             accessibilityState={{ selected: sortMode === 'distance' }}
           >
@@ -1028,10 +1086,11 @@ export function ContractsScreen() {
             <Text style={[styles.sortBarHint, sortMode === 'distance' && styles.sortBarTextOn]}>
               {sortMode === 'distance' ? 'tap for default order' : 'nearest first, within each type'}
             </Text>
+            {TAB_PLANES}
           </Pressable>
           <Pressable
             onPress={() => pickSort('ready')}
-            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'ready' && styles.sortBarReadyOn, pressed && styles.sortBarPressed]}
+            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, sortMode === 'ready' && styles.sortBarReadyOn, pressed && styles.sortBarPressed]}
             accessibilityRole="button"
             accessibilityState={{ selected: sortMode === 'ready' }}
           >
@@ -1041,6 +1100,7 @@ export function ContractsScreen() {
             <Text style={[styles.sortBarHint, sortMode === 'ready' && styles.sortBarReadyText]}>
               {sortMode === 'ready' ? 'tap for default order' : 'finished work first, nearest first'}
             </Text>
+            {TAB_PLANES}
           </Pressable>
         </View>
         {/* OTA-1152 — the roll-up itself: every ready contract, pulled from its
@@ -1151,7 +1211,7 @@ export function ContractsScreen() {
                         leaves the tower on the slate and any laid course intact. */}
                     {!done && (
                       <Pressable
-                        style={({ pressed }) => [styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
                         onPress={() => setGreatClimbActive(c.id, !climbActive)}
                         accessibilityRole="button"
                         accessibilityState={{ selected: climbActive }}
@@ -1159,6 +1219,7 @@ export function ContractsScreen() {
                         <Text style={[styles.trackBtnText, climbActive ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
                           {climbActive ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
                         </Text>
+                        {CTL_PLANES}
                       </Pressable>
                     )}
                   </View>
@@ -1359,7 +1420,7 @@ export function ContractsScreen() {
                       ? () => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
                       : undefined}
                     disabled={!canRoute}
-                    style={styles.card}
+                    style={[styles.card]}
                     accessibilityRole={canRoute ? 'button' : 'text'}
                   >
                     <View style={styles.cardHead}>
@@ -1384,6 +1445,7 @@ export function ContractsScreen() {
                     <Text style={canRoute ? styles.cardHint : styles.bountyCourseNote}>
                       {canRoute ? 'Tap to set course' : bountyCourseLabel(cs)}
                     </Text>
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -1534,6 +1596,7 @@ export function ContractsScreen() {
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -1617,6 +1680,7 @@ export function ContractsScreen() {
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -1700,6 +1764,7 @@ export function ContractsScreen() {
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -1789,7 +1854,7 @@ export function ContractsScreen() {
                         contract: stays on the slate but stops auto-advancing until
                         re-activated. Activating it pauses every other contract. */}
                     <Pressable
-                      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
                       accessibilityRole="button"
                       accessibilityState={{ selected: tracked }}
@@ -1798,6 +1863,7 @@ export function ContractsScreen() {
                         {/* OTA-963 — name the party the toggle stands down / recalls. */}
                         {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
+                      {CTL_PLANES}
                     </Pressable>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
@@ -1880,6 +1946,7 @@ export function ContractsScreen() {
                         <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -2076,6 +2143,7 @@ export function ContractsScreen() {
                         <Text style={styles.discardBtnText}>DISCARD LEAD</Text>
                       </Pressable>
                     )}
+                    {ROW_PLANES}
                   </Pressable>
                 );
               })}
@@ -2157,14 +2225,15 @@ export function ContractsScreen() {
             </Text>
             <View style={styles.routeBtnRow}>
               <Pressable
-                style={styles.routeBtnNeutral}
+                style={[kit.ctl, styles.routeBtnNeutral]}
                 onPress={() => setPendingRoute(null)}
                 accessibilityRole="button"
               >
                 <Text style={styles.routeBtnTextNeutral}>CANCEL</Text>
+                {CTL_PLANES}
               </Pressable>
               <Pressable
-                style={styles.routeBtnPrimary}
+                style={[kit.ctl, styles.routeBtnPrimary]}
                 accessibilityRole="button"
                 onPress={() => {
                   if (!pendingRoute || !player) return;
@@ -2220,6 +2289,7 @@ export function ContractsScreen() {
                 }}
               >
                 <Text style={styles.routeBtnTextPrimary}>SET COURSE</Text>
+                {CTL_PLANES}
               </Pressable>
             </View>
           </View>
@@ -2251,7 +2321,7 @@ export function ContractsScreen() {
                 when the store said a runner can genuinely carry this one. */}
             {contractsNotice.action ? (
               <TouchableOpacity
-                style={[styles.refusalButton, styles.refusalButtonPrimary]}
+                style={[kit.ctl, styles.refusalButton, styles.refusalButtonPrimary]}
                 onPress={() => sendContractByRunner(
                   contractsNotice.action!.kind, contractsNotice.action!.id,
                 )}
@@ -2259,10 +2329,11 @@ export function ContractsScreen() {
                 accessibilityLabel={contractsNotice.action.label}
               >
                 <Text style={styles.refusalButtonText}>{contractsNotice.action.label}</Text>
+                {CTL_PLANES}
               </TouchableOpacity>
             ) : null}
             <TouchableOpacity
-              style={styles.refusalButton}
+              style={[kit.ctl, styles.refusalButton]}
               onPress={clearContractsNotice}
               accessibilityRole="button"
               accessibilityLabel={contractsNotice.action ? 'Not now' : 'Got it'}
@@ -2270,6 +2341,7 @@ export function ContractsScreen() {
               <Text style={styles.refusalButtonText}>
                 {contractsNotice.action ? 'NOT NOW' : 'GOT IT'}
               </Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         </View>
@@ -2365,13 +2437,14 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                         which is the same "ends in nothing" defect one step further along
                         (PUNCHLIST P1). */}
                     <TouchableOpacity
-                      style={styles.readStoryBtn}
+                      style={[kit.ctl, styles.readStoryBtn]}
                       onPress={() => openStoryReveal(story.id)}
                       activeOpacity={0.7}
                       accessibilityRole="button"
                       accessibilityLabel={`Read ${story.characterName}'s story`}
                     >
                       <Text style={styles.readStoryText}>READ THE WHOLE STORY</Text>
+                      {CTL_PLANES}
                     </TouchableOpacity>
                   </>
                 )}

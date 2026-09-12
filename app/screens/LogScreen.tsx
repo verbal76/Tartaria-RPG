@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share } from 'react-native';
-import { TScreenHeader } from '../ui/tartariaKit';
+import { TScreenHeader, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -11,6 +11,25 @@ import { stampLogExport } from '../diagnostics/aboutSummary';
 // app (~30 KB observed). Player paste tests can lower this if a
 // specific destination still cuts mid-line.
 const CHUNK_SIZE = 25_000;
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -143,8 +162,9 @@ export function LogScreen() {
             {copied ? `COPIED ${charCount.toLocaleString()} CHARS` : `COPY ALL · ${charCount.toLocaleString()}`}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareBtn} onPress={handleShare} activeOpacity={0.7} accessibilityRole="button">
+        <TouchableOpacity style={[kit.ctl, styles.shareBtn]} onPress={handleShare} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.shareText}>{shared ? 'SHARED' : 'SHARE'}</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
       </View>
       {/* OTA 024 — chunked copy. Most chat apps cap pastes at

@@ -83,6 +83,21 @@ type Pending =
  *  projection's memo does not depend on a table rebuilt every render. */
 const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
 
+/* ⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH. `kit.ctl` is only the material: the
+ * face, the rim and the radius. The catch of light on the top edge, the
+ * sidewall and the contact shadow under it are hand-placed children, absolutely
+ * positioned inside a box the control already owns, so adopting them moves
+ * nothing by a pixel. Semantic colour a call site already carries layers on
+ * top and still wins — construction is what the object IS, not what state it
+ * is in. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function VendorScreen() {
   const player = useGameStore((s) => s.player);
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
@@ -725,12 +740,13 @@ export function VendorScreen() {
         <Text style={styles.title} accessibilityRole="header">SHOP</Text>
         <TouchableOpacity
           onPress={openDismiss}
-          style={styles.dismissBtn}
+          style={[kit.ctl, styles.dismissBtn]}
           hitSlop={8}
           activeOpacity={0.7}
           accessibilityRole="button"
         >
           <Text style={styles.dismissText}>DISMISS</Text>
+          {CTL_PLANES}
         </TouchableOpacity>
       </View>
 
@@ -844,23 +860,25 @@ export function VendorScreen() {
           <View style={styles.groupBarActions}>
             <TouchableOpacity
               onPress={exitSellSelect}
-              style={styles.groupBarCancel}
+              style={[kit.ctl, styles.groupBarCancel]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Cancel the group and go back to selling one at a time"
             >
               <Text style={styles.groupBarCancelText}>CANCEL</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setGroupSellConfirm(true)}
               disabled={selectedRows.length === 0}
-              style={[styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
+              style={[kit.ctl, styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityState={{ disabled: selectedRows.length === 0 }}
               accessibilityLabel={`Sell the group of ${selectedRows.length} for ${selectedTotal} trade coin`}
             >
               <Text style={styles.groupBarSellText}>SELL GROUP</Text>
+              {CTL_PLANES}
             </TouchableOpacity>
           </View>
         </View>
@@ -1235,7 +1253,7 @@ export function VendorScreen() {
                   <TouchableOpacity
                     key={s}
                     onPress={() => setSellSort(s)}
-                    style={[styles.sortTab, sellSort === s && styles.sortTabActive]}
+                    style={[kit.ctl, styles.sortTab, sellSort === s && styles.sortTabActive]}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sellSort === s }}
@@ -1243,6 +1261,7 @@ export function VendorScreen() {
                     <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
                       {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
                     </Text>
+                    {CTL_PLANES}
                   </TouchableOpacity>
                 ))}
               </View>

@@ -13,6 +13,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortOption {
@@ -42,6 +43,25 @@ export interface SearchSortBarProps {
    *  default direction. */
   onSortChange: (key: string, direction: SortDirection) => void;
 }
+
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const TAB_PLANES = (
+  <>
+    <View style={kit.tabPlaneTop} pointerEvents="none" />
+    <View style={kit.tabPlaneBottom} pointerEvents="none" />
+    <View style={kit.tabPlaneContact} pointerEvents="none" />
+  </>
+);
 
 export function SearchSortBar({
   query,
@@ -100,12 +120,13 @@ export function SearchSortBar({
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 onPress={() => handleSortTap(opt.key)}
-                style={[styles.sortBtn, active && styles.sortBtnActive]}
+                style={[kit.ctl, styles.sortBtn, active && styles.sortBtnActive]}
                 activeOpacity={0.7}
               >
                 <Text style={[styles.sortBtnText, active && styles.sortBtnTextActive]}>
                   {opt.label}{arrow}
                 </Text>
+                {TAB_PLANES}
               </TouchableOpacity>
             );
           })}

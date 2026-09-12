@@ -37,6 +37,7 @@ import {
   type EncounterState,
 } from '../engine/missionEncounter';
 
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 /** ⚠ THE BUTTON SAYS WHAT HAPPENS. A generic CONTINUE is how a beat gets missed
  *  even after it has been given a button — the exact failure this card exists to
  *  end. So PROCEED is labelled from the stage's own bindings first (the item
@@ -70,6 +71,25 @@ const LABEL: Record<EncounterChoice, string> = {
   take_and_kill: 'TAKE IT — AND FINISH THEM',
 };
 
+/* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
+ * Each fragment below belongs to ONE physical family, and which one a control
+ * gets is decided by its INTERACTION CONTRACT, never by what its style key is
+ * called: CTL for a thing you strike, TAB for a thing you switch between, ROW
+ * for a thing you select or open. A full-width list row wearing the command
+ * key's sidewall is the same category error as a button with no depth at all.
+ *
+ * ⚠⚠ They are absolutely positioned, `pointerEvents="none"` children inside a
+ * box the control already owns, so adopting them moves nothing by a pixel, and
+ * any SEMANTIC colour the call site already carries layers on top and still
+ * wins. Construction is what the object IS; state is what it is IN. */
+const CTL_PLANES = (
+  <>
+    <View style={kit.controlPlaneTop} pointerEvents="none" />
+    <View style={kit.controlPlaneBottom} pointerEvents="none" />
+    <View style={kit.controlPlaneContact} pointerEvents="none" />
+  </>
+);
+
 export function MissionEncounterCard() {
   // ⚠ Subscribe to the PLAYER, derive the encounter. A selector that returns
   // `armedEncounter(...)`'s fresh object every call hands zustand a new snapshot
@@ -97,7 +117,7 @@ export function MissionEncounterCard() {
   if (stranded) {
     return (
       <TouchableOpacity
-        style={styles.summonBar}
+        style={[kit.ctl, styles.summonBar]}
         onPress={summon}
         activeOpacity={0.7}
         accessibilityRole="button"
@@ -105,6 +125,7 @@ export function MissionEncounterCard() {
       >
         <Text style={styles.summonText}>▸ SUMMON {armed.person.name.toUpperCase()}</Text>
         <Text style={styles.summonHint}>{armed.missionTitle} — unfinished</Text>
+        {CTL_PLANES}
       </TouchableOpacity>
     );
   }
@@ -154,7 +175,7 @@ export function MissionEncounterCard() {
             return (
               <TouchableOpacity
                 key={c}
-                style={[styles.btn, primary && styles.btnPrimary, danger && styles.btnDanger]}
+                style={[kit.ctl, styles.btn, primary && styles.btnPrimary, danger && styles.btnDanger]}
                 onPress={() => answer(c)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
@@ -171,6 +192,7 @@ export function MissionEncounterCard() {
                 {c === 'persuade' ? (
                   <Text style={styles.btnHint}>{armed.stakes} · DC {dc} · one attempt, ever</Text>
                 ) : null}
+                {CTL_PLANES}
               </TouchableOpacity>
             );
           })}
