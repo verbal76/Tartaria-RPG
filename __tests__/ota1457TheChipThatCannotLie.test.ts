@@ -264,8 +264,14 @@ describe('OTA-1457 — it is an accelerator, never the only route', () => {
     // second ("I don't see it on you") at a player who did nothing wrong. This
     // survived being lifted out of the picker; it must keep surviving.
     const i = EXPL.indexOf('const takeAndWear = useCallback(');
-    const body = EXPL.slice(i, EXPL.indexOf('}, [player, takeAmbientNoun]);', i));
-    expect(body).toContain('takeAmbientNoun(noun)');
+    // ⚠ OTA-1807 — the take moved behind `takeDirect` (which notes the player is
+    // here, then calls `takeAmbientNoun`), so the dependency that closes this
+    // block moved with it. Both anchors are re-pointed to the ONE new spelling;
+    // the claim under test — equip only after a landed take — is untouched.
+    const end = EXPL.indexOf('}, [player, takeDirect]);', i);
+    expect(end).toBeGreaterThan(i);            // a lost terminator must not silently widen the body
+    const body = EXPL.slice(i, end);
+    expect(body).toContain('takeDirect(noun);');
     // the inventory is re-read from the store and checked before equipping
     expect(body).toContain('useGameStore.getState().player?.inventory');
     expect(body).toContain('i.quantity > 0');

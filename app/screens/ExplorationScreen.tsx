@@ -6,6 +6,9 @@ import * as Clipboard from 'expo-clipboard';
 // a raw `player.dog` answers "yes" forever. Every rescue gate asks this instead.
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap, hasActiveDog } from '../state/gameStore';
 import { playerGridCell } from '../state/playerGrid';
+// ⚠⚠ OTA-1807 — the Gather sheet's controls mutate the game WITHOUT submitting an
+// action, so the activity authority never heard about them. They say so here.
+import { noteHumanInteraction } from '../state/humanActivity';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
@@ -1006,6 +1009,30 @@ export function ExplorationScreen() {
     return null;
   }, [gatherChips, currentScene?.vendor?.name, currentScene?.wanderer?.name]);
 
+  // ⚠⚠⚠ OTA-1807 — THE ONE DOOR EVERY DIRECT TAKE PASSES THROUGH, AND THE ONLY
+  // REASON IT EXISTS IS THAT `takeAmbientNoun` IS NOT A SUBMIT.
+  //
+  // `submitPlayerAction` is described in its own comments as "the one door every
+  // action passes through", and stamps the activity authority there (OTA-1126 /
+  // OTA-1129). A Take is not an action in that sense: the picker row calls the
+  // store mutation directly. Measured on e7eea2e3, with the rope actually landing
+  // in the pack, neither `lastPlayerActionAt` nor `uiIdleSince` moved — so a
+  // player clearing a room by hand read as IDLE to the scene-intro bank, which
+  // starts a full narration-sized generation once the last action is 6 s old.
+  //
+  // ⚠ THREE DOORS CALL `takeAmbientNoun` ON THIS SCREEN (picker row via
+  // take-and-wear, the feed's pack chip, and the TAKE ALL sweep) and the census
+  // proved there are no others anywhere in the app. Wrapping the store call once
+  // here is what keeps that number from quietly becoming four.
+  //
+  // ⚠ IT NOTES, THEN TAKES. Nothing about the take itself changes: same noun,
+  // same refusals, same dedup, same persist. The note is bookkeeping ONLY — see
+  // app/state/humanActivity.ts for why it is not the sprint/preemption door.
+  const takeDirect = useCallback((noun: string) => {
+    noteHumanInteraction();
+    takeAmbientNoun(noun);
+  }, [takeAmbientNoun]);
+
   // ⚠⚠⚠ OTA-1457 — TAKE-AND-WEAR, IN ONE PLACE, BECAUSE IT NOW HAS TWO CALLERS.
   //
   // This is the OTA-1237 block verbatim, lifted out of the gather picker's
@@ -1022,7 +1049,7 @@ export function ExplorationScreen() {
   //     ("I don't see it on you") at a player who did nothing wrong.
   const takeAndWear = useCallback((noun: string) => {
     const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(player, noun) : null;
-    takeAmbientNoun(noun);
+    takeDirect(noun);
     if (!wear) return;
     const held = useGameStore.getState().player?.inventory ?? [];
     // ⚠ OTA-1485 — both outcomes of the equip half leave a debug line. The owner
@@ -1036,7 +1063,7 @@ export function ExplorationScreen() {
     } else {
       useGameStore.getState().appendLog('debug', `take&wear: take of "${noun}" did not land - equip skipped`);
     }
-  }, [player, takeAmbientNoun]);
+  }, [player, takeDirect]);
 
   // ⚠⚠ OTA-1457 — THE FEED'S TRAILING CHIP, DERIVED FROM THE PICKER'S OWN ARRAY.
   // `gatherChips` is the exact list the take picker renders, consumed rows already
@@ -2187,6 +2214,8 @@ export function ExplorationScreen() {
             // a scene noun, so the generic take path cannot grant it; the beat's
             // store action grants, wears and advances (vest-flow rules).
             if (tutBeat === 'screen_pick') {
+              // ⚠ OTA-1807 — the beat's own direct grant; see the picker row's copy.
+              noteHumanInteraction();
               useGameStore.getState().tutorialScreenPick();
               return;
             }
@@ -2199,7 +2228,9 @@ export function ExplorationScreen() {
             // door is the picker's own plain take (takeAmbientNoun): item lands in
             // the pack, nothing equipped, nothing un-equipped.
             logUiTap(feedPackChipLabel(feedChip));
-            takeAmbientNoun(feedChip.noun);
+            // ⚠ OTA-1807 — through the direct-take door, so the pack chip counts
+            // as the player being here exactly as the picker row does.
+            takeDirect(feedChip.noun);
           } : undefined}
         />
         {/* ⚠ OTA-1168 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is
@@ -3150,6 +3181,10 @@ export function ExplorationScreen() {
           // on-screen offer), the beat's store action does the grant + wear.
           if (tutBeat === 'screen_pick' && /salvage cap/i.test(noun)) {
             setTakeOpen(false);
+            // ⚠ OTA-1807 — the beat's store action is a direct grant like any other
+            // row tap in this card, and shares the same bypass. Its sibling door on
+            // the feed chip is noted the same way.
+            noteHumanInteraction();
             useGameStore.getState().tutorialScreenPick();
             return;
           }
@@ -3195,10 +3230,18 @@ export function ExplorationScreen() {
         // GatherModal's header for the full history.
         onTakeAll={(nouns) => {
           Keyboard.dismiss();
-          for (const n of nouns) takeAmbientNoun(n);
+          // ⚠ OTA-1807 — the same doorway the single row uses, once per noun. The
+          // sweep is synchronous and this job does NOT optimise it (Baker #11);
+          // the only change is that the sweep now counts as the player being here.
+          for (const n of nouns) takeDirect(n);
         }}
         onSalvageAll={(nouns) => {
           Keyboard.dismiss();
+          // ⚠ OTA-1807 — SALVAGE ALL is the take sweep's sibling in this same card
+          // and shares its bypass exactly: `salvageAllAmbient` is a store mutation,
+          // and the whole of inventorySlice never mentions the activity authority.
+          // The single-noun salvage above needs nothing — it goes through `submit`.
+          noteHumanInteraction();
           // The store's bulk path — which since OTA-1231 skips catalog items, so
           // this can never scrap something the player could have pocketed.
           useGameStore.getState().salvageAllAmbient(nouns);

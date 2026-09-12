@@ -148,7 +148,10 @@ describe('OTA-1498 — the second door goes to the pack', () => {
     );
     // Same tap-ledger-first rule as the main chip (OTA-1485).
     expect(span).toContain('logUiTap(feedPackChipLabel(feedChip));');
-    expect(span).toContain('takeAmbientNoun(feedChip.noun);');
+    // ⚠ OTA-1807 — the plain take moved behind `takeDirect`, the one door that
+    // notes the player is present before calling `takeAmbientNoun`. THE CLAIM IS
+    // UNCHANGED and is the pair below: this door pockets, it never wears.
+    expect(span).toContain('takeDirect(feedChip.noun);');
     expect(span).not.toContain('takeAndWear');
     expect(span).not.toContain('equipItem');
   });

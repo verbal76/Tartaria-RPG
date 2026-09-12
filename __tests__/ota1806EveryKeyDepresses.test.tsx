@@ -175,18 +175,46 @@ describe('3. the repair reaches EVERY interior, and nothing else had to move', (
     expect(others).toEqual(['app/components/InputBox.tsx']);
   });
 
-  it('the whole repair is one component plus the stamp', () => {
-    /* ⚠ Reads the COMMIT (HEAD~1..HEAD), not the working tree, so it states
-     * what actually shipped rather than what is open on a desk. Skipped — not
-     * failed — outside a git checkout: an unprovable claim must never be
-     * reported as a proven one. */
-    let changed: string[] = [];
-    try {
-      changed = execSync('git diff --name-only HEAD~1 HEAD -- app/', { cwd: ROOT })
-        .toString().trim().split('\n').filter(Boolean);
-    } catch { return; } // packaged run — unprovable here, not falsely claimed
-    if (changed.length === 0) return;
-    expect(changed.sort()).toEqual(['app/buildInfo.ts', 'app/components/InputBox.tsx']);
+  it('the room door is ONE component — declared once, used nowhere else', () => {
+    /* ⚠⚠⚠ CLASS P — PRE-EXISTING LATENT VALIDATION DEFECT, exposed while
+     * validating OTA-1807 and repaired there. It is NOT part of that Baker
+     * repair and must not be read as one.
+     *
+     * WHAT WAS WRONG. This asserted `git diff --name-only HEAD~1 HEAD -- app/`
+     * equalled exactly ['app/buildInfo.ts', 'app/components/InputBox.tsx'] —
+     * OTA-1805's file set, carried into this renamed suite without being
+     * updated. Two independent faults, both measured rather than argued:
+     *
+     *   • FALSE after its own commit. At e7eea2e3 — this suite's own published
+     *     SHA — that command returns 48 files, because 1806 swept the whole key
+     *     class. A clean worktree at e7eea2e3 runs 1 failed / 29 passed, with
+     *     THIS test the only failure, carrying none of 1807's changes.
+     *   • VACUOUS in CI. `actions/checkout@v4` defaults to fetch-depth 1, and in
+     *     a one-commit clone `git diff HEAD~1 HEAD` is `fatal: bad revision
+     *     'HEAD~1'`: execSync throws, the catch returns, and the test passes
+     *     having checked nothing. Required 1806 CI and publication were green
+     *     over it for that reason, not because the claim held.
+     *
+     * ⚠ THE SHAPE WAS UNFIXABLE, NOT MIS-PARAMETERISED. Any range measured from
+     * HEAD stops describing an OTA the moment that OTA's own commit lands, so
+     * re-pointing it at another moving range would reproduce the defect on the
+     * next OTA. It is therefore replaced rather than re-aimed — and NOT by
+     * expecting today's 48-file diff, which would be the same trap re-armed.
+     *
+     * WHAT IT RESTORES. The section's durable claim is CONFINEMENT: the room
+     * door is one component, not copies. The test above already proves that of
+     * the room DATA (`buildingRooms` appears in one file); this proves it of the
+     * CONTROL, which is the half the deleted assertion was reaching for and the
+     * half no other test covers. Tree-provable, and true in a shallow clone. */
+    const declares = execSync('grep -rl "function TravelBtn" app --include=*.tsx || true', { cwd: ROOT })
+      .toString().trim().split('\n').filter(Boolean);
+    expect(declares).toEqual(['app/components/InputBox.tsx']);
+    // ⚠ A grep that matches nothing returns [] and would make the equality above
+    // pass for the wrong reason. Assert the subject was actually found.
+    expect(declares.length).toBe(1);
+    const uses = execSync('grep -rl "<TravelBtn" app --include=*.tsx || true', { cwd: ROOT })
+      .toString().trim().split('\n').filter(Boolean);
+    expect(uses).toEqual(['app/components/InputBox.tsx']);
   });
 });
 
@@ -511,7 +539,18 @@ describe('8. the stamp is what the game DISPLAYS, so it has to change', () => {
     // arriving: the just-updated modal keys on a CHANGE in OTA_BUILD_ID.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toMatch(/^2026-09-12-1806-/);
+    // ⚠⚠ OTA-1807 — THIS ASSERTED `^2026-09-12-1806-`, WHICH EVERY LATER OTA MUST
+    // BREAK. A stamp pinned to one number is a claim with a one-bundle shelf
+    // life: it was true of 1806 and false the moment 1807 stamped, so it would
+    // have had to be hand-edited forever. The DURABLE claim — the one the
+    // comment above is actually about — is that the badge never goes BACKWARDS
+    // onto a bundle that has already moved past it. Stated that way it holds for
+    // 1806 and for everything after, and `check:otastamp` separately ties the
+    // stamp to the highest otaNNNN suite on disk, so the exact number still has
+    // a hard gate; it simply is not this test's job.
+    const n = Number(/^\d{4}-\d{2}-\d{2}-(\d+)-/.exec(OTA_BUILD_ID)?.[1]);
+    expect(Number.isFinite(n)).toBe(true);
+    expect(n).toBeGreaterThanOrEqual(1806);
     expect(OTA_BUILD_ID).not.toMatch(/-1805-|-1804-/);
   });
 });

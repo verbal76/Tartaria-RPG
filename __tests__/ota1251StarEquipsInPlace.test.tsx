@@ -146,7 +146,9 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     const i = screen.indexOf('const wear = isUpgradeOverEquipped(player, noun)');
     expect(i).toBeGreaterThan(-1);
     const block = blockAt(screen, 'const wear = isUpgradeOverEquipped(player, noun)');
-    expect(block).toContain('takeAmbientNoun(noun);');
+    // ⚠ OTA-1807 — the take moved behind `takeDirect`, which notes the player is
+    // here and then calls `takeAmbientNoun`. Still one tap, still take THEN wear.
+    expect(block).toContain('takeDirect(noun);');
     expect(block).toContain('equipItem(wear.name, wear.slot)');
   });
 

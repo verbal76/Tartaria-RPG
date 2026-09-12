@@ -30172,7 +30172,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ AND A REAL DEFECT FELL OUT OF THE PASS: both Act buttons (InputBox and
 // KeyboardInputBar) were drawing SIX plane layers - the three inline Views plus
 // {CTL_PLANES} - since Phase 1. Collapsed to one call.
-export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
+// OTA-1807 - a take is the player being here. BAKER ITEM 13, the first bounded
+// Baker repair under the one-item-per-OTA policy.
+//
+// THE DEFECT, RE-PROVEN AT RUNTIME ON e7eea2e3 BEFORE ANY EDIT, with the rope
+// actually landing in the pack:
+//   submitPlayerAction('look')  -> uiIdleSince cleared, lastPlayerActionAt set
+//   takeAmbientNoun('rope')     -> rope granted, and NEITHER moved
+//
+// submitPlayerAction calls itself "the one door every action passes through"
+// (OTA-1126 / OTA-1129) and stamps the activity authority there. True of typed
+// and chip-driven input; FALSE of the Gather sheet, where every control is a
+// direct store mutation. So a player clearing a room by hand was invisible to
+// every gate that asks whether anyone is there - and past the 6 s floor the
+// scene-intro bank starts a full narration-sized generation on top of somebody
+// who is plainly still playing.
+//
+// THE REPAIR (J1 ONLY). One named authority, app/state/humanActivity.ts:
+// noteHumanInteraction() refreshes lastPlayerActionAt and clears a standing
+// uiIdleSince. Nothing else. Five doors on the Exploration screen reach it -
+// the picker row, the feed action chip, the feed pack chip, TAKE ALL and
+// SALVAGE ALL, plus the screen_pick tutorial grant on both of its doors.
+//
+// IT LIVES OUTSIDE THE STORE ON PURPOSE. gameStore.ts is AT its ceiling
+// (check:storeceiling, 36,945, no headroom, standing ruling "EXTRACT, DO NOT
+// JUST RAISE IT"), and the ceiling's own text says the responsibility then
+// belongs in a module outside the file. It also keeps the import acyclic.
+//
+// A TAKE IS STILL NOT A TURN. No stamina, no roll queue, no epoch bump, no
+// breadcrumb, no deferred Qwen warm - measured, not assumed. Sheet OPEN and
+// CLOSE are deliberately NOT noted: they mutate nothing, and a player dwelling
+// in an open card is reading, which is what the idle window is for.
+//
+// J2 (homework preemption) IS DEFERRED, NOT DECLINED. Six of the seven
+// authorising conditions are proven in the suite. The seventh is not: the only
+// canonical caller of preemptHomeworkForPlayer is notePlayerActionForSprint,
+// whose own header insists it is the single door - while going through it would
+// also feed the SPRINT detector, which gates whether a scene intro may start at
+// all, on an interaction that is not a gameplay turn. Either choice contradicts
+// something already written down, so neither was taken.
+//
+// APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This repairs an accounting defect.
+export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
