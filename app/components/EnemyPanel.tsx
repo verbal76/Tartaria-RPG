@@ -311,6 +311,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         {card}
         <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
         <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
+        <View style={tartariaKitStyles.chassisPlaneContact} pointerEvents="none" />
       </TouchableOpacity>
     </ScrollView>
   );

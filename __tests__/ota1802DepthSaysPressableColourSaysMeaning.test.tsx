@@ -41,8 +41,9 @@ import {
   tControlDepth,
   tFilledGold,
   TScreenHeader,
-  TTabBar,
-} from '../app/ui/tartariaKit';
+  TTabBar, tartariaKitStyles } from '../app/ui/tartariaKit';
+const flatKit = (x: unknown): Record<string, unknown> =>
+  Object.assign({}, ...[x].flat(9).filter(Boolean) as Record<string, unknown>[]);
 
 const renderer = require('react-test-renderer') as {
   create: (el: React.ReactElement) => { root: { findAll: (f: (n: any) => boolean) => any[] } };
@@ -118,7 +119,18 @@ describe('OTA-1802 — the compact authority carries the structural weight', () 
     const down = flat(tControlDepth(true));
     expect(down.borderTopColor).toBe(rest.borderBottomColor);
     expect(down.borderBottomColor).toBe(rest.borderTopColor);
-    expect(down.transform).toEqual([{ translateY: 1.5 }]);
+    /* ⚠⚠⚠ PHASE 2 SUPERSEDES THE 1.5dp LITERAL, ON OWNER AUTHORITY. Game
+     * Director, after physical inspection: Phase 1 is *"too subtle"*, and the
+     * ruling that followed asks for *"actual depressed pressed geometry"* and
+     * *"stronger pressed displacement"*. The travel moved 1.5 → 2.
+     * ⚠ AND THE REPLACEMENT IS STRICTER THAN THE NUMBER IT REPLACES: it reads
+     * the distance from the ONE governing style rather than restating it, so a
+     * control that settles by some private amount now fails; and it holds a
+     * FLOOR, so the travel can never quietly shrink back under the threshold
+     * the device review rejected. A literal could do neither. */
+    expect(down.transform).toEqual(flatKit(tartariaKitStyles.controlPressed).transform);
+    expect((down.transform as [{ translateY: number }])[0].translateY).toBeGreaterThanOrEqual(2);
+
     // REST must not translate — a control that sits pre-depressed reads wrong.
     expect(rest.transform).toBeUndefined();
   });
@@ -195,7 +207,18 @@ describe('OTA-1802 — the shared header BACK is wired to the authority', () => 
     expect(rest.borderTopColor).toBe(T.controlRaisedLit);
     expect(rest.borderBottomColor).toBe(T.controlRaisedDark);
     expect(down.borderTopColor).toBe(T.controlRaisedDark);
-    expect(down.transform).toEqual([{ translateY: 1.5 }]);
+    /* ⚠⚠⚠ PHASE 2 SUPERSEDES THE 1.5dp LITERAL, ON OWNER AUTHORITY. Game
+     * Director, after physical inspection: Phase 1 is *"too subtle"*, and the
+     * ruling that followed asks for *"actual depressed pressed geometry"* and
+     * *"stronger pressed displacement"*. The travel moved 1.5 → 2.
+     * ⚠ AND THE REPLACEMENT IS STRICTER THAN THE NUMBER IT REPLACES: it reads
+     * the distance from the ONE governing style rather than restating it, so a
+     * control that settles by some private amount now fails; and it holds a
+     * FLOOR, so the travel can never quietly shrink back under the threshold
+     * the device review rejected. A literal could do neither. */
+    expect(down.transform).toEqual(flatKit(tartariaKitStyles.controlPressed).transform);
+    expect((down.transform as [{ translateY: number }])[0].translateY).toBeGreaterThanOrEqual(2);
+
   });
 
   it('keeps its own semantic chassis and its logical target', () => {
@@ -221,30 +244,99 @@ describe('OTA-1802 — the shared header BACK is wired to the authority', () => 
 });
 
 describe('OTA-1802 — the negative boundary holds', () => {
-  it('tab bar tabs stay flat: interactive is not the same as a command', () => {
-    let tree!: ReturnType<typeof renderer.create>;
-    renderer.act(() => {
-      tree = renderer.create(
-        React.createElement(TTabBar, {
-          tabs: [
-            { key: 'a', label: 'ONE' },
-            { key: 'b', label: 'TWO' },
-          ],
-          value: 'a',
-          onChange: () => {},
-        } as any),
-      );
-    });
-    const tabs = tree.root.findAll((n: any) => typeof n.props?.onPress === 'function');
-    expect(tabs.length).toBeGreaterThan(0);
-    for (const t of tabs) {
-      for (const pressed of [false, true]) {
-        const s = styleAt(t, pressed);
-        expect(s.borderTopColor).not.toBe(T.controlRaisedLit);
-        expect(s.borderBottomColor).not.toBe(T.controlRaisedDark);
-        expect(s.transform).toBeUndefined();
+  /* ⚠⚠⚠ SUPERSEDED BY OWNER AUTHORITY — PHASE 2, AND THE OLD ASSERTION HAD
+   * ALREADY STOPPED BITING. This described tabs as FLAT, because OTA-1802 ruled
+   * "interactive is not the same as a command" and concluded a tab should
+   * therefore carry no physical language at all. The PRINCIPLE survives; the
+   * VISUAL CONCLUSION does not. Game Director, Phase 2: *"inactive tabs use
+   * governed selector affordance; active tab uses governed engaged/docked
+   * affordance"*, and tabs now belong to the raised family.
+   *
+   * ⚠⚠ IT IS REPLACED RATHER THAN DELETED, AND THE REPLACEMENT IS STRICTLY
+   * STRONGER. The old test asked only what a tab is NOT (not these two border
+   * colours, no transform) — and once the planes arrived as CHILD VIEWS rather
+   * than border colours it would have passed on a fully raised tab while
+   * claiming to prove it flat. A guard that cannot fail is worse than no guard.
+   * What replaces it asserts what a tab IS, in both states, structurally:
+   * inactive stands proud on three planes, active has none of them and instead
+   * docks; and the two can never be the same object. */
+  it('an inactive tab is a raised selector and an active tab is docked — two objects, not two colours', () => {
+    const render = (value: string) => {
+      let tree!: ReturnType<typeof renderer.create>;
+      renderer.act(() => {
+        tree = renderer.create(
+          React.createElement(TTabBar, {
+            tabs: [{ key: 'a', label: 'ONE' }, { key: 'b', label: 'TWO' }],
+            value,
+            onChange: () => {},
+          } as any),
+        );
+      });
+      return tree;
+    };
+    const tree = render('a');
+    /* ⚠ The test renderer surfaces both the Touchable and its host View for one
+     * control, so match on the ACCESSIBILITY STATE — the selected flag is what
+     * makes a node a tab rather than an implementation detail underneath one. */
+    /* ⚠ `deep: false` returns only the OUTERMOST match per branch. Without it the
+     * renderer surfaces both the TouchableOpacity and the element it renders,
+     * and one control counts twice — which would quietly halve every per-tab
+     * assertion below. */
+    const tabsOf = (root: any) => root.findAll(
+      (n: any) => n.props?.accessibilityState?.selected !== undefined
+        && typeof n.props?.onPress === 'function',
+      { deep: false },
+    );
+    const tabs = tabsOf(tree.root);
+    expect(tabs.length).toBe(2);
+
+    const planesOf = (tab: any) =>
+      tab.findAll((n: any) => n.props?.pointerEvents === 'none' && n.props?.style, { deep: false })
+        .map((n: any) => flatKit(n.props.style)) as Record<string, unknown>[];
+
+    const [active, inactive] = tabs;
+    expect(active.props.accessibilityState.selected).toBe(true);
+    expect(inactive.props.accessibilityState.selected).toBe(false);
+
+    // INACTIVE: a raised key — face light, sidewall, contact. Three planes.
+    const inert = planesOf(inactive);
+    expect(inert.length).toBe(3);
+    const colours = inert.map((p: Record<string, unknown>) => p.backgroundColor);
+    expect(colours).toContain(T.controlFaceLit);
+    expect(colours).toContain(T.controlSidewall);
+    expect(colours).toContain(T.controlContact);
+    // …and the side has real thickness, which is what a drawn edge cannot have.
+    expect(inert.find((p: Record<string, unknown>) => p.backgroundColor === T.controlSidewall)!.height as number)
+      .toBeGreaterThanOrEqual(3);
+
+    // ACTIVE: no side, no contact — it is not standing proud of anything.
+    const act = planesOf(active);
+    const actColours = act.map((p: Record<string, unknown>) => p.backgroundColor);
+    expect(actColours).not.toContain(T.controlSidewall);
+    expect(actColours).not.toContain(T.controlContact);
+    expect(actColours).not.toContain(T.controlFaceLit);
+
+    // …instead it DOCKS: its bottom border is opened and its own material is
+    // carried BELOW the row baseline, so the face is continuous into the region
+    // it controls rather than stopping at a line the inactive tabs stop at.
+    const activeStyle = flatKit(active.props.style);
+    expect(activeStyle.borderBottomWidth).toBe(0);
+    const mouth = act.find((p: Record<string, unknown>) => (p.bottom as number) < 0);
+    expect(mouth).toBeDefined();
+    expect(mouth!.position).toBe('absolute');
+    expect(mouth!.backgroundColor).toBe(activeStyle.backgroundColor);
+
+    // ⚠ NO GLOW, AND NO COLOUR-ONLY SELECTION: the two states differ as OBJECTS.
+    expect(JSON.stringify(act)).not.toBe(JSON.stringify(inert));
+    for (const p of [...act, ...inert]) {
+      for (const banned of ['shadowColor', 'shadowRadius', 'elevation']) {
+        expect(p).not.toHaveProperty(banned);
       }
     }
+
+    // ⚠ And selecting the other tab moves the docking, rather than adding a second.
+    const other = tabsOf(render('b').root);
+    expect(other.filter((t: any) => t.props.accessibilityState.selected).length).toBe(1);
   });
 
   /* ⚠⚠ THE RULE THIS ENFORCES IS OWNER RULE 8: *"Do not copy/paste depth colors

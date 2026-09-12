@@ -138,7 +138,11 @@ describe('Phase 1 — the second plane is apparent depth, and it costs no geomet
     const pressed = flat(tartariaKitStyles.controlPressed);
     expect(resting.borderTopColor).toBe(T.controlRaisedLit);
     expect(pressed.borderTopColor).toBe(T.controlRaisedDark);
-    expect(pressed.transform).toEqual([{ translateY: 1.5 }]);
+    /* ⚠ PHASE 2 raised the travel 1.5 → 2 on owner authority ("too subtle").
+     * The floor is the claim now: the displacement may grow, never shrink. */
+    expect((flat(tartariaKitStyles.controlPressed).transform as [{ translateY: number }])[0].translateY)
+      .toBeGreaterThanOrEqual(2);
+
   });
 
   /* ⚠⚠ THE CHASSIS DOES NOT INVERT, AND THAT ABSENCE IS DELIBERATE. A card does

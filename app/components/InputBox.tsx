@@ -1463,6 +1463,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           <Text style={styles.sendText}>Act</Text>
           <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+          <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
         </TouchableOpacity>
       </TutorialTarget>
     </View>
@@ -1890,6 +1891,10 @@ function QuickBtn({
         <>
           <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+          {/* ⚠ PHASE 2 — the third band: the dark where the key meets its housing.
+              Not drawn while pressed, because a key pushed home is no longer
+              standing on anything — that absence IS the reduced contact shadow. */}
+          {pressed ? null : <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />}
         </>
       )}
       </>)}

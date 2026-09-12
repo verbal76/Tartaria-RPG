@@ -3485,6 +3485,8 @@ const CHASSIS_PLANES = (
   <>
     <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
     <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
+    {/* ⚠ PHASE 2 — the contact band: a card now visibly RESTS on the panel. */}
+    <View style={tartariaKitStyles.chassisPlaneContact} pointerEvents="none" />
   </>
 );
 

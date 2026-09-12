@@ -196,12 +196,30 @@ export const T = {
   /** The catch of light on a pressable control's own FACE, just inside its lit
    *  rim. Quieter than `controlRaisedLit` on purpose: the rim is the structure,
    *  this is the face turning up to the light beneath it. */
-  controlFaceLit: 'rgba(255,250,240,0.16)',
+  /* ⚠⚠⚠ VISUAL LANGUAGE PHASE 2 — THE SAME CONSTRUCTION, LOUD ENOUGH TO SEE.
+   * Game Director, after physically inspecting Phase 1: *"the visual difference
+   * is too subtle."* That is authoritative, and it is NOT a verdict on the
+   * grammar — the four families are right. The SIGNAL was too quiet.
+   *
+   * ⚠⚠ AND THE ANSWER IS STILL NOT ALPHA ALONE. Phase 1 already learned that a
+   * louder 1dp line becomes glow, not depth. Phase 2 raises these values AND
+   * adds a THIRD BAND — see `controlContact` below — so the bottom of a key
+   * stops being one dark edge and becomes a side with a shadow under it. Two
+   * planes became three; that is geometry, and it is what the eye reads at
+   * arm's length on a phone. */
+  controlFaceLit: 'rgba(255,250,240,0.30)',
   /** The SIDEWALL — the side of the key, in its own shadow, above the dark rim.
    *  2dp rather than a hairline, because a side has thickness and an edge does
    *  not; that thickness is the whole difference between a raised object and a
    *  drawn frame. */
-  controlSidewall: 'rgba(0,0,0,0.38)',
+  controlSidewall: 'rgba(0,0,0,0.58)',
+  /** ⚠ THE CONTACT SHADOW — the dark line where the key meets the surface it
+   *  stands on, drawn INSIDE the control's own box because Android `elevation`
+   *  would halo all four sides and iOS `shadow*` does not exist on Android at
+   *  all. One near-black hairline under the sidewall is what separates "a side"
+   *  from "a side resting on something". It is the cheapest real plane in the
+   *  language and the one Phase 1 did not have. */
+  controlContact: 'rgba(0,0,0,0.82)',
   /* ⚠⚠⚠ THE SAME CONSTRUCTION AT CHASSIS WEIGHT — AND THE GAP BETWEEN THE TWO IS
    * THE POINT, NOT A SHADE. Owner: a large tappable card *"is NOT the same thing
    * as a command button… less key-like protrusion than a discrete command."* A
@@ -213,8 +231,23 @@ export const T = {
    * values at roughly half strength, and the sidewall drops from 2dp to 1dp.
    * Same grammar, lower voice. A card still says "you can touch me"; it no
    * longer says "strike me". */
-  chassisFaceLit: 'rgba(255,250,240,0.07)',
-  chassisSidewall: 'rgba(0,0,0,0.20)',
+  chassisFaceLit: 'rgba(255,250,240,0.13)',
+  chassisSidewall: 'rgba(0,0,0,0.34)',
+  /** The chassis contact. Present, so a card reads as RESTING on the panel —
+   *  and weaker than a command's, so a card never reads as a key. */
+  chassisContact: 'rgba(0,0,0,0.46)',
+  /* ⚠⚠⚠ PHASE 2 — THE BOARD LIFT. A dialog, a mission board, an inspection
+   * card: these sit ABOVE the interface, not in it, and Phase 1 gave them
+   * nothing at all — `modalCard` and `momentCard` were a fill, a 1dp rim and a
+   * radius, which is the same construction as a panel the player cannot touch.
+   *
+   * ⚠⚠ THIS IS THE ONE PLACE ELEVATION IS CORRECT. The dossier construction
+   * refused Android `elevation` because a four-sided halo is wrong on a compact
+   * chip standing on a plate. A BOARD LAID OVER THE WHOLE SCREEN is exactly the
+   * object a four-sided shadow describes — it is lifted on every side, and
+   * `TButton`'s own `btnOuter` has used the same pair since VIS-1. Shadow for
+   * iOS, elevation for Android, and neither consumes a pixel of layout. */
+  boardShadow: 'rgba(0,0,0,0.75)',
   /* ⚠⚠⚠ THE RECESS — AND THE DEFECT IT ANSWERS IS THAT A FIELD AND A BUTTON ARE
    * CURRENTLY THE SAME OBJECT. Measured on this tree before touching anything:
    *     styles.quick            (a COMMAND)  #1a1714 · #3a342c 1dp · radius 4
@@ -945,7 +978,22 @@ export function TScreenHeader({
           accessibilityRole="button"
           accessibilityLabel={accessibilityLabel}
         >
-          <Text style={kit.schBackText}>{backLabel}</Text>
+          {({ pressed }) => (<>
+            <Text style={kit.schBackText}>{backLabel}</Text>
+            {/* ⚠⚠⚠ PHASE 2 — THE HIGHEST-LEVERAGE CONTROL IN THE GAME JOINS THE
+                SECOND PLANE. Seven screens take this header, so whatever BACK
+                says about pressability is what most of Tartaria says. Phase 1
+                gave it the ring and stopped there; it now carries the same
+                face/sidewall/contact construction as every other command, and
+                collapses the same way under a thumb.
+                ⚠ THE TITLE DELIBERATELY GETS NOTHING. Owner: *"BACK =
+                interactive physical control. TITLE = structural/read-only
+                information."* The header is not one raised slab — it is a
+                pressable object, a label, and a slot. */}
+            <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+            <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+            {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
+          </>)}
         </Pressable>
       ) : (
         <View style={kit.schSlot} />
@@ -1066,6 +1114,25 @@ export function TTabBar({
             <Text style={[kit.tabLabel, on && kit.tabLabelOn]}>
               {t.badge !== undefined && t.badge > 0 ? `${t.label} (${t.badge})` : t.label}
             </Text>
+            {/* ⚠⚠⚠ PHASE 2 — TWO OBJECTS, NOT TWO COLOURS. An INACTIVE tab wears the
+                raised family's three planes and stands proud of the row; the
+                ACTIVE one has no side and no contact at all and instead pushes
+                `tabMouth` past the baseline, so its body is continuous with the
+                region it controls. The difference a player sees is a key versus
+                a key that has been pressed home — which is what a selected tab
+                physically IS.
+                ⚠ All of it is absolute and `pointerEvents="none"`, so the tab's
+                own handler, role, selected state and label are untouched and no
+                plane can ever take a tap. */}
+            {on ? (
+              <View style={kit.tabMouth} pointerEvents="none" />
+            ) : (
+              <>
+                <View style={kit.tabPlaneTop} pointerEvents="none" />
+                <View style={kit.tabPlaneBottom} pointerEvents="none" />
+                <View style={kit.tabPlaneContact} pointerEvents="none" />
+              </>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -1167,7 +1234,13 @@ export function TTabBar({
  * copy-paste from owning it. Naming them by role says the same thing and cannot
  * be pasted into a style. This comment failed that gate on its first draft. */
 export function tModalCard(maxWidth = 380): StyleProp<ViewStyle> {
-  return [kit.modalCard, { maxWidth }];
+  /* ⚠⚠⚠ PHASE 2 — A BOARD IS ABOVE THE GAME, AND UNTIL NOW IT DID NOT SAY SO.
+   * `modalCard` was a fill, a 1dp rim and a radius — the same construction as a
+   * panel the player cannot touch. Nine dialogs inherited that, and the owner's
+   * hierarchy puts them at the TOP of the stack, not level with a frame.
+   * `boardLift` is shadow + elevation, both of which are paint rather than
+   * layout, so every one of those nine keeps its exact geometry. */
+  return [kit.modalCard, kit.boardLift, { maxWidth }];
 }
 
 /**
@@ -1206,7 +1279,9 @@ export function tModalCard(maxWidth = 380): StyleProp<ViewStyle> {
  * real visible difference and not this helper's business to settle.
  */
 export function tMomentCard(rim: string = T.gold): StyleProp<ViewStyle> {
-  return [kit.momentCard, { borderColor: rim }];
+  /* ⚠ PHASE 2 — the moment shells lift too, for the same reason and by the same
+   * paint-only means. The rim stays the caller's: elevation is not meaning. */
+  return [kit.momentCard, kit.boardLift, { borderColor: rim }];
 }
 
 export interface TRowState {
@@ -1404,11 +1479,22 @@ const kit = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, height: 1,
     backgroundColor: T.controlFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
-  /** The SIDEWALL: the side of the key, above its dark rim. 2dp — a side has
-   *  thickness; an edge does not. */
+  /* ⚠⚠ PHASE 2 — THE SIDEWALL GOES TO 3dp AND STOPS TOUCHING THE GROUND.
+   * At 2dp, flush against the rim, the side and the shadow under it were the
+   * same line, and one line is an edge no matter how dark it is. Lifting it 1dp
+   * off the bottom leaves room for `controlPlaneContact` underneath, so the key
+   * now has a SIDE and, below that, the dark where it MEETS the surface — which
+   * is the difference between a drawn rectangle and an object standing on
+   * something. Still absolute, still zero layout. */
   controlPlaneBottom: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
-    backgroundColor: T.controlSidewall, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 3,
+    backgroundColor: T.controlSidewall,
+  },
+  /** The contact shadow: the near-black hairline where the key meets its
+   *  housing. The third plane, and the one that makes the other two read. */
+  controlPlaneContact: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.controlContact, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
   },
   /* ⚠⚠ PRESSED IS THE OBJECT GOING IN, SO THE SIDE CHANGES SIDES. Push a key into
    * its housing and the face you were looking down at tips away: the shaded side
@@ -1416,6 +1502,13 @@ const kit = StyleSheet.create({
    * inversion `controlPressed` already performs on the ring, applied to the
    * planes, so the two layers agree instead of contradicting each other. The
    * 1.5dp travel is unchanged and still lives on the ring, where it always has. */
+  /* ⚠⚠⚠ PHASE 2 — PRESSED IS THE KEY GOING DOWN INTO ITS HOUSING, AND IT IS
+   * NOW A GEOMETRY CHANGE RATHER THAN A COLOUR SWAP. Owner: *"reduce apparent
+   * height; compress/remove some lower sidewall; move the face toward the
+   * substrate; reduce contact shadow… Opacity-only press feedback is
+   * insufficient."* So on press the sidewall COLLAPSES from 3dp to 1dp, the
+   * contact band is not drawn at all, the shaded side moves ABOVE the face, and
+   * the whole control travels 2dp (up from 1.5). The key visibly loses height. */
   controlPlaneTopPressed: {
     position: 'absolute', top: 0, left: 0, right: 0, height: 2,
     backgroundColor: T.controlSidewall, borderTopLeftRadius: 3, borderTopRightRadius: 3,
@@ -1434,9 +1527,28 @@ const kit = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, height: 1,
     backgroundColor: T.chassisFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
+  /* ⚠ PHASE 2 — the chassis gets the same three-plane construction at its own
+   * weight: a 2dp side (against a command's 3dp) lifted off a 1dp contact. A
+   * card now visibly RESTS on the panel; it still does not read as a key, which
+   * is the boundary the whole family split exists to hold. */
   chassisPlaneBottom: {
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 2,
+    backgroundColor: T.chassisSidewall,
+  },
+  chassisPlaneContact: {
     position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
-    backgroundColor: T.chassisSidewall, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+    backgroundColor: T.chassisContact, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+  },
+  /* ⚠⚠⚠ PHASE 2 — THE BOARD LIFT, and it owns NO layout: `shadow*` and
+   * `elevation` are both paint, so a dialog wearing this is the same size it
+   * was. iOS reads the shadow, Android reads the elevation, and on a full-width
+   * board a four-sided halo is the CORRECT description of the object. */
+  boardLift: {
+    shadowColor: T.boardShadow,
+    shadowOpacity: 0.9,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 16,
   },
   /* ⚠⚠⚠ THE RECESS MATERIAL. Ground and ring only — NO geometry, for the same
    * reason `panelFrame` owns none: it has to ride on two fields that already own
@@ -1466,7 +1578,10 @@ const kit = StyleSheet.create({
   controlPressed: {
     borderTopColor: T.controlRaisedDark,
     borderBottomColor: T.controlRaisedLit,
-    transform: [{ translateY: 1.5 }],
+    /* ⚠ PHASE 2 — 1.5 → 2. The travel is the one cue that survives being looked
+     * at from a distance, and 1.5dp was inside the noise on a dense row. Still a
+     * transform, so no sibling reflows and the touch target does not move. */
+    transform: [{ translateY: 2 }],
   },
   rowChassis: {
     flexDirection: 'row',
@@ -1658,7 +1773,52 @@ const kit = StyleSheet.create({
   },
   // ⚠⚠ THE ONE THING THAT MOVES IN THIS PASS. Vendor's shipped selected ground,
   // taken as-is so Vendor does not shift; Crafting's selected tab gains it.
-  tabChipOn: { borderColor: T.gold, backgroundColor: '#2a2520' },
+  /* ⚠⚠⚠ PHASE 2 — THE ACTIVE TAB DOCKS INTO WHAT IT CONTROLS. Selected used to
+   * be a colour: a gold ring and a lighter ground. Colour alone is exactly what
+   * the owner ruled out — *"NO arbitrary color-only selected state. Selected
+   * state must be physically legible."*
+   *
+   * ⚠⚠ SO THE GEOMETRY CARRIES IT. An engaged tab has no side and no shadow —
+   * it is not standing proud of anything, it has been pushed home — and its
+   * BOTTOM BORDER IS OPENED so the face is continuous downward into the region
+   * below. `tabMouth` then continues the tab's own material 2dp PAST the row's
+   * baseline, which is the docking tongue: the active tab's body crosses the
+   * line the inactive ones stop at.
+   *
+   * ⚠ THE COLOUR STAYS TOO, because it was never wrong — it is just no longer
+   * doing the work alone. Gold rim, lighter ground, AND a physically different
+   * object. No glow, no underline as the primary cue. */
+  tabChipOn: {
+    borderColor: T.gold,
+    backgroundColor: '#2a2520',
+    borderBottomWidth: 0,
+    // The 1dp the opened border gives back, so the row's height cannot move.
+    paddingBottom: 9,
+  },
+  /** The docking tongue: the engaged tab's own material, carried below the row
+   *  baseline. Absolute, so it costs nothing and cannot move a sibling. */
+  tabMouth: {
+    position: 'absolute', left: 1, right: 1, bottom: -2, height: 2,
+    backgroundColor: '#2a2520',
+  },
+  /* ⚠⚠ AN INACTIVE TAB IS A RAISED MECHANICAL SELECTOR — the same three-plane
+   * construction as a command key, at the command's own weight, because the
+   * owner's new contract puts an inactive tab in the raised family: *"small
+   * raised mechanical selector; clearly pressable; belongs to raised-control
+   * family."* What keeps a tab from BEING a command is not a weaker plane — it
+   * is that its engaged state docks instead of travelling. */
+  tabPlaneTop: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.controlFaceLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
+  },
+  tabPlaneBottom: {
+    position: 'absolute', bottom: 1, left: 0, right: 0, height: 3,
+    backgroundColor: T.controlSidewall,
+  },
+  tabPlaneContact: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
+    backgroundColor: T.controlContact, borderBottomLeftRadius: 3, borderBottomRightRadius: 3,
+  },
   tabLabel: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   tabLabelOn: { color: T.gold },
   // ── TScreenHeader ─────────────────────────────────────────────────────────
@@ -1790,9 +1950,15 @@ const kit = StyleSheet.create({
    * whole claim of this language is that a control sits proud OF that plane. If
    * both wore the same edges there would be nothing for a control to be proud
    * of. */
+  /* ⚠⚠ PHASE 2 — THE ANCESTOR GETS THE STRONGER PAIR TOO. `btnFace` carried
+   * `controlLit`/`controlDark` (0.20 / 0.45) — the INNER sheen, tuned when it was
+   * the only face treatment in the game. Beside chips that now draw a 3dp side
+   * and a contact band, the one control that was always the most physical had
+   * become the least. It takes the raised pair its own rim proved, so the family
+   * reads as one family. Geometry unchanged: two border colours, same widths. */
   btnFace: {
     backgroundColor: T.face, paddingVertical: 12, paddingHorizontal: 12, alignItems: 'center',
-    borderTopWidth: 1, borderTopColor: T.controlLit, borderBottomWidth: 1, borderBottomColor: T.controlDark,
+    borderTopWidth: 1, borderTopColor: T.controlFaceLit, borderBottomWidth: 1, borderBottomColor: T.controlSidewall,
   },
   btnFacePrimary: { backgroundColor: 'rgba(46,37,27,0.94)', paddingVertical: 16 },
   btnFaceUtility: { backgroundColor: T.faceUtility, paddingVertical: 10, borderTopWidth: 0 },

@@ -25,7 +25,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { T, tFilledGold, tControlDepth } from '../app/ui/tartariaKit';
+import { T, tFilledGold, tControlDepth, tartariaKitStyles } from '../app/ui/tartariaKit';
+const flatKit = (x: unknown): Record<string, unknown> =>
+  Object.assign({}, ...[x].flat(9).filter(Boolean) as Record<string, unknown>[]);
 import { WhisperCompleteModal } from '../app/components/WhisperCompleteModal';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -71,7 +73,18 @@ describe('OTA-1791 — one filled-gold authority', () => {
     expect(s.backgroundColor).toBe(T.gold);
     expect(s.borderTopColor).toBe(T.controlRaisedDark);
     expect(s.borderBottomColor).toBe(T.controlRaisedLit);
-    expect(s.transform).toEqual([{ translateY: 1.5 }]);
+    /* ⚠⚠⚠ PHASE 2 SUPERSEDES THE 1.5dp LITERAL, ON OWNER AUTHORITY. Game
+     * Director, after physical inspection: Phase 1 is *"too subtle"*, and the
+     * ruling that followed asks for *"actual depressed pressed geometry"* and
+     * *"stronger pressed displacement"*. The travel moved 1.5 → 2.
+     * ⚠ AND THE REPLACEMENT IS STRICTER THAN THE NUMBER IT REPLACES: it reads
+     * the distance from the ONE governing style rather than restating it, so a
+     * control that settles by some private amount now fails; and it holds a
+     * FLOOR, so the travel can never quietly shrink back under the threshold
+     * the device review rejected. A literal could do neither. */
+    expect(s.transform).toEqual(flatKit(tartariaKitStyles.controlPressed).transform);
+    expect((s.transform as [{ translateY: number }])[0].translateY).toBeGreaterThanOrEqual(2);
+
     // Not a second effect for a second colour: the depth half IS tControlDepth.
     expect(flat([tControlDepth(true)])).toEqual(expect.objectContaining({
       borderTopColor: s.borderTopColor, borderBottomColor: s.borderBottomColor, transform: s.transform,
@@ -139,7 +152,7 @@ describe('OTA-1791 — the boundary: four files of the same name are NOT this co
 });
 
 describe('OTA-1791 — a rendered pill carries the depth under press', () => {
-  it('WhisperCompleteModal\'s CLOSE pill rests lit-on-top and presses lit-on-bottom, settling 1.5dp', () => {
+  it('WhisperCompleteModal\'s CLOSE pill rests lit-on-top and presses lit-on-bottom, settling by the governed distance', () => {
     const tree = renderer.create(
       <WhisperCompleteModal visible title="A whisper" lines={['done']} rewards={['✦ 3 coins']} onClose={() => {}} />,
     );
@@ -155,7 +168,9 @@ describe('OTA-1791 — a rendered pill carries the depth under press', () => {
     expect(resting.opacity).toBeUndefined(); // the fade is gone; depth replaced it
     expect(pressed.borderTopColor).toBe(T.controlRaisedDark);
     expect(pressed.borderBottomColor).toBe(T.controlRaisedLit);
-    expect(pressed.transform).toEqual([{ translateY: 1.5 }]);
+    expect(pressed.transform).toEqual(flatKit(tartariaKitStyles.controlPressed).transform);
+    expect((pressed.transform as [{ translateY: number }])[0].translateY).toBeGreaterThanOrEqual(2);
+
     expect(pressed.opacity).toBeUndefined();
     // Layout preserved: the chassis is still the modal's own.
     expect(resting.borderWidth).toBe(1);

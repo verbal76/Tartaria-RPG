@@ -231,9 +231,18 @@ describe('OTA-1782 — none of the forbidden treatments arrived with it', () => 
      * still ZERO per TONE, and the per-tone assertion below — which is the real
      * rule — is unchanged and still bites on a `controlStrike` or a `controlGold`
      * the moment one appears. This list is the spelling; that loop is the law. */
+    /* ⚠⚠⚠ PHASE 2 ADDS THE THIRD BAND, AND THE RULE IS STILL THE RULE. Game
+     * Director on the device: Phase 1 is *"too subtle."* The answer authorised
+     * was geometry, not alpha — the bottom of a key stops being one dark edge and
+     * becomes a SIDE (`controlPlaneBottom`, now lifted 1dp) with a CONTACT
+     * SHADOW under it (`controlContact` / `controlPlaneContact`). Three planes
+     * where there were two.
+     * ⚠ One set per STRENGTH, still zero per TONE. The list is the spelling; the
+     * loop below is the law, and it is unchanged. */
     expect([...names].sort()).toEqual([
-      'controlDark', 'controlFaceLit', 'controlLit',
-      'controlPlaneBottom', 'controlPlaneBottomPressed', 'controlPlaneTop', 'controlPlaneTopPressed',
+      'controlContact', 'controlDark', 'controlFaceLit', 'controlLit',
+      'controlPlaneBottom', 'controlPlaneBottomPressed', 'controlPlaneContact',
+      'controlPlaneTop', 'controlPlaneTopPressed',
       'controlPressed', 'controlRaisedDark', 'controlRaisedLit', 'controlResting', 'controlSidewall',
     ]);
     /* ⚠ THE INTENT, ASSERTED DIRECTLY rather than left to the list above: no
@@ -359,8 +368,18 @@ describe('OTA-1782 — one language, including for the control that invented it'
   it('TButton s face reads the control tokens, not the panel pair', () => {
     const face = code.match(/btnFace:\s*\{[^}]*\}/)?.[0] ?? '';
     expect(face).not.toBe('');
-    expect(face).toContain('T.controlLit');
-    expect(face).toContain('T.controlDark');
+    /* ⚠⚠⚠ PHASE 2 — THE ANCESTOR MOVES TO THE STRONGER PAIR, AND THE CLAIM GETS
+     * HARDER RATHER THAN SOFTER. The rule this test defends is that TButton's
+     * face belongs to the CONTROL family and never to the PANEL pair
+     * (`edgeLit`/`edgeDark`) — two languages that merely agree about direction is
+     * the drift it was written to stop. Phase 1's chips grew a 3dp side and a
+     * contact band; leaving TButton on the 0.20/0.45 inner sheen would have made
+     * the most physical control in the game the flattest. It now takes the very
+     * same tokens the chips paint with, so the two can never diverge again —
+     * which is a stricter statement than "some control token". */
+    expect(face).toContain('T.controlFaceLit');
+    expect(face).toContain('T.controlSidewall');
+    for (const panelPair of ['T.edgeLit', 'T.edgeDark']) expect(face).not.toContain(panelPair);
   });
 
   it('its pressed face inverts the same way every adopter does', () => {

@@ -83,7 +83,15 @@ function bodyOf(src: string, key: string): string | null {
 describe('⚠⚠⚠ the kit carries two modal shells, deliberately', () => {
   test('the moment card resolves to what all six files drew', () => {
     const { StyleSheet } = require('react-native');
-    expect(StyleSheet.flatten(tMomentCard())).toEqual({
+    const flat = StyleSheet.flatten(tMomentCard()) as Record<string, unknown>;
+    /* ⚠⚠⚠ AMENDED BY VISUAL LANGUAGE PHASE 2 — the six files' geometry is still
+     * here byte for byte; what is new is `kit.boardLift`, which is shadow and
+     * elevation only. OTA-1777's claim was that the shell resolves to what the
+     * six hand-copies drew, and that stays exactly true of every value that
+     * occupies a pixel. Asserted in two halves so the lift can never smuggle in
+     * a layout property — the dialog shell's twin claim is in OTA-1765. */
+    const LIFT = ['shadowColor', 'shadowOpacity', 'shadowRadius', 'shadowOffset', 'elevation'];
+    expect(Object.fromEntries(Object.entries(flat).filter(([k]) => !LIFT.includes(k)))).toEqual({
       width: '100%',
       maxWidth: 440,
       backgroundColor: '#17150f',
@@ -92,6 +100,8 @@ describe('⚠⚠⚠ the kit carries two modal shells, deliberately', () => {
       borderRadius: 6,
       padding: 20,
     });
+    expect(Object.keys(flat).filter((k) => LIFT.includes(k)).sort()).toEqual([...LIFT].sort());
+    expect(flat.shadowColor).toBe(T.boardShadow);
   });
 
   test('⚠⚠ and it differs from the DIALOG shell in every property that matters', () => {

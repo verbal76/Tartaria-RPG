@@ -279,7 +279,23 @@ describe('⚠⚠⚠ GuidanceScreen\'s tabs: three defects, all dead on adoption'
     /* `#221d15` against the kit's `#2a2520`. Not in the owner's report; a cover
      * that named two while three moved would have been worse than no cover. */
     expect(bodyOf(scr('GuidanceScreen'), 'tabActive')).toBe('');
-    expect(KIT).toContain("tabChipOn: { borderColor: T.gold, backgroundColor: '#2a2520' }");
+    /* ⚠⚠ AMENDED BY VISUAL LANGUAGE PHASE 2. `tabChipOn` was a one-line style and
+     * this test pinned the line. It is now a block — the owner's tab language
+     * docks the engaged tab into the region it controls, so the selected chip
+     * opens its bottom border and repays the dp in padding — and a whole-line
+     * match would have made that a spelling question. The DEFECT-3 claim was
+     * never about the line: it was that GuidanceScreen has no local `tabActive`
+     * and that the kit's selected fill is `#2a2520` rather than `#221d15`. Both
+     * are asserted directly, against the style block, which is what the other
+     * DEFECT tests in this suite already do. */
+    const chipOn = bodyOf(KIT, 'tabChipOn');
+    expect(chipOn).not.toBe('');
+    expect(chipOn).toContain("backgroundColor: '#2a2520'");
+    expect(chipOn).toContain('borderColor: T.gold');
+    /* ⚠ GRADE THE CODE, NOT THE PROSE — the kit's own ledger at the TTabBar
+     * comment RECORDS `#221d15` as the value Guidance used to ship, so a raw
+     * scan trips on the sentence documenting the defect this test is about. */
+    expect(codeOf(KIT)).not.toContain('#221d15');
   });
 
   test('⚠⚠ the three tabs, their order and their labels survived intact', () => {

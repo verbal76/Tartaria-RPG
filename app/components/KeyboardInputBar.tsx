@@ -503,6 +503,7 @@ export function KeyboardInputBar() {
           <Text style={styles.sendText}>Act</Text>
           <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
           <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+          <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
         </TouchableOpacity>
       </View>
     </View>

@@ -428,6 +428,7 @@ export function StatsPanel({ player, enemyPower }: Props) {
           `overflow: 'hidden'` clips them, as it already does the damage pulse. */}
       <View style={tartariaKitStyles.chassisPlaneTop} pointerEvents="none" />
       <View style={tartariaKitStyles.chassisPlaneBottom} pointerEvents="none" />
+      <View style={tartariaKitStyles.chassisPlaneContact} pointerEvents="none" />
     </Animated.View>
   );
 }

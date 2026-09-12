@@ -79,7 +79,15 @@ describe('the modal shell is a kit export now', () => {
      * naming a decision nobody has made. */
     expect(styleBlock(KIT, 'modalCard')).not.toContain('maxWidth');
     expect(codeOf(KIT)).toContain('export function tModalCard(maxWidth = 380)');
-    expect(codeOf(KIT)).toContain('return [kit.modalCard, { maxWidth }]');
+    /* ⚠⚠ AMENDED BY VISUAL LANGUAGE PHASE 2 — and the claim is unchanged. The
+     * helper now composes `kit.boardLift` between the card and the width,
+     * because the owner's elevation hierarchy puts a dialog ABOVE the interface
+     * rather than level with a panel. `maxWidth` is still the only parameter and
+     * `modalCard` still fixes no width, which is all this test ever asserted;
+     * the second style in the array is pinned by name so the composition cannot
+     * grow a third member unnoticed. */
+    expect(codeOf(KIT)).toContain('return [kit.modalCard, kit.boardLift, { maxWidth }]');
+    expect(styleBlock(KIT, 'boardLift')).not.toContain('maxWidth');
   });
 
   test('⚠⚠⚠ it is a helper, not a <TModal> component — the arb73 reason is kept', () => {
@@ -108,7 +116,22 @@ describe('the composed style is the shipped card, byte for byte', () => {
      * grepping for a lowercase hex and finding the modal no longer has one. */
     expect(flat.borderColor).toBe(T.gold);
     expect(String(flat.borderColor).toLowerCase()).toBe('#c9a86a');
-    expect({ ...flat, borderColor: String(flat.borderColor).toLowerCase() }).toEqual({
+    /* ⚠⚠⚠ AMENDED BY VISUAL LANGUAGE PHASE 2, AND THE ORIGINAL CLAIM IS THE
+     * REASON THE AMENDMENT IS SHAPED THIS WAY. OTA-1765's claim was "zero pixels
+     * moved when eleven copies became one shell". Phase 2 lifts the board — the
+     * owner's hierarchy — which is PAINT, not layout, so that claim is still
+     * literally true and this test now says so in two halves instead of one:
+     *   1. the eleven-copy geometry, still byte for byte, nothing added;
+     *   2. the lift, exactly and exhaustively, with no layout key in it.
+     * Splitting it this way is STRONGER than the single object it replaces: a
+     * future pass that sneaks a `margin` or a `padding` into `boardLift` now
+     * fails on the layout-key assertion even if it also updated the literal. */
+    const LIFT = ['shadowColor', 'shadowOpacity', 'shadowRadius', 'shadowOffset', 'elevation'];
+    const geometry = Object.fromEntries(
+      Object.entries({ ...flat, borderColor: String(flat.borderColor).toLowerCase() })
+        .filter(([k]) => !LIFT.includes(k)),
+    );
+    expect(geometry).toEqual({
       width: '100%',
       maxWidth: 380,
       maxHeight: '85%',
@@ -118,6 +141,21 @@ describe('the composed style is the shipped card, byte for byte', () => {
       borderRadius: 4,
       padding: 14,
     });
+    expect(Object.keys(flat).filter((k) => LIFT.includes(k)).sort()).toEqual([...LIFT].sort());
+    expect(flat.shadowColor).toBe(T.boardShadow);
+    expect(flat.elevation).toBe(16);
+    /* ⚠ The lift moves NOTHING. Named exhaustively rather than by a substring
+     * test, so a new layout property cannot slip in under a name we did not
+     * think to grep for. */
+    const { tartariaKitStyles } = require('../app/ui/tartariaKit');
+    const lift = StyleSheet.flatten(tartariaKitStyles.boardLift) as Record<string, unknown>;
+    expect(Object.keys(lift).sort()).toEqual([...LIFT].sort());
+    for (const k of ['margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
+      'marginHorizontal', 'marginVertical', 'padding', 'paddingTop', 'paddingBottom',
+      'paddingHorizontal', 'paddingVertical', 'top', 'bottom', 'left', 'right',
+      'width', 'height', 'minWidth', 'minHeight', 'flex', 'position', 'transform']) {
+      expect([k, lift[k]]).toEqual([k, undefined]);
+    }
   });
 
   test('⚠⚠ and 420 differs in that one number and nothing else', () => {
