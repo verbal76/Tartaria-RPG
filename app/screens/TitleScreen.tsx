@@ -4,7 +4,7 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity, Pressable,
   FlatList,
   RefreshControl,
   Linking,
@@ -252,13 +252,20 @@ function DossierField({
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -873,21 +880,22 @@ export function TitleScreen() {
             it did not narrow. */}
         {item.dead && (
           <View style={styles.deadActions}>
-            <TouchableOpacity
-              style={[kit.ctl, styles.shareLogBtn]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.shareLogBtn, pressed && kit.controlPressed]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void backUpSlot(item);
               }}
-              activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel={`Back up ${item.playerName}`}
             >
+{({ pressed }) => (<>
               <Text style={styles.shareLogText}>
                 {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         )}
         {item.dead && (
@@ -897,15 +905,15 @@ export function TitleScreen() {
           // SHARE routes through Android's Share intent so apps that
           // truncate large pastes get the full payload anyway.
           <View style={styles.deadActions}>
-            <TouchableOpacity
-              style={[kit.ctl, styles.copyLogBtn]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.copyLogBtn, pressed && kit.controlPressed]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void copyDeadLog(item);
               }}
-              activeOpacity={0.7}
               accessibilityRole="button"
             >
+{({ pressed }) => (<>
               <Text style={styles.copyLogText}>
                 {(() => {
                   // Single-chunk legacy flash.
@@ -925,22 +933,24 @@ export function TitleScreen() {
                   return 'COPY LOG';
                 })()}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[kit.ctl, styles.shareLogBtn]}
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.shareLogBtn, pressed && kit.controlPressed]}
               onPress={(e) => {
                 e.stopPropagation?.();
                 void shareDeadLog(item);
               }}
-              activeOpacity={0.7}
               accessibilityRole="button"
             >
+{({ pressed }) => (<>
               <Text style={styles.shareLogText}>
                 {sharedSlotId === item.slotId ? '✓ SHARED' : 'SHARE'}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         )}
               </View>
@@ -1125,14 +1135,16 @@ export function TitleScreen() {
               >
                 <Text style={styles.playStoreNagPrimaryText}>OPEN PLAY STORE</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[kit.ctl, styles.playStoreNagDismiss]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.playStoreNagDismiss, pressed && kit.controlPressed]}
                 onPress={() => setPlayStoreNagDismissed(true)}
                 accessibilityRole="button"
               >
+{({ pressed }) => (<>
                 <Text style={styles.playStoreNagDismissText}>later</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           </View>
         );
@@ -1184,9 +1196,8 @@ export function TitleScreen() {
               On the release page, tap the .apk file under Assets to download. If your browser blocks it, use COPY URL and paste into a desktop browser.
             </Text>
 
-            <TouchableOpacity
-              style={[kit.ctl, styles.apkBannerCopyBtn]}
-              activeOpacity={0.7}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.apkBannerCopyBtn, pressed && kit.controlPressed]}
               accessibilityRole="button"
               onPress={() => {
                 void Clipboard.setStringAsync(url).then(() => {
@@ -1195,11 +1206,13 @@ export function TitleScreen() {
                 });
               }}
             >
+{({ pressed }) => (<>
               <Text style={styles.apkBannerCopyText}>
                 {copied ? '✓ COPIED' : 'COPY URL'}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         );
       })()}
@@ -1376,17 +1389,18 @@ export function TitleScreen() {
           THIS PROJECT MEANS A LIVE OBLIGATION, A LIVE PROCESS, OR THE SETTINGS
           KEY. Everything else the rule refuses still stands, and Exploration's
           scene header is still stripped of it. */}
-      <TouchableOpacity
-        style={[kit.ctl, styles.cornerGear]}
+      <Pressable
+        style={({ pressed }) => [kit.ctl, styles.cornerGear, pressed && kit.controlPressed]}
         onPress={() => setScreen('about')}
-        activeOpacity={0.7}
         hitSlop={10}
         accessibilityRole="button"
         accessibilityLabel="Settings"
       >
+{({ pressed }) => (<>
         <TGear size={20} color={T.gold} />
-        {CTL_PLANES}
-      </TouchableOpacity>
+        {ctlPlanes(pressed)}
+      </>)}
+</Pressable>
       {/* ⚠⚠⚠ PHONE-FIX — THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN.
           Owner: remove RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE
           PLAYTESTER. EXIT GAME is DELETED outright — on Android it only

@@ -112,7 +112,15 @@ describe('OTA-1064 — the identity bug that made a whole cast mute', () => {
       require('path').join(__dirname, '../app/screens/ExplorationScreen.tsx'), 'utf8');
     /* eslint-enable @typescript-eslint/no-require-imports */
     expect(store).toContain('hasTopicsFor(vendorNpcId(currentScene.vendor))');
-    expect(screen).toContain('hasTopicsFor(npcLedgerId(currentScene.vendor))');
+    /* ⚠ OTA-1806 RE-ANCHORED TO THE EXACT NEW SPELLING, NOT BROADENED.
+     * The control's children became a render-prop callback so the planes can
+     * follow `pressed`; a callback loses TypeScript's narrowing from the
+     * enclosing guard, so the read carries a non-null assertion. PROVEN
+     * equivalent: `!` is erased by the compiler — `scene.vendor!.name` and
+     * `scene.vendor.name` emit byte-identical JavaScript, so the runtime
+     * invariant this pin protects is unchanged. The pin is pinned to ONE
+     * spelling, so a regression to the old form would still fail. */
+    expect(screen).toContain('hasTopicsFor(npcLedgerId(currentScene.vendor!))');
     // ...and nowhere asks the old way.
     expect(store).not.toContain("hasTopicsFor(vId)");
     expect(screen).not.toContain("hasTopicsFor(currentScene.vendor.id");

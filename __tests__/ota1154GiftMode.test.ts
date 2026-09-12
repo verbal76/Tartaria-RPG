@@ -129,7 +129,11 @@ describe('OTA-1154 — everyone who can receive a gift can be offered one', () =
   });
 
   it('the wanderer chip has its own GIFT button', () => {
-    expect(EXPL).toMatch(/Give a gift to \$\{currentScene\.wanderer\.name\}/);
+    // ⚠ OTA-1806 — `!` optional: the wanderer chip's children became a render
+    // prop, which loses the `currentScene?.wanderer &&` narrowing, and the file
+    // already asserted it that way in the chip's own onPress. The GIFT button
+    // and its label are unchanged.
+    expect(EXPL).toMatch(/Give a gift to \$\{currentScene\.wanderer!\.name\}/);
   });
 
   it('there are at least two GIFT entry points now', () => {

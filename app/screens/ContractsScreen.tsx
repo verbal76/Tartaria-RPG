@@ -133,13 +133,20 @@ type Tab = 'contracts' | 'collectables';
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const TAB_PLANES = (
   <>
     <View style={kit.tabPlaneTop} pointerEvents="none" />
@@ -807,10 +814,9 @@ export function ContractsScreen() {
               </Text>
             )}
             {atCapitalForSummon && (
-              <TouchableOpacity
-                style={[kit.ctl, styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait, pressed && kit.controlPressed]}
                 onPress={() => useGameStore.getState().summonCoreGuardian()}
-                activeOpacity={0.7}
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel={summonBlocked.blocked
@@ -819,13 +825,15 @@ export function ContractsScreen() {
                     ? 'Summon Guardian'
                     : `Guardian settling, ${settleWaitPhrase(summonSettle.hoursLeft)} to wait`}
               >
+{({ pressed }) => (<>
                 <Text style={[styles.summonChipText, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWaitText]}>
                   {summonBlocked.blocked
                     ? '★ FIGHT FIRST'
                     : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                 </Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             )}
             {mqExpanded && (
               <View style={styles.mqTracker}>
@@ -930,47 +938,51 @@ export function ContractsScreen() {
             )}
             {mq.phase === 'choice' && (
               <View style={styles.mainQuestChoiceRow}>
-                <TouchableOpacity
-                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }, pressed && kit.controlPressed]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.mainQuestChoiceText}>SEAL</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }, pressed && kit.controlPressed]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }, pressed && kit.controlPressed]}
                   onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
                 {/* ⚠⚠ OTA-1225 — THE EARNED FOURTH. Rendered only when the run
                     earned it, and NEVER as a disabled or greyed row: a player
                     who has not earned STAY must not be shown a door they cannot
                     open. The three above are unconditional and always will be. */}
                 {canStay && (
-                  <TouchableOpacity
-                    style={[kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }]}
+                  <Pressable
+                    style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }, pressed && kit.controlPressed]}
                     onPress={() => useGameStore.getState().chooseEndingMainQuest('stay')}
-                    activeOpacity={0.7}
                     accessibilityRole="button"
                   >
+{({ pressed }) => (<>
                     <Text style={styles.mainQuestChoiceText}>STAY</Text>
-                    {CTL_PLANES}
-                  </TouchableOpacity>
+                    {ctlPlanes(pressed)}
+                  </>)}
+</Pressable>
                 )}
               </View>
             )}
@@ -994,18 +1006,17 @@ export function ContractsScreen() {
             ['active', `ACTIVE (${slateCounts.active})`],
             ['parked', `PARKED (${slateCounts.parked})`],
           ] as const).map(([key, label]) => (
-            <TouchableOpacity
+            <Pressable
               key={key}
               onPress={() => setSlate(key)}
-              style={[kit.ctl, styles.slateBtn, slate === key && styles.slateBtnOn]}
-              activeOpacity={0.7}
+              style={({ pressed }) => [kit.ctl, styles.slateBtn, slate === key && styles.slateBtnOn, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityState={{ selected: slate === key }}
               accessibilityLabel={`Show ${label}`}
             >
               <Text style={[styles.slateBtnText, slate === key && styles.slateBtnTextOn]}>{label}</Text>
               {TAB_PLANES}
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       )}
@@ -2229,9 +2240,11 @@ export function ContractsScreen() {
                 onPress={() => setPendingRoute(null)}
                 accessibilityRole="button"
               >
+{({ pressed }) => (<>
                 <Text style={styles.routeBtnTextNeutral}>CANCEL</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
               <Pressable
                 style={({ pressed }) => [kit.ctl, styles.routeBtnPrimary, pressed && kit.controlPressed]}
                 accessibilityRole="button"
@@ -2288,9 +2301,11 @@ export function ContractsScreen() {
                   setScreen('exploration');
                 }}
               >
+{({ pressed }) => (<>
                 <Text style={styles.routeBtnTextPrimary}>SET COURSE</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           </View>
         </View>
@@ -2320,29 +2335,37 @@ export function ContractsScreen() {
                 That is most of why ten taps read as ten dead ends. Rendered only
                 when the store said a runner can genuinely carry this one. */}
             {contractsNotice.action ? (
-              <TouchableOpacity
-                style={[kit.ctl, styles.refusalButton, styles.refusalButtonPrimary]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.refusalButton, styles.refusalButtonPrimary, pressed && kit.controlPressed]}
                 onPress={() => sendContractByRunner(
                   contractsNotice.action!.kind, contractsNotice.action!.id,
                 )}
                 accessibilityRole="button"
                 accessibilityLabel={contractsNotice.action.label}
               >
-                <Text style={styles.refusalButtonText}>{contractsNotice.action.label}</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+{({ pressed }) => (<>
+                {/* ⚠ OTA-1806 — `!` because a render-prop callback loses the
+                    narrowing from the `contractsNotice.action ?` guard three
+                    lines up; the onPress above already asserts it the same way
+                    under the same guard. */}
+                <Text style={styles.refusalButtonText}>{contractsNotice.action!.label}</Text>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             ) : null}
-            <TouchableOpacity
-              style={[kit.ctl, styles.refusalButton]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.refusalButton, pressed && kit.controlPressed]}
               onPress={clearContractsNotice}
               accessibilityRole="button"
               accessibilityLabel={contractsNotice.action ? 'Not now' : 'Got it'}
             >
+{({ pressed }) => (<>
               <Text style={styles.refusalButtonText}>
                 {contractsNotice.action ? 'NOT NOW' : 'GOT IT'}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         </View>
       ) : null}
@@ -2436,16 +2459,17 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                         is the ONLY time the assembled story is ever readable end to end,
                         which is the same "ends in nothing" defect one step further along
                         (PUNCHLIST P1). */}
-                    <TouchableOpacity
-                      style={[kit.ctl, styles.readStoryBtn]}
+                    <Pressable
+                      style={({ pressed }) => [kit.ctl, styles.readStoryBtn, pressed && kit.controlPressed]}
                       onPress={() => openStoryReveal(story.id)}
-                      activeOpacity={0.7}
                       accessibilityRole="button"
                       accessibilityLabel={`Read ${story.characterName}'s story`}
                     >
+{({ pressed }) => (<>
                       <Text style={styles.readStoryText}>READ THE WHOLE STORY</Text>
-                      {CTL_PLANES}
-                    </TouchableOpacity>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                   </>
                 )}
               </View>

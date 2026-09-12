@@ -28,13 +28,20 @@ import { T, tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
  * from the one the rest of Tartaria now uses. ROLL, SEAL THE NAME and KEEP ITS
  * MAKING are all ordinary Tartaria controls and now say so. Handlers, the
  * disabled rule on an empty name, roles and labels are untouched. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -134,9 +141,11 @@ export function GolemNamingModal() {
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
+{({ pressed }) => (<>
                 <Text style={styles.rollText}>⚄ ROLL</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
 
             <Pressable
@@ -146,13 +155,17 @@ export function GolemNamingModal() {
               accessibilityRole="button"
               accessibilityLabel="Seal the name"
             >
+{({ pressed }) => (<>
               <Text style={[styles.confirmText, !name.trim() && styles.confirmTextDisabled]}>SEAL THE NAME</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             <Pressable onPress={keep} style={({ pressed }) => [kit.ctl, styles.keepBtn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Keep its making">
+{({ pressed }) => (<>
               <Text style={styles.keepText}>KEEP ITS MAKING</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         </ScrollView>
       </View>

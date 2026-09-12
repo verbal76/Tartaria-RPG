@@ -25,13 +25,20 @@ import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
  * ⚠⚠ THE BLOCKED ROW AT THE TOP OF THE LIST IS A `<View>`, NOT A CONTROL, AND
  * IT STAYS FLAT. The interaction contract decides the physical family — not the
  * style key, which `row` shares with three pressables. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -347,23 +354,31 @@ export function FusionPickerModal() {
                   <Text style={styles.catLabel}>{isUpgrade ? 'Mode' : 'Forge as'}</Text>
                   <View style={styles.kindRow}>
                     <Pressable onPress={() => setKind('weapon')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'weapon' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'weapon' }}>
+{({ pressed }) => (<>
                       <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                     <Pressable onPress={() => setKind('armor')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'armor' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'armor' }}>
+{({ pressed }) => (<>
                       <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                     {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. */}
                     <Pressable onPress={() => setKind('dog_armor')} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'dog_armor' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'dog_armor' }}>
+{({ pressed }) => (<>
                       <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                     {/* OTA-873 — fourth mode: upgrade an existing weapon with a 2nd coating slot. */}
                     <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={({ pressed }) => [kit.ctl, styles.kindBtn, kind === 'upgrade' && styles.kindOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityState={{ selected: kind === 'upgrade' }}>
+{({ pressed }) => (<>
                       <Text style={[styles.kindTxt, kind === 'upgrade' && styles.kindTxtOn]}>⬆ Upgrade</Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                   </View>
 
                   <View style={styles.actions}>

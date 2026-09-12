@@ -91,9 +91,16 @@ describe('OTA-1453 — the STORE button', () => {
 
   it('⚠⚠ CARRIES A REAL ACCESSIBILITY LABEL, not the bare word', () => {
     // A screen reader announcing "STORE" tells somebody nothing about WHOSE.
-    const storeBtn = between(EXPL, 'styles.placeChipStore]}', '>STORE<');
+    /* ⚠ OTA-1806 RE-ANCHORED. The style became a `({ pressed }) => [...]`
+     * callback when the STORE chip joined the depress language, so the old
+     * anchor — which ended at the array's `]}` — no longer exists. Anchor on the
+     * style KEY, which is what this test was ever really about. The claim (a
+     * screen reader hears WHOSE store, not the bare word) is untouched. */
+    const storeBtn = between(EXPL, 'styles.placeChipStore,', '>STORE<');
     expect(storeBtn).toContain('accessibilityRole="button"');
-    expect(storeBtn).toMatch(/accessibilityLabel=\{`Open \$\{currentScene\.vendor\.name\}'s store/);
+    // `vendor!` because a render-prop callback loses the enclosing guard's
+    // narrowing; the file already used that idiom under this same guard.
+    expect(storeBtn).toMatch(/accessibilityLabel=\{`Open \$\{currentScene\.vendor!\.name\}'s store/);
     expect(storeBtn).toContain('offers');
   });
 

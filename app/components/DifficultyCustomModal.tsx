@@ -61,13 +61,20 @@ export interface DifficultyCustomModalProps {
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const TAB_PLANES = (
   <>
     <View style={kit.tabPlaneTop} pointerEvents="none" />
@@ -158,18 +165,22 @@ export function DifficultyCustomModal({ visible, initial, onCancel, onConfirm }:
 
           <View style={styles.buttons}>
             <Pressable onPress={onCancel} style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Cancel">
+{({ pressed }) => (<>
               <Text style={styles.btnText}>CANCEL</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             <Pressable
               onPress={() => onConfirm({ intensity, systems })}
               style={({ pressed }) => [kit.ctl, styles.btn, styles.btnPrimary, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel="Confirm custom difficulty"
             >
+{({ pressed }) => (<>
               <Text style={[styles.btnText, styles.btnTextPrimary]}>USE THIS</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         </View>
       </View>

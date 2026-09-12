@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Platform, Share } from 'react-native';
 import { TScreenHeader, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
@@ -23,13 +23,20 @@ const CHUNK_SIZE = 25_000;
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -162,10 +169,12 @@ export function LogScreen() {
             {copied ? `COPIED ${charCount.toLocaleString()} CHARS` : `COPY ALL · ${charCount.toLocaleString()}`}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[kit.ctl, styles.shareBtn]} onPress={handleShare} activeOpacity={0.7} accessibilityRole="button">
+        <Pressable style={({ pressed }) => [kit.ctl, styles.shareBtn, pressed && kit.controlPressed]} onPress={handleShare} accessibilityRole="button">
+{({ pressed }) => (<>
           <Text style={styles.shareText}>{shared ? 'SHARED' : 'SHARE'}</Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
       </View>
       {/* OTA 024 — chunked copy. Most chat apps cap pastes at
           ~30-60KB, silently truncating beyond that. Player's

@@ -74,9 +74,30 @@ const { TextInput } = require('react-native');
 type Node = { props: Record<string, unknown>; type?: unknown };
 type Tree = { root: { findAll(f: (n: Node) => boolean): Node[] }; unmount(): void };
 
+/* ⚠⚠⚠ OTA-1806 — A CHILD MAY NOW BE A FUNCTION, AND THIS WALKER HAD NO BRANCH
+ * FOR ONE. React Native's `Pressable` declares
+ * `children?: ReactNode | ((state) => ReactNode)`, and it is the ONLY channel
+ * through which a pressed state can reach what a control draws. When the
+ * physical-depression repair started using it, every control whose identity
+ * comes from its TEXT CONTENT returned '' here and read as "(unlabelled)" —
+ * the screen still rendered it, this walker simply could not see it.
+ *
+ * ⚠⚠ RESOLVED AT REST, AND ONLY AT REST. `{ pressed: false }` is the state the
+ * guard has always inspected: what the player sees with no finger on the
+ * control. The returned content is then walked exactly as ordinary children
+ * are. This RESTORES the walker's existing reach — it does not widen what the
+ * guard accepts, supply any expected text, or let a missing control pass. A
+ * control that genuinely is not rendered still yields nothing and still fails.
+ *
+ * ⚠ hovered/focused are supplied because RN's `PressableStateCallbackType`
+ * carries them; both are false at rest on a touch device. */
 function textOf(n: unknown): string {
   if (typeof n === 'string') return n;
   if (Array.isArray(n)) return n.map(textOf).join(' ');
+  if (typeof n === 'function') {
+    const render = n as (s: { pressed: boolean; hovered: boolean; focused: boolean }) => unknown;
+    return textOf(render({ pressed: false, hovered: false, focused: false }));
+  }
   const node = n as { props?: { children?: unknown } } | null;
   return node?.props ? textOf(node.props.children) : '';
 }

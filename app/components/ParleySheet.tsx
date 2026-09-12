@@ -13,20 +13,27 @@
 // place — the conversation continues at the bottom of the screen.
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { choicesFor, temperamentReadout, temperamentTell } from '../engine/parley';
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
  * label, hitSlop and geometry unchanged; only the material moved to the kit. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function ParleySheet() {
   const ctx = useGameStore((s) => s.pendingParley);
@@ -55,17 +62,18 @@ export function ParleySheet() {
       <Text style={styles.targetName}>{ctx.targetName}</Text>
       <Text style={styles.read}>{read}</Text>
 
-      <TouchableOpacity
-        style={[kit.ctl, styles.choiceBtn]}
+      <Pressable
+        style={({ pressed }) => [kit.ctl, styles.choiceBtn, pressed && kit.controlPressed]}
         onPress={() => resolve(safe)}
-        activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel={safeLabel}
       >
+{({ pressed }) => (<>
         <Text style={styles.choiceLabel}>{safeLabel}</Text>
         <Text style={styles.choiceHint}>{safeHint}</Text>
-        {CTL_PLANES}
-      </TouchableOpacity>
+        {ctlPlanes(pressed)}
+      </>)}
+</Pressable>
 
       <TouchableOpacity
         style={[styles.choiceBtn, styles.hardBtn]}
@@ -84,17 +92,18 @@ export function ParleySheet() {
           sheet back. Talking to somebody must never spend the chance to deal
           with them. */}
       {ctx.topicsNpcId ? (
-        <TouchableOpacity
-          style={[kit.ctl, styles.choiceBtn]}
+        <Pressable
+          style={({ pressed }) => [kit.ctl, styles.choiceBtn, pressed && kit.controlPressed]}
           onPress={intoTalk}
-          activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel="Just talk"
         >
+{({ pressed }) => (<>
           <Text style={styles.choiceLabel}>Just talk</Text>
           <Text style={styles.choiceHint}>Ask them about the road. Costs nothing, forfeits nothing.</Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
       ) : null}
 
       <TouchableOpacity

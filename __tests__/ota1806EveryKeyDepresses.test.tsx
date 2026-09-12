@@ -275,52 +275,187 @@ describe('5. AT REST the room doors are byte-for-byte what shipped in 1804', () 
   });
 });
 
-describe('6. ⚠⚠⚠ THE CLASS IS NOT CLOSED — a shrink-only ceiling on frozen planes', () => {
-  /** Every site that DRAWS a control plane, graded on whether the drawing is a
-   *  function of `pressed`. A frozen site is a key that cannot lose height. */
-  const sites = (() => {
+describe('6. ⚠⚠⚠ THE CLASS, CENSUSED — and what is deliberately left out', () => {
+  /** Classify every control that is ITSELF constructed as a Tartaria key.
+   *
+   *  ⚠⚠ NESTED CONTROLS ARE SUBTRACTED, and that correction matters: an earlier
+   *  cut tested the whole element span, so a plain `View`-ish container wrapping
+   *  a key scored as a key — which is exactly how the Inventory category header
+   *  first appeared in this census when it is not built as a key at all.
+   *
+   *  ⚠ AND THE CANON INCLUDES `tFilledGold(pressed)`. OTA-1791 consolidated ten
+   *  hand-copied gold pills onto it; a classifier that only knows
+   *  `tControlDepth` reports twelve finished controls as defects. */
+  type Row = { f: string; line: number; cls: string };
+  const rows: Row[] = (() => {
+    const tagEnd = (str: string, i: number) => {
+      let d = 0; let q = '';
+      while (i < str.length) {
+        const c = str[i]!;
+        if (q) { if (c === q && str[i - 1] !== '\\') q = ''; i += 1; continue; }
+        if (c === '"' || c === "'" || c === '`') { q = c; i += 1; continue; }
+        if (c === '{') { d += 1; i += 1; continue; }
+        if (c === '}') { d -= 1; i += 1; continue; }
+        if (c === '>' && d === 0) return i;
+        i += 1;
+      }
+      return i;
+    };
+    const spanEnd = (str: string, i: number, tag: string) => {
+      const e = tagEnd(str, i);
+      if (str[e - 1] === '/') return e + 1;
+      let d = 1; let j = e + 1;
+      const open = new RegExp(`<${tag}\\b`, 'g'); const close = new RegExp(`</${tag}>`, 'g');
+      while (d > 0 && j < str.length) {
+        open.lastIndex = j; close.lastIndex = j;
+        const o = open.exec(str); const c = close.exec(str);
+        if (!c) break;
+        if (o && o.index < c.index) { d += 1; j = o.index + 1; } else { d -= 1; j = c.index + 1; }
+      }
+      return str.indexOf('>', j) + 1;
+    };
+    const MATERIAL = /kit\.ctl\b|tartariaKitStyles\.ctl\b|tControlDepth|tFilledGold|containerStyle\(|ctlStyle\(/;
+    const PLANES = /controlPlane|CTL_PLANES|ctlPlanes\(/;
     const files = execSync('find app -name "*.tsx"', { cwd: ROOT }).toString().trim().split('\n').sort();
-    const frozen: string[] = []; const live: string[] = [];
+    const out: Row[] = [];
     for (const f of files) {
       const code = codeOf(readFileSync(join(ROOT, f), 'utf8'));
-      const re = /style=\{([^}]*controlPlaneTop\b[^}]*)\}/g;
-      let m: RegExpExecArray | null;
-      while ((m = re.exec(code))) {
-        (/pressed/.test(m[1]!) ? live : frozen).push(f);
+      const hits: Array<{ i: number; tag: string; end: number }> = [];
+      for (const tag of ['Pressable', 'TouchableOpacity']) {
+        const re = new RegExp(`<${tag}\\b`, 'g'); let m: RegExpExecArray | null;
+        while ((m = re.exec(code))) hits.push({ i: m.index, tag, end: spanEnd(code, m.index, tag) });
+      }
+      hits.sort((a, b) => a.i - b.i);
+      for (const h of hits) {
+        const attrsEnd = tagEnd(code, h.i);
+        const attrs = code.slice(h.i, attrsEnd);
+        if (!/onPress\s*=/.test(attrs)) continue;
+        let body = code.slice(attrsEnd, h.end);
+        for (const n of hits) if (n.i > h.i && n.i < h.end) body = body.replace(code.slice(n.i, n.end), '');
+        if (!MATERIAL.test(attrs) && !PLANES.test(attrs + body)) continue;
+        const pressedHalf = /style=\{\(\s*\{\s*pressed/.test(attrs) || /\bpressed\s*&&/.test(attrs);
+        const canon = /tControlDepth\(pressed\)|tFilledGold\(pressed\)|pressed && \w+\.controlPressed|containerStyle\(pressed\)|ctlStyle\(pressed\)/.test(attrs);
+        const draws = PLANES.test(body);
+        /* ⚠ EVERY FORM IN WHICH THE PLANES FOLLOW THE FINGER, not just the
+         * inline ternary. A first cut knew only that one and reported all 151
+         * repaired sites as defects, because the ternary now lives INSIDE the
+         * file's `ctlPlanes` helper and the call site just passes `pressed`. */
+        const live = /pressed \? \w+\.controlPlaneTopPressed/.test(body)
+          || /ctlPlanes\(pressed\)/.test(body)
+          || /\{pressed \? \(<>/.test(body);
+        const cls = h.tag === 'TouchableOpacity' ? 'C-FADE-ONLY'
+          : !pressedHalf ? 'D-INERT'
+          : !canon ? 'E-LOCAL-CUE'
+          : (draws && !live) ? 'B-PARTIAL' : 'A-COMPLETE';
+        out.push({ f, line: code.slice(0, h.i).split('\n').length, cls });
       }
     }
-    return { frozen, live };
+    return out;
   })();
+  const of = (c: string) => rows.filter((r) => r.cls === c);
 
-  it('the room doors and LOOK AROUND are both on the LIVE side', () => {
-    expect(sites.live.filter((f) => f === 'app/components/InputBox.tsx').length).toBe(2);
-    expect(sites.live.length).toBeGreaterThanOrEqual(8);
+  it('⚠⚠⚠ NOT ONE physical key is built on a primitive that cannot report a press', () => {
+    /* The defect the owner kept feeling and no census could see: a control
+     * wearing the full key construction on a `TouchableOpacity`, whose only
+     * possible answer to a finger is a fade of the whole chip. 99 of these
+     * before this pass. The claim is ZERO, and it closes the class. */
+    expect(of('C-FADE-ONLY').map((r) => `${r.f}:${r.line}`)).toEqual([]);
   });
 
-  it('⚠ 52 plane sites elsewhere are STILL FROZEN, and this number may only fall', () => {
-    /* ⚠⚠ THIS ASSERTION IS THE HONEST PART OF THE SUITE. OTA-1805 repairs the
-     * controls the owner named and NOTHING ELSE — the wider class (frozen
-     * planes, and separately the physical keys built on `TouchableOpacity`,
-     * which cannot express `pressed` at all) is awaiting his scope ruling. A
-     * ceiling rather than a target: adopting the live idiom at any site is
-     * never a failure, and a NEW frozen site fails immediately. */
-    expect(sites.frozen.length).toBeLessThanOrEqual(52);
-    // Not vacuous — the corpus really is full of plane-drawing controls.
-    expect(sites.frozen.length + sites.live.length).toBeGreaterThan(50);
+  it('no constructed key is inert, and the corpus is big enough for that to mean something', () => {
+    expect(of('D-INERT').map((r) => `${r.f}:${r.line}`)).toEqual([]);
+    expect(of('A-COMPLETE').length).toBeGreaterThanOrEqual(232);
+    expect(rows.length).toBeGreaterThan(250);
   });
 
-  it('and the remaining gap is named, not merely counted', () => {
-    // The structural reason the wider class exists: a physical key built on a
-    // primitive that has no `pressed` to report. Still true of many controls.
-    const stuck = execSync(
-      'grep -rln "TouchableOpacity" app --include=*.tsx | xargs grep -l "controlPlaneTop" || true',
-      { cwd: ROOT },
-    ).toString().trim().split('\n').filter(Boolean);
-    expect(stuck.length).toBeGreaterThan(0);
-    // InputBox is no longer stuck for its ROOM DOORS; it still holds other
-    // TouchableOpacity keys (SEND, the keyboard dismiss), which is why it is
-    // still on this list. The claim is about the class, not this file.
-    expect(TRAVEL).not.toMatch(/TouchableOpacity/);
+  it('and no key travels while its planes stay frozen at resting height', () => {
+    /* The second half of the defect, and the half OTA-1804's census could not
+     * see: a ring that inverts over a 4dp sidewall that never shrinks. The key
+     * moves and never loses height, which is most of what a press looks like. */
+    expect(of('B-PARTIAL').map((r) => `${r.f}:${r.line}`)).toEqual([]);
+  });
+
+  it('⚠⚠ the 26 local-cue controls are EXEMPT BY DECISION, and the list may only shrink', () => {
+    /* These already answer a finger — they simply answer with a local style
+     * instead of the kit canon. Several are list rows and cards, where the
+     * standing chassis ruling forbids command-key travel outright; one is
+     * DEACTIVATE, the control the owner named as the most responsive on the
+     * device. Converting them is a LOOK change, not a dead-button fix, so this
+     * pass reports them instead of sweeping them in. A ceiling, not a target. */
+    expect(of('E-LOCAL-CUE').length).toBeLessThanOrEqual(26);
+    // and the boundary is real: the kit still has no row-pressed style, so
+    // "make the rows travel too" cannot happen by accident.
+    expect(Object.keys(kit)).not.toContain('rowPressed');
+  });
+});
+
+describe('6b. the Inventory collapsible headers — the owner\'s named controls', () => {
+  const INV = codeOf(read('app/screens/InventoryScreen.tsx'));
+
+  it('the category header is a Pressable that travels and takes pressed-only planes', () => {
+    const head = INV.slice(INV.indexOf('styles.sectionHeader, { borderLeftColor'));
+    expect(head).toMatch(/pressed && kit\.controlPressed/);
+    /* ⚠ Bounded by what FOLLOWS the header, not by the first `</Pressable>`:
+     * the header WRAPS a nested control (the FUSABLE view's SELECT ALL), so the
+     * first closing tag is the child's and cuts the body in half. */
+    const body = head.slice(0, head.indexOf('{!collapsed && categoryRuns'));
+    expect(body).toMatch(/\{pressed \? \(<>/);
+    expect(body).toMatch(/kit\.controlPlaneTopPressed/);
+    expect(body).toMatch(/kit\.controlPlaneBottomPressed/);
+    // and NOT the resting planes — nothing new appears in the list at rest.
+    expect(body).not.toMatch(/kit\.controlPlaneTop\}/);
+    expect(INV).not.toMatch(/<TouchableOpacity[\s\S]{0,200}styles\.sectionHeader/);
+  });
+
+  it('⚠ AT REST the header is exactly what it was — no construction was added', () => {
+    // The plate itself is untouched: same translucent fill, same 4dp category
+    // bar, same radius. Only a pressed branch was added.
+    expect(INV).toMatch(/backgroundColor: 'rgba\(8,6,4,0\.55\)'/);
+    expect(INV).toMatch(/borderLeftWidth: 4/);
+    expect(INV).toMatch(/borderRadius: 3/);
+    // and it did not quietly acquire the kit's key material
+    const decl = INV.slice(INV.indexOf('  sectionHeader: {'));
+    expect(decl.slice(0, decl.indexOf('},') + 2)).not.toMatch(/kit\.ctl|borderWidth/);
+  });
+
+  it('the rack headers travel, and take NO planes — a bare row has no height to lose', () => {
+    const rack = INV.slice(INV.indexOf('function RackFrame('));
+    expect(rack).toMatch(/style=\{\(\{ pressed \}\) => \[rackFrameStyles\.header, pressed && kit\.controlPressed\]\}/);
+    expect(rack.slice(0, rack.indexOf('const rackFrameStyles'))).not.toMatch(/controlPlane/);
+    // the row is still a bare row: no fill, no ring, no radius
+    expect(INV).toMatch(/header: \{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 \}/);
+  });
+
+  it('both headers still toggle exactly what they toggled', () => {
+    expect(INV).toMatch(/setCollapsedSections\(\(s\) => \(\{ \.\.\.s, \[cat\]: !\(s\[cat\] \?\? true\) \}\)\)/);
+    expect(INV).toMatch(/accessibilityState=\{\{ expanded: !collapsed \}\}/);
+    expect(INV).toMatch(/accessibilityState=\{\{ expanded: open \}\}/);
+  });
+});
+
+describe('6c. the Act buttons stopped drawing six plane layers', () => {
+  it('⚠ a real defect this pass uncovered: three inline planes PLUS {CTL_PLANES}', () => {
+    /* Both Act buttons had carried the inline triple AND the shared fragment
+     * since Phase 1 — six absolutely-positioned layers on one 
+     * control, painting the same three bands twice. Now one call. */
+    for (const f of ['app/components/InputBox.tsx', 'app/components/KeyboardInputBar.tsx']) {
+      const src = codeOf(read(f));
+      const act = src.slice(src.indexOf('styles.sendText'));
+      const region = act.slice(0, 400);
+      expect(region).toMatch(/\{ctlPlanes\(pressed\)\}/);
+      expect(region).not.toMatch(/<View style=\{tartariaKitStyles\.controlPlaneTop\}/);
+    }
+  });
+
+  it('every file that draws planes has ONE authority for them', () => {
+    const files = execSync('grep -rl "const ctlPlanes = (pressed: boolean)" app --include=*.tsx', { cwd: ROOT })
+      .toString().trim().split('\n').filter(Boolean);
+    expect(files.length).toBeGreaterThanOrEqual(30);
+    for (const f of files) {
+      const src = codeOf(read(f));
+      // the frozen const, where it survives, is DERIVED from the function
+      if (/const CTL_PLANES/.test(src)) expect(src).toMatch(/const CTL_PLANES = ctlPlanes\(false\);/);
+    }
   });
 });
 
@@ -376,7 +511,7 @@ describe('8. the stamp is what the game DISPLAYS, so it has to change', () => {
     // arriving: the just-updated modal keys on a CHANGE in OTA_BUILD_ID.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toMatch(/^2026-09-12-1805-/);
-    expect(OTA_BUILD_ID).not.toMatch(/-1804-/);
+    expect(OTA_BUILD_ID).toMatch(/^2026-09-12-1806-/);
+    expect(OTA_BUILD_ID).not.toMatch(/-1805-|-1804-/);
   });
 });

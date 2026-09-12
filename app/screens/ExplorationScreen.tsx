@@ -145,13 +145,20 @@ import { isLeadNoun, orderByStoryTier } from '../engine/storyNouns';
  * across this file for two phases — the face, the sidewall and the contact are
  * hand-placed children, absolutely positioned inside a box the control already
  * owns, so nothing moves by a pixel. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
-    <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
-    <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -1534,16 +1541,18 @@ export function ExplorationScreen() {
                   element among six. See TitleScreen for the rule's stated
                   exception. */}
               <View style={styles.sceneBarBtns}>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => setScreen('about')}
                   hitSlop={8}
-                  style={[tartariaKitStyles.ctl, styles.sceneBarBtn]}
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.sceneBarBtn, pressed && tartariaKitStyles.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel="Settings"
                 >
+{({ pressed }) => (<>
                   <TGear size={SCENE_GEAR_SIZE} color={T.gold} />
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               </View>
               {/* v2.4.1 (OTA 045) — QUESTS button removed per player
                   direction. The main-quest objective chip below the
@@ -1663,8 +1672,8 @@ export function ExplorationScreen() {
         }
         return (
           <TutorialTarget area="objective-chip">
-          <TouchableOpacity
-            style={[tartariaKitStyles.ctl, styles.objectiveChip]}
+          <Pressable
+            style={({ pressed }) => [tartariaKitStyles.ctl, styles.objectiveChip, pressed && tartariaKitStyles.controlPressed]}
             accessibilityRole="button"
             onPress={() => {
               // Tungsten Spire — advance the main_quest tutorial beat
@@ -1673,9 +1682,9 @@ export function ExplorationScreen() {
               useGameStore.getState().maybeAdvanceTutorial('main_quest');
               setScreen('contracts');
             }}
-            activeOpacity={0.7}
             hitSlop={6}
           >
+          {({ pressed }) => (<>
             <View style={styles.objectiveChipRow}>
               {/* arb120 — slimmed to ONE line (was title + subtitle) to give the
                   exploration feed more room; the MISSIONS quick-button now carries
@@ -1686,13 +1695,13 @@ export function ExplorationScreen() {
                 {mainLine}
               </Text>
               {atUnrecovered && (
-                <TouchableOpacity
-                  style={[tartariaKitStyles.ctl, styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait]}
+                <Pressable
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait, pressed && tartariaKitStyles.controlPressed]}
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
-                  activeOpacity={0.7}
                   hitSlop={8}
                   accessibilityRole="button"
                 >
+{({ pressed }) => (<>
                   {/* OTA-1471 — the label names the wait BEFORE the tap; the tap
                       still prints the full reason.
                       OTA-1480 — and names the fight, which is the nearer of the two
@@ -1702,13 +1711,15 @@ export function ExplorationScreen() {
                       ? '★ FIGHT FIRST'
                       : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                   </Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               )}
             </View>
             {CHASSIS_PLANES}
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+          </Pressable>
           </TutorialTarget>
         );
       })()}
@@ -1752,21 +1763,22 @@ export function ExplorationScreen() {
                 <Text style={styles.objectiveChipLabel}>GREAT CLIMB · </Text>
                 {`${climb.noun} — ${climb.tiers} tiers`}
               </Text>
-              <TouchableOpacity
-                style={[tartariaKitStyles.ctl, styles.objectiveChipSummon]}
+              <Pressable
+                style={({ pressed }) => [tartariaKitStyles.ctl, styles.objectiveChipSummon, pressed && tartariaKitStyles.controlPressed]}
                 // ⚠ Submits the canonical noun rather than calling a private climb entry
                 // point. That is deliberate: it walks the SAME parser → climb path a
                 // player typing the name walks, so the button cannot drift away from the
                 // typed route or skip the strap gate, the height rules, or the guaranteed
                 // Skyreacher drop.
                 onPress={() => { void useGameStore.getState().submitPlayerAction(`climb ${climb.noun}`); }}
-                activeOpacity={0.7}
                 hitSlop={8}
                 accessibilityRole="button"
               >
+{({ pressed }) => (<>
                 <Text style={styles.objectiveChipSummonText}>★ CLIMB</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           </View>
         );
@@ -1796,16 +1808,16 @@ export function ExplorationScreen() {
           shopkeepers who work a Market stall and had tastes written for them.
           Typing "gift" always reached them; the affordance never did. */}
       {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && (
-        <TouchableOpacity
-          style={[tartariaKitStyles.ctl, styles.placeChip, styles.vendorChip]}
+        <Pressable
+          style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChip, styles.vendorChip, pressed && tartariaKitStyles.controlPressed]}
           onPress={() => setScreen('vendor')}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
+          {({ pressed }) => (<>
           <View style={styles.vendorBannerStripe} />
           <View style={styles.placeChipBody}>
-            <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor.name}</Text>
-            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor.offers.length} offers · tap to trade</Text>
+            <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor!.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor!.offers.length} offers · tap to trade</Text>
           </View>
           {/* OTA-1059 — TALK. The Phase 2 exchange shipped in OTA-1058 with no
               way to reach it but typing `talk to <name>`, which is a feature
@@ -1834,52 +1846,55 @@ export function ExplorationScreen() {
               trading is the primary action at a counter and the other two are
               not. Nested touchables do not bubble in RN, so tapping it navigates
               exactly once. */}
-          <TouchableOpacity
-            style={[tartariaKitStyles.ctl, styles.placeChipTalk, styles.placeChipStore]}
+          <Pressable
+            style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, styles.placeChipStore, pressed && tartariaKitStyles.controlPressed]}
             onPress={() => setScreen('vendor')}
             hitSlop={8}
-            activeOpacity={0.7}
             accessibilityRole="button"
-            accessibilityLabel={`Open ${currentScene.vendor.name}'s store, ${currentScene.vendor.offers.length} offers`}
+            accessibilityLabel={`Open ${currentScene.vendor!.name}'s store, ${currentScene.vendor!.offers.length} offers`}
           >
+{({ pressed }) => (<>
             <Text style={[styles.placeChipTalkText, styles.placeChipStoreText]}>STORE</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
-          {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
+          {hasTopicsFor(npcLedgerId(currentScene.vendor!)) ? (
             // OTA-1079 — the glow means "something NEW to hear": green while
             // any gate-open topic still has unread lines, back to gold once
             // the player has heard them all. Same spent-math as the sheet's
             // "(asked)" marks, via hasUnspokenTalk.
-            <TouchableOpacity
-              style={[tartariaKitStyles.ctl, styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken]}
+            <Pressable
+              style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, vendorTalkGlow && styles.placeChipTalkUnspoken, pressed && tartariaKitStyles.controlPressed]}
               onPress={() => talkToNpc(currentScene.vendor?.name ?? '')}
               hitSlop={8}
-              activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel={
                 vendorTalkGlow
-                  ? `Talk to ${currentScene.vendor.name}, they have something new to say`
-                  : `Talk to ${currentScene.vendor.name}`
+                  ? `Talk to ${currentScene.vendor!.name}, they have something new to say`
+                  : `Talk to ${currentScene.vendor!.name}`
               }
             >
+{({ pressed }) => (<>
               <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           ) : null}
           {/* OTA-1083 — GIFT beside TALK. The verb existed since OTA-1060 but
               only as typed input ("I didn't see a gift button" — owner). Same
               quiet affordance as TALK; opens the OTA-1060 picker. */}
-          <TouchableOpacity
-            style={[tartariaKitStyles.ctl, styles.placeChipTalk]}
+          <Pressable
+            style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, pressed && tartariaKitStyles.controlPressed]}
             onPress={() => useGameStore.getState().openGift()}
             hitSlop={8}
-            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel={`Give a gift`}
           >
+{({ pressed }) => (<>
             <Text style={styles.placeChipTalkText}>GIFT</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
           {/* OTA-1029 — ✕ on the trader, matching the Crucible's. Nested touchable
               handles its own tap (doesn't open the stall). Hides the chip for this
               tile only: the vendor stays anchored to the room, so walking back in
@@ -1898,7 +1913,7 @@ export function ExplorationScreen() {
               const st = useGameStore.getState();
               if (st.pendingPayoff) return;
               if (st.pendingTalk && currentScene.vendor
-                && st.pendingTalk.npcId === npcLedgerId(currentScene.vendor)) {
+                && st.pendingTalk.npcId === npcLedgerId(currentScene.vendor!)) {
                 st.closeTalk();
               }
               setVendorChipDismissedKey(chipViewKey);
@@ -1906,13 +1921,14 @@ export function ExplorationScreen() {
             hitSlop={10}
             activeOpacity={0.7}
             accessibilityRole="button"
-            accessibilityLabel={`Dismiss ${currentScene.vendor.name}`}
+            accessibilityLabel={`Dismiss ${currentScene.vendor!.name}`}
           >
             <Text style={styles.vendorChipX}>✕</Text>
           </TouchableOpacity>
           {CHASSIS_PLANES}
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+          </>)}
+        </Pressable>
       )}
 
       {/* OTA-780 — no floating stall chips. Inside the market the room tabs ARE
@@ -1925,30 +1941,31 @@ export function ExplorationScreen() {
           the feed (the rep-0 starter quests + anything the player qualifies for)
           so a brand-new character has an immediate quest on-ramp. */}
       {currentScene?.missionBoard && missionBoardHasPostings && (
-        <TouchableOpacity
-          style={[tartariaKitStyles.ctl, styles.placeChip, styles.missionBoardChip]}
+        <Pressable
+          style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChip, styles.missionBoardChip, pressed && tartariaKitStyles.controlPressed]}
           onPress={() => setMissionBoardOpen(true)}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
+{({ pressed }) => (<>
           <View style={styles.missionBoardStripe} />
           <View style={styles.placeChipBody}>
             {/* OTA-1475 — the Market's post is a different thing from a
                 faction outpost's board, and saying so is why he asked for it:
                 every colour, under the square's truce. */}
             <Text style={styles.missionBoardName} numberOfLines={1}>
-              {currentScene.missionBoard.faction === null ? '⚑ THE MARKET POST' : '⚑ MISSION BOARD'}
+              {currentScene.missionBoard!.faction === null ? '⚑ THE MARKET POST' : '⚑ MISSION BOARD'}
             </Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>
-              {currentScene.missionBoard.faction === null
+              {currentScene.missionBoard!.faction === null
                 ? 'every faction posts here · tap to read'
                 : 'tap to view postings'}
             </Text>
           </View>
           <Text style={styles.placeChipArrow}>›</Text>
           {CHASSIS_PLANES}
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
       )}
 
       {/* OTA-807 — Wandering NPC chip. A person (not a vendor) resting on a peaceful
@@ -1956,12 +1973,12 @@ export function ExplorationScreen() {
           engine's wanderer talk-check (a d20 + CHA read for a tip / coins / a rare
           standing nudge). Hidden in combat. */}
       {currentScene?.wanderer && !inCombat && (
-        <TouchableOpacity
-          style={[tartariaKitStyles.ctl, styles.placeChip, styles.wandererChip]}
+        <Pressable
+          style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChip, styles.wandererChip, pressed && tartariaKitStyles.controlPressed]}
           onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
+          {({ pressed }) => (<>
           <View style={styles.wandererStripe} />
           <View style={styles.placeChipBody}>
             {/* ⚠ OTA-1530 — ❖, not ☺. The owner: "the icon is a horrible choice." He was
@@ -1969,8 +1986,8 @@ export function ExplorationScreen() {
                 as a chat sticker glued to a buried country. ❖ is a traveller's marker:
                 same weight as the vendor stripe beside it, in the ✦ ★ ⚄ ⚠ family the
                 rest of the UI already speaks, and it has no face. */}
-            <Text style={styles.wandererName} numberOfLines={1}>❖ {currentScene.wanderer.name}</Text>
-            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
+            <Text style={styles.wandererName} numberOfLines={1}>❖ {currentScene.wanderer!.name}</Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer!.role} · tap to speak</Text>
           </View>
           {/* ⚠ OTA-1154 — GIFT reaches the wanderer now. They were always a valid
               recipient (openGift reads talkablePeople, which includes them) and
@@ -1978,21 +1995,23 @@ export function ExplorationScreen() {
               in the game sat on the VENDOR chip — so the affordance existed for
               shopkeepers and nobody else. Stops propagation so the chip's own
               tap-to-speak does not also fire. */}
-          <TouchableOpacity
-            style={[tartariaKitStyles.ctl, styles.placeChipTalk]}
+          <Pressable
+            style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, pressed && tartariaKitStyles.controlPressed]}
             onPress={(e) => { e.stopPropagation(); useGameStore.getState().openGift(); }}
             hitSlop={8}
-            activeOpacity={0.7}
             accessibilityRole="button"
-            accessibilityLabel={`Give a gift to ${currentScene.wanderer.name}`}
+            accessibilityLabel={`Give a gift to ${currentScene.wanderer!.name}`}
           >
+{({ pressed }) => (<>
             <Text style={styles.placeChipTalkText}>GIFT</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
           <Text style={styles.placeChipArrow}>›</Text>
           {CHASSIS_PLANES}
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+          </>)}
+        </Pressable>
       )}
 
       {/* OTA-217 / OTA-220 — visible permit indicator for the OTA-195
@@ -2091,12 +2110,12 @@ export function ExplorationScreen() {
             ? `${currentScene?.vendor?.name ?? 'the trader'} fires it · spends ♥ items`
             : 'tap to fuse · spends ♥ items';
         return (
-        <TouchableOpacity
-          style={[tartariaKitStyles.ctl, styles.placeChip, styles.fusionChip]}
+        <Pressable
+          style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChip, styles.fusionChip, pressed && tartariaKitStyles.controlPressed]}
           onPress={fireCrucible}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
+{({ pressed }) => (<>
           <View style={styles.fusionBannerStripe} />
           <View style={styles.placeChipBody}>
             <Text style={styles.fusionBannerName} numberOfLines={1}>
@@ -2128,8 +2147,9 @@ export function ExplorationScreen() {
             <Text style={styles.crucibleDismissText}>✕</Text>
           </TouchableOpacity>
           {CHASSIS_PLANES}
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
         );
       })()}
       </View>
@@ -2256,16 +2276,17 @@ export function ExplorationScreen() {
             <View style={styles.didYouMeanRow}>
               <Text style={styles.didYouMeanLabel}>Did you mean…</Text>
               {parseSuggestions.map((s) => (
-                <TouchableOpacity
+                <Pressable
                   key={s}
-                  style={[tartariaKitStyles.ctl, styles.didYouMeanChip]}
-                  activeOpacity={0.7}
+                  style={({ pressed }) => [tartariaKitStyles.ctl, styles.didYouMeanChip, pressed && tartariaKitStyles.controlPressed]}
                   onPress={() => submit(s)}
                   accessibilityRole="button"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.didYouMeanChipText}>{s}</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               ))}
             </View>
           )}

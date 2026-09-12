@@ -25,13 +25,20 @@ import { tartariaKitStyles as kit } from '../ui/tartariaKit';
  * or cold-grey outline with no face, side or contact). The control is now the
  * one Tartaria physical control; its handler, role, label and geometry are
  * unchanged. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 import { useGameStore } from '../state/gameStore';
 
 /** Safety net only — the player is expected to tap. Long enough to read two
@@ -69,9 +76,11 @@ export function FusionBlockedModal() {
                 accessibilityRole="button"
                 accessibilityLabel="Close the Crucible"
               >
+{({ pressed }) => (<>
                 <Text style={styles.btnText}>UNDERSTOOD</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           </TouchableWithoutFeedback>
         </View>

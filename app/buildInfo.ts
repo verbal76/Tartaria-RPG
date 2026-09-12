@@ -30135,7 +30135,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ceiling on that remainder so the gap stays visible while it awaits a scope
 // ruling. It also REPLACES buttonsPressLikeOneSystem, which was green and
 // asked the wrong question.
-export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';
+// OTA-1806 - every key depresses. Owner, after 1805 reached the phone: "Also
+// the collapsable headers in inventory those are considered buttons and get the
+// look around you depress function also if you are waiting for implementation
+// permission do it."
+//
+// TWO INSTRUCTIONS, AND THE SECOND IS THE SCOPE RULING 1805 WAS HOLDING FOR.
+// 1805 repaired the room doors and left a shrink-only CEILING over the rest of
+// the class, because the remainder needed a decision that was his to make. He
+// made it, so the class closes here.
+//
+// THE CENSUS, of controls that are THEMSELVES constructed as Tartaria keys:
+//   A complete   83 -> 232
+//   B partial    51 -> 1    (ring travelled, planes frozen at resting height)
+//   C fade-only  99 -> 0    (TouchableOpacity - CANNOT report a press at all)
+//   E local cue  26 -> 26   NOT TOUCHED, see below
+// The single remaining B is the Inventory category header, which draws its
+// planes only while pressed BY DESIGN - a classifier artefact, not a defect.
+//
+// THE INVENTORY HEADERS, which he named. Both kinds - the category plates
+// (WEAPONS, ARMOR...) and the three rack headers (bandolier, tool pouch,
+// healing pouch) - were TouchableOpacity with no kit material at all. They are
+// NOT constructed as keys, and the standing rule is "AT REST: preserve the UI
+// we have. UNDER MY FINGER: make the buttons feel consistently alive." So they
+// gain NO resting construction: the plate takes the travel plus pressed-only
+// planes, and the bare rack row takes the travel alone, because a row with no
+// surface has no height to lose.
+//
+// ⚠ E-LOCAL-CUE IS NOT CONVERTED, AND THAT IS A DECISION. Those 26 already
+// respond to a finger; they simply answer with a local style rather than the
+// kit canon. Several are list rows and cards, where the standing chassis ruling
+// forbids command-key travel outright, and one is DEACTIVATE - the control he
+// singled out as the most responsive on the device. Converting them would be a
+// LOOK change, not a dead-button fix, so they are reported rather than swept in.
+//
+// ⚠ AND A REAL DEFECT FELL OUT OF THE PASS: both Act buttons (InputBox and
+// KeyboardInputBar) were drawing SIX plane layers - the three inline Views plus
+// {CTL_PLANES} - since Phase 1. Collapsed to one call.
+export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat

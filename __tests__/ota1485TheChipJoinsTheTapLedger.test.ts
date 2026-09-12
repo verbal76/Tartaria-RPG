@@ -121,11 +121,16 @@ describe('OTA-1485 — the feed has exactly one pressable, and it is the logged 
     // catch, and it pays the toll this comment demanded: its handler in
     // ExplorationScreen calls logUiTap first (pinned in ota1498). Count is now
     // exactly TWO, each wired to a named prop — never an inline handler.
-    expect((FEED.match(/<TouchableOpacity/g) ?? []).length).toBe(2);
+    // ⚠ OTA-1806 RE-ANCHORED THE PRIMITIVE, NOT THE CLAIM. Both chips became
+    // `Pressable` when the depress pass closed the fade-only class — a
+    // `TouchableOpacity` cannot report `pressed` at all. What this pin exists to
+    // catch is unchanged: the feed renders EXACTLY TWO pressables and each is
+    // wired to a NAMED prop, so a third one cannot ship outside the tap ledger.
+    expect((FEED.match(/<Pressable/g) ?? []).length).toBe(2);
     expect((FEED.match(/onPress=/g) ?? []).length).toBe(2);
     expect(FEED).toContain('onPress={onActionChipPress}');
     expect(FEED).toContain('onPress={onPackChipPress}');
-    expect(FEED).not.toContain('Pressable');
+    expect(FEED).not.toContain('TouchableOpacity');
   });
 });
 

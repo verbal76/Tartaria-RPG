@@ -27,13 +27,20 @@ const PAGE_IN_MS = 1400;
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function StoryIntroOverlay() {
   const pages = useGameStore((s) => s.storyIntro);
@@ -75,9 +82,11 @@ export function StoryIntroOverlay() {
         <View style={styles.topRow}>
           <Text style={styles.pageCount}>{page + 1} / {pages.length}</Text>
           <Pressable onPress={dismiss} style={({ pressed }) => [kit.ctl, styles.skipBtn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Skip opening">
+{({ pressed }) => (<>
             <Text style={styles.skipText}>SKIP</Text>
-            {CTL_PLANES}
-          </Pressable>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
         <Animated.View
           style={[

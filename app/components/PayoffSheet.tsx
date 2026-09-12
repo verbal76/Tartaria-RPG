@@ -61,9 +61,16 @@ export function PayoffSheet() {
         accessibilityRole="button"
         accessibilityLabel="Refuse and fight"
       >
+        {({ pressed }) => (<>
         <Text style={styles.fightText}>FIGHT</Text>
         <Text style={styles.fightHint}>"Thief!" — steel comes out, and the factions hear of it.</Text>
-        {ctlPlanes(false)}
+        {/* ⚠ OTA-1806 — was `ctlPlanes(false)`, a LITERAL. The ring travelled and
+            the planes were pinned to their resting heights, so FIGHT moved
+            without losing height — the same defect as the 51 frozen sites, hand
+            written rather than inherited. The census found it; nothing else
+            would have, because the call already looked like the live idiom. */}
+        {ctlPlanes(pressed)}
+        </>)}
       </Pressable>
     </View>
   );

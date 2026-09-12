@@ -44,12 +44,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   TextInput,
-  TouchableOpacity,
   Text,
   StyleSheet,
   Keyboard,
   Platform,
   Dimensions,
+  Pressable,
 } from 'react-native';
 /* ⚠ VISUAL LANGUAGE PHASE 1 — the recess/sidewall material arrives as kit
    STYLESHEET entries, not new exports (owner ruling: the kit is at 13/13
@@ -106,13 +106,20 @@ let sessionMaxHeight = 0;
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
-    <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
-    <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -516,15 +523,16 @@ export function KeyboardInputBar() {
         />
         {/* ⚠⚠ VISUAL LANGUAGE PHASE 1 — this Act joins the same command family as
             InputBox's, for the same reason and with the same restraint: a 1dp ring
-            PAID FOR out of the padding so the outer box does not move, the resting
-            plane, and no change to the handler, the role or the press feedback. */}
-        <TouchableOpacity accessibilityRole="button" style={[tartariaKitStyles.ctl, styles.send]} onPress={handleSubmit}>
+            PAID FOR out of the padding so the outer box does not move, and no
+            change to the handler or the role.
+            ⚠ OTA-1806 — the resting-plane-only half of that restraint is lifted
+            with its twin in InputBox: this Act depresses now. */}
+        <Pressable accessibilityRole="button" style={({ pressed }) => [tartariaKitStyles.ctl, styles.send, pressed && tartariaKitStyles.controlPressed]} onPress={handleSubmit}>
+{({ pressed }) => (<>
           <Text style={styles.sendText}>Act</Text>
-          <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
-          <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
-          <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
       </View>
     </View>
   );

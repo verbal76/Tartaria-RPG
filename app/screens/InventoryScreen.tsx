@@ -157,13 +157,20 @@ function sortInventoryItems(
  * nothing by a pixel. Semantic colour a call site already carries layers on
  * top and still wins — construction is what the object IS, not what state it
  * is in. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 /* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
  * Each fragment below belongs to ONE physical family, and which one a control
@@ -1816,10 +1823,12 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a throwable below to rack it on your bandolier.
             </Text>
-            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={[kit.ctl, styles.pouchFilterCancel]} accessibilityRole="button">
+            <Pressable onPress={() => setBandolierFilterActive(false)} style={({ pressed }) => [kit.ctl, styles.pouchFilterCancel, pressed && kit.controlPressed]} accessibilityRole="button">
+{({ pressed }) => (<>
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         )}
         {/* OTA-269 — filter active callout. Shows when the player
@@ -1831,10 +1840,12 @@ export function InventoryScreen() {
             <Text style={styles.pouchFilterText}>
               Tap a tool below to stow it on your belt.
             </Text>
-            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={[kit.ctl, styles.pouchFilterCancel]} accessibilityRole="button">
+            <Pressable onPress={() => setPouchFilterActive(false)} style={({ pressed }) => [kit.ctl, styles.pouchFilterCancel, pressed && kit.controlPressed]} accessibilityRole="button">
+{({ pressed }) => (<>
               <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         )}
         {/* OTA-1097 — say the mode out loud. The FUSABLE view now behaves
@@ -1859,10 +1870,12 @@ export function InventoryScreen() {
           <View style={styles.groupBar}>
             <View style={styles.groupBarHead}>
               <Text style={styles.groupBarCount}>☑ {selectedItems.length} picked</Text>
-              <TouchableOpacity onPress={exitInvSelect} style={[kit.ctl, styles.groupBarCancel]} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Cancel the group">
+              <Pressable onPress={exitInvSelect} style={({ pressed }) => [kit.ctl, styles.groupBarCancel, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Cancel the group">
+{({ pressed }) => (<>
                 <Text style={styles.groupBarCancelText}>CANCEL</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
             <View style={styles.groupBarActions}>
               {/* OTA-1114 — gear first, and DESTRUCTIVE LAST. Before this, a
@@ -1962,13 +1975,32 @@ export function InventoryScreen() {
               {/* arb108 — semi-transparent backing so the label reads over any
                   background; tap anywhere on the header (chevron included) to
                   collapse/expand the whole section. */}
-              <TouchableOpacity
-                style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
-                activeOpacity={0.7}
+              {/* ⚠⚠⚠ OTA-1806 — THE CATEGORY HEADER IS A BUTTON, SO IT DEPRESSES.
+                  Owner: *"the collapsable headers in inventory those are
+                  considered buttons and get the look around you depress
+                  function."*
+                  It was a `TouchableOpacity`, which has no `({ pressed })` style
+                  callback and no render-prop children — so like the room doors
+                  before OTA-1805, the depth language was structurally
+                  unreachable here and a 30% fade was the only thing a tap could
+                  produce.
+                  ⚠⚠ AT REST IT IS BYTE-FOR-BYTE WHAT IT WAS, and that is
+                  deliberate. This header is NOT constructed as a key — it is a
+                  translucent plate with a category-coloured left bar and no ring
+                  at all — and the standing rule is *"AT REST: preserve the UI we
+                  have. UNDER MY FINGER: make the buttons feel consistently
+                  alive."* So it gains no resting construction: `controlPressed`
+                  contributes only its travel here (the two border colours it
+                  also sets are inert on a plate with no top or bottom border),
+                  and the planes below are drawn ONLY while pressed. Nothing is
+                  added to the resting list; the header goes IN when struck. */}
+              <Pressable
+                style={({ pressed }) => [styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }, pressed && kit.controlPressed]}
                 onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: !collapsed }}
               >
+                {({ pressed }) => (<>
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
                     {/* ⚠ OTA-1456 — chevron-as-state: ▸ closed, ▾ open. */}
@@ -1990,26 +2022,38 @@ export function InventoryScreen() {
                   const sel = categorySelection(items);
                   if (sel.eligible === 0) return null;
                   return (
-                    <TouchableOpacity
-                      style={[kit.ctl, styles.selectAllBtn, sel.allSelected && styles.selectAllBtnOn]}
-                      activeOpacity={0.7}
+                    <Pressable
+                      style={({ pressed }) => [kit.ctl, styles.selectAllBtn, sel.allSelected && styles.selectAllBtnOn, pressed && kit.controlPressed]}
                       onPress={() => reserveManyForFusion(sel.ids, !sel.allSelected)}
                       accessibilityRole="button"
                       accessibilityLabel={sel.allSelected
                         ? `Clear all ${sel.eligible} reserved ${CATEGORY_LABEL[cat]} items`
                         : `Reserve all ${sel.eligible} ${CATEGORY_LABEL[cat]} items for fusion`}
                     >
+{({ pressed }) => (<>
                       <Text style={[styles.selectAllText, sel.allSelected && styles.selectAllTextOn]}>
                         {sel.allSelected ? `♥ CLEAR ${sel.eligible}` : `♡ ALL ${sel.eligible}`}
                       </Text>
-                      {CTL_PLANES}
-                    </TouchableOpacity>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                   );
                 })()}
                 <Text style={styles.sectionCount}>
                   {items.reduce((sum, i) => sum + i.quantity, 0)}
                 </Text>
-              </TouchableOpacity>
+                {/* ⚠ OTA-1806 — DRAWN ONLY WHILE PRESSED, so the resting header
+                    is untouched. The plate takes the pressed pair the kit
+                    already owns: the shaded sidewall tips ABOVE the face and the
+                    light catches BELOW it, which is what a surface pushed into
+                    its housing looks like. No resting planes, so nothing new
+                    appears in the list until a finger is on it. */}
+                {pressed ? (<>
+                  <View style={kit.controlPlaneTopPressed} pointerEvents="none" />
+                  <View style={kit.controlPlaneBottomPressed} pointerEvents="none" />
+                </>) : null}
+                </>)}
+              </Pressable>
               {/* ⚠⚠ OTA-1683 — THE WEAPONS SECTION READS IN RUNS. Owner: "weapons
                   category in inventory should have subsections for each type of
                   weapon, I don't know what's what, mele, spear, ranged and so
@@ -2330,19 +2374,29 @@ function RackFrame({
 }) {
   return (
     <View style={style}>
-      <TouchableOpacity
+      {/* ⚠⚠ OTA-1806 — THE RACK HEADER FOLDS, SO IT IS A BUTTON TOO, and it
+          takes the same ruling as the category headers above.
+          ⚠ TRAVEL ONLY, AND THAT IS NOT A SHORTCUT. This header is a bare text
+          row — no plate, no fill, no ring, no radius — so there is no surface
+          to lose height from and no border for the light to cross. Drawing the
+          planes here would paint bands across two lines of text and invent a
+          key where the design put a heading. What a bare row CAN express is the
+          settle, and that is exactly what `controlPressed` reduces to here: its
+          two border colours are inert without a border, leaving the 3dp travel.
+          Same authority as every other key, expressed to the extent this
+          surface has one. */}
+      <Pressable
         onPress={onToggle}
-        activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel={`${title}, ${summary}`}
         accessibilityState={{ expanded: open }}
-        style={rackFrameStyles.header}
+        style={({ pressed }) => [rackFrameStyles.header, pressed && kit.controlPressed]}
       >
         <Text style={[titleStyle, rackFrameStyles.headerTitle]}>
           {open ? '▾' : '▸'} {title}
         </Text>
         <Text style={[hintStyle, rackFrameStyles.headerSummary]}>{summary}</Text>
-      </TouchableOpacity>
+      </Pressable>
       {open ? (
         <>
           <Text style={hintStyle}>{hint}</Text>

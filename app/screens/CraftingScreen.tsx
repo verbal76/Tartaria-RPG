@@ -321,13 +321,20 @@ export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }
  * nothing by a pixel. Semantic colour a call site already carries layers on
  * top and still wins — construction is what the object IS, not what state it
  * is in. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
@@ -965,16 +972,17 @@ export function CraftingScreen() {
                 <Text style={styles.groupBarCount}>
                   ☑ {repairPlan.picked.length} to mend
                 </Text>
-                <TouchableOpacity
+                <Pressable
                   onPress={exitRepairSelect}
-                  style={[kit.ctl, styles.groupBarCancel]}
-                  activeOpacity={0.7}
+                  style={({ pressed }) => [kit.ctl, styles.groupBarCancel, pressed && kit.controlPressed]}
                   accessibilityRole="button"
                   accessibilityLabel="Cancel the group and go back to repairing one at a time"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.groupBarCancelText}>CANCEL</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               </View>
               {/* The running bill. This is the number the dimming is derived
                   from, so showing it turns "why is that greyed out?" into
@@ -984,18 +992,19 @@ export function CraftingScreen() {
                   ? 'No materials committed yet.'
                   : `Costs: ${[...repairPlan.spend.entries()].map(([n, q]) => `${q}× ${n}`).join(', ')}`}
               </Text>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => setRepairGroupConfirm(true)}
                 disabled={repairPlan.picked.length === 0}
-                style={[kit.ctl, styles.groupBarGo, repairPlan.picked.length === 0 && styles.groupBarGoOff]}
-                activeOpacity={0.7}
+                style={({ pressed }) => [kit.ctl, styles.groupBarGo, repairPlan.picked.length === 0 && styles.groupBarGoOff, pressed && kit.controlPressed]}
                 accessibilityRole="button"
                 accessibilityState={{ disabled: repairPlan.picked.length === 0 }}
                 accessibilityLabel={`Repair the group of ${repairPlan.picked.length}`}
               >
+{({ pressed }) => (<>
                 <Text style={styles.groupBarGoText}>⚒ REPAIR GROUP ({repairPlan.picked.length})</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           ) : (
             <>

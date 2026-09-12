@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 /* ⚠⚠⚠ BOOT-HANG-1741 — THE SPINNER MUST NOT BE A DEAD END.
@@ -56,13 +56,20 @@ export interface BootTroubleProps {
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function BootTroubleScreen({
   stage, message, stalled, onRetry, onCheckForUpdate, onCopyDiagnostic,
@@ -95,24 +102,24 @@ export function BootTroubleScreen({
           </Text>
         ) : null}
 
-        <TouchableOpacity
-          style={[kit.ctl, styles.primaryBtn]}
+        <Pressable
+          style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
           onPress={() => { setNote(null); onRetry(); }}
           accessibilityRole="button"
-          activeOpacity={0.75}
         >
+{({ pressed }) => (<>
           <Text style={styles.primaryBtnText}>TRY STARTING AGAIN</Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
 
         {/* ⚠ THE REPAIR DOOR. A build that cannot boot cannot reach the update
             check on its own — that check is chained after hydration. */}
-        <TouchableOpacity
-          style={[kit.ctl, styles.secondaryBtn, busy && styles.btnDisabled]}
+        <Pressable
+          style={({ pressed }) => [kit.ctl, styles.secondaryBtn, busy && styles.btnDisabled, pressed && kit.controlPressed]}
           disabled={busy}
           accessibilityRole="button"
           accessibilityState={{ disabled: busy }}
-          activeOpacity={0.75}
           onPress={() => {
             setBusy(true);
             setNote('Checking…');
@@ -128,21 +135,24 @@ export function BootTroubleScreen({
             })();
           }}
         >
+{({ pressed }) => (<>
           <Text style={styles.secondaryBtnText}>CHECK FOR AN UPDATE</Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
 
-        <TouchableOpacity
-          style={[kit.ctl, styles.secondaryBtn]}
+        <Pressable
+          style={({ pressed }) => [kit.ctl, styles.secondaryBtn, pressed && kit.controlPressed]}
           accessibilityRole="button"
-          activeOpacity={0.75}
           onPress={() => { onCopyDiagnostic(); setCopied(true); }}
         >
+{({ pressed }) => (<>
           <Text style={styles.secondaryBtnText}>
             {copied ? '✓ COPIED — PASTE IT TO THE DEV' : 'COPY DIAGNOSTIC'}
           </Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
 
         {note ? <Text style={styles.note}>{note}</Text> : null}
         <Text style={styles.footer}>

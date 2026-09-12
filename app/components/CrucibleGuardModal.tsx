@@ -34,13 +34,20 @@ import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -124,21 +131,27 @@ export function CrucibleGuardModal() {
                 disabled={noneTicked || allTicked}
                 onPress={() => resolve('save', ticked)}
               >
+{({ pressed }) => (<>
                 <Text style={styles.saveSomeText}>
                   SAVE TICKED ({ticked.length}) · SPEND THE REST
                 </Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
 
               <View style={styles.footRow}>
                 <Pressable style={({ pressed }) => [kit.ctl, styles.cancel, pressed && kit.controlPressed]} onPress={close}>
+{({ pressed }) => (<>
                   <Text style={styles.cancelText}>CANCEL</Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
                 <Pressable style={({ pressed }) => [kit.ctl, styles.spend, pressed && kit.controlPressed]} onPress={() => resolve('spend')}>
+{({ pressed }) => (<>
                   <Text style={styles.spendText}>SPEND IT ALL</Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               </View>
             </View>
           </TouchableWithoutFeedback>

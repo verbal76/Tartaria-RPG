@@ -21,7 +21,7 @@
 // host still renders the entries as info-only).
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, TextInput } from 'react-native';
 import { BrandedModal } from './BrandedModal';
 import { WeaponGlyphKey } from './WeaponGlyphKey'; // OTA-1667 - the key moved out of Settings
 import factionsData from '../data/factions/factions.json';
@@ -119,13 +119,20 @@ interface LoreConcept { id: string; title: string; answer: string }
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const TAB_PLANES = (
   <>
     <View style={kit.tabPlaneTop} pointerEvents="none" />
@@ -395,10 +402,10 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
           a tab that exists must be visible. */}
       <View style={styles.tabs}>
         {TAB_ORDER.map((s) => (
-          <TouchableOpacity
+          <Pressable
             key={s}
             onPress={() => setSection(s)}
-            style={[kit.ctl, styles.tab, section === s && styles.tabActive]}
+            style={({ pressed }) => [kit.ctl, styles.tab, section === s && styles.tabActive, pressed && kit.controlPressed]}
             accessibilityRole="button"
             accessibilityState={{ selected: section === s }}
           >
@@ -406,7 +413,7 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
               {TAB_LABEL[s]}
             </Text>
             {TAB_PLANES}
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -676,24 +683,28 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
             </View>
           ))}
           <View style={styles.exchangeRow}>
-            <TouchableOpacity
-              style={[kit.ctl, styles.exchangeBtn]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.exchangeBtn, pressed && kit.controlPressed]}
               onPress={() => { void sendRequest(); }}
               accessibilityRole="button"
               disabled={busy}
             >
+{({ pressed }) => (<>
               <Text style={styles.exchangeBtnText}>SEND REQUEST</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[kit.ctl, styles.exchangeBtn]}
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.exchangeBtn, pressed && kit.controlPressed]}
               onPress={() => { void acceptRequest(); }}
               accessibilityRole="button"
               disabled={busy}
             >
+{({ pressed }) => (<>
               <Text style={styles.exchangeBtnText}>ACCEPT REQUEST</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
           <TextInput
             style={styles.houseInput}
@@ -705,24 +716,28 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
             accessibilityLabel="Their house card"
           />
           <View style={styles.exchangeRow}>
-            <TouchableOpacity
-              style={[kit.ctl, styles.exchangeBtn]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.exchangeBtn, pressed && kit.controlPressed]}
               onPress={() => { void shareMyDead(); }}
               accessibilityRole="button"
               disabled={busy}
             >
+{({ pressed }) => (<>
               <Text style={styles.exchangeBtnText}>SEND MY DEAD</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[kit.ctl, styles.exchangeBtn]}
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.exchangeBtn, pressed && kit.controlPressed]}
               onPress={() => { void importTheirDead(); }}
               accessibilityRole="button"
               disabled={busy}
             >
+{({ pressed }) => (<>
               <Text style={styles.exchangeBtnText}>TAKE IN THEIRS</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
           <TextInput
             style={styles.payloadBox}
@@ -782,24 +797,26 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
               controls until you arrive or STOP.
             </Text>
             <View style={styles.modalRow}>
-              <TouchableOpacity
-                style={[kit.ctl, styles.modalBtn, styles.modalBtnGhost]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.modalBtn, styles.modalBtnGhost, pressed && kit.controlPressed]}
                 onPress={() => setPendingRoute(null)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
               >
+{({ pressed }) => (<>
                 <Text style={styles.modalBtnGhostText}>CANCEL</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[kit.ctl, styles.modalBtn, styles.modalBtnGo]}
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.modalBtn, styles.modalBtnGo, pressed && kit.controlPressed]}
                 onPress={confirmRoute}
-                activeOpacity={0.7}
                 accessibilityRole="button"
               >
+{({ pressed }) => (<>
                 <Text style={styles.modalBtnGoText}>SET COURSE</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
           </View>
         </View>

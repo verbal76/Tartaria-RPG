@@ -90,13 +90,20 @@ const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 
  * nothing by a pixel. Semantic colour a call site already carries layers on
  * top and still wins — construction is what the object IS, not what state it
  * is in. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function VendorScreen() {
   const player = useGameStore((s) => s.player);
@@ -738,16 +745,17 @@ export function VendorScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </Pressable>
         <Text style={styles.title} accessibilityRole="header">SHOP</Text>
-        <TouchableOpacity
+        <Pressable
           onPress={openDismiss}
-          style={[kit.ctl, styles.dismissBtn]}
+          style={({ pressed }) => [kit.ctl, styles.dismissBtn, pressed && kit.controlPressed]}
           hitSlop={8}
-          activeOpacity={0.7}
           accessibilityRole="button"
         >
+{({ pressed }) => (<>
           <Text style={styles.dismissText}>DISMISS</Text>
-          {CTL_PLANES}
-        </TouchableOpacity>
+          {ctlPlanes(pressed)}
+        </>)}
+</Pressable>
       </View>
 
       <View style={styles.vendorCard}>
@@ -858,28 +866,30 @@ export function VendorScreen() {
             <Text style={styles.groupBarTotal}>+{selectedTotal} TC</Text>
           </View>
           <View style={styles.groupBarActions}>
-            <TouchableOpacity
+            <Pressable
               onPress={exitSellSelect}
-              style={[kit.ctl, styles.groupBarCancel]}
-              activeOpacity={0.7}
+              style={({ pressed }) => [kit.ctl, styles.groupBarCancel, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel="Cancel the group and go back to selling one at a time"
             >
+{({ pressed }) => (<>
               <Text style={styles.groupBarCancelText}>CANCEL</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
-            <TouchableOpacity
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
+            <Pressable
               onPress={() => setGroupSellConfirm(true)}
               disabled={selectedRows.length === 0}
-              style={[kit.ctl, styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff]}
-              activeOpacity={0.7}
+              style={({ pressed }) => [kit.ctl, styles.groupBarSell, selectedRows.length === 0 && styles.groupBarSellOff, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityState={{ disabled: selectedRows.length === 0 }}
               accessibilityLabel={`Sell the group of ${selectedRows.length} for ${selectedTotal} trade coin`}
             >
+{({ pressed }) => (<>
               <Text style={styles.groupBarSellText}>SELL GROUP</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         </View>
       ) : (
@@ -1250,19 +1260,20 @@ export function VendorScreen() {
               <View style={styles.sortRow}>
                 <Text style={styles.sortLabel}>Sort:</Text>
                 {(['value', 'rarity', 'name'] as const).map((s) => (
-                  <TouchableOpacity
+                  <Pressable
                     key={s}
                     onPress={() => setSellSort(s)}
-                    style={[kit.ctl, styles.sortTab, sellSort === s && styles.sortTabActive]}
-                    activeOpacity={0.7}
+                    style={({ pressed }) => [kit.ctl, styles.sortTab, sellSort === s && styles.sortTabActive, pressed && kit.controlPressed]}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sellSort === s }}
                   >
+{({ pressed }) => (<>
                     <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
                       {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
                     </Text>
-                    {CTL_PLANES}
-                  </TouchableOpacity>
+                    {ctlPlanes(pressed)}
+                  </>)}
+</Pressable>
                 ))}
               </View>
             )}

@@ -24,13 +24,20 @@ import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 /* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
  * its handler, role, label and geometry; only the material changed, and the
  * press now collapses the sidewall instead of only shifting a colour. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 import { useFirstTimeHint, setHintsDisabled } from './useFirstTimeHint';
 
 interface Props {
@@ -71,10 +78,12 @@ export function FirstTimeHint({ id, title, body }: Props) {
             <Text style={styles.linkText}>Turn off tips</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
-          <TouchableOpacity accessibilityRole="button" onPress={dismiss} style={[kit.ctl, styles.btn]} activeOpacity={0.7}>
+          <Pressable accessibilityRole="button" onPress={dismiss} style={({ pressed }) => [kit.ctl, styles.btn, pressed && kit.controlPressed]}>
+{({ pressed }) => (<>
             <Text style={styles.btnText}>Got it</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
       </View>
     </Pressable>

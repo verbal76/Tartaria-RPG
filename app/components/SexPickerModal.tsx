@@ -38,13 +38,20 @@ import { T, tartariaKitStyles as kit } from '../ui/tartariaKit';
  * ⚠ BEHAVIOUR IS UNTOUCHED: the same handlers, the same `disabled` on an
  * unmade choice, the same roles, labels and `accessibilityState`, the same
  * postpone-on-back. Only the material changed. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function SexPickerModal() {
   const player = useGameStore((s) => s.player);
@@ -78,14 +85,16 @@ export function SexPickerModal() {
                   accessibilityState={{ selected: isSel }}
                   accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
                 >
+{({ pressed }) => (<>
                   <Text style={[styles.signGlyph, isSel && styles.signGlyphSel]}>
                     {sx === 'male' ? '♂' : '♀'}
                   </Text>
                   <Text style={[styles.signWord, isSel && styles.signWordSel]}>
                     {sx === 'male' ? 'MALE' : 'FEMALE'}
                   </Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               );
             })}
           </View>
@@ -97,9 +106,11 @@ export function SexPickerModal() {
             accessibilityState={{ disabled: !selected }}
             accessibilityLabel="Confirm"
           >
+{({ pressed }) => (<>
             <Text style={styles.confirmText}>SO MARK THE RECORD</Text>
-            {CTL_PLANES}
-          </Pressable>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
           <Text style={styles.hint}>Asked once, kept forever. It changes how strangers address you — nothing else.</Text>
         </View>
       </View>

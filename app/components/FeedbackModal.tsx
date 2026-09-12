@@ -61,13 +61,20 @@ interface Props {
  * key sat beside a flat outline IN THE SAME ROW. Every key-level instrument
  * scored `btn` as migrated, because one of its two call sites had adopted the
  * kit. Construction is what the object IS; "secondary" is what it is FOR. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   const [text, setText] = useState('');
@@ -231,9 +238,11 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
             onPress={handleCancel}
             accessibilityRole="button"
           >
+{({ pressed }) => (<>
             <Text style={styles.btnTextNeutral}>CANCEL</Text>
-            {CTL_PLANES}
-          </Pressable>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
           <Pressable
             style={({ pressed }) => [
               styles.btn,

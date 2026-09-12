@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { tControlDepth, tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
@@ -61,13 +61,20 @@ const STEP_TITLE: Record<Step, string> = {
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function CharacterCreationScreen() {
   const startNewGame = useGameStore((s) => s.startNewGame);
@@ -200,21 +207,22 @@ export function CharacterCreationScreen() {
         {step === 'sex' && (
           <>
             {(['male', 'female'] as const).map((sx) => (
-              <TouchableOpacity
+              <Pressable
                 key={sx}
-                style={[kit.ctl, styles.sexCard, sex === sx && styles.optionSelected]}
+                style={({ pressed }) => [kit.ctl, styles.sexCard, sex === sx && styles.optionSelected, pressed && kit.controlPressed]}
                 onPress={() => setSex(sx)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: sex === sx }}
                 accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
               >
+{({ pressed }) => (<>
                 <Text style={[styles.sexCardGlyph, sex === sx && styles.sexGlyphSelected]}>
                   {sx === 'male' ? '\u2642' : '\u2640'}
                 </Text>
                 <Text style={styles.optionName}>{sx === 'male' ? 'MALE' : 'FEMALE'}</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             ))}
             <View style={styles.beginBlock}>
               <Text style={styles.beginHint}>
@@ -229,14 +237,14 @@ export function CharacterCreationScreen() {
             .filter(([, v]) => (v ?? 0) !== 0)
             .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${k.slice(0, 3).toUpperCase()}`);
           return (
-            <TouchableOpacity
+            <Pressable
               key={r.id}
-              style={[kit.ctl, styles.option, raceId === r.id && styles.optionSelected]}
+              style={({ pressed }) => [kit.ctl, styles.option, raceId === r.id && styles.optionSelected, pressed && kit.controlPressed]}
               onPress={() => setRaceId(r.id)}
-              activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityState={{ selected: raceId === r.id }}
             >
+{({ pressed }) => (<>
               <Text style={styles.optionName}>{r.name}</Text>
               <Text style={styles.optionDesc}>{r.description}</Text>
               <Text style={styles.optionMeta}>
@@ -263,8 +271,9 @@ export function CharacterCreationScreen() {
               {raceId === r.id && r.flavor && (
                 <Text style={styles.optionFlavor}>{r.flavor}</Text>
               )}
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           );
         })}
 
@@ -287,22 +296,23 @@ export function CharacterCreationScreen() {
           <>
             <Text style={styles.contextLine}>Race: {selectedRace.name}</Text>
             {factions.map((f) => (
-              <TouchableOpacity
+              <Pressable
                 key={f.id}
-                style={[kit.ctl, styles.option, factionId === f.id && styles.optionSelected]}
+                style={({ pressed }) => [kit.ctl, styles.option, factionId === f.id && styles.optionSelected, pressed && kit.controlPressed]}
                 onPress={() => setFactionId(f.id)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: factionId === f.id }}
               >
+{({ pressed }) => (<>
                 <Text style={styles.optionName}>{f.name}</Text>
                 <Text style={styles.optionDesc}>{f.subtitle}</Text>
                 <Text style={styles.optionMeta}>{f.goal}</Text>
                 {factionId === f.id && f.flavor && (
                   <Text style={styles.optionFlavor}>{f.flavor}</Text>
                 )}
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             ))}
             {/* ⚠ OTA-1431 — rendered INSIDE the faction step, so leaving the
                 step unmounts it and its pending timer with it. Mounted at the
@@ -340,21 +350,22 @@ export function CharacterCreationScreen() {
               {selectedRace.name} · {selectedFaction.name}
             </Text>
             {motives.map((m) => (
-              <TouchableOpacity
+              <Pressable
                 key={m.id}
-                style={[kit.ctl, styles.option, motiveId === m.id && styles.optionSelected]}
+                style={({ pressed }) => [kit.ctl, styles.option, motiveId === m.id && styles.optionSelected, pressed && kit.controlPressed]}
                 onPress={() => setMotiveId(m.id)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: motiveId === m.id }}
               >
+{({ pressed }) => (<>
                 <Text style={styles.optionName}>{m.title}</Text>
                 <Text style={styles.optionDesc}>{m.blurb}</Text>
                 {motiveId === m.id && (
                   <Text style={styles.optionFlavor}>{m.pages[0]?.split('\n')[0] ?? ''}</Text>
                 )}
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             ))}
           </>
         )}
@@ -370,41 +381,43 @@ export function CharacterCreationScreen() {
             {PRESET_TIERS.map((id) => {
               const prof = PRESSURE_PROFILES[id];
               return (
-                <TouchableOpacity
+                <Pressable
                   key={id}
-                  style={[kit.ctl, styles.option, pressure === id && styles.optionSelected]}
+                  style={({ pressed }) => [kit.ctl, styles.option, pressure === id && styles.optionSelected, pressed && kit.controlPressed]}
                   onPress={() => setPressure(id)}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityState={{ selected: pressure === id }}
                   accessibilityLabel={`${prof.label} ${prof.subtitle}`}
                 >
+{({ pressed }) => (<>
                   <Text style={styles.optionName}>{prof.label}</Text>
                   <Text style={styles.optionDesc}>{prof.subtitle}</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               );
             })}
             {/* OTA-1113 — CUSTOM sits BELOW the four presets on purpose. The
                 survey is explicit that sliders give the best experience and the
                 worst discoverability, so the presets stay the front door and
                 this is the advanced option behind it. */}
-            <TouchableOpacity
-              style={[kit.ctl, styles.option, pressure === 'custom' && styles.optionSelected]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.option, pressure === 'custom' && styles.optionSelected, pressed && kit.controlPressed]}
               onPress={() => setCustomOpen(true)}
-              activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityState={{ selected: pressure === 'custom' }}
               accessibilityLabel="Custom difficulty. Choose which systems the difficulty affects."
             >
+{({ pressed }) => (<>
               <Text style={styles.optionName}>&quot;Let me choose what it takes.&quot;</Text>
               <Text style={styles.optionDesc}>
                 {pressure === 'custom' && pressureCustom
                   ? `${pressureCustom.systems.length} of ${DIFFICULTY_SYSTEMS.length} systems · tap to change`
                   : 'Pick how hard, then pick exactly which systems it is allowed to touch.'}
               </Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             <DifficultyCustomModal
               visible={customOpen}
               initial={pressureCustom}

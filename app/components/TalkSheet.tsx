@@ -44,7 +44,7 @@
 // No spinner, no async, no model. See engine/dialogue.ts.
 
 import React, { useMemo, useRef, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { lockedTeaserLabel } from '../engine/dialogue';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
@@ -61,13 +61,20 @@ import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -184,16 +191,17 @@ export function TalkSheet() {
                 <Text style={styles.kicker}>CONVERSATION</Text>
                 <Text style={styles.npcName} numberOfLines={1}>{ctx.npcName}</Text>
               </View>
-              <TouchableOpacity
-                style={[kit.ctl, styles.collapseBtn]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.collapseBtn, pressed && kit.controlPressed]}
                 onPress={() => setCollapsed(true)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Collapse the conversation — it stays open"
               >
+{({ pressed }) => (<>
                 <Text style={styles.collapseText}>▾</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
 
             {/* THE EXCHANGE — the reason this view exists. */}
@@ -246,19 +254,20 @@ export function TalkSheet() {
               {ordered.map((t) => {
                 const asked = spent(t.id, t.lines.length);
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={t.id}
-                    style={[kit.ctl, styles.topicBtn, asked && styles.topicBtnSpent]}
+                    style={({ pressed }) => [kit.ctl, styles.topicBtn, asked && styles.topicBtnSpent, pressed && kit.controlPressed]}
                     onPress={() => raise(t.id)}
-                    activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={asked ? `${t.label}, already asked` : t.label}
                   >
+{({ pressed }) => (<>
                     <Text style={[styles.topicText, asked && styles.topicTextSpent]}>
                       {asked ? `${t.label}  (asked)` : t.label}
                     </Text>
-                    {CTL_PLANES}
-                  </TouchableOpacity>
+                    {ctlPlanes(pressed)}
+                  </>)}
+</Pressable>
                 );
               })}
 
@@ -268,18 +277,19 @@ export function TalkSheet() {
                   Tapping it gets an in-voice deflection — the person telling you,
                   in character, that the rest is earned. */}
               {ctx.lockedCount > 0 && (
-                <TouchableOpacity
-                  style={[kit.ctl, styles.teaserBtn]}
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.teaserBtn, pressed && kit.controlPressed]}
                   onPress={tapTeaser}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel={`${ctx.lockedCount} locked topic${ctx.lockedCount > 1 ? 's' : ''} — ask about them`}
                 >
+{({ pressed }) => (<>
                   <Text style={styles.teaserText}>
                     {lockedTeaserLabel(ctx.npcName, ctx.regard, ctx.lockedCount)}
                   </Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               )}
             </ScrollView>
 

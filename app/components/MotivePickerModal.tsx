@@ -13,13 +13,20 @@ import { T, tartariaKitStyles as kit } from '../ui/tartariaKit';
  * or cold-grey outline with no face, side or contact). The control is now the
  * one Tartaria physical control; its handler, role, label and geometry are
  * unchanged. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 import { useGameStore } from '../state/gameStore';
 import { getStoryMotives } from '../engine/story';
 
@@ -55,19 +62,23 @@ export function MotivePickerModal() {
                 accessibilityRole="button"
                 accessibilityLabel={`${m.title}. ${m.blurb}`}
               >
+{({ pressed }) => (<>
                 <View style={styles.cardHead}>
                   <Text style={[styles.cardTitle, isSel && styles.cardTitleSel]}>{m.title.toUpperCase()}</Text>
                   {m.id === dealt && <Text style={styles.guessTag}>THE MUD'S GUESS</Text>}
                 </View>
                 <Text style={styles.cardBlurb}>{m.blurb}</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             );
           })}
           <Pressable onPress={commit} style={({ pressed }) => [kit.ctl, styles.confirmBtn, kit.ctlOn, pressed && kit.controlPressed]} accessibilityRole="button" accessibilityLabel="Confirm motive">
+{({ pressed }) => (<>
             <Text style={styles.confirmText}>THIS IS WHY I CAME DOWN</Text>
-            {CTL_PLANES}
-          </Pressable>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
           <Text style={styles.hint}>You can read your opening any time: tap your portrait → REPLAY OPENING.</Text>
         </ScrollView>
       </View>

@@ -40,7 +40,7 @@
 // sheet by construction.
 
 import React, { useMemo, useRef, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findChain, pronounForms, whisperRouteTarget } from '../engine/whispers';
 import { playerGridCell } from '../state/playerGrid';
@@ -57,13 +57,20 @@ import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -145,16 +152,17 @@ export function WhisperTalkSheet() {
                 </Text>
               ))}
             </ScrollView>
-            <TouchableOpacity
-              style={[kit.ctl, styles.primaryBtn]}
+            <Pressable
+              style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
               onPress={() => { setFarewell(null); setOpen(false); }}
-              activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Close"
             >
+{({ pressed }) => (<>
               <Text style={styles.primaryText}>CLOSE</Text>
-              {CTL_PLANES}
-            </TouchableOpacity>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
           </View>
         </View>
       </Modal>
@@ -243,16 +251,17 @@ export function WhisperTalkSheet() {
                 <Text style={styles.kicker}>{c.kicker}</Text>
                 <Text style={styles.npcName}>{c.npcName}</Text>
               </View>
-              <TouchableOpacity
-                style={[kit.ctl, styles.closeBtn]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.closeBtn, pressed && kit.controlPressed]}
                 onPress={() => setOpen(false)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Step back — the conversation keeps"
               >
+{({ pressed }) => (<>
                 <Text style={styles.closeText}>▾</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
 
             <ScrollView
@@ -281,16 +290,17 @@ export function WhisperTalkSheet() {
                 moment you ACCEPT it re-aims at the mark without the sheet
                 closing. Filled, like the SPEAK chip: a thing you can use now. */}
             {route && !here && (
-              <TouchableOpacity
-                style={[kit.ctl, styles.routeBtn]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.routeBtn, pressed && kit.controlPressed]}
                 onPress={takeCourse}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Set course to ${route.label}`}
               >
+{({ pressed }) => (<>
                 <Text style={styles.routeBtnText}>▸ SET COURSE TO {route.label.toUpperCase()}</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             )}
 
             {handing ? (
@@ -300,16 +310,17 @@ export function WhisperTalkSheet() {
                     chat window from him."* Handing it over is a deliberate act
                     with a button, not something arrival does to you, and the
                     reply lands in this transcript rather than the world feed. */}
-                <TouchableOpacity
-                  style={[kit.ctl, styles.primaryBtn]}
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
                   onPress={giveItBack}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel={`Hand over ${c.goodsLong}`}
                 >
+{({ pressed }) => (<>
                   <Text style={styles.primaryText}>HAND OVER {c.goodsShort.toUpperCase()}</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
                 <TouchableOpacity
                   style={styles.stepBackBtn}
                   onPress={() => setOpen(false)}
@@ -322,38 +333,41 @@ export function WhisperTalkSheet() {
               </>
             ) : deciding ? (
               <>
-                <TouchableOpacity
-                  style={[kit.ctl, styles.primaryBtn]}
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
                   onPress={() => choose('accept')}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel="Take the fetch job"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.primaryText}>{c.acceptBtnLabel}</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
                 {c.buy && c.buyBtnLabel && (
-                  <TouchableOpacity
-                    style={[kit.ctl, styles.secondaryBtn]}
+                  <Pressable
+                    style={({ pressed }) => [kit.ctl, styles.secondaryBtn, pressed && kit.controlPressed]}
                     onPress={() => choose('buy')}
-                    activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={`Buy for ${c.buy.costTc} TC`}
                   >
+{({ pressed }) => (<>
                     <Text style={styles.secondaryText}>{c.buyBtnLabel}</Text>
-                    {CTL_PLANES}
-                  </TouchableOpacity>
+                    {ctlPlanes(pressed)}
+                  </>)}
+</Pressable>
                 )}
-                <TouchableOpacity
-                  style={[kit.ctl, styles.secondaryBtn]}
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.secondaryBtn, pressed && kit.controlPressed]}
                   onPress={() => choose('leave')}
-                  activeOpacity={0.7}
                   accessibilityRole="button"
                   accessibilityLabel="Walk away from her fire"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.secondaryText}>WALK AWAY</Text>
-                  {CTL_PLANES}
-                </TouchableOpacity>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
                 <TouchableOpacity
                   style={styles.stepBackBtn}
                   onPress={() => setOpen(false)}
@@ -365,16 +379,17 @@ export function WhisperTalkSheet() {
                 </TouchableOpacity>
               </>
             ) : (
-              <TouchableOpacity
-                style={[kit.ctl, styles.primaryBtn]}
+              <Pressable
+                style={({ pressed }) => [kit.ctl, styles.primaryBtn, pressed && kit.controlPressed]}
                 onPress={() => setOpen(false)}
-                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Close"
               >
+{({ pressed }) => (<>
                 <Text style={styles.primaryText}>CLOSE</Text>
-                {CTL_PLANES}
-              </TouchableOpacity>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             )}
           </View>
         </View>

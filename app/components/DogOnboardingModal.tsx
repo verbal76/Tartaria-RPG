@@ -35,13 +35,20 @@ import { T, tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
  * are Tartaria controls now. Handlers, the disabled rule until a sex is picked,
  * hitSlop, roles and labels are untouched — `turnOffBtn` stays a plain text
  * affordance, because that is what it is. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -172,9 +179,11 @@ export function DogOnboardingModal() {
                 accessibilityRole="button"
                 accessibilityLabel="Roll a name"
               >
+{({ pressed }) => (<>
                 <Text style={styles.rollText}>⚄ ROLL</Text>
-                {CTL_PLANES}
-              </Pressable>
+                {ctlPlanes(pressed)}
+              </>)}
+</Pressable>
             </View>
 
             <Text style={styles.fieldLabel}>BOY OR GIRL?</Text>
@@ -187,9 +196,11 @@ export function DogOnboardingModal() {
                   accessibilityRole="button"
                   accessibilityLabel={s === 'boy' ? 'Boy' : 'Girl'}
                 >
+{({ pressed }) => (<>
                   <Text style={[styles.pillText, sex === s && styles.pillTextSel]}>{s.toUpperCase()}</Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               ))}
             </View>
 
@@ -200,9 +211,11 @@ export function DogOnboardingModal() {
               accessibilityRole="button"
               accessibilityLabel="Take them with you"
             >
+{({ pressed }) => (<>
               <Text style={[styles.confirmText, !sex && styles.confirmTextDisabled]}>TAKE THEM WITH YOU</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             <Text style={styles.hint}>
               A blank breed or name is fine — the mud fills in. Boy or girl needs an answer.
             </Text>

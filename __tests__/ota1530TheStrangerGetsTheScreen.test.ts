@@ -57,7 +57,15 @@ const codeOnly = (s: string) =>
 
 describe('OTA-1530 — the icon has no face', () => {
   it('⚠⚠ the wanderer chip is marked ❖, and ☺ is gone from the app', () => {
-    expect(codeOnly(EXPLORE)).toContain('❖ {currentScene.wanderer.name}');
+    /* ⚠ OTA-1806 RE-ANCHORED TO THE EXACT NEW SPELLING, NOT BROADENED.
+     * The control's children became a render-prop callback so the planes can
+     * follow `pressed`; a callback loses TypeScript's narrowing from the
+     * enclosing guard, so the read carries a non-null assertion. PROVEN
+     * equivalent: `!` is erased by the compiler — `scene.vendor!.name` and
+     * `scene.vendor.name` emit byte-identical JavaScript, so the runtime
+     * invariant this pin protects is unchanged. The pin is pinned to ONE
+     * spelling, so a regression to the old form would still fail. */
+    expect(codeOnly(EXPLORE)).toContain('❖ {currentScene.wanderer!.name}');
     expect(codeOnly(EXPLORE)).not.toContain('☺');
   });
 

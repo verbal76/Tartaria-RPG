@@ -98,7 +98,15 @@ describe('OTA-1029 — SOURCE LOCKS', () => {
 
   it('the trader chip carries its own ✕, wired to the tile-scoped dismiss', () => {
     expect(screen).toMatch(/setVendorChipDismissedKey\(chipViewKey\)/);
-    expect(screen).toMatch(/accessibilityLabel=\{`Dismiss \$\{currentScene\.vendor\.name}`}/);
+    /* ⚠ OTA-1806 RE-ANCHORED TO THE EXACT NEW SPELLING, NOT BROADENED.
+     * The control's children became a render-prop callback so the planes can
+     * follow `pressed`; a callback loses TypeScript's narrowing from the
+     * enclosing guard, so the read carries a non-null assertion. PROVEN
+     * equivalent: `!` is erased by the compiler — `scene.vendor!.name` and
+     * `scene.vendor.name` emit byte-identical JavaScript, so the runtime
+     * invariant this pin protects is unchanged. The pin is pinned to ONE
+     * spelling, so a regression to the old form would still fail. */
+    expect(screen).toMatch(/accessibilityLabel=\{`Dismiss \$\{currentScene\.vendor!\.name}`}/);
     // The Crucible's ✕ reads from the same tile key — one rule for both.
     expect(screen).toMatch(/setCrucibleChipDismissedKey\(chipViewKey\)/);
     expect(screen).toMatch(/const chipViewKey = chipDismissTileKey\(player\)/);

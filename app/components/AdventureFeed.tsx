@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
 /* ⚠⚠⚠ VIS-2 — THE STRUCTURED COMBAT RESULT COMES FIRST. An entry whose meta
  * carries a `cmb` event (engine/combatEvent) is drawn as a compact instrument
  * row instead of a paragraph of prose; everything else in the feed renders
@@ -278,13 +278,20 @@ const FeedRow = React.memo(function FeedRow({ entry, names, event }: { entry: Ga
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
@@ -369,17 +376,18 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
           own chip", that IS the bug. It belongs outside. */}
       {actionChipLabel ? (
         <View style={styles.chipRow}>
-          <TouchableOpacity
-            style={[kit.ctl, styles.chip]}
-            activeOpacity={0.7}
+          <Pressable
+            style={({ pressed }) => [kit.ctl, styles.chip, pressed && kit.controlPressed]}
             onPress={onActionChipPress}
             accessibilityRole="button"
             accessibilityLabel={actionChipA11yLabel}
             testID="feed-action-chip"
           >
+{({ pressed }) => (<>
             <Text style={styles.chipText}>{actionChipLabel}</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
       ) : null}
       {/* ⚠ OTA-1498 — the quieter second door: same item, straight to the pack,
@@ -387,17 +395,18 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
           reads as one choice — swap in, or just carry it. */}
       {actionChipLabel && packChipLabel ? (
         <View style={styles.chipRow}>
-          <TouchableOpacity
-            style={[kit.ctl, styles.packChip]}
-            activeOpacity={0.7}
+          <Pressable
+            style={({ pressed }) => [kit.ctl, styles.packChip, pressed && kit.controlPressed]}
             onPress={onPackChipPress}
             accessibilityRole="button"
             accessibilityLabel={packChipA11yLabel}
             testID="feed-pack-chip"
           >
+{({ pressed }) => (<>
             <Text style={styles.packChipText}>{packChipLabel}</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
       ) : null}
     </ScrollView>

@@ -58,13 +58,20 @@ export const WANDERER_CARD_DWELL_MS = 1200;
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 export function WandererEncounterModal() {
   const wanderer = useGameStore((s) => s.currentScene?.wanderer);
@@ -148,18 +155,22 @@ export function WandererEncounterModal() {
               accessibilityRole="button"
               accessibilityLabel={`Speak with ${wanderer.name}`}
             >
+{({ pressed }) => (<>
               <Text style={styles.primaryText}>SPEAK WITH THEM</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             <Pressable
               onPress={dismiss}
               style={({ pressed }) => [kit.ctl, styles.secondaryBtn, pressed && kit.controlPressed]}
               accessibilityRole="button"
               accessibilityLabel="Walk on without speaking"
             >
+{({ pressed }) => (<>
               <Text style={styles.secondaryText}>WALK ON</Text>
-              {CTL_PLANES}
-            </Pressable>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
             {/* ⚠ The same escape hatch every other card offers (OTA-1524), in the
                 same words and writing the same global flag. It silences the
                 explanation above, not the encounter — a switch that turned off

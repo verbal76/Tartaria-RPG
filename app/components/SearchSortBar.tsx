@@ -11,7 +11,7 @@
 // Tapping the active sort toggles its direction (asc ↔ desc).
 
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 export type SortDirection = 'asc' | 'desc';
@@ -115,19 +115,18 @@ export function SearchSortBar({
             const active = opt.key === sortKey;
             const arrow = active ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
             return (
-              <TouchableOpacity
+              <Pressable
                 key={opt.key}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 onPress={() => handleSortTap(opt.key)}
-                style={[kit.ctl, styles.sortBtn, active && styles.sortBtnActive]}
-                activeOpacity={0.7}
+                style={({ pressed }) => [kit.ctl, styles.sortBtn, active && styles.sortBtnActive, pressed && kit.controlPressed]}
               >
                 <Text style={[styles.sortBtnText, active && styles.sortBtnTextActive]}>
                   {opt.label}{arrow}
                 </Text>
                 {TAB_PLANES}
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>

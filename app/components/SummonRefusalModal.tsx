@@ -13,19 +13,26 @@
 // about why (the two-derivations defect this project keeps retiring). The
 // modal owns the FRAME — heading, tone, the one button — and nothing else.
 import React from 'react';
-import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
  * its handler, role, label and geometry; only the material changed, and the
  * press now collapses the sidewall instead of only shifting a colour. */
-const CTL_PLANES = (
+/** ⚠⚠⚠ OTA-1806 — THE PLANES ARE A FUNCTION OF THE FINGER NOW.
+ *  Pressed, the sidewall collapses and crosses to the TOP, the light catches
+ *  BELOW the face, and the contact band is not drawn — a key pushed home is not
+ *  standing on anything. Frozen at their resting heights, as these were, a key
+ *  could travel 3dp and never lose height, which is most of a depression. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 
 interface Props {
   /** The engine's refusal narration, or null when nothing is owed. */
@@ -45,16 +52,17 @@ export function SummonRefusalModal({ message, onDismiss }: Props) {
           <Text style={styles.aside}>
             Finish the fight in front of you before you call down more punishment. The seat keeps.
           </Text>
-          <TouchableOpacity
-            style={[styles.btn, tFilledGold(false)]}
+          <Pressable
+            style={({ pressed }) => [styles.btn, tFilledGold(false), pressed && kit.controlPressed]}
             onPress={onDismiss}
-            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="Back to the fight"
           >
+{({ pressed }) => (<>
             <Text style={styles.btnText}>BACK TO THE FIGHT</Text>
-            {CTL_PLANES}
-          </TouchableOpacity>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
       </Pressable>
     </Modal>
