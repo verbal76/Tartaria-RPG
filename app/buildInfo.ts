@@ -30102,7 +30102,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //                 fresh verification. A's result is NOT transferable to C, and
 //                 the owner ruled explicitly that it must never be restated
 //                 against a base it did not run on.
-export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';
+// OTA-1805 - the room door presses. Owner, on the device, after 1804 landed:
+// "Also look at the room navigation buttons inside all the structures - those
+// need to act like the 'look around you' button."
+//
+// ⚠⚠⚠ AND HE WAS POINTING AT A CLASS, NOT A BUTTON. 1804 unified whether a
+// control RESOLVES THROUGH a physical authority. It could not see two further
+// ways a key stays dead under a finger, and the room doors had both:
+//   1. THE PRIMITIVE CANNOT REPORT THE PRESS. `TravelBtn` was a
+//      `TouchableOpacity`, which has no `({ pressed }) => ...` style callback
+//      and no render-prop children. The depth language was not merely unused
+//      there - it was STRUCTURALLY UNREACHABLE. Its only feedback is
+//      `activeOpacity`, a fade of the whole chip.
+//   2. THE PLANES WERE FROZEN. Phase 3 gave the row the full three-plane
+//      construction but drew all three at their RESTING heights, so the face
+//      could travel 3dp down while the 4dp sidewall stayed 4dp tall. The key
+//      moved and never lost height - and losing height is most of what a
+//      depression looks like.
+// `QuickBtn` (LOOK AROUND) sits ~280 lines away in the same file, went through
+// the same pass, and had all of it. That A/B pair is the whole diagnosis.
+//
+// ⚠ ONE COMPONENT, ONE FILE, NINETEEN CALL SITES: every room tab in every
+// interior, the four cardinals, ENTER, STOP TRAVEL and both EXITs. The
+// behaviour is untouched - logUiTap still first, a blocked tap still buzzes and
+// returns, a spent tap still speaks and costs no game clock - and a dead door
+// keeps its construction and is carried by the dim, per the owner's standing
+// ruling that a disabled control "remains physically constructed as a button."
+//
+// ⚠⚠ THE CLASS IS NOT CLOSED AND THIS STAMP DOES NOT CLAIM IT IS. Fifty-two
+// plane sites elsewhere are still frozen, and other physical keys are still
+// built on `TouchableOpacity`. ota1805TheRoomDoorsPress holds a shrink-only
+// ceiling on that remainder so the gap stays visible while it awaits a scope
+// ruling. It also REPLACES buttonsPressLikeOneSystem, which was green and
+// asked the wrong question.
+export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';
 // OTA-1800 - green means usable now, not merely in range. Owner ruling from
 // physical Android screenshots: "The large equipped weapon control in Combat
 // looks substantially better with the DARK / BLACK fill than with the bright

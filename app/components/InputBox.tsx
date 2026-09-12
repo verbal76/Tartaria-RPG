@@ -2010,16 +2010,44 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
     onPress();
   };
   return (
-    <TouchableOpacity
+    /* ⚠⚠⚠ OTA-1805 — THE ROOM DOOR NOW DEPRESSES, BECAUSE A DOOR YOU PUSH SHOULD
+       MOVE. Owner, on the device: *"the room navigation buttons inside all the
+       structures … need to act like the 'look around you' button."*
+       Phase 3 gave this component the full three-plane construction (see the
+       note over the planes below) and its comment claimed it as a key — but it
+       was still a `TouchableOpacity`, which has NO `({ pressed })` style
+       callback and no render-prop children. So the depth language was
+       STRUCTURALLY UNREACHABLE here: the planes were frozen at their resting
+       heights and the only press feedback the primitive can produce is
+       `activeOpacity`, a fade of the whole chip. Built like a key, faded like a
+       link. `QuickBtn` — LOOK AROUND, ~280 lines above, same file, same Phase 3
+       pass — is `Pressable` and presses properly; this is that component's
+       construction applied here, nothing more.
+       ⚠ `activeOpacity` IS GONE RATHER THAN TRANSLATED. OTA-1782: *"The depth
+       language replaces a fade with a settle: nothing goes translucent, the
+       light simply moves and the face travels toward the interface plane."* A
+       translucent chip also lets a player-tuned background flood through it,
+       which arb86 already had to remove from the disabled state.
+       ⚠⚠ AND A BLOCKED/SPENT DOOR KEEPS THE DEPTH PAIR, matching the ruling
+       recorded over `QuickBtn`'s planes: *"a disabled control remains
+       physically constructed as a button. Its semantic state may dim/mute it,
+       but it must not lose the physical button construction."*
+       `travelBtnBlocked` carries the state (dim + flat rim colour); the
+       behaviour is untouched — a blocked tap still buzzes and returns, a spent
+       tap still speaks and costs nothing. */
+    <Pressable
       testID={testID}
-      style={[tartariaKitStyles.ctl, styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && tartariaKitStyles.ctlOn]}
+      style={({ pressed }) => [tartariaKitStyles.ctl, styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && tartariaKitStyles.ctlOn,
+        // ⚠ LAST, so the semantic rim above still colours the left and right
+        // edges and the depth rides on top of it. See tControlDepth.
+        tControlDepth(pressed)]}
       onPressIn={noteTouchDown}
       onPress={handlePress}
-      activeOpacity={blocked ? 1 : 0.7}
       accessibilityRole="button"
       accessibilityLabel={a11yLabel ?? `${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
       accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
+      {({ pressed }) => (<>
       <Text
         style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, wayOut && styles.travelBtnWayOutText, active && styles.travelBtnTextActive]}
         numberOfLines={isDestination ? 2 : 1}
@@ -2035,11 +2063,21 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
           reading as outlined rectangles. It kept a `'#5a4a2e'` rim, which is
           why the colour-fingerprint census missed it and the structural one
           caught it. Same three planes as every other command; `blocked`/`spent`
-          still dim the whole key rather than stripping its construction. */}
-      <View style={tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
-      <View style={tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
-      <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />
-    </TouchableOpacity>
+          still dim the whole key rather than stripping its construction.
+          ⚠⚠⚠ OTA-1805 — AND NOW THE PLANES MOVE. Phase 3 drew them at their
+          RESTING heights only, so the key's sidewall stayed 4dp tall no matter
+          what the finger did: it could not lose height, which is the larger
+          half of the depression. Pressed, the sidewall collapses to 1dp and
+          crosses to the TOP (push a key into its housing and the shaded side
+          tips above the face while the light catches below it), and the contact
+          band is not drawn at all — a key pushed home is no longer standing on
+          anything, and that absence IS the reduced contact shadow. Identical
+          to `QuickBtn`'s planes and `NumberStepper`'s `ctlPlanes`. */}
+      <View style={pressed ? tartariaKitStyles.controlPlaneTopPressed : tartariaKitStyles.controlPlaneTop} pointerEvents="none" />
+      <View style={pressed ? tartariaKitStyles.controlPlaneBottomPressed : tartariaKitStyles.controlPlaneBottom} pointerEvents="none" />
+      {pressed ? null : <View style={tartariaKitStyles.controlPlaneContact} pointerEvents="none" />}
+      </>)}
+    </Pressable>
   );
 }
 
