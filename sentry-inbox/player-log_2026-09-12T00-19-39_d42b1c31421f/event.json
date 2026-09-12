@@ -1,0 +1,239 @@
+{
+  "id": "d42b1c31421f48dbb65ce4449ea7327e",
+  "groupID": "7727458630",
+  "eventID": "d42b1c31421f48dbb65ce4449ea7327e",
+  "projectID": "4511945117532160",
+  "size": 7009,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxn1fjz7g62 [inline 15/15]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-11-1803-the-hud-belongs-to-tartaria",
+  "message": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxn1fjz7g62 [inline 15/15]",
+  "title": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxn1fjz7g62 [inline 15/15]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2600:1016:b08d:ebeb:3021:e6b8:65be:d58a",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Monongahela",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4e855ec3d2d145e5b92910892ceedbe1",
+      "span_id": "b01c1881bd9e1f1c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-NTQ-uNz-czW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1wa-WNr-dXA-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-cGl-ja3-VwI-HRh-cmd-ldD-0tI-HJl-c29-sdm-VkP-S0g-cmF-uZ2-U9L-SBl-bmV-taW-VzP-TAg-aG9-va3-M9M-Apb-MjA-yNi-0wN-i0w-MVQ-yMz-ozM-To1-NC4-3Nz-JaX-SBb-cGx-heW-VyX-SBw-aWN-rIH-VwC-lsy-MDI-2LT-A2L-TAx-VDI-zOj-MxO-jM5-LjA-5Ml-pdI-Ftz-eXN-0ZW-1dI-FRy-eTo-gbG-9va-yBh-cm9-1bm-Qgw-rcg-c2V-hcm-NoI-MK3-IHJ-lc3-QKW-zIw-MjY-tMD-YtM-DFU-MjM-6Mz-E6M-zku-MDk-xWl-0gW-2Fy-Yml-0ZX-JdI-FRo-ZSB-Bcm-Jpd-GVy-IGd-sYW-5jZ-XMg-YXQ-geW-91c-iBw-YWN-rLi-AiW-W91-ciB-hZX-RoZ-XJp-YyB-0b3-Jja-CBp-cyB-zdG-lsb-CB0-aGV-yZS-wga-WYg-aXQ-gc3-Vpd-HMg-dGh-lIG-1vb-WVu-dC4-iCg-==",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-Mzk-uMD-kxW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-11b-mtu-b3d-uIG-Nvb-mY9-MC4-xMC-B2Z-XJi-PS0-gdG-FyZ-2V0-PS0-gcm-Vzb-2x2-ZWQ-9LS-ByY-W5n-ZT0-tIG-VuZ-W1p-ZXM-9MC-Bob-29r-cz0-wCl-syM-DI2-LTA-2LT-AxV-DIz-OjM-xOj-M5L-jA5-MVp-dIF-twb-GF5-ZXJ-dIG-V4c-Gxv-cmF-0aW-9uC-lsy-MDI-2LT-A2L-TAx-VDI-zOj-MxO-jM5-LjA-1Nl-pdI-Ft3-b3J-sZF-0gQ-SBz-aGF-yZC-BvZ-iBt-dWQ-tZ2-xhc-3Mg-bml-ja3-Mge-W91-LiB-TbW-Fsb-CB3-b3V-uZC-wgc-3Rl-YWR-5IH-Jlb-Wlu-ZGV-yLg-o=",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-MTE-uMT-Y5W-l0g-W3d-vcm-xkX-SBQ-YXR-ocz-ogb-m9y-dGg-gdG-8gU-2Fu-Y3R-1bS-DCt-yBl-YXN-0IH-RvI-EFy-bW9-yeS-DCt-yB3-ZXN-0IH-RvI-FJl-ZmV-jdG-9ye-S4g-KFR-5cG-UgJ-2xl-YXZ-lIG-91d-HBv-c3Q-nIH-RvI-Ghl-YWQ-gaW-50b-yB0-aGU-gd2-lsZ-HMu-KQp-bMj-AyN-i0w-Ni0-wMV-QyM-zoz-MTo-xMS-4xN-jha-XSB-bd2-9yb-GRd-IFl-vdS-d2Z-SBz-dG9-vZC-BoZ-XJl-IGJ-lZm-9yZ-S4g-KHZ-pc2-l0I-DIp-Cg=-=",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-MTE-uMT-Y3W-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIG-luY-2xp-bmV-zIG-Ega-GFu-ZCB-0b3-dhc-mQg-dGh-lIG-Rvb-3J3-YXk-uIC-JZb-3Un-cmU-gaW-5za-WRl-IE9-yZG-VyI-ENs-b2l-zdG-VyL-iBU-byB-0cm-F2Z-Wwg-dG8-gYW-5vd-Ghl-ciB-jaX-R5L-CB3-YWx-rIG-91d-CB0-aGU-gZ2-F0Z-SBm-aXJ-zdC-Dig-JQg-dGF-wIE-xFQ-VZF-IE9-VVF-BPU-1Qs-IG9-yIH-R5c-GUg-J2x-lYX-ZlI-G91-dHB-vc3-QnL-iBV-bnR-pbC-B0a-GVu-IHR-oZS-BjY-XJk-aW5-hbH-Mgb-25s-eSB-tb3-ZlI-Hlv-dSB-iZX-R3Z-WVu-IHR-oZS-Byb-29t-cyB-vZi-B0a-Glz-IHB-sYW-NlL-iIK",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-MTE-uMT-Y2W-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIH-dhd-GNo-ZXM-geW-91I-HNl-dHR-sZS-4gI-klm-IHl-vdS-B3Y-W50-IHR-vIG-tub-3cg-d2h-hdC-Bzb-21l-dGh-pbm-cga-XMg-4oC-UIH-RoZ-SBB-ZXR-oZX-IsI-GEg-ZmF-jdG-lvb-iwg-YSB-wbG-FjZ-SDi-gJQ-gYX-NrL-iAn-V2h-hdC-Bpc-yB0-aGU-gQW-V0a-GVy-Lic-gJ1-dob-yBh-cmU-gdG-hlI-FJl-Y2x-haW-1lc-nMu-JyA-nV2-hhd-CBp-cyB-Ecm-Frb-3Zh-Lic-gSS-BrZ-WVw-IHd-oYX-QgS-SBy-ZW1-lbW-Jlc-iBv-ZiB-0aG-UgY-nVy-aWV-kIH-dvc-mxk-LiI-K",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-MTE-uMT-Y2W-l0g-W3d-vcm-xkX-SBU-aGU-gb3-V0c-G9z-dCd-zIG-xhb-nRl-cm5-zIH-N3Y-Xkg-aW4-gYS-Bkc-mFm-dCB-0aG-F0I-HNo-b3V-sZC-Bub-3Qg-cmV-hY2-ggd-Ghp-cyB-mYX-Iga-W5z-aWR-lLi-BBI-Gds-YXN-zIG-hha-Wwg-cHJ-lc3-Nlc-yBv-biB-0aG-Ugd-29y-bGQ-g4o-CUI-C0x-IER-FWC-4gV-2hh-dCB-5b3-UgZ-G8g-aGV-yZS-Bpc-yB5-b3V-ycy-B0b-yBj-aG9-vc2-UuC-lsy-MDI-2LT-A2L-TAx-VDI-zOj-MxO-jEx-LjE-2Nl-pdI-Ft3-b3J-sZF-0gT-3Jk-ZXI-gQ2-xva-XN0-ZXI-gcm-lzZ-XMg-b3V-0IG-9mI-HRo-ZSB-zaW-x0I-GF0-IHR-oZS-BlZ-Gdl-IG9-mIH-RoZ-SBW-YXJ-ha3-Vza-C4g-WW9-1IG-Fyc-ml2-ZSB-hdC-BUa-GUg-VGh-yZX-Nob-2xk-LiB-BIH-Zlc-3Rp-YnV-sZS-BvZ-iB2-YXV-sdC-1zd-G9u-ZSB-hbm-Qgc-2ls-ZW5-0IG-Jvb-2tz-aGV-sdm-VzL-iBU-aGU-gT3-JkZ-XIg-YnJ-vdG-hlc-iBh-dCB-0aG-Ug",
+      "ZGV-zay-BtY-XJr-cyB-5b3-VyI-G5h-bWU-gaW-4gY-SBs-ZWR-nZX-Iga-GUg-d2l-sbC-Bub-3Qg-c2h-vdy-B5b-3Uu-Cls-yMD-I2L-TA2-LTA-xVD-IzO-jMx-OjE-xLj-E2N-lpd-IFt-3b3-JsZ-F0g-TWV-ybH-luL-CBv-ZiB-0aG-UgQ-WV0-aGV-yYm-9yb-iwg-c3d-vcm-4gd-G8g-dGh-lIE-Zvc-mdv-dHR-lbi-BPc-mRl-cjo-geW-91I-Ghh-dmU-gY3-Jvc-3Nl-ZCB-pbn-RvI-FRh-cnR-hcm-lhL-iBU-aGU-gYn-Vya-WVk-IGN-vdW-50c-nku-IFR-oZS-BjY-XRh-Y2x-5c2-0gd-Ghh-dCB-tYW-RlI-Gl0-IHd-hcy-BjY-Wxs-ZWQ-gdG-hlI-EFl-dGh-lcn-N0b-25l-IEZ-sb2-9kL-CBh-bmQ-gaX-QgZ-W5k-ZWQ-gYS-B0a-G91-c2F-uZC-B5Z-WFy-cyB-hZ2-8g4-oCU-IHl-ldC-BoZ-XJl-LCB-hdC-Bnc-m91-bmQ-gbG-V2Z-Wws-IGl-0IG-5ld-mVy-IHF-1aX-RlI-HN0-b3B-wZW-QuI-FRo-ZSB-tdW-Qgc-3Rp-bGw-gbW-92Z-XMu-IFR-oZS-Bha-XIg-c3R-pbG-wga-HVt-cy4-K",
+      "WzI-wMj-YtM-DYt-MDF-UMj-M6M-zE6-MTE-uMT-U4W-l0g-W2R-lYn-VnX-SBP-VEE-gc2-Vzc-2lv-biB-zdG-Fyd-Dog-MjA-yNi-0wN-S0z-MS0-yNj-UuC-go9-PT0-gRU-5EI-FJF-UE9-SVC-A9P-T0="
+    ],
+    "chunkChars": 2275,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-11-1803-the-hud-belongs-to-tartaria #mtxn1fjz7g62 [inline 15/15]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtxn1fjz7g62"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-11-1803-the-hud-belongs-to-tartaria"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "15"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria"
+    },
+    {
+      "key": "user",
+      "value": "ip:2600:1016:b08d:ebeb:3021:e6b8:65be:d58a",
+      "query": "user.ip:\"2600:1016:b08d:ebeb:3021:e6b8:65be:d58a\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-12T00:19:39.862847Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-12T00:19:39.692000Z",
+  "fingerprints": [
+    "c6a3a8c9286aa5fab605b35352547fbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1968105438,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-11T18:35:23.043894Z",
+    "dateReleased": "2026-09-11T18:35:23.751029Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "257b583ed18ceaf6e363db91f3d7aa1995a0eee4",
+      "message": "[ota-hal] OTA-1803 \u2014 the HUD belongs to Tartaria\n\nTwo passes, accepted together by the owner as one visual release.\n\nDEPTH SAYS PRESSABLE, COLOUR SAYS MEANING (OTA-1802). The compact controls\ncarried the language on one layer only \u2014 the inner sheen \u2014 while TButton\ncarried it on two, so a small button read flat beside a large one that read\nraised. The depth pair is repointed at its own named tokens\n(controlRaisedLit / controlRaisedDark), roughly doubling the measured\nRec.709 luminance gradient on the resting and pressed states (96 -> 171,\n93 -> 168, 58 -> 134, 56 -> 131), and 65 governed call sites across eleven\nscreens now take it through tControlDepth / tFilledGold. The rule that made\nthe pass safe is asserted, not assumed: depth means pressability, semantic\ncolour means meaning, and the suite proves the two axes stay independent.\nThe intentionally flat controls stay flat \u2014 that boundary is a negative\ntest, not an oversight. Three ringless controls traded 1dp of padding for\n1dp of border so their outer height is byte-identical to before, which also\nends a pre-existing 2dp jitter on World's ACCEPT.\n\nTHE PANEL IS BUILT, NOT DRAWN ON. Exploration's four families \u2014 player,\nenemy, location/scene and the transcript \u2014 take a single hairline gold rim\n(panelRim at 0.26) plus the existing TCorners registration. Framing is\nstructural grouping and is deliberately NOT the button treatment; the two\nlanguages are kept apart by construction, because panelFrame contributes\nborderWidth, borderColor and borderRadius and nothing else. No width, no\nmargin, no padding, no flex, no minHeight, no position \u2014 so the outer flex\ngeometry cannot move, and only 2dp of inner width is spent per panel.\n\nTHE FACTION IS IN THE ROOM. FactionWatermark places the player's own crest\nbehind the transcript at 0.055 opacity with an 8% inset, contained and\ncentred from the measured panel via containCrestField. It belongs to the\nPANEL, not to the log: an absolutely positioned sibling that joins no\nlayout, adds no scroll extent, re-measures only when the panel actually\nchanges, and takes no touch. A faction with no art renders nothing at all.\n\nVERIFIED AT THE SMALLEST PHONE. The existing viewport harness is height-only\nand cannot express this, so the 320x568 proof composes each panel's real\nstyle and asserts the residue after removing the frame's three keys equals\nthe pre-frame style exactly; the flex track still divides (320 - 6) / 2 =\n157 per column, with a 155 content box. The watermark is proven contained,\ncentred, inert to touch and outside the scrolling content for all nine\nfactions. Jest runs no Yoga, so what is proven is that the treatment is\nincapable of moving a box \u2014 stated plainly in the suite rather than dressed\nup as a measurement.\n\nFull surface 1341/1341 suites, 13,920 tests, 3 skipped. 20/20 gates,\ntypecheck:ci clean, typecheck:tests at baseline 201 with no growth, lint\nclean. Negative controls red-then-green throughout; none committed.\n\ntrackBtn and selectAllBtn remain deliberately flat, deferred with the\nowner's acceptance.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-11T18:21:36Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+          "shortVersion": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-11T18:35:23.751029Z",
+          "dateCreated": "2026-09-11T18:35:23.043894Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "157738402",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-11T18:35:24.057984Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-11-1803-the-hud-belongs-to-tartaria",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-11-1803-the-hud-belongs-to-tartaria",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-11-1803-the-hud-belongs-to-tartaria)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "cb7222528450426687c1835ff321805b"
+}
