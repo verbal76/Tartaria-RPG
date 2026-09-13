@@ -30380,7 +30380,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // behind Guidance, Vendor and Crafting — carries the same defect and was NOT
 // converted under a Contracts authorization; its blast radius is reported, not
 // spent. Nothing was added at rest, and no second press system was minted.
-export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';
+// ⚠⚠⚠ OTA-1812 — THE REPORT RECEIPT STOPS OPENING A NATIVE DOOR, AND THIS IS AN
+// ISOLATION EXPERIMENT AS MUCH AS A REPAIR. Physical iOS Build 189 reproduced a
+// post-report freeze TWICE — Send Full Log, and a character report described
+// "Froze". Both times the UI reached the success receipt and then stopped
+// accepting touch while the process stayed ALIVE and JS timers kept firing.
+// Both Sentry bundles arrived COMPLETE (mu00gi1et5oc 8/8, mu00jlb219pe 7/7), so
+// the report worked; what died was the hand.
+//
+// ⚠⚠ EVERYTHING REPORT-CONTROLLED IS ALREADY FINISHED when that receipt renders
+// — composition, pending persistence, encoding, Sentry capture, bounded flush,
+// pending-file clearing and the composer's return — and nothing report-owned
+// remains scheduled after it. So the first narrow thing left on the common
+// post-success path is the PRESENTATION boundary: bugReportPopup ->
+// BrandedModal -> React Native's native <Modal>. That one prop now takes
+// arb73's EXISTING `inline` path instead. No new material, no second
+// workaround, no other consumer moved.
+//
+// ⚠ THE MECHANISM IS SOURCE-DERIVED, NOT CAUSALLY PROVEN. No test here can
+// present a native iOS modal, so nothing in this repository shows that <Modal>
+// froze anything. One variable moves so the physical iPhone can answer it.
+// Android is a control and not a disproof: it ran four consecutive
+// report->receipt->continue cycles the same day, on a presentation
+// implementation not proven equivalent.
+export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';

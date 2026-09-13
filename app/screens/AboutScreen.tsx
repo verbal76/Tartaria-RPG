@@ -2017,7 +2017,37 @@ export function AboutScreen() {
           line that I missed the first few times appear as a popup so it's very
           visible."* One button, and it dismisses — nothing here is a decision,
           it is a receipt. */}
+      {/* ⚠⚠⚠ OTA-1812 — THIS RECEIPT NO LONGER OPENS A NATIVE MODAL, AND THAT IS
+          AN ISOLATION EXPERIMENT AS MUCH AS A REPAIR. Physical iOS Build 189
+          reproduced a post-report freeze TWICE — Send Full Log, and a character
+          report described "Froze". Both times the UI reached THIS receipt and
+          then stopped accepting touch while the process stayed alive and JS
+          timers kept firing.
+
+          ⚠⚠ EVERYTHING THE REPORT ITSELF DOES IS ALREADY FINISHED BY THE TIME
+          THIS RENDERS — composition, pending persistence, encoding, Sentry
+          capture, bounded flush, pending-file clearing and the composer's
+          return all complete before the popup is presented, and no
+          report-controlled network, persistence, native-ML, voice, reload or
+          navigation work remains scheduled after it. So the first thing left on
+          the common post-success path is the PRESENTATION boundary: this
+          BrandedModal's native <Modal>.
+
+          ⚠ arb73 ALREADY BOUGHT THIS ANSWER ONCE, WHICH IS WHY NO NEW MATERIAL
+          IS MINTED HERE. `inline` exists because iOS can present a native
+          <Modal> INVISIBLY while its backdrop still eats touches — the same
+          shape of fault, found on the tutorial door. Reusing that path adds no
+          second workaround and changes no other consumer.
+
+          ⚠⚠⚠ THE MECHANISM IS SOURCE-DERIVED, NOT CAUSALLY PROVEN. No test on
+          this machine can present a native iOS modal, so nothing here
+          establishes that <Modal> caused the freeze. One variable moves so the
+          physical iPhone can answer the question. Android is a control and not
+          a disproof: it ran four consecutive report→receipt→continue cycles the
+          same day, but its presentation implementation is not proven
+          equivalent. */}
       <BrandedModal
+        inline
         visible={bugReportPopup !== null}
         title={bugReportPopup?.title ?? ''}
         body={bugReportPopup?.body}
