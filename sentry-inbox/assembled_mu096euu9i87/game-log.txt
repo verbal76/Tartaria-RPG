@@ -1,0 +1,696 @@
+Bug Report — Robert Schmobert · (2026-09-13-1813-the-tap-says-how-far-it-got) · Clean outpost run
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-13T20:14:55.926Z
+Character: Robert Schmobert
+Slot ID: slot_mu090tcc_kwag6q
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 43/43
+
+--- DESCRIPTION ---
+Clean outpost run
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-13T20:14:55.837Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 189
+  AAB: (build 189)
+  OTA: (2026-09-13-1813-the-tap-says-how-far-it-got)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-13T20:11:06.173Z
+  Last init success: 2026-09-13T20:11:20.197Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu08zdkkn3 · started 2026-09-13T20:09:27.668Z
+  Followed an OTA apply 122ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠ Memory warnings: 2 this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 5.8s · 2 job kinds queued >3s · worst 15.8ms/prompt-token · 3 generations thrown away (27.4s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 103 jobs · worst wait 8.8s (llm) · 11 past 3s · 2 cut as obsolete
+  App state trail: inactive → background → active
+Model contexts
+  Live now: 0
+  Opened: 1 · Released: 1 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 152MB · last 152MB · net +140MB over 34 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native voice running q1 · warns 0
+    +18.6s appstate [active→inactive] — heap 20MB gc 0ms/21 · ctx 0 · app=inactive · native idle q0 · warns 0
+    +19.3s appstate [inactive→background] — heap 20MB gc 0ms/22 · ctx 0 · app=background · native idle q0 · warns 0
+    +35.5s appstate [background→active] — heap 20MB gc 0ms/22 · ctx 0 · app=active · native idle q0 · warns 0
+    +90.2s heap-move — heap 28MB gc 0ms/58 · ctx 0 · app=active · native idle q0 · warns 0
+   +105.2s heap-move — heap 36MB gc 0ms/99 · ctx 0 · app=active · native voice running q1 · warns 0
+   +110.2s heap-move — heap 44MB gc 0ms/144 · ctx 0 · app=active · native voice running q1 · warns 0
+   +112.5s ctx-event — heap 48MB gc 0ms/163 · ctx 1 ≈425MB est · app=active · native llm running q1 · warns 0
+   +112.5s watch-start — heap 48MB gc 0ms/164 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+   +117.5s heap-move — heap 56MB gc 0ms/194 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+   +127.5s heap-move — heap 64MB gc 0ms/249 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+   +167.6s gen-settled [investigate_lore ok] — heap 64MB gc 0ms/440 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +176.8s gen-settled [narration:travel preempt] — heap 68MB gc 0ms/466 · ctx 1 ≈425MB est · app=active · native narration:travel running q3 · warns 0
+   +179.7s gen-settled [investigate_lore ok] — heap 72MB gc 0ms/478 · ctx 1 ≈425MB est · app=active · native investigate_lore running q3 · warns 0
+   +181.1s gen-settled [investigate_lore ok] — heap 80MB gc 0ms/488 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +186.9s gen-settled [ambient preempted] — heap 88MB gc 0ms/503 · ctx 1 ≈425MB est · app=active · native ambient running q3 · warns 0
+   +189.8s gen-settled [investigate_lore ok] — heap 88MB gc 0ms/508 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +192.7s heap-move — heap 96MB gc 0ms/515 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +195.4s gen-settled [investigate_lore ok] — heap 96MB gc 0ms/519 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +202.6s gen-settled [investigate_lore ok] — heap 104MB gc 0ms/537 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +204.1s gen-settled [investigate_lore ok] — heap 112MB gc 0ms/547 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+   +205.1s gen-settled [investigate_lore ok] — heap 112MB gc 0ms/552 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +212.7s heap-move — heap 124MB gc 0ms/578 · ctx 1 ≈425MB est · app=active · native narration:travel running q3 · warns 0
+   +217.0s gen-settled [narration:travel preempt] — heap 132MB gc 0ms/590 · ctx 1 ≈425MB est · app=active · native narration:travel running q3 · warns 0
+   +219.7s gen-settled [investigate_lore ok] — heap 136MB gc 0ms/601 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +222.7s heap-move — heap 144MB gc 0ms/616 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +223.7s gen-settled [investigate_lore ok] — heap 148MB gc 0ms/619 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +232.9s mem-warning — heap 152MB gc 0ms/648 · ctx 1 ≈425MB est · app=active · native voice running q2 · warns 1
+   +234.7s ctx-event — heap 152MB gc 0ms/650 · ctx 0 · app=active · native teardown running q2 · warns 1
+   +234.7s mem-warn-settled [freed-ctx] — heap 152MB gc 0ms/650 · ctx 0 · app=active · native cognition running q1 · warns 1
+   +234.8s gen-settled [investigate_lore dormant] — heap 152MB gc 0ms/652 · ctx 0 · app=active · native investigate_lore running q0 · warns 1
+   +235.1s mem-warning — heap 152MB gc 0ms/656 · ctx 0 · app=active · native idle q0 · warns 2
+   +235.1s mem-warn-settled [freed-nothing] — heap 152MB gc 0ms/656 · ctx 0 · app=active · native idle q0 · warns 2
+Touch path
+  prior boot: (no trace loaded)
+  this boot:
+  2026-09-13T20:14:33.353Z #198 done travel:ENTER OUTPOST (navigation) p=none exploration
+  2026-09-13T20:14:34.574Z #199 root p=none exploration
+  2026-09-13T20:14:34.575Z #199 in travel:🚪 EXIT p=none exploration
+  2026-09-13T20:14:34.705Z #199 enter travel:🚪 EXIT p=none exploration
+  2026-09-13T20:14:34.705Z #199 reject travel:🚪 EXIT (stamina-spent) p=none exploration
+  2026-09-13T20:14:36.191Z #200 root p=none exploration
+  2026-09-13T20:14:36.192Z #200 in quick:rest p=none exploration
+  2026-09-13T20:14:36.338Z #200 enter quick:rest p=none exploration
+  2026-09-13T20:14:36.339Z #200 admit quick:rest (callback) p=none exploration
+  2026-09-13T20:14:36.339Z #200 dispatch quick:rest (callback) p=none exploration
+  2026-09-13T20:14:36.356Z #200 done quick:rest (callback) p=none exploration
+  2026-09-13T20:14:36.822Z #201 root p=none exploration
+  2026-09-13T20:14:36.822Z #201 in quick:rest p=none exploration
+  2026-09-13T20:14:36.955Z #201 enter quick:rest p=none exploration
+  2026-09-13T20:14:36.955Z #201 admit quick:rest (callback) p=none exploration
+  2026-09-13T20:14:36.955Z #201 dispatch quick:rest (callback) p=none exploration
+  2026-09-13T20:14:36.967Z #201 done quick:rest (callback) p=none exploration
+  2026-09-13T20:14:37.525Z #202 root p=none exploration
+  2026-09-13T20:14:37.525Z #202 in travel:🚪 EXIT p=none exploration
+  2026-09-13T20:14:37.638Z #202 enter travel:🚪 EXIT p=none exploration
+  2026-09-13T20:14:37.639Z #202 admit travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-13T20:14:37.639Z #202 dispatch travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-13T20:14:37.699Z #202 done travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-13T20:14:40.623Z #203 root p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Take your time. Tap EXIT when you're rea"
+    • route=bundled-kokoro · kokoro=ready · "The way's open. Pick this place over, or"
+    • route=bundled-kokoro · kokoro=ready · "The north door is locked. Tap INVESTIGAT"
+    • route=bundled-kokoro · kokoro=ready · "Now the rope earns its keep. Tap CLIMB, "
+    • route=bundled-kokoro · kokoro=ready · "That broken plate is worth more in piece"
+    • route=bundled-kokoro · kokoro=ready · "Good. That rope earns its keep."
+
+--- INVENTORY ---
+Inventory (Robert Schmobert)
+  HP: 43/43  Stamina: 14/16  TC: 195  Corruption: 2
+  Pack: 65 distinct rows / 157 total
+
+Weapons (14)
+  Aetheric Pike (1d8 aetheric, dur 13/13, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 33/33, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Energy Blade (1d6 burn, dur 10/10, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 36/36, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 20/20, equipped:off, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, unequip:off, use
+  Cudgel (1d8 bludgeoning, dur 7/7, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 16/16, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 34/34, equipped:main, [weapon,starter])
+    actions: equip:off, unequip:main, use(off)
+  Mud-fist Wraps (1d10 bludgeoning, dur 37/37, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 31/31, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 39/39, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pocket Knife (1d4 slashing, dur 11/11, [weapon,starter,knife,tool])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusty Shortbow (1d6 piercing, dur 27/27, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 38/38, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (13)
+  Aether-Walker's Cape (dur 13/13, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,cloak,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Strider Boots (dur 9/9, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,feet,boots,feet,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Aetheric Boots (dur 18/18, AC +2 · INT +2, [armor,feet,boots,feet,architectural_sentinels])
+    actions: equip:feet, use, scrap, drop
+  Architect's Leg Enhancers (dur 20/20, AC +2 · Resists: slashing · INT +2, [armor,legs,greaves,legs,architectural_sentinels])
+    actions: equip:legs, use, scrap, drop
+  Architect's Observer Visor (dur 29/29, AC +1 · Resists: cold · WIS +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 8/8, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Mud-Warden's Vest (dur 35/35, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 29/29, equipped:head, AC +1 · INT +1, [armor])
+    actions: unequip:head
+  Seer's Veil of the Aether (dur 10/10, AC +2 · Resists: aetheric · WIS +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Sentinel's Faceguard (dur 35/35, AC +1 · Resists: slashing · HP +5 · DEX +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Traveler's Cloak (dur 21/21, AC +1 · STE +1 · STE +1, [armor,cloak,cloak,outer,unknowing_masses])
+    actions: equip:cloak, use, scrap, drop
+  Wanderer's Face of Shadows (dur 27/27, AC +1 · STE +1, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 24/24, AC +1 · STR +1, [armor,hands,gauntlets,hands,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (2)
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Torch (Reveals hidden scene hooks, [light])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Rope ([climb,rope,fiber])
+    actions: use, scrap, drop
+
+Materials (23)
+  Aether Crystal ×17 ([aether,crystal,climb_top])
+    actions: drop
+  Aether Dust ×19 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Cloth (Uncommon, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Shard ×2 (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×4 ([automation,tech,scrap])
+    actions: drop
+  ◆ Beetle-Chitin Flake ([trophy])
+    actions: save-for-fusion, drop
+  Bent Nail ×8 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail
+    actions: scrap, drop
+  Bone Sliver ([bone,junk,scrap])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy])
+    actions: save-for-fusion, drop
+  Cloth Scrap ×7 ([fiber,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap
+    actions: scrap, drop
+  ◆ Dried Tendon Coil ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Hollow Quill Sheaf (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  Mud Fragment ×3 ([mud])
+    actions: drop
+  Scrap Metal ×15 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Smooth Stone ×2 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×4 ([organic,fiber])
+    actions: drop
+  Stick ×2
+    actions: drop
+  Stick ×3 ([wood,improvised,kindling])
+    actions: drop
+  Worn Tartarian Coin ×3
+    actions: scrap, drop
+  Worn Tartarian Coin ×13 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (7)
+  ◆ Amber Droplet (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  ◆ Copper Wire Spool (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  ◆ Faded Ribbon Coil ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Fractured Geode Half ×2 ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Mud-Frosted Bead ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Oil-Stained Sash ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Salvager's Tether Loop ×2 (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 392 of 983 entries; older trimmed to fit a single email paste)
+
+[2026-09-13T20:14:55.323Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-09-13T20:14:40.811Z] [debug] persist sizes(KB): total=137 player=17 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=2
+[2026-09-13T20:14:37.745Z] [cognitive] RETREAT · DISENGAGE · HIDE  (31ms)
+[2026-09-13T20:14:37.699Z] [system] ⏳ Time passed: 1h
+[2026-09-13T20:14:37.698Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T20:14:37.698Z] [world] Rare workings for sale: Aether Bolt-Caster (200 TC), Aether-Damped Shield (200 TC), Aether-Seeker's Hood (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-13T20:14:37.690Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Nell of the Long Road, wandering trader. A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with one eye and the merchandise with the other."
+[2026-09-13T20:14:37.690Z] [world] A figure crests the rise — Nell of the Long Road, wandering trader, pack heavy across the shoulders. They set down to trade.
+[2026-09-13T20:14:37.690Z] [world] [The Monarch's Waystation] north: open ground · east: Dynasty Border Post (4 tiles, 10 hours) · south: The Reaver's Crest (1 tile, 3 hours) · west: Raider's Ridge (2 tiles, 5 hours)
+[2026-09-13T20:14:37.686Z] [system] Weather effect — Black Rain: -1 CHA
+[2026-09-13T20:14:37.685Z] [world] Same silt, same lean, same everything.
+Footprints from no recent traveller cross the path ahead, leading neither in nor out.
+You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+[2026-09-13T20:14:37.685Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-13T20:14:37.679Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:37.679Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n
+[2026-09-13T20:14:37.679Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-09-13T20:14:37.678Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:37.677Z] [player] leave outpost
+[2026-09-13T20:14:37.638Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-13T20:14:37.041Z] [cognitive] REST  (53ms)
+[2026-09-13T20:14:36.966Z] [system] ⏳ Time passed: 8h
+[2026-09-13T20:14:36.965Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:36.965Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:36.964Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T20:14:36.964Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 2, evening)
+[2026-09-13T20:14:36.962Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:36.961Z] [player] rest
+[2026-09-13T20:14:36.955Z] [debug] ui: tap "rest"
+[2026-09-13T20:14:36.425Z] [cognitive] REST  (50ms)
+[2026-09-13T20:14:36.355Z] [system] ⏳ Time passed: 8h
+[2026-09-13T20:14:36.354Z] [world] Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.
+[2026-09-13T20:14:36.354Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T20:14:36.354Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 2, afternoon)
+[2026-09-13T20:14:36.352Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:36.352Z] [player] rest
+[2026-09-13T20:14:36.338Z] [debug] ui: tap "rest"
+[2026-09-13T20:14:34.706Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-13T20:14:34.705Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-13T20:14:33.352Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:33.352Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:33.351Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Robert Schmobert."
+[2026-09-13T20:14:33.351Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:33.349Z] [world] Nothing here has bothered to change on your account.
+[2026-09-13T20:14:33.348Z] [world] Monarch Court — The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+[2026-09-13T20:14:33.341Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:33.341Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n
+[2026-09-13T20:14:33.341Z] [world] You cross to the gate and step through.
+[2026-09-13T20:14:33.340Z] [player] enter outpost
+[2026-09-13T20:14:33.338Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-13T20:14:32.489Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-13T20:14:32.488Z] [debug] ui: tap "NORTH"
+[2026-09-13T20:14:29.982Z] [reward] ✦ Architect's Observer Visor (Common).
+[2026-09-13T20:14:29.981Z] [world] You take the Architect's Observer Visor. The hollow it came out of starts closing.
+[2026-09-13T20:14:29.979Z] [reward] ✦ Rusty Shortbow (Common).
+[2026-09-13T20:14:29.978Z] [world] Where the Rusty Shortbow was, the ground is a shade darker.
+[2026-09-13T20:14:29.976Z] [reward] ✦ Cudgel (Common).
+[2026-09-13T20:14:29.975Z] [world] The Cudgel leaves a shape behind it in the mud, filling slowly.
+[2026-09-13T20:14:29.242Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-13T20:14:29.242Z] [world] One good tug and the Scrap Metal is out.
+[2026-09-13T20:14:28.391Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-13T20:14:28.391Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-09-13T20:14:28.391Z] [reward]     • Stick (Common)
+[2026-09-13T20:14:28.391Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-13T20:14:28.391Z] [reward] ✦ Salvage haul:
+[2026-09-13T20:14:28.391Z] [world] You work the tilting obsidian pillar over. A part of it comes loose, intact.
+[2026-09-13T20:14:28.391Z] [world] You strip the shattered endless stair landing carefully. Something usable comes free in your hand.
+[2026-09-13T20:14:28.390Z] [world] You salvage the shattered buried reclaimer cache. The take is small but real.
+[2026-09-13T20:14:28.390Z] [world] You break the sack apart. Among the pieces, something worth keeping.
+[2026-09-13T20:14:28.390Z] [world] Something papery rustles as you strip the rubble. You pull free a journal leaf.
+[2026-09-13T20:14:28.390Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-09-13T20:14:28.387Z] [reward] ✦ Found Fifth Inscription — the prophecy — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-09-13T20:14:28.254Z] [cognitive] neutral  (79ms)
+[2026-09-13T20:14:28.174Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T20:14:28.174Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:28.174Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:28.173Z] [world] You give the Cudgel your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-13T20:14:28.172Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cudgel resolved=Cudgel range=- enemies=0 hooks=1
+[2026-09-13T20:14:28.171Z] [player] investigate Cudgel
+[2026-09-13T20:14:27.403Z] [debug] ui: tap "take / salvage"
+[2026-09-13T20:14:27.003Z] [cognitive] SWIM  (69ms)
+[2026-09-13T20:14:26.933Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:26.933Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:26.932Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-13T20:14:26.931Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1
+[2026-09-13T20:14:26.930Z] [player] investigate still pond
+[2026-09-13T20:14:25.737Z] [debug] ui: tap "investigate"
+[2026-09-13T20:14:23.403Z] [debug] persist sizes(KB): total=137 player=16 wm=30[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=3
+[2026-09-13T20:14:23.369Z] [cognitive] RETREAT · DISENGAGE · HIDE  (62ms)
+[2026-09-13T20:14:23.306Z] [system] ⏳ Time passed: 1h
+[2026-09-13T20:14:23.306Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:23.306Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:23.305Z] [arbiter] "Nine Cores, nine Guardians, nine Lost Capitals. That's the road. Tap MAIN QUEST to start."
+[2026-09-13T20:14:23.305Z] [arbiter] "Three things in this place would reward attention," the Arbiter says, without naming them. "I would start with the one you cannot quite see."
+[2026-09-13T20:14:23.305Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:23.304Z] [world] Rare workings for sale: Nightglass Pendant (500 TC), Phoenix Rebirth Scepter (500 TC), Plague Tonic (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-13T20:14:23.297Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Bek Whisperlot, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move."
+[2026-09-13T20:14:23.297Z] [world] A figure crests the rise — Bek Whisperlot, fence, pack heavy across the shoulders. They set down to trade.
+[2026-09-13T20:14:23.297Z] [world] You think back to the jar from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-13T20:14:23.296Z] [world] [The Monarch's Waystation] north: open ground · east: Dynasty Border Post (4 tiles, 10 hours) · south: The Reaver's Crest (1 tile, 3 hours) · west: Raider's Ridge (2 tiles, 5 hours)
+[2026-09-13T20:14:23.294Z] [system] Weather effect — Aetheric Storm: +1 INT · -1 WIS
+A taste of copper. A taste of ozone. A taste of something not in the body's vocabulary.
+You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+[2026-09-13T20:14:23.293Z] [world] Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors — the Etheric fields the Overload buried still discharging where the old grid shorts against itself. Electronics fail. The air tastes like copper.
+[2026-09-13T20:14:23.285Z] [debug] spawn: gear=[Cudgel, Architect's Observer Visor, Rusty Shortbow] window=10 roster=new
+[2026-09-13T20:14:23.280Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:23.280Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n
+[2026-09-13T20:14:23.279Z] [world] You let yourself out the Standards's side door and into the open ground. The outpost falls away behind you.
+[2026-09-13T20:14:23.278Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:23.278Z] [player] leave outpost
+[2026-09-13T20:14:23.236Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-13T20:14:22.318Z] [cognitive] REST  (80ms)
+[2026-09-13T20:14:22.238Z] [system] ⏳ Time passed: 8h
+[2026-09-13T20:14:22.237Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:22.237Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:22.237Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:22.235Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:22.234Z] [world] You rest for 8 hours. +2 HP, +8 stamina recovered. (Day 2, night)
+[2026-09-13T20:14:22.232Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:22.232Z] [player] rest
+[2026-09-13T20:14:22.219Z] [debug] ui: tap "rest"
+[2026-09-13T20:14:21.090Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-13T20:14:21.086Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-13T20:14:20.272Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-09-13T20:14:19.705Z] [cognitive] neutral  (35ms)
+[2026-09-13T20:14:19.654Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:19.654Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:19.653Z] [world] Paths: north to Strongroom · south to Atrium · east to Arsenal · west to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:19.653Z] [world] Whatever was making the noise last time has stopped.
+[2026-09-13T20:14:19.653Z] [world] Monarch Court — The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.
+[2026-09-13T20:14:19.652Z] [arbiter] A porter sets down two crates in the square and stretches his back. "Salt's short again. Hollis carts it up from the pans, south of here, daylight man. Runner cracked his last load and he's paying for the recovery."
+[2026-09-13T20:14:19.650Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:19.650Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n
+[2026-09-13T20:14:19.647Z] [world] You head on to the Standards.
+[2026-09-13T20:14:19.646Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:19.646Z] [player] go south
+[2026-09-13T20:14:19.619Z] [debug] ui: tap "↓ ✓ STANDARDS"
+[2026-09-13T20:14:17.197Z] [cognitive] neutral  (34ms)
+[2026-09-13T20:14:17.146Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:17.146Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:17.142Z] [system] Weather effect — Aether Lightning: +1 INT
+[2026-09-13T20:14:17.142Z] [world] Paths: south to Standards · east to Workshop · west to Curiosities. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:17.141Z] [world] The light is different. The place is not.
+[2026-09-13T20:14:17.141Z] [world] Monarch Court — The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.
+[2026-09-13T20:14:17.138Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:17.138Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-13T20:14:17.138Z] [world] You head on to the Strongroom.
+[2026-09-13T20:14:17.137Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:17.136Z] [player] go east
+[2026-09-13T20:14:17.103Z] [debug] ui: tap "→ ✓ STRONGROOM"
+[2026-09-13T20:14:15.862Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-09-13T20:14:15.861Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-13T20:14:15.861Z] [reward]     • Fractured Geode Half (Common)
+[2026-09-13T20:14:15.861Z] [reward]     • Aether Dust x4 (Common)
+[2026-09-13T20:14:15.861Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-13T20:14:15.860Z] [reward] ✦ Salvage haul:
+[2026-09-13T20:14:15.860Z] [world] You work the tome over. A part of it comes loose, intact.
+[2026-09-13T20:14:15.859Z] [world] You break the tilted sentinel diagnostic console apart. Among the pieces, something worth keeping.
+[2026-09-13T20:14:15.859Z] [world] You break the stripped maintenance panel apart. Among the pieces, something worth keeping.
+[2026-09-13T20:14:15.859Z] [world] The lantern gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-13T20:14:15.858Z] [world] You salvage the jar. The take is small but real.
+[2026-09-13T20:14:15.853Z] [world] You salvage the desk. The take is small but real.
+[2026-09-13T20:14:14.859Z] [reward] ✦ Aetheric Strider Boots (Common).
+[2026-09-13T20:14:14.858Z] [world] You brace a foot and the Aetheric Strider Boots gives.
+[2026-09-13T20:14:14.448Z] [cognitive] neutral  (72ms)
+[2026-09-13T20:14:14.375Z] [world] The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.
+[2026-09-13T20:14:14.374Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tome resolved=tome range=- enemies=0 hooks=0
+[2026-09-13T20:14:14.373Z] [player] investigate tome
+[2026-09-13T20:14:13.702Z] [debug] ui: tap "take / salvage"
+[2026-09-13T20:14:13.199Z] [cognitive] neutral  (38ms)
+[2026-09-13T20:14:13.136Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:13.136Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-13T20:14:13.134Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:13.134Z] [player] investigate the floor
+[2026-09-13T20:14:11.636Z] [debug] ui: tap "investigate"
+[2026-09-13T20:14:10.772Z] [cognitive] TRAVEL  (39ms)
+[2026-09-13T20:14:10.714Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:10.714Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:10.713Z] [world] Jorah the Scholar nods at a mystery notice: "Fragment of the Red Tower." (Say 'accept tower' or open Contracts.)
+[2026-09-13T20:14:10.713Z] [world] Rare workings for sale: Sentinel Cleaver (200 TC), Shadow Caller Stave (200 TC), Sickening Light Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-13T20:14:10.703Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Jorah the Scholar, Tomekeeper. Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves."
+[2026-09-13T20:14:10.702Z] [world] Jorah the Scholar (Tomekeeper) is already here when you arrive, stall half-unpacked. They look up and nod once.
+[2026-09-13T20:14:10.702Z] [world] Paths: east to Strongroom. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:10.701Z] [world] Monarch Court — The Cabinet of Curiosities. The Monarchs' private collection of suppressed Tartarian artifacts. Jorah catalogs each piece for the family that owns it; nothing leaves these shelves.
+[2026-09-13T20:14:10.700Z] [debug] spawn: gear=[Aetheric Strider Boots] window=10 roster=new
+[2026-09-13T20:14:10.696Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:10.696Z] [debug] scene: loc=monarch_waystation hub=outpost_lab arrival=n opening=n passing=n
+[2026-09-13T20:14:10.695Z] [world] You head on to the Curiosities.
+[2026-09-13T20:14:10.694Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=1
+[2026-09-13T20:14:10.694Z] [player] go west
+[2026-09-13T20:14:10.668Z] [debug] ui: tap "← CURIOSITIES"
+[2026-09-13T20:14:09.796Z] [cognitive] TRAVEL  (36ms)
+[2026-09-13T20:14:09.742Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:14:09.741Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:14:09.741Z] [world] You think back to the bench from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-13T20:14:09.741Z] [world] Paths: south to Standards · east to Workshop · west to Curiosities. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:09.740Z] [world] It is a little emptier than you remember, or you are.
+[2026-09-13T20:14:09.740Z] [world] Monarch Court — The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.
+[2026-09-13T20:14:09.737Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:09.736Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-13T20:14:09.736Z] [world] You head on to the Strongroom.
+[2026-09-13T20:14:09.735Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:09.735Z] [player] go west
+[2026-09-13T20:14:09.702Z] [debug] ui: tap "← ✓ STRONGROOM"
+[2026-09-13T20:14:08.209Z] [debug] persist sizes(KB): total=128 player=16 wm=25[rooms=8 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=86 scene=2
+[2026-09-13T20:14:08.145Z] [reward] ✦ Aetheric Pike (Common).
+[2026-09-13T20:14:08.145Z] [world] The Aetheric Pike resists, then does not.
+[2026-09-13T20:14:07.202Z] [reward]     • Salvager's Tether Loop (Uncommon)
+[2026-09-13T20:14:07.201Z] [reward]     • Aether Dust (Common)
+[2026-09-13T20:14:07.201Z] [reward]     • Amber Droplet (Uncommon)
+[2026-09-13T20:14:07.201Z] [reward] ✦ Salvage haul:
+[2026-09-13T20:14:07.200Z] [world] Already worked over: stripped tartarian power conduit.
+[2026-09-13T20:14:07.200Z] [world] You lever something loose from the jagged royal vault pedestal — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-13T20:14:07.199Z] [world] You strip the conduit carefully. Something usable comes free in your hand.
+[2026-09-13T20:14:07.199Z] [world] The broken hidden weapon locker gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-13T20:14:07.199Z] [world] You work the bench apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-13T20:14:07.193Z] [reward] ✦ Found Mother's Note — to her son — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-09-13T20:14:06.940Z] [cognitive] neutral  (68ms)
+[2026-09-13T20:14:06.872Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:06.871Z] [world] You look the tool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-13T20:14:06.871Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tool resolved=tool range=- enemies=0 hooks=0
+[2026-09-13T20:14:06.870Z] [player] investigate tool
+[2026-09-13T20:14:06.269Z] [debug] ui: tap "take / salvage"
+[2026-09-13T20:14:05.699Z] [cognitive] neutral  (39ms)
+[2026-09-13T20:14:05.634Z] [reward] ✦ Cloth Scrap.
+[2026-09-13T20:14:05.634Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-13T20:14:05.632Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:05.631Z] [player] investigate the floor
+[2026-09-13T20:14:03.918Z] [debug] ui: tap "investigate"
+[2026-09-13T20:14:03.245Z] [cognitive] neutral  (36ms)
+[2026-09-13T20:14:03.191Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:03.190Z] [world] Tarek the Tinkerer points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-09-13T20:14:03.190Z] [world] Tarek the Tinkerer offers a contract: "Scrap Run." (Say 'accept scrap' or open Contracts for details.)
+[2026-09-13T20:14:03.190Z] [world] Rare workings for sale: Aetheric Crown of the Giants (500 TC), Aetheric Padded Vest (200 TC), Aetheric Spear (Legendary) (500 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-13T20:14:03.180Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Tarek the Tinkerer, Mechanical Outfitter. Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem parts and experimental gear."
+[2026-09-13T20:14:03.180Z] [world] You hear a kettle whistling before you see them. Tarek the Tinkerer, Mechanical Outfitter, has made camp here.
+[2026-09-13T20:14:03.179Z] [world] Paths: west to Strongroom. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:14:03.179Z] [world] Monarch Court — The Cabinet Workshop. An immaculate room of polished tools and dynastic technicians. Tarek serves the Monarchs as their relic-repairer — the older the artifact, the higher up the request came from.
+[2026-09-13T20:14:03.177Z] [debug] spawn: gear=[Aetheric Pike] window=10 roster=new
+[2026-09-13T20:14:03.174Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:14:03.173Z] [debug] scene: loc=monarch_waystation hub=outpost_workshop arrival=n opening=n passing=n
+[2026-09-13T20:14:03.173Z] [world] You head on to the Workshop.
+[2026-09-13T20:14:03.172Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:14:03.172Z] [player] go east
+[2026-09-13T20:14:03.135Z] [debug] ui: tap "→ WORKSHOP"
+[2026-09-13T20:14:01.258Z] [reward] ✦ Gale Binder Wand (Common).
+[2026-09-13T20:14:01.257Z] [world] It takes two pulls. The Gale Binder Wand is yours on the second.
+[2026-09-13T20:14:00.504Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-13T20:14:00.504Z] [reward]     • Worn Tartarian Coin x4 (Common)
+[2026-09-13T20:14:00.504Z] [reward]     • Stick (Common)
+[2026-09-13T20:14:00.504Z] [reward]     • Bent Nail x2 (Common)
+[2026-09-13T20:14:00.504Z] [reward] ✦ Salvage haul:
+[2026-09-13T20:14:00.504Z] [world] Already worked over: tilting submerged library shelf.
+[2026-09-13T20:14:00.504Z] [world] You work the stripped maintenance panel over. A part of it comes loose, intact.
+[2026-09-13T20:14:00.504Z] [world] You work the shelf over. A part of it comes loose, intact.
+[2026-09-13T20:14:00.504Z] [world] You work the salt-crusted sentinel diagnostic console apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-13T20:14:00.504Z] [world] You strip the relic down. Mostly debris — but a Stick comes loose at the bottom of the pile.
+[2026-09-13T20:14:00.504Z] [world] You strip the lock down. Mostly debris — but a Bent Nail comes loose at the bottom of the pile.
+[2026-09-13T20:14:00.504Z] [world] You strip the door carefully. Something usable comes free in your hand.
+[2026-09-13T20:14:00.502Z] [reward] ✦ Found Entry 3 — the Pillars — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-13T20:14:00.456Z] [cognitive] neutral  (61ms)
+[2026-09-13T20:14:00.394Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:14:00.393Z] [world] You study the Gale Binder Wand and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-13T20:14:00.393Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=gale binder wand resolved=Gale Binder Wand range=- enemies=0 hooks=0
+[2026-09-13T20:14:00.392Z] [player] investigate Gale Binder Wand
+[2026-09-13T20:13:59.418Z] [debug] ui: tap "take / salvage"
+[2026-09-13T20:13:59.195Z] [cognitive] neutral  (37ms)
+[2026-09-13T20:13:59.132Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:59.132Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:59.132Z] [reward] ✦ Worn Tartarian Coin.
+[2026-09-13T20:13:59.132Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-13T20:13:59.130Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:59.129Z] [player] investigate the floor
+[2026-09-13T20:13:57.917Z] [debug] ui: tap "investigate"
+[2026-09-13T20:13:57.349Z] [debug] persist sizes(KB): total=124 player=15 wm=23[rooms=7 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=85 scene=2
+[2026-09-13T20:13:57.318Z] [cognitive] TRAVEL  (41ms)
+[2026-09-13T20:13:57.257Z] [world] Paths: south to Standards · east to Workshop · west to Curiosities. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:57.256Z] [world] Something has shifted here, and you cannot say what.
+[2026-09-13T20:13:57.256Z] [world] Monarch Court — The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.
+[2026-09-13T20:13:57.254Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:57.253Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-13T20:13:57.253Z] [world] You head on to the Strongroom.
+[2026-09-13T20:13:57.252Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:57.252Z] [player] go north
+[2026-09-13T20:13:57.218Z] [debug] ui: tap "↑ ✓ STRONGROOM"
+[2026-09-13T20:13:55.812Z] [cognitive] neutral  (36ms)
+[2026-09-13T20:13:55.759Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:13:55.758Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:55.758Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:55.758Z] [world] Paths: north to Strongroom · south to Atrium · east to Arsenal · west to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:55.757Z] [world] The mud has moved since you were last through. Not much. Some.
+[2026-09-13T20:13:55.757Z] [world] Monarch Court — The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.
+[2026-09-13T20:13:55.754Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:55.754Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n
+[2026-09-13T20:13:55.754Z] [world] You head on to the Standards.
+[2026-09-13T20:13:55.753Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:55.753Z] [player] go south
+[2026-09-13T20:13:55.718Z] [debug] ui: tap "↓ ✓ STANDARDS"
+[2026-09-13T20:13:54.889Z] [cognitive] TRAVEL  (42ms)
+[2026-09-13T20:13:54.827Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:54.826Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:54.826Z] [world] Paths: south to Standards · east to Workshop · west to Curiosities. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:54.825Z] [world] Monarch Court — The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.
+[2026-09-13T20:13:54.824Z] [debug] spawn: gear=[Gale Binder Wand] window=10 roster=new
+[2026-09-13T20:13:54.822Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:54.822Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-09-13T20:13:54.822Z] [world] You head on to the Strongroom.
+[2026-09-13T20:13:54.821Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:54.821Z] [player] go north
+[2026-09-13T20:13:54.799Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−2 HP)
+[2026-09-13T20:13:54.785Z] [debug] ui: tap "↑ STRONGROOM"
+[2026-09-13T20:13:53.077Z] [cognitive] neutral  (36ms)
+[2026-09-13T20:13:53.025Z] [world] Paths: north to Strongroom · south to Atrium · east to Arsenal · west to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:53.024Z] [world] Some part of you already knew where the footing was bad.
+[2026-09-13T20:13:53.024Z] [world] Monarch Court — The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.
+[2026-09-13T20:13:53.022Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:53.021Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n
+[2026-09-13T20:13:53.021Z] [world] You head on to the Standards.
+[2026-09-13T20:13:53.020Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:53.020Z] [player] go east
+[2026-09-13T20:13:52.985Z] [debug] ui: tap "→ ✓ STANDARDS"
+[2026-09-13T20:13:43.884Z] [debug] ui: tap "map"
+[2026-09-13T20:13:39.765Z] [cognitive] TRAVEL  (33ms)
+[2026-09-13T20:13:39.716Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:39.716Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:39.715Z] [world] Halem the Trader nods once. "Robert Schmobert. Come look — a few things moved since you were last through."
+[2026-09-13T20:13:39.715Z] [world] Paths: south to Chapel · east to Standards · west to Retainers. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:39.715Z] [world] You breathe easier here than you did the first time.
+[2026-09-13T20:13:39.714Z] [world] Monarch Court — The Banquet Floor. A long table laid with mismatched silver — half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones.
+[2026-09-13T20:13:39.713Z] [arbiter] A pilgrim at the corner table cups her hands around a steaming mug and looks over at you. "South of here, past the gate. After the moon's up. Mud Dweller name of Yulka camps out there some nights — sells Aetheric Discs cheap. Don't ask where she gets them."
+[2026-09-13T20:13:39.710Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:39.710Z] [debug] scene: loc=monarch_waystation hub=outpost_messhall arrival=n opening=n passing=n
+[2026-09-13T20:13:39.710Z] [world] You head on to the Banquet.
+[2026-09-13T20:13:39.709Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:39.708Z] [player] go north
+[2026-09-13T20:13:39.683Z] [debug] ui: tap "↑ ✓ BANQUET"
+[2026-09-13T20:13:38.494Z] [cognitive] neutral  (35ms)
+[2026-09-13T20:13:38.443Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:13:38.443Z] [world] Paths: north to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:38.442Z] [world] Your shoulders drop a fraction. Whatever this place is, it is not new.
+[2026-09-13T20:13:38.442Z] [world] Monarch Court — The Family Chapel. A small room with portraits of dead Monarchs and a single lit candle. Family business is conducted here when nothing else is appropriate.
+[2026-09-13T20:13:38.439Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:38.439Z] [debug] scene: loc=monarch_waystation hub=outpost_chapel arrival=n opening=n passing=n
+[2026-09-13T20:13:38.439Z] [world] You head on to the Chapel.
+[2026-09-13T20:13:38.438Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:38.434Z] [player] go south
+[2026-09-13T20:13:38.401Z] [debug] ui: tap "↓ ✓ CHAPEL"
+[2026-09-13T20:13:35.013Z] [cognitive] TRAVEL  (35ms)
+[2026-09-13T20:13:34.962Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:34.962Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:34.961Z] [world] Halem the Trader nods once. "Robert Schmobert. Come look — a few things moved since you were last through."
+[2026-09-13T20:13:34.961Z] [world] Paths: south to Chapel · east to Standards · west to Retainers. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:34.960Z] [world] You step around something that is no longer there.
+[2026-09-13T20:13:34.960Z] [world] Monarch Court — The Banquet Floor. A long table laid with mismatched silver — half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones.
+[2026-09-13T20:13:34.954Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-13T20:13:34.954Z] [debug] scene: loc=monarch_waystation hub=outpost_messhall arrival=n opening=n passing=n
+[2026-09-13T20:13:34.953Z] [world] You head on to the Banquet.
+[2026-09-13T20:13:34.952Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:34.952Z] [player] go north
+[2026-09-13T20:13:34.917Z] [debug] ui: tap "↑ ✓ BANQUET"
+[2026-09-13T20:13:33.761Z] [reward] ✦ Sentinel's Faceguard (Common).
+[2026-09-13T20:13:33.760Z] [world] The Sentinel's Faceguard comes away clean.
+[2026-09-13T20:13:33.757Z] [reward] ✦ Wanderer's Worn Gauntlets (Common).
+[2026-09-13T20:13:33.756Z] [world] You turn the Wanderer's Worn Gauntlets over once, then keep it.
+[2026-09-13T20:13:33.120Z] [debug] persist sizes(KB): total=121 player=14 wm=23[rooms=7 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=82 scene=2
+[2026-09-13T20:13:33.022Z] [reward]     • Aether Crystal (Common)
+[2026-09-13T20:13:33.021Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-09-13T20:13:33.021Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-09-13T20:13:33.021Z] [reward]     • Aether Dust (Common)
+[2026-09-13T20:13:33.020Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-13T20:13:33.020Z] [reward]     • Bent Nail x3 (Common)
+[2026-09-13T20:13:33.020Z] [reward] ✦ Salvage haul:
+[2026-09-13T20:13:33.019Z] [world] You break the stripped royal display case apart. Among the pieces, something worth keeping.
+[2026-09-13T20:13:33.019Z] [world] You salvage the salt-crusted tartarian power conduit. The take is small but real.
+[2026-09-13T20:13:33.018Z] [world] You work the leaning submerged library shelf over. A part of it comes loose, intact.
+[2026-09-13T20:13:33.018Z] [world] You work the lantern over. A part of it comes loose, intact.
+[2026-09-13T20:13:33.017Z] [world] You salvage the cushion. The take is small but real.
+[2026-09-13T20:13:33.017Z] [world] You salvage the bench. The take is small but real.
+[2026-09-13T20:13:32.216Z] [debug] ui: tap "take / salvage"
+[2026-09-13T20:13:31.909Z] [cognitive] neutral  (33ms)
+[2026-09-13T20:13:31.852Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T20:13:31.852Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-09-13T20:13:31.850Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-13T20:13:31.849Z] [player] investigate the floor
+[2026-09-13T20:13:30.634Z] [debug] ui: tap "investigate"
+[2026-09-13T20:13:29.620Z] [cognitive] neutral  (40ms)
+[2026-09-13T20:13:29.560Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T20:13:29.560Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-13T20:13:29.560Z] [world] Paths: north to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-13T20:13:29.559Z] [world] Monarch Court — The Family Chapel. A small room with portraits of dead Monarchs and a single lit candle. Family business is conducted here when nothing else is appropriate.
+[2026-09-13T20:13:29.558Z] [debug] spawn: gear=[Sentinel's Faceguard, Wanderer's Worn Gauntlets] window=10 roster=new
+[2026-09-13T20:13:29.553Z] [debug] missions: none active · at=monarch_waystation
+
+=== END REPORT ===
