@@ -132,6 +132,20 @@ interface Props {
   /** Escape hatch for a card that must not be dismissed by tapping away. */
   dismissOnScrim?: boolean;
   testID?: string;
+  /** ⚠⚠⚠ OTA-1814 — OPT-IN M0 OBSERVER, and opt-in is the whole point. This card
+   *  is shared by five modals; only the bug-report composer sits on a freeze
+   *  campaign, so only it passes this. For the other four the prop is undefined
+   *  and the rendered tree is byte-identical to what shipped in 1813.
+   *
+   *  ⚠⚠ IT IS NEEDED BECAUSE THIS CARD IS A NATIVE <Modal>. Its content is hosted
+   *  OUTSIDE the screen that rendered it, so AboutScreen's root observer
+   *  structurally cannot see a touch that lands here — the same RN mechanism
+   *  already proven for SearchModal / GatherModal / ClimbModal.
+   *
+   *  ⚠ IT NEVER CLAIMS THE RESPONDER. It is wired to
+   *  `onStartShouldSetResponderCapture`, which RETURNS FALSE below, so it only
+   *  observes the capture-phase question and takes no gesture from the card. */
+  onRootTouch?: () => void;
 }
 
 export function KeyboardSafeCard({
@@ -143,6 +157,7 @@ export function KeyboardSafeCard({
   maxWidth = 420,
   dismissOnScrim = true,
   testID,
+  onRootTouch,
 }: Props) {
   const vp = useCardViewport();
   const scrollRef = useRef<ScrollViewType>(null);
@@ -164,7 +179,21 @@ export function KeyboardSafeCard({
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onScrim} accessible={false}>
-        <View style={[styles.scrim, { paddingBottom: inset }]} accessibilityViewIsModal={true}>
+        <View
+          /* ⚠⚠ OTA-1814 — M0, and ONLY for a caller that asked. `undefined` here
+             leaves the prop absent, which is exactly what the four uninstrumented
+             consumers render. Returning false means this view never becomes the
+             responder, so the card's own controls keep the negotiation they have.
+             ⚠ TouchableWithoutFeedback clones this element with Pressability's
+             handlers, which include `onStartShouldSetResponder` but NOT the
+             capture variant, so this prop survives the clone and displaces
+             nothing. */
+          onStartShouldSetResponderCapture={
+            onRootTouch ? () => { onRootTouch(); return false; } : undefined
+          }
+          style={[styles.scrim, { paddingBottom: inset }]}
+          accessibilityViewIsModal={true}
+        >
           <TouchableWithoutFeedback accessible={false}>
             <View
               testID={testID}

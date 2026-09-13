@@ -30452,7 +30452,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // entitlements, gameplay admission, responder ownership or control behaviour.
 // Apple-freeze causation remains UNKNOWN. The instrument's own answer will
 // require a device reproduction to be worth anything.
-export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';
+// ⚠⚠⚠ OTA-1814 — THE REPORT SCREEN JOINS THE TRACE. OBSERVATIONAL ONLY.
+// GAMEPLAY FREEZE REPAIR ATTEMPTED: NO. REPORT FREEZE REPAIR ATTEMPTED: NO.
+// Neither freeze is fixed and neither cause is known.
+//
+// ⚠⚠ WHAT THE HEALTHY APPLE CONTROL EXPOSED. Robert Schmobert's OTA-1813 run on
+// a 2022 iPhone SE (bundle mu096euu9i87, 8/8 parts) proved the instrument works:
+// four interactions, zero orphans, T0→T1 in 0–1ms, and a stamina refusal whose
+// `reject` matched the store's own line one millisecond later. It also showed
+// where the instrument is BLIND — and the blind spot is exactly where the other
+// freeze lives. AboutScreen carried ZERO touch-path coverage, so the post-report
+// freeze that reproduced 2/2 on Build 189 would have left no trace at all.
+//
+// ⚠⚠ FOUR SEAMS, EACH ANSWERING A QUESTION NOTHING ELSE COULD:
+//   T0 on AboutScreen        · did a touch reach the report screen at all?
+//   M0 on the composer card  · KeyboardSafeCard is a native <Modal>, so its
+//                              content sits OUTSIDE AboutScreen's tree and T0
+//                              structurally cannot see it — the same mechanism
+//                              already proven for Search/Gather/Climb. OPT-IN by
+//                              one prop, so the other four consumers of that
+//                              card render byte-identically to 1813.
+//   T1/T2 on SEND and CANCEL · did the control receive the press, and did its
+//                              handler run?
+//   admit/reject + pres      · did the async send RESOLVE, and did the receipt
+//                              get REQUESTED and then actually SHOWN?
+//
+// ⚠⚠⚠ `pres` IS THE ONE NEW WORD, and it is one rather than four because the
+// phase rides the existing bounded `reason` field. `requested` without `shown`
+// means React never committed the receipt; `shown` without `dismissed` means it
+// committed and the way out never completed. Those are different faults with
+// different repairs, and no stage in 1813 could separate them.
+//
+// ⚠⚠ THE SENT REPORT STILL CANNOT DESCRIBE ITS OWN AFTERMATH, and this OTA does
+// not pretend otherwise. The payload is composed before the receipt exists, so
+// every stage above from `admit` onward reaches a reader on the NEXT boot, under
+// `prior boot:`. The existing persistence already carries them — one write in
+// flight, leading plus one coalesced trailing — so nothing about it was changed.
+//
+// ⚠ AND A REFUSAL IS STILL ONLY WRITTEN WHERE SOURCE PROVES ONE. The composer's
+// `canSend` guard is NOT recorded: the SEND key is `disabled` in that state, so
+// the branch is defensive and unreachable. The recorded rejections are the
+// report's own returned statuses — unchanged / off / unconfigured / failed.
+export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';

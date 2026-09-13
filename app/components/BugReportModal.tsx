@@ -37,6 +37,10 @@ const DESCRIBE_ACCESSORY = 'bugReportDescribeAccessory';
 import type { SlotSummary } from '../engine/saveSystem';
 import type { BugReportMode } from '../diagnostics/bugReport';
 import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
+// ⚠⚠⚠ OTA-1814 — the report path joins the OTA-1813 trace. The SAME instrument,
+// the same bounded ring, the same coalesced persistence. No second telemetry
+// architecture is created here and none is needed.
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 interface Props {
   visible: boolean;
@@ -150,15 +154,29 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
   const canSend = isFullLog ? fullLogSlot !== null : description.trim().length > 0;
 
   const handleSend = (): void => {
+    // ⚠⚠ OTA-1814 — T2 on the one control the report freeze runs through.
+    const tp = noteHandlerEnter('report:send');
+    // ⚠⚠⚠ `canSend` IS NOT RECORDED AS A REJECTION. The SEND key is `disabled`
+    // when it is false, so RN never runs this handler in that state and this
+    // guard is defensive only — source does NOT prove it reachable. Calling it a
+    // refusal would put a fabricated one in the instrument built to find truth,
+    // the same discipline the cleared climb chip and the consumed gather row get.
     if (!canSend) return;
+    noteStage(tp, 'admit', { control: 'report:send', reason: isFullLog ? 'fulllog' : 'described' });
+    noteStage(tp, 'dispatch', { control: 'report:send', reason: isFullLog ? 'fulllog' : 'described' });
     if (isFullLog) {
       onSend({ slot: fullLogSlot, description: '', mode: 'fulllog', screen });
+      noteStage(tp, 'done', { control: 'report:send', reason: 'handed-off' });
       return;
     }
     const slot = selectedId === 'general'
       ? null
       : slots.find((s) => s.slotId === selectedId) ?? null;
     onSend({ slot, logSlot: fullLogSlot, description: description.trim(), mode: slot ? 'character' : 'general', screen });
+    // ⚠ `done` HERE MEANS "the composer handed the send on", NOT "the report was
+    // delivered". Delivery resolves asynchronously and is recorded by AboutScreen
+    // when the promise settles — see the admit/reject it writes from `r.status`.
+    noteStage(tp, 'done', { control: 'report:send', reason: 'handed-off' });
   };
 
   return (
@@ -166,6 +184,11 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
       visible={visible}
       onRequestClose={onCancel}
       maxWidth={420}
+      /* ⚠⚠⚠ OTA-1814 — M0. This card is a native <Modal>, so AboutScreen's root
+         observer cannot see a touch that lands on it. Without this line a freeze
+         with the composer open would read as "no touch arrived at all", which is
+         precisely the wrong answer. Only this consumer opts in. */
+      onRootTouch={() => { noteRootTouch('modal'); }}
       testID="bug-report-card"
       header={(
         <View style={styles.headerRow}>
@@ -183,7 +206,16 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
         <View style={styles.buttonRow}>
           <Pressable
             style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}
-            onPress={onCancel}
+            /* ⚠ OTA-1814 — the way OUT of the composer is instrumented too: a
+               player who cannot leave the report card is the same class of fault
+               as one who cannot send from it. */
+            onPressIn={(e) => { notePressIn('report:cancel', e); }}
+            onPress={() => {
+              const tp = noteHandlerEnter('report:cancel');
+              noteStage(tp, 'dispatch', { control: 'report:cancel', reason: 'close' });
+              onCancel();
+              noteStage(tp, 'done', { control: 'report:cancel', reason: 'close' });
+            }}
             accessibilityRole="button"
           >
 {({ pressed }) => (<>
@@ -203,6 +235,10 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
                * It keeps its construction now and the mute carries readiness. */
               canSend ? tFilledGold(pressed) : [tFilledGold(null), kit.ctlDead],
             ]}
+            /* ⚠ OTA-1814 — T1. A not-ready SEND is `disabled`, so RN runs neither
+               this nor onPress and nothing is recorded; that silence is correct
+               and is not a refusal. */
+            onPressIn={(e) => { notePressIn('report:send', e); }}
             onPress={handleSend}
             disabled={!canSend}
             accessibilityRole="button"

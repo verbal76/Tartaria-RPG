@@ -81,7 +81,19 @@ const STORAGE_KEY = '@tartaria/touchPath';
 /** The stages, short on the wire because they are written far more often than
  *  they are read. See the chain in the header for what each one proves. */
 export type TouchStage =
-  | 'root' | 'modal' | 'in' | 'enter' | 'admit' | 'reject' | 'dispatch' | 'done';
+  | 'root' | 'modal' | 'in' | 'enter' | 'admit' | 'reject' | 'dispatch' | 'done'
+  /** ⚠⚠⚠ OTA-1814 — A PRESENTATION CHANGED STATE, and it is ONE new word rather
+   *  than four because the phase already has a home: the bounded `reason` field
+   *  carries 'requested' | 'shown' | 'dismiss-requested' | 'dismissed'.
+   *
+   *  ⚠⚠ WHY IT EXISTS AT ALL. The other eight stages describe a touch travelling
+   *  toward an action. This one describes the app answering back, and the two
+   *  Build 189 report freezes died exactly there: the receipt was REQUESTED and
+   *  the screen stopped taking touch. `requested` without `shown` means React
+   *  never committed the receipt; `shown` without `dismissed` means it committed
+   *  and the way out never completed. Those are different faults with different
+   *  repairs, and no existing stage can tell them apart. */
+  | 'pres';
 
 export interface TouchPathEntry {
   /** Monotonic per-boot sequence — proves ordering even if two wall times tie. */

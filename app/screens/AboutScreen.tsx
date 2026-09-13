@@ -1,5 +1,12 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView, Platform, Linking } from 'react-native';
+// ⚠⚠⚠ OTA-1814 — THE REPORT SCREEN JOINS THE OTA-1813 TRACE. Same instrument,
+// same bounded ring, same coalesced persistence — no second architecture. This
+// screen is where the 2/2 Build 189 post-report freeze happened and it had ZERO
+// touch-path coverage, so a dead touch here left no trace at all.
+import {
+  noteRootTouch, noteHandlerEnter, noteStage, currentTouchId,
+} from '../diagnostics/touchPath';
 /* ⚠ The session commands are discrete commands — SAVE, BACK UP CHARACTER,
    RESTORE FROM BACKUP, SAVE & EXIT TO TITLE, REPORT A BUG, RESET TO DEFAULT,
    SHOW ALL TIPS AGAIN, REPLAY TEACHING — so they take the governed physical
@@ -203,6 +210,29 @@ export function AboutScreen() {
   // OTA-1665's dedupe gate had to exist in the first place.
   const [bugReportPopup, setBugReportPopup] =
     useState<{ title: string; body: string } | null>(null);
+  /** ⚠⚠ OTA-1814 — the interaction id of the send in flight, held across the
+   *  await so the receipt's stages belong to the tap that caused them. A REF,
+   *  not state: nothing here may cause a render. */
+  const reportTraceId = useRef<number | null>(null);
+  /* ⚠⚠⚠ OTA-1814 — REQUESTED IS NOT SHOWN, AND THAT GAP IS THE WHOLE POINT.
+   * `setBugReportPopup` above only ASKS for the receipt. This effect runs after
+   * React has COMMITTED it, so `requested` with no `shown` means the commit
+   * never happened, while `shown` with no `dismissed` means it rendered and the
+   * way out never completed. Those are different faults needing different
+   * repairs, and until now nothing could tell them apart — the two Build 189
+   * freezes died somewhere in exactly this window.
+   * ⚠ It adds no state and triggers no render: it rides a commit that already
+   * happens, and writes one bounded entry to the existing ring. */
+  useEffect(() => {
+    const id = reportTraceId.current;
+    if (id === null) return;
+    if (bugReportPopup !== null) {
+      noteStage(id, 'pres', { control: 'report:receipt', reason: 'shown' });
+    } else {
+      noteStage(id, 'pres', { control: 'report:receipt', reason: 'dismissed' });
+      reportTraceId.current = null;
+    }
+  }, [bugReportPopup]);
   // ⚠ PHONE-FIX — RESTORE's outcome, in the same shape every other tool on this
   // screen reports in: one line, verbatim, that stays until the next attempt.
   const [restoreBusy, setRestoreBusy] = useState(false);
@@ -857,7 +887,20 @@ export function AboutScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View
+      /* ⚠⚠⚠ OTA-1814 — T0 ON THE REPORT SCREEN. ExplorationScreen has had this
+         since 1813; this screen had nothing, which is why the post-report freeze
+         — the one that reproduced 2/2 on Build 189 — sat entirely outside the
+         instrument. A touch that lands here is now recorded even when no
+         instrumented control receives it, so "the finger never reached the app"
+         and "it reached the app and no handler ran" stop looking identical.
+         ⚠⚠ RETURNING FALSE. The capture-phase question is asked of every view on
+         the way down; answering false means this view never becomes the
+         responder, so every control below keeps the negotiation it has today.
+         ⚠ It reads no state and wakes no store subscriber. */
+      onStartShouldSetResponderCapture={() => { noteRootTouch('root'); return false; }}
+      style={styles.container}
+    >
       <View style={styles.header}>
         <Pressable
           onPress={() => setScreen(player ? 'exploration' : 'title')}
@@ -2005,10 +2048,31 @@ export function AboutScreen() {
         activeSlotId={useGameStore.getState().activeSlotId}
         onCancel={() => setBugReportOpen(false)}
         onSend={(args) => {
+          /* ⚠⚠⚠ OTA-1814 — THE SEND SPANS AN AWAIT, SO THE INTERACTION ID IS HELD.
+             `currentTouchId()` is age-bounded at 1.5s and this promise can take
+             seconds, so the id is captured HERE — while the composer's handler is
+             still fresh — and reused for the resolution and for every receipt
+             stage. One physical tap stays ONE interaction id from the press all
+             the way to the receipt's dismissal, which is what makes the trace
+             readable as a single story.
+             ⚠ A null id records nothing rather than minting a fake one. */
+          const tp = currentTouchId() ?? noteHandlerEnter('report:send');
+          reportTraceId.current = tp;
+          noteStage(tp, 'dispatch', { control: 'report:send', reason: 'compose' });
           setBugReportOpen(false);
           setBugReportResult('Sending…');
           void composeAndSendBugReport(args).then((r) => {
+            /* ⚠⚠ THE SEND RESOLVED — and this is the stage the sent report can
+               NEVER contain, because its own payload was composed before this
+               ran. It reaches the reader on the NEXT boot, under `prior boot:`.
+               ⚠ `unchanged` / `off` / `unconfigured` / `failed` are the composer's
+               OWN refusals, returned as data rather than invented here, so this
+               is a source-proven rejection and not a fabricated one. */
+            const ok = r.status === 'sent' || r.status === 'queued';
+            noteStage(tp, ok ? 'admit' : 'reject', { control: 'report:send', reason: r.status });
+            noteStage(tp, 'done', { control: 'report:send', reason: 'resolved' });
             setBugReportResult(r.message);
+            noteStage(tp, 'pres', { control: 'report:receipt', reason: 'requested' });
             setBugReportPopup({ title: bugReportOutcomeTitle(r.status), body: r.message });
           });
         }}
