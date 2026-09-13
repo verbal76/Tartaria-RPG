@@ -522,14 +522,51 @@ describe('7. ⚠⚠⚠ THE CHARACTER SCREEN IS PROTECTED — artwork, crest, com
     expect(code).not.toMatch(/CharacterCreationScreen/);
   });
 
-  it('neither protected file is in this repair\'s diff', () => {
-    let changed: string[] = [];
-    try {
-      changed = execSync('git diff --name-only HEAD~1 -- app/', { cwd: ROOT })
-        .toString().trim().split('\n').filter(Boolean);
-    } catch { return; }
-    expect(changed).not.toContain(PORTRAIT);
-    expect(changed).not.toContain(SCREEN);
+  /* ⚠⚠⚠ OTA-1810 — THIS CLAIM WAS A `HEAD~1` DIFF AND IS NOW A PROPERTY.
+   * ⚠⚠ AN EXISTING GUARD WAS REWRITTEN. THAT IS DISCLOSED, NOT BURIED.
+   *
+   * It read `git diff --name-only HEAD~1 -- app/` and refused if either
+   * protected file appeared. Two things were wrong with it, and the owner has
+   * since named both as standing validation debt:
+   *
+   *   1. IT DEPENDED ON MOVING GIT HISTORY. `HEAD~1` is whatever happened to
+   *      land before this commit, so the claim meant something different on
+   *      every push and nothing at all after a rebase. Worse, its
+   *      `try { … } catch { return; }` FAILED OPEN: on a shallow clone — which
+   *      is what CI checks out — `HEAD~1` does not resolve, the catch returns,
+   *      and the test passes by not running. A guard that cannot fail where it
+   *      matters most is not a guard.
+   *   2. IT PROTECTED A COMMIT, NOT A PROPERTY. "CharacterScreen.tsx is absent
+   *      from today's diff" is a fact about one diff, not about the artwork.
+   *
+   * ⚠ AND THE PREMISE WAS SUPERSEDED BY THE OWNER, IN WRITING. OTA-1810 was
+   * explicitly commissioned to repair the Character expandable headers, which
+   * live in `CharacterScreen.tsx`; the same instruction re-scoped the firewall
+   * to `CharacterPortrait` — the file that actually owns artwork, background,
+   * banner, faction crest, sex mark, motive and caption. This assertion could
+   * not have passed and could not have been satisfied by any correct version of
+   * the authorised work.
+   *
+   * ⚠⚠ SO THE PROTECTION IS STRONGER HERE, NOT WEAKER. The three claims above
+   * are UNTOUCHED and still assert the portrait's geometry, its crest position
+   * and the screen's composition of it. This one now asserts the invariant the
+   * diff check was only ever a proxy for, and does it in every commit rather
+   * than one: the portrait is never converted into, or wrapped in, a control. */
+  it('the portrait is never a control, and is never wrapped in one — in any commit', () => {
+    const portrait = read(PORTRAIT);
+    expect(portrait).not.toMatch(/<Pressable\b/);
+    expect(portrait).not.toMatch(/<Touchable\w*\b/);
+    expect(portrait).not.toMatch(/\bonPress\b/);
+    expect(portrait).not.toMatch(/controlPressed|tControlDepth/);
+
+    // …and the screen renders it as a bare element: every touchable opened
+    // before it is also closed before it, so no control encloses the artwork.
+    const code = codeOf(read(SCREEN));
+    const at = code.indexOf('<CharacterPortrait');
+    expect(at).toBeGreaterThan(-1);
+    const opened = [...code.slice(0, at).matchAll(/<(?:Pressable|TouchableOpacity)\b/g)].length;
+    const closed = [...code.slice(0, at).matchAll(/<\/(?:Pressable|TouchableOpacity)>/g)].length;
+    expect(opened).toBe(closed);
   });
 });
 

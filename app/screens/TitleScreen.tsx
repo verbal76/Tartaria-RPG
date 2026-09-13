@@ -735,21 +735,33 @@ export function TitleScreen() {
          two-stage card (OTA-1491) and is unchanged here. */
       return (
         <SwipeableRow onDelete={() => confirmDelete(item)}>
-          <TouchableOpacity
-            style={[styles.dossierOuter, !bootGateOpen && styles.btnDisabled]}
+          {/* ⚠⚠⚠ OTA-1810 — THE RECORD GOES IN WHEN YOU PRESS IT. Owner, on the
+              device: the character-selection controls do not answer the finger.
+              A `TouchableOpacity` cannot report a press to its own subtree, so
+              an 15% fade was all a tap could produce on a plate built out of a
+              lit rim, a recessed face and a drop shadow.
+              ⚠⚠ THE DOSSIER PRESSES IN ITS OWN MATERIAL, NOT IN THE KIT'S. The
+              outer takes `controlPressed` for the travel alone — it owns no
+              border, so the two colours that style also sets are inert here,
+              exactly as on the Inventory header — and the RIM inverts its OWN
+              bespoke pair. Using the kit's generic control colours would make a
+              pressed record momentarily stop looking like a filed record, and
+              VIS-1's construction is protected. Same language, own light. */}
+          <Pressable
+            style={({ pressed }) => [styles.dossierOuter, !bootGateOpen && styles.btnDisabled, pressed && kit.controlPressed]}
             onPress={() => setExpandedSlotId(item.slotId)}
-            activeOpacity={0.85}
             disabled={!bootGateOpen}
             accessibilityRole="button"
             accessibilityState={{ disabled: !bootGateOpen, expanded: false }}
             accessibilityHint={`Shows ${item.playerName}'s full details`}
           >
+            {({ pressed }) => (<>
             {/* ⚠ VIS-1 — the same TSettle wraps BOTH states, so React keeps one
                 instance across the expand and the animation runs on the change
                 rather than on a mount that never happens (FlatList reuses the
                 row). A collapsed record simply sits at rest. */}
             <TSettle active={false}>
-            <View style={[styles.dossierRim, item.dead && styles.dossierRimDead]}>
+            <View style={[styles.dossierRim, item.dead && styles.dossierRimDead, pressed && styles.dossierRimPressed]}>
               <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
                 <DossierField crest={crest} factionId={summaryFactionId(item)} compact />
                 <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
@@ -778,7 +790,8 @@ export function TitleScreen() {
               </View>
             </View>
             </TSettle>
-          </TouchableOpacity>
+            </>)}
+          </Pressable>
         </SwipeableRow>
       );
     }
@@ -794,17 +807,21 @@ export function TitleScreen() {
        or the scroll. */
     return (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
-      <TouchableOpacity
-        style={[styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled]}
+      {/* ⚠ OTA-1810 — the SELECTED record presses the same way, in its own lit
+          material: the outer travels, the open rim inverts its own warmer pair.
+          Everything inside stays `pointerEvents="none"` as before, so the plate
+          is still the one tap target and the second tap still LOADS. */}
+      <Pressable
+        style={({ pressed }) => [styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled, pressed && kit.controlPressed]}
         onPress={() => onSlotTap(item)}
-        activeOpacity={0.9}
         disabled={!bootGateOpen}
         accessibilityRole="button"
         accessibilityState={{ disabled: !bootGateOpen, expanded: true }}
         accessibilityHint={`Loads ${item.playerName}`}
       >
+        {({ pressed }) => (<>
         <TSettle active>
-        <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
+        <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead, pressed && styles.dossierRimOpenPressed]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
             <DossierField crest={crest} factionId={summaryFactionId(item)} />
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
@@ -995,7 +1012,8 @@ export function TitleScreen() {
           </View>
         </View>
         </TSettle>
-      </TouchableOpacity>
+        </>)}
+      </Pressable>
     </SwipeableRow>
     );
   };
@@ -1678,6 +1696,19 @@ const styles = StyleSheet.create({
     padding: 1,
   },
   dossierRimOpen: { borderColor: T.rimLit, borderTopColor: '#B08F55', borderBottomColor: '#1E170F', backgroundColor: '#443925' },
+  /* ⚠⚠ OTA-1810 — PRESSED IS THE LIGHT MOVING, IN THE DOSSIER'S OWN COLOURS.
+   * The kit's rule is that the catch of light goes to the BOTTOM edge and the
+   * shadow to the TOP when a surface is pushed into its housing. These two are
+   * that rule applied to the rim's OWN pair rather than to the kit's generic
+   * control pair: exactly the resting colours, swapped, and nothing else. Using
+   * `controlRaisedLit`/`Dark` here would have worked mechanically and made a
+   * pressed record stop looking like a filed record for as long as the finger
+   * was down — VIS-1's construction is protected, so the material stays. The
+   * travel comes from `kit.controlPressed` on the OUTER, which owns no border,
+   * so that style's own colour pair is inert there and only its translate
+   * lands. Neither style appears at rest. */
+  dossierRimPressed: { borderTopColor: '#0D0E0E', borderBottomColor: T.rimAlloy },
+  dossierRimOpenPressed: { borderTopColor: '#1E170F', borderBottomColor: '#B08F55' },
   dossierRimDead: { borderColor: T.rustRim, borderTopColor: '#7A3B34', borderBottomColor: '#170C0A', backgroundColor: '#33201D' },
   dossierFace: { borderRadius: 3, backgroundColor: T.face, borderTopWidth: 1, borderTopColor: T.edgeLit },
   // The selected record is not "the same card with a different border": the

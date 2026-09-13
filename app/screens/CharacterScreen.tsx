@@ -253,17 +253,45 @@ export function CharacterScreen() {
   // tapped anything first.
   const setPressure = useGameStore((st) => st.setPressure); // OTA-1066
 
+  /* ⚠⚠⚠ OTA-1810 — THE CHARACTER SECTION HEADER IS A BUTTON, SO IT DEPRESSES.
+   * Owner, on the device after the 1806 pass: the Character expandable headers
+   * still do not answer the finger.
+   *
+   * ⚠⚠ THIS IS THE SAME REPAIR OTA-1806 MADE TO THE INVENTORY CATEGORY HEADER,
+   * AT THE SAME FAMILY. arb119 built this helper to mirror those headers and the
+   * two plates are the same material — `rgba(8,6,4,0.55)`, a 4dp coloured left
+   * bar, radius 3, the same paddings — but only Inventory's got the press. This
+   * was a `TouchableOpacity`, which has NO `({ pressed }) => …` style callback
+   * and no render-prop children, so the depth language was STRUCTURALLY
+   * UNREACHABLE here (OTA-1805's finding) and a 30% fade was the only thing a
+   * tap could produce.
+   *
+   * ⚠⚠ AT REST IT IS BYTE-FOR-BYTE WHAT IT WAS. This plate is NOT constructed as
+   * a key — no ring at all — and the standing rule is "AT REST: preserve the UI
+   * we have. UNDER MY FINGER: make the buttons feel consistently alive." So it
+   * gains no resting construction: `controlPressed` contributes only its travel
+   * (the two border colours it also sets are inert on a plate with no top or
+   * bottom border), and the planes are drawn ONLY while pressed.
+   *
+   * ⚠ ONE OWNER, FIFTEEN HEADERS. Every expandable section on this screen comes
+   * through this helper, so the repair lands once and all fifteen inherit it.
+   */
   const sectionHeader = (key: string, label: string) => (
-    <TouchableOpacity
-      style={styles.sectionHeaderBar}
-      activeOpacity={0.7}
+    <Pressable
+      style={({ pressed }) => [styles.sectionHeaderBar, pressed && kit.controlPressed]}
       onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}
       accessibilityRole="button"
       accessibilityState={{ expanded: !collapsed[key] }}
     >
+      {({ pressed }) => (<>
       <Text style={styles.sectionChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
       <Text style={styles.sectionHeaderLabel}>{label}</Text>
-    </TouchableOpacity>
+      {pressed ? (<>
+        <View style={kit.controlPlaneTopPressed} pointerEvents="none" />
+        <View style={kit.controlPlaneBottomPressed} pointerEvents="none" />
+      </>) : null}
+      </>)}
+    </Pressable>
   );
 
   return (

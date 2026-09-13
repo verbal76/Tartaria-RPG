@@ -30314,7 +30314,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This ships an instrument so the next
 // physical Apple session can answer a question we have only ever been able to
 // pose.
-export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';
+//
+// ⚠⚠⚠ OTA-1810 — THE RECORD ANSWERS THE FINGER.
+//
+// A bounded Character physical-interaction repair, and nothing else. Owner, on
+// the device after the broad 1806 pass: the character-selection dossier
+// controls and the in-game Character expandable section headers still do not
+// respond while the finger is down.
+//
+// THREE SURFACES WERE ASKED ABOUT. TWO NEEDED REPAIR.
+//   - CharacterScreen `sectionHeader()` - ONE helper, 15 call sites. It was a
+//     `TouchableOpacity`, so the depth language was STRUCTURALLY UNREACHABLE
+//     (OTA-1805's finding) and a 30% fade was all a tap could produce. It now
+//     reports the press, takes `kit.controlPressed` for the travel, and draws
+//     the sidewall planes ONLY while pressed. arb119 built it to mirror the
+//     Inventory category headers and the two plates are the same material;
+//     OTA-1806 gave Inventory's the press and this one never got it. That
+//     asymmetry is closed at the shared owner, so all fifteen inherit it.
+//   - TitleScreen dossier, BOTH states. The outer takes `controlPressed` for
+//     the travel alone (it owns no border, so that style's colour pair is inert
+//     there), and the rim inverts its OWN bespoke pair rather than borrowing the
+//     kit's generic control colours - a pressed record must still look like a
+//     filed record, and VIS-1's construction is protected.
+//   - REPLAY OPENING - INSPECTED AND LEFT ALONE. It was already a `Pressable`
+//     carrying `tControlDepth(pressed)`, so the minimum repair for it was none.
+//     Its resting colour was not authorised for change and did not change.
+//
+// AT REST NOTHING MOVED, which is half the point. No resting construction was
+// added to either family, and the suite asserts that every pressed-only style
+// is reachable only behind `pressed`.
+//
+// CharacterPortrait was NOT edited. It owns artwork / background / banner /
+// faction crest / sex mark / motive / caption and is presentation-only; the
+// firewall is asserted here rather than merely respected.
+export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
