@@ -93,3 +93,21 @@ pull: 2026-09-13T16:36Z — re-request. The previous request commit (e383fa40) q
 marker verbatim in its message while explaining why not to use it, and GitHub matches that token
 anywhere in a commit message, so it skipped every workflow including this relay. Same request as
 above, unchanged: everything newer than the 2026-09-13T16:10:50Z events of bundle #mu00gi1et5oc.
+pull: 2026-09-13T20:1xZ — HEALTHY APPLE CONTROL, OTA-1813. Character Robert Schmobert, device a
+2022 iPhone SE (3rd generation), running OTA-1813 (app SHA 1a3dc7c9). Owner created a FRESH
+character and played from the beginning; the session ran extremely well and NO gameplay freeze
+reproduced. He then submitted a FULL LOG from that session.
+This is the FIRST healthy Apple trace carrying OTA-1813's dead-touch instrumentation, so it is the
+control we will diff the eventual FROZEN Apple trace against. DO NOT read a healthy run as proof
+the gameplay freeze is fixed — classification stands at CANNOT REPLICATE FAULT / ROOT CAUSE
+UNKNOWN / GAMEPLAY REPAIR NOT ATTEMPTED.
+Wanted from the bundle:
+  · the Touch path block the report header now carries — prior-boot tail above this boot's ring
+  · the T0/M0 root observations, T1 press-ins, T2 handler entries, T3 admit/reject decisions,
+    T4 dispatches and T5 completions, with their interaction ids and ordering
+  · delayed-submit armed/fired pairs from the sheet path
+  · AppState transitions and whatever the runtime-pressure and tap-clock instruments recorded
+  · the report lifecycle itself: composition, send, delivery, the OTA-1812 inline success receipt,
+    its dismissal, and CRITICALLY whether any touch or action evidence continues AFTER the receipt
+Fetch everything newer than the last synced bundle. Part completeness per bundle on the relay's
+own pagination and issue-walk evidence, as usual.
