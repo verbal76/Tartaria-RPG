@@ -18,7 +18,7 @@
       "bundleIdentifier": "com.hotatticgames.tartarprim.golem",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSPhotoLibraryUsageDescription": "Tartaria Realms does not access your photo library.",
+        "NSPhotoLibraryUsageDescription": "Tartaria Realms saves your game with a file component that can also read photo-library items. The game never opens, uploads, or changes your photos.",
         "NSPhotoLibraryAddUsageDescription": "Tartaria Realms does not save photos to your photo library.",
         "NSCameraUsageDescription": "Tartaria Realms does not access your camera.",
         "NSLocationWhenInUseUsageDescription": "Tartaria Realms does not access your location.",
