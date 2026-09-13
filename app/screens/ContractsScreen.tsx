@@ -81,8 +81,19 @@ function MilestoneStat({
    * deciding the physical family exactly as the ruling requires. Its contract
    * when pressable is DISCLOSURE (▸ tap to list / ▾ tap to close), so it takes
    * the row chassis, not the command key. */
-  const body = (interactive: boolean) => (
-    <View style={[milestoneStyles.cell, active && milestoneStyles.cellActive]}>
+  /** ⚠⚠⚠ OTA-1811 — AND THE FINGER NEVER REACHED THE THING THE PLAYER SEES.
+   *  The wrapper was a `TouchableOpacity` with `activeOpacity={0.7}`: the fade
+   *  landed on a bare `flex: 1` box, and the CELL — the object with the border,
+   *  the radius and the chassis planes — was never told a finger was on it. So
+   *  `pressed` is now a second parameter of the same renderer, and the flat
+   *  read-only contract still passes `false` for it and is byte-identical.
+   *
+   *  ⚠⚠ THE ACTIVE RING IS LAST IN THE ARRAY ON PURPOSE. `cellActive` is how an
+   *  EXPANDED cell says so, and `controlPressed` writes the same two border
+   *  fields. Ordering it after the press means a pressed cell can never stop
+   *  looking expanded — SELECTED beats PRESSED structurally, not by luck. */
+  const body = (interactive: boolean, pressed: boolean) => (
+    <View style={[milestoneStyles.cell, pressed && kit.controlPressed, active && milestoneStyles.cellActive]}>
       <Text style={milestoneStyles.value}>{value}</Text>
       <Text style={milestoneStyles.label}>{label}</Text>
       <Text style={milestoneStyles.next}>{toNext === next ? `next ${suffix} after ${next}` : `${toNext} → ${suffix}`}</Text>
@@ -90,14 +101,17 @@ function MilestoneStat({
           accordion in the app. The words carry the affordance; the glyph carries
           the state, so the two are not competing to say the same thing. */}
       {onPress ? <Text style={milestoneStyles.tapHint}>{active ? '▾ tap to close' : '▸ tap to list'}</Text> : null}
-      {interactive ? ROW_PLANES : null}
+      {/* ⚠ A CELL PUSHED HOME IS NOT STANDING ON ANYTHING — the chassis planes
+          are simply not drawn while the finger is down, so the cell loses its
+          apparent height instead of merely tinting. Nothing is ADDED at rest. */}
+      {interactive ? (pressed ? null : ROW_PLANES) : null}
     </View>
   );
-  if (!onPress) return body(false);
+  if (!onPress) return body(false, false);
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }} accessibilityRole="button" accessibilityState={{ selected: active }}>
-      {body(true)}
-    </TouchableOpacity>
+    <Pressable onPress={onPress} style={{ flex: 1 }} accessibilityRole="button" accessibilityState={{ selected: active }}>
+      {({ pressed }) => body(true, pressed)}
+    </Pressable>
   );
 }
 
@@ -774,13 +788,31 @@ export function ContractsScreen() {
           ? summonHostiles(scene?.enemies, scene?.enemyHps, scene?.enemyKnockedOut)
           : { blocked: false, count: 0, names: [] as string[] };
         return (
-          <TouchableOpacity
-            style={[styles.mainQuestCard]}
+          /* ⚠⚠⚠ OTA-1811 — THE PRIMARY OBJECTIVE CARD REPORTS THE FINGER.
+             It was a `TouchableOpacity` at `activeOpacity={0.85}` — a 15% fade
+             on the largest press surface on the screen, and structurally the
+             fade was ALL it could ever be: a TouchableOpacity has no
+             `({ pressed }) => …` style callback and no render-prop children, so
+             the depth language could not be expressed inside one. Same finding
+             as OTA-1805's room doors and OTA-1810's dossier, at a third door.
+
+             ⚠⚠ IT TAKES THE SHARED PRESS AND MINTS NOTHING. `controlPressed`
+             carries the travel and moves the light to the lower edge; the gold
+             ring's top and bottom go to the control language for exactly as
+             long as a finger is down, and the card's IDENTITY — its 1.5dp gold
+             sides, its gold PRIMARY OBJECTIVE tag, its gold phase line — is
+             untouched. OTA-1810's dossier reasoning deliberately does NOT
+             transfer: that rim was already an asymmetric lit/dark pair, so
+             borrowing generic colours would have replaced its material. This
+             ring is one uniform gold, and minting a second gold to invert it
+             would invent material AND push against the gold ratchet. */
+          <Pressable
+            style={({ pressed }) => [styles.mainQuestCard, pressed && kit.controlPressed]}
             onPress={() => setMqExpanded((v) => !v)}
-            activeOpacity={0.85}
             accessibilityRole="button"
             accessibilityState={{ expanded: mqExpanded }}
           >
+            {({ pressed: cardPressed }) => (<>
             {/* ⚠ OTA-1456 — chevron-as-state, ▸ closed / ▾ open. */}
             <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▾' : '▸'}</Text>
             <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
@@ -848,14 +880,16 @@ export function ContractsScreen() {
                   <Pressable
                     onPress={() => pickSort('distance')}
                     hitSlop={6}
-                    style={({ pressed }) => [kit.ctl, styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
+                    style={({ pressed }) => [kit.ctl, styles.mqSortBtn, pressed && kit.controlPressed, sortByDistance && styles.mqSortBtnOn]}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sortByDistance }}
                   >
+                    {({ pressed }) => (<>
                     <Text style={[styles.mqSortText, sortByDistance && styles.sortBarTextOn]}>
                       ◈ {sortByDistance ? 'BY DISTANCE' : 'SORT'}
                     </Text>
-                    {TAB_PLANES}
+                    {ctlPlanes(pressed)}
+                    </>)}
                   </Pressable>
                 </View>
                 {/* arb148 — the Primary Objective card sits in the FIXED region
@@ -991,8 +1025,15 @@ export function ContractsScreen() {
                 Ending recorded: {mq.ending.toUpperCase()}.
               </Text>
             )}
-            {ROW_PLANES}
-          </TouchableOpacity>
+            {/* ⚠ THE CARD STOPS STANDING ON ANYTHING WHILE IT IS HELD — the
+                chassis planes are not drawn under a finger, so the card loses
+                its apparent height rather than merely tinting. Written as a
+                conditional on the planes themselves, not hidden behind a
+                helper, because the resting construction must stay visible to
+                the reader AND to OTA-1804's structural detector. */}
+            {cardPressed ? null : ROW_PLANES}
+            </>)}
+          </Pressable>
         );
       })()}
 
@@ -1021,29 +1062,49 @@ export function ContractsScreen() {
         </View>
       )}
 
+      {/* ⚠⚠⚠ OTA-1811 — THE TABS, AND WHY THEY DO NOT SIMPLY TAKE `controlPressed`.
+          Both were `TouchableOpacity` at `activeOpacity={0.7}`, so neither could
+          express the depth language at all. But this tab family is an UNDERLINE
+          family: `tabBtn` has no fill and no ring, and the ONE mark that says
+          SELECTED is `borderBottomColor` going gold. `controlPressed` writes
+          that exact field.
+
+          ⚠⚠ SO PRESSING A TAB WOULD HAVE DRAWN A LIT UNDERLINE ON AN
+          UNSELECTED TAB — pressed would have LOOKED like selected, which is the
+          one thing the tab contract cannot allow. Two structural answers, and
+          both are ordering, not cleverness:
+            · `tabBtnPressed` returns the bottom edge to `transparent`, so the
+              press cannot forge the selection mark;
+            · `tabBtnActive` is LAST in every array, so a genuinely selected tab
+              keeps its gold underline all the way through a press.
+          What the player gets is the face lighting and the tab travelling —
+          family-appropriate for a thing with no sidewall to collapse.
+
+          ⚠ AboutScreen's same-named `tabBtn` DOES take `kit.controlPressed`
+          whole, and that is not an inconsistency: its selected state is a
+          BACKGROUND swap on a fully ringed chip, so there is no semantic border
+          for the press to overwrite. Different construction, different answer. */}
       <View style={styles.tabRow}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setTab('contracts')}
-          style={[styles.tabBtn, tab === 'contracts' && styles.tabBtnActive]}
-          activeOpacity={0.7}
+          style={({ pressed }) => [styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'contracts' && styles.tabBtnActive]}
           accessibilityRole="button"
           accessibilityState={{ selected: tab === 'contracts' }}
         >
           <Text style={[styles.tabBtnText, tab === 'contracts' && styles.tabBtnTextActive]}>
             CONTRACTS
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           onPress={() => setTab('collectables')}
-          style={[styles.tabBtn, tab === 'collectables' && styles.tabBtnActive]}
-          activeOpacity={0.7}
+          style={({ pressed }) => [styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'collectables' && styles.tabBtnActive]}
           accessibilityRole="button"
           accessibilityState={{ selected: tab === 'collectables' }}
         >
           <Text style={[styles.tabBtnText, tab === 'collectables' && styles.tabBtnTextActive]}>
             COLLECTIBLES {totalFragments > 0 ? `(${totalFragmentsFound}/${totalFragments})` : ''}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* OTA-1014 — refusal strip: when a COMPLETE tap is refused (wrong faction, no
@@ -1084,34 +1145,58 @@ export function ContractsScreen() {
             moves-to-target (nearest first) while keeping each type grouped.
             OTA-1152 — READY TO HAND IN joins it on the right, same style. The two
             share one mode, so lighting either one clears the other. */}
+        {/* ⚠⚠⚠ OTA-1811 — THESE THREE ALREADY CONSUMED `pressed`, AND THAT MADE
+            THEM LOOK REPAIRED WHEN THEY WERE NOT. What `sortBarPressed` drew was
+            `{ opacity: 0.7 }` — the whole-control fade this file's own header
+            records OTA-1806 removing from COMPLETE / ABANDON / DISCARD, and
+            which the kit's pressed-plane note calls insufficient in the owner's
+            words. Two of them survived that sweep because a live `pressed` in
+            the style array reads as compliance to every scan we have.
+            `sortBarPressed` is deleted; nothing else referenced it.
+
+            ⚠⚠ THEY ARE `kit.ctl` CONTROLS, SO THEY TAKE THE COMMAND ANSWER:
+            `controlPressed` for the travel and the ring, and the planes become
+            a function of the finger. The plane swap moves NOTHING at rest —
+            `tabPlane*` and `controlPlane*` are the same three heights, offsets
+            and colours (the kit built the tab at "the command's own weight"), so
+            `ctlPlanes(false)` is what `TAB_PLANES` was already drawing here.
+
+            ⚠ AND THE `On` STYLE MOVES TO THE END OF EACH ARRAY. A lit sort bar
+            says so with a teal/green ring; `controlPressed` writes two of those
+            four edges. Ordering selection last means a held sort bar cannot stop
+            looking sorted — the same structural rule as the tabs above. */}
         <View style={styles.sortRow}>
           <Pressable
             onPress={() => pickSort('distance')}
-            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, sortMode === 'distance' && styles.sortBarOn, pressed && styles.sortBarPressed]}
+            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, pressed && kit.controlPressed, sortMode === 'distance' && styles.sortBarOn]}
             accessibilityRole="button"
             accessibilityState={{ selected: sortMode === 'distance' }}
           >
+            {({ pressed }) => (<>
             <Text style={[styles.sortBarText, sortMode === 'distance' && styles.sortBarTextOn]}>
               {sortMode === 'distance' ? '◈ SORTED BY DISTANCE' : '◈ SORT BY DISTANCE'}
             </Text>
             <Text style={[styles.sortBarHint, sortMode === 'distance' && styles.sortBarTextOn]}>
               {sortMode === 'distance' ? 'tap for default order' : 'nearest first, within each type'}
             </Text>
-            {TAB_PLANES}
+            {ctlPlanes(pressed)}
+            </>)}
           </Pressable>
           <Pressable
             onPress={() => pickSort('ready')}
-            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, sortMode === 'ready' && styles.sortBarReadyOn, pressed && styles.sortBarPressed]}
+            style={({ pressed }) => [kit.ctl, styles.sortBar, styles.sortBarHalf, pressed && kit.controlPressed, sortMode === 'ready' && styles.sortBarReadyOn]}
             accessibilityRole="button"
             accessibilityState={{ selected: sortMode === 'ready' }}
           >
+            {({ pressed }) => (<>
             <Text style={[styles.sortBarText, sortMode === 'ready' && styles.sortBarReadyText]}>
               {sortMode === 'ready' ? `✦ READY TO HAND IN · ${readyRows.length}` : '✦ SORT BY READY TO HAND IN'}
             </Text>
             <Text style={[styles.sortBarHint, sortMode === 'ready' && styles.sortBarReadyText]}>
               {sortMode === 'ready' ? 'tap for default order' : 'finished work first, nearest first'}
             </Text>
-            {TAB_PLANES}
+            {ctlPlanes(pressed)}
+            </>)}
           </Pressable>
         </View>
         {/* OTA-1152 — the roll-up itself: every ready contract, pulled from its
@@ -2740,7 +2825,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
-  sortBarPressed: { opacity: 0.7 },
+  /* ⚠ OTA-1811 — `sortBarPressed: { opacity: 0.7 }` was HERE and is gone. It
+     was the whole-control fade, wearing a live `pressed` so that it read as a
+     repaired control. The three sites it served now take `kit.controlPressed`
+     and pressed planes. Nothing references it; it is not replaced. */
   // OTA-1152 — the two sort buttons share the row; READY sits to the right of
   // BY DISTANCE, same shape, and lights the completion-green the COMPLETE button
   // uses so "ready" reads as the same idea in both places.
@@ -2934,6 +3022,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   tabBtnActive: { borderBottomColor: '#c9a86a' },
+  /* ⚠⚠ OTA-1811 — THE PRESSED TAB FACE, AND THE EDGE IT GIVES BACK. The fill is
+     the raised-face colour this screen already uses everywhere, so a struck tab
+     lights instead of fading. `borderBottomColor` is restored to `transparent`
+     on purpose: `kit.controlPressed` sets that field to the lit rim, and on a
+     tab whose selection mark IS the bottom edge that would forge a selected
+     tab under any finger. `tabBtnActive` still comes after this in every array,
+     so a really-selected tab keeps its gold through the press.
+     ⚠ Nothing here is reachable at rest — both arms are behind `pressed`. */
+  tabBtnPressed: { backgroundColor: '#1a1714', borderBottomColor: 'transparent' },
   tabBtnText: { color: '#a2977b', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   tabBtnTextActive: { color: '#c9a86a' },
   collectIntro: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },

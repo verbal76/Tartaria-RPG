@@ -30347,7 +30347,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // CharacterPortrait was NOT edited. It owns artwork / background / banner /
 // faction crest / sex mark / motive / caption and is presentation-only; the
 // firewall is asserted here rather than merely respected.
-export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';
+//
+// ── OTA-1811 · THE CONTRACTS SLATE TAKES THE WEIGHT ─────────────────────────
+//
+// The second iteration of the second UI pass, and the same question at a
+// different door: if the player understands a surface as pressable, does it
+// answer the finger? Four Contracts families were named on the device. All four
+// were deficient — but only three of them LOOKED it.
+//
+//   · PRIMARY OBJECTIVE — a TouchableOpacity at activeOpacity 0.85, so the
+//     depth language was structurally unreachable inside it. It now reports the
+//     press, takes the shared travel and ring, and stops standing on its
+//     chassis planes while it is held.
+//   · CONTRACTS / COLLECTIBLES tabs — TouchableOpacity at 0.7, and this family
+//     needed a different answer rather than the same one. An underline tab's
+//     only selection mark is its bottom edge, which is the exact field the
+//     shared press writes, so the mechanical repair would have made PRESSED
+//     look like SELECTED. The face lights and the tab travels; the bottom edge
+//     is handed back while pressed, and selection resolves last in every array.
+//   · MILESTONE CELLS — TouchableOpacity at 0.7, and the fade landed on a bare
+//     `flex: 1` wrapper, never on the cell the player can see. The renderer now
+//     takes the finger as a parameter; the read-only contract still passes
+//     false and is byte-identical.
+//   · THE SORT / FILTER BARS — Pressable, with a LIVE `pressed`, spending it on
+//     `{ opacity: 0.7 }`. Every census we own read that as repaired. It is the
+//     whole-control fade OTA-1806 removed from COMPLETE / ABANDON / DISCARD in
+//     this same file; three sites survived that sweep BECAUSE they consumed
+//     `pressed`. Presence is not participation.
+//
+// The slate filter (ALL / ACTIVE / PARKED) already travelled and was left
+// untouched as a proven exclusion. `TTabBar` — the kit's shared tab component
+// behind Guidance, Vendor and Crafting — carries the same defect and was NOT
+// converted under a Contracts authorization; its blast radius is reported, not
+// spent. Nothing was added at rest, and no second press system was minted.
+export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';

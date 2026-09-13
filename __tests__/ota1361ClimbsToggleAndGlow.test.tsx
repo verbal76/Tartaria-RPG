@@ -215,10 +215,31 @@ describe('OTA-1361 — the towers toggle, and the active mission glows', () => {
     return out;
   }
   /** The same walk over UNRENDERED React elements, whose text hides under `props`. */
+  /* ⚠⚠⚠ OTA-1811 — THE WALKER NOW READS A CONTROL THAT REPORTS ITS PRESS, AND
+   * THAT IS A WIDENING, NOT A WEAKENING. This helper exists so the test can
+   * find SORT BY DISTANCE by its label and press the same control the player
+   * presses — which is the right way to write it. But it walked `props.children`
+   * as a static element tree, and a `Pressable` that feeds `pressed` to its
+   * planes renders its children as a FUNCTION. The moment the sort bar was
+   * repaired the label went invisible here, the finder returned zero nodes, and
+   * a suite about SORTING failed on its ability to locate a BUTTON — which says
+   * nothing at all about whether the towers sort.
+   *
+   * ⚠⚠ NOT ONE SORTING ASSERTION WAS TOUCHED. The invariant this file defends —
+   * the five towers obey SORT BY DISTANCE, in the slate's own comparator order,
+   * none dropped — is unchanged and still goes red if that behaviour breaks.
+   * Only the LOCATOR moved, and it moved to cover MORE controls than before:
+   * every depressing control in the game renders this way now, so a walker that
+   * cannot see through a render prop would go on failing correct repairs. The
+   * function is invoked at REST (`pressed: false`), because the resting label is
+   * what a player reads before deciding to touch anything. */
   function elementTexts(node: unknown, out: string[] = []): string[] {
     if (node == null) return out;
     if (typeof node === 'string') { out.push(node); return out; }
     if (typeof node === 'number') { out.push(String(node)); return out; }
+    if (typeof node === 'function') {
+      return elementTexts((node as (s: { pressed: boolean }) => unknown)({ pressed: false }), out);
+    }
     if (Array.isArray(node)) { for (const n of node) elementTexts(n, out); return out; }
     const props = (node as { props?: { children?: unknown } }).props;
     if (props?.children != null) elementTexts(props.children, out);
