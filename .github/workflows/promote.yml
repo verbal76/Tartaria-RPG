@@ -109,6 +109,28 @@ jobs:
 
       # ⚠ The exact SHA, line=hal, and NO validated_by — the publisher takes its
       # manual path and runs Change A's receipt against that SHA itself.
+      #
+      # ⚠⚠⚠ 2026-09-13 — `-R "$GITHUB_REPOSITORY"`, AND IT IS NOT DECORATION. The
+      # first non-inert promotion in this branch's history reached this step and
+      # died on it: run #2 (id 34732478089) validated everything, printed
+      # `DISPATCH 8e2e6ac6db8de26780f62cd4096fd0431f15ec48`, and then failed with
+      #
+      #     failed to run git: fatal: not a git repository (or any of the parent
+      #     directories): .git
+      #
+      # No publisher run was created and HAL never received the SHA. The cause is
+      # this job's own shape: it checks the two repositories out into `ledger/`
+      # and `trunk/`, so the workspace ROOT is not a checkout, and `gh` resolves
+      # which repository to talk to from the CWD's git remote. ci.yml's publish
+      # job runs the identical command successfully because IT checks out at the
+      # root — which is exactly why the bug survived review: the form is correct
+      # everywhere it had ever run.
+      #
+      # ⚠ Repository identity is now STATED rather than inferred. A dispatch
+      # names the repository it targets; it should not depend on which directory
+      # a shell happens to be standing in. `$GITHUB_REPOSITORY` is the spelling
+      # this repo already uses for naming itself to `gh` (three times in
+      # eas-update-golem.yml's receipt step) — no new convention is introduced.
       - name: Dispatch the publisher for the exact SHA, line hal
         if: steps.decide.outputs.sha != ''
         env:
@@ -116,7 +138,7 @@ jobs:
           SHA: ${{ steps.decide.outputs.sha }}
         run: |
           set -euo pipefail
-          gh workflow run eas-update-golem.yml --ref golem-line \
+          gh workflow run eas-update-golem.yml -R "$GITHUB_REPOSITORY" --ref golem-line \
             -f sha="$SHA" \
             -f line=hal
           echo "Dispatched eas-update-golem.yml for ${SHA} → HAL (the publisher will verify the receipt)."
