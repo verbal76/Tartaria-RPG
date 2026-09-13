@@ -89,3 +89,7 @@ verdict. This push-triggered run reads golem-line's current relay, which can. Wa
 whether Sentry actually RECEIVED both reports, per-bundle part completeness on the relay's own
 pagination/issue-walk evidence, and whether either payload carries telemetry from before the
 gameplay freeze's force-close.
+pull: 2026-09-13T16:36Z — re-request. The previous request commit (e383fa40) quoted the CI-skip
+marker verbatim in its message while explaining why not to use it, and GitHub matches that token
+anywhere in a commit message, so it skipped every workflow including this relay. Same request as
+above, unchanged: everything newer than the 2026-09-13T16:10:50Z events of bundle #mu00gi1et5oc.
