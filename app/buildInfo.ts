@@ -30213,7 +30213,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // something already written down, so neither was taken.
 //
 // APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This repairs an accounting defect.
-export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';
+// OTA-1808 - the aside does not start in a fight. BAKER ITEM 9: player
+// preemption arrives too late for running prefill.
+//
+// THE WINDOW, DETERMINISTICALLY MEASURED at 1807 on the REAL native-ML lock,
+// with the exact opts narration.ts was passing:
+//   admitted valid -> held behind a live job -> combat started while waiting
+//   -> released -> ctx.completion CALLED.
+// With a predicate, the same sequence: ctx.completion NOT called, '' returned.
+//
+// WHY IT WAS OPEN. maybeGenerateAmbientArbiter muzzles itself on
+// `scene.enemies.length > 0` - in its own words "about whether a musing is
+// WANTED at all" - and that is the architecture's statement that an aside must
+// not BEGIN in a fight. It is asked ONCE, before an unbounded wait for the one
+// native lock (the owner's 2026-09-02 log: a 22.3 s aside holding it while five
+// classifier calls queued 23-24 s behind, the aside itself "came back stale
+// (combat had started)"). An encounter spawning during that wait turns the job
+// into exactly the work the muzzle refuses - and it reached prompt prefill
+// anyway, because nothing re-asked.
+//
+// THE REPAIR IS ONE PREDICATE, NOT A MECHANISM. OTA-1368 already built the
+// door: inside the runExclusiveNativeMl callback, after the lock is ours and
+// before the native call, armed by `shouldAbort`. Every other optional class
+// either supplies one or is deliberately exempt; ambient simply never did, so
+// the door was inert there. It now hands the door the muzzle's own question.
+//
+// WHAT IT IS NOT. Not prefill interruption - once ctx.completion is entered
+// nothing changes, and OTA-1368's per-token door and OTA-1123's preempt hook
+// are untouched. Not Baker #7: no prompt, token budget or model parameter
+// moved. Not Baker #8: no priority, lane or queue policy moved, and the
+// refusal happens INSIDE the lock, so exclusivity is unchanged. Not Baker #13:
+// humanActivity.ts is untouched and J2 stays deferred.
+//
+// ONLY COMBAT IS RE-ASKED, and that is a deliberate limit. `ambientStaleReason`
+// is the FINISH-time authority and says so ("the start-of-generation guard
+// already refuses to BEGIN in combat; this refuses to finish into one"), and
+// OTA-1122 deliberately BANKS a line that went stale by MOVING - still a good
+// musing for the place it was written about. Aborting on movement would throw
+// that away. Combat is the one state already ruled a begin-time refusal.
+//
+// SETTLEMENT USES PATHS THAT ALREADY EXIST: the door marks the call preempted,
+// so the live lane takes OTA-1634's "cut short" branch and the fill lane logs
+// the empty outcome. Nothing is banked because nothing was written.
+//
+// APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This closes one proven admission
+// window; it claims nothing about #7, #8, or the larger failure.
+export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1804-one-control-language';

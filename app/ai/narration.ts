@@ -1479,7 +1479,14 @@ export async function maybeGenerateAmbientArbiter(
       // (arb163). It yields like homework — below the voice, cut the instant the
       // player acts or a real call arrives — and a cut aside is discarded below,
       // because the thing that cut it is the thing that made it stale.
-      { maxNewTokens: 32, job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: true },
+      // ⚠⚠⚠ OTA-1808 (Baker #9) — the combat muzzle at the top of this function
+      // is asked ONCE, before an unbounded wait for the one native lock. An
+      // encounter that spawns during that wait made this job exactly the work
+      // the muzzle refuses, and it reached prefill anyway because nothing
+      // re-asked. `shouldAbort` hands OTA-1368's existing door that same
+      // question at the last free moment. See buildInfo for the measurement.
+      { maxNewTokens: 32, shouldAbort: () => (get().currentScene?.enemies?.length ?? 0) > 0,
+        job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: true },
     );
     // OTA-663 — off-canon entity guard (ambient path). A dropped line just stays
     // silent (ambient has no template fallback), which is the safe outcome.

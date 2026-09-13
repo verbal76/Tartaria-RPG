@@ -545,6 +545,15 @@ describe('OTA-1807 §7 — build identity', () => {
   it('⚠ the OTA stamp names this work', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { OTA_BUILD_ID } = require('../app/buildInfo');
-    expect(OTA_BUILD_ID).toMatch(/^2026-09-12-1807-/);
+    // ⚠⚠ OTA-1808 — THIS PINNED `^2026-09-12-1807-`, WHICH EVERY LATER OTA MUST
+    // BREAK. I repaired exactly this shape in the 1806 suite one OTA ago, wrote
+    // that a stamp pinned to one number has a one-bundle shelf life, and then
+    // authored the same trap here in the same commit. The durable claim is that
+    // the badge never goes BACKWARDS onto a bundle that has moved past it;
+    // `check:otastamp` separately ties the exact number to the newest suite.
+    const n = Number(/^\d{4}-\d{2}-\d{2}-(\d+)-/.exec(OTA_BUILD_ID)?.[1]);
+    expect(Number.isFinite(n)).toBe(true);
+    expect(n).toBeGreaterThanOrEqual(1807);
+    expect(OTA_BUILD_ID).not.toMatch(/-1806-|-1805-/);
   });
 });
