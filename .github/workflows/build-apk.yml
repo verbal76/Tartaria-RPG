@@ -768,9 +768,39 @@ jobs:
           Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship to channel ${{ steps.identity.outputs.channel }} while this APK is installed."
           fi
 
+          # ⚠⚠⚠ A3-1 — THE TAG HAS TO POINT AT WHAT WAS BUILT.
+          #
+          # Without `--target`, `gh release create` creates the tag at the
+          # REPOSITORY'S DEFAULT BRANCH head, not at the source this run
+          # compiled. Measured on the existing releases, not assumed:
+          # golem-apk-327/328/329/330, aab-build-318 and Hal2001-317 ALL resolve
+          # to the same commit b21a331d — a `main` doc commit from 2026-08-07
+          # that is not even an ancestor of golem-line. The API says
+          # `target_commitish: "main"` for golem-apk-330 while that same
+          # release's own body says `Branch: claude/golem-emblems-github-fnkt0v`
+          # / `Commit: 6de648e`. The body was right the whole time; the tag lied.
+          #
+          # ⚠ NOTHING WENT RED, which is why it survived. The release is created,
+          # the .apk attaches, the run is green — and the one durable handle on
+          # the artifact, its tag, names a tree that never produced it. Under
+          # "exact Git SHA = source identity" that is an integrity hole, and the
+          # only way to notice it is to go and resolve a tag.
+          #
+          # ⚠ $GITHUB_SHA IS THE AUTHORITY, not a convenience. `actions/checkout`
+          # above takes no `ref:`, so it checks out exactly $GITHUB_SHA, and every
+          # step after it — prebuild, the signing patch, gradle — operates on that
+          # tree. It is also already the source of `SHORT_SHA` in the body twelve
+          # lines up, so the tag and the note now name the same commit by
+          # construction rather than by luck.
+          #
+          # ⚠ THE TAG-PUSH PATH NEEDS NO EXCEPTION. On refs/tags/v* the tag
+          # already exists and GitHub ignores target_commitish for an existing
+          # tag; $GITHUB_SHA there IS the tagged commit, so the flag is correct
+          # and inert on that path and load-bearing on the other three.
           gh release create "$TAG" \
             "${{ steps.artifact.outputs.path }}" \
             --repo "${{ github.repository }}" \
+            --target "$GITHUB_SHA" \
             --title "$TITLE" \
             --latest \
             --notes "## Tartaria Realms — $KIND
