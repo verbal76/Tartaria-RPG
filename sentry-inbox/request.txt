@@ -67,3 +67,25 @@ pull: owner's newest log, pushed 2026-09-06 after OTA-1715..1719 (dog off the be
 pull: the TWO fresh logs pushed 2026-09-06 after OTA-1721. Owner's comments FIRST. Then the vendor/crucible anchoring question, counted correctly: key each vendor sighting to the number of 'You walk' lines before it (tile steps), NOT to 'You've left X and entered Y' (region changes) — that miscount is what made the last read wrong.
 pull: 2026-09-07T18:25Z — owner just used FULL PUSH LOG; target character Johnny Blaze. Fetch newest complete bundle and analyze it.
 pull: 2026-09-10T01:10Z — owner: two NEW logs from a NEW device, a 2022 iPhone SE that FROZE. One is a FULL log. Sent ~10 and ~3 minutes before this request, i.e. AFTER the 00:56Z hourly run. Fetch everything newer than that run. Looking for: the freeze — what the device was doing, memory/pressure lines, the model gate, and whether the process was killed.
+pull: 2026-09-13T16:35Z — BUILD 189 FREEZE EVIDENCE. Owner is testing 2.4.1 build 189 on a
+physical iPhone via TestFlight; character Verbal, at The Monarch's Waystation. TWO reports were
+sent today within minutes of each other:
+  REPORT A — Settings -> Report a Bug -> "Send full log for analysis" -> SEND LOG. The screen
+    reached "Report sent. Thank you — it arrived with your log attached." and then the app FROZE
+    on that screen, non-responsive.
+  REPORT B — a second character-specific report for Verbal, description approximately
+    freeze/froze/frozen. EXACT WORDING UNKNOWN — do not match on invented text. Same success
+    state, then the same freeze. 2/2 device-observed reproduction of the reporting freeze.
+Separately and immediately BEFORE those: a hard gameplay freeze on a brand-new Verbal character
+about 30 s in, during deliberate rapid button mashing — last frame intact, no pressed-state or
+touch response for >2.5 minutes, survived background -> ~20 s -> foreground, iOS did not kill the
+process, force-close required, save survived cold relaunch. DO NOT assume the reporting freeze and
+the gameplay freeze share a cause.
+Fetch everything newer than the 2026-09-13T16:10:50Z events (bundle #mu00gi1et5oc, 8 inline parts
++ beacon, which the 16:11Z hourly run synced). The hourly clock fires from `main`, whose copy of
+this workflow is frozen at 2026-08-27 and has NO issue-feed walk, NO cursor pagination and NO
+inline chunkBlocks reassembly — so it syncs raw events and can neither stitch a bundle nor write a
+verdict. This push-triggered run reads golem-line's current relay, which can. Wanted from it:
+whether Sentry actually RECEIVED both reports, per-bundle part completeness on the relay's own
+pagination/issue-walk evidence, and whether either payload carries telemetry from before the
+gameplay freeze's force-close.
