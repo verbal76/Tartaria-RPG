@@ -65,6 +65,8 @@ import { startAudioController, stopAudioController } from './app/audio/AudioCont
 import { setAliveBeatContext, startAliveBeat, stopAliveBeat } from './app/diagnostics/aliveBeat';
 // ⚠ OTA-1798 — the boot effect owns the teardown of the two instruments its hydrate→bootQwen path starts.
 import { stopRuntimePressureWatch } from './app/diagnostics/runtimePressureWatch';
+// ⚠⚠⚠ OTA-1813 — the previous boot's touch path. Hydrated in the boot effect.
+import { loadPriorTouchPath } from './app/diagnostics/touchPath';
 import { stopQwenWatchdog } from './app/ai/qwenWatchdog';
 // ⚠⚠⚠ BOOT-HANG-1741 — the screen a boot that never finished is allowed to have.
 import { BootTroubleScreen } from './app/components/BootTroubleScreen';
@@ -395,6 +397,15 @@ export default function App() {
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).
     void loadDisplaySettings();
+    // ⚠⚠⚠ OTA-1813 — HYDRATE THE PREVIOUS BOOT'S TOUCH PATH, for exactly the
+    // reason the crash ledger below is hydrated here: `touchPathBlock` is read
+    // SYNCHRONOUSLY by the bug-report header, which has no loading state. And
+    // the freeze this trace exists for ends in a FORCE-CLOSE, so the boot that
+    // can send a report is never the boot that recorded the dead touch —
+    // without this line the trace would be written every session and read in
+    // none of them.
+    // ⚠ Fire-and-forget and caught: an instrument may never fail a boot.
+    void loadPriorTouchPath().catch(() => { /* an instrument never fails a boot */ });
     // ⚠⚠ OTA-1380 — hydrate the crash ledger and the delivery preference at
     // boot. Both are read SYNCHRONOUSLY later (crashLedgerSummary and
     // reportingStatusLine serve the About screen and the bug report, neither of

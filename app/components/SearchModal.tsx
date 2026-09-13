@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 import type { InteractableChip } from './InteractableChip';
 
@@ -117,10 +118,22 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
   }, [visible, chips, onCancel]);
 
   const handleSubmit = () => {
+    // ⚠⚠ OTA-1813 — T2. Reached from the INVESTIGATE key AND from the keyboard's
+    // return key (`onSubmitEditing`), which is why the empty-text branch below is
+    // genuinely reachable: the KEY is `disabled` when the field is empty, the
+    // RETURN KEY is not. That branch is a real handler refusal, so it is the one
+    // place in this file entitled to record a rejection.
+    const tp = noteHandlerEnter('search:submit');
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      noteStage(tp, 'reject', { control: 'search:submit', reason: 'empty-text' });
+      return;
+    }
+    noteStage(tp, 'admit', { control: 'search:submit', reason: 'typed' });
     Keyboard.dismiss();
+    noteStage(tp, 'dispatch', { control: 'search:submit', reason: 'typed' });
     onSubmit(trimmed);
+    noteStage(tp, 'done', { control: 'search:submit', reason: 'typed' });
   };
 
   // One-tap search targets. Playtest feedback: "I'm not typing the
@@ -130,8 +143,15 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
   // input first, the keyboard collapses cleanly before the modal
   // closes.
   const tapToSearch = (target: string) => {
+    // ⚠ OTA-1813 — T2 for a chip. There is no refusal here to record: an
+    // actionable chip always submits, and a consumed chip is `disabled` so this
+    // function is never entered for it.
+    const tp = noteHandlerEnter(`search:${target}`);
+    noteStage(tp, 'admit', { control: `search:${target}`, reason: 'chip' });
     Keyboard.dismiss();
+    noteStage(tp, 'dispatch', { control: `search:${target}`, reason: 'chip' });
     onSubmit(target);
+    noteStage(tp, 'done', { control: `search:${target}`, reason: 'chip' });
   };
   // OTA-747 — a CONSUMED chip always leaves the list, INCLUDING the pinned surface
   // chip ('the ground' / 'floor' / 'mud'). Player ask: every other investigated noun
@@ -183,6 +203,12 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
     >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <KeyboardAvoidingView
+          /* ⚠⚠⚠ OTA-1813 — MODAL_TOUCH. Native <Modal> hosts this card outside
+             ExplorationScreen's tree, so the T0 observer there cannot see these
+             touches. Returning false observes at the capture phase without ever
+             claiming the responder, leaving the chips, the field and the keys
+             below exactly the negotiation they have today. */
+          onStartShouldSetResponderCapture={() => { noteRootTouch('modal'); return false; }}
           style={kit.modalScrim}
           accessibilityViewIsModal={true}
           // OTA 022 — see ExplorationScreen comment. 'height' on
@@ -251,6 +277,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                             pressed && !c.consumed && styles.btnPressed,
                           ]}
                           disabled={c.consumed}
+                          /* ⚠ OTA-1813 — T1. A consumed chip is `disabled`, so
+                             neither this nor onPress runs for it; that silence is
+                             correct and is not recorded as a refusal. */
+                          onPressIn={(e) => { notePressIn(`search:${c.noun}`, e); }}
                           onPress={() => tapToSearch(c.noun)}
                           accessibilityRole="button"
                           accessibilityState={{ disabled: c.consumed }}
@@ -288,7 +318,18 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                   {onInvestigateAll && actionableChips.length >= 2 && (
                     <Pressable
                       style={({ pressed }) => [styles.btn, tFilledGold(pressed), { marginTop: 8 }]}
-                      onPress={() => onInvestigateAll(actionableChips.map((c) => c.noun))}
+                      /* ⚠ OTA-1813 — T1/T2 on the BULK control. The sweep is the
+                         control most likely to be pressed repeatedly during the
+                         reported freeze, so it gets the same chain the single
+                         chips do. */
+                      onPressIn={(e) => { notePressIn('search:all', e); }}
+                      onPress={() => {
+                        const tp = noteHandlerEnter('search:all');
+                        noteStage(tp, 'admit', { control: 'search:all', reason: 'bulk' });
+                        noteStage(tp, 'dispatch', { control: 'search:all', reason: 'bulk' });
+                        onInvestigateAll(actionableChips.map((c) => c.noun));
+                        noteStage(tp, 'done', { control: 'search:all', reason: 'bulk' });
+                      }}
                       accessibilityRole="button"
                       accessibilityLabel={`Investigate all ${actionableChips.length} surfaces`}
                     >
@@ -323,6 +364,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                     styles.btn,
                     text.trim() ? tFilledGold(pressed) : [tFilledGold(null), kit.ctlDead],
                   ]}
+                  onPressIn={(e) => { notePressIn('search:submit', e); }}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
                   accessibilityRole="button"

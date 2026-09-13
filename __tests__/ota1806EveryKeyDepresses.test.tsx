@@ -226,7 +226,18 @@ describe('4. the BEHAVIOUR of a room door is untouched — only its surface move
   });
 
   it('a blocked door still buzzes and returns; a spent door still speaks and costs nothing', () => {
-    expect(TRAVEL).toMatch(/if \(blocked\) \{ buzzWrong\(\); useGameStore\.getState\(\)\.nudgeTutorialBlocked\(\); return; \}/);
+    /* ⚠⚠ OTA-1813 RETARGETED THIS LINE AND DID NOT SOFTEN IT. The claim is the
+     * BEHAVIOUR named in this test's own title — a blocked door buzzes, nudges,
+     * and RETURNS without reaching the verb — and that is exactly what is
+     * asserted below, now in three ordered pieces instead of one single-line
+     * spelling. The branch gained an OTA-1813 observational statement in front
+     * of the buzz and had to wrap; nothing it does can admit, delay or reorder
+     * the tap. Bite for bite this is stronger: it pins the RETURN as coming
+     * before `onPress()`, which the old one-line regex only implied. */
+    const blocked = TRAVEL.slice(TRAVEL.indexOf('if (blocked)'));
+    expect(blocked).toMatch(/buzzWrong\(\)/);
+    expect(blocked).toMatch(/useGameStore\.getState\(\)\.nudgeTutorialBlocked\(\)/);
+    expect(blocked.slice(0, blocked.indexOf('onPress()'))).toMatch(/return;/);
     // OTA-1458 — a spent tap must not reach the store's travel path, or it
     // spends the 15-minute anti-stuck tick for a move that never happened.
     const spent = TRAVEL.slice(TRAVEL.indexOf('if (spent)'));
@@ -248,7 +259,11 @@ describe('4. the BEHAVIOUR of a room door is untouched — only its surface move
 
   it('the handle, the screen-reader identity and the selected/disabled states all survive', () => {
     expect(TRAVEL).toMatch(/testID=\{testID\}/);
-    expect(TRAVEL).toMatch(/onPressIn=\{noteTouchDown\}/);
+    /* ⚠ OTA-1813 RETARGETED, NOT SOFTENED — same claim as ota1695's twin pin:
+     * the door still notes the DOWN event from its own press-in. The prop is now
+     * a composed handler that feeds tapClock FIRST and then the correlation
+     * observer, so the call is pinned rather than the bare identifier. */
+    expect(TRAVEL).toMatch(/onPressIn=\{\(e\) => \{ noteTouchDown\(e\);/);
     expect(TRAVEL).toMatch(/onPress=\{handlePress\}/);
     expect(TRAVEL).toMatch(/accessibilityRole="button"/);
     expect(TRAVEL).toMatch(/accessibilityState=\{\{ disabled: !!blocked, selected: !!active \}\}/);

@@ -115,7 +115,18 @@ describe('OTA-1695 — the arithmetic', () => {
 describe('OTA-1695 — the wiring', () => {
   it('both chip families and ROLL note the DOWN event; logUiTap keeps its pinned call shape and rides the suffix', () => {
     const input = src('app', 'components', 'InputBox.tsx');
-    expect(input.split('onPressIn={noteTouchDown}').length - 1).toBe(2);
+    /* ⚠⚠ OTA-1813 RETARGETED THIS LINE AND DID NOT SOFTEN IT. The claim is and
+     * remains: BOTH chip families note the DOWN event from their own press-in,
+     * and there are exactly two of them. What changed is the CALL SHAPE — the
+     * prop was the bare `onPressIn={noteTouchDown}` and is now a composed
+     * handler that calls `noteTouchDown(e)` FIRST and then hands the same event
+     * to OTA-1813's correlation observer. Counting the composed form keeps every
+     * failure the old count caught (drop noteTouchDown from either family, or
+     * add a third family without it, and this still goes red) and adds one the
+     * old spelling could not make: that tapClock is fed BEFORE anything else in
+     * the handler, which is what keeps its `⏱+Nms` suffix on the tap line. */
+    expect(input.split('onPressIn={(e) => { noteTouchDown(e);').length - 1).toBe(2);
+    expect(input.split('noteTouchDown(').length - 1).toBe(2);
     expect(input.split('logUiTap(label);').length - 1).toBe(2); // OTA-1172's two, untouched
     const dice = src('app', 'components', 'DiceRoller.tsx');
     expect(dice.includes('onPressIn={noteTouchDown} onPress={handleRoll}')).toBe(true);

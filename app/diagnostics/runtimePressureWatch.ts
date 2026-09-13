@@ -56,6 +56,8 @@ import {
   type PressureSnapshot,
 } from './runtimePressure';
 import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded, peekLiveBreadcrumb } from '../engine/saveSystem';
+// ⚠ OTA-1813 — observational only; see app/diagnostics/touchPath.ts.
+import { flushTouchPath, resetTouchCorrelation, setTouchPathContext, touchPathContext } from './touchPath';
 import { nativeMlSnapshot, nativeQueuePressure } from '../ai/nativeMlLock';
 import { qwen } from '../ai/engines';
 import { nativePressure } from '../ai/generation/qwenTelemetry';
@@ -328,6 +330,16 @@ export function startRuntimePressureWatch(
       // background→active transition, on a path no action/homework stamp covers.
       // Stamped before any other work so the crumb survives whatever follows.
       stampBreadcrumbPhase(`appstate:${prev}→${nextStr}`);
+      // ⚠ OTA-1813 — the touch path rides THIS existing seam rather than adding
+      // a listener of its own. Leaving `active` asks for the one coalesced
+      // trailing snapshot now (fire-and-forget), and drops the outstanding touch
+      // correlation so a finger from before the background can never be
+      // inherited by a handler after it. The RING IS KEPT — it is the evidence a
+      // force-close has to leave behind.
+      try {
+        setTouchPathContext({ ...touchPathContext(), appState: nextStr });
+        if (nextStr !== 'active') { resetTouchCorrelation(); flushTouchPath(); }
+      } catch { /* an instrument may never break the lifecycle it observes */ }
       try { get().appendLog('debug', appStateLine(prev, nextStr, t - rpAppStateSince)); } catch { /* ignore */ }
       rpAppStateTrail = [...rpAppStateTrail, nextStr].slice(-APPSTATE_TRAIL_MAX);
       rpAppState = nextStr;

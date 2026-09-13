@@ -78,6 +78,37 @@ function memoryTimelineBlock(): string {
     return 'Memory timeline\n  (unavailable this session)';
   }
 }
+/** ⚠⚠⚠ OTA-1813 — THE TOUCH PATH, AND IT IS THE ONLY BLOCK HERE THAT ASKS ABOUT
+ *  THE PLAYER'S FINGER. Every other block answers what the PROCESS was doing;
+ *  the two Build 189 freeze reports are the case where the process was fine and
+ *  the hand was not, and nothing in this header could tell a reader whether a
+ *  tap reached a handler at all.
+ *
+ *  ⚠⚠ THE PRIOR BOOT COMES FIRST, because the freeze under investigation ends in
+ *  a force-close: the boot that can send a report is never the boot that froze.
+ *  A null prior trace is printed as a null, never as an empty one — "we did not
+ *  load it" and "there were no touches" are different findings.
+ *
+ *  ⚠ BOUNDED BY CONSTRUCTION on both sides: each ring is capped at
+ *  TOUCH_PATH_MAX_ENTRIES, so this block cannot grow with session length. */
+function touchPathBlock(): string {
+  try {
+    const prior = priorTouchPath();
+    const now = peekTouchPath();
+    const priorPart = prior === null
+      ? '  prior boot: (no trace loaded)'
+      : prior.length === 0
+        ? '  prior boot: (trace present, no stages)'
+        : ['  prior boot:', ...touchPathLines(prior)].join('\n');
+    const nowPart = now.length === 0
+      ? '  this boot: (no stages yet)'
+      : ['  this boot:', ...touchPathLines(now)].join('\n');
+    return `Touch path\n${priorPart}\n${nowPart}`;
+  } catch {
+    return 'Touch path\n  (unavailable this session)';
+  }
+}
+import { peekTouchPath, priorTouchPath, touchPathLines } from './touchPath';
 import { memoryTimelineSummary } from './memoryTimeline';
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
@@ -225,6 +256,9 @@ export function buildBasicDeviceSummary(): string {
     // every cycle. LAST in the report because it is the longest block and the
     // counts above are what a triage reader looks at first.
     memoryTimelineBlock(),
+    // ⚠⚠⚠ OTA-1813 — and the one block about the PLAYER rather than the process.
+    // Placed last, beside the other long block, for the same triage reason.
+    touchPathBlock(),
   ];
   return lines.join('\n');
 }

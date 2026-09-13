@@ -75,6 +75,8 @@ import {
   feedPackChipLabel, feedPackChipA11yLabel,
 } from '../engine/feedActionChip';
 import { ClimbModal } from '../components/ClimbModal';
+// ⚠ OTA-1813 — observational only; see app/diagnostics/touchPath.ts.
+import { noteRootTouch, setTouchPathContext, resetTouchCorrelation, currentTouchId, noteStage } from '../diagnostics/touchPath';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
@@ -281,6 +283,40 @@ export function ExplorationScreen() {
   // closing under those. Modals raised over a sheet that STAYS open are fine
   // (present-over-presented works); it is present-during-dismiss that wedges.
   const submitAfterSheetSettles = (text: string, after?: () => void): void => {
+    // ⚠⚠⚠ OTA-1813 — THE ARMED/FIRED PAIR. This is the one seam where a
+    // deferred submit can be told apart from a lost one. A player who taps a
+    // sheet control during the reported freeze and sees nothing has two
+    // possible stories: the tap never reached a handler at all, or it reached
+    // one and the work that handler scheduled never ran. `armed` without a
+    // matching `fired` separates them, and nothing else in the trace can.
+    //
+    // ⚠⚠ THE SUBMIT STATEMENT BELOW IS UNCHANGED, BYTE FOR BYTE. OTA-1497's
+    // suite reads it literally, and the deferral it pins is load-bearing — it
+    // is the fix for a different iOS wedge. `after` is composed BEFORE the
+    // timeout is scheduled, so the closure that line captures is the wrapped
+    // one, and the caller's own callback still runs exactly where it always
+    // did: immediately after the submit, inside the same timer tick.
+    //
+    // ⚠ IT BORROWS THE HANDLER'S ID AND NEVER MINTS ONE. Calling
+    // `noteHandlerEnter` here would find the root touch already claimed by T1
+    // and report a fabricated orphan. A null means no handler owns this call,
+    // and then nothing is recorded — a missing stage beats an invented one.
+    const tp = currentTouchId();
+    if (tp !== null) {
+      noteStage(tp, 'dispatch', {
+        control: 'sheet:deferred',
+        reason: 'delayed-submit-armed',
+        delayMs: SHEET_SETTLE_MS,
+      });
+      const caller = after;
+      after = (): void => {
+        noteStage(tp, 'dispatch', {
+          control: 'sheet:deferred',
+          reason: 'delayed-submit-fired',
+        });
+        caller?.();
+      };
+    }
     setTimeout(() => { submit(text); after?.(); }, SHEET_SETTLE_MS);
   };
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
@@ -1329,8 +1365,40 @@ export function ExplorationScreen() {
   // wash over the texture rather than an opaque fill.
   void timeOfDayTint;
 
+  // ⚠⚠⚠ OTA-1813 — M0, THE PRESENTATION TOKEN. A bounded string, not a
+  // serialised anything: it names WHICH surface could be eating touches, which
+  // is the only thing the freeze report needs from the presentation layer. No
+  // props, no content, no store objects — a handful of letters.
+  const presentationToken = ((): string => {
+    const on: string[] = [];
+    if (searchOpen) on.push('S');
+    if (takeOpen || salvageOpen) on.push('G');
+    if (climbOpen) on.push('C');
+    if (approachOpen) on.push('A');
+    if (torchChooserOpen) on.push('T');
+    if (pickpocketOpen) on.push('P');
+    if (missionBoardOpen) on.push('M');
+    if (askArbiterOpen) on.push('K');
+    return on.length ? on.join('+') : 'none';
+  })();
+  // Set from render, so a touch stage never has to read a store to know where
+  // it happened. Cheap, bounded, and it wakes no subscriber.
+  setTouchPathContext({ screen: 'exploration', presentation: presentationToken });
+
   return (
     <KeyboardAvoidingView
+      /* ⚠⚠⚠ OTA-1813 — T0: THE EARLIEST APP-OWNED EVIDENCE THAT A FINGER LANDED.
+         `onStartShouldSetResponderCapture` fires at the CAPTURE phase, before
+         any child negotiates the gesture, and RETURNING FALSE means this view
+         never becomes the responder — the control the player actually pressed
+         still gets it. Hit testing, scrolling, the keyboard, accessibility and
+         every callback are untouched; this observes and steps aside.
+
+         ⚠⚠ Native <Modal> content is NOT inside this tree, so a touch on the
+         Search/Gather/Climb sheets does not reach here. That absence is itself
+         readable: `enter` with no `root` before it says the touch arrived
+         through a modal, which is why those roots record `modal` separately. */
+      onStartShouldSetResponderCapture={() => { noteRootTouch('root'); return false; }}
       style={[styles.container, { backgroundColor: 'transparent' }]}
       // OTA 022 — was behavior='height' on Android (OTA 209 fix for
       // keyboard covering the input). 'height' on Android double-

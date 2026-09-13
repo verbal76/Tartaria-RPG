@@ -77,6 +77,7 @@ import { utilityArt, UTILITY_ART_SIZE } from '../engine/utilityGlyphArt';
 import { rarityHexColor } from './InventoryCategorize';
 
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 /** ⚠⚠ OTA-1317 — the row's rarity edge, or nothing.
  *
  *  A row here is an ambient NOUN, not an inventory item — "cart", "rubble", a
@@ -382,13 +383,27 @@ export function GatherModal({
           pressed && !consumed && styles.rowPressed,
         ]}
         disabled={consumed}
+        /* ⚠ OTA-1813 — T1. A consumed row is `disabled`, so neither this nor
+           onPress runs for it, and that silence is not recorded as a refusal. */
+        onPressIn={(e) => { notePressIn(`gather:${noun}`, e); }}
         onPress={() => {
           // ⚠ The refusal comes FIRST and returns. Falling through to the verb
           // after buzzing would be a lock that complains and then complies.
-          if (locked) { refuse(); return; }
-          if (lane === 'lead') { onInvestigate(noun); return; }
-          if (lane === 'scrap') { onSalvage(noun); return; }
-          onTake(noun);
+          // ⚠⚠ OTA-1813 — T2, and the ONE source-proven rejection in this row:
+          // the tutorial lock runs `refuse()` and returns without reaching a
+          // verb. Everything below it admits.
+          const tp = noteHandlerEnter(`gather:${noun}`);
+          if (locked) {
+            noteStage(tp, 'reject', { control: `gather:${noun}`, reason: 'tutorial-locked' });
+            refuse(); return;
+          }
+          const verb = lane === 'lead' ? 'investigate' : lane === 'scrap' ? 'salvage' : 'take';
+          noteStage(tp, 'admit', { control: `gather:${noun}`, reason: verb });
+          noteStage(tp, 'dispatch', { control: `gather:${noun}`, reason: verb });
+          if (lane === 'lead') { onInvestigate(noun); }
+          else if (lane === 'scrap') { onSalvage(noun); }
+          else { onTake(noun); }
+          noteStage(tp, 'done', { control: `gather:${noun}`, reason: verb });
         }}
         accessibilityRole="button"
         accessibilityState={{ disabled: consumed || locked }}
@@ -534,7 +549,21 @@ export function GatherModal({
               lockKey !== null && styles.sweepLocked,
               pressed && styles.rowPressed,
             ]}
-            onPress={() => { if (lockKey !== null) { refuse(); return; } onSweep(nouns); }}
+            /* ⚠ OTA-1813 — T1/T2 on the BULK control. The lock branch is a real
+               handler refusal (it buzzes and returns without sweeping), so it is
+               recorded as one; nothing else here is. */
+            onPressIn={(e) => { notePressIn(`gather:all:${lane}`, e); }}
+            onPress={() => {
+              const tp = noteHandlerEnter(`gather:all:${lane}`);
+              if (lockKey !== null) {
+                noteStage(tp, 'reject', { control: `gather:all:${lane}`, reason: 'tutorial-locked' });
+                refuse(); return;
+              }
+              noteStage(tp, 'admit', { control: `gather:all:${lane}`, reason: 'bulk' });
+              noteStage(tp, 'dispatch', { control: `gather:all:${lane}`, reason: 'bulk' });
+              onSweep(nouns);
+              noteStage(tp, 'done', { control: `gather:all:${lane}`, reason: 'bulk' });
+            }}
             accessibilityRole="button"
             accessibilityState={{ disabled: lockKey !== null }}
             accessibilityLabel={buttonLabel(nouns.length)}
@@ -560,7 +589,16 @@ export function GatherModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel} statusBarTranslucent>
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
+        <View
+          /* ⚠⚠⚠ OTA-1813 — MODAL_TOUCH. Native <Modal> hosts this card outside
+             ExplorationScreen's tree, so the T0 observer there never sees a touch
+             that lands here. Returning false observes at the capture phase
+             WITHOUT claiming the responder: the rows, the sweeps and IGNORE keep
+             the negotiation they have today. */
+          onStartShouldSetResponderCapture={() => { noteRootTouch('modal'); return false; }}
+          style={styles.scrim}
+          accessibilityViewIsModal={true}
+        >
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title} accessibilityRole="header">THIS ROOM</Text>

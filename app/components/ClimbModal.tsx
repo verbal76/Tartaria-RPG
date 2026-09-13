@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 // ⚠ OTA-1771 — the modal sweep. The scrim and the card are the kit's now; this
 // file's copies were byte-identical to `BrandedModal`'s.
@@ -81,7 +82,25 @@ export function ClimbModal({
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
-        <View style={kit.modalScrim} accessibilityViewIsModal={true}>
+        <View
+          /* ⚠⚠⚠ OTA-1813 — MODAL_TOUCH. This card is presented by a native
+             <Modal>, so its content is NOT inside ExplorationScreen's tree and
+             the T0 observer there never sees these touches. PROVEN from RN
+             0.76.3's Modal, which hosts its children in a separate root view.
+             Without this line a freeze with a climb sheet up would read as
+             "no touch arrived at all", which is exactly the wrong answer.
+             ⚠⚠ RETURNING FALSE. The capture-phase question is ASKED of every
+             view on the way down; answering false means this view never becomes
+             the responder, so the chips and CANCEL below keep the responder
+             negotiation they have today, unchanged.
+             ⚠ TouchableWithoutFeedback clones this element with Pressability's
+             handlers, which include `onStartShouldSetResponder` but NOT the
+             capture variant (PASSTHROUGH_PROPS + Pressability.js), so this prop
+             survives the clone and displaces nothing. */
+          onStartShouldSetResponderCapture={() => { noteRootTouch('modal'); return false; }}
+          style={kit.modalScrim}
+          accessibilityViewIsModal={true}
+        >
           <TouchableWithoutFeedback>
             <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">CLIMB</Text>
@@ -125,7 +144,22 @@ export function ClimbModal({
                           isCleared && styles.rowCleared,
                           pressed && !isCleared && styles.rowPressed,
                         ]}
-                        onPress={() => tapTo(noun)}
+                        /* ⚠⚠ OTA-1813 — T1. A CLEARED CHIP IS `disabled`, so RN
+                           never calls onPressIn OR onPress on it and nothing is
+                           recorded here. That is CORRECT and is not a rejection:
+                           a disabled Pressable that never runs a handler has not
+                           refused anything. The MODAL_TOUCH above still records
+                           that the finger landed, so the honest reading of a
+                           cleared-chip tap is "touch arrived, no handler was
+                           addressed" — which is what happened. */
+                        onPressIn={(e) => { notePressIn(`climb:${noun}`, e); }}
+                        onPress={() => {
+                          const tp = noteHandlerEnter(`climb:${noun}`);
+                          noteStage(tp, 'admit', { control: `climb:${noun}`, reason: 'submit' });
+                          noteStage(tp, 'dispatch', { control: `climb:${noun}`, reason: 'submit' });
+                          tapTo(noun);
+                          noteStage(tp, 'done', { control: `climb:${noun}`, reason: 'submit' });
+                        }}
                         accessibilityRole="button"
                         accessibilityState={{ disabled: isCleared }}
                       >

@@ -30403,7 +30403,57 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Android is a control and not a disproof: it ran four consecutive
 // report->receipt->continue cycles the same day, on a presentation
 // implementation not proven equivalent.
-export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';
+// ⚠⚠⚠ OTA-1813 — THE TAP SAYS HOW FAR IT GOT. OBSERVATIONAL TELEMETRY ONLY.
+// THIS OTA DOES NOT REPAIR THE GAMEPLAY FREEZE AND DOES NOT CLAIM A CAUSE FOR
+// IT. It answers one question the existing instruments cannot: when the player
+// reports that the screen has stopped taking touch, did the finger reach a
+// handler and get refused, reach a handler and get lost on the way to work it
+// scheduled, or never reach the app's own tree at all? Those three have the
+// same symptom and completely different repairs, and every Build 189 report so
+// far has been unable to separate them.
+//
+// ⚠⚠ THE CHAIN, and every link is an OBSERVER that changes nothing:
+//   T0 root      · ExplorationScreen's `onStartShouldSetResponderCapture`,
+//                  which RETURNS FALSE — it asks the capture-phase question and
+//                  never becomes the responder, so no control loses a gesture.
+//   M0 modal     · the same observer on SearchModal / GatherModal / ClimbModal.
+//                  PROVEN NECESSARY, not assumed: all three are presented by a
+//                  native <Modal>, whose content is hosted outside the
+//                  Exploration tree, so T0 cannot see a touch that lands there.
+//   T1 in        · each instrumented control's own `onPressIn`.
+//   T2 enter     · the first statement of the completed handler.
+//   T3 admit/reject · what the handler DECIDED. A `reject` is written ONLY where
+//                  source proves a real refusal — a branch that buzzes and
+//                  returns without reaching a verb. A `disabled` Pressable that
+//                  correctly never runs is NOT recorded as a refusal, and an
+//                  out-of-range travel button that still dispatches is not one
+//                  either: it vibrates and proceeds.
+//   T4/T5 dispatch/done · the verb was handed on, and the handler returned.
+//   armed/fired  · `submitAfterSheetSettles` schedules work 400ms later. An
+//                  `armed` with no `fired` is the difference between a tap that
+//                  was never heard and a tap that was heard and then dropped.
+//
+// ⚠⚠ IT REUSES tapClock RATHER THAN EXTENDING IT, AND LEAVES IT UNTOUCHED. That
+// instrument keeps ONE mutable slot for the last touch and CONSUMES it, which is
+// exactly right for a latency suffix and useless for correlation: two fingers in
+// flight would share a slot. `touchPath` keeps its own bounded claim queue,
+// newest-first, claimed once, age-bounded, so a handler running after a stall
+// can never inherit an older touch's identity. `touchLateMs` is imported PURELY
+// to compute a number; nothing in tapClock is mutated.
+//
+// ⚠ THE TRACE IS PERSISTED BECAUSE THE FREEZE ENDS IN A FORCE-CLOSE. The boot
+// that can send a report is never the boot that froze, so the ring is snapshot
+// to AsyncStorage with ONE write in flight ever (leading write plus a single
+// coalesced trailing write), and the previous boot's tail is hydrated once at
+// start and printed in the report header above this boot's.
+//
+// ⚠⚠⚠ WHAT THIS OTA MUST NOT BE READ AS SAYING. It does not fix the gameplay
+// freeze, does not identify its cause, and does not touch native code, memory
+// entitlements, gameplay admission, responder ownership or control behaviour.
+// Apple-freeze causation remains UNKNOWN. The instrument's own answer will
+// require a device reproduction to be worth anything.
+export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1810-the-record-answers-the-finger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';

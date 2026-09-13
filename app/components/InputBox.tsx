@@ -18,6 +18,10 @@ import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, isTutorialLocked } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
 import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695 — the tap has a clock
+// ⚠ OTA-1813 — observational only. These record WHERE a touch got to; none of
+// them admits, rejects, delays or reorders anything, and tapClock above is
+// untouched (it still owns `noteTouchDown` and the `⏱+Nms` suffix).
+import { notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach, weaponSwingRefusal } from '../state/combatResolution';
@@ -1757,10 +1761,14 @@ function QuickBtn({
     // way to tell "the tap never arrived" (screen frozen) from "the tap arrived and the
     // work hung" (engine frozen). Moving this below any handler destroys that signal.
     logUiTap(label);
+    // ⚠ OTA-1813 — the first NEW statement, deliberately AFTER logUiTap: that
+    // line is the pinned freeze signal and its position is the contract.
+    const tp = noteHandlerEnter(`quick:${label}`);
     if (blocked) {
       // arb109 — wrong control for this tutorial beat. A stronger double-pulse
       // (clearly an "error" buzz, not a tap) PLUS an on-screen Arbiter nudge,
       // because the old single 30ms buzz was easy to miss and "said" nothing.
+      noteStage(tp, 'reject', { control: `quick:${label}`, reason: 'tutorial-blocked' });
       buzzWrong();
       useGameStore.getState().nudgeTutorialBlocked();
       return;
@@ -1788,7 +1796,13 @@ function QuickBtn({
       // why. One implementation of the answer, and it is the one with words.
       try { Vibration.vibrate(30); } catch { /* ignore */ }
     }
+    // ⚠⚠ `outOfRange` IS NOT A REJECTION AND IS NOT RECORDED AS ONE. OTA-1591
+    // made that branch buzz and then LET THE TAP THROUGH so the store can speak
+    // its refusal; calling it a reject here would put a lie in the instrument.
+    noteStage(tp, 'admit', { control: `quick:${label}`, reason: 'callback' });
+    noteStage(tp, 'dispatch', { control: `quick:${label}`, reason: 'callback' });
     onPress();
+    noteStage(tp, 'done', { control: `quick:${label}`, reason: 'callback' });
   };
   return (
     // OTA-898 (SA-6) — screen-reader support for the quick-action chips: each
@@ -1809,7 +1823,7 @@ function QuickBtn({
        tween is a density choice, not a second language. */
     <Pressable
       style={({ pressed }) => containerStyle(pressed)}
-      onPressIn={noteTouchDown}
+      onPressIn={(e) => { noteTouchDown(e); notePressIn(`quick:${label}`, e); }}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1
@@ -2015,13 +2029,19 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
   // player can't wander off-script and gets clear "wrong" feedback.
   const handlePress = () => {
     logUiTap(label); // OTA-1172 — before any handler; see the note in QuickBtn.
-    if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
+    // ⚠ OTA-1813 — first NEW statement, after the pinned logUiTap.
+    const tp = noteHandlerEnter(`travel:${label}`);
+    if (blocked) {
+      noteStage(tp, 'reject', { control: `travel:${label}`, reason: 'tutorial-blocked' });
+      buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return;
+    }
     // ⚠⚠ OTA-1458 — a spent tap SAYS SO AND COSTS NOTHING. It does not reach the
     // store's travel path, so it never spends the 15-minute anti-stuck tick
     // (OTA-163) that a genuine refused move still charges. Refusing a move the
     // player was never shown they could not make, and billing them for it, is the
     // part that turned one mistake into thirty wasted minutes in his log.
     if (spent) {
+      noteStage(tp, 'reject', { control: `travel:${label}`, reason: 'stamina-spent' });
       buzzSpent();
       useGameStore.getState().appendLog(
         'world',
@@ -2029,7 +2049,10 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
       );
       return;
     }
+    noteStage(tp, 'admit', { control: `travel:${label}`, reason: 'navigation' });
+    noteStage(tp, 'dispatch', { control: `travel:${label}`, reason: 'navigation' });
     onPress();
+    noteStage(tp, 'done', { control: `travel:${label}`, reason: 'navigation' });
   };
   return (
     /* ⚠⚠⚠ OTA-1805 — THE ROOM DOOR NOW DEPRESSES, BECAUSE A DOOR YOU PUSH SHOULD
@@ -2063,7 +2086,7 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
         // ⚠ LAST, so the semantic rim above still colours the left and right
         // edges and the depth rides on top of it. See tControlDepth.
         tControlDepth(pressed)]}
-      onPressIn={noteTouchDown}
+      onPressIn={(e) => { noteTouchDown(e); notePressIn(`travel:${label}`, e); }}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={a11yLabel ?? `${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
