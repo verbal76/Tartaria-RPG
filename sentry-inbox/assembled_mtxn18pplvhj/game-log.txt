@@ -1,0 +1,581 @@
+Bug Report — Merlyn · (2026-09-11-1803-the-hud-belongs-to-tartaria) · freeze
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-12T00:19:30.780Z
+Character: Merlyn
+Slot ID: slot_mpvue7ca_xph4hm
+Race: Aetherborn
+Location: Varakush
+HP: 22/34
+
+--- DESCRIPTION ---
+freeze
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.4.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 390×844 / screen 390×844 @ 3x density
+  Captured at: 2026-09-12T00:19:30.726Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-09-11-1803-the-hud-belongs-to-tartaria)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-12T00:19:01.245Z
+  Last init success: 2026-09-12T00:19:05.942Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtxn0loc81 · started 2026-09-12T00:19:00.924Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: rendered at 2026-09-12T00:18:53.616Z (1 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 3.1s (cognition) · 1 past 3s
+  App state trail: active
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Merlyn)
+  HP: 22/34  Stamina: 2/13  TC: 85  Corruption: 3
+  Pack: 30 distinct rows / 76 total
+  Dog: name dog (salvage rack) loyalty 86 HP 16/16
+
+Weapons (6)
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 24/25, equipped:off, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, unequip:off, use, repair
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 25/25, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 33/33, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Order Letter-Opener (1d4 piercing, dur 13/15, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Pyric Wand (1d6 burn, dur 6/25, equipped:main, [weapon,starter,runecaster])
+    actions: equip:off, unequip:main, use(off), repair
+  Rusted Blade (1d6 slashing, dur 24/25, [weapon,blade,melee])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+
+Armor (3)
+  Forgotten Leggings (dur 19/20, equipped:legs, AC +1 · Resists: slashing · DEX +1, [armor,legs,greaves,unknowing_masses])
+    actions: unequip:legs, repair
+  Reclaimer's Trousers (dur 29/29, AC +1 · DEX +1, [armor,legs,greaves,reclaimers])
+    actions: equip:legs, use, scrap, drop
+  Wanderer's Armor of Wisdom (dur 34/34, AC +1 · STR +1, [armor,chest,plate,unknowing_masses])
+    actions: equip:chest, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (2)
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+
+Tools (4)
+  Aetheric Harmonics Tuner ([exploration,relic,common,race_starter,aetherborn])
+    actions: equip:lens, use, scrap, drop
+  Aetheric Torch ×2 (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Climbing Rope (dur 135/150, [utility,gate,rope])
+    actions: use, repair, drop
+  Glyph-Sealed Scroll (Restores: −2 corruption, [exploration,relic,common,race_starter,aetherborn])
+    actions: use, scrap, drop
+
+Materials (14)
+  Aether Crystal ×2 ([aether,crystal])
+    actions: drop
+  Aether Dust ×3 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Sludge ×3 ([mud,aether,loot])
+    actions: scrap, drop
+  Automaton Circuit ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×8 ([metal,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Moth-Eaten Felt Scrap ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×5 ([mud])
+    actions: drop
+  Scrap Metal ×7 ([metal,loot])
+    actions: drop
+  Small Rock ×2 ([thrown,stone,improvised])
+    actions: drop
+  Smooth Stone ([stone,junk,scrap])
+    actions: scrap, drop
+  Stick ([wood,improvised,kindling])
+    actions: drop
+  ◆ Weathered Granite Knob ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Worn Tartarian Coin ×20 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 417 of 1003 entries; older trimmed to fit a single email paste)
+
+[2026-09-12T00:19:08.019Z] [debug] boot: life bmtxn0loc81 started 2026-09-12T00:19:00.924Z · not an OTA apply (no handoff on disk)
+[2026-09-12T00:19:08.018Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:19:08.018Z] [debug] ═══ SESSION 2026-09-12T00:19:08.018Z · build 2026-09-11-1803-the-hud-belongs-to-tartaria · previous entry moments earlier ═══
+[2026-09-12T00:19:07.942Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Merlyn. The buried country is no place to walk alone."
+[2026-09-12T00:19:07.942Z] [world] You step back into Varakush. The world waits for your move.
+[2026-09-12T00:19:07.941Z] [debug] OTA session start: 2026-09-11-1803-the-hud-belongs-to-tartaria.
+[2026-09-12T00:19:05.773Z] [debug] voice⏱ gap 1136ms (wait 78ms + synth 1056ms, live) "Choose your character."
+[2026-09-12T00:19:04.608Z] [debug] voice: bundled ready
+[2026-09-12T00:19:01.714Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T00:19:01.350Z] [debug] voice: bundled loading
+[2026-09-12T00:19:01.350Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-12T00:19:01.226Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T00:19:01.226Z] [debug] ota: Already up to date
+[2026-09-12T00:19:01.068Z] [debug] appstate: inactive → active (was inactive for 116ms)
+[2026-09-12T00:19:00.957Z] [debug] ota: Checking…
+[2026-09-12T00:19:00.956Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a091c0-aefe-7ab0-b1f5-374f58127cb8
+[2026-09-12T00:18:53.576Z] [debug] appstate: inactive → background (was inactive for 749ms)
+[2026-09-12T00:18:52.827Z] [debug] appstate: active → inactive (was active for 108146ms)
+[2026-09-12T00:18:39.808Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-12T00:18:33.349Z] [cognitive] neutral  (37ms)
+[2026-09-12T00:18:33.298Z] [world] Paths: north to Armory. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:18:33.297Z] [world] You know this place. Not well, but you know it.
+[2026-09-12T00:18:33.297Z] [world] Order Cloister — The Archive Descent. Stone stairs to the deeper archive levels. The Order's oldest texts live below; the air is dry by Aetheric design and the light is rationed.
+[2026-09-12T00:18:33.294Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:18:33.294Z] [debug] scene: loc=varakush hub=outpost_culvert_descent arrival=n opening=n passing=n
+[2026-09-12T00:18:33.294Z] [world] You head on to the Descent.
+[2026-09-12T00:18:33.293Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:18:33.293Z] [player] go south
+[2026-09-12T00:18:33.255Z] [debug] ui: tap "↓ ✓ DESCENT"
+[2026-09-12T00:18:28.172Z] [cognitive] TRAVEL  (58ms)
+[2026-09-12T00:18:28.113Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T00:18:28.112Z] [arbiter] Irma Ironhand unrolls a thick scroll. "Long-form work — The Red Tower's Mouth. Vesryn of Varakush wants you to gather every Fragment of the Red Tower you can find and bring them to the Order. Multi-step contract. 1500 TC and faction standing on completion. Say 'accept mouth' to take it."
+[2026-09-12T00:18:28.112Z] [world] Irma Ironhand nods at a mystery notice: "Fragment of the Red Tower." (Say 'accept tower' or open Contracts.)
+[2026-09-12T00:18:28.111Z] [world] Irma Ironhand nods once. "Merlyn. Come look — a few things moved since you were last through."
+[2026-09-12T00:18:28.111Z] [world] Paths: south to Descent · west to Sanctum. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:18:28.110Z] [world] Something about this ground is already familiar.
+[2026-09-12T00:18:28.110Z] [world] Order Cloister — The Reliquary Armory. A locked vault of restored pre-flood weapons, each tagged with provenance. Irma keeps the older steel oiled and the Aether-touched blades behind silk drape.
+[2026-09-12T00:18:28.107Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:18:28.107Z] [debug] scene: loc=varakush hub=outpost_armory arrival=n opening=n passing=n
+[2026-09-12T00:18:28.107Z] [world] You head on to the Armory.
+[2026-09-12T00:18:28.106Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:18:28.102Z] [player] go north
+[2026-09-12T00:18:28.070Z] [debug] ui: tap "↑ ✓ ARMORY"
+[2026-09-12T00:18:25.806Z] [debug] kbbar: mounted bottom=335 raw=335 from=live winH=844 beat=-
+[2026-09-12T00:18:19.491Z] [debug] qwen⏱ ✂ DISCARDED ambient after 4606ms — ambient:preempted
+[2026-09-12T00:18:19.491Z] [debug] arbiter: ambient cut short 4688ms — yielded to the player
+[2026-09-12T00:18:19.471Z] [cognitive] neutral  (4035ms)
+[2026-09-12T00:18:19.455Z] [debug] qwen⏱ ambient preempted 4606ms read 0ms/write 0ms in 363t→out 0t thr1 (0ch)
+[2026-09-12T00:18:15.481Z] [debug] persist sizes(KB): total=117 player=10 wm=24[rooms=6 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=80 scene=2
+[2026-09-12T00:18:15.435Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T00:18:15.435Z] [world] You look around. You're in The Archive Descent (Varakush). You've worked over everything here. Time to move. Hazard active: Aether Mist. Exits: north to Armory. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:18:15.435Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:18:15.435Z] [player] look
+[2026-09-12T00:18:15.433Z] [debug] ui: tap "look around you"
+[2026-09-12T00:18:10.154Z] [reward] ✦ Reclaimer's Trousers (Common).
+[2026-09-12T00:18:10.153Z] [world] You lift the Reclaimer's Trousers clear.
+[2026-09-12T00:18:08.419Z] [cognitive] neutral  (53ms)
+[2026-09-12T00:18:08.365Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:18:08.364Z] [reward] ✦ Mud Fragment x2 (Common).
+[2026-09-12T00:18:08.363Z] [world] You salvage the step. The take is small but real.
+[2026-09-12T00:18:08.362Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=step resolved=step range=- enemies=0 hooks=0
+[2026-09-12T00:18:08.361Z] [player] salvage step
+[2026-09-12T00:18:08.337Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-09-12T00:18:07.750Z] [cognitive] TRAVEL · RETREAT  (46ms)
+[2026-09-12T00:18:07.703Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:18:07.703Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T00:18:07.703Z] [reward] ✦ Mud Fragment x3 (Common).
+[2026-09-12T00:18:07.702Z] [world] You strip the stairwell carefully. Something usable comes free in your hand.
+[2026-09-12T00:18:07.701Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=stairwell resolved=stairwell range=- enemies=0 hooks=0
+[2026-09-12T00:18:07.701Z] [player] salvage stairwell
+[2026-09-12T00:18:07.089Z] [cognitive] neutral  (40ms)
+[2026-09-12T00:18:07.048Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:18:07.047Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T00:18:07.047Z] [reward] ✦ Worn Tartarian Coin x10 (Common).
+[2026-09-12T00:18:07.046Z] [world] You work the shattered royal display case over. A part of it comes loose, intact.
+[2026-09-12T00:18:07.046Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=shattered royal display case resolved=shattered royal display case range=- enemies=0 hooks=0
+[2026-09-12T00:18:07.045Z] [player] salvage shattered royal display case
+[2026-09-12T00:18:06.330Z] [cognitive] neutral  (40ms)
+[2026-09-12T00:18:06.289Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:18:06.288Z] [reward] ✦ Scrap Metal x4 (Common).
+[2026-09-12T00:18:06.288Z] [world] You work the rusted sentinel diagnostic console over. A part of it comes loose, intact.
+[2026-09-12T00:18:06.287Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=rusted sentinel diagnostic console resolved=rusted sentinel diagnostic console range=- enemies=0 hooks=0
+[2026-09-12T00:18:06.287Z] [player] salvage rusted sentinel diagnostic console
+[2026-09-12T00:18:04.949Z] [cognitive] SEARCH  (42ms)
+[2026-09-12T00:18:04.907Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:18:04.906Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T00:18:04.906Z] [reward] ✦ Smooth Stone (Common).
+[2026-09-12T00:18:04.905Z] [world] You strip the weathered aether-tether grapple point carefully. Something usable comes free in your hand.
+[2026-09-12T00:18:04.905Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=weathered aether tether grapple point resolved=weathered aether-tether grapple point range=- enemies=0 hooks=0
+[2026-09-12T00:18:04.904Z] [player] salvage weathered aether-tether grapple point
+[2026-09-12T00:17:59.723Z] [cognitive] neutral  (66ms)
+[2026-09-12T00:17:59.656Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:17:59.656Z] [reward] ✦ Weathered Granite Knob (Common).
+[2026-09-12T00:17:59.655Z] [world] You work the lingering scent apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-12T00:17:59.654Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=lingering scent resolved=lingering scent range=- enemies=0 hooks=0
+[2026-09-12T00:17:59.654Z] [player] salvage lingering scent
+[2026-09-12T00:17:59.065Z] [cognitive] neutral  (47ms)
+[2026-09-12T00:17:59.017Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:17:59.017Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-12T00:17:59.017Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-12T00:17:59.016Z] [reward] ✦ Worn Tartarian Coin x7 (Common).
+[2026-09-12T00:17:59.016Z] [world] You work the leaning submerged library shelf over. A part of it comes loose, intact.
+[2026-09-12T00:17:59.015Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=leaning submerged library shelf resolved=leaning submerged library shelf range=- enemies=0 hooks=0
+[2026-09-12T00:17:59.015Z] [player] salvage leaning submerged library shelf
+[2026-09-12T00:17:58.948Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-09-12T00:17:58.333Z] [cognitive] RELOAD  (62ms)
+[2026-09-12T00:17:58.270Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:17:58.270Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-12T00:17:58.269Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-12T00:17:58.266Z] [reward] ✦ Aether Crystal (Common).
+[2026-09-12T00:17:58.265Z] [world] You strip the barrel carefully. Something usable comes free in your hand.
+[2026-09-12T00:17:58.264Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=barrel resolved=barrel range=- enemies=0 hooks=0
+[2026-09-12T00:17:58.263Z] [player] salvage barrel
+[2026-09-12T00:17:57.216Z] [debug] persist sizes(KB): total=114 player=10 wm=23[rooms=6 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=80 scene=2
+[2026-09-12T00:17:57.186Z] [cognitive] neutral  (65ms)
+[2026-09-12T00:17:57.120Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T00:17:57.120Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-12T00:17:57.120Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-12T00:17:57.119Z] [reward] ✦ Moth-Eaten Felt Scrap (Common).
+[2026-09-12T00:17:57.118Z] [world] You work the lantern apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-12T00:17:57.117Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=lantern resolved=lantern range=- enemies=0 hooks=0
+[2026-09-12T00:17:57.116Z] [player] salvage lantern
+[2026-09-12T00:17:54.797Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-12T00:17:54.012Z] [debug] ui: tap "take / salvage"
+[2026-09-12T00:17:47.998Z] [reward] ✦ Wanderer's Armor of Wisdom (Common).
+[2026-09-12T00:17:47.997Z] [world] You pick up the Wanderer's Armor of Wisdom.
+[2026-09-12T00:17:47.993Z] [debug] ui: tap "⤵ Just take it — to your pack"
+[2026-09-12T00:17:25.288Z] [arbiter] The Arbiter adds one line to an old page. "So marked. The record keeps you whole now — the buried country will know how to address you before it learns your name."
+[2026-09-12T00:17:09.749Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-12T00:17:09.629Z] [cognitive] neutral  (7423ms)
+[2026-09-12T00:17:09.627Z] [cognitive] neutral  (11788ms)
+[2026-09-12T00:17:04.662Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-12T00:17:02.204Z] [world] Paths: north to Armory. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:17:02.204Z] [world] Order Cloister — The Archive Descent. Stone stairs to the deeper archive levels. The Order's oldest texts live below; the air is dry by Aetheric design and the light is rationed.
+[2026-09-12T00:17:02.204Z] [world] name dog noses at the lingering scent and snorts. There's something there.
+[2026-09-12T00:17:02.203Z] [debug] spawn: gear=[Reclaimer's Trousers, Wanderer's Armor of Wisdom] window=4 roster=new
+[2026-09-12T00:17:02.202Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:17:02.202Z] [debug] scene: loc=varakush hub=outpost_culvert_descent arrival=n opening=n passing=n
+[2026-09-12T00:17:02.202Z] [world] You head on to the Descent.
+[2026-09-12T00:17:02.202Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:17:02.202Z] [player] go south
+[2026-09-12T00:17:02.195Z] [debug] ui: tap "↓ DESCENT"
+[2026-09-12T00:16:57.838Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-12T00:16:57.838Z] [world] Irma Ironhand points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-09-12T00:16:57.838Z] [world] Irma Ironhand offers a contract: "Field Samples." (Say 'accept samples' or open Contracts for details.)
+[2026-09-12T00:16:57.837Z] [world] Irma Ironhand glances up. "You again." Not warm, not cold — noted.
+[2026-09-12T00:16:57.837Z] [world] Paths: south to Descent · west to Sanctum. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:16:57.837Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-12T00:16:57.837Z] [world] Order Cloister — The Reliquary Armory. A locked vault of restored pre-flood weapons, each tagged with provenance. Irma keeps the older steel oiled and the Aether-touched blades behind silk drape.
+[2026-09-12T00:16:57.837Z] [world] name dog noses at the lingering scent and snorts. There's something there.
+[2026-09-12T00:16:57.836Z] [debug] spawn: gear=[Wanderer's Swiftstride Greaves] window=3 roster=new
+[2026-09-12T00:16:57.835Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:16:57.835Z] [debug] scene: loc=varakush hub=outpost_armory arrival=n opening=n passing=n
+[2026-09-12T00:16:57.835Z] [world] You head on to the Armory.
+[2026-09-12T00:16:57.834Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:16:57.834Z] [player] go east
+[2026-09-12T00:16:57.828Z] [debug] ui: tap "→ ARMORY"
+[2026-09-12T00:16:52.836Z] [cognitive] TRAVEL  (67ms)
+[2026-09-12T00:16:52.767Z] [arbiter] The Arbiter steps to the edge of Varakush and watches. "Worth a careful look before the dust settles."
+[2026-09-12T00:16:52.767Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-12T00:16:52.766Z] [system] Weather effect — Iron Fog: -1 DEX
+[2026-09-12T00:16:52.766Z] [world] Paths: north to Sealed Archive · south to Threshold · east to Armory · west to Refectory. (Type 'leave outpost' to head into the wilds.)
+[2026-09-12T00:16:52.765Z] [world] Order Cloister — The Sanctum Hall. A vaulted study under a single hanging Aetheric chandelier. A reading lectern at the center holds an open atlas, the Cradle of Dusk marked in three competing scholars' hands.
+[2026-09-12T00:16:52.765Z] [world] name dog noses at the blood-spotted cloth and snorts. There's something there.
+[2026-09-12T00:16:52.763Z] [debug] spawn: gear=[Mud-Iron Cleaver, Scrap Targe, Crude Golem Pike] window=0 roster=new
+[2026-09-12T00:16:52.759Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:16:52.759Z] [debug] scene: loc=varakush hub=outpost_central arrival=n opening=n passing=n
+[2026-09-12T00:16:52.759Z] [world] You head on to the Sanctum.
+[2026-09-12T00:16:52.757Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-12T00:16:52.757Z] [player] go west
+[2026-09-12T00:16:52.729Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-12T00:16:52.726Z] [debug] ui: tap "← SANCTUM"
+[2026-09-12T00:16:49.467Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-09-12T00:16:49.466Z] [world] You take the Bolt-Caster from where it lay.
+[2026-09-12T00:16:49.462Z] [debug] ui: tap "⤵ Just take it — to your pack"
+[2026-09-12T00:16:40.267Z] [debug] boot: life bmtxmx59ogl started 2026-09-12T00:16:19.692Z · not an OTA apply (no handoff on disk)
+[2026-09-12T00:16:40.267Z] [debug] missions: none active · at=varakush
+[2026-09-12T00:16:40.266Z] [debug] ═══ SESSION 2026-09-12T00:16:40.266Z · build 2026-09-11-1803-the-hud-belongs-to-tartaria · previous entry moments earlier ═══
+[2026-09-12T00:16:40.154Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Merlyn. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-12T00:16:40.145Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.
+[2026-09-12T00:16:40.144Z] [world] You step back into Varakush. The world waits for your move.
+[2026-09-12T00:16:40.144Z] [debug] OTA session start: 2026-09-11-1803-the-hud-belongs-to-tartaria.
+[2026-09-12T00:16:24.499Z] [debug] voice⏱ gap 1146ms (wait 34ms + synth 1109ms, live) "Choose your character."
+[2026-09-12T00:16:23.336Z] [debug] voice: bundled ready
+[2026-09-12T00:16:20.485Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T00:16:20.049Z] [debug] voice: bundled loading
+[2026-09-12T00:16:20.049Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-12T00:16:19.897Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T00:16:19.897Z] [debug] ota: Already up to date
+[2026-09-12T00:16:19.802Z] [debug] appstate: inactive → active (was inactive for 79ms)
+[2026-09-12T00:16:19.726Z] [debug] ota: Checking…
+[2026-09-12T00:16:19.726Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a091c0-aefe-7ab0-b1f5-374f58127cb8
+[2026-09-12T00:16:15.274Z] [debug] appstate: inactive → background (was inactive for 1308ms)
+[2026-09-12T00:16:13.966Z] [debug] appstate: active → inactive (was active for 18872ms)
+[2026-09-12T00:16:00.479Z] [debug] voice⏱ gap 1256ms (wait 88ms + synth 1166ms, live) "Choose your character."
+[2026-09-12T00:15:59.192Z] [debug] voice: bundled ready
+[2026-09-12T00:15:55.859Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T00:15:55.381Z] [debug] voice: bundled loading
+[2026-09-12T00:15:55.381Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-12T00:15:55.226Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T00:15:55.226Z] [debug] ota: Already up to date
+[2026-09-12T00:15:55.097Z] [debug] ota: Checking…
+[2026-09-12T00:15:55.097Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a091c0-aefe-7ab0-b1f5-374f58127cb8
+[2026-09-12T00:15:54.867Z] [debug] ota: Restarting to apply…
+[2026-09-12T00:15:54.866Z] [debug] ota: Saving progress…
+[2026-09-12T00:15:54.469Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-12T00:15:53.758Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T00:15:53.004Z] [debug] ota: Checking…
+[2026-09-12T00:15:53.004Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a08369-8907-78f8-8c55-7aa9e73b34e3
+[2026-09-09T00:12:30.778Z] [debug] voice⏱ gap 1173ms (wait 65ms + synth 1106ms, live) "Choose your character."
+[2026-09-09T00:12:29.573Z] [debug] voice: bundled ready
+[2026-09-09T00:12:25.888Z] [debug] voice: bundled loading
+[2026-09-09T00:12:25.888Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-09T00:12:25.718Z] [debug] ota: boot check result = errored
+      Error: OTA check timed out after 10s |     at anonymous (address at /var/mobile/Containers/Data/Application/5CD65B1B-05EA-4CB8-BB53-8A431A25ED92/Library/Application Support/.expo-internal/db37dd18a21eff65dac2890215c0e43a.bundle:1:3637454)
+[2026-09-09T00:12:25.717Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+[2026-09-09T00:12:25.716Z] [debug] ota: Error
+[2026-09-09T00:12:15.714Z] [debug] ota: Checking…
+[2026-09-09T00:12:15.714Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a077f9-bdfc-7232-ae14-ae586dfc049e
+[2026-09-06T18:46:24.816Z] [debug] send-log: #mtq5xlv4az11 — DELIVERED (inline, no attachments): beacon out, 6/6 parts accepted (42509 chars) — flush said yes, transport took every part
+[2026-09-06T18:46:00.229Z] [debug] voice⏱ gap 1892ms (wait 59ms + synth 1830ms, live) "Choose your character."
+[2026-09-06T18:45:58.290Z] [debug] voice: bundled ready
+[2026-09-06T18:45:51.872Z] [debug] voice: bundled loading
+[2026-09-06T18:45:51.871Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-06T18:45:51.534Z] [debug] ota: boot check result = noUpdate
+[2026-09-06T18:45:51.533Z] [debug] ota: Already up to date
+[2026-09-06T18:45:51.450Z] [debug] ota: Checking…
+[2026-09-06T18:45:51.450Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a077f9-bdfc-7232-ae14-ae586dfc049e
+[2026-09-06T18:45:46.563Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-06T18:45:46.481Z] [debug] appstate: inactive → background (was inactive for 666ms)
+[2026-09-06T18:45:45.815Z] [debug] appstate: active → inactive (was active for 15578ms)
+[2026-09-06T18:45:30.237Z] [debug] appstate: inactive → active (was inactive for 2307ms)
+[2026-09-06T18:45:27.930Z] [debug] appstate: active → inactive (was active for 79445ms)
+[2026-09-06T18:44:15.407Z] [arbiter] The Arbiter marks the ledger without looking up. "The Calling. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."
+[2026-09-06T18:44:08.398Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-06T18:43:59.247Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Merlyn. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-06T18:43:59.237Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.
+[2026-09-06T18:43:59.237Z] [world] You step back into Varakush. The world waits for your move.
+[2026-09-06T18:43:59.237Z] [debug] OTA session start: 2026-08-21-1427-x-of-y-names-the-x.
+[2026-08-21T21:36:56.393Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T21:36:40.905Z] [debug] voice⏱ gap 1139ms (wait 56ms + synth 1078ms, live) "Choose your character."
+[2026-08-21T21:36:39.738Z] [debug] voice: bundled ready
+[2026-08-21T21:36:36.010Z] [debug] voice: bundled loading
+[2026-08-21T21:36:36.010Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-21T21:36:35.878Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T21:36:35.878Z] [debug] ota: Already up to date
+[2026-08-21T21:36:35.696Z] [debug] ota: Checking…
+[2026-08-21T21:36:35.696Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a02615-eba9-7aa7-8d35-4658d9503234
+[2026-06-16T04:41:03.595Z] [debug] voice: bundled ready
+[2026-06-16T04:40:59.973Z] [debug] voice: bundled loading
+[2026-06-16T04:40:59.973Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-06T17:32:45.777Z] [cognitive] REST  (60ms)
+[2026-06-06T17:32:45.716Z] [system] ⏳ Time passed: 8h
+[2026-06-06T17:32:45.715Z] [arbiter] The Arbiter watches. "I saw the way you came at that."
+[2026-06-06T17:32:45.706Z] [world] You rest for 8 hours. +4 stamina recovered. (Day 3, morning)
+[2026-06-06T17:32:45.705Z] [world] name dog circles three times and curls beside you. Their breathing slows to yours.
+[2026-06-06T17:32:45.704Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:32:45.704Z] [player] rest
+[2026-06-06T17:32:31.416Z] [cognitive] neutral  (65ms)
+[2026-06-06T17:32:31.348Z] [arbiter] The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."
+[2026-06-06T17:32:31.346Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:32:31.346Z] [player] drink
+[2026-06-06T17:32:15.179Z] [cognitive] neutral  (38ms)
+[2026-06-06T17:32:15.141Z] [system] ⏳ Time passed: 30 min
+[2026-06-06T17:32:15.140Z] [arbiter] The Arbiter glances at the Trail Rations. "Tea, here, is a small ritual against the Aether. Drink the tea."
+[2026-06-06T17:32:15.135Z] [world] You eat the Trail Rations. +5 HP.
+[2026-06-06T17:32:15.134Z] [debug] parser: intent=rest conf=1.00 verb=eat target=trail rations resolved=Trail Rations range=- enemies=0 hooks=0
+[2026-06-06T17:32:15.134Z] [player] eat Trail Rations
+[2026-06-06T17:31:52.493Z] [cognitive] REST  (62ms)
+[2026-06-06T17:31:52.430Z] [system] ⏳ Time passed: 8h
+[2026-06-06T17:31:52.421Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 3, night)
+[2026-06-06T17:31:52.420Z] [world] name dog circles three times and curls beside you. Their breathing slows to yours.
+[2026-06-06T17:31:52.417Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:31:52.416Z] [player] rest
+[2026-06-06T17:31:41.098Z] [cognitive] neutral  (58ms)
+[2026-06-06T17:31:41.038Z] [arbiter] "Eat something," the Arbiter says, almost gentle. "Stamina doesn't refill on grit. You've got rations."
+[2026-06-06T17:31:41.037Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-06-06T17:31:41.036Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=anvil resolved=anvil range=- enemies=0 hooks=0
+[2026-06-06T17:31:41.035Z] [player] investigate anvil
+[2026-06-06T17:31:41.007Z] [world] An Aetheric arc finds you — copper taste, blue afterimage, and a bite of damage.
+[2026-06-06T17:31:26.516Z] [dog_quest] The Arbiter studies the new pair. "name dog, then. The chain is off. The road is open."
+[2026-06-06T17:31:26.515Z] [world] name dog circles three times and settles at your boot. Their breathing slows to yours.
+[2026-06-06T17:31:26.514Z] [player] pepper
+[2026-06-06T17:31:01.983Z] [dog_quest] The Arbiter nods again. "Boy or girl?"
+[2026-06-06T17:31:01.982Z] [world] name dog. The name settles on the dog like a coat.
+[2026-06-06T17:31:01.981Z] [player] name dog
+[2026-06-06T17:30:18.773Z] [reward]     • Bent Nail x4 (Common)
+[2026-06-06T17:30:18.773Z] [reward] ✦ Salvage haul:
+[2026-06-06T17:30:18.772Z] [world] You salvage the workbench. The take is small but real.
+[2026-06-06T17:30:18.771Z] [world] You work the rack over. A part of it comes loose, intact.
+[2026-06-06T17:29:58.620Z] [dog_quest] The Arbiter nods. "What will you name them?"
+[2026-06-06T17:29:58.619Z] [world] You name the breed: salvage rack.
+[2026-06-06T17:29:58.617Z] [player] salvage rack
+[2026-06-06T17:29:48.598Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-06-06T17:29:48.597Z] [world] You take the Bolt-Caster from where it lay.
+[2026-06-06T17:28:53.639Z] [reward] +4 TC pried from the dust.
+[2026-06-06T17:28:53.638Z] [dog_quest] The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"
+[2026-06-06T17:28:53.638Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-06-06T17:28:53.637Z] [reward] Reclaimer Deserter defeated. You recover Scrap Metal ×3.
+[2026-06-06T17:28:53.637Z] [combat] The killing blow with the bolt-caster: 10. Reclaimer Deserter drops where it stood.
+[2026-06-06T17:28:53.637Z] [combat] You — d20 → 9 + DEX 5 = 14 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:53.636Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-06-06T17:28:49.447Z] [cognitive] AGGRESSION · AIM · RELOAD · ATTACK · DISENGAGE  (38ms)
+[2026-06-06T17:28:49.409Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:49.409Z] [world] You raise the bolt-caster toward Reclaimer Deserter. The room narrows around the both of you.
+[2026-06-06T17:28:49.405Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Bolt-Caster bareHand=false
+[2026-06-06T17:28:49.400Z] [world] You stow the Pyric Wand and equip Bolt-Caster (Main hand).
+[2026-06-06T17:28:49.400Z] [world] You shift grip and bring up the Bolt-Caster.
+[2026-06-06T17:28:49.400Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=bolt-caster range=close enemies=1 hooks=0
+[2026-06-06T17:28:49.399Z] [player] attack with the off-hand bolt-caster
+[2026-06-06T17:28:41.981Z] [combat] Reclaimer Deserter deals 4 damage. You have 22 HP remaining.
+[2026-06-06T17:28:41.934Z] [combat] Reclaimer Deserter — d20 → 17 + ATK 4 = 21 vs your AC 12 — ✓ HIT
+[2026-06-06T17:28:41.934Z] [combat] Your strike with the pyric wand lands for 4. Reclaimer Deserter staggers — 7 HP remaining. It answers.
+[2026-06-06T17:28:41.933Z] [combat] You — d20 → 18 + INT 11 = 29 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:41.933Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.
+[2026-06-06T17:28:36.782Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (42ms)
+[2026-06-06T17:28:36.739Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:36.739Z] [world] Your pyric wand comes around in an arc; Reclaimer Deserter reads it but does not move yet.
+[2026-06-06T17:28:36.735Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-06T17:28:36.734Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=close enemies=1 hooks=0
+[2026-06-06T17:28:36.734Z] [player] attack with the pyric wand
+[2026-06-06T17:28:26.449Z] [combat] Reclaimer Deserter — d20 → 1 + ATK 4 = 5 vs your AC 12 — ✗ FUMBLE
+[2026-06-06T17:28:26.449Z] [combat] Reclaimer Deserter takes 3 with the pyric wand. It reels: 11 left. Then it fights back.
+[2026-06-06T17:28:26.448Z] [combat] You — d20 → 10 + INT 11 = 21 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:26.448Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.
+[2026-06-06T17:28:15.252Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (42ms)
+[2026-06-06T17:28:15.209Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:15.209Z] [world] You commit forward with the pyric wand. Reclaimer Deserter watches your hands.
+[2026-06-06T17:28:15.202Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-06T17:28:15.202Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=close enemies=1 hooks=0
+[2026-06-06T17:28:15.201Z] [player] attack with the pyric wand
+[2026-06-06T17:27:49.535Z] [world] You equip Forgotten Leggings (Legs).
+[2026-06-06T17:27:38.040Z] [world] You stow the Rusted Blade and equip Bolt-Caster (Off hand).
+[2026-06-06T17:27:22.897Z] [world] You stow the Rusted Blade and equip Pyric Wand (Main hand).
+[2026-06-06T17:26:03.523Z] [dog_quest] You step into the smelter's ruin. The Reclaimer Deserter is here, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. "Walk on. This one's not yours."
+[2026-06-06T17:26:03.518Z] [player] investigate anvil
+[2026-06-06T17:25:54.041Z] [cognitive] AGGRESSION · DISENGAGE · TAKE_COVER  (35ms)
+[2026-06-06T17:25:54.006Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter looks around. "The Forgotten Order keeps a door …"
+[2026-06-06T17:25:54.006Z] [arbiter] The Arbiter looks around. "The Forgotten Order keeps a door open here for those who know how to knock."
+[2026-06-06T17:25:54.005Z] [world] You turn the shield in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-06-06T17:25:54.005Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shield resolved=shield range=- enemies=0 hooks=0
+[2026-06-06T17:25:54.005Z] [player] investigate shield
+[2026-06-06T17:25:49.334Z] [cognitive] neutral  (49ms)
+[2026-06-06T17:25:49.284Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-06-06T17:25:49.280Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:25:49.280Z] [player] investigate the floor
+[2026-06-06T17:25:33.486Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-06T17:25:33.486Z] [arbiter] "A name came back to me in the night-of-your-absence. I'll know it when we meet whoever wears it."
+[2026-06-06T17:25:33.486Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-06T17:25:33.485Z] [debug] OTA session start: 2026-06-06-313.
+[2026-06-06T17:25:33.485Z] [debug] OTA applied: 2026-06-02-281 → 2026-06-06-313.
+[2026-06-06T17:25:25.025Z] [debug] voice: bundled ready
+[2026-06-06T17:25:22.958Z] [debug] voice: bundled loading
+[2026-06-06T17:25:02.088Z] [debug] voice: bundled downloading
+[2026-06-06T17:25:00.067Z] [debug] voice: bundled loading
+[2026-06-06T17:25:00.067Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-02T01:34:06.574Z] [system] True Tartarians standing +1 (now 1)
+[2026-06-02T01:34:06.573Z] [reward] Bought Forgotten Leggings from Irma Ironhand for 95 TC. (81 TC left)
+[2026-06-02T01:33:44.493Z] [cognitive] AGGRESSION · DISENGAGE · TAKE_COVER  (116ms)
+[2026-06-02T01:33:44.375Z] [arbiter] The Arbiter looks around. "The Forgotten Order keeps a door open here for those who know how to knock."
+[2026-06-02T01:33:44.374Z] [world] You turn the shield in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-06-02T01:33:44.373Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shield resolved=shield range=- enemies=0 hooks=0
+[2026-06-02T01:33:44.372Z] [player] investigate shield
+[2026-06-02T01:33:44.350Z] [world] An Aetheric arc finds you — copper taste, blue afterimage, and a bite of damage.
+[2026-06-02T01:33:39.371Z] [arbiter] The Arbiter inclines their head. "Welcome back, Merlyn."
+[2026-06-02T01:33:39.371Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:33:39.371Z] [debug] OTA session start: 2026-06-02-281.
+[2026-06-02T01:33:39.371Z] [debug] OTA applied: 2026-06-02-277 → 2026-06-02-281.
+[2026-06-02T01:05:36.466Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T01:05:36.466Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:05:36.465Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T01:04:20.595Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T01:04:20.595Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:04:20.595Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T01:03:14.153Z] [system] The Arbiter considers your words…
+[2026-06-02T01:03:14.152Z] [debug] parse-fallback: handing "water" to qwen
+[2026-06-02T01:03:14.152Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-02T01:03:14.152Z] [player] water
+[2026-06-02T01:03:05.607Z] [cognitive] neutral  (54ms)
+[2026-06-02T01:03:05.551Z] [arbiter] The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."
+[2026-06-02T01:03:05.550Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-02T01:03:05.549Z] [player] drink
+[2026-06-02T01:02:55.642Z] [reward]     • Aether Crystal (Common)
+[2026-06-02T01:02:55.642Z] [reward]     • Bent Nail x2 (Common)
+[2026-06-02T01:02:55.641Z] [reward] ✦ Salvage haul:
+[2026-06-02T01:02:55.641Z] [world] You break the leaning engine chamber scaffolding apart. Among the pieces, something worth keeping.
+[2026-06-02T01:02:55.641Z] [world] You strip the workbench carefully. Something usable comes free in your hand.
+[2026-06-02T01:02:50.640Z] [world] You break for the entrance. Behind you the chamber settles back into silence.
+[2026-06-02T01:02:48.713Z] [cognitive] FEAR · RETREAT · HIDE  (60ms)
+[2026-06-02T01:02:48.653Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:48.640Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=0
+[2026-06-02T01:02:48.639Z] [player] flee
+[2026-06-02T01:02:42.696Z] [cognitive] neutral  (57ms)
+[2026-06-02T01:02:42.638Z] [combat] Mudling — Mud Whip ready, 1D6 damage on a hit.
+[2026-06-02T01:02:42.638Z] [world] Something shifted while you were turned away — a Mudling breaks cover, fast and low. (range: close)
+[2026-06-02T01:02:42.636Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=workbench resolved=workbench range=- enemies=0 hooks=0
+[2026-06-02T01:02:42.635Z] [player] salvage workbench
+[2026-06-02T01:02:40.630Z] [cognitive] neutral  (53ms)
+[2026-06-02T01:02:40.576Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:40.575Z] [reward] ✦ Bent Nail x2 (Common).
+[2026-06-02T01:02:40.573Z] [world] You work the rack over. A part of it comes loose, intact.
+[2026-06-02T01:02:40.572Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=rack resolved=rack range=- enemies=0 hooks=0
+[2026-06-02T01:02:40.571Z] [player] salvage rack
+[2026-06-02T01:02:38.253Z] [cognitive] neutral  (38ms)
+[2026-06-02T01:02:38.216Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:38.214Z] [reward] ✦ Aetheric Locket (Common).
+[2026-06-02T01:02:38.213Z] [world] You strip the broken submerged library shelf carefully. Something usable comes free in your hand.
+[2026-06-02T01:02:38.212Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=broken submerged library shelf resolved=broken submerged library shelf range=- enemies=0 hooks=0
+[2026-06-02T01:02:38.212Z] [player] salvage broken submerged library shelf
+[2026-06-02T01:02:32.986Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-06-02T01:02:32.985Z] [world] You take the Bolt-Caster from where it lay.
+[2026-06-02T01:02:22.317Z] [arbiter] You step back, your blade still in hand, as you feel the weight of your new responsibilities. The air around you seems to contract, creating an atmosphere of anticipation.
+[2026-06-02T01:02:09.684Z] [cognitive] neutral  (51ms)
+[2026-06-02T01:02:09.633Z] [system] ⏳ Time passed: 1h
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand offers a contract: "Walk the buried road." (Say 'accept road' or open Contracts for details.)
+
+=== END REPORT ===
