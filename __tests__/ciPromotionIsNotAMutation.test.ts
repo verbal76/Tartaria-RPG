@@ -190,7 +190,8 @@ describe('2. promote.yml — wired exactly as designed', () => {
   it('⚠⚠ it dispatches the EXISTING publisher for the EXACT SHA with line=hal and NO validated_by — the publisher runs Change A\'s receipt itself', () => {
     expect(dispatch).toBeDefined();
     expect(dispatch.if).toBe("steps.decide.outputs.sha != ''");
-    expect(dispatch.run).toContain('gh workflow run eas-update-golem.yml --ref golem-line');
+    expect(dispatch.run).toContain('gh workflow run eas-update-golem.yml');
+    expect(dispatch.run).toContain('--ref golem-line');
     expect(dispatch.run).toContain('-f sha="$SHA"');
     expect(dispatch.run).toContain('-f line=hal');
     expect(dispatch.run).not.toContain('validated_by');
@@ -198,6 +199,45 @@ describe('2. promote.yml — wired exactly as designed', () => {
     // the SHA comes from the decision step's output, nowhere else
     expect((dispatch as Step & { env: Record<string, string> }).env.SHA).toBe('${{ steps.decide.outputs.sha }}');
     expect((dispatch as Step & { env: Record<string, string> }).env.GH_TOKEN).toBe('${{ github.token }}');
+  });
+
+  // ⚠⚠⚠ 2026-09-13 — THE DISPATCH NAMES ITS REPOSITORY. THIS IS THE INCIDENT TEST.
+  //
+  // The first non-inert promotion ever attempted — run #2, id 34732478089 —
+  // passed EVERY gate above, printed
+  //   DISPATCH 8e2e6ac6db8de26780f62cd4096fd0431f15ec48
+  // and then died on the next line with
+  //   failed to run git: fatal: not a git repository (or any of the parent
+  //   directories): .git
+  // No publisher run was created; HAL never received the SHA; and because the
+  // record was already in the ledger it was consumed by a failure that had
+  // nothing to do with whether the SHA deserved to ship.
+  //
+  // ⚠ THE CAUSE IS THIS JOB'S SHAPE, not the command's syntax. It checks the two
+  // repositories out into `ledger/` and `trunk/`, so the workspace ROOT is not a
+  // checkout, and `gh` resolves which repository to talk to from the CWD's git
+  // remote. ci.yml's publish job runs the identical command successfully because
+  // IT checks out at the root — which is precisely why the bug survived review.
+  // A test that only read the flags would have been green through the whole
+  // incident, so this one is about the PROPERTY: repository identity is stated,
+  // not inferred from a working directory.
+  it('⚠⚠⚠ NC-B17 — the publisher dispatch states its repository and cannot depend on $PWD being a checkout', () => {
+    const run = dispatch.run!;
+    // Explicit repository identity, in the spelling this repo already uses to
+    // name itself to `gh` (see eas-update-golem.yml's receipt step).
+    expect(run).toContain('-R "$GITHUB_REPOSITORY"');
+    // …on the same command line as the dispatch itself, not somewhere else.
+    const line = run.split('\n').find((l) => l.includes('gh workflow run'))!;
+    expect(line).toContain('-R "$GITHUB_REPOSITORY"');
+    // ⚠ And the step still does NOT try to fix this by standing somewhere else:
+    // a `working-directory` would make the command work while leaving it silent
+    // about which repository it targets, which is the weaker of the two repairs.
+    expect(dispatch).not.toHaveProperty('working-directory');
+    // The job genuinely has no repository at its root — that is the condition
+    // the repair exists for, and it must stay true or the test is meaningless.
+    const checkouts = steps.filter((s) => s.uses?.startsWith('actions/checkout'));
+    expect(checkouts).toHaveLength(2);
+    for (const c of checkouts) expect((c.with as { path?: string }).path).toBeTruthy();
   });
 
   it('⚠⚠ the decision is trunk logic run against the ledger — before/after/forced from the event, script from golem-line', () => {
