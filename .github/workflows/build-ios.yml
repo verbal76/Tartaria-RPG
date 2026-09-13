@@ -1,0 +1,90 @@
+name: iOS Build (Tartaria Realms)
+
+# ⚠⚠⚠ STUB ON main — THE REAL WORKFLOW LIVES ON golem-line (where the code is).
+#
+# This file exists for exactly one reason: GitHub surfaces a `workflow_dispatch`
+# "Run workflow" control ONLY for a definition present on the DEFAULT branch.
+# `build-ios.yml` had never been committed to main — not removed by the trunk
+# collapse, never there at all — so the production iOS workflow's Actions page
+# rendered its run history with no way to fire it. Every production IPA this
+# repository ever made, Build 33 included, was fired by the `[build-ios]`
+# commit-title marker instead, which needs no default-branch presence, which is
+# precisely why nobody noticed the button was missing.
+#
+# ⚠⚠ THIS IS THE SAME PATTERN build-ios-native.yml ALREADY USES HERE, and the
+# same one `88cd9aa4` (2026-06-14) used to make submit-ios.yml dispatchable the
+# day Build 33 went to TestFlight. When the operator picks golem-line from the
+# "Use workflow from" dropdown, GitHub loads the workflow file FROM golem-line —
+# this stub is never executed in that case.
+#
+# ⚠ THE NAME AND THE INPUTS ARE COPIED, NOT RETYPED. `name:` is byte-identical
+# to golem-line's so this binds to the existing workflow entity and its run
+# history rather than appearing as a second entry. The three inputs below are
+# verbatim from golem-line's definition — same names, types, option lists and
+# defaults — because the dispatch form can be rendered from the DEFAULT branch's
+# definition, and a stub with reduced or renamed inputs would hand the operator
+# a form that cannot express `line=hal`.
+#
+# ⚠⚠⚠ IT CANNOT BUILD AND IT CANNOT SUBMIT. There is no checkout, no Node, no
+# `npm ci`, no eas-cli, no EXPO_TOKEN, and no secrets of any kind in this file.
+# A misfire against main costs one runner-second and a red X, not a queued EAS
+# build against a tree that has no package.json. That containment is the whole
+# reason this is a stub and not a copy of the production workflow.
+#
+# HOW TO ACTUALLY BUILD:
+#   Actions → "iOS Build (Tartaria Realms)" → Run workflow
+#     Use workflow from:  golem-line      ⚠ the dropdown defaults to main
+#     Build profile:      production
+#     Submit to TestFlight: true
+#     Product line:       hal
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (preview = sideload, production = TestFlight-ready)'
+        required: false
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+      submit:
+        description: 'Submit to TestFlight after build (production only)'
+        required: false
+        default: false
+        type: boolean
+      # ⚠⚠ OTA-1386 — see build-apk.yml for the full note. The branch used to
+      # answer "which product"; the collapse removed that answer, this restores it.
+      line:
+        description: 'Product line (golem = dev phone, hal = live testers, steam = PC, html = web)'
+        required: false
+        default: 'golem'
+        type: choice
+        options:
+          - golem
+          - hal
+          - steam
+          - html
+
+permissions:
+  contents: read
+
+jobs:
+  refuse:
+    name: Refuse to run against main — re-dispatch against golem-line
+    runs-on: ubuntu-latest
+    steps:
+      - name: Loud refusal
+        run: |
+          echo "::error::This workflow was fired against 'main', which holds no application code — only the pointer docs and these dispatch stubs."
+          echo "::error::Nothing was built and nothing was submitted. Re-dispatch with 'Use workflow from: golem-line'."
+          echo ""
+          echo "Actions -> iOS Build (Tartaria Realms) -> Run workflow"
+          echo "  Use workflow from:    golem-line     <- the dropdown defaults to main"
+          echo "  Build profile:        production"
+          echo "  Submit to TestFlight: true"
+          echo "  Product line:         hal"
+          echo ""
+          echo "golem-line is the application source authority. This branch is control plane only."
+          exit 1
