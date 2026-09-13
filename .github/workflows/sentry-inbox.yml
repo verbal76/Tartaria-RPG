@@ -49,6 +49,59 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: golem-line
+
+      # ⚠⚠⚠ 2026-09-13 — THE HOURLY CLOCK RAN A STALE READER FOR SEVENTEEN DAYS
+      # AND EVERY RUN WAS GREEN. `schedule:` executes the workflow file as it
+      # exists on the DEFAULT branch, so the hourly route ran main's copy, which
+      # was frozen at 50287cb1 (2026-08-27) — 250 lines against this file's 650.
+      # It had no cursor walk, no issue-feed depth walk, no inline chunkBlocks
+      # reassembly and no VERDICT block. Run 210 at 16:11Z fetched the owner's
+      # Build 189 report, committed nine raw events, wrote no assembled bundle
+      # and no verdict, and reported SUCCESS. VERDICT.txt had not changed since
+      # 2026-09-10 while the clock ticked hourly on top of it.
+      #
+      # ⚠⚠ A GREEN RUN THAT SILENTLY USES LAST MONTH'S READER IS THE WORST
+      # FAILURE THIS RELAY CAN HAVE, because the whole point of the VERDICT block
+      # is to distinguish "nothing was there" from "I stopped looking" — and a
+      # stale reader answers neither while looking healthy. So the executing
+      # definition now proves it is current before it touches the evidence.
+      #
+      # ⚠ THE SAME SHAPE promote.yml ALREADY USES: the running workflow compares
+      # itself against golem-line's canonical copy and refuses rather than
+      # proceeding on a mismatch. Only the `jobs:` block is compared — `name:`
+      # and the `push:` trigger differ between the two copies BY DESIGN (a push
+      # trigger is evaluated from the pushed branch's own file, so it belongs
+      # only on golem-line), and the reader body is the part that must not drift.
+      #
+      # ⚠ IT REFUSES ONLY THE SCHEDULED ROUTE. A push run is executing THIS file
+      # and is current by construction, so drift there is a warning: the manual
+      # request path keeps working and stays able to retrieve evidence even while
+      # main is behind. A fetch failure warns rather than fails — this guard must
+      # never be the reason the owner cannot get his logs.
+      - name: Prove the executing reader is current
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -uo pipefail
+          if ! git fetch --depth=1 origin main 2>/dev/null; then
+            echo "::warning::could not fetch main to check for reader drift — continuing UNVERIFIED."
+            exit 0
+          fi
+          git show origin/main:.github/workflows/sentry-inbox.yml > "$RUNNER_TEMP/main.yml"
+          sed -n '/^jobs:/,$p' "$RUNNER_TEMP/main.yml" > "$RUNNER_TEMP/main.jobs"
+          sed -n '/^jobs:/,$p' .github/workflows/sentry-inbox.yml > "$RUNNER_TEMP/trunk.jobs"
+          if cmp -s "$RUNNER_TEMP/main.jobs" "$RUNNER_TEMP/trunk.jobs"; then
+            echo "✓ main's scheduled reader is byte-identical to golem-line's canonical reader"
+            exit 0
+          fi
+          echo "main jobs: $(wc -l < "$RUNNER_TEMP/main.jobs") lines · golem-line jobs: $(wc -l < "$RUNNER_TEMP/trunk.jobs") lines"
+          diff -u "$RUNNER_TEMP/main.jobs" "$RUNNER_TEMP/trunk.jobs" | head -60
+          if [ "$EVENT" = 'schedule' ]; then
+            echo "::error::The hourly clock is executing main's copy of this workflow and its reader has drifted from golem-line's. Refusing to commit evidence gathered by a stale reader. Mirror golem-line's jobs: block onto main."
+            exit 1
+          fi
+          echo "::warning::main's copy of this workflow has drifted from golem-line's canonical reader. THIS run is current and continues, but the HOURLY CLOCK is stale until main is mirrored."
+
       - name: Pull player-log bundles from Sentry
         env:
           SENTRY_READ_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
