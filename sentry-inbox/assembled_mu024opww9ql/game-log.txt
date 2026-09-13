@@ -1,0 +1,720 @@
+Bug Report — Cheddar Bob · (2026-09-13-1811-the-slate-takes-the-weight) · Player dump cheddar Bob
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-13T16:57:38.082Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Karok-Sa
+HP: 35/47
+
+--- DESCRIPTION ---
+Player dump cheddar Bob
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-13T16:57:37.976Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-13-1811-the-slate-takes-the-weight)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-13T16:56:44.143Z
+  Last init success: 2026-09-13T16:56:44.801Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu023iwags · started 2026-09-13T16:56:43.882Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 9 fatal (newest last)
+  ⚠⚠ 7 of 9 process kills landed on an OTA-apply boot
+  • 2026-09-05T20:20:16.991Z (11317m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (11150m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (10032m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (9774m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (9737m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (9605m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (9497m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (9454m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (8536m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (6628m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 63/63  Stamina: 19/19  TC: 687  Corruption: 8
+  Pack: 159 distinct rows / 445 total
+  Dog: Wick (Mutt) loyalty 100 HP 15/15
+
+Weapons (31)
+  Aetheric Touch Wand (1d6 aetheric, dur 32/32, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 22/22, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Sling (1d4 bludgeoning, dur 13/14, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Dust Cloud Wand (1d6 bludgeoning, dur 24/24, [runecaster,rune_power,mud_dwellers,cover])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 13/13, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 54/54, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grinder Axe (1d8 slashing, dur 41/41, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 38/38, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Reaver's Greatsword (Legendary, 2d10 slashing, +1d4 acid coat, dur 35/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Veilkeeper Blades (Legendary, dur 55/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Vine Grasp Wand (1d6 piercing, dur 14/14, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (28)
+  Anvil-Struck Footguards (Legendary, dur 44/45, equipped:feet, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:feet, repair
+  Burl Aegis (Legendary, dur 45/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 45/45, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 24/24, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forge-Black Cowl (Legendary, dur 45/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Mask (dur 15/15, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Spore-Crusted Tassets (Legendary, dur 45/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs
+  Traveler's Cloak (dur 16/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · STR +2 · HP +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 18/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Dog Armor (4)
+  ◆ Burlap Vest (dur 18/18, ♥reserved, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, release-from-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  ◆ Riveted Leather Vest (Uncommon, dur 24/24, ♥reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])
+    actions: scrap, release-from-fusion, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (11)
+  Blue Aetheric Fungus ×2 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×4 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Honey-Glazed Knuckle (Rare, [food,treat,dog_treat,baker])
+    actions: use(eat), drop
+  Oat Cake ([food,cooked])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ([alcohol,drink])
+    actions: use(drink), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Wild Carrot ×5 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+  Wild Oats ([food,foraged,grain])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask ×6 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste ×2 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×3 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×23 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (10)
+  Aetheric Compass (Uncommon, dur 25/25, +1 WIS (passive), [detection,navigation,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    act
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 355 of 3683 entries; older trimmed to fit a single email paste)
+
+[2026-09-09T20:43:53.939Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T20:43:53.395Z] [debug] voice: bundled idle
+[2026-09-09T20:43:53.395Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T20:43:53.373Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T20:43:53.373Z] [debug] ota: Already up to date
+[2026-09-09T20:43:53.195Z] [debug] ota: Checking…
+[2026-09-09T20:43:53.195Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a087be-2c69-7e82-a605-d73b1d5f8008
+[2026-09-09T20:43:53.040Z] [debug] appstate: active → background (was active for 1220ms)
+[2026-09-09T20:43:53.031Z] [debug] ota: boot check result = applied
+[2026-09-09T20:43:52.949Z] [debug] ota: Restarting to apply…
+[2026-09-09T20:43:52.949Z] [debug] ota: Saving progress…
+[2026-09-09T20:43:52.868Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-09T20:43:52.588Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T20:43:51.842Z] [debug] ota: Checking…
+[2026-09-09T20:43:51.842Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a086df-8b42-7ca5-b8a4-e0c98fc0aebe
+[2026-09-09T17:06:03.054Z] [debug] appstate: active → background (was active for 8131ms)
+[2026-09-09T17:05:55.392Z] [debug] persist sizes(KB): total=397 player=87 wm=214[rooms=122 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=93 scene=3
+[2026-09-09T17:05:54.922Z] [debug] appstate: background → active (was background for 1840ms)
+[2026-09-09T17:05:53.083Z] [debug] appstate: active → background (was active for 162436ms)
+[2026-09-09T17:05:31.390Z] [cognitive] SEARCH · THROW  (412ms)
+[2026-09-09T17:05:30.977Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T17:05:30.976Z] [arbiter] "You saw the cold," the Arbiter notes. "That memory will rot if you leave it."
+[2026-09-09T17:05:30.976Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-09T17:05:30.976Z] [world] Broken stone and dried mortar. The wreckage gives up no secrets — the secrets fell with the building that owned them.
+[2026-09-09T17:05:30.975Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ash heap resolved=ash heap range=- enemies=0 hooks=2
+[2026-09-09T17:05:30.974Z] [player] investigate ash heap
+[2026-09-09T17:05:29.079Z] [debug] ui: tap "investigate" ⏱+17ms
+[2026-09-09T17:03:57.099Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.
+[2026-09-09T17:03:57.099Z] [debug] train: dexterity (escape check) → progress 22/100
+[2026-09-09T17:03:57.099Z] [debug] stats: STR20 DEX23 INT15 WIS19 CHA13 STE9 | gear: WIS+6,INT+4,DEX+10,STR+6,STE+2 | worn: main=Plasma Thrower off=Pyric Wand head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet
+[2026-09-09T17:03:56.978Z] [debug] skillcheck: escape d20=5 DEX 23 = 28 vs Pursuit 26 — Conspiracy Architects Raider 2 (d20 17 + SPD 9) → PASS
+[2026-09-09T17:03:56.966Z] [debug] dice⏱ skill_check: shown +507ms, tapped +1544ms, settled +836ms = 2887ms
+[2026-09-09T17:03:56.130Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-09T17:03:54.586Z] [debug] render⏱ 347ms after engine-done · feed 500
+[2026-09-09T17:03:54.159Z] [system] ⏳ Time passed: 15 min
+[2026-09-09T17:03:53.914Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-09T17:03:53.914Z] [player] flee
+[2026-09-09T17:03:53.722Z] [debug] ui: tap "flee 96%" ⏱+19ms
+[2026-09-09T17:03:49.564Z] [combat] Conspiracy Architects Raider 4 deals 2 piercing damage [armor −35%] [edge of reach — halved]. You have 35 HP remaining.
+[2026-09-09T17:03:49.485Z] [combat] Conspiracy Architects Raider 1 deals 5 slashing damage [armor −34%]. You have 37 HP remaining.
+[2026-09-09T17:03:49.406Z] [combat] Conspiracy Architects Raider 5 deals 1 bludgeoning damage [plate −1] [edge of reach — halved]. You have 42 HP remaining.
+[2026-09-09T17:03:48.831Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 4 takes 1 piercing. (14 HP left)
+[2026-09-09T17:03:48.830Z] [combat] Conspiracy Architects Raider 4 — d20 → 19 + ATK 8 = 27 vs your AC 24 — ✓ HIT
+[2026-09-09T17:03:48.828Z] [combat] Rust takes 5. (3/17 HP left)
+[2026-09-09T17:03:48.828Z] [combat] Conspiracy Architects Raider 3 turns on Rust — d20 2 + ATK 8 = 10 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T17:03:48.828Z] [combat] Conspiracy Architects Raider 2 — d20 → 5 + ATK 8 = 13 vs your AC 24 — ✗ MISS
+[2026-09-09T17:03:48.826Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 1 takes 1 slashing. (10 HP left)
+[2026-09-09T17:03:48.825Z] [combat] Conspiracy Architects Raider 1 — d20 → 17 + ATK 7 = 24 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-09T17:03:48.823Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 5 takes 1 bludgeoning. (17 HP left)
+[2026-09-09T17:03:48.821Z] [combat] Conspiracy Architects Raider 5 — d20 → 18 + ATK 6 = 24 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-09T17:03:48.821Z] [debug] ac-shift 27→24: race/base 11 + gear 20 + title 1 → trimmed 24 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-09T17:03:48.813Z] [combat] Your strike with the pyric wand lands for 4. Conspiracy Architects Raider 1 staggers — 11 HP remaining. It answers.
+[2026-09-09T17:03:48.812Z] [debug] wear ward: Pyric Wand keeps its point (15%)
+[2026-09-09T17:03:48.810Z] [combat] You — d20 → 15 + INT 16 + 2 (point blank) perfect opening (2× dice) = 33 vs Conspiracy Architects Raider 1 AC 11 — ✓ HIT
+[2026-09-09T17:03:48.809Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.
+[2026-09-09T17:03:48.761Z] [debug] dice⏱ damage: shown +389ms, tapped +555ms, settled +834ms = 1778ms
+[2026-09-09T17:03:47.927Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-09T17:03:46.978Z] [debug] dice⏱ attack: shown +400ms, tapped +450ms, settled +834ms = 1684ms
+[2026-09-09T17:03:46.143Z] [debug] ui: tap "roll" ⏱+11ms
+[2026-09-09T17:03:45.292Z] [debug] dice⏱ initiative: shown +555ms, tapped +1565ms, settled +832ms = 2952ms
+[2026-09-09T17:03:44.460Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T17:03:42.895Z] [debug] render⏱ 381ms after engine-done · feed 500
+[2026-09-09T17:03:42.427Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T17:03:42.427Z] [world] You commit forward with the pyric wand. Conspiracy Architects Raider 1 watches your hands.
+[2026-09-09T17:03:42.252Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-09T17:03:42.165Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Pyric Wand bareHand=false
+[2026-09-09T17:03:41.991Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand pyric wand resolved=Pyric Wand range=close enemies=5 hooks=2
+[2026-09-09T17:03:41.991Z] [player] attack with the off-hand pyric wand
+[2026-09-09T17:03:41.882Z] [system] evasive — harder to hit fades.
+[2026-09-09T17:03:41.709Z] [debug] ui: tap "pyric wand 🔥" ⏱+89ms
+[2026-09-09T17:03:40.150Z] [combat] Conspiracy Architects Raider 4 deals 1 piercing damage [armor −35%, plate −1] [edge of reach — halved]. You have 43 HP remaining.
+[2026-09-09T17:03:40.068Z] [debug] render⏱ 570ms after engine-done · feed 500
+[2026-09-09T17:03:39.416Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T17:03:39.416Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 4 takes 1 piercing. (15 HP left)
+[2026-09-09T17:03:39.252Z] [combat] Conspiracy Architects Raider 4 — d20 → 18 + ATK 8 = 26 vs your AC 27 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-09T17:03:39.250Z] [combat] Conspiracy Architects Raider 3 turns on Rust — d20 1 + ATK 8 = 9 vs Rust's AC 9 — ✗ FUMBLE
+[2026-09-09T17:03:39.250Z] [combat] Conspiracy Architects Raider 2 — d20 → 5 + ATK 8 = 13 vs your AC 27 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-09T17:03:39.248Z] [combat] Conspiracy Architects Raider 1 — d20 → 3 + ATK 7 = 10 vs your AC 27 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-09T17:03:39.248Z] [debug] ac-shift 24→27: race/base 11 + gear 20 + title 1 → trimmed 24 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-09T17:03:39.166Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-09T17:03:39.084Z] [combat] Dodge — d20 → 17 + DEX 23 = 40 vs ATK 23. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-09T17:03:39.084Z] [combat] Conspiracy Architects Raider 5 — d20 → 17 + ATK 6 = 23 vs your AC 24 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-09T17:03:38.840Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-09T17:03:38.760Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-09T17:03:38.760Z] [player] dodge
+[2026-09-09T17:03:38.548Z] [debug] ui: tap "dodge" ⏱+21ms
+[2026-09-09T17:03:36.640Z] [combat] Conspiracy Architects Raider 2 deals 1 slashing damage [armor −34%] [edge of reach — halved]. You have 44 HP remaining.
+[2026-09-09T17:03:36.053Z] [combat] Conspiracy Architects Raider 5 closes the distance.
+[2026-09-09T17:03:36.053Z] [combat] Conspiracy Architects Raider 1 — d20 → 4 + ATK 7 = 11 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-09T17:03:36.049Z] [combat] Rust takes 5. (8/17 HP left)
+[2026-09-09T17:03:36.048Z] [combat] Conspiracy Architects Raider 4 turns on Rust — d20 8 + ATK 8 = 16 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T17:03:36.047Z] [combat] Conspiracy Architects Raider 3 — d20 → 15 + ATK 8 = 23 vs your AC 24 — ✗ MISS
+[2026-09-09T17:03:36.044Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 2 takes 1 slashing. (16 HP left)
+[2026-09-09T17:03:36.042Z] [combat] Conspiracy Architects Raider 2 — d20 → 18 + ATK 8 = 26 vs your AC 24 — ✓ HIT
+[2026-09-09T17:03:36.039Z] [combat] Clean hit with the plasma thrower for 3. Conspiracy Architects Raider 1 has 15 left and does not back away.
+[2026-09-09T17:03:36.034Z] [combat] You — d20 → 5 + WIS 19 + 2 (point blank) = 26 vs Conspiracy Architects Raider 1 AC 11 — ✓ HIT
+[2026-09-09T17:03:36.032Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.
+[2026-09-09T17:03:35.984Z] [debug] dice⏱ damage: shown +385ms, tapped +714ms, settled +833ms = 1932ms
+[2026-09-09T17:03:35.150Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T17:03:34.050Z] [debug] dice⏱ attack: shown +394ms, tapped +535ms, settled +835ms = 1764ms
+[2026-09-09T17:03:33.466Z] [debug] freeze watch: recovered — painting again after 776ms quiet.
+[2026-09-09T17:03:33.215Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-09T17:03:32.283Z] [debug] dice⏱ initiative: shown +470ms, tapped +1347ms, settled +833ms = 2650ms
+[2026-09-09T17:03:31.449Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-09T17:03:30.564Z] [debug] persist sizes(KB): total=394 player=87 wm=208[rooms=116 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=92 scene=7
+[2026-09-09T17:03:30.102Z] [debug] render⏱ 384ms after engine-done · feed 500
+[2026-09-09T17:03:29.718Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T17:03:29.718Z] [world] You raise the plasma thrower toward Conspiracy Architects Raider 1. The room narrows around the both of you.
+[2026-09-09T17:03:29.456Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-09T17:03:29.285Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=close enemies=5 hooks=2
+[2026-09-09T17:03:29.284Z] [player] attack with the plasma thrower
+[2026-09-09T17:03:29.094Z] [debug] ui: tap "plasma thrower 🔥" ⏱+704ms late 690ms
+[2026-09-09T17:03:28.458Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 2003ms · frames 0ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: native:cognition:done +9596ms → now: engine-done +1376ms · doing: action "approach Conspiracy Architects Raider 1" · native: idle · heap 24MB · gc +0ms/186 · feed 500
+[2026-09-09T17:03:27.742Z] [combat] Conspiracy Architects Raider 2 deals 1 slashing damage [armor −34%] [edge of reach — halved]. You have 45 HP remaining.
+[2026-09-09T17:03:27.661Z] [debug] render⏱ 580ms after engine-done · feed 500
+[2026-09-09T17:03:27.080Z] [combat] Conspiracy Architects Raider 3 and 1 other close the distance.
+[2026-09-09T17:03:26.999Z] [combat] Conspiracy Architects Raider 1 — d20 → 12 + ATK 7 = 19 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-09T17:03:26.996Z] [combat] Rust takes 4. (13/17 HP left)
+[2026-09-09T17:03:26.915Z] [combat] Conspiracy Architects Raider 4 turns on Rust — d20 9 + ATK 8 = 17 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T17:03:26.833Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 2 takes 1 slashing. (17 HP left)
+[2026-09-09T17:03:26.670Z] [combat] Conspiracy Architects Raider 2 — d20 → 16 + ATK 10 = 26 vs your AC 24 — ✓ HIT
+[2026-09-09T17:03:26.497Z] [world] You close the gap with the Conspiracy Architects Raider 1 and 4 others. (range: close / arm's reach)
+[2026-09-09T17:03:26.497Z] [debug] move: field advance target=Conspiracy Architects Raider 1 d 0.36->0.35 band close->close
+[2026-09-09T17:03:26.410Z] [debug] move: advance from range=close enemies=5 weather=Aetheric Storm cost=1 partial=0
+[2026-09-09T17:03:26.325Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 1 resolved=Conspiracy Architects Raider 1 range=close enemies=5 hooks=2
+[2026-09-09T17:03:26.325Z] [player] approach Conspiracy Architects Raider 1
+[2026-09-09T17:03:26.071Z] [debug] ui: tap "approach" ⏱+21ms
+[2026-09-09T17:03:10.649Z] [debug] appstate: background → active (was background for 1703897ms)
+[2026-09-09T16:34:46.753Z] [debug] appstate: active → background (was active for 74561ms)
+[2026-09-09T16:34:16.362Z] [debug] ui: tap "? glyphs" ⏱+15ms
+[2026-09-09T16:34:10.006Z] [cognitive] CLIMB  (1781ms)
+[2026-09-09T16:34:08.313Z] [arbiter] "The Conspiracy Architects do not forgive a friend of the Forgotten Order," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-09T16:34:08.313Z] [world] A Conspiracy Architects war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Forgotten Order.
+[2026-09-09T16:34:08.142Z] [system] ⏳ Time passed: 24 min
+[2026-09-09T16:34:08.140Z] [debug] wear ward: Sentinel Cleaver keeps its point (15%)
+[2026-09-09T16:34:08.140Z] [world] You scrape at the silt with the sentinel cleaver. Nothing of worth.
+[2026-09-09T16:34:08.126Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-09-09T16:34:08.126Z] [player] investigate the ground
+[2026-09-09T16:34:08.099Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-09T16:34:05.665Z] [debug] ui: tap "investigate" ⏱+14ms
+[2026-09-09T16:34:02.874Z] [reward] ✦ Compact Laser Pistol (Ranged) (Common).
+[2026-09-09T16:34:02.873Z] [world] You pick up the Compact Laser Pistol (Ranged).
+[2026-09-09T16:34:01.506Z] [reward]     • Aether Crystal (Common)
+[2026-09-09T16:34:01.506Z] [reward]     • Coiled Snare Thread (Common)
+[2026-09-09T16:34:01.505Z] [reward]     • Worn Tartarian Coin x8 (Common)
+[2026-09-09T16:34:01.505Z] [reward]     • Bone-Handled Rivet (Uncommon)
+[2026-09-09T16:34:01.505Z] [reward]     • Scrap Metal x4 (Common)
+[2026-09-09T16:34:01.505Z] [reward] ✦ Salvage haul:
+[2026-09-09T16:34:01.505Z] [world] You salvage the standing water. The take is small but real.
+[2026-09-09T16:34:01.505Z] [world] You break the shelf apart. Among the pieces, something worth keeping.
+[2026-09-09T16:34:01.505Z] [world] You work the seal warden apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-09T16:34:01.504Z] [world] You strip the scribe alcove carefully. Something usable comes free in your hand.
+[2026-09-09T16:34:01.504Z] [world] You work the ritual seat apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-09T16:34:01.504Z] [world] You salvage the binding chain. The take is small but real.
+[2026-09-09T16:33:49.959Z] [debug] ui: tap "take / salvage" ⏱+14ms
+[2026-09-09T16:33:48.479Z] [world] The thread you were following waits where you left it.
+[2026-09-09T16:33:48.478Z] [world] You walk west through open silt. The compass points west into open ground.
+[2026-09-09T16:33:48.477Z] [debug] spawn: gear=[Compact Laser Pistol (Ranged)] window=10 roster=new
+[2026-09-09T16:33:48.425Z] [debug] ui: tap "→ ASGARDAR" ⏱+16ms
+[2026-09-09T16:33:42.942Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-09T16:33:42.942Z] [reward]     • Aether Crystal (Common)
+[2026-09-09T16:33:42.942Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-09-09T16:33:42.942Z] [reward]     • Web-Silk Wadding (Common)
+[2026-09-09T16:33:42.942Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-09T16:33:42.942Z] [reward] ✦ Salvage haul:
+[2026-09-09T16:33:42.942Z] [world] You strip the stone tablet carefully. Something usable comes free in your hand.
+[2026-09-09T16:33:42.941Z] [world] You salvage the standing water. The take is small but real.
+[2026-09-09T16:33:42.941Z] [world] You salvage the sigil floor. The take is small but real.
+[2026-09-09T16:33:42.941Z] [world] You work the seal sigil over again, but the mark itself is long gone — a worn coin in the rubble is all that's left.
+[2026-09-09T16:33:42.941Z] [world] Tucked inside the crystal: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-09T16:33:42.941Z] [world] You salvage the broken stylus. The take is small but real.
+[2026-09-09T16:33:41.380Z] [reward] ✦ Plasma Dagger (Common).
+[2026-09-09T16:33:41.379Z] [world] You take the Plasma Dagger from where it lay.
+[2026-09-09T16:33:39.875Z] [debug] ui: tap "take / salvage" ⏱+28ms
+[2026-09-09T16:33:37.998Z] [debug] boot: life bmtubiac5bm started 2026-09-09T16:33:32.117Z · FOLLOWED AN OTA APPLY 281ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T16:33:37.998Z] [debug] missions: · at=karok_sa travelTo=asgardar
+[2026-09-09T16:33:37.998Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-09T16:33:37.998Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-09T16:33:37.998Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-09T16:33:37.998Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-09T16:33:37.998Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-09T16:33:37.998Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-09T16:33:37.997Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-09T16:33:37.997Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-09T16:33:37.997Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-09T16:33:37.997Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-09T16:33:37.997Z] [debug] ═══ SESSION 2026-09-09T16:33:37.994Z · build 2026-09-09-1784-six-traders-six-voices · updated from 2026-09-09-1777-family-b-is-named · previous entry moments earlier ═══
+[2026-09-09T16:33:37.211Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-09T16:33:37.208Z] [world] You step back into Karok-Sa. The world waits for your move.
+[2026-09-09T16:33:37.208Z] [debug] OTA session start: 2026-09-09-1784-six-traders-six-voices.
+[2026-09-09T16:33:37.208Z] [debug] OTA applied: 2026-09-09-1777-family-b-is-named → 2026-09-09-1784-six-traders-six-voices.
+[2026-09-09T16:33:32.956Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T16:33:32.522Z] [debug] voice: bundled idle
+[2026-09-09T16:33:32.522Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T16:33:32.494Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T16:33:32.493Z] [debug] ota: Already up to date
+[2026-09-09T16:33:32.209Z] [debug] ota: Checking…
+[2026-09-09T16:33:32.209Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a086df-8b42-7ca5-b8a4-e0c98fc0aebe
+[2026-09-09T16:33:31.835Z] [debug] ota: Restarting to apply…
+[2026-09-09T16:33:31.833Z] [debug] ota: Saving progress…
+[2026-09-09T16:33:31.537Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-09T16:33:30.118Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T16:33:29.380Z] [debug] ota: Checking…
+[2026-09-09T16:33:29.380Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a085cc-abdd-7163-a299-385a5bf9a6ea
+[2026-09-09T11:03:15.319Z] [reward] Dral Hollowpocket works your Auralite Talon over the anvil. ✦ Reinforced 1/3 — durability 30/35 → 37/42. (−280 TC, Small Rock ×2)
+[2026-09-09T11:02:42.438Z] [reward] Bought the Killing Frost Stave working for 200 TC. ✦ Recipe learned (Rare)! Open Crafting to forge it — you'll still need the materials.
+[2026-09-09T11:02:23.967Z] [debug] persist sizes(KB): total=409 player=86 wm=208[rooms=116 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=93 scene=22
+[2026-09-09T11:02:23.347Z] [reward] They don't charge a friend full price — 4 TC stayed in your pouch.
+[2026-09-09T11:02:23.347Z] [reward] Bought 4× Aether Crystal from Dral Hollowpocket for 52 TC. (516 TC left)
+[2026-09-09T11:02:14.976Z] [reward] They don't charge a friend full price — 3 TC stayed in your pouch.
+[2026-09-09T11:02:14.976Z] [reward] Bought 3× Blue Cap Mushroom from Dral Hollowpocket for 18 TC. (568 TC left)
+[2026-09-09T11:01:40.424Z] [debug] freeze watch: recovered — painting again after 18ms quiet.
+[2026-09-09T11:01:35.403Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 5022ms · frames 0ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: rendered +31372ms → now: rendered +31372ms · doing: tap "⤵ Just take it — to your pack" · native: idle · heap 28MB · gc +0ms/559 · feed 500
+[2026-09-09T11:01:33.995Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 2 TC. (586 TC on hand)
+[2026-09-09T11:01:33.919Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Dral Hollowpocket for 2 TC. (584 TC on hand)
+[2026-09-09T11:01:33.839Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 2 TC. (582 TC on hand)
+[2026-09-09T11:01:33.758Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 2 TC. (580 TC on hand)
+[2026-09-09T11:01:33.677Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 2 TC. (578 TC on hand)
+[2026-09-09T11:01:33.595Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 2 TC. (576 TC on hand)
+[2026-09-09T11:01:33.514Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 2 TC. (574 TC on hand)
+[2026-09-09T11:01:33.432Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 2 TC. (572 TC on hand)
+[2026-09-09T11:01:33.350Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (570 TC on hand)
+[2026-09-09T11:01:33.268Z] [reward] Sold Crude Golem Pike (Common) to Dral Hollowpocket for 5 TC. (565 TC on hand)
+[2026-09-09T11:01:33.187Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Dral Hollowpocket for 5 TC. (560 TC on hand)
+[2026-09-09T11:01:33.108Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (555 TC on hand)
+[2026-09-09T11:01:33.026Z] [reward] Sold Mask of the Mud Stalker (Common) to Dral Hollowpocket for 6 TC. (550 TC on hand)
+[2026-09-09T11:01:32.944Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 2 TC. (544 TC on hand)
+[2026-09-09T11:01:32.861Z] [reward] Sold Cloak of the Mud Shaman (Common) to Dral Hollowpocket for 6 TC. (542 TC on hand)
+[2026-09-09T11:01:32.778Z] [reward] Sold Reclaimer's Gloves (Common) to Dral Hollowpocket for 6 TC. (536 TC on hand)
+[2026-09-09T11:01:32.695Z] [reward] Sold Diplomat's Mask of the Giants (Common) to Dral Hollowpocket for 6 TC. (530 TC on hand)
+[2026-09-09T11:01:32.612Z] [reward] Sold Sentinel's Mobile Greaves (Common) to Dral Hollowpocket for 6 TC. (524 TC on hand)
+[2026-09-09T11:01:32.528Z] [reward] Sold Architect's Mask of Vision (Common) to Dral Hollowpocket for 6 TC. (518 TC on hand)
+[2026-09-09T11:01:32.444Z] [reward] Sold Scholar's Headband of Knowledge (Common) to Dral Hollowpocket for 6 TC. (512 TC on hand)
+[2026-09-09T11:01:32.360Z] [reward] Sold Aetheric Helm of Command (Common) to Dral Hollowpocket for 6 TC. (506 TC on hand)
+[2026-09-09T11:01:32.276Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 6 TC. (500 TC on hand)
+[2026-09-09T11:01:32.193Z] [reward] Sold Cloak of the Mud Shaman (Common) to Dral Hollowpocket for 6 TC. (494 TC on hand)
+[2026-09-09T11:01:32.109Z] [reward] Sold Lost Seeker's Gloves (Common) to Dral Hollowpocket for 6 TC. (488 TC on hand)
+[2026-09-09T11:01:32.024Z] [reward] Sold Architect's Observer Visor (Common) to Dral Hollowpocket for 6 TC. (482 TC on hand)
+[2026-09-09T11:01:31.937Z] [reward] Sold Arcane Sprinter's Legplates (Common) to Dral Hollowpocket for 6 TC. (476 TC on hand)
+[2026-09-09T11:01:31.851Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Dral Hollowpocket for 8 TC. (470 TC on hand)
+[2026-09-09T11:01:31.766Z] [reward] Sold Titan's Gauntlets (Common) to Dral Hollowpocket for 8 TC. (462 TC on hand)
+[2026-09-09T11:01:31.681Z] [reward] Sold Scrap-Forged Breastplate (Common) to Dral Hollowpocket for 8 TC. (454 TC on hand)
+[2026-09-09T11:01:31.596Z] [reward] Sold Lost Scholar's Robe (Common) to Dral Hollowpocket for 8 TC. (446 TC on hand)
+[2026-09-09T11:01:31.509Z] [reward] Sold Wanderer's Armor of Wisdom (Common) to Dral Hollowpocket for 8 TC. (438 TC on hand)
+[2026-09-09T11:01:31.424Z] [reward] Sold Lost Scholar's Robe (Common) to Dral Hollowpocket for 8 TC. (430 TC on hand)
+[2026-09-09T11:01:31.339Z] [reward] Sold Architect's Mantle (Common) to Dral Hollowpocket for 8 TC. (422 TC on hand)
+[2026-09-09T11:01:31.253Z] [reward] Sold Titan's Vest (Common) to Dral Hollowpocket for 8 TC. (414 TC on hand)
+[2026-09-09T11:01:31.166Z] [reward] Sold Sentinel's Chestplate (Common) to Dral Hollowpocket for 10 TC. (406 TC on hand)
+[2026-09-09T11:01:31.080Z] [reward] Sold Golem-Bound Armor (Common) to Dral Hollowpocket for 10 TC. (396 TC on hand)
+[2026-09-09T11:01:30.993Z] [reward] Sold Mud Harpoon (Common) to Dral Hollowpocket for 12 TC. (386 TC on hand)
+[2026-09-09T11:01:30.906Z] [reward] Sold Order Letter-Opener (Common) to Dral Hollowpocket for 12 TC. (374 TC on hand)
+[2026-09-09T11:01:30.819Z] [reward] Sold Tartarian Claw Knife (Common) to Dral Hollowpocket for 12 TC. (362 TC on hand)
+[2026-09-09T11:01:30.733Z] [reward] Sold Pocket Knife (Common) to Dral Hollowpocket for 12 TC. (350 TC on hand)
+[2026-09-09T11:01:30.647Z] [reward] Sold Giant Bone Longbow (Common) to Dral Hollowpocket for 12 TC. (338 TC on hand)
+[2026-09-09T11:01:30.560Z] [reward] Sold Mud Long Axe (Common) to Dral Hollowpocket for 13 TC. (326 TC on hand)
+[2026-09-09T11:01:30.475Z] [reward] Sold Rust Dagger (Common) to Dral Hollowpocket for 13 TC. (313 TC on hand)
+[2026-09-09T11:01:30.390Z] [reward] Sold Mud Mauler (Common) to Dral Hollowpocket for 13 TC. (300 TC on hand)
+[2026-09-09T11:01:30.303Z] [reward] Sold Short Hunting Bow (Common) to Dral Hollowpocket for 13 TC. (287 TC on hand)
+[2026-09-09T11:01:30.215Z] [reward] Sold Echoing Steps Boots (Common) to Dral Hollowpocket for 13 TC. (274 TC on hand)
+[2026-09-09T11:01:30.126Z] [reward] Sold Mud-Iron Cleaver (Common) to Dral Hollowpocket for 14 TC. (261 TC on hand)
+[2026-09-09T11:01:03.739Z] [reward] ✦ Mud Long Axe (Common).
+[2026-09-09T11:01:03.738Z] [world] You take the Mud Long Axe from where it lay.
+[2026-09-09T11:01:03.733Z] [debug] ui: tap "⤵ Just take it — to your pack"
+[2026-09-09T11:00:46.108Z] [world] The thread you were following waits where you left it.
+[2026-09-09T11:00:46.107Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-09-09T11:00:46.107Z] [world] Rare workings for sale: Iron-Worm Engine (200 TC), Killing Frost Stave (200 TC), Leadlined Pavise (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-09T11:00:46.092Z] [world] A stall has been thrown up on the next stretch of ground — Dral Hollowpocket, fence. Tap the vendor banner to trade.
+[2026-09-09T11:00:46.092Z] [world] Dral Hollowpocket picks up where you left off. "You were asking about ‘Ask why they trade out here’. I've had time to think on it."
+[2026-09-09T11:00:46.092Z] [world] Dral Hollowpocket looks you over. "It's been a long stretch, Cheddar Bob. I'd started asking after you."
+[2026-09-09T11:00:46.092Z] [world] Dral Hollowpocket catches your eye and nods — the kind of nod that knows your name. "Cheddar Bob. Come look at what came in this week."
+[2026-09-09T11:00:46.090Z] [debug] spawn: gear=[Plasma Dagger, Mud Long Axe] window=10 roster=new
+[2026-09-09T11:00:46.028Z] [debug] ui: tap "→ ASGARDAR" ⏱+16ms
+[2026-09-09T11:00:41.088Z] [reward] +9 TC pried from the dust.
+[2026-09-09T11:00:41.087Z] [reward] Aetheric Ooze defeated. You recover Ooze Residue, Aether Crystal.
+[2026-09-09T11:00:41.086Z] [combat] Aetheric Ooze shakes off the last of the coating — the burn has run its course.
+[2026-09-09T11:00:41.086Z] [combat] Aetheric Ooze suffers — burn eats 3. (0/24 HP, 0 turns left)
+[2026-09-09T11:00:41.086Z] [combat] Aetheric Ooze shakes off the last of the current — the Bone Siege Crossbow has run its course.
+[2026-09-09T11:00:41.086Z] [combat] Aetheric Ooze convulses — arcing current bites 2. (0/24 HP, 0 turns left)
+[2026-09-09T11:00:40.998Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=mid enemies=1 hooks=2
+[2026-09-09T11:00:40.997Z] [player] attack with the plasma thrower
+[2026-09-09T11:00:40.777Z] [debug] ui: tap "plasma thrower 🔥 ★" ⏱+15ms
+[2026-09-09T11:00:38.298Z] [combat] Aetheric Ooze regenerates 1 HP (2/24).
+[2026-09-09T11:00:37.684Z] [combat] Aetheric Ooze — d20 → 9 + ATK 4 = 13 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-09T11:00:37.679Z] [combat] Clean hit with the pyric wand for 2. Aetheric Ooze has 1 left and does not back away.
+[2026-09-09T11:00:37.677Z] [combat] Weakness exposed — Aetheric Ooze flinches. (burn ×1.5 for 2)
+[2026-09-09T11:00:37.674Z] [combat] You — d20 → 13 + INT 16 = 29 vs Aetheric Ooze AC 9 — ✓ HIT
+[2026-09-09T11:00:37.674Z] [world] You seize the initiative. Aetheric Ooze has no time to react.
+[2026-09-09T11:00:37.618Z] [debug] dice⏱ damage: shown +413ms, tapped +452ms, settled +831ms = 1696ms
+[2026-09-09T11:00:36.786Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-09T11:00:35.918Z] [debug] dice⏱ attack: shown +418ms, tapped +528ms, settled +834ms = 1780ms
+[2026-09-09T11:00:35.083Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-09T11:00:34.133Z] [debug] dice⏱ initiative: shown +467ms, tapped +1293ms, settled +834ms = 2594ms
+[2026-09-09T11:00:33.299Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-09T11:00:32.006Z] [debug] render⏱ 380ms after engine-done · feed 500
+[2026-09-09T11:00:31.626Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T11:00:31.626Z] [world] You commit forward with the pyric wand. Aetheric Ooze watches your hands.
+[2026-09-09T11:00:31.360Z] [debug] attack: target=Aetheric Ooze range=mid reach.bands=[distant,far,mid,close] reach.label=Pyric Wand bareHand=false
+[2026-09-09T11:00:31.273Z] [combat] Aetheric Ooze suffers — burn eats 3. (3/24 HP, 1 turn left)
+[2026-09-09T11:00:31.272Z] [combat] Aetheric Ooze convulses — arcing current bites 2. (6/24 HP, 1 turn left)
+[2026-09-09T11:00:31.184Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand pyric wand resolved=Pyric Wand range=mid enemies=1 hooks=2
+[2026-09-09T11:00:31.184Z] [player] attack with the off-hand pyric wand
+[2026-09-09T11:00:30.964Z] [debug] ui: tap "pyric wand 🔥 ★" ⏱+11ms
+[2026-09-09T11:00:29.566Z] [combat] Aetheric Ooze regenerates 1 HP (8/24).
+[2026-09-09T11:00:29.480Z] [combat] Aetheric Ooze deals 1 acid damage [plate −2] [edge of reach — halved]. You have 46 HP remaining.
+[2026-09-09T11:00:28.865Z] [combat] Your armour turns the blow back — Aetheric Ooze takes 1 acid. (7 HP left)
+[2026-09-09T11:00:28.860Z] [combat] Aetheric Ooze — d20 → 17 + ATK 4 = 21 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-09T11:00:28.857Z] [combat] Burn sets in — 3/turn for 2 turns.
+[2026-09-09T11:00:28.857Z] [combat] Your strike with the plasma thrower lands for 5. Aetheric Ooze staggers — 8 HP remaining. It answers.
+[2026-09-09T11:00:28.854Z] [combat] Weakness exposed — Aetheric Ooze flinches. (burn ×1.5 for 5)
+[2026-09-09T11:00:28.850Z] [combat] You — d20 → 2 + WIS 19 = 21 vs Aetheric Ooze AC 9 — ✓ HIT
+[2026-09-09T11:00:28.850Z] [world] You seize the initiative. Aetheric Ooze has no time to react.
+[2026-09-09T11:00:28.799Z] [debug] dice⏱ damage: shown +416ms, tapped +467ms, settled +835ms = 1718ms
+[2026-09-09T11:00:27.965Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-09T11:00:27.080Z] [debug] dice⏱ attack: shown +417ms, tapped +477ms, settled +833ms = 1727ms
+[2026-09-09T11:00:26.246Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-09T11:00:25.349Z] [debug] dice⏱ initiative: shown +464ms, tapped +1447ms, settled +838ms = 2749ms
+[2026-09-09T11:00:24.511Z] [debug] ui: tap "roll" ⏱+11ms
+[2026-09-09T11:00:23.529Z] [debug] persist sizes(KB): total=411 player=101 wm=213[rooms=122 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=92 scene=4
+[2026-09-09T11:00:23.064Z] [debug] render⏱ 376ms after engine-done · feed 500
+[2026-09-09T11:00:22.687Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T11:00:22.687Z] [world] You raise the plasma thrower toward Aetheric Ooze. The room narrows around the both of you.
+[2026-09-09T11:00:22.420Z] [debug] attack: target=Aetheric Ooze range=mid reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-09T11:00:22.333Z] [combat] Aetheric Ooze convulses — arcing current bites 2. (13/24 HP, 2 turns left)
+[2026-09-09T11:00:22.246Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=mid enemies=1 hooks=2
+[2026-09-09T11:00:22.246Z] [player] attack with the plasma thrower
+[2026-09-09T11:00:22.026Z] [debug] ui: tap "plasma thrower 🔥 ★" ⏱+20ms
+[2026-09-09T11:00:11.125Z] [debug] stats: STR20 DEX23 INT15 WIS19 CHA13 STE9 | gear: WIS+6,INT+4,DEX+10,STR+6,STE+2 | worn: main=Plasma Thrower off=Pyric Wand head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet
+[2026-09-09T10:59:43.397Z] [debug] stats: STR20 DEX23 INT14 WIS19 CHA13 STE9 | gear: WIS+6,INT+3,DEX+10,STR+6,STE+2 | worn: main=Plasma Thrower head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet
+[2026-09-09T10:58:57.856Z] [debug] ui: tap "inventory" ⏱+15ms
+[2026-09-09T10:58:52.215Z] [combat] Charged Bone Siege Crossbow — 2 electrical bites in and festers (3 turns).
+[2026-09-09T10:58:52.215Z] [combat] The blow with the charged bone siege crossbow finds purchase — 9 damage, 15 HP standing. Aetheric Ooze commits to the counter.
+[2026-09-09T10:58:52.210Z] [combat] You — d20 → 6 + STR 22 = 28 vs Aetheric Ooze AC 9 — ✓ HIT
+[2026-09-09T10:58:52.209Z] [combat] Aetheric Ooze closes the distance.
+[2026-09-09T10:58:52.209Z] [world] Aetheric Ooze moves first. The pressure is immediate.
+[2026-09-09T10:58:52.154Z] [debug] dice⏱ coating: shown +412ms, tapped +844ms, settled +831ms = 2087ms
+[2026-09-09T10:58:51.323Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-09T10:58:50.063Z] [debug] dice⏱ damage: shown +404ms, tapped +448ms, settled +815ms = 1667ms
+[2026-09-09T10:58:49.246Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T10:58:48.393Z] [debug] dice⏱ attack: shown +419ms, tapped +470ms, settled +833ms = 1722ms
+[2026-09-09T10:58:47.560Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-09T10:58:46.669Z] [debug] dice⏱ initiative: shown +548ms, tapped +1492ms, settled +835ms = 2875ms
+[2026-09-09T10:58:45.834Z] [debug] ui: tap "roll" ⏱+11ms
+[2026-09-09T10:58:44.343Z] [debug] render⏱ 462ms after engine-done · feed 500
+[2026-09-09T10:58:43.881Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T10:58:43.880Z] [world] You commit forward with the charged bone siege crossbow. Aetheric Ooze watches your hands.
+[2026-09-09T10:58:43.616Z] [debug] attack: target=Aetheric Ooze range=far reach.bands=[distant,far,mid,close] reach.label=Bone Siege Crossbow bareHand=false
+[2026-09-09T10:58:43.440Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone siege crossbow resolved=Bone Siege Crossbow range=far enemies=1 hooks=2
+[2026-09-09T10:58:43.440Z] [player] attack with the bone siege crossbow
+[2026-09-09T10:58:43.418Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-09T10:58:43.300Z] [debug] ui: tap "⚡ siege crossbow ▲" ⏱+23ms
+[2026-09-09T10:58:39.113Z] [debug] boot: life bmttzjfmnsh started 2026-09-09T10:58:30.239Z · FOLLOWED AN OTA APPLY 211ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T10:58:39.113Z] [debug] missions: · at=karok_sa travelTo=asgardar
+[2026-09-09T10:58:39.113Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-09T10:58:39.113Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-09T10:58:39.113Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+
+=== END REPORT ===

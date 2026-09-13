@@ -1,0 +1,751 @@
+Bug Report — Johnny Blaze · (2026-09-13-1811-the-slate-takes-the-weight) · Player dump Johnny blaze
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-13T16:57:22.322Z
+Character: Johnny Blaze
+Slot ID: slot_mtrjgazg_fumkzk
+Race: Reclaimers
+Location: Samarran
+HP: 12/18
+
+--- DESCRIPTION ---
+Player dump Johnny blaze
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-13T16:57:22.199Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-13-1811-the-slate-takes-the-weight)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-13T16:56:44.143Z
+  Last init success: 2026-09-13T16:56:44.801Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu023iwags · started 2026-09-13T16:56:43.882Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 9 fatal (newest last)
+  ⚠⚠ 7 of 9 process kills landed on an OTA-apply boot
+  • 2026-09-05T20:20:16.991Z (11317m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (11149m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (10032m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (9773m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (9737m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (9604m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (9496m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (9454m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (8536m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (6628m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 63/63  Stamina: 19/19  TC: 687  Corruption: 8
+  Pack: 159 distinct rows / 445 total
+  Dog: Wick (Mutt) loyalty 100 HP 15/15
+
+Weapons (31)
+  Aetheric Touch Wand (1d6 aetheric, dur 32/32, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 22/22, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Sling (1d4 bludgeoning, dur 13/14, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Dust Cloud Wand (1d6 bludgeoning, dur 24/24, [runecaster,rune_power,mud_dwellers,cover])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 13/13, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 54/54, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grinder Axe (1d8 slashing, dur 41/41, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 38/38, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Reaver's Greatsword (Legendary, 2d10 slashing, +1d4 acid coat, dur 35/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Veilkeeper Blades (Legendary, dur 55/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Vine Grasp Wand (1d6 piercing, dur 14/14, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (28)
+  Anvil-Struck Footguards (Legendary, dur 44/45, equipped:feet, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:feet, repair
+  Burl Aegis (Legendary, dur 45/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 45/45, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 24/24, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forge-Black Cowl (Legendary, dur 45/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Mask (dur 15/15, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Spore-Crusted Tassets (Legendary, dur 45/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs
+  Traveler's Cloak (dur 16/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · STR +2 · HP +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 18/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Dog Armor (4)
+  ◆ Burlap Vest (dur 18/18, ♥reserved, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, release-from-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  ◆ Riveted Leather Vest (Uncommon, dur 24/24, ♥reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])
+    actions: scrap, release-from-fusion, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (11)
+  Blue Aetheric Fungus ×2 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×4 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Honey-Glazed Knuckle (Rare, [food,treat,dog_treat,baker])
+    actions: use(eat), drop
+  Oat Cake ([food,cooked])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ([alcohol,drink])
+    actions: use(drink), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Wild Carrot ×5 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+  Wild Oats ([food,foraged,grain])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask ×6 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste ×2 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×3 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×23 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (10)
+  Aetheric Compass (Uncommon, dur 25/25, +1 WIS (passive), [detection,navigation,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    act
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 386 of 2726 entries; older trimmed to fit a single email paste)
+
+[2026-09-12T02:36:18.749Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T02:36:18.189Z] [debug] voice: bundled idle
+[2026-09-12T02:36:18.189Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-12T02:36:18.139Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T02:36:18.139Z] [debug] ota: Already up to date
+[2026-09-12T02:36:18.063Z] [debug] ota: Checking…
+[2026-09-12T02:36:18.063Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a091bf-84ff-73f3-95b7-43eef74e73b8
+[2026-09-12T00:53:20.404Z] [debug] boot: life bmtxo8l0qlx started 2026-09-12T00:53:12.938Z · not an OTA apply (no handoff on disk)
+[2026-09-12T00:53:20.404Z] [debug] missions: none active · at=samarran
+[2026-09-12T00:53:20.404Z] [debug] ═══ SESSION 2026-09-12T00:53:20.402Z · build 2026-09-11-1803-the-hud-belongs-to-tartaria · previous entry moments earlier ═══
+[2026-09-12T00:53:20.169Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Johnny Blaze. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-12T00:53:20.159Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.
+[2026-09-12T00:53:20.158Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-12T00:53:20.158Z] [debug] OTA session start: 2026-09-11-1803-the-hud-belongs-to-tartaria.
+[2026-09-09T22:12:55.257Z] [combat] Mud Strider deals 2 piercing damage. You have 12 HP remaining.
+[2026-09-09T22:12:55.242Z] [combat] The aetheric went through clean — nothing you're wearing resists aetheric. A matching coating worked into your armor would blunt the next one.
+[2026-09-09T22:12:55.242Z] [combat] Aetheric Horror deals 4 aetheric damage [edge of reach — halved]. You have 14 HP remaining.
+[2026-09-09T22:12:55.077Z] [arbiter] The Arbiter does not look away from the aetheric horror. "Decide quickly. It already has."
+[2026-09-09T22:12:55.077Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Smoldering Paste now, if you wanted."
+[2026-09-09T22:12:55.060Z] [reward] +8 TC pried from the dust.
+[2026-09-09T22:12:55.059Z] [combat] 2 attackers remain. Aetheric Horror now in your sights.
+[2026-09-09T22:12:55.059Z] [reward] Mud Strider defeated. You recover Aether Residue.
+[2026-09-09T22:12:55.058Z] [combat] Mud Strider folds under the bone crossbow. 7 damage was enough. The room exhales.
+[2026-09-09T22:12:55.058Z] [arbiter] The Arbiter watches the piercing skid off. "Swap to the Aetheric Touch Wand — aetheric or force will bite where piercing won't."
+[2026-09-09T22:12:55.057Z] [combat] Mud Strider shrugs off the piercing. (resisted, ×0.5 for 7)
+[2026-09-09T22:12:55.057Z] [combat] Piercing flares — +2 on hit.
+[2026-09-09T22:12:55.056Z] [combat] You — d20 → 11 + DEX 13 − 1 (Ash Storm) + 2 (point blank) = 25 vs Mud Strider AC 9 — ✓ HIT
+[2026-09-09T22:12:55.056Z] [combat] Bog Hound closes the distance.
+[2026-09-09T22:12:55.054Z] [combat] Mud Strider — d20 → 13 + ATK 7 = 20 vs your AC 20 — ✓ HIT
+[2026-09-09T22:12:55.051Z] [combat] Aetheric Horror — d20 → 11 + ATK 9 = 20 vs your AC 20 — ✓ HIT
+[2026-09-09T22:12:55.049Z] [world] Mud Strider moves first. The pressure is immediate.
+[2026-09-09T22:12:54.989Z] [debug] dice⏱ damage: shown +141ms, tapped +404ms, settled +834ms = 1379ms
+[2026-09-09T22:12:54.155Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-09T22:12:53.604Z] [debug] dice⏱ attack: shown +131ms, tapped +589ms, settled +831ms = 1551ms
+[2026-09-09T22:12:52.774Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-09T22:12:52.052Z] [debug] dice⏱ initiative: shown +109ms, tapped +1012ms, settled +822ms = 1943ms
+[2026-09-09T22:12:51.230Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-09T22:12:50.123Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T22:12:50.123Z] [world] You raise the bone crossbow toward Mud Strider. The room narrows around the both of you.
+[2026-09-09T22:12:50.094Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-09T22:12:50.080Z] [arbiter] Ash Storm hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-09-09T22:12:50.064Z] [debug] attack: target=Mud Strider range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-09T22:12:50.048Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=3 hooks=0
+[2026-09-09T22:12:50.048Z] [player] attack with the off-hand bone crossbow
+[2026-09-09T22:12:49.968Z] [debug] ui: tap "bone crossbow ▲" ⏱+27ms
+[2026-09-09T22:12:33.116Z] [reward] ✦ Resurrection. Johnny Blaze returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-09T22:12:33.116Z] [arbiter] The Arbiter's gaze stays on the mud strider. "Strike, hide, or speak — the choice is yours and it is brief."
+[2026-09-09T22:12:33.116Z] [debug] arbiter: template (reason=combat)
+[2026-09-09T22:12:33.113Z] [combat] A Mud Strider, an Aetheric Horror, and a Bog Hound close on you. Tap the right-side panel to cycle targets.
+[2026-09-09T22:12:33.113Z] [world] [Samarran Outskirts] north: Samarran (1 tile, 3 hours) · east: The Cistern Intake (2 tiles, 5 hours) · south: Varakush (9 tiles, 23 hours) · west: The Architect's Blind (10 tiles, 1 day, 1 hour)
+[2026-09-09T22:12:33.111Z] [system] Weather effect — Ash Storm: -1 STR
+[2026-09-09T22:12:33.111Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-09T22:12:33.111Z] [arbiter] The Arbiter's voice drops. "This one's beyond you for now — there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill."
+[2026-09-09T22:12:33.110Z] [combat] Distance: close / arm's reach. Mud-fist Wraps ✓ in range · Bone Crossbow ✓ in range.
+A Mud Strider (Mud Creature, Common) emerges. Its Spear Jab can deal 2D6.
+Hazard: Aetheric Storm Burst. A localized burst of pure Aether discharge. Reality buckles for a moment.
+You are at Samarran. A research hub of Tartaria. Home of Thametan's Tower and the Aetheric Engine whose malfunction triggered the Great Mud Flood.
+[2026-09-09T22:12:33.110Z] [world] A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.
+[2026-09-09T22:12:33.049Z] [debug] missions: none active · at=samarran
+[2026-09-09T22:12:33.048Z] [debug] scene: loc=samarran hub=- arrival=n opening=n passing=n
+[2026-09-09T22:12:27.158Z] [system] You join the Fallen of Tartaria — 23 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-09T22:12:26.944Z] [system] Johnny Blaze has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-09T22:12:26.944Z] [combat] Johnny Blaze does not rise. The ruins remember another.
+[2026-09-09T22:12:26.944Z] [combat] Aetheric Drone deals 9 bludgeoning damage. You fall.
+[2026-09-09T22:12:26.780Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The aetheric drone is patient. Be patienter."
+[2026-09-09T22:12:26.779Z] [combat] Aetheric Drone — d20 → 16 + ATK 4 = 20 vs your AC 20 — ✓ HIT
+[2026-09-09T22:12:26.776Z] [combat] Your strike with the bone crossbow lands for 6. Aetheric Drone staggers — 12 HP remaining. It answers.
+[2026-09-09T22:12:26.775Z] [arbiter] The Arbiter watches the piercing skid off. "Swap to the Pyric Wand — burn will bite where piercing won't."
+[2026-09-09T22:12:26.774Z] [combat] Aetheric Drone shrugs off the piercing. (resisted, ×0.5 for 6)
+[2026-09-09T22:12:26.773Z] [combat] You — d20 → 8 + DEX 12 − 1 (Glass Hail) + 2 (point blank) = 21 vs Aetheric Drone AC 11 — ✓ HIT
+[2026-09-09T22:12:26.773Z] [world] You seize the initiative. Aetheric Drone has no time to react.
+[2026-09-09T22:12:26.713Z] [debug] dice⏱ damage: shown +133ms, tapped +498ms, settled +835ms = 1466ms
+[2026-09-09T22:12:25.878Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-09T22:12:25.245Z] [debug] dice⏱ attack: shown +134ms, tapped +480ms, settled +833ms = 1447ms
+[2026-09-09T22:12:24.412Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-09T22:12:23.797Z] [debug] dice⏱ initiative: shown +101ms, tapped +873ms, settled +834ms = 1808ms
+[2026-09-09T22:12:22.962Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-09T22:12:22.003Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T22:12:22.003Z] [world] Your bone crossbow comes around in an arc; Aetheric Drone squares up to meet it.
+[2026-09-09T22:12:21.973Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T22:12:21.958Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-09T22:12:21.942Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-09-09T22:12:21.942Z] [player] attack with the off-hand bone crossbow
+[2026-09-09T22:12:21.862Z] [debug] ui: tap "bone crossbow ▲" ⏱+25ms
+[2026-09-09T22:12:11.755Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter watches the aetheric drone. "It is not the first…"
+[2026-09-09T22:12:11.755Z] [arbiter] The Arbiter watches the aetheric drone. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-09T22:12:11.754Z] [combat] Aetheric Drone — d20 → 6 + ATK 4 = 10 vs your AC 20 — ✗ MISS
+[2026-09-09T22:12:11.753Z] [combat] Aetheric Drone takes 9 with the mud-fist wraps. It reels: 18 left. Then it fights back.
+[2026-09-09T22:12:11.749Z] [combat] You — d20 → 12 + STR 8 − 1 (Glass Hail) = 19 vs Aetheric Drone AC 11 — ✓ HIT
+[2026-09-09T22:12:11.747Z] [world] You seize the initiative. Aetheric Drone has no time to react.
+[2026-09-09T22:12:11.694Z] [debug] dice⏱ damage: shown +130ms, tapped +532ms, settled +821ms = 1483ms
+[2026-09-09T22:12:10.873Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T22:12:10.210Z] [debug] dice⏱ attack: shown +145ms, tapped +553ms, settled +835ms = 1533ms
+[2026-09-09T22:12:09.375Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-09T22:12:08.675Z] [debug] dice⏱ initiative: shown +120ms, tapped +1298ms, settled +834ms = 2252ms
+[2026-09-09T22:12:07.841Z] [debug] ui: tap "roll" ⏱+10ms
+[2026-09-09T22:12:07.364Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-09T22:12:06.437Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T22:12:06.437Z] [world] You raise the mud-fist wraps toward Aetheric Drone. The room narrows around the both of you.
+[2026-09-09T22:12:06.408Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T22:12:06.393Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[close] reach.label=Mud-fist Wraps bareHand=false
+[2026-09-09T22:12:06.379Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud fist wraps resolved=Mud-fist Wraps range=close enemies=1 hooks=0
+[2026-09-09T22:12:06.378Z] [player] attack with the mud-fist wraps
+[2026-09-09T22:12:06.329Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-09T22:12:06.274Z] [debug] ui: tap "mud-fist wraps ⚒" ⏱+26ms
+[2026-09-09T22:12:05.071Z] [debug] boot: life bmtunlkc0fx started 2026-09-09T22:12:00.432Z · FOLLOWED AN OTA APPLY 278ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T22:12:05.071Z] [debug] missions: none active · at=samarran
+[2026-09-09T22:12:05.071Z] [debug] ═══ SESSION 2026-09-09T22:12:05.069Z · build 2026-09-09-1790-the-exchange-reads-as-a-sentence · updated from 2026-09-09-1789-one-weapon-family-resolver · previous entry moments earlier ═══
+[2026-09-09T22:12:04.561Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again."
+[2026-09-09T22:12:04.561Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T22:12:04.561Z] [debug] OTA session start: 2026-09-09-1790-the-exchange-reads-as-a-sentence.
+[2026-09-09T22:12:04.561Z] [debug] OTA applied: 2026-09-09-1789-one-weapon-family-resolver → 2026-09-09-1790-the-exchange-reads-as-a-sentence.
+[2026-09-09T22:12:01.223Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T22:12:00.666Z] [debug] voice: bundled idle
+[2026-09-09T22:12:00.666Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T22:12:00.634Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T22:12:00.634Z] [debug] ota: Already up to date
+[2026-09-09T22:12:00.490Z] [debug] ota: Checking…
+[2026-09-09T22:12:00.490Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a08835-b16d-7b1b-81f7-5f6091f838f0
+[2026-09-09T22:12:00.308Z] [debug] appstate: active → background (was active for 1905ms)
+[2026-09-09T22:12:00.285Z] [debug] ota: boot check result = applied
+[2026-09-09T22:12:00.153Z] [debug] ota: Restarting to apply…
+[2026-09-09T22:12:00.152Z] [debug] ota: Saving progress…
+[2026-09-09T22:12:00.045Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-09T22:11:59.163Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T22:11:58.424Z] [debug] ota: Checking…
+[2026-09-09T22:11:58.424Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a087f0-b996-7ab4-9d57-13a80088211a
+[2026-09-09T21:23:13.980Z] [debug] persist sizes(KB): total=153 player=22 wm=42[rooms=17 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=4
+[2026-09-09T21:23:04.837Z] [debug] ui: tap "glyph key" ⏱+18ms
+[2026-09-09T21:23:03.113Z] [debug] appstate: background → active (was background for 67309ms)
+[2026-09-09T21:21:55.804Z] [debug] appstate: active → background (was active for 4463ms)
+[2026-09-09T21:21:51.341Z] [debug] appstate: background → active (was background for 31844ms)
+[2026-09-09T21:21:19.498Z] [debug] appstate: active → background (was active for 27264ms)
+[2026-09-09T21:21:07.733Z] [system] Action cancelled.
+[2026-09-09T21:21:05.133Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T21:21:05.133Z] [world] You raise the bone crossbow toward Aetheric Drone. The room narrows around the both of you.
+[2026-09-09T21:21:05.104Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T21:21:05.089Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-09T21:21:05.073Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-09-09T21:21:05.073Z] [player] attack with the off-hand bone crossbow
+[2026-09-09T21:21:04.998Z] [debug] ui: tap "bone crossbow ▲" ⏱+12ms
+[2026-09-09T21:21:03.120Z] [combat] Aetheric Drone — d20 → 5 + ATK 4 = 9 vs your AC 20 — ✗ MISS
+[2026-09-09T21:21:03.118Z] [combat] Clean hit with the mud-fist wraps for 10. Aetheric Drone has 27 left and does not back away.
+[2026-09-09T21:21:03.117Z] [combat] You — d20 → 20 + STR 8 − 1 (Glass Hail) = 27 vs Aetheric Drone AC 11 — ✓ CRITICAL HIT
+[2026-09-09T21:21:03.116Z] [world] You seize the initiative. Aetheric Drone has no time to react.
+[2026-09-09T21:21:03.068Z] [debug] dice⏱ damage: shown +127ms, tapped +420ms, settled +855ms = 1402ms
+[2026-09-09T21:21:02.213Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-09T21:21:01.664Z] [debug] dice⏱ attack: shown +127ms, tapped +523ms, settled +849ms = 1499ms
+[2026-09-09T21:21:00.815Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T21:21:00.164Z] [debug] dice⏱ initiative: shown +100ms, tapped +779ms, settled +849ms = 1728ms
+[2026-09-09T21:20:59.315Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-09T21:20:58.451Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T21:20:58.450Z] [world] Your mud-fist wraps comes around in an arc; Aetheric Drone squares up to meet it.
+[2026-09-09T21:20:58.421Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T21:20:58.406Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[close] reach.label=Mud-fist Wraps bareHand=false
+[2026-09-09T21:20:58.391Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud fist wraps resolved=Mud-fist Wraps range=close enemies=1 hooks=0
+[2026-09-09T21:20:58.391Z] [player] attack with the mud-fist wraps
+[2026-09-09T21:20:58.313Z] [debug] ui: tap "mud-fist wraps ⚒" ⏱+17ms
+[2026-09-09T21:20:56.323Z] [combat] Aetheric Drone deals 2 bludgeoning damage. You have 5 HP remaining.
+[2026-09-09T21:20:56.165Z] [combat] Aetheric Drone — d20 → 16 + ATK 4 = 20 vs your AC 20 — ✓ HIT
+[2026-09-09T21:20:56.164Z] [combat] Aetheric Drone takes 5 with the mud-fist wraps. It reels: 37 left. Then it fights back.
+[2026-09-09T21:20:56.162Z] [combat] You — d20 → 4 + STR 8 − 1 (Glass Hail) = 11 vs Aetheric Drone AC 11 — ✓ HIT
+[2026-09-09T21:20:56.162Z] [world] You seize the initiative. Aetheric Drone has no time to react.
+[2026-09-09T21:20:56.114Z] [debug] dice⏱ damage: shown +160ms, tapped +423ms, settled +852ms = 1435ms
+[2026-09-09T21:20:55.262Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-09T21:20:54.678Z] [debug] dice⏱ attack: shown +127ms, tapped +471ms, settled +835ms = 1433ms
+[2026-09-09T21:20:53.843Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T21:20:53.244Z] [debug] dice⏱ initiative: shown +106ms, tapped +1142ms, settled +834ms = 2082ms
+[2026-09-09T21:20:52.409Z] [debug] ui: tap "roll" ⏱+6ms
+[2026-09-09T21:20:52.126Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-09T21:20:51.175Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T21:20:51.175Z] [world] You bring the mud-fist wraps to bear on Aetheric Drone.
+[2026-09-09T21:20:51.146Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T21:20:51.131Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[close] reach.label=Mud-fist Wraps bareHand=false
+[2026-09-09T21:20:51.115Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud fist wraps resolved=Mud-fist Wraps range=close enemies=1 hooks=0
+[2026-09-09T21:20:51.115Z] [player] attack with the mud-fist wraps
+[2026-09-09T21:20:51.097Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-09-09T21:20:51.061Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-09T21:20:50.993Z] [debug] ui: tap "mud-fist wraps ⚒" ⏱+22ms
+[2026-09-09T21:20:47.696Z] [debug] boot: life bmtulrjyhpm started 2026-09-09T21:20:40.649Z · FOLLOWED AN OTA APPLY 183ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T21:20:47.696Z] [debug] missions: none active · at=samarran
+[2026-09-09T21:20:47.696Z] [debug] ═══ SESSION 2026-09-09T21:20:47.694Z · build 2026-09-09-1789-one-weapon-family-resolver · updated from 2026-09-09-1788-the-utility-marks-are-ours · previous entry moments earlier ═══
+[2026-09-09T21:20:47.180Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Johnny Blaze. The road kept your place."
+[2026-09-09T21:20:47.180Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T21:20:47.179Z] [debug] OTA session start: 2026-09-09-1789-one-weapon-family-resolver.
+[2026-09-09T21:20:47.178Z] [debug] OTA applied: 2026-09-09-1788-the-utility-marks-are-ours → 2026-09-09-1789-one-weapon-family-resolver.
+[2026-09-09T21:20:41.438Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T21:20:40.842Z] [debug] voice: bundled idle
+[2026-09-09T21:20:40.842Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T21:20:40.810Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T21:20:40.809Z] [debug] ota: Already up to date
+[2026-09-09T21:20:40.711Z] [debug] ota: Checking…
+[2026-09-09T21:20:40.711Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a087f0-b996-7ab4-9d57-13a80088211a
+[2026-09-09T21:20:40.466Z] [debug] ota: Restarting to apply…
+[2026-09-09T21:20:40.465Z] [debug] ota: Saving progress…
+[2026-09-09T21:20:40.375Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-09T21:20:40.254Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T21:20:39.509Z] [debug] ota: Checking…
+[2026-09-09T21:20:39.508Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a087be-2c69-7e82-a605-d73b1d5f8008
+[2026-09-09T20:46:21.977Z] [debug] appstate: background → active (was background for 111262ms)
+[2026-09-09T20:44:30.715Z] [debug] appstate: active → background (was active for 14611ms)
+[2026-09-09T20:44:19.892Z] [combat] Aetheric Drone — d20 → 12 + ATK 4 = 16 vs your AC 20 — ✗ MISS
+[2026-09-09T20:44:19.891Z] [combat] The blow with the mud-fist wraps finds purchase — 2 damage, 42 HP standing. Aetheric Drone commits to the counter.
+[2026-09-09T20:44:19.889Z] [combat] You — d20 → 11 + STR 8 − 1 (Glass Hail) = 18 vs Aetheric Drone AC 11 — ✓ HIT
+[2026-09-09T20:44:19.888Z] [world] You seize the initiative. Aetheric Drone has no time to react.
+[2026-09-09T20:44:19.840Z] [debug] dice⏱ damage: shown +125ms, tapped +488ms, settled +831ms = 1444ms
+[2026-09-09T20:44:19.008Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-09T20:44:18.391Z] [debug] dice⏱ attack: shown +123ms, tapped +512ms, settled +832ms = 1467ms
+[2026-09-09T20:44:17.559Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-09T20:44:16.923Z] [debug] dice⏱ initiative: shown +130ms, tapped +921ms, settled +819ms = 1870ms
+[2026-09-09T20:44:16.104Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-09T20:44:16.013Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-09T20:44:15.067Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T20:44:15.067Z] [world] You commit forward with the mud-fist wraps. Aetheric Drone watches your hands.
+[2026-09-09T20:44:15.038Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-09-09T20:44:15.024Z] [arbiter] Glass Hail hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-09-09T20:44:15.009Z] [debug] attack: target=Aetheric Drone range=close reach.bands=[close] reach.label=Mud-fist Wraps bareHand=false
+[2026-09-09T20:44:14.994Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud fist wraps resolved=Mud-fist Wraps range=close enemies=1 hooks=0
+[2026-09-09T20:44:14.994Z] [player] attack with the mud-fist wraps
+[2026-09-09T20:44:14.945Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-09T20:44:14.888Z] [debug] ui: tap "mud-fist wraps ⚒" ⏱+17ms
+[2026-09-09T20:44:06.159Z] [debug] dedup: suppressed arbiter repeat — "Zorin Nightblade taps the cold Crucible. "Your reserved item…"
+[2026-09-09T20:44:06.158Z] [arbiter] Zorin Nightblade taps the cold Crucible. "Your reserved items are too alike — the Crucible needs 3 DIFFERENT material types to fuse (not just more of the same), but yours span only 2 (stone, wood). Reserve something of another material — metal, bone, stone, cloth, wood, crystal." No charge until you are ready.
+[2026-09-09T20:44:04.661Z] [debug] dedup: suppressed arbiter repeat — "Zorin Nightblade taps the cold Crucible. "Your reserved item…"
+[2026-09-09T20:44:04.660Z] [arbiter] Zorin Nightblade taps the cold Crucible. "Your reserved items are too alike — the Crucible needs 3 DIFFERENT material types to fuse (not just more of the same), but yours span only 2 (stone, wood). Reserve something of another material — metal, bone, stone, cloth, wood, crystal." No charge until you are ready.
+[2026-09-09T20:44:02.775Z] [arbiter] Zorin Nightblade taps the cold Crucible. "Your reserved items are too alike — the Crucible needs 3 DIFFERENT material types to fuse (not just more of the same), but yours span only 2 (stone, wood). Reserve something of another material — metal, bone, stone, cloth, wood, crystal." No charge until you are ready.
+[2026-09-09T20:43:58.874Z] [debug] boot: life bmtukg8mr32 started 2026-09-09T20:43:53.139Z · FOLLOWED AN OTA APPLY 189ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T20:43:58.874Z] [debug] missions: none active · at=samarran
+[2026-09-09T20:43:58.874Z] [debug] ═══ SESSION 2026-09-09T20:43:58.872Z · build 2026-09-09-1788-the-utility-marks-are-ours · updated from 2026-09-09-1784-six-traders-six-voices · previous entry moments earlier ═══
+[2026-09-09T20:43:58.390Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-09T20:43:58.386Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.
+[2026-09-09T20:43:58.386Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T20:43:58.386Z] [debug] OTA session start: 2026-09-09-1788-the-utility-marks-are-ours.
+[2026-09-09T20:43:58.386Z] [debug] OTA applied: 2026-09-09-1784-six-traders-six-voices → 2026-09-09-1788-the-utility-marks-are-ours.
+[2026-09-09T10:36:18.750Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T10:36:18.135Z] [debug] voice: bundled idle
+[2026-09-09T10:36:18.135Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T10:36:18.079Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T10:36:18.079Z] [debug] ota: Already up to date
+[2026-09-09T10:36:17.997Z] [debug] ota: Checking…
+[2026-09-09T10:36:17.996Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a085ac-a636-7f95-8389-8802acde8daf
+[2026-09-09T10:36:17.836Z] [debug] appstate: active → background (was active for 1398ms)
+[2026-09-09T10:36:17.830Z] [debug] ota: boot check result = applied
+[2026-09-09T10:36:17.770Z] [debug] ota: Restarting to apply…
+[2026-09-09T10:36:17.769Z] [debug] ota: Saving progress…
+[2026-09-09T10:36:17.629Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-09T10:36:17.200Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T10:36:16.454Z] [debug] ota: Checking…
+[2026-09-09T10:36:16.454Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a084a1-7901-72ed-9145-b7e8d748b372
+[2026-09-09T05:44:48.987Z] [debug] appstate: active → background (was active for 11151ms)
+[2026-09-09T05:44:42.956Z] [debug] boot: life bmttobse03y started 2026-09-09T05:44:37.752Z · not an OTA apply (no handoff on disk)
+[2026-09-09T05:44:42.956Z] [debug] missions: none active · at=samarran
+[2026-09-09T05:44:42.956Z] [debug] ═══ SESSION 2026-09-09T05:44:42.954Z · build 2026-09-09-1769-the-sheet-is-two-shapes · previous entry moments earlier ═══
+[2026-09-09T05:44:42.448Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again."
+[2026-09-09T05:44:42.448Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T05:44:42.447Z] [debug] OTA session start: 2026-09-09-1769-the-sheet-is-two-shapes.
+[2026-09-09T05:44:38.560Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T05:44:37.942Z] [debug] voice: bundled idle
+[2026-09-09T05:44:37.942Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T05:44:37.899Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T05:44:37.898Z] [debug] ota: Already up to date
+[2026-09-09T05:44:37.840Z] [debug] ota: Checking…
+[2026-09-09T05:44:37.840Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a084a1-7901-72ed-9145-b7e8d748b372
+[2026-09-09T05:43:07.032Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-09T05:43:07.032Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-09T05:43:07.032Z] [world] You are already at close / arm's reach with Aetheric Drone.
+[2026-09-09T05:43:07.032Z] [debug] move: advance from range=close enemies=1 weather=Glass Hail cost=1 partial=0
+[2026-09-09T05:43:07.015Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric drone resolved=Aetheric Drone range=close enemies=1 hooks=0
+[2026-09-09T05:43:07.015Z] [player] approach Aetheric Drone
+[2026-09-09T05:43:06.938Z] [debug] ui: tap "approach" ⏱+23ms
+[2026-09-09T05:43:05.490Z] [combat] Aetheric Drone deals 10 bludgeoning damage. You have 8 HP remaining.
+[2026-09-09T05:43:05.336Z] [arbiter] The Arbiter watches the aetheric drone. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-09T05:43:05.336Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-09T05:43:05.305Z] [combat] Aetheric Drone — d20 → 16 + ATK 4 = 20 vs your AC 20 — ✓ HIT
+[2026-09-09T05:43:05.304Z] [world] You close the gap with Aetheric Drone. (range: close / arm's reach)
+[2026-09-09T05:43:05.304Z] [debug] move: field advance target=Aetheric Drone d 0.50->0.35 band close->close
+[2026-09-09T05:43:05.290Z] [debug] move: advance from range=close enemies=1 weather=Glass Hail cost=1 partial=0
+[2026-09-09T05:43:05.273Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric drone resolved=Aetheric Drone range=close enemies=1 hooks=0
+[2026-09-09T05:43:05.273Z] [player] approach Aetheric Drone
+[2026-09-09T05:43:05.230Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-09T05:43:05.189Z] [debug] ui: tap "approach" ⏱+27ms
+[2026-09-09T05:42:50.193Z] [debug] boot: life bmtto97utvk started 2026-09-09T05:42:37.829Z · FOLLOWED AN OTA APPLY 196ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-09T05:42:50.193Z] [debug] missions: none active · at=samarran
+[2026-09-09T05:42:50.192Z] [debug] ═══ SESSION 2026-09-09T05:42:50.191Z · build 2026-09-09-1769-the-sheet-is-two-shapes · updated from 2026-09-09-1767-the-button-grows · previous entry moments earlier ═══
+[2026-09-09T05:42:49.633Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again."
+[2026-09-09T05:42:49.633Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T05:42:49.633Z] [debug] OTA session start: 2026-09-09-1769-the-sheet-is-two-shapes.
+[2026-09-09T05:42:49.633Z] [debug] OTA applied: 2026-09-09-1767-the-button-grows → 2026-09-09-1769-the-sheet-is-two-shapes.
+[2026-09-09T04:54:36.735Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T04:54:36.161Z] [debug] voice: bundled idle
+[2026-09-09T04:54:36.161Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T04:54:36.042Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T04:54:36.042Z] [debug] ota: Already up to date
+[2026-09-09T04:54:35.975Z] [debug] ota: Checking…
+[2026-09-09T04:54:35.975Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0846b-63ae-7b7b-a0a3-e568633f294e
+[2026-09-09T04:29:48.728Z] [debug] appstate: background → active (was background for 22751ms)
+[2026-09-09T04:29:25.977Z] [debug] appstate: active → background (was active for 9745ms)
+[2026-09-09T04:29:16.232Z] [debug] appstate: background → active (was background for 2748ms)
+[2026-09-09T04:29:13.484Z] [debug] appstate: active → background (was active for 13678ms)
+[2026-09-09T04:28:59.885Z] [combat] Aetheric Drone — d20 → 10 + ATK 4 = 14 vs your AC 20 — ✗ MISS
+[2026-09-09T04:28:59.884Z] [world] You close the gap with Aetheric Drone. (range: close / arm's reach)
+[2026-09-09T04:28:59.884Z] [debug] move: field advance target=Aetheric Drone d 1.50->0.50 band mid->close
+[2026-09-09T04:28:59.870Z] [debug] move: advance from range=mid enemies=1 weather=Glass Hail cost=1 partial=0
+[2026-09-09T04:28:59.854Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric drone resolved=Aetheric Drone range=mid enemies=1 hooks=0
+[2026-09-09T04:28:59.854Z] [player] approach Aetheric Drone
+[2026-09-09T04:28:59.809Z] [debug] ui: tap "approach" ⏱+20ms
+[2026-09-09T04:28:59.615Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-09T04:28:58.597Z] [combat] Aetheric Drone — d20 → 9 + ATK 4 = 13 vs your AC 20 — ✗ MISS
+[2026-09-09T04:28:58.596Z] [world] You close the gap with Aetheric Drone. (range: mid-range)
+[2026-09-09T04:28:58.596Z] [debug] move: field advance target=Aetheric Drone d 2.50->1.50 band far->mid
+[2026-09-09T04:28:58.581Z] [debug] move: advance from range=far enemies=1 weather=Glass Hail cost=1 partial=0
+[2026-09-09T04:28:58.566Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric drone resolved=Aetheric Drone range=far enemies=1 hooks=0
+[2026-09-09T04:28:58.566Z] [player] approach Aetheric Drone
+[2026-09-09T04:28:58.518Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-09T04:28:58.458Z] [debug] ui: tap "approach" ⏱+15ms
+[2026-09-09T04:28:47.368Z] [debug] boot: life bmttlm5m27d started 2026-09-09T04:28:42.602Z · FOLLOWED AN OTA APPLY 1210ms ago via mid-session · prev ctx o1/r1/l0/p1/dn0 (previous life released its contexts first)
+[2026-09-09T04:28:47.368Z] [debug] missions: none active · at=samarran
+[2026-09-09T04:28:47.367Z] [debug] ═══ SESSION 2026-09-09T04:28:47.366Z · build 2026-09-09-1767-the-button-grows · updated from 2026-09-09-1766-the-glyphs-are-artwork · previous entry moments earlier ═══
+[2026-09-09T04:28:46.875Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Johnny Blaze. The buried country is no place to walk alone."
+[2026-09-09T04:28:46.875Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-09T04:28:46.874Z] [debug] OTA session start: 2026-09-09-1767-the-button-grows.
+[2026-09-09T04:28:46.874Z] [debug] OTA applied: 2026-09-09-1766-the-glyphs-are-artwork → 2026-09-09-1767-the-button-grows.
+[2026-09-09T04:28:43.401Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-09T04:28:42.856Z] [debug] voice: bundled idle
+[2026-09-09T04:28:42.856Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-09T04:28:42.794Z] [debug] ota: boot check result = noUpdate
+[2026-09-09T04:28:42.794Z] [debug] ota: Already up to date
+[2026-09-09T04:28:42.663Z] [debug] ota: Checking…
+[2026-09-09T04:28:42.663Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0846b-63ae-7b7b-a0a3-e568633f294e
+[2026-09-09T04:28:41.364Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-09T04:28:34.097Z] [debug] appstate: background → active (was background for 2904995ms)
+[2026-09-09T03:40:09.364Z] [debug] persist sizes(KB): total=151 player=22 wm=41[rooms=17 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=4
+[2026-09-09T03:40:09.099Z] [debug] appstate: active → background (was active for 9115ms)
+[2026-09-09T03:39:59.984Z] [debug] appstate: background → active (was background for 53479ms)
+[2026-09-09T03:39:06.506Z] [debug] appstate: active → background (was active for 31947ms)
+[2026-09-09T03:38:59.579Z] [cognitive] REST  (269ms)
+[2026-09-09T03:38:59.193Z] [debug] dedup: suppressed arbiter repeat — ""There's coin on the board for a willing blade," the Arbiter…"
+[2026-09-09T03:38:59.193Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-09-09T03:38:59.177Z] [system] ⏳ Time passed: 8h
+[2026-09-09T03:38:59.159Z] [debug] enemy: Aetheric Drone hp=44 ac=11 atk=Laser Beam dmg=2D6 rarity=Uncommon ap=4
+[2026-09-09T03:38:59.159Z] [world] An Aetheric Drone comes out of the open ground at a walk, in no particular hurry. The rest is over.
+[2026-09-09T03:38:59.159Z] [arbiter] The Arbiter goes still. "It watched you sleep from the treeline and made up its mind about you."
+[2026-09-09T03:38:59.131Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:59.130Z] [world] You rest for 8 hours. −1 corruption recovered. (Day 8, afternoon)
+[2026-09-09T03:38:59.130Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-09T03:38:59.130Z] [player] rest
+[2026-09-09T03:38:59.122Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-09T03:38:58.547Z] [cognitive] REST  (96ms)
+[2026-09-09T03:38:58.382Z] [system] ⏳ Time passed: 8h
+[2026-09-09T03:38:58.382Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:58.382Z] [world] Wind in the silt overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.
+[2026-09-09T03:38:58.382Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:58.382Z] [world] You rest for 8 hours. −1 corruption recovered. (Day 8, morning)
+[2026-09-09T03:38:58.381Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-09T03:38:58.381Z] [player] rest
+[2026-09-09T03:38:58.372Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-09T03:38:57.789Z] [cognitive] REST  (107ms)
+[2026-09-09T03:38:57.614Z] [system] ⏳ Time passed: 8h
+[2026-09-09T03:38:57.613Z] [world] Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.
+[2026-09-09T03:38:57.613Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:57.613Z] [world] You rest for 8 hours. −1 corruption recovered. (Day 7, evening)
+[2026-09-09T03:38:57.612Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-09T03:38:57.612Z] [player] rest
+[2026-09-09T03:38:57.596Z] [debug] ui: tap "rest" ⏱+11ms
+[2026-09-09T03:38:56.963Z] [cognitive] REST  (107ms)
+[2026-09-09T03:38:56.792Z] [system] ⏳ Time passed: 8h
+[2026-09-09T03:38:56.792Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-09T03:38:56.792Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-09T03:38:56.791Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:56.791Z] [world] You rest for 8 hours. −1 corruption recovered. (Day 7, afternoon)
+[2026-09-09T03:38:56.790Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-09T03:38:56.790Z] [player] rest
+[2026-09-09T03:38:56.787Z] [debug] ui: tap "rest" ⏱+18ms
+[2026-09-09T03:38:56.180Z] [cognitive] REST  (122ms)
+[2026-09-09T03:38:55.955Z] [system] ⏳ Time passed: 8h
+[2026-09-09T03:38:55.954Z] [arbiter] The Arbiter is quiet a long moment after you stir. "I was wrong about something earlier. I'll say so when the moment's right."
+[2026-09-09T03:38:55.954Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T03:38:55.954Z] [world] You rest for 8 hours. −1 corruption recovered. (Day 7, morning)
+[2026-09-09T03:38:55.953Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-09T03:38:55.953Z] [player] rest
+[2026-09-09T03:38:55.938Z] [debug] ui: tap "rest" ⏱+15ms
+[2026-09-09T03:38:52.471Z] [debug] render⏱ 8856ms after engine-done · feed 500
+[2026-09-09T03:38:52.365Z] [reward] ✦ Resurrection. Johnny Blaze returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-09T03:38:52.365Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Lightstone Amulet (200 TC), Many-Colored Tonic (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-09T03:38:52.356Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Zorin Nightblade, Exotic Weapons Dealer. Silent and mysterious. Rare and exotic weapons, including legendary and cursed items. Expensive and risky."
+[2026-09-09T03:38:52.356Z] [world] Zorin Nightblade (Exotic Weapons Dealer) is already here when you arrive, stall half-unpacked. They look up and nod once.
+
+=== END REPORT ===

@@ -1,0 +1,683 @@
+Bug Report — Great Scott · (2026-09-13-1811-the-slate-takes-the-weight) · Player dump great scott
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-13T16:57:05.967Z
+Character: Great Scott
+Slot ID: slot_mt52mm21_5mcq3a
+Race: Tartarian Giants
+Location: Iskan-Veil
+HP: 63/63
+
+--- DESCRIPTION ---
+Player dump great scott
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-13T16:57:05.848Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-13-1811-the-slate-takes-the-weight)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-13T16:56:44.143Z
+  Last init success: 2026-09-13T16:56:44.801Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu023iwags · started 2026-09-13T16:56:43.882Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 9 fatal (newest last)
+  ⚠⚠ 7 of 9 process kills landed on an OTA-apply boot
+  • 2026-09-05T20:20:16.991Z (11317m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (11149m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (10031m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:04:07.405Z (9773m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1721-your-name-was-three-dots · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 875ms into the action · alive 53359ms after it
+      launch: died 54265ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 207ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T22:40:49.002Z (9736m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1723-the-kitchen-opens · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1011ms into the action · alive 0ms after it
+      launch: died 1045ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 153ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T00:52:54.641Z (9604m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1726-the-road-back-to-a-dog · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 940ms into the action · alive 0ms after it
+      launch: died 984ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 210ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T02:41:06.328Z (9496m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1729-the-guardian-payout-guards-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1030ms into the action · alive 0ms after it
+      launch: died 1094ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o1/r1/l0/p1/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T03:23:14.327Z (9454m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (8536m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (6628m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 63/63  Stamina: 19/19  TC: 687  Corruption: 8
+  Pack: 159 distinct rows / 445 total
+  Dog: Wick (Mutt) loyalty 100 HP 15/15
+
+Weapons (31)
+  Aetheric Touch Wand (1d6 aetheric, dur 32/32, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 22/22, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Sling (1d4 bludgeoning, dur 13/14, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Dust Cloud Wand (1d6 bludgeoning, dur 24/24, [runecaster,rune_power,mud_dwellers,cover])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 13/13, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 54/54, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grinder Axe (1d8 slashing, dur 41/41, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 38/38, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Reaver's Greatsword (Legendary, 2d10 slashing, +1d4 acid coat, dur 35/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Veilkeeper Blades (Legendary, dur 55/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Vine Grasp Wand (1d6 piercing, dur 14/14, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (28)
+  Anvil-Struck Footguards (Legendary, dur 44/45, equipped:feet, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:feet, repair
+  Burl Aegis (Legendary, dur 45/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 45/45, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 24/24, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forge-Black Cowl (Legendary, dur 45/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Mask (dur 15/15, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Spore-Crusted Tassets (Legendary, dur 45/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs
+  Traveler's Cloak (dur 16/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · STR +2 · HP +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 18/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Dog Armor (4)
+  ◆ Burlap Vest (dur 18/18, ♥reserved, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, release-from-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  ◆ Riveted Leather Vest (Uncommon, dur 24/24, ♥reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])
+    actions: scrap, release-from-fusion, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (11)
+  Blue Aetheric Fungus ×2 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×4 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Honey-Glazed Knuckle (Rare, [food,treat,dog_treat,baker])
+    actions: use(eat), drop
+  Oat Cake ([food,cooked])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ([alcohol,drink])
+    actions: use(drink), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Wild Carrot ×5 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+  Wild Oats ([food,foraged,grain])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask ×6 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste ×2 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×3 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×23 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (10)
+  Aetheric Compass (Uncommon, dur 25/25, +1 WIS (passive), [detection,navigation,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    act
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 318 of 3378 entries; older trimmed to fit a single email paste)
+
+[2026-09-13T16:56:49.483Z] [debug] boot: life bmu023iwags started 2026-09-13T16:56:43.882Z · not an OTA apply (no handoff on disk)
+[2026-09-13T16:56:49.483Z] [debug] missions: · at=iskan_veil travelTo=hidden_market
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T16:56:49.483Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4]
+[2026-09-13T16:56:49.482Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 1/7 [investigate] @karok_sa needs=Enclave-Mother's Ash Mark✗MISSING gives=The Holding Seam PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: storyline:story_order_red_tower stage 1/9 [investigate] @great_tartary_plains needs=Vesryn's Fragment Map✗MISSING gives=First Fragment PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 1/6 [investigate] @ostragar needs=Factor's Name and Route✗MISSING gives=Empty Field-Book Case PAUSED
+[2026-09-13T16:56:49.482Z] [debug] missions: storyline:story_monarch_silence stage 1/8 [diplomacy] @reclaimer_stake npc="the talkative Reclaimer" needs=Kincaid's List of Six✗MISSING gives=A Reasonable Man's Note PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_leviathan_eye stage 1/4 [investigate] @mud_seas needs=Jar of Aetherstone Packing✗MISSING gives=Fossilised Leviathan Scale PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_ashen_codex stage 1/4 [investigate] @nimari needs=Ash-Frame✗MISSING gives=Framed Char-Block PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_weeping_core stage 1/4 [investigate] @buried_cities needs=Sealed Catch-Vial✗MISSING gives=A Single Core-Tear PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_servants_hum stage 1/5 [investigate] @obsidian_pillars needs=Vael's Three Listening Stones✗MISSING gives=First Note — the Pillars PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_red_tower stage 1/4 [investigate] @cradle_of_dusk needs=Scholar's Survey Chit✗MISSING gives=Warm Hexagonal Plate PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_hollow_crown stage 1/4 [investigate] @giant_vault needs=Hoard Manifest✗MISSING gives=Assayer's Note PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_pale_signal stage 1/4 [investigate] @mud_flood_nexus needs=Beat-Counter✗MISSING gives=The Counted Sequence PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 1/4 [investigate] @samarran needs=Founder's Tuning-Rod✗MISSING gives=Wreck Bearing PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: mystery:mystery_cradle_compass stage 1/3 [stealth] @cradle_of_dusk needs=Halem's Broken Compass✗MISSING gives=Cradle of Dusk Compass PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-13T16:56:49.481Z] [debug] missions: hunt:hunt_mud_titan stage 1/7 [investigate] @buried_cities gives=Collapsed Gantry Log PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_salamander_voronov stage 1/5 [investigate] @buried_cities needs=Engineer's Conduit Chit✗MISSING gives=Cracked Conduit Reading PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 1/5 [investigate] @great_tartary_plains needs=Reeve's Road-Writ✗MISSING gives=Lame-Hound Bait Sign PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 1/5 [investigate] @giant_vault needs=Physician's Rot-Ward Mask✓ gives=Salvager's Dying Testimony PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 1/7 [investigate] @thametans_tower needs=Lodge Survey Warrant✗MISSING gives=Builders' Scattered Tools PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 1/7 [investigate] @great_tartary_plains needs=Caravan-Mother's Grit-Token✗MISSING gives=Scoured Wheel-Warning PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 1/7 [investigate] @cradle_of_dusk needs=Warden's Dusk-Warrant✗MISSING gives=Three Grey Pinions PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_apparition_red_tower stage 1/7 [investigate] @red_tower_of_nimari needs=Archivist's Requisition✗MISSING gives=Core-Casing Rubbing PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 1/7 [investigate] @obsidian_pillars needs=Coil of Tartarian Filament✗MISSING gives=Wire-Marked Toolkit PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 1/7 [investigate] @mud_seas needs=Ferryman's Crossing-Token✗MISSING gives=Boot-Trail Cast PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_shade_endless_stair stage 1/7 [investigate] @endless_stair needs=Warden's Tally of the Missing✗MISSING gives=Pilgrim's Still-Burning Lantern PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 1/7 [investigate] @sinking_cathedral needs=Dive-Boss's Mooring Chit✗MISSING gives=Wren's Cut Line PAUSED
+[2026-09-13T16:56:49.480Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 1/7 [investigate] @zharaks_teeth needs=Caravan-Master's Pass-Chit✗MISSING gives=Scalded Glass Shard PAUSED
+[2026-09-13T16:56:49.479Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains needs=Servants' Mark of Sanction✗MISSING spawn=Tartarian Raider×3 PAUSED
+[2026-09-13T16:56:49.479Z] [debug] missions: hunt:hunt_mud_siren_queen stage 1/5 [boss→attack] @mud_seas needs=Drifter's South-Spire Poster✗MISSING spawn=Mud Siren×3 PAUSED
+[2026-09-13T16:56:49.479Z] [debug] missions: hunt:hunt_sludge_behemoth stage 1/7 [boss→attack] @mud_seas needs=Sealed Coordinate Tube✗MISSING gives=Dive-Camp Tally spawn=Swamp Crab×1 PAUSED
+[2026-09-13T16:56:49.479Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk gives=Obsidian-Edged Scale PAUSED
+[2026-09-13T16:56:49.475Z] [debug] ═══ SESSION 2026-09-13T16:56:49.463Z · build 2026-09-13-1811-the-slate-takes-the-weight · previous entry moments earlier ═══
+[2026-09-13T16:56:49.237Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-13T16:56:49.233Z] [world] The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.
+[2026-09-13T16:56:49.233Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-13T16:56:49.232Z] [debug] OTA session start: 2026-09-13-1811-the-slate-takes-the-weight.
+[2026-09-13T16:56:44.740Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T16:56:44.090Z] [debug] voice: bundled idle
+[2026-09-13T16:56:44.089Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T16:56:44.065Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T16:56:44.065Z] [debug] ota: Already up to date
+[2026-09-13T16:56:43.999Z] [debug] ota: Checking…
+[2026-09-13T16:56:43.999Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0991c-65b0-79c0-bf76-7fe0ac2b091a
+[2026-09-13T05:56:21.737Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T05:56:21.089Z] [debug] voice: bundled idle
+[2026-09-13T05:56:21.089Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T05:56:21.014Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T05:56:21.014Z] [debug] ota: Already up to date
+[2026-09-13T05:56:20.996Z] [debug] ota: Checking…
+[2026-09-13T05:56:20.996Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0991c-65b0-79c0-bf76-7fe0ac2b091a
+[2026-09-13T04:53:13.508Z] [debug] appstate: active → background (was active for 4457ms)
+[2026-09-13T04:53:09.808Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:53:09.189Z] [debug] voice: bundled idle
+[2026-09-13T04:53:09.189Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T04:53:09.161Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T04:53:09.161Z] [debug] ota: Already up to date
+[2026-09-13T04:53:09.073Z] [debug] ota: Checking…
+[2026-09-13T04:53:09.073Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0991c-65b0-79c0-bf76-7fe0ac2b091a
+[2026-09-13T04:53:06.533Z] [debug] appstate: background → active (was background for 19666ms)
+[2026-09-13T04:52:46.866Z] [debug] appstate: active → background (was active for 7824ms)
+[2026-09-13T04:52:39.042Z] [debug] appstate: background → active (was background for 54398ms)
+[2026-09-13T04:51:44.644Z] [debug] appstate: active → background (was active for 33351ms)
+[2026-09-13T04:51:11.293Z] [debug] appstate: background → active (was background for 15815ms)
+[2026-09-13T04:50:55.479Z] [debug] appstate: active → background (was active for 16353ms)
+[2026-09-13T04:50:39.125Z] [debug] appstate: background → active (was background for 10173ms)
+[2026-09-13T04:50:28.952Z] [debug] appstate: active → background (was active for 26167ms)
+[2026-09-13T04:50:02.786Z] [debug] appstate: background → active (was background for 57672ms)
+[2026-09-13T04:49:05.114Z] [debug] appstate: active → background (was active for 7685ms)
+[2026-09-13T04:48:58.187Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:48:57.546Z] [debug] voice: bundled idle
+[2026-09-13T04:48:57.546Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T04:48:57.513Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T04:48:57.513Z] [debug] ota: Already up to date
+[2026-09-13T04:48:57.457Z] [debug] ota: Checking…
+[2026-09-13T04:48:57.457Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a098d3-b73d-7ba7-b227-0b7f586cf46e
+[2026-09-13T04:45:16.631Z] [debug] appstate: active → background (was active for 67996ms)
+[2026-09-13T04:44:09.403Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:44:08.793Z] [debug] voice: bundled idle
+[2026-09-13T04:44:08.793Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T04:44:08.743Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T04:44:08.743Z] [debug] ota: Already up to date
+[2026-09-13T04:44:08.652Z] [debug] ota: Checking…
+[2026-09-13T04:44:08.652Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a098d3-b73d-7ba7-b227-0b7f586cf46e
+[2026-09-13T04:11:29.790Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:11:29.198Z] [debug] voice: bundled idle
+[2026-09-13T04:11:29.198Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T04:11:29.160Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T04:11:29.160Z] [debug] ota: Already up to date
+[2026-09-13T04:11:29.051Z] [debug] ota: Checking…
+[2026-09-13T04:11:29.051Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a098d3-b73d-7ba7-b227-0b7f586cf46e
+[2026-09-13T03:38:41.974Z] [debug] stats: STR20 DEX15 INT10 WIS13 CHA13 STE5 | gear: STR+6,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Sentinel Core Plate head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring
+[2026-09-13T03:38:38.399Z] [debug] appstate: background → active (was background for 194304ms)
+[2026-09-13T03:35:24.095Z] [debug] appstate: active → background (was active for 24574ms)
+[2026-09-13T03:35:09.029Z] [debug] ui: tap "inventory" ⏱+25ms
+[2026-09-13T03:35:03.469Z] [debug] boot: life bmtz9fwvzjt started 2026-09-13T03:34:33.023Z · FOLLOWED AN OTA APPLY 261ms ago via mid-session · prev ctx o1/r1/l0/p1/dn0 (previous life released its contexts first)
+[2026-09-13T03:35:03.469Z] [debug] missions: · at=iskan_veil travelTo=hidden_market
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T03:35:03.468Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4]
+[2026-09-13T03:35:03.467Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 1/7 [investigate] @karok_sa needs=Enclave-Mother's Ash Mark✗MISSING gives=The Holding Seam PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: storyline:story_order_red_tower stage 1/9 [investigate] @great_tartary_plains needs=Vesryn's Fragment Map✗MISSING gives=First Fragment PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 1/6 [investigate] @ostragar needs=Factor's Name and Route✗MISSING gives=Empty Field-Book Case PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: storyline:story_monarch_silence stage 1/8 [diplomacy] @reclaimer_stake npc="the talkative Reclaimer" needs=Kincaid's List of Six✗MISSING gives=A Reasonable Man's Note PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: mystery:mystery_leviathan_eye stage 1/4 [investigate] @mud_seas needs=Jar of Aetherstone Packing✗MISSING gives=Fossilised Leviathan Scale PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: mystery:mystery_ashen_codex stage 1/4 [investigate] @nimari needs=Ash-Frame✗MISSING gives=Framed Char-Block PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: mystery:mystery_weeping_core stage 1/4 [investigate] @buried_cities needs=Sealed Catch-Vial✗MISSING gives=A Single Core-Tear PAUSED
+[2026-09-13T03:35:03.467Z] [debug] missions: mystery:mystery_servants_hum stage 1/5 [investigate] @obsidian_pillars needs=Vael's Three Listening Stones✗MISSING gives=First Note — the Pillars PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_red_tower stage 1/4 [investigate] @cradle_of_dusk needs=Scholar's Survey Chit✗MISSING gives=Warm Hexagonal Plate PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_hollow_crown stage 1/4 [investigate] @giant_vault needs=Hoard Manifest✗MISSING gives=Assayer's Note PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_pale_signal stage 1/4 [investigate] @mud_flood_nexus needs=Beat-Counter✗MISSING gives=The Counted Sequence PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 1/4 [investigate] @samarran needs=Founder's Tuning-Rod✗MISSING gives=Wreck Bearing PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: mystery:mystery_cradle_compass stage 1/3 [stealth] @cradle_of_dusk needs=Halem's Broken Compass✗MISSING gives=Cradle of Dusk Compass PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: hunt:hunt_mud_titan stage 1/7 [investigate] @buried_cities gives=Collapsed Gantry Log PAUSED
+[2026-09-13T03:35:03.466Z] [debug] missions: hunt:hunt_salamander_voronov stage 1/5 [investigate] @buried_cities needs=Engineer's Conduit Chit✗MISSING gives=Cracked Conduit Reading PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 1/5 [investigate] @great_tartary_plains needs=Reeve's Road-Writ✗MISSING gives=Lame-Hound Bait Sign PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 1/5 [investigate] @giant_vault needs=Physician's Rot-Ward Mask✓ gives=Salvager's Dying Testimony PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 1/7 [investigate] @thametans_tower needs=Lodge Survey Warrant✗MISSING gives=Builders' Scattered Tools PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 1/7 [investigate] @great_tartary_plains needs=Caravan-Mother's Grit-Token✗MISSING gives=Scoured Wheel-Warning PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 1/7 [investigate] @cradle_of_dusk needs=Warden's Dusk-Warrant✗MISSING gives=Three Grey Pinions PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_apparition_red_tower stage 1/7 [investigate] @red_tower_of_nimari needs=Archivist's Requisition✗MISSING gives=Core-Casing Rubbing PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 1/7 [investigate] @obsidian_pillars needs=Coil of Tartarian Filament✗MISSING gives=Wire-Marked Toolkit PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 1/7 [investigate] @mud_seas needs=Ferryman's Crossing-Token✗MISSING gives=Boot-Trail Cast PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_shade_endless_stair stage 1/7 [investigate] @endless_stair needs=Warden's Tally of the Missing✗MISSING gives=Pilgrim's Still-Burning Lantern PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 1/7 [investigate] @sinking_cathedral needs=Dive-Boss's Mooring Chit✗MISSING gives=Wren's Cut Line PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 1/7 [investigate] @zharaks_teeth needs=Caravan-Master's Pass-Chit✗MISSING gives=Scalded Glass Shard PAUSED
+[2026-09-13T03:35:03.464Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains needs=Servants' Mark of Sanction✗MISSING spawn=Tartarian Raider×3 PAUSED
+[2026-09-13T03:35:03.463Z] [debug] missions: hunt:hunt_mud_siren_queen stage 1/5 [boss→attack] @mud_seas needs=Drifter's South-Spire Poster✗MISSING spawn=Mud Siren×3 PAUSED
+[2026-09-13T03:35:03.463Z] [debug] missions: hunt:hunt_sludge_behemoth stage 1/7 [boss→attack] @mud_seas needs=Sealed Coordinate Tube✗MISSING gives=Dive-Camp Tally spawn=Swamp Crab×1 PAUSED
+[2026-09-13T03:35:03.463Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk gives=Obsidian-Edged Scale PAUSED
+[2026-09-13T03:35:03.461Z] [debug] ═══ SESSION 2026-09-13T03:35:03.457Z · build 2026-09-13-1810-the-record-answers-the-finger · updated from 2026-09-12-1809-what-memory-was-doing-at-the-time · previous entry moments earlier ═══
+[2026-09-13T03:35:03.259Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Great Scott. I kept watch while you were gone."
+[2026-09-13T03:35:03.259Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-13T03:35:03.258Z] [debug] OTA session start: 2026-09-13-1810-the-record-answers-the-finger.
+[2026-09-13T03:35:03.258Z] [debug] OTA applied: 2026-09-12-1809-what-memory-was-doing-at-the-time → 2026-09-13-1810-the-record-answers-the-finger.
+[2026-09-13T03:34:59.521Z] [debug] appstate: background → active (was background for 17443ms)
+[2026-09-13T03:34:42.078Z] [debug] appstate: active → background (was active for 8993ms)
+[2026-09-13T03:34:33.840Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T03:34:33.378Z] [debug] voice: bundled idle
+[2026-09-13T03:34:33.378Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T03:34:33.298Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T03:34:33.298Z] [debug] ota: Already up to date
+[2026-09-13T03:34:33.136Z] [debug] ota: Checking…
+[2026-09-13T03:34:33.136Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a098d3-b73d-7ba7-b227-0b7f586cf46e
+[2026-09-13T03:34:32.736Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-13T03:34:32.553Z] [debug] persist sizes(KB): total=266 player=68 wm=106[rooms=45 events=7 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=89 scene=3
+[2026-09-13T03:34:25.048Z] [debug] appstate: background → active (was background for 2301937ms)
+[2026-09-13T02:56:03.109Z] [debug] appstate: active → background (was active for 19028ms)
+[2026-09-13T02:55:56.037Z] [cognitive] REST  (3763ms)
+[2026-09-13T02:55:56.007Z] [cognitive] REST  (4446ms)
+[2026-09-13T02:55:55.971Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 6041ms
+[2026-09-13T02:55:55.970Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 5931ms — intro-fill:∅
+[2026-09-13T02:55:55.893Z] [debug] qwen⏱ narration:scene_intro_fill preempted 5931ms read 0ms/write 0ms in 820t→out 0t thr1 (0ch)
+[2026-09-13T02:55:54.524Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-13T02:55:54.524Z] [debug] arbiter: template (reason=combat)
+[2026-09-13T02:55:54.523Z] [arbiter] The Arbiter holds up a hand. "Reaver's Greatsword works at close / arm's reach range only — you're at far. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+[2026-09-13T02:55:54.523Z] [debug] attack: target=Silt Thief range=far reach.bands=[close] reach.label=Reaver's Greatsword bareHand=false
+[2026-09-13T02:55:54.520Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reaver greatsword resolved=- range=far enemies=1 hooks=1
+[2026-09-13T02:55:54.520Z] [player] attack with the reaver's greatsword
+[2026-09-13T02:55:54.449Z] [debug] ui: tap "⚗ reaver's greatsword ⚔" ⏱+17ms
+[2026-09-13T02:55:52.272Z] [system] ⏳ Time passed: 8h
+[2026-09-13T02:55:52.271Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter glances toward the crystal. "Still there. Still …"
+[2026-09-13T02:55:52.271Z] [arbiter] The Arbiter glances toward the crystal. "Still there. Still yours, if you take it."
+[2026-09-13T02:55:52.271Z] [debug] arbiter: template (reason=combat)
+[2026-09-13T02:55:52.270Z] [debug] enemy: Silt Thief hp=37 ac=11 atk=Quick Knife dmg=1D8 rarity=Uncommon ap=6
+[2026-09-13T02:55:52.270Z] [world] A Silt Thief comes out of the open ground at a walk, in no particular hurry. The rest is over.
+[2026-09-13T02:55:52.270Z] [arbiter] The Arbiter goes still. "Whatever found you had all night to leave. It stayed."
+[2026-09-13T02:55:52.262Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T02:55:52.262Z] [world] You rest for 8 hours. +9 HP, −1 corruption recovered. (Day 47, afternoon)
+[2026-09-13T02:55:52.262Z] [world] Wick turns twice, thinks about a third, and drops where he stands.
+[2026-09-13T02:55:52.260Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-13T02:55:52.259Z] [player] rest
+[2026-09-13T02:55:52.248Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-13T02:55:51.559Z] [system] ⏳ Time passed: 8h
+[2026-09-13T02:55:51.559Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T02:55:51.558Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T02:55:51.557Z] [world] You rest for 8 hours. +10 HP, +6 stamina, −1 corruption recovered. (Day 47, morning)
+[2026-09-13T02:55:51.557Z] [world] Wick circles three times and curls beside you. His breathing slows to yours.
+[2026-09-13T02:55:51.556Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-13T02:55:51.555Z] [player] rest
+[2026-09-13T02:55:51.547Z] [debug] ui: tap "rest" ⏱+16ms
+[2026-09-13T02:55:49.931Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-13T02:55:49.533Z] [combat] Aetheric Worm regenerates 1 HP (18/26).
+[2026-09-13T02:55:49.433Z] [arbiter] The Arbiter looks around. "The corridor you came in by is not behind you. This is normal here. Keep walking."
+[2026-09-13T02:55:49.409Z] [reward] +9 TC pried from the dust.
+[2026-09-13T02:55:49.408Z] [reward] Aetheric Worm defeated. You recover Aether Acid, Worm Mucus.
+[2026-09-13T02:55:49.407Z] [combat] The killing blow with the acid-etched reaver's greatsword: 23. Aetheric Worm drops where it stood.
+[2026-09-13T02:55:49.406Z] [combat] The Acid-Etched coating fails to take on Aetheric Worm.
+[2026-09-13T02:55:49.403Z] [combat] You — d20 → 20 + STR 20 = 40 vs Aetheric Worm AC 10 — ✓ CRITICAL HIT
+[2026-09-13T02:55:49.403Z] [combat] Aetheric Worm — d20 → 15 + ATK 5 = 20 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-13T02:55:49.401Z] [world] Aetheric Worm moves first. The pressure is immediate.
+[2026-09-13T02:55:49.328Z] [debug] dice⏱ coating: shown +48ms, tapped +519ms, settled +847ms = 1414ms
+[2026-09-13T02:55:48.481Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-13T02:55:47.912Z] [debug] dice⏱ damage: shown +55ms, tapped +474ms, settled +850ms = 1379ms
+[2026-09-13T02:55:47.062Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-13T02:55:46.528Z] [debug] dice⏱ attack: shown +53ms, tapped +445ms, settled +848ms = 1346ms
+[2026-09-13T02:55:45.681Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-13T02:55:45.179Z] [debug] dice⏱ initiative: shown +30ms, tapped +1103ms, settled +852ms = 1985ms
+[2026-09-13T02:55:44.326Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-13T02:55:44.024Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-13T02:55:43.195Z] [system] ⏳ Time passed: 6 min
+[2026-09-13T02:55:43.195Z] [world] You commit forward with the acid-etched reaver's greatsword. Aetheric Worm watches your hands.
+[2026-09-13T02:55:43.185Z] [debug] attack: target=Aetheric Worm range=close reach.bands=[close] reach.label=Reaver's Greatsword bareHand=false
+[2026-09-13T02:55:43.182Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reaver greatsword resolved=- range=close enemies=1 hooks=1
+[2026-09-13T02:55:43.181Z] [player] attack with the reaver's greatsword
+[2026-09-13T02:55:43.119Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-13T02:55:43.110Z] [debug] ui: tap "⚗ reaver's greatsword ⚔" ⏱+24ms
+[2026-09-13T02:55:40.267Z] [debug] boot: life bmtz81sq5qj started 2026-09-13T02:55:34.829Z · FOLLOWED AN OTA APPLY 240ms ago via mid-session · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-13T02:55:40.267Z] [debug] missions: · at=iskan_veil travelTo=hidden_market
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T02:55:40.267Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-13T02:55:40.266Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T02:55:40.266Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-13T02:55:40.266Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-13T02:55:40.266Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4]
+[2026-09-13T02:55:40.262Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 1/7 [investigate] @karok_sa needs=Enclave-Mother's Ash Mark✗MISSING gives=The Holding Seam PAUSED
+[2026-09-13T02:55:40.262Z] [debug] missions: storyline:story_order_red_tower stage 1/9 [investigate] @great_tartary_plains needs=Vesryn's Fragment Map✗MISSING gives=First Fragment PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 1/6 [investigate] @ostragar needs=Factor's Name and Route✗MISSING gives=Empty Field-Book Case PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: storyline:story_monarch_silence stage 1/8 [diplomacy] @reclaimer_stake npc="the talkative Reclaimer" needs=Kincaid's List of Six✗MISSING gives=A Reasonable Man's Note PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_leviathan_eye stage 1/4 [investigate] @mud_seas needs=Jar of Aetherstone Packing✗MISSING gives=Fossilised Leviathan Scale PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_ashen_codex stage 1/4 [investigate] @nimari needs=Ash-Frame✗MISSING gives=Framed Char-Block PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_weeping_core stage 1/4 [investigate] @buried_cities needs=Sealed Catch-Vial✗MISSING gives=A Single Core-Tear PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_servants_hum stage 1/5 [investigate] @obsidian_pillars needs=Vael's Three Listening Stones✗MISSING gives=First Note — the Pillars PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_red_tower stage 1/4 [investigate] @cradle_of_dusk needs=Scholar's Survey Chit✗MISSING gives=Warm Hexagonal Plate PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_hollow_crown stage 1/4 [investigate] @giant_vault needs=Hoard Manifest✗MISSING gives=Assayer's Note PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_pale_signal stage 1/4 [investigate] @mud_flood_nexus needs=Beat-Counter✗MISSING gives=The Counted Sequence PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 1/4 [investigate] @samarran needs=Founder's Tuning-Rod✗MISSING gives=Wreck Bearing PAUSED
+[2026-09-13T02:55:40.261Z] [debug] missions: mystery:mystery_cradle_compass stage 1/3 [stealth] @cradle_of_dusk needs=Halem's Broken Compass✗MISSING gives=Cradle of Dusk Compass PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_mud_titan stage 1/7 [investigate] @buried_cities gives=Collapsed Gantry Log PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_salamander_voronov stage 1/5 [investigate] @buried_cities needs=Engineer's Conduit Chit✗MISSING gives=Cracked Conduit Reading PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 1/5 [investigate] @great_tartary_plains needs=Reeve's Road-Writ✗MISSING gives=Lame-Hound Bait Sign PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 1/5 [investigate] @giant_vault needs=Physician's Rot-Ward Mask✓ gives=Salvager's Dying Testimony PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 1/7 [investigate] @thametans_tower needs=Lodge Survey Warrant✗MISSING gives=Builders' Scattered Tools PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 1/7 [investigate] @great_tartary_plains needs=Caravan-Mother's Grit-Token✗MISSING gives=Scoured Wheel-Warning PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 1/7 [investigate] @cradle_of_dusk needs=Warden's Dusk-Warrant✗MISSING gives=Three Grey Pinions PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_apparition_red_tower stage 1/7 [investigate] @red_tower_of_nimari needs=Archivist's Requisition✗MISSING gives=Core-Casing Rubbing PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 1/7 [investigate] @obsidian_pillars needs=Coil of Tartarian Filament✗MISSING gives=Wire-Marked Toolkit PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 1/7 [investigate] @mud_seas needs=Ferryman's Crossing-Token✗MISSING gives=Boot-Trail Cast PAUSED
+[2026-09-13T02:55:40.260Z] [debug] missions: hunt:hunt_shade_endless_stair stage 1/7 [investigate] @endless_stair needs=Warden's Tally of the Missing✗MISSING gives=Pilgrim's Still-Burning Lantern PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 1/7 [investigate] @sinking_cathedral needs=Dive-Boss's Mooring Chit✗MISSING gives=Wren's Cut Line PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 1/7 [investigate] @zharaks_teeth needs=Caravan-Master's Pass-Chit✗MISSING gives=Scalded Glass Shard PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains needs=Servants' Mark of Sanction✗MISSING spawn=Tartarian Raider×3 PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_mud_siren_queen stage 1/5 [boss→attack] @mud_seas needs=Drifter's South-Spire Poster✗MISSING spawn=Mud Siren×3 PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_sludge_behemoth stage 1/7 [boss→attack] @mud_seas needs=Sealed Coordinate Tube✗MISSING gives=Dive-Camp Tally spawn=Swamp Crab×1 PAUSED
+[2026-09-13T02:55:40.259Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk gives=Obsidian-Edged Scale PAUSED
+[2026-09-13T02:55:40.257Z] [debug] ═══ SESSION 2026-09-13T02:55:40.255Z · build 2026-09-12-1809-what-memory-was-doing-at-the-time · updated from 2026-09-11-1803-the-hud-belongs-to-tartaria · previous entry moments earlier ═══
+[2026-09-13T02:55:40.068Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Great Scott. The buried country is no place to walk alone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-13T02:55:40.060Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.
+[2026-09-13T02:55:40.060Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-13T02:55:40.059Z] [debug] OTA session start: 2026-09-12-1809-what-memory-was-doing-at-the-time.
+[2026-09-13T02:55:40.059Z] [debug] OTA applied: 2026-09-11-1803-the-hud-belongs-to-tartaria → 2026-09-12-1809-what-memory-was-doing-at-the-time.
+[2026-09-13T02:55:35.650Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T02:55:35.094Z] [debug] voice: bundled idle
+[2026-09-13T02:55:35.094Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T02:55:35.035Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T02:55:35.035Z] [debug] ota: Already up to date
+[2026-09-13T02:55:34.898Z] [debug] ota: Checking…
+[2026-09-13T02:55:34.898Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a098ae-2b08-705f-9d2b-fb65faecc5f9
+[2026-09-13T02:55:27.735Z] [debug] appstate: background → active (was background for 1449042ms)
+[2026-09-13T02:31:18.691Z] [debug] appstate: active → background (was active for 5979ms)
+[2026-09-13T02:31:12.714Z] [debug] appstate: background → active (was background for 655877ms)
+[2026-09-13T02:20:16.835Z] [debug] appstate: active → background (was active for 30205ms)
+[2026-09-13T02:19:47.386Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T02:19:46.826Z] [debug] voice: bundled idle
+
+=== END REPORT ===

@@ -1,0 +1,708 @@
+Bug Report — Cinderbound Tartarian Giant · (2026-09-13-1811-the-slate-takes-the-weight) · Player log golem
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-13T16:56:18.474Z
+Character: Cinderbound Tartarian Giant
+Slot ID: slot_mszbgsi1_inv6if
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 37/38
+
+--- DESCRIPTION ---
+Player log golem
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-13T16:56:18.356Z
+
+Install
+  App ID: com.hotatticgames.tartarprim.golem
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 299
+  AAB: (build 299)
+  OTA: (2026-09-13-1811-the-slate-takes-the-weight)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-13T16:56:00.034Z
+  Last init success: 2026-09-13T16:56:00.879Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu022imawh · started 2026-09-13T16:55:56.866Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 9 recorded (newest last)
+  • 2026-08-21T12:59:53.873Z (33356m ago) — PROCESS KILLED — no JS ran
+      build 4.32.1 · 2026-08-20-1393-slice-two-the-engines-move-down · stage ctx-release-done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: ctx-release-done · 8790ms into the action
+  • 2026-08-24T17:49:49.532Z (28746m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-24-1491-two-taps-to-load · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 37008ms into the action
+  • 2026-08-25T23:10:56.630Z (26985m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-25-1502-the-swipe-is-the-selector · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 0ms into the action
+  • 2026-08-25T23:31:40.258Z (26965m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-25-1503-the-bullseye-is-the-truth · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 0ms into the action
+  • 2026-08-27T01:40:40.146Z (25396m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-27-1517-the-green-button-can-reach · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 589ms into the action
+  • 2026-08-27T02:02:02.396Z (25374m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-27-1518-the-beacon-goes-first · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 550ms into the action
+  • 2026-08-27T02:32:50.729Z (25343m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-27-1519-the-attachment-was-the-fault · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 884ms into the action
+  • 2026-08-27T03:03:46.026Z (25313m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-27-1520-the-scrubber-takes-a-whole-value · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 4949ms into the action
+  • 2026-08-27T12:26:15.871Z (24750m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-27-1520-the-scrubber-takes-a-whole-value · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 0ms into the action
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cinderbound Tartarian Giant)
+  HP: 37/38  Stamina: 2/15  TC: 189  Corruption: 4
+  Pack: 81 distinct rows / 258 total
+  Dog: Corbel (Parakeet) loyalty 97 HP 14/14
+
+Weapons (17)
+  Aetheric Baton (1d6 electrical, dur 33/33, [weapon,melee,single_handed,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 34/35, equipped:off, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, unequip:off, use, repair
+  Bone Shiv (1d4 piercing, dur 9/9, [weapon,melee,knife,tool,bone])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Sling (1d4 bludgeoning, dur 37/37, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 33/33, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Flame of Aether Wand (1d6 burn, dur 16/16, [weapon,runecaster,rune_power,aetheric,fire])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Claymore (1d8 slashing, dur 37/37, [weapon,melee,two_handed,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Heater Sword (1d6 slashing, dur 39/39, [weapon,melee,single_handed,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Sledge (1d8 bludgeoning, dur 16/16, [weapon,melee,two_handed,hammer,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 36/36, equipped:main, [weapon,starter,barehanded,melee])
+    actions: equip:off, unequip:main, use(off)
+  Plasma Cutter (1d6 burn, dur 39/39, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pocket Knife (1d4 slashing, dur 24/24, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pyric Wand (1d6 burn, dur 30/30, [weapon,runecaster])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Repeater Rifle (1d8 piercing, dur 32/32, [weapon,ranged,two_handed,firearm,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 23/23, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 42/42, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Throwing Knife (1d4 piercing, dur 39/39, [throwable,weapon,ranged,knife,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (19)
+  Aetheric Strider Boots (dur 10/10, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Aetheric Boots (dur 27/27, equipped:feet, AC +1 · INT +1, [armor,feet,boots,architectural_sentinels])
+    actions: unequip:feet
+  Architect's Field Jacket (dur 10/10, AC +2 · Regen: +1 HP per action · INT +2, [armor,cloak,outer,tartarian_giants])
+    actions: equip:cloak, use, scrap, drop
+  Architect's Leg Enhancers (dur 12/12, equipped:legs, AC +2 · Resists: slashing · INT +2, [armor,legs,greaves,architectural_sentinels])
+    actions: unequip:legs
+  Architect's Mask of Vision (dur 33/33, AC +1 · Resists: slashing · INT +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 31/31, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 10/10, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Faceshroud (dur 8/8, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Lost Seeker's Gloves (dur 34/34, AC +1 · INT +1, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+  Mud-Warden's Vest (dur 28/28, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Rough-Hewn Gauntlets (dur 20/20, AC +2 · STR +2, [armor,hands,gauntlets,mud_golems])
+    actions: equip:hands, use, scrap, drop
+  Salvager's Worn Boots (dur 14/14, AC +2 · Resists: slashing · DEX +2 · STE +2, [armor,feet,boots,reclaimers,stealth])
+    actions: equip:feet, use, scrap, drop
+  Salvager's Worn Boots (dur 35/35, AC +1 · Resists: slashing · INT +1 · STE +1, [armor,feet,boots,reclaimers,stealth])
+    actions: equip:feet, use, scrap, drop
+  Sentinel's Faceguard (dur 24/24, equipped:head, AC +1 · Resists: slashing · HP +5 · DEX +1, [armor,head,mask,face,architectural_sentinels])
+    actions: unequip:head
+  Shaman's Warden Gloves (dur 10/10, AC +2 · WIS +2, [armor,hands,gauntlets,mud_dwellers])
+    actions: equip:hands, use, scrap, drop
+  Wanderer's Outercoat (dur 27/28, AC +1 · Resists: cold · STE +1, [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Wanderer's Swiftstride Greaves (dur 32/32, AC +1 · DEX +1, [armor,legs,greaves,unknowing_masses])
+    actions: equip:legs, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 20/20, AC +2 · STR +2, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 16/16, AC +2 · STR +2, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (3)
+  Trail Rations ×8 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+  Wild Onion ([food,foraged,vegetable])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Incendiary Paste (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Searing Paste (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (5)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×2 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+
+Materials (32)
+  Aether Crystal ×16 ([aether,crystal])
+    actions: drop
+  Aether Dust ×19 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Shard ×3 (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×8 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×10 ([metal,junk,scrap])
+    actions: scrap, drop
+  Blank Runecaster Casing (Common) ([runecaster,casing,blank,loot])
+    actions: drop
+  Bone Sliver ×2 ([bone,junk,scrap])
+    actions: drop
+  ◆ Bone-Handled Rivet (Uncommon, ♥reserved, [trophy,organic,metal])
+    actions: scrap, release-from-fusion, drop
+  Cloth Scrap ×16 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Coiled Snare Thread (♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  ◆ Coiled Snare Thread ([trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  ◆ Copper Wire Spool (Uncommon, ♥reserved, [trophy,metal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Dried Tendon Coil (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  ◆ Faded Ribbon Coil (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Flint Core Nodule (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  ◆ Frayed Rigging Twine ([trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  Hardened Mudstone ×2 (Rare, [mud,stone,tartarian,found-recipe,loot])
+    actions: scrap, drop
+  ◆ Horn-Capped Dowel (♥reserved, [trophy,organic,wood])
+    actions: scrap, release-from-fusion, drop
+  ◆ Knotted Sinew Braid (♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  ◆ Mud Cloth ×2 (Uncommon, ♥reserved, [trophy,loot,cloth])
+    actions: scrap, release-from-fusion, drop
+  Mud Fragment ×8 ([mud])
+    actions: drop
+  Mudstone (Rare, [mud,stone])
+    actions: drop
+  ◆ Obsidian Chip ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Scrap Metal ×16 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Smooth Stone ×12 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×6 ([organic,fiber])
+    actions: drop
+  Stick ×6 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Stiffened Leather Offcut (Uncommon, ♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Weathered Granite Knob (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Worn Tartarian Coin ×58 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 397 of 3927 entries; older trimmed to fit a single email paste)
+
+[2026-09-13T16:56:03.132Z] [debug] boot: life bmu022imawh started 2026-09-13T16:55:56.866Z · not an OTA apply (no handoff on disk)
+[2026-09-13T16:56:03.132Z] [debug] missions: · at=monarch_waystation
+[2026-09-13T16:56:03.132Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-13T16:56:03.132Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-13T16:56:03.131Z] [debug] ═══ SESSION 2026-09-13T16:56:03.129Z · build 2026-09-13-1811-the-slate-takes-the-weight · previous entry moments earlier ═══
+[2026-09-13T16:56:02.967Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Cinderbound. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-13T16:56:02.958Z] [world] Reclaimers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the silt.
+[2026-09-13T16:56:02.958Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-13T16:56:02.958Z] [debug] OTA session start: 2026-09-13-1811-the-slate-takes-the-weight.
+[2026-09-13T16:56:00.053Z] [debug] voice: bundled idle
+[2026-09-13T16:56:00.053Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T16:56:00.008Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T16:56:00.007Z] [debug] ota: Already up to date
+[2026-09-13T16:55:57.724Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T16:55:56.966Z] [debug] ota: Checking…
+[2026-09-13T16:55:56.966Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a0990b-db64-7c75-8f43-c2cfb73c5e57
+[2026-09-13T04:48:53.639Z] [debug] appstate: active → background (was active for 8281ms)
+[2026-09-13T04:48:46.317Z] [debug] voice: bundled idle
+[2026-09-13T04:48:46.317Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T04:48:46.256Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T04:48:46.254Z] [debug] ota: Already up to date
+[2026-09-13T04:48:46.123Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:48:45.364Z] [debug] ota: Checking…
+[2026-09-13T04:48:45.364Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a0990b-db64-7c75-8f43-c2cfb73c5e57
+[2026-09-13T04:48:45.144Z] [debug] ota: Restarting to apply…
+[2026-09-13T04:48:45.143Z] [debug] ota: Saving progress…
+[2026-09-13T04:48:45.069Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-13T04:48:44.821Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T04:48:44.060Z] [debug] ota: Checking…
+[2026-09-13T04:48:44.060Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09880-ab5a-7fe4-b255-5dc406d3158e
+[2026-09-13T02:07:43.671Z] [debug] appstate: active → background (was active for 4856ms)
+[2026-09-13T02:07:39.581Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T02:07:39.001Z] [debug] voice: bundled idle
+[2026-09-13T02:07:39.000Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T02:07:38.943Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T02:07:38.943Z] [debug] ota: Already up to date
+[2026-09-13T02:07:38.827Z] [debug] ota: Checking…
+[2026-09-13T02:07:38.827Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09880-ab5a-7fe4-b255-5dc406d3158e
+[2026-09-13T02:07:38.600Z] [debug] appstate: active → background (was active for 10596ms)
+[2026-09-13T02:07:38.161Z] [debug] voice: bundled idle
+[2026-09-13T02:07:38.160Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T02:07:38.032Z] [debug] ota: boot check result = errored
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim.golem/files/.expo-internal/c2662655fc02dd0e2138fb2440fb0e55:1:3674842)
+[2026-09-13T02:07:38.031Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+[2026-09-13T02:07:38.027Z] [debug] ota: Error
+[2026-09-13T02:07:28.762Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T02:07:28.019Z] [debug] ota: Checking…
+[2026-09-13T02:07:28.019Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09831-9c8f-777c-9ce8-ef43aacdadef
+[2026-09-13T02:02:40.434Z] [debug] boot: life bmtz61r8ju7 started 2026-09-13T01:59:33.667Z · not an OTA apply (no handoff on disk)
+[2026-09-13T02:02:40.434Z] [debug] missions: · at=monarch_waystation
+[2026-09-13T02:02:40.433Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-13T02:02:40.433Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-13T02:02:40.433Z] [debug] ═══ SESSION 2026-09-13T02:02:40.429Z · build 2026-09-12-1808-the-aside-does-not-start-in-a-fight · previous entry moments earlier ═══
+[2026-09-13T02:02:40.207Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Cinderbound. The road kept your place."
+[2026-09-13T02:02:40.207Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-13T02:02:40.206Z] [debug] OTA session start: 2026-09-12-1808-the-aside-does-not-start-in-a-fight.
+[2026-09-13T02:02:29.094Z] [debug] appstate: background → active (was background for 166376ms)
+[2026-09-13T01:59:42.716Z] [debug] appstate: active → background (was active for 8943ms)
+[2026-09-13T01:59:34.549Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T01:59:33.994Z] [debug] voice: bundled idle
+[2026-09-13T01:59:33.994Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T01:59:33.880Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T01:59:33.879Z] [debug] ota: Already up to date
+[2026-09-13T01:59:33.789Z] [debug] ota: Checking…
+[2026-09-13T01:59:33.789Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09831-9c8f-777c-9ce8-ef43aacdadef
+[2026-09-13T01:11:25.328Z] [debug] boot: life bmtz45o1cln started 2026-09-13T01:06:36.912Z · not an OTA apply (no handoff on disk)
+[2026-09-13T01:11:25.328Z] [debug] missions: · at=monarch_waystation
+[2026-09-13T01:11:25.328Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-13T01:11:25.328Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-13T01:11:25.328Z] [debug] ═══ SESSION 2026-09-13T01:11:25.325Z · build 2026-09-12-1808-the-aside-does-not-start-in-a-fight · previous entry moments earlier ═══
+[2026-09-13T01:11:25.107Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Cinderbound. I kept watch while you were gone."
+[2026-09-13T01:11:25.107Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-13T01:11:25.106Z] [debug] OTA session start: 2026-09-12-1808-the-aside-does-not-start-in-a-fight.
+[2026-09-13T01:11:18.549Z] [debug] persist sizes(KB): total=153 player=31 wm=37[rooms=13 events=0 memos=0 npcs=2 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-09-13T01:11:04.195Z] [debug] ui: tap "map"
+[2026-09-13T01:10:56.034Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter tilts their head. "I do not see a 'traveler' her…"
+[2026-09-13T01:10:56.034Z] [arbiter] The Arbiter tilts their head. "I do not see a 'traveler' here. Choose words carefully — try: spire, tower, mud, silt, rubble, cart."
+[2026-09-13T01:10:55.978Z] [debug] native queue: 76 jobs · worst wait 5.3s (investigate_lore) · 4 past 3s · q1 oldest 1.4s · running investigate_lore 2.7s
+[2026-09-13T01:10:55.977Z] [debug] qwen⏱ stats — investigate_lore n6 avg5.7s max6.6s read0.5s/write1.1s ⚠1unusable in129t→out28t ms/tok 2.5-10.4 wait3.7s | narration:scene_intro_fill n2 avg6.9s max7.5s read5.8s/write1.7s ⚠1unusable in739t→out17t ms/tok 7.8-7.8 cap1 ⏸1 ✂1/6.2s | ambient n1 avg9.9s max9.9s read4.2s/write4.7s in362t→out31t ms/tok 11.7-11.7 cap1 wait1.0s | narration:travel n1 avg10.9s max10.9s read8.4s/write2.4s in770t→out33t ms/tok 10.9-10.9 cap1 || WASTED 1 calls / 6.2s
+[2026-09-13T01:10:55.976Z] [debug] qwen⏱ investigate_lore ok 2655ms read 1331ms/write 1303ms in 128t→out 30t thr2 10.4ms/t (142ch)
+[2026-09-13T01:10:54.578Z] [cognitive] TRAVEL  (48ms)
+[2026-09-13T01:10:54.488Z] [arbiter] "Threads in Tartaria don't wait long," the Arbiter says quietly. "The spire won't either."
+[2026-09-13T01:10:54.488Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-13T01:10:54.486Z] [arbiter] The Arbiter taps the slate. "Not here. Shifting Obsidian Orb points elsewhere — set a course from Contracts and do it there."
+[2026-09-13T01:10:54.485Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=traveler resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:10:54.484Z] [player] investigate traveler
+[2026-09-13T01:10:53.323Z] [cognitive] neutral  (91ms)
+[2026-09-13T01:10:53.230Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-13T01:10:53.227Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=1
+[2026-09-13T01:10:53.227Z] [player] investigate footprint
+[2026-09-13T01:10:52.457Z] [debug] homework: scene_intro "The Monarch's Waystation" ✓ 7718ms
+[2026-09-13T01:10:52.391Z] [debug] qwen⏱ narration:scene_intro_fill ok 7549ms read 5775ms/write 1718ms in 739t→out 33t thr1 7.8ms/t HIT-CAP (148ch)
+[2026-09-13T01:10:51.427Z] [debug] ui: tap "investigate" ⏱+7ms
+[2026-09-13T01:10:50.494Z] [debug] ui: tap "more ▸" ⏱+11ms
+[2026-09-13T01:10:49.403Z] [reward] ✦ Legacy of Power — you channel Aether into the Mud Heater Sword. It mends to full.
+[2026-09-13T01:10:48.378Z] [debug] ui: tap "✦ ability" ⏱+12ms
+[2026-09-13T01:10:46.190Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-13T01:10:46.190Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-13T01:10:46.190Z] [reward]     • Aetheric Cloth (Uncommon)
+[2026-09-13T01:10:46.189Z] [reward]     • Obsidian Chip (Common)
+[2026-09-13T01:10:46.189Z] [reward] ✦ Salvage haul:
+[2026-09-13T01:10:46.189Z] [world] You work the tent over. A part of it comes loose, intact.
+[2026-09-13T01:10:46.188Z] [world] You salvage the lamp. The take is small but real.
+[2026-09-13T01:10:46.188Z] [world] You salvage the crate. The take is small but real.
+[2026-09-13T01:10:46.188Z] [world] You work the bedroll over. A part of it comes loose, intact.
+[2026-09-13T01:10:46.187Z] [world] You lever something loose from the banner — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-13T01:10:45.642Z] [debug] persist sizes(KB): total=149 player=31 wm=33[rooms=8 events=0 memos=0 npcs=2 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-09-13T01:10:45.463Z] [reward] ✦ Rough-Hewn Gauntlets (Common).
+[2026-09-13T01:10:45.463Z] [world] You lift the Rough-Hewn Gauntlets clear.
+[2026-09-13T01:10:44.740Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-13T01:10:44.603Z] [debug] appstate: background → active (was background for 106752ms)
+[2026-09-13T01:08:57.850Z] [debug] appstate: active → background (was active for 41165ms)
+[2026-09-13T01:08:52.907Z] [debug] arbiter: qwen ✓ 11021ms (intent=travel)
+[2026-09-13T01:08:52.907Z] [arbiter] You carefully examine the traveler's chest, feeling for any clues.
+[2026-09-13T01:08:52.843Z] [debug] qwen⏱ narration:travel ok 10859ms read 8425ms/write 2405ms in 770t→out 33t thr2 10.9ms/t HIT-CAP (163ch)
+[2026-09-13T01:08:42.885Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-13T01:08:41.986Z] [cognitive] TRAVEL  (98ms)
+[2026-09-13T01:08:41.887Z] [system] ⏳ Time passed: 15 min
+[2026-09-13T01:08:41.884Z] [world] What you started here has not finished itself in your absence.
+[2026-09-13T01:08:41.883Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-13T01:08:41.882Z] [debug] spawn: gear=[Rough-Hewn Gauntlets] window=10 roster=new
+[2026-09-13T01:08:41.875Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:08:41.874Z] [player] go north
+[2026-09-13T01:08:41.856Z] [debug] ui: tap "NORTH" ⏱+25ms
+[2026-09-13T01:08:41.742Z] [debug] arbiter: ambient-said "Your journey has brought you to the Triage Tent, the humble location where you have been waiting for this moment."
+[2026-09-13T01:08:41.741Z] [debug] arbiter: ambient ✓ 10042ms
+[2026-09-13T01:08:41.741Z] [arbiter] Your journey has brought you to the Triage Tent, the humble location where you have been waiting for this moment.
+[2026-09-13T01:08:41.685Z] [debug] qwen⏱ ambient ok 9947ms wait 957ms read 4230ms/write 4720ms in 362t→out 31t thr1 11.7ms/t HIT-CAP (148ch)
+[2026-09-13T01:08:35.033Z] [reward]     • Cloth Scrap (Common)
+[2026-09-13T01:08:35.033Z] [reward]     • Worn Tartarian Coin x4 (Common)
+[2026-09-13T01:08:35.033Z] [reward]     • Mud Fragment x2 (Common)
+[2026-09-13T01:08:35.033Z] [reward]     • Aether Crystal (Common)
+[2026-09-13T01:08:35.033Z] [reward] ✦ Salvage haul:
+[2026-09-13T01:08:35.032Z] [world] You work the tent over. A part of it comes loose, intact.
+[2026-09-13T01:08:35.032Z] [world] You strip the stone marker carefully. Something usable comes free in your hand.
+[2026-09-13T01:08:35.032Z] [world] You break the signpost apart. Among the pieces, something worth keeping.
+[2026-09-13T01:08:35.032Z] [world] You break the rubble apart. Among the pieces, something worth keeping.
+[2026-09-13T01:08:34.034Z] [reward] ✦ Wanderer's Swiftstride Greaves (Common).
+[2026-09-13T01:08:34.034Z] [world] You pick up the Wanderer's Swiftstride Greaves.
+[2026-09-13T01:08:32.690Z] [debug] qwen⏱ investigate_lore ok 6540ms wait 5319ms read 319ms/write 888ms in 128t→out 24t thr2 2.5ms/t (111ch)
+[2026-09-13T01:08:31.464Z] [debug] qwen⏱ investigate_lore ok 6554ms wait 5300ms read 322ms/write 918ms in 128t→out 25t thr2 2.5ms/t (128ch)
+[2026-09-13T01:08:30.205Z] [debug] qwen⏱ investigate_lore ok 6539ms wait 5163ms read 337ms/write 1025ms in 128t→out 26t thr2 2.6ms/t (119ch)
+[2026-09-13T01:08:28.828Z] [arbiter] The Arbiter tilts their head. "I do not see a 'traveler' here. Choose words carefully — try: spire, tower, mud, silt, rubble, cart."
+[2026-09-13T01:08:28.787Z] [debug] qwen⏱ investigate_lore ok 6358ms wait 4619ms read 351ms/write 1368ms in 129t→out 37t thr2 2.7ms/t (171ch)
+[2026-09-13T01:08:27.396Z] [cognitive] TRAVEL  (48ms)
+[2026-09-13T01:08:27.297Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter taps the slate. "Not here. Shifting Obsidian Orb…"
+[2026-09-13T01:08:27.296Z] [arbiter] The Arbiter taps the slate. "Not here. Shifting Obsidian Orb points elsewhere — set a course from Contracts and do it there."
+[2026-09-13T01:08:27.296Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=traveler resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:08:27.295Z] [player] investigate traveler
+[2026-09-13T01:08:26.851Z] [debug] qwen⏱ investigate_lore ok 5684ms wait 1831ms read/write unusable (native mis-reported 7706ms/2320ms — llama.rn split bug, not this call) in 134t→out 28t thr2 (126ch)
+[2026-09-13T01:08:26.043Z] [reward] ✦ Mud Fragment from the barrel.
+[2026-09-13T01:08:26.043Z] [world] You tilt the rim. A residue of something long-evaporated coats the inside — sour, organic, old. Tucked into the seam: a mud fragment.
+[2026-09-13T01:08:26.041Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=barrel resolved=barrel range=- enemies=0 hooks=1
+[2026-09-13T01:08:26.040Z] [player] investigate barrel
+[2026-09-13T01:08:26.017Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-09-13T01:08:24.784Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T01:08:24.782Z] [world] The tent sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-13T01:08:24.780Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tent resolved=tent range=- enemies=0 hooks=1
+[2026-09-13T01:08:24.779Z] [player] investigate tent
+[2026-09-13T01:08:24.447Z] [debug] ui: tap "take / salvage" ⏱+13ms
+[2026-09-13T01:08:23.552Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T01:08:23.551Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-13T01:08:23.549Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=1
+[2026-09-13T01:08:23.548Z] [player] investigate ladder
+[2026-09-13T01:08:23.060Z] [debug] homework: scene_intro "The Monarch's Waystation" ∅ 6335ms
+[2026-09-13T01:08:23.060Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6198ms — intro-fill:∅
+[2026-09-13T01:08:22.994Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6198ms read 0ms/write 0ms in 738t→out 0t thr1 (0ch)
+[2026-09-13T01:08:22.479Z] [debug] persist sizes(KB): total=152 player=30 wm=37[rooms=13 events=0 memos=0 npcs=2 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-09-13T01:08:22.316Z] [world] The signpost resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-13T01:08:22.311Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=signpost resolved=signpost range=- enemies=0 hooks=1
+[2026-09-13T01:08:22.310Z] [player] investigate signpost
+[2026-09-13T01:08:21.048Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T01:08:21.047Z] [world] The Wanderer's Swiftstride Greaves sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-13T01:08:21.044Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wanderer swiftstride greaves resolved=Wanderer's Swiftstride Greaves range=- enemies=0 hooks=1
+[2026-09-13T01:08:21.043Z] [player] investigate Wanderer's Swiftstride Greaves
+[2026-09-13T01:08:19.381Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-13T01:08:17.709Z] [system] ⏳ Time passed: 15 min
+[2026-09-13T01:08:17.708Z] [world] The thread you were following waits where you left it.
+[2026-09-13T01:08:17.707Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-13T01:08:17.697Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:08:17.697Z] [player] go east
+[2026-09-13T01:08:17.678Z] [debug] ui: tap "EAST" ⏱+18ms
+[2026-09-13T01:08:16.726Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-13T01:08:16.686Z] [debug] appstate: background → active (was background for 63252ms)
+[2026-09-13T01:07:13.433Z] [debug] appstate: active → background (was active for 15829ms)
+[2026-09-13T01:07:12.067Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T01:07:05.813Z] [cognitive] REST  (56ms)
+[2026-09-13T01:07:05.728Z] [system] ⏳ Time passed: 8h
+[2026-09-13T01:07:05.727Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-13T01:07:05.727Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter looks around. "The seneschal logs your name with…"
+[2026-09-13T01:07:05.727Z] [arbiter] The Arbiter looks around. "The seneschal logs your name without asking it. The Monarchs' ledgers have their ways."
+[2026-09-13T01:07:05.727Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-13T01:07:05.724Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T01:07:05.724Z] [world] You rest for 8 hours. +1 HP, +7 stamina, −1 corruption recovered. (Day 8, night)
+[2026-09-13T01:07:05.724Z] [world] Corbel turns twice, thinks about a third, and drops where she stands.
+[2026-09-13T01:07:05.722Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:07:05.721Z] [player] rest
+[2026-09-13T01:07:05.714Z] [debug] ui: tap "rest" ⏱+18ms
+[2026-09-13T01:07:04.477Z] [cognitive] REST  (116ms)
+[2026-09-13T01:07:04.360Z] [system] ⏳ Time passed: 8h
+[2026-09-13T01:07:04.358Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-13T01:07:04.358Z] [world] You rest for 8 hours. +6 HP, +8 stamina, −1 corruption recovered. (Day 7, evening)
+[2026-09-13T01:07:04.358Z] [world] Corbel circles three times and curls beside you. Her breathing slows to yours.
+[2026-09-13T01:07:04.353Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:07:04.352Z] [player] rest
+[2026-09-13T01:07:04.330Z] [debug] ui: tap "rest" ⏱+10ms
+[2026-09-13T01:06:57.808Z] [arbiter] The Arbiter tilts their head. "I do not see a 'traveler' here. Choose words carefully — try: spire, tower, mud, silt, rubble, crate."
+[2026-09-13T01:06:57.578Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-13T01:06:56.723Z] [cognitive] TRAVEL  (82ms)
+[2026-09-13T01:06:56.638Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter taps the slate. "Not here. Shifting Obsidian Orb…"
+[2026-09-13T01:06:56.638Z] [arbiter] The Arbiter taps the slate. "Not here. Shifting Obsidian Orb points elsewhere — set a course from Contracts and do it there."
+[2026-09-13T01:06:56.637Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=traveler resolved=- range=- enemies=0 hooks=1
+[2026-09-13T01:06:56.636Z] [player] investigate traveler
+[2026-09-13T01:06:56.596Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-13T01:06:53.794Z] [debug] ui: tap "investigate" ⏱+19ms
+[2026-09-13T01:06:51.291Z] [reward]     • Mud Fragment (Common)
+[2026-09-13T01:06:51.290Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-13T01:06:51.290Z] [reward]     • Aether Dust (Common)
+[2026-09-13T01:06:51.290Z] [reward]     • Coiled Snare Thread (Common)
+[2026-09-13T01:06:51.289Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-13T01:06:51.289Z] [reward] ✦ Salvage haul:
+[2026-09-13T01:06:51.289Z] [world] Already worked over: signpost.
+[2026-09-13T01:06:51.289Z] [world] You break the sign apart. Among the pieces, something worth keeping.
+[2026-09-13T01:06:51.288Z] [world] You strip the sack carefully. Something usable comes free in your hand.
+[2026-09-13T01:06:51.288Z] [world] You strip the marker carefully. Something usable comes free in your hand.
+[2026-09-13T01:06:51.288Z] [world] You strip the lamp carefully. Something usable comes free in your hand.
+[2026-09-13T01:06:51.287Z] [world] You lever something loose from the cart — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-13T01:06:51.287Z] [world] You strip the bedroll carefully. Something usable comes free in your hand.
+[2026-09-13T01:06:50.334Z] [reward] ✦ Salvager's Worn Boots (Common).
+[2026-09-13T01:06:50.333Z] [world] You take the Salvager's Worn Boots from where it lay.
+[2026-09-13T01:06:43.209Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-13T01:06:41.795Z] [debug] boot: life bmtz45o1cln started 2026-09-13T01:06:36.912Z · not an OTA apply (no handoff on disk)
+[2026-09-13T01:06:41.795Z] [debug] missions: · at=monarch_waystation
+[2026-09-13T01:06:41.795Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-13T01:06:41.795Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-13T01:06:41.795Z] [debug] ═══ SESSION 2026-09-13T01:06:41.791Z · build 2026-09-12-1808-the-aside-does-not-start-in-a-fight · previous entry moments earlier ═══
+[2026-09-13T01:06:41.515Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cinderbound. We've still got ground to cover, you and I."
+[2026-09-13T01:06:41.515Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-13T01:06:41.515Z] [debug] OTA session start: 2026-09-12-1808-the-aside-does-not-start-in-a-fight.
+[2026-09-13T01:06:37.790Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T01:06:37.147Z] [debug] voice: bundled idle
+[2026-09-13T01:06:37.147Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T01:06:37.111Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T01:06:37.111Z] [debug] ota: Already up to date
+[2026-09-13T01:06:37.029Z] [debug] ota: Checking…
+[2026-09-13T01:06:37.028Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09831-9c8f-777c-9ce8-ef43aacdadef
+[2026-09-13T00:44:46.821Z] [debug] appstate: background → active (was background for 54669ms)
+[2026-09-13T00:43:52.153Z] [debug] appstate: active → background (was active for 3443ms)
+[2026-09-13T00:43:49.497Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T00:43:49.189Z] [debug] voice: bundled idle
+[2026-09-13T00:43:49.189Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-13T00:43:49.075Z] [debug] ota: boot check result = noUpdate
+[2026-09-13T00:43:49.072Z] [debug] ota: Already up to date
+[2026-09-13T00:43:48.738Z] [debug] ota: Checking…
+[2026-09-13T00:43:48.738Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a09831-9c8f-777c-9ce8-ef43aacdadef
+[2026-09-13T00:43:48.393Z] [debug] ota: Restarting to apply…
+[2026-09-13T00:43:48.392Z] [debug] ota: Saving progress…
+[2026-09-13T00:43:48.270Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-13T00:43:43.714Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-13T00:43:42.944Z] [debug] ota: Checking…
+[2026-09-13T00:43:42.944Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a097f7-fcd8-729d-a3ae-7b15670550a2
+[2026-09-12T23:34:42.978Z] [world] Floodwater laps at a tilted hearth. Swollen cupboards hang open, their contents long since taken by the silt. A cast pot still sits on the cold stove.
+[2026-09-12T23:34:42.977Z] [world] You step inside the quiet tenement, into the kitchen.
+[2026-09-12T23:34:42.973Z] [debug] ui: tap "ENTER" ⏱+23ms
+[2026-09-12T23:34:41.540Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-12T23:34:41.539Z] [debug] ui: tap "WEST" ⏱+15ms
+[2026-09-12T23:34:41.194Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T23:34:41.194Z] [world] The loose end is exactly as loose as you left it.
+[2026-09-12T23:34:41.193Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-12T23:34:41.192Z] [world] A quiet tenement stands off the path here — weathered and quiet, a way in still clear. (Tap ENTER to step inside.)
+[2026-09-12T23:34:41.180Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-09-12T23:34:41.179Z] [player] go east
+[2026-09-12T23:34:41.156Z] [debug] ui: tap "EAST" ⏱+14ms
+[2026-09-12T23:34:40.721Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T23:34:40.720Z] [arbiter] The Arbiter glances at the south. "The seneschal logs your name without asking it. The Monarchs' ledgers have their ways."
+[2026-09-12T23:34:40.720Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-12T23:34:40.719Z] [world] What you started here has not finished itself in your absence.
+[2026-09-12T23:34:40.718Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-12T23:34:40.707Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-09-12T23:34:40.706Z] [player] go south
+[2026-09-12T23:34:40.673Z] [debug] ui: tap "SOUTH" ⏱+12ms
+[2026-09-12T23:34:40.214Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T23:34:40.213Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T23:34:40.212Z] [world] The thread you were following waits where you left it.
+[2026-09-12T23:34:40.212Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-12T23:34:40.210Z] [debug] spawn: gear=[Compact Energy Blade] window=10 roster=new
+[2026-09-12T23:34:40.199Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-12T23:34:40.198Z] [player] go north
+[2026-09-12T23:34:40.173Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-12T23:34:40.172Z] [debug] ui: tap "NORTH" ⏱+17ms
+[2026-09-12T23:34:38.621Z] [debug] boot: life bmtz0uwru5e started 2026-09-12T23:34:16.170Z · FOLLOWED AN OTA APPLY 737ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-12T23:34:38.621Z] [debug] missions: · at=monarch_waystation
+[2026-09-12T23:34:38.620Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-12T23:34:38.620Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-12T23:34:38.620Z] [debug] ═══ SESSION 2026-09-12T23:34:38.617Z · build 2026-09-12-1807-a-take-is-the-player-being-here · updated from 2026-09-12-1806-every-key-depresses · previous entry moments earlier ═══
+[2026-09-12T23:34:38.382Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cinderbound. The buried country is no place to walk alone."
+[2026-09-12T23:34:38.381Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-12T23:34:38.381Z] [debug] OTA session start: 2026-09-12-1807-a-take-is-the-player-being-here.
+[2026-09-12T23:34:38.381Z] [debug] OTA applied: 2026-09-12-1806-every-key-depresses → 2026-09-12-1807-a-take-is-the-player-being-here.
+[2026-09-12T23:34:37.071Z] [debug] appstate: background → active (was background for 16015ms)
+[2026-09-12T23:34:21.056Z] [debug] appstate: active → background (was active for 4835ms)
+[2026-09-12T23:34:16.983Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T23:34:16.545Z] [debug] voice: bundled idle
+[2026-09-12T23:34:16.545Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-12T23:34:16.519Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T23:34:16.518Z] [debug] ota: Already up to date
+[2026-09-12T23:34:16.240Z] [debug] ota: Checking…
+[2026-09-12T23:34:16.240Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a097f7-fcd8-729d-a3ae-7b15670550a2
+[2026-09-12T23:34:15.433Z] [debug] ota: Restarting to apply…
+[2026-09-12T23:34:15.432Z] [debug] ota: Saving progress…
+[2026-09-12T23:34:15.262Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-12T23:34:12.499Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T23:34:11.751Z] [debug] ota: Checking…
+[2026-09-12T23:34:11.751Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a0979b-9155-78b2-a318-c4a89def4afe
+[2026-09-12T23:14:16.985Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T23:14:16.578Z] [debug] voice: bundled idle
+[2026-09-12T23:14:16.578Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-12T23:14:16.524Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T23:14:16.523Z] [debug] ota: Already up to date
+[2026-09-12T23:14:16.227Z] [debug] ota: Checking…
+[2026-09-12T23:14:16.227Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a0979b-9155-78b2-a318-c4a89def4afe
+[2026-09-12T22:11:16.706Z] [debug] appstate: active → background (was active for 50288ms)
+[2026-09-12T22:10:26.418Z] [debug] appstate: background → active (was background for 29227ms)
+[2026-09-12T22:09:57.191Z] [debug] appstate: active → background (was active for 26875ms)
+[2026-09-12T22:09:46.532Z] [debug] persist sizes(KB): total=150 player=29 wm=32[rooms=8 events=0 memos=0 npcs=2 defeated=0 tags=0 discovered=0] log=85 scene=3
+[2026-09-12T22:09:46.159Z] [reward] Sold Mud Knife (Common) to Onda Blackpalm for 15 TC. (189 TC on hand)
+[2026-09-12T22:09:30.317Z] [debug] appstate: background → active (was background for 67240ms)
+[2026-09-12T22:08:23.077Z] [debug] appstate: active → background (was active for 33880ms)
+[2026-09-12T22:08:06.313Z] [cognitive] TRAVEL  (95ms)
+[2026-09-12T22:08:06.219Z] [system] ⏳ Time passed: 15 min
+[2026-09-12T22:08:06.217Z] [world] Half a Tartarian spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.
+[2026-09-12T22:08:06.216Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-12T22:08:06.215Z] [world] Rare workings for sale: Heart of the Aetherstorm (500 TC), Helm of the Great Architect (200 TC), Hoarfrost Ward Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-12T22:08:06.206Z] [world] A stall has been thrown up on the next stretch of ground — Onda Blackpalm, fence. Tap the vendor banner to trade.
+[2026-09-12T22:08:06.204Z] [debug] spawn: gear=[Forgotten Faceshroud] window=10 roster=new
+[2026-09-12T22:08:06.193Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-12T22:08:06.191Z] [player] go west
+[2026-09-12T22:08:06.170Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-12T22:08:06.162Z] [debug] ui: tap "WEST" ⏱+11ms
+[2026-09-12T22:08:04.782Z] [world] You set the course aside. Cardinal direction is yours again.
+[2026-09-12T22:08:04.779Z] [debug] ui: tap "STOP TRAVEL" ⏱+23ms
+[2026-09-12T22:07:49.196Z] [debug] appstate: background → active (was background for 28502ms)
+[2026-09-12T22:07:20.695Z] [debug] appstate: active → background (was active for 8389ms)
+[2026-09-12T22:07:17.256Z] [debug] ui: tap "inventory" ⏱+19ms
+[2026-09-12T22:07:12.305Z] [debug] appstate: background → active (was background for 3171ms)
+[2026-09-12T22:07:09.135Z] [debug] appstate: active → background (was active for 6056ms)
+[2026-09-12T22:07:03.212Z] [debug] persist sizes(KB): total=149 player=30 wm=32[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=2
+[2026-09-12T22:07:03.079Z] [debug] appstate: background → active (was background for 101547ms)
+[2026-09-12T22:05:21.532Z] [debug] appstate: active → background (was active for 21331ms)
+[2026-09-12T22:05:00.202Z] [debug] appstate: background → active (was background for 336946ms)
+[2026-09-12T21:59:23.254Z] [debug] appstate: active → background (was active for 105631ms)
+[2026-09-12T21:57:40.700Z] [debug] ui: tap "inventory" ⏱+14ms
+[2026-09-12T21:57:39.965Z] [debug] ui: tap "more ▸" ⏱+17ms
+[2026-09-12T21:57:37.623Z] [debug] appstate: background → active (was background for 44435ms)
+[2026-09-12T21:56:53.188Z] [debug] appstate: active → background (was active for 45815ms)
+[2026-09-12T21:56:16.953Z] [debug] ui: tap "missions" ⏱+22ms
+[2026-09-12T21:56:14.353Z] [debug] boot: life bmtyxcowozg started 2026-09-12T21:56:07.320Z · FOLLOWED AN OTA APPLY 293ms ago via mid-session · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-12T21:56:14.353Z] [debug] missions: · at=monarch_waystation travelTo=obsidian_pillars
+[2026-09-12T21:56:14.353Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-12T21:56:14.353Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard
+[2026-09-12T21:56:14.352Z] [debug] ═══ SESSION 2026-09-12T21:56:14.348Z · build 2026-09-12-1806-every-key-depresses · updated from 2026-09-12-1805-the-room-doors-press · previous entry moments earlier ═══
+[2026-09-12T21:56:14.145Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cinderbound. We've still got ground to cover, you and I."
+[2026-09-12T21:56:14.145Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-12T21:56:14.145Z] [debug] OTA session start: 2026-09-12-1806-every-key-depresses.
+[2026-09-12T21:56:14.144Z] [debug] OTA applied: 2026-09-12-1805-the-room-doors-press → 2026-09-12-1806-every-key-depresses.
+[2026-09-12T21:56:08.133Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T21:56:07.602Z] [debug] voice: bundled idle
+[2026-09-12T21:56:07.602Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-12T21:56:07.529Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T21:56:07.529Z] [debug] ota: Already up to date
+[2026-09-12T21:56:07.385Z] [debug] ota: Checking…
+[2026-09-12T21:56:07.385Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a0979b-9155-78b2-a318-c4a89def4afe
+[2026-09-12T21:56:07.092Z] [debug] appstate: active → background (was active for 5301ms)
+[2026-09-12T21:56:01.794Z] [debug] appstate: background → active (was background for 220706ms)
+[2026-09-12T21:52:21.085Z] [debug] appstate: active → background (was active for 7244ms)
+[2026-09-12T21:52:14.602Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-12T21:52:13.952Z] [debug] voice: bundled idle
+[2026-09-12T21:52:13.951Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-12T21:52:13.916Z] [debug] ota: boot check result = noUpdate
+[2026-09-12T21:52:13.915Z] [debug] ota: Already up to date
+[2026-09-12T21:52:13.850Z] [debug] ota: Checking…
+[2026-09-12T21:52:13.850Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.4.1 updateId=01a096eb-36a8-7d87-9a50-497686e68468
+[2026-09-12T21:48:51.831Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-12T21:48:46.800Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-12T21:48:42.335Z] [debug] ui: tap "climb" ⏱+11ms
+[2026-09-12T21:48:41.703Z] [cognitive] REST  (81ms)
+[2026-09-12T21:48:41.624Z] [system] ⏳ Time passed: 8h
+[2026-09-12T21:48:41.620Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-12T21:48:41.620Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter looks around. "The seneschal logs your name with…"
+[2026-09-12T21:48:41.619Z] [arbiter] The Arbiter looks around. "The seneschal logs your name without asking it. The Monarchs' ledgers have their ways."
+[2026-09-12T21:48:41.619Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-12T21:48:41.617Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-12T21:48:41.617Z] [world] You rest for 8 hours. +6 HP, +8 stamina, −1 corruption recovered. (Day 7, morning)
+[2026-09-12T21:48:41.616Z] [world] Corbel circles three times and curls beside you. Her breathing slows to yours.
+[2026-09-12T21:48:41.613Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-12T21:48:41.612Z] [player] rest
+[2026-09-12T21:48:41.601Z] [debug] ui: tap "rest" ⏱+24ms
+
+=== END REPORT ===
