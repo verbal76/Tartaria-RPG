@@ -30258,7 +30258,64 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //
 // APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This closes one proven admission
 // window; it claims nothing about #7, #8, or the larger failure.
-export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';
+//
+// OTA-1809 (BAKER #3A) - WHAT MEMORY WAS DOING AT THE TIME. AN INSTRUMENT, NOT
+// A FIX, AND THE DIFFERENCE IS THE WHOLE POINT.
+//
+// Baker #3 is EXCESSIVE PROCESS MEMORY / iOS JETSAM PRESSURE. The physical
+// evidence is three jetsam reports off a 3 GB iPhone XR naming this process at
+// ~1.85-1.89 GB with reason `per-process-limit`. That is a serious lead and it
+// names no mechanism. #3A is explicitly forbidden from repairing any memory
+// behaviour; it exists to make the phone an instrumented laboratory.
+//
+// WHAT ALREADY EXISTED, because nothing here re-adds a signal the device had.
+// OTA-1172 counts memory warnings with the engine and voice state beside them
+// and keeps an AppState trail; OTA-1696 already READS Hermes's own counters
+// every five seconds; OTA-1177 counts live native model contexts and disposes
+// that freed nothing; OTA-1105/1107 price every generation.
+//
+// WHAT NONE OF IT COULD SAY: what memory was doing AT those moments, or whether
+// it RECOVERED. The heap was read every sample and printed only on a freeze
+// stall edge. The memory-warning line - the single most valuable marker iOS
+// gives us - carried no memory figure at all. Nothing anywhere recorded a point
+// AFTER expensive native work. So a report could say "five memory warnings" and
+// could not distinguish a large-but-STABLE working set from a SPIKE that
+// recovers from a RATCHET that settles higher every cycle. Those three want
+// different repairs and #3B is not allowed to guess between them.
+//
+// THE INSTRUMENT: app/diagnostics/memoryTimeline.ts, a ring of 64 compact
+// scalar rows. Marked at seams that ALREADY RAN - watch start, every AppState
+// transition, the memory warning and the settlement of the dispose it already
+// performed, every model-context open/release through the OTA-1177 sink, every
+// generation settlement through the OTA-1105 sink - plus one GATED row off the
+// existing five-second freeze sampler, recorded only when the heap has moved
+// 8 MB or more. NO NEW TIMER IS CREATED ANYWHERE.
+//
+// THE METRIC IS NAMED HONESTLY, WHICH MATTERS MORE THAN IT BEING BIG. `heapMb`
+// is the HERMES JS HEAP, not process RSS. Process resident memory is NOT
+// reachable from this runtime without a new native dependency - checked against
+// package.json, not assumed: no react-native-device-info, no expo-device, and
+// @sentry/react-native exposes no live-memory read. Adding a package for a
+// nicer number was not authorised and was not done. So the JS heap is reported
+// as the JS heap, the model contexts as an exact COUNT with an explicitly
+// ESTIMATED MB beside it, and an unavailable metric as null - never a
+// fabricated zero. This codebase has twice built a wrong finding on a number
+// that looked like a measurement (OTA-1179's "released ~400MB" line that freed
+// nothing; OTA-1259's impossible 64.7 ms/token), and both corrections are
+// written down in this file.
+//
+// NOTHING ABOUT MEMORY MANAGEMENT MOVED. No unload, no dispose policy, no
+// forced collection, no model or context lifetime, no cache lifetime, no queue
+// behaviour, no priority, no lock exclusivity, no AppState rewarm, no watchdog,
+// no persistence. The quiet window is still 90 s and the stand-down still
+// latches at the third warning - both asserted by driving the real handlers.
+// Baker #9's shouldAbort and Baker #13's activity accounting are untouched.
+//
+// APPLE-FREEZE CAUSATION REMAINS UNKNOWN. This ships an instrument so the next
+// physical Apple session can answer a question we have only ever been able to
+// pose.
+export const OTA_BUILD_ID = '2026-09-12-1809-what-memory-was-doing-at-the-time';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1808-the-aside-does-not-start-in-a-fight';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1807-a-take-is-the-player-being-here';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1806-every-key-depresses';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-12-1805-the-room-doors-press';

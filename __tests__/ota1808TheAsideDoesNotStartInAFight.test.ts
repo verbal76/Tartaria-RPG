@@ -344,10 +344,21 @@ describe('OTA-1808 §H — neighbouring Baker items are untouched', () => {
     expect(span).not.toContain('n_predict');
   });
 
-  it('⚠ the stamp names this work', () => {
+  it('⚠ the stamp is this OTA or later, and never goes backwards', () => {
+    // ⚠⚠⚠ RE-ANCHORED BY OTA-1809, AND THE HISTORY IS THE POINT. This asserted
+    // `/^2026-09-12-1808-/` — a pin to ONE bundle, which every later OTA must
+    // break by definition. That is the THIRD time this exact trap has been
+    // authored into this repo: OTA-1807 repaired it in the 1806 suite, OTA-1808
+    // repaired it in the 1807 suite, and then wrote it here in that same commit.
+    // Recorded rather than quietly fixed, because the pattern is the lesson.
+    // The durable form keeps the invariant the pin was reaching for — the stamp
+    // advances and never regresses — without tying the repo to one build.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toMatch(/^2026-09-12-1808-/);
+    const n = Number(/^\d{4}-\d{2}-\d{2}-(\d+)-/.exec(OTA_BUILD_ID)?.[1]);
+    expect(Number.isFinite(n)).toBe(true);
+    expect(n).toBeGreaterThanOrEqual(1808);
+    expect(OTA_BUILD_ID).not.toMatch(/-1807-|-1806-/);
   });
 });
 

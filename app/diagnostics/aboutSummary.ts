@@ -67,6 +67,18 @@ function contextLedgerBlock(): string {
     return 'Model contexts\n  (unavailable this session)';
   }
 }
+/** ⚠ OTA-1809 (Baker #3A) — the bounded memory timeline. Same isolation as the two
+ *  blocks above, and for the same reason: the session this is worth the most in is
+ *  the one that is already going wrong. Bounded by construction — the ring is
+ *  capped at MEMORY_TIMELINE_MAX, so this block cannot grow with session length. */
+function memoryTimelineBlock(): string {
+  try {
+    return memoryTimelineSummary();
+  } catch {
+    return 'Memory timeline\n  (unavailable this session)';
+  }
+}
+import { memoryTimelineSummary } from './memoryTimeline';
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
 import { crashLedgerSummary } from './crashLedger';
@@ -205,6 +217,14 @@ export function buildBasicDeviceSummary(): string {
     // are live right now — separates "we are holding four of them" from "look elsewhere",
     // and no amount of reading the code answers it.
     contextLedgerBlock(),
+    // ⚠⚠⚠ OTA-1809 (Baker #3A) — AND THE TIMELINE THE TWO BLOCKS ABOVE ARE
+    // SNAPSHOTS OF. Both of them answer "how many" at the instant the report is
+    // written; neither can answer "when", "in what order", or "did it come back
+    // down" — and those are the three questions that separate a large but stable
+    // working set from a spike that recovers from a ratchet that settles higher
+    // every cycle. LAST in the report because it is the longest block and the
+    // counts above are what a triage reader looks at first.
+    memoryTimelineBlock(),
   ];
   return lines.join('\n');
 }

@@ -60,6 +60,13 @@ import { nativeMlSnapshot, nativeQueuePressure } from '../ai/nativeMlLock';
 import { qwen } from '../ai/engines';
 import { nativePressure } from '../ai/generation/qwenTelemetry';
 import { APPROX_CONTEXT_MB, contextLedger } from '../ai/generation/contextLedger';
+// ⚠⚠⚠ OTA-1809 (Baker #3A) — THE MEMORY TIMELINE, MARKED FROM THE SEAMS THAT
+// ALREADY RAN. Every call below is a recording and nothing else: no dispose, no
+// reload, no timer, no reordering. The warning handler's behaviour, the quiet
+// window, the stand-down ladder and the AppState policy are untouched — what
+// changes is that a reader can now see what memory was doing at each of them,
+// and whether it came back down. See app/diagnostics/memoryTimeline.ts.
+import { noteMemoryMark, noteMemoryMarkIfMoved, setMemoryWarnCounter } from './memoryTimeline';
 import type { GameStore } from '../state/gameStore';
 
 type SetState = (
@@ -192,6 +199,12 @@ export function startRuntimePressureWatch(
   rpAppStateSince = now;
   try { rpAppState = String(AppState.currentState ?? 'active'); } catch { rpAppState = 'active'; }
 
+  // ⚠ OTA-1809 (Baker #3A) — the baseline row, and the counter the timeline
+  // reports. This module owns `rpMemoryWarnings`; the timeline must not import
+  // it back (that would be a cycle), so it gets a getter instead of a value.
+  setMemoryWarnCounter(() => rpMemoryWarnings);
+  noteMemoryMark('watch-start');
+
   // ⚠⚠ THE ONE THE OWNER ASKED FOR, AND NOTHING IN THIS APP LISTENED FOR IT BEFORE.
   // On iOS the OS warns before it stalls the app and again before it kills it, so this is
   // the highest-value signal available for a frozen-but-alive report — and it was being
@@ -199,6 +212,12 @@ export function startRuntimePressureWatch(
   try {
     rpMemorySub = AppState.addEventListener('memoryWarning', () => {
       rpMemoryWarnings += 1;
+      // ⚠⚠ OTA-1809 (Baker #3A) — THE PEAK ROW. FIRST STATEMENT AFTER THE
+      // COUNTER, so the mark carries this warning's own ordinal and is taken
+      // BEFORE the dispose that follows changes what is resident. The existing
+      // warning LINE names the engine and the voice but has never carried a
+      // memory figure of any kind; this is that figure, beside them.
+      noteMemoryMark('mem-warning');
       const t = Date.now();
       const since = rpLastMemoryWarningAt == null ? null : t - rpLastMemoryWarningAt;
       rpLastMemoryWarningAt = t;
@@ -277,6 +296,15 @@ export function startRuntimePressureWatch(
                   // is asking about, and the search moves.
                   : `memory: NOTHING TO RELEASE — no model was loaded (qwen='${statusAtWarning}'), so this freed 0 bytes. `
                     + `The pressure is coming from something else.`);
+                // ⚠⚠⚠ OTA-1809 (Baker #3A) — THE RECOVERY ROW, AND IT IS THE
+                // HALF THAT WAS MISSING. Peak alone cannot tell a large-but-
+                // stable working set from a spike that recovers from a ratchet
+                // that settles higher every cycle, and those three want
+                // different repairs. Paired with the 'mem-warning' row above,
+                // this says whether handing the context back actually moved
+                // anything. NO NEW TIMER: this rides the `.then` that OTA-1179
+                // already installed on the existing dispose.
+                noteMemoryMark('mem-warn-settled', freed ? 'freed-ctx' : 'freed-nothing');
               } catch { /* ignore */ }
             })
             .catch(() => { /* a failed release must never escalate a memory warning into a crash */ });
@@ -304,6 +332,15 @@ export function startRuntimePressureWatch(
       rpAppStateTrail = [...rpAppStateTrail, nextStr].slice(-APPSTATE_TRAIL_MAX);
       rpAppState = nextStr;
       rpAppStateSince = t;
+      // ⚠⚠ OTA-1809 (Baker #3A) — background/foreground churn, ON the memory
+      // timeline. The AppState trail already existed and says WHAT happened;
+      // this row says what memory looked like WHILE it happened, which is the
+      // only way a dispose/rewarm cycle that fails to return to baseline can be
+      // told apart from one that does. ⚠ Recorded AFTER the state variables are
+      // updated, so the row names the state it moved TO, and BEFORE the clock
+      // restart below, so it reads the heap as the transition found it. Neither
+      // clock, the clean-exit latch, nor any lifecycle policy is touched.
+      noteMemoryMark('appstate', `${prev}→${nextStr}`);
       // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
       // painting, and counting that as a render stall would cry wolf every time the
       // player checks a message.
@@ -408,6 +445,17 @@ export function startRuntimePressureWatch(
       }
       rpLastVerdict = v;
     }
+    // ⚠⚠⚠ OTA-1809 (Baker #3A) — THE PLATEAU/RATCHET ROW, AND IT IS A GATE, NOT
+    // A SAMPLER. #3A is explicitly not allowed to be a polling daemon, and it
+    // creates NO TIMER: this rides the five-second tick OTA-1172 has run since
+    // the first freeze report, and records only when the heap has actually moved
+    // (MEMORY_MARK_HEAP_DELTA_MB). A stable session therefore writes almost
+    // nothing and a session that climbs writes exactly the climb — which is the
+    // difference between "large but stable working set" and "settles higher
+    // every cycle", the two readings #3B is not allowed to guess between.
+    // ⚠ LAST, after the verdict: the stall edge is the older instrument and
+    // nothing added here may sit between a stall and the line that reports it.
+    try { noteMemoryMarkIfMoved(); } catch { /* an instrument never breaks the watch */ }
     crumbAtLastSample = crumbNow;
     hermesAtLastSample = hermesNow; // OTA-1696
     rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);

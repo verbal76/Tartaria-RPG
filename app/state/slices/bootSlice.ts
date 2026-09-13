@@ -53,6 +53,9 @@ import {
   readOtaHandoff,
 } from '../../diagnostics/bootIdentity';
 import { setLastBootBreadcrumb } from '../../diagnostics/runtimePressure';
+// ⚠ OTA-1809 (Baker #3A) — the bounded memory timeline. Marked from the two
+// sinks installed below, which already fire on exactly the events #3A needs.
+import { noteMemoryMark } from '../../diagnostics/memoryTimeline';
 import { getCrashedSlotIds, loadSaveLoadHealth } from '../../diagnostics/saveLoadHealth';
 import { createCharacter, type CreateCharacterInput } from '../../engine/character';
 import { buildArbiterSceneIntro, buildOpening } from '../../engine/narrativeGenerator';
@@ -424,6 +427,14 @@ export const createBootSlice = (
         : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
       get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${starve}${thr}${msPerTok}${stop} (${r.chars}ch)`);
+      // ⚠⚠⚠ OTA-1809 (Baker #3A) — SETTLEMENT, ON THE MEMORY TIMELINE. Baker #7
+      // established that this record already carries every correlation field
+      // worth having — job, wait, prefill, decode, prompt and output tokens —
+      // and #3A is forbidden from redesigning telemetry to join two logs. So the
+      // join happens where the record already is: one bounded row naming the job
+      // and its outcome, with the heap and the live-context count beside it. The
+      // `qwen⏱` line above is untouched, and nothing about the generation moves.
+      try { noteMemoryMark('gen-settled', `${r.job} ${r.outcome}`); } catch { /* never break a generation */ }
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
         // ⚠⚠ LAG-3 — AND THE QUEUE'S OWN LINE BESIDE THE GENERATIONS'. The
@@ -451,6 +462,14 @@ export const createBootSlice = (
     // armed after the fact would miss the event we built this to catch.
     setContextLedgerSink((line) => {
       get().appendLog('debug', line);
+      // ⚠⚠⚠ OTA-1809 (Baker #3A) — A MODEL CONTEXT OPENED OR WENT AWAY, AND THAT
+      // IS THE BIGGEST SINGLE ALLOCATION THIS APP MAKES. The ledger has counted
+      // these since OTA-1177 and the count is exact; what it could never say is
+      // what the heap was doing on either side of one, so a load that plateaus
+      // and a load that ratchets read identically. The mark reads the ledger
+      // itself for the live count, so no part of this depends on parsing the
+      // line — the line stays the human-readable record, the row is the data.
+      try { noteMemoryMark('ctx-event'); } catch { /* an instrument never breaks a boot */ }
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
