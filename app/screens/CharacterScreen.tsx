@@ -123,6 +123,22 @@ const ROW_PLANES = (
   </>
 );
 
+/** Every collapsible section on this screen, named. Written out rather than
+ *  derived from absence: `{}` used to mean "all open" by accident, and a key
+ *  nobody lists is exactly how that happened. Adding a section means adding it
+ *  here, and the suite counts them. */
+const SECTIONS_ALL_COLLAPSED = (): Record<string, boolean> => ({
+  pressure: true, arbiter: true, chronicle: true, core: true, defense: true,
+  wallet: true, factions: true, equipped: true, companion: true, golem: true,
+  status: true, racial: true, contracts: true, milestones: true, titles: true,
+});
+
+/* Module-scoped so it survives remounts within the same JS process; resets on a
+ * fresh process / OTA reload. Leaving the Character screen unmounts it, so this
+ * is what carries the player's open/closed choices back when they return — and
+ * its lifetime is deliberately the running app and nothing longer. */
+let sectionCollapsedThisLaunch: Record<string, boolean> = SECTIONS_ALL_COLLAPSED();
+
 export function CharacterScreen() {
   const player = useGameStore((s) => s.player);
   const scene = useGameStore((s) => s.currentScene);
@@ -168,7 +184,26 @@ export function CharacterScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1023
   // arb119 — per-section collapse (hook must precede the early return below).
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  /* ⚠⚠⚠ OTA-1820 — TWO THINGS WERE WRONG AND THEY PULLED IN OPPOSITE DIRECTIONS.
+   *
+   * ⚠⚠ THE DEFAULT WAS `{}`, WHICH MEANS EVERY SECTION OPEN. `collapsed[key]` was
+   * `undefined` for a key nobody had touched, `!undefined` is true, so a first
+   * visit unrolled all fifteen sections at once and the player met a wall of text
+   * instead of a list of headers. `SECTIONS_ALL_COLLAPSED` names every key
+   * explicitly rather than relying on the absence of one.
+   *
+   * ⚠⚠ AND IT DIED ON UNMOUNT, so the opposite fault appeared the moment the
+   * default was fixed: open EQUIPPED, step out to the pack, come back, and the
+   * screen had forgotten. `useState` lives exactly one mount, and this screen is
+   * mounted and unmounted every time the player leaves it.
+   *
+   * ⚠ SO THE SEED LIVES ABOVE THE COMPONENT — SplashOverlay's idiom, module
+   * scope, surviving remounts inside one JS process and resetting on a fresh
+   * process or OTA reload. That is the whole required lifetime: the player's
+   * choices last as long as the app is running and no longer. NOT a store field,
+   * NOT a save field, NOT AsyncStorage — nothing here is written to disk, and a
+   * relaunch legitimately starts collapsed again. */
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(sectionCollapsedThisLaunch);
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
   const [openTitle, setOpenTitle] = useState<string | null>(null);
   // ⚠⚠ OTA-1716 — ONE OPEN SET FOR THE WHOLE "WHAT MOVED IT" LIST. This was two
@@ -266,20 +301,38 @@ export function CharacterScreen() {
    * UNREACHABLE here (OTA-1805's finding) and a 30% fade was the only thing a
    * tap could produce.
    *
-   * ⚠⚠ AT REST IT IS BYTE-FOR-BYTE WHAT IT WAS. This plate is NOT constructed as
-   * a key — no ring at all — and the standing rule is "AT REST: preserve the UI
-   * we have. UNDER MY FINGER: make the buttons feel consistently alive." So it
-   * gains no resting construction: `controlPressed` contributes only its travel
-   * (the two border colours it also sets are inert on a plate with no top or
-   * bottom border), and the planes are drawn ONLY while pressed.
+   * ⚠⚠⚠ OTA-1820 SUPERSEDES 1810'S REST CLAUSE, ON THE OWNER'S WORD. That pass
+   * left this plate byte-for-byte at rest under the then-standing rule "AT REST:
+   * preserve the UI we have", so the planes were drawn ONLY while pressed. The
+   * owner has now looked at the untouched screen and ruled the other way: these
+   * read as flat section labels until you happen to touch one, which is the
+   * affordance arriving AFTER the decision to press it. So the resting triple is
+   * drawn too — `controlPlaneTop`, `controlPlaneBottom`, `controlPlaneContact`,
+   * the same three the kit gives every other resting key.
+   *
+   * ⚠⚠ AND IT STILL MOVES NOTHING. All five planes are absolutely positioned,
+   * `pointerEvents="none"` children of a box this plate already owns, so the
+   * header's height, width, padding, margins, label, chevron and the 4dp gold
+   * left bar are all untouched — the planes inset past that bar because absolute
+   * `left: 0` is the padding box, which is exactly where the depth belongs.
+   *
+   * ⚠ THE PRESS IS NOT THE DEFECT AND IS NOT TOUCHED. `controlPressed` keeps its
+   * travel and the pressed pair still replaces the resting triple on finger-down,
+   * so the object goes IN from a raised rest instead of from flat.
    *
    * ⚠ ONE OWNER, FIFTEEN HEADERS. Every expandable section on this screen comes
-   * through this helper, so the repair lands once and all fifteen inherit it.
+   * through this helper, so both repairs land once and all fifteen inherit them.
    */
   const sectionHeader = (key: string, label: string) => (
     <Pressable
       style={({ pressed }) => [styles.sectionHeaderBar, pressed && kit.controlPressed]}
-      onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}
+      /* ⚠ WRITE-THROUGH. The module seed is what the next mount reads, so the
+       * player's choice has to reach it here and not only React's copy. */
+      onPress={() => {
+        const next = { ...collapsed, [key]: !collapsed[key] };
+        sectionCollapsedThisLaunch = next;
+        setCollapsed(next);
+      }}
       accessibilityRole="button"
       accessibilityState={{ expanded: !collapsed[key] }}
     >
@@ -289,7 +342,11 @@ export function CharacterScreen() {
       {pressed ? (<>
         <View style={kit.controlPlaneTopPressed} pointerEvents="none" />
         <View style={kit.controlPlaneBottomPressed} pointerEvents="none" />
-      </>) : null}
+      </>) : (<>
+        <View style={kit.controlPlaneTop} pointerEvents="none" />
+        <View style={kit.controlPlaneBottom} pointerEvents="none" />
+        <View style={kit.controlPlaneContact} pointerEvents="none" />
+      </>)}
       </>)}
     </Pressable>
   );

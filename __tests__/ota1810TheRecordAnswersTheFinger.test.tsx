@@ -112,14 +112,28 @@ describe('2. the Character expandable headers — one owner, every instance', ()
     expect(HEADER).toMatch(/style=\{\(\{ pressed \}\) =>/);
   });
 
-  it('the sidewall planes are drawn ONLY while pressed, so nothing is added at rest', () => {
+  /* ⚠⚠⚠ OTA-1820 SUPERSEDES THIS ONE ASSERTION, ON THE OWNER'S DIRECT WORD — it
+   * is NOT being relaxed to let an implementation through. 1810 wrote "this plate
+   * has no resting construction and must not acquire one" under the standing rule
+   * of the day, "AT REST: preserve the UI we have", and asserted the resting
+   * planes were ABSENT. The owner has since looked at the untouched Character
+   * screen and ruled the opposite: these read as flat section labels until you
+   * happen to touch one, so the affordance arrives only AFTER the player has
+   * already decided to press. The resting triple is now required, and this says so.
+   *
+   * ⚠ WHAT 1810 ACTUALLY PROTECTED IS KEPT, AND THE CLAIM GETS STRONGER: the
+   * style is still a function of `pressed`, the pressed pair is still drawn, and
+   * rest and press are now asserted MUTUALLY EXCLUSIVE — which catches both sets
+   * rendering at once, a fault "rest draws nothing" could never have seen. */
+  it('rest and press are the two arms of one conditional — both drawn, never together', () => {
     expect(HEADER).toMatch(/\{pressed \? \(<>/);
     expect(HEADER).toMatch(/kit\.controlPlaneTopPressed/);
     expect(HEADER).toMatch(/kit\.controlPlaneBottomPressed/);
-    // The resting plane styles must NOT appear: this plate has no resting
-    // construction and must not acquire one.
-    expect(HEADER).not.toMatch(/kit\.controlPlaneTop\b/);
-    expect(HEADER).not.toMatch(/kit\.controlPlaneBottom\b/);
+    // OTA-1820 — the resting triple is now REQUIRED, and lives in the else arm.
+    expect(HEADER).toMatch(/kit\.controlPlaneTop\b/);
+    expect(HEADER).toMatch(/kit\.controlPlaneBottom\b/);
+    expect(HEADER).toMatch(/kit\.controlPlaneContact\b/);
+    expect(HEADER).toMatch(/\{pressed \? \(<>[\s\S]*?<\/>\) : \(<>[\s\S]*?<\/>\)\}/);
   });
 
   it('every expandable section on the screen inherits it from ONE helper', () => {
@@ -195,10 +209,22 @@ describe('4. AT REST, NOTHING MOVED — the protected half', () => {
         const at = occ.index as number;
         const line = body.slice(body.lastIndexOf('\n', at) + 1, (body.indexOf('\n', at) + 1) || body.length);
         // Guarded either on its own line (`pressed && …`) or by an enclosing
-        // `{pressed ? (<> … </>) : null}` block opened before it.
+        // `{pressed ? (<> … </>) : …}` block opened before it.
+        /* ⚠ THE ELSE ARM IS NO LONGER ALWAYS `null`. This hard-coded `</>) : null}`
+         * as the only terminator, so when OTA-1820 gave the Character header a
+         * REST arm — `{pressed ? (<>…</>) : (<>…</>)}` — the walker stopped finding
+         * the close and reported the pressed planes unguarded. They were guarded
+         * the whole time; the matcher was measuring the shape of the else branch
+         * instead of the guard. It now accepts either terminator, so the invariant
+         * is unchanged and it can no longer be fooled by a sibling's punctuation. */
         const inlineGuard = /pressed (?:&&|\?)/.test(line);
         const blockOpen = body.lastIndexOf('{pressed ? (<>', at);
-        const blockGuard = blockOpen !== -1 && body.indexOf('</>) : null}', blockOpen) > at;
+        const blockClose = Math.min(
+          ...['</>) : null}', '</>) : (<>']
+            .map((t) => body.indexOf(t, blockOpen === -1 ? 0 : blockOpen))
+            .filter((i) => i !== -1),
+        );
+        const blockGuard = blockOpen !== -1 && Number.isFinite(blockClose) && blockClose > at;
         const where = `${name} :: ${line.trim()}`;
         expect({ where, guarded: inlineGuard || blockGuard }).toEqual({ where, guarded: true });
       }

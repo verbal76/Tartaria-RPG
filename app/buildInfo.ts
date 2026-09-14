@@ -30637,7 +30637,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //
 // Passive throughout: no setter is called, no visibility, responder, pointerEvents
 // or layout changes, no store write, no navigation, no story mutation.
-export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';
+// ── OTA-1820 — THE SECTIONS REST RAISED, AND THEY REMEMBER (Character UI) ────
+// Two owner-reported faults on the expanded Character screen, one helper.
+//
+// ⚠⚠ THE HEADERS WERE FLAT UNTIL TOUCHED. OTA-1810 gave them the pressed planes,
+// under the then-standing rule "AT REST: preserve the UI we have", so an
+// untouched header drew nothing and read as a section label — the affordance
+// arriving only AFTER the player had decided to press. The owner has ruled the
+// other way for these fifteen, so the kit's resting triple now draws in the else
+// arm of the same conditional. All five planes are absolute and pointerEvents
+// none, so height, width, padding, margins, radius, label, chevron and the 4dp
+// gold left bar are untouched and nothing moves by a pixel. The press is not the
+// defect and is not touched.
+//
+// ⚠⚠ AND THE STATE WAS WRONG TWICE, IN OPPOSITE DIRECTIONS. `useState({})` meant
+// an absent key, and the screen reads `!collapsed[key]`, so a FIRST visit
+// unrolled all fifteen sections at once; and `useState` lives one mount, so
+// fixing only the default would have thrown the player's choices away every time
+// they left the screen. The seed now names every key explicitly and lives at
+// module scope — SplashOverlay's idiom, surviving remounts inside one JS process
+// and resetting on a fresh process or OTA reload.
+//
+// ⚠ THE LIFETIME IS DELIBERATELY SHORT. No AsyncStorage, no store field, no save
+// field, no serialization, no hydration, no new storage key, no new timer. A
+// relaunch legitimately starts collapsed again. Multi-open is preserved, and
+// nothing is forced shut on mount or focus.
+export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
