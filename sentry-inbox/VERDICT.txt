@@ -1,6 +1,7 @@
 
 ════ VERDICT ════
-  every fetch this run succeeded
+  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
+    issue 7727714551 events FAILED: The read operation timed out
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
     1 page(s), 35 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
@@ -181,8 +182,6 @@
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /organizations/hot-attic-games-llc/issues/7727714504/events/?full=false
     1 page(s), 8 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7727714551/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7729887067/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /organizations/hot-attic-games-llc/issues/7729887118/events/?full=false
