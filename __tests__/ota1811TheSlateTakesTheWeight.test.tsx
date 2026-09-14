@@ -284,8 +284,21 @@ describe('OTA-1811 §4 — a held control never stops looking selected', () => {
    * test that cannot see a missing operand is a vacuous test. */
   it('the expanded milestone ring also resolves after the press', () => {
     const arr = styleArray(MILESTONE);
-    // the cell is rendered by `body`, so the ordering lives in the renderer
-    const line = /\[milestoneStyles\.cell[^\]]*\]/.exec(CONTRACTS)?.[0] ?? '';
+    /* the cell is rendered by `body`, so the ordering lives in the renderer
+     *
+     * ⚠ OTA-1822 — THE ANCHOR WIDENED; THE RULE DID NOT. This read
+     * `/\[milestoneStyles\.cell…/`, which silently assumed `milestoneStyles.cell`
+     * was the FIRST entry in the array. OTA-1822 puts `kit.ctl` ahead of it — the
+     * forged face and lit/dark edges these cells never had — and the matcher then
+     * found nothing at all, so both indices came back -1 and the ordering claim
+     * had no operands to compare. That is the exact vacuity the guard on the line
+     * below was written to catch, and it caught it.
+     *
+     * ⚠ WHAT IS ASSERTED IS UNCHANGED: the press still has to resolve BEFORE the
+     * expanded ring, so a held cell can never stop looking expanded. The anchor
+     * now finds the array that CONTAINS the cell rather than one that begins with
+     * it, and the vacuity guard still fails loudly if it matches nothing. */
+    const line = /\[[^\]]*\bmilestoneStyles\.cell\b[^\]]*\]/.exec(CONTRACTS)?.[0] ?? '';
     const press = line.indexOf('kit.controlPressed');
     const on = line.indexOf('milestoneStyles.cellActive');
     expect(arr).toContain('flex: 1');

@@ -93,8 +93,21 @@ function MilestoneStat({
    *  EXPANDED cell says so, and `controlPressed` writes the same two border
    *  fields. Ordering it after the press means a pressed cell can never stop
    *  looking expanded — SELECTED beats PRESSED structurally, not by luck. */
+  /** ⚠⚠⚠ OTA-1822 — WHY THESE FOUR NEVER MATCHED THE ACCEPTED CONTROLS. Owner,
+   *  from the device: the milestone squares are buttons but do not read as the
+   *  same physical material as the gameplay keys. `cell` declared `borderWidth: 1`
+   *  with NO borderColor and NO backgroundColor — a colourless hairline over
+   *  nothing. That hairline is the faint upper edge he could see, and it was the
+   *  whole of the treatment. `kit.ctl` supplies what the accepted controls have
+   *  and this never did: face, rim, lit top edge, dark bottom edge.
+   *
+   *  ⚠ IT IS FIRST IN THE ARRAY, so everything below still wins its own fields:
+   *  the press and then the expanded ring keep their order, and SELECTED still
+   *  beats PRESSED structurally exactly as OTA-1811 requires. The row-chassis
+   *  planes are untouched — this is a MATERIAL repair, not a re-classification
+   *  of the cell's disclosure contract. */
   const body = (interactive: boolean, pressed: boolean) => (
-    <View style={[milestoneStyles.cell, pressed && kit.controlPressed, active && milestoneStyles.cellActive]}>
+    <View style={[kit.ctl, milestoneStyles.cell, pressed && kit.controlPressed, active && milestoneStyles.cellActive]}>
       <Text style={milestoneStyles.value}>{value}</Text>
       <Text style={milestoneStyles.label}>{label}</Text>
       <Text style={milestoneStyles.next}>{toNext === next ? `next ${suffix} after ${next}` : `${toNext} → ${suffix}`}</Text>
@@ -373,7 +386,7 @@ export function ContractsScreen() {
     }
     return (
       <Pressable
-        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+        style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
         onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
         accessibilityRole="button"
       >
@@ -1088,7 +1101,13 @@ export function ContractsScreen() {
       <View style={styles.tabRow}>
         <Pressable
           onPress={() => setTab('contracts')}
-          style={({ pressed }) => [styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'contracts' && styles.tabBtnActive]}
+          /* ⚠ OTA-1822 — A TAB THAT IS STILL A TAB. kit.ctl gives it the forged
+             face and the lit-top / dark-bottom edge pair it never had, so it
+             reads as pressable at rest. Everything that makes it a TAB is
+             declared after and is untouched: the selected mark, tabBtnPressed's
+             returned bottom edge (so a press can never forge selection), and
+             the geometry. Nothing here becomes a gameplay command key. */
+          style={({ pressed }) => [kit.ctl, styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'contracts' && styles.tabBtnActive]}
           accessibilityRole="button"
           accessibilityState={{ selected: tab === 'contracts' }}
         >
@@ -1098,7 +1117,7 @@ export function ContractsScreen() {
         </Pressable>
         <Pressable
           onPress={() => setTab('collectables')}
-          style={({ pressed }) => [styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'collectables' && styles.tabBtnActive]}
+          style={({ pressed }) => [kit.ctl, styles.tabBtn, pressed && kit.controlPressed, pressed && styles.tabBtnPressed, tab === 'collectables' && styles.tabBtnActive]}
           accessibilityRole="button"
           accessibilityState={{ selected: tab === 'collectables' }}
         >
@@ -1287,7 +1306,7 @@ export function ContractsScreen() {
                     {!done && movesLine(c.locationId)}
                     {!done && !standingAtLocation(player, c.locationId) && (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                        style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => setPendingRoute({ id: c.locationId, name: safeLocName(c.locationId), climbId: c.id })}
                         accessibilityRole="button"
                       >
@@ -1937,7 +1956,7 @@ export function ContractsScreen() {
                       }
                       return (
                         <Pressable
-                          style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                          style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                           onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
                           accessibilityRole="button"
                         >
@@ -2083,7 +2102,7 @@ export function ContractsScreen() {
                       {!inHand && movesLine(l.tileId)}
                       {!inHand && !here && (
                         <Pressable
-                          style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                          style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                           onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
                           accessibilityRole="button"
                         >
@@ -2105,7 +2124,7 @@ export function ContractsScreen() {
                 {movesLine('parley_ground')}
                 {!standingAtLocation(player, 'parley_ground') && (
                   <Pressable
-                    style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                    style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                     onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
                     accessibilityRole="button"
                   >
@@ -2158,7 +2177,7 @@ export function ContractsScreen() {
                     {movesLine(rec.targetLocationId)}
                     {route && !here && tracked && (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                        style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => {
                           setWhisperCourse(route.gridX, route.gridY, route.label);
                           setScreen('exploration');
@@ -2281,7 +2300,7 @@ export function ContractsScreen() {
                     {!here && movesLine(sg.tileId)}
                     {here ? (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                        style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => turnInSigil(sg.item.id)}
                         accessibilityRole="button"
                       >
@@ -2289,7 +2308,7 @@ export function ContractsScreen() {
                       </Pressable>
                     ) : (
                       <Pressable
-                        style={({ pressed }) => [styles.routeBtn, tControlDepth(pressed)]}
+                        style={({ pressed }) => [kit.ctl, styles.routeBtn, tControlDepth(pressed)]}
                         onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
                         accessibilityRole="button"
                       >

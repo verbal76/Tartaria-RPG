@@ -30683,7 +30683,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // no activate/deactivate control to repair. ACCESSIBILITY UNTOUCHED — the
 // programmatic signal was always `accessibilityState={{ selected }}`, never this
 // perimeter, which was decorative active-state styling.
-export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
+//
+// ⚠⚠⚠ OTA-1822 — THE KEYS READ AS KEYS. An owner physical punch list of five
+// targets, checked by hand on the device against a reference he named himself:
+// the gameplay movement/action controls. Read from source, that reference is
+// `kit.ctl` (face + rim + LIT TOP EDGE + DARK BOTTOM EDGE) composed with
+// `tControlDepth(pressed)`. Four of the five targets already had a press
+// response and were missing the same ONE thing — the resting dimensional body —
+// which is why REPLAY OPENING read as a label, the two tabs as headings, the
+// routing command as a flat blue outline, and the four milestone squares as
+// stat cells. `cell` is the clearest case: it declared `borderWidth: 1` with NO
+// colour and NO face, so it drew a colourless hairline over nothing.
+//
+// ⚠ SO THE REPAIR IS ADDITIVE AND IT IS THE SAME REPAIR FOUR TIMES: `kit.ctl`
+// first in the array, every local declaration after it still winning its own
+// fields — accepted colours, blue identity, selected mark, expanded ring. No new
+// visual system, no invented glow, no global primitive touched, no geometry
+// moved, and the reference controls themselves are not restyled.
+//
+// ⚠⚠ THE FIFTH WAS NOT A MATERIAL DEFECT AND NOT A BACKING LAYER. Pressing a
+// Character Selection record exposed a black bar; there is no black layer behind
+// it. `dossierOuter` paints no background and no border — it exists to cast the
+// drop shadow — and the press travel was applied to THAT view, sliding the
+// shadow out from under the card. The travel now rides `dossierRim`, the thing
+// the player perceives as the card, so the record still depresses and the shadow
+// stays where the resting card put it. Nothing was flattened to hide it.
+export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';

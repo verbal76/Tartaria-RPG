@@ -377,7 +377,12 @@ export function CharacterScreen() {
              label, the 8dp hitSlop — is untouched. */
           <Pressable
             onPress={() => replayStoryIntro()}
-            style={({ pressed }) => [styles.replayBtn, tControlDepth(pressed)]}
+            /* ⚠ OTA-1822 — kit.ctl FIRST, so the header command reads as the same
+               forged key as the gameplay controls. It supplies ONLY what this
+               button never had: the lit top edge and the dark bottom edge. Its
+               own face (#1a1714) and rim (#3a342c) are declared after and still
+               win those two properties, so the accepted colour is untouched. */
+            style={({ pressed }) => [kit.ctl, styles.replayBtn, tControlDepth(pressed)]}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Replay the opening crawl"

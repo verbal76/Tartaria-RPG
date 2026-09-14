@@ -748,7 +748,18 @@ export function TitleScreen() {
               pressed record momentarily stop looking like a filed record, and
               VIS-1's construction is protected. Same language, own light. */}
           <Pressable
-            style={({ pressed }) => [styles.dossierOuter, !bootGateOpen && styles.btnDisabled, pressed && kit.controlPressed]}
+            /* ⚠⚠⚠ OTA-1822 — THE TRAVEL COMES OFF THE SHADOW-CASTER. Owner, from
+               the device and from video: pressing a character record exposed a
+               black bar behind it. It was never a backing layer — it was THIS
+               view's own drop shadow. `dossierOuter` paints no background and no
+               border, so the only thing `kit.controlPressed` contributed here was
+               its translateY(3); its two border colours were inert. Translating
+               the shadow-CASTING view slid the shadow (#000 at 0.5, already offset
+               y+3) out from under the card, and 3dp of near-opaque black appeared
+               below the record for exactly as long as the finger was down.
+               The travel now rides the RIM — the thing a player perceives as the
+               card — so the shadow stays where the resting card put it. */
+            style={({ pressed }) => [styles.dossierOuter, !bootGateOpen && styles.btnDisabled]}
             onPress={() => setExpandedSlotId(item.slotId)}
             disabled={!bootGateOpen}
             accessibilityRole="button"
@@ -761,7 +772,7 @@ export function TitleScreen() {
                 rather than on a mount that never happens (FlatList reuses the
                 row). A collapsed record simply sits at rest. */}
             <TSettle active={false}>
-            <View style={[styles.dossierRim, item.dead && styles.dossierRimDead, pressed && styles.dossierRimPressed]}>
+            <View style={[styles.dossierRim, item.dead && styles.dossierRimDead, pressed && kit.controlPressed, pressed && styles.dossierRimPressed]}>
               <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
                 <DossierField crest={crest} factionId={summaryFactionId(item)} compact />
                 <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
@@ -812,7 +823,7 @@ export function TitleScreen() {
           Everything inside stays `pointerEvents="none"` as before, so the plate
           is still the one tap target and the second tap still LOADS. */}
       <Pressable
-        style={({ pressed }) => [styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled, pressed && kit.controlPressed]}
+        style={({ pressed }) => [styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled]}
         onPress={() => onSlotTap(item)}
         disabled={!bootGateOpen}
         accessibilityRole="button"
@@ -821,7 +832,7 @@ export function TitleScreen() {
       >
         {({ pressed }) => (<>
         <TSettle active>
-        <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead, pressed && styles.dossierRimOpenPressed]}>
+        <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead, pressed && kit.controlPressed, pressed && styles.dossierRimOpenPressed]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
             <DossierField crest={crest} factionId={summaryFactionId(item)} />
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
