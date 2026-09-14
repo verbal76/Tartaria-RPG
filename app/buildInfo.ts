@@ -30531,7 +30531,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sigil path, costs and TAKE boundaries — pinned by a frozen fingerprint. 63
 // nouns were REROUTED to an existing pool; 45 that only ever matched by accident
 // now match nothing, which is the defect leaving rather than a new one arriving.
-export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';
+// ── OTA-1816 — PLAYER ACTIONS KEEP THE CLOCK HONEST (Baker item 13, job A) ────
+// OTA-1807 closed the Take family and said the number of unaccounted direct
+// mutation doors was three. A census of current source found them on SEVEN
+// screens: fight a whole combat by resolving pending rolls, trade, equip, coat,
+// stow, travel, repair, accept and turn in contracts — none of it passes
+// `submitPlayerAction`, so none of it moved `lastPlayerActionAt`. Past
+// `introFillTick`'s 6 s floor the scene-intro bank started a narration-sized
+// generation on top of a player who was plainly still playing.
+//
+// 39 store actions now reach their human call sites through `useHumanAction`
+// (the selector wrap) or `humanGetState` (the imperative seam), both of which
+// note and then call. The wrap is at the UI boundary and NOT at the store,
+// because the engine invokes these same actions itself and automatic simulation
+// must never look like a person — pinned by a test. Nothing else moves: same
+// two stamps as OTA-1807, no sprint feed, no homework preemption, no
+// `uiIdleSince` policy change, no gameplay behaviour altered — return values
+// pass through untouched.
+export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';

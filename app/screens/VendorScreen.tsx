@@ -1,3 +1,4 @@
+import { useHumanAction } from '../state/humanActivity';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity , Pressable } from 'react-native';
 import { tControlDepth } from '../ui/tartariaKit';
@@ -145,16 +146,16 @@ export function VendorScreen() {
   });
   const setScreen = useGameStore((s) => s.setScreen);
   const appendLog = useGameStore((s) => s.appendLog);
-  const buyFromVendor = useGameStore((s) => s.buyFromVendor);
-  const equipItem = useGameStore((s) => s.equipItem);
-  const sellToVendor = useGameStore((s) => s.sellToVendor);
-  const stealFromVendor = useGameStore((s) => s.stealFromVendor);
+  const buyFromVendor = useHumanAction('buyFromVendor');
+  const equipItem = useHumanAction('equipItem');
+  const sellToVendor = useHumanAction('sellToVendor');
+  const stealFromVendor = useHumanAction('stealFromVendor');
   const dismissVendor = useGameStore((s) => s.dismissVendor);
-  const reinforceWithVendor = useGameStore((s) => s.reinforceWithVendor);
-  const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
-  const acceptHunt = useGameStore((s) => s.acceptHunt);
-  const acceptMystery = useGameStore((s) => s.acceptMystery);
-  const acceptStoryline = useGameStore((s) => s.acceptStoryline);
+  const reinforceWithVendor = useHumanAction('reinforceWithVendor');
+  const acceptFactionQuest = useHumanAction('acceptFactionQuest');
+  const acceptHunt = useHumanAction('acceptHunt');
+  const acceptMystery = useHumanAction('acceptMystery');
+  const acceptStoryline = useHumanAction('acceptStoryline');
   const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
 
   const [mode, setMode] = useState<Mode>('buy');

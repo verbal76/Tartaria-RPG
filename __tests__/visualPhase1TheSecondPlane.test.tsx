@@ -468,7 +468,11 @@ describe('Phase 1 — an interactive chassis does not swallow its children', () 
     const talk = /placeChipTalk,[\s\S]{0,200}?onPress=\{\(\) => talkToNpc\([\s\S]{0,80}?hitSlop=\{8\}/;
     expect(EXPLORATION).toMatch(talk);
     // The gift action still stops propagation so the card's own tap cannot also fire.
-    expect(EXPLORATION).toMatch(/e\.stopPropagation\(\);\s*useGameStore\.getState\(\)\.openGift\(\)/);
+    // ⚠ OTA-1816 — SPELLING MIGRATED, CLAIM UNCHANGED: the store read is now
+    // `humanGetState()` so the press accounts the player's activity. What this pin
+    // holds is the ORDER — stopPropagation FIRST, then the gift opens — and that is
+    // asserted exactly as before.
+    expect(EXPLORATION).toMatch(/e\.stopPropagation\(\);\s*humanGetState\(\)\.openGift\(\)/);
   });
 
   it('the compact nested controls keep their hit slop', () => {

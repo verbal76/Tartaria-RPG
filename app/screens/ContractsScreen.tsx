@@ -1,3 +1,4 @@
+import { useHumanAction, humanGetState } from '../state/humanActivity';
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 /* ⚠ COMPLETE / ABANDON / DISCARD are discrete commands. They already used
@@ -180,26 +181,26 @@ export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
   const missionCompleteNotice = useGameStore((s) => s.missionCompleteNotice); // OTA-1738 — the bounty primer owns the beat
   const setScreen = useGameStore((s) => s.setScreen);
-  const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
+  const completeContractFromUI = useHumanAction('completeContractFromUI');
   const contractsNotice = useGameStore((s) => s.contractsNotice);
   const clearContractsNotice = useGameStore((s) => s.clearContractsNotice);
-  const sendContractByRunner = useGameStore((s) => s.sendContractByRunner);
-  const abandonContract = useGameStore((s) => s.abandonContract);
+  const sendContractByRunner = useHumanAction('sendContractByRunner');
+  const abandonContract = useHumanAction('abandonContract');
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const routeGreatClimb = useGameStore((s) => s.routeGreatClimb);
   const setGreatClimbActive = useGameStore((s) => s.setGreatClimbActive);
-  const discardLead = useGameStore((s) => s.discardLead);
+  const discardLead = useHumanAction('discardLead');
   // OTA-1014 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.
   useEffect(() => () => { useGameStore.getState().clearContractsNotice(); }, []);
-  const turnInSigil = useGameStore((s) => s.turnInSigil);
+  const turnInSigil = useHumanAction('turnInSigil');
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
-  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const setTravelCourse = useHumanAction('setTravelCourse');
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
-  const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
+  const setWhisperCourse = useHumanAction('setWhisperCourse');
   const appendLog = useGameStore((s) => s.appendLog);
   const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string; climbId?: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
@@ -848,7 +849,7 @@ export function ContractsScreen() {
             {atCapitalForSummon && (
               <Pressable
                 style={({ pressed }) => [kit.ctl, styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait, pressed && kit.controlPressed]}
-                onPress={() => useGameStore.getState().summonCoreGuardian()}
+                onPress={() => humanGetState().summonCoreGuardian()}
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel={summonBlocked.blocked
@@ -974,7 +975,7 @@ export function ContractsScreen() {
               <View style={styles.mainQuestChoiceRow}>
                 <Pressable
                   style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }, pressed && kit.controlPressed]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
+                  onPress={() => humanGetState().chooseEndingMainQuest('seal')}
                   accessibilityRole="button"
                 >
 {({ pressed }) => (<>
@@ -984,7 +985,7 @@ export function ContractsScreen() {
 </Pressable>
                 <Pressable
                   style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }, pressed && kit.controlPressed]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
+                  onPress={() => humanGetState().chooseEndingMainQuest('unleash')}
                   accessibilityRole="button"
                 >
 {({ pressed }) => (<>
@@ -994,7 +995,7 @@ export function ContractsScreen() {
 </Pressable>
                 <Pressable
                   style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }, pressed && kit.controlPressed]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
+                  onPress={() => humanGetState().chooseEndingMainQuest('preserve')}
                   accessibilityRole="button"
                 >
 {({ pressed }) => (<>
@@ -1009,7 +1010,7 @@ export function ContractsScreen() {
                 {canStay && (
                   <Pressable
                     style={({ pressed }) => [kit.ctl, styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }, pressed && kit.controlPressed]}
-                    onPress={() => useGameStore.getState().chooseEndingMainQuest('stay')}
+                    onPress={() => humanGetState().chooseEndingMainQuest('stay')}
                     accessibilityRole="button"
                   >
 {({ pressed }) => (<>
@@ -1513,7 +1514,7 @@ export function ContractsScreen() {
                   <Pressable
                     key={`b_${bountyKey(b)}`}
                     onPress={canRoute
-                      ? () => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
+                      ? () => { humanGetState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
                       : undefined}
                     disabled={!canRoute}
                     style={[styles.card]}

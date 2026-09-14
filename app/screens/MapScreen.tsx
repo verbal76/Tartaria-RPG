@@ -14,6 +14,7 @@
 // render). The dot was removed at OTA-182; the chain kept computing into nothing for
 // fifty more OTAs and died with the old-map scrub. See engine/atlasCoords for the note.
 
+import { useHumanAction } from '../state/humanActivity';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
@@ -265,11 +266,11 @@ export function MapScreen() {
   // No confirm modal (player ask: "I don't want to copy the text I
   // want to be able to push to route automatically"). Tapping a
   // place row calls setTravelCourse + bounces to exploration.
-  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const setTravelCourse = useHumanAction('setTravelCourse');
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-616 — turn a contract in directly from the map when you're standing on
   // its anchor (the route row would otherwise just grey out).
-  const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
+  const completeContractFromUI = useHumanAction('completeContractFromUI');
   // OTA-498 — discovered-location set drives the Hidden Market "?" reveal: the
   // travel-list row + the map overlay both show "?" until the id is in here.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);

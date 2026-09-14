@@ -1,3 +1,4 @@
+import { useHumanAction, humanGetState } from '../state/humanActivity';
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
@@ -195,7 +196,7 @@ export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   // OTA-1154 — gift mode: who we are giving to while the player browses.
   const giftMode = useGameStore((s) => s.giftMode);
-  const giveGift = useGameStore((s) => s.giveGift);
+  const giveGift = useHumanAction('giveGift');
   const cancelGiftMode = useGameStore((s) => s.cancelGiftMode);
   const setScreen = useGameStore((s) => s.setScreen);
   // arb103 → shared. The bottom legend text washed out when the player tuned a
@@ -203,15 +204,15 @@ export function InventoryScreen() {
   // bg, faded parchment on a dark one) now lives in displaySettings so the
   // title screen + other on-background text reuse the exact same color.
   const legendTextColor = useReadableMuted();
-  const equipItem = useGameStore((s) => s.equipItem);
-  const unequipSlot = useGameStore((s) => s.unequipSlot);
+  const equipItem = useHumanAction('equipItem');
+  const unequipSlot = useHumanAction('unequipSlot');
   // OTA-1114 — is something swinging at you right now? The take-off confirm
   // says a different thing mid-fight, because that is the case the owner's
   // death log actually is: AC 16 → 10 with five raiders on the tile.
   const inCombatNow = useGameStore((s) => (s.currentScene?.enemies?.length ?? 0) > 0);
-  const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
-  const useInventoryItem = useGameStore((s) => s.useInventoryItem);
-  const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
+  const dropInventoryItem = useHumanAction('dropInventoryItem');
+  const useInventoryItem = useHumanAction('useInventoryItem');
+  const scrapInventoryItem = useHumanAction('scrapInventoryItem');
   // ⚠ OTA-1738 — teaching keyed on the pack's own state (the same predicates the
   // actions read), never on a route: any scrappable piece, any bandolier-eligible
   // throwable or coating. The tutorial's salvage beat teaches room salvage, so
@@ -226,15 +227,15 @@ export function InventoryScreen() {
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const reserveManyForFusion = useGameStore((s) => s.reserveManyForFusion);
   const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
-  const applyCoating = useGameStore((s) => s.applyCoating);
-  const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
+  const applyCoating = useHumanAction('applyCoating');
+  const applyCoatingToArmor = useHumanAction('applyCoatingToArmor');
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
-  const stowInPouch = useGameStore((s) => s.stowInPouch);
-  const stowInBandolier = useGameStore((s) => s.stowInBandolier);
-  const stowInMedkit = useGameStore((s) => s.stowInMedkit);
-  const useHealBatch = useGameStore((s) => s.useHealBatch);
+  const stowInPouch = useHumanAction('stowInPouch');
+  const stowInBandolier = useHumanAction('stowInBandolier');
+  const stowInMedkit = useHumanAction('stowInMedkit');
+  const useHealBatch = useHumanAction('useHealBatch');
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -1212,7 +1213,7 @@ export function InventoryScreen() {
             // parser's `arm golem with <weapon>` branch just calls it — so this
             // is the same work with the dead gate taken out from in front.
             onPress: () => {
-              useGameStore.getState().armGolem(pending.item.name);
+              humanGetState().armGolem(pending.item.name);
               closeModal();
             },
             tone: 'primary',
@@ -2428,7 +2429,7 @@ function ToolPouchBanner({
 }) {
   const POUCH_MAX = 3;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
-  const unpouchItem = useGameStore((s) => s.unpouchItem);
+  const unpouchItem = useHumanAction('unpouchItem');
   const slots: Array<{ name: string | null; id: string | null }> = [];
   for (let i = 0; i < POUCH_MAX; i++) {
     const id = pouchIds[i];
@@ -2550,7 +2551,7 @@ function BandolierBanner({
 }) {
   const BANDOLIER_MAX = 5;
   const ids = player.equipped?.bandolierIds ?? [];
-  const removeFromBandolier = useGameStore((s) => s.removeFromBandolier);
+  const removeFromBandolier = useHumanAction('removeFromBandolier');
   const slots: Array<{ name: string | null; qty: number; id: string | null }> = [];
   for (let i = 0; i < BANDOLIER_MAX; i++) {
     const id = ids[i];
@@ -2625,7 +2626,7 @@ function MedkitBanner({
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { MEDKIT_MAX } = require('../engine/medkitEligibility') as typeof import('../engine/medkitEligibility');
   const ids = player.equipped?.medkitIds ?? [];
-  const removeFromMedkit = useGameStore((s) => s.removeFromMedkit);
+  const removeFromMedkit = useHumanAction('removeFromMedkit');
   const slots: Array<{ name: string | null; qty: number; id: string | null }> = [];
   for (let i = 0; i < MEDKIT_MAX; i++) {
     const id = ids[i];

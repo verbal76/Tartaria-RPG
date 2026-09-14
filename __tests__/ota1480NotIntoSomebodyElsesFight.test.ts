@@ -391,8 +391,12 @@ describe('"am I really here" has one owner and reads the authoritative cell', ()
 
 describe('two SUMMON chips, one rule', () => {
   it('⚠⚠ both chips reach the same action', () => {
-    expect(EXPL).toContain('onPress={() => useGameStore.getState().summonCoreGuardian()}');
-    expect(CONTRACTS).toContain('onPress={() => useGameStore.getState().summonCoreGuardian()}');
+    // ⚠ OTA-1816 — SPELLING MIGRATED, CLAIM UNCHANGED. `humanGetState()` replaced
+    // `useGameStore.getState()` so a SUMMON press accounts the player's activity.
+    // The many-doors rule this pin exists to hold is untouched: both chips must
+    // still reach THE SAME action, spelled identically on both screens.
+    expect(EXPL).toContain('onPress={() => humanGetState().summonCoreGuardian()}');
+    expect(CONTRACTS).toContain('onPress={() => humanGetState().summonCoreGuardian()}');
   });
 
   it('⚠⚠ both read the hostiles state at render, from the same helper', () => {

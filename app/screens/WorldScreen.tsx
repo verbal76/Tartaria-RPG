@@ -5,6 +5,7 @@
 // where the previously-invisible tides finally surface — the Character sheet only
 // tagged factions you already stood with; here you see the whole board.
 
+import { humanGetState } from '../state/humanActivity';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tFilledGold, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
@@ -189,7 +190,7 @@ export function WorldScreen() {
               return (
                 <Pressable
                   style={({ pressed }) => [styles.bountySecondaryBtn, tControlDepth(pressed)]}
-                  onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                  onPress={() => { humanGetState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
                   accessibilityRole="button"
                 >
                   <Text style={styles.bountySecondaryText}>{bountyCourseLabel(cs)}</Text>
@@ -235,7 +236,7 @@ export function WorldScreen() {
                   frozen ? tFilledGold(pressed) : [styles.bountyBtnLocked, tControlDepth(pressed)]]}
                 onPress={() => {
                   const before = (useGameStore.getState().player?.activeBounties ?? []).length;
-                  useGameStore.getState().acceptBounty(offer);
+                  humanGetState().acceptBounty(offer);
                   const after = (useGameStore.getState().player?.activeBounties ?? []).length;
                   // Only leave the screen if the contract was actually taken. A refusal
                   // has to leave the player looking at the board it is telling them to read.

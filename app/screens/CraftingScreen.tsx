@@ -1,3 +1,4 @@
+import { useHumanAction } from '../state/humanActivity';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
@@ -344,11 +345,11 @@ export function CraftingScreen() {
   // recipe needs to strip substitutes) set the flag with nothing on screen, and the
   // prompt "only appeared after hitting back." Render it here too.
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
-  const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
+  const repairInventoryItem = useHumanAction('repairInventoryItem');
   // ⚠ OTA-1552 — REPAIR ALL and the repair group hand the whole list to the store
   // now instead of looping here. A guard that can stop the run has to be able to
   // keep the REST of the run, and a screen-side loop has nowhere to keep it.
-  const repairInventoryItems = useGameStore((s) => s.repairInventoryItems);
+  const repairInventoryItems = useHumanAction('repairInventoryItems');
   const [tab, setTab] = useState<Tab>('craft');
   // OTA-264 — post-craft confirmation modal state. Non-null after a
   // successful craft (RecipesView's inventory diff produced items);

@@ -8,7 +8,7 @@ import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap, hasActiveDog }
 import { playerGridCell } from '../state/playerGrid';
 // ⚠⚠ OTA-1807 — the Gather sheet's controls mutate the game WITHOUT submitting an
 // action, so the activity authority never heard about them. They say so here.
-import { noteHumanInteraction } from '../state/humanActivity';
+import { noteHumanInteraction, useHumanAction, humanGetState } from '../state/humanActivity';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
@@ -405,8 +405,8 @@ export function ExplorationScreen() {
   const pendingMissionOffer = useGameStore((s) => s.pendingMissionOffer);
   const acceptMissionOffer = useGameStore((s) => s.acceptMissionOffer);
   const declineMissionOffer = useGameStore((s) => s.declineMissionOffer);
-  const resolveRollStep = useGameStore((s) => s.resolveRollStep);
-  const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
+  const resolveRollStep = useHumanAction('resolveRollStep');
+  const cancelPendingRolls = useHumanAction('cancelPendingRolls');
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
   const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
 
@@ -1792,7 +1792,7 @@ export function ExplorationScreen() {
               {atUnrecovered && (
                 <Pressable
                   style={({ pressed }) => [tartariaKitStyles.ctl, styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait, pressed && tartariaKitStyles.controlPressed]}
-                  onPress={() => useGameStore.getState().summonCoreGuardian()}
+                  onPress={() => humanGetState().summonCoreGuardian()}
                   hitSlop={8}
                   accessibilityRole="button"
                 >
@@ -1980,7 +1980,7 @@ export function ExplorationScreen() {
               quiet affordance as TALK; opens the OTA-1060 picker. */}
           <Pressable
             style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, pressed && tartariaKitStyles.controlPressed]}
-            onPress={() => useGameStore.getState().openGift()}
+            onPress={() => humanGetState().openGift()}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={`Give a gift`}
@@ -2092,7 +2092,7 @@ export function ExplorationScreen() {
               tap-to-speak does not also fire. */}
           <Pressable
             style={({ pressed }) => [tartariaKitStyles.ctl, styles.placeChipTalk, pressed && tartariaKitStyles.controlPressed]}
-            onPress={(e) => { e.stopPropagation(); useGameStore.getState().openGift(); }}
+            onPress={(e) => { e.stopPropagation(); humanGetState().openGift(); }}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={`Give a gift to ${currentScene.wanderer!.name}`}
@@ -2192,7 +2192,7 @@ export function ExplorationScreen() {
         // move with it — the chip is a new door onto the old handler, not a
         // second implementation of it.
         const fireCrucible = () => (vendorCrucible
-          ? useGameStore.getState().useVendorCrucible()
+          ? humanGetState().useVendorCrucible()
           : useGameStore.getState().submitPlayerAction('fuse'));
         const shortOfCoin = vendorCrucible && (player.tc ?? 0) < 25;
         const readyName = vendorCrucible ? '★★ Crucible · 25 TC' : '★★ Crucible ready';
@@ -2362,7 +2362,7 @@ export function ExplorationScreen() {
             marks={[currentScene?.vendor?.name, currentScene?.wanderer?.name, ...escortLeaderMarks].filter((n): n is string => !!n)}
             onPick={(mark) => {
               setPickpocketOpen(false);
-              useGameStore.getState().pickpocketPerson(mark);
+              humanGetState().pickpocketPerson(mark);
             }}
             onCancel={() => setPickpocketOpen(false)}
           />
@@ -3416,7 +3416,7 @@ export function ExplorationScreen() {
           .map((h) => ({ id: h.id, noun: h.nouns[0] ?? h.kind }))}
         onSubmit={(hookId) => {
           setTorchChooserOpen(false);
-          useGameStore.getState().applyTorchToHook(hookId);
+          humanGetState().applyTorchToHook(hookId);
         }}
         onCancel={() => setTorchChooserOpen(false)}
       />
@@ -3502,7 +3502,7 @@ export function ExplorationScreen() {
           },
           {
             label: 'Use it & fuse',
-            onPress: () => useGameStore.getState().confirmEquippedCatalystFusion(),
+            onPress: () => humanGetState().confirmEquippedCatalystFusion(),
             tone: 'primary',
           },
         ]}
@@ -3526,7 +3526,7 @@ export function ExplorationScreen() {
           },
           {
             label: 'Craft & strip',
-            onPress: () => useGameStore.getState().confirmCraftSubstitution(),
+            onPress: () => humanGetState().confirmCraftSubstitution(),
             tone: 'primary',
           },
         ]}
@@ -3553,7 +3553,7 @@ export function ExplorationScreen() {
             buttons={[
               ...avail.map((a) => ({
                 label: a.name,
-                onPress: () => useGameStore.getState().useRaceAbility(a.id),
+                onPress: () => humanGetState().useRaceAbility(a.id),
                 tone: 'primary' as const,
               })),
               { label: 'Close', onPress: close, tone: 'neutral' as const },

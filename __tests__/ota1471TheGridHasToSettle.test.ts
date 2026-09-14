@@ -539,8 +539,13 @@ describe('OTA-1471 — both SUMMON chips, because there are two', () => {
     // Hiding the control would leave the player with no explanation at all,
     // which is the the-game-knows-and-does-not-say defect (OTA-1402). The label
     // names the wait; the tap prints the whole reason.
-    expect(EXPL).toContain('onPress={() => useGameStore.getState().summonCoreGuardian()}');
-    expect(CONTRACTS).toContain('onPress={() => useGameStore.getState().summonCoreGuardian()}');
+    // ⚠ OTA-1816 — SPELLING MIGRATED, CLAIM UNCHANGED. The store read moved from
+    // `useGameStore.getState()` to `humanGetState()` so a SUMMON press accounts the
+    // player's activity. The pin still requires exactly what it always required: an
+    // onPress reaching `summonCoreGuardian()` directly, on BOTH screens. Nothing
+    // here was relaxed to accommodate the change.
+    expect(EXPL).toContain('onPress={() => humanGetState().summonCoreGuardian()}');
+    expect(CONTRACTS).toContain('onPress={() => humanGetState().summonCoreGuardian()}');
   });
 
   it('⚠⚠ and both say the wait BEFORE the tap, in words as well as a badge', () => {
