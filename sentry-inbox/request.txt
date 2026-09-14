@@ -143,3 +143,46 @@ Wanted from this pull, in order:
    pagination and issue-walk evidence, and any redactions. A partially assembled bundle is evidence
    about the relay and must be reported rather than quietly stitched.
 Nothing here authorizes a repair, a native build, an OTA or a promotion.
+
+────────────────────────────────────────────────────────────────────────────
+REQUEST 2026-09-14 (post OTA-1821) — OWNER-INITIATED PULL
+Authority at request time: e7d23a0f8265038c0ff848e1812efdd6b973fb7a (OTA-1821),
+live on Golem (publisher 1390) and on HAL (promote run 16; owner device-confirmed
+"1821 is live on hal"). Last relay sync landed 1c41910b, whose newest events were
+dated 2026-09-09/09-10.
+
+Pull everything currently reachable. Report:
+
+1. WHAT ARRIVED SINCE 1c41910b, by bundle, with event timestamps. If the newest
+   event is still 2026-09-10, say so plainly — "nothing newer landed" is a result,
+   not a failure, and it is the answer to whether the device has reported since.
+
+2. WHICH OTA EACH BUNDLE WAS RUNNING, read from OTA_BUILD_ID rather than inferred
+   from dates. 1819, 1820 and 1821 all reached HAL within roughly four hours of
+   each other, so a bundle's stamp is the only thing that says which build
+   produced it. Report the stamp verbatim per bundle.
+
+3. NATIVE DEATHS / TERMINATIONS, if any: name the action, room and screen each
+   one carries. A record that cannot name an action is itself the finding. Do NOT
+   connect any of it to the iPhone SE gameplay freeze, the report-screen freeze,
+   or the Class H interval — all remain UNKNOWN and separately tracked.
+
+4. THE OTA-1819 PRESENTATION EDGES, because they are the instrument that a Class H
+   interval can actually produce: any `pres` stage entries in a touch-path trace —
+   mount/unmount for chapter:<phase>, fork:<id>, hint:combat_readout. Report the
+   sequence as written, including any mount with no matching unmount. Claim no
+   causation; the instrument was shipped to be read, not to be confirmed.
+
+5. NATIVE QUEUE LINES, verbatim, wherever they appear: job count, worst wait, and
+   the running job. Two such lines exist in the tree today (worst wait 1.9s at 47
+   and at 63 jobs). More samples are the only thing that can move Baker #8 off
+   "harmful starvation NOT PROVEN", in either direction. Report the numbers; do
+   not interpret them as a defect.
+
+6. SCRUB AND ASSEMBLY ACCOUNTING as usual — per-bundle part counts, completeness
+   on the relay's own pagination and issue-walk evidence, and any redactions. A
+   partially assembled bundle is evidence about the relay and must be reported
+   rather than quietly stitched.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion, and nothing retrieved may be attributed to any open freeze.
