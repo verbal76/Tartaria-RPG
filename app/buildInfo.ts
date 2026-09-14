@@ -30662,7 +30662,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // field, no serialization, no hydration, no new storage key, no new timer. A
 // relaunch legitimately starts collapsed again. Multi-open is preserved, and
 // nothing is forced shut on mount or focus.
-export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';
+//
+// ⚠⚠⚠ OTA-1821 — THE WORDS SAY WHICH ONE IS RUNNING. Target 7. The ACTIVATE /
+// DEACTIVATE control on the Contracts screen stopped reading as a physical
+// Tartaria key once its contract was running. OTA-1361 drew the active state as
+// FOUR layers — a tinted fill, a brighter rim at double width, a box glow, and a
+// text halo — and three of those four are the PERIMETER, so an active button
+// appeared to flatten into a lit frame. The body is now declared ONCE on
+// `trackBtn` and NEITHER state overrides it (`trackBtnOn` and `trackBtnOff` are
+// both deliberately empty), leaving the fourth layer — the text — as the whole
+// signal, in the accent that already existed. No new colour is minted.
+//
+// ⚠ ONE STYLE FAMILY, EIGHT CONTRACT FAMILIES, ZERO CALL SITES TOUCHED. The
+// helper `trackToggle` reaches only six kinds; GREAT CLIMBS and FACTION QUESTS
+// are HAND-COPIED duplicates of its body, and Faction Quests does not even share
+// its label. What all three shapes share byte for byte is the style array — so
+// the style family, not the helper, is the narrowest seam reaching all of them.
+//
+// ⚠ BOUNTIES ARE NOT REACHED, AND THAT IS TRUTHFUL RATHER THAN A MISS: they have
+// no activate/deactivate control to repair. ACCESSIBILITY UNTOUCHED — the
+// programmatic signal was always `accessibilityState={{ selected }}`, never this
+// perimeter, which was decorative active-state styling.
+export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';

@@ -2954,28 +2954,47 @@ const styles = StyleSheet.create({
   },
   refusalButtonText: { color: '#e8c894', fontSize: 12, fontWeight: '700', letterSpacing: 1.4 },
   refusalButtonPrimary: { backgroundColor: '#3a2c1c', borderColor: '#f0bd77' },
-  // Activate / deactivate toggle (single-active). Active = teal; paused = grey.
+  /* ⚠⚠⚠ TARGET-7 — ONE BODY, BOTH STATES. THE WORDS CARRY THE ACTIVATION.
+   *
+   * This is the single visual authority for every ACTIVATE / DEACTIVATE control
+   * on this screen. Three call shapes use it with identical style arrays — the
+   * `trackToggle` helper (hunt, mystery, storyline, whisper, lead, broker), the
+   * GREAT CLIMBS toggle, and the FACTION QUESTS toggle, which is a hand-copy of
+   * the helper's body rather than a call to it. Repairing the STYLE therefore
+   * reaches all eight families at once and touches no call site.
+   *
+   * ⚠⚠ WHAT OTA-1361 DID, AND WHY IT IS BEING UNDONE HERE. The owner asked then
+   * for "the set active buttons should glow on missions", and it was built as
+   * FOUR layers: a tinted fill, a brighter border at double width, a box glow,
+   * and a text halo. Three of those four draw the PERIMETER, and on the device
+   * the result is that an active control stops reading as the same physical
+   * Tartaria key — the depth is replaced by a lit outline around the rectangle,
+   * and the button appears to flatten into a glowing frame. Owner, looking at an
+   * active Hunt: the body must read the same whether the contract is running or
+   * not; only the WORDS should say which.
+   *
+   * ⚠ SO THE BODY IS NOW DECLARED ONCE, HERE, AND NEITHER STATE OVERRIDES IT.
+   * `borderColor` moves onto the base as the resting grey — which changes nothing
+   * that renders, because every call site always passed `tracked ? On : Off` and
+   * `trackBtnOff` already painted that exact grey over the base. What changes is
+   * that the ACTIVE arm now agrees with it instead of repainting the rim.
+   *
+   * ⚠ THE FOURTH LAYER SURVIVES AND IS NOW THE WHOLE SIGNAL: `trackBtnTextOn`
+   * keeps its colour, its weight and its halo. The accent is the existing one; no
+   * new colour is minted. `kit.ctl` + `CTL_PLANES` still draw the dimensional key
+   * underneath, unchanged and identical in both states.
+   *
+   * ⚠ NOT AN ACCESSIBILITY INDICATOR. The programmatic signal is
+   * `accessibilityState={{ selected }}` at each call site and is untouched; this
+   * perimeter was decorative active-state styling, never a focus ring. */
   trackBtn: {
-    marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',
+    marginTop: 8, backgroundColor: 'transparent', borderColor: '#5a6a6e',
     borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center',
   },
-  // ⚠ OTA-1361 — THE ACTIVE ONE GLOWS. Owner: "the set active buttons should glow
-  // on missions." Teal-on-dark vs grey-on-dark is a hue difference you have to
-  // hunt for down a long slate; a lit button you find at a glance. Four layers so
-  // it survives both platforms: a tinted FILL (Android draws no elevation shadow
-  // behind a transparent view), a brighter border, the box glow, and a text halo
-  // (textShadow is the one glow that renders identically on iOS and Android).
-  trackBtnOn: {
-    backgroundColor: '#123a3a',
-    borderColor: '#7ef0dd',
-    borderWidth: 2,
-    shadowColor: '#54d6c4',
-    shadowOpacity: 0.9,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 10,
-  },
-  trackBtnOff: { borderColor: '#5a6a6e' },
+  /** Deliberately empty: the active state contributes NOTHING to the body. */
+  trackBtnOn: {},
+  /** Deliberately empty: the resting body above is already the inactive body. */
+  trackBtnOff: {},
   trackBtnPressed: { opacity: 0.7 },
   trackBtnText: { color: '#54d6c4', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   trackBtnTextOn: {
