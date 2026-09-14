@@ -1,0 +1,683 @@
+Bug Report — Robert Schmobert · (2026-09-14-1818-the-touch-reaches-the-region) · It froze entering a capital city
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-14T13:07:27.927Z
+Character: Robert Schmobert
+Slot ID: slot_mu090tcc_kwag6q
+Race: Tartarian Giants
+Location: Iskan-Veil
+HP: 22/38
+
+--- DESCRIPTION ---
+It froze entering a capital city
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-14T13:07:27.887Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 189
+  AAB: (build 189)
+  OTA: (2026-09-14-1818-the-touch-reaches-the-region)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-14T13:07:00.772Z
+  Last init success: 2026-09-14T13:07:05.619Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: retrying this boot (cooldown elapsed after 1 completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu19bycdk1 · started 2026-09-14T13:07:00.637Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 3.2s (cognition) · 1 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/16 · ctx 0 · app=active · native idle q0 · warns 0
+Touch path
+  prior boot:
+  2026-09-14T13:06:24.222Z #26 content controls p=none exploration
+  2026-09-14T13:06:24.222Z #26 in quick:flee 43% p=none exploration
+  2026-09-14T13:06:24.352Z #26 enter quick:flee 43% p=none exploration
+  2026-09-14T13:06:24.352Z #26 admit quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:24.352Z #26 dispatch quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:24.387Z #26 done quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:24.921Z #27 root p=none exploration
+  2026-09-14T13:06:24.921Z #27 content controls p=none exploration
+  2026-09-14T13:06:26.921Z #28 root p=none exploration
+  2026-09-14T13:06:26.922Z #28 content controls p=none exploration
+  2026-09-14T13:06:26.922Z #28 in quick:flee 43% p=none exploration
+  2026-09-14T13:06:27.035Z #28 enter quick:flee 43% p=none exploration
+  2026-09-14T13:06:27.035Z #28 admit quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:27.035Z #28 dispatch quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:27.065Z #28 done quick:flee 43% (callback) p=none exploration
+  2026-09-14T13:06:27.603Z #29 root p=none exploration
+  2026-09-14T13:06:27.604Z #29 content controls p=none exploration
+  2026-09-14T13:06:29.721Z #30 root p=none exploration
+  2026-09-14T13:06:29.721Z #30 content controls p=none exploration
+  2026-09-14T13:06:29.722Z #30 in travel:→ ISKAN-VEIL p=none exploration
+  2026-09-14T13:06:29.834Z #30 enter travel:→ ISKAN-VEIL p=none exploration
+  2026-09-14T13:06:29.834Z #30 admit travel:→ ISKAN-VEIL (navigation) p=none exploration
+  2026-09-14T13:06:29.834Z #30 dispatch travel:→ ISKAN-VEIL (navigation) p=none exploration
+  2026-09-14T13:06:29.881Z #30 done travel:→ ISKAN-VEIL (navigation) p=none exploration
+  this boot:
+  2026-09-14T13:07:07.957Z #1 root p=none exploration
+  2026-09-14T13:07:11.507Z #2 root p=none exploration
+  2026-09-14T13:07:12.705Z #3 root p=none exploration
+  2026-09-14T13:07:13.789Z #4 root p=none exploration
+  2026-09-14T13:07:15.378Z #5 root p=none exploration
+  2026-09-14T13:07:16.340Z #6 root p=none exploration
+  2026-09-14T13:07:17.991Z #7 root p=none exploration
+  2026-09-14T13:07:17.991Z #8 modal p=none exploration
+  2026-09-14T13:07:19.454Z #9 root p=none exploration
+  2026-09-14T13:07:19.454Z #10 modal p=none exploration
+  2026-09-14T13:07:27.810Z #11 root p=none exploration
+  2026-09-14T13:07:27.810Z #12 modal p=none exploration
+  2026-09-14T13:07:27.811Z #12 in report:send p=none exploration
+  2026-09-14T13:07:27.887Z #12 enter report:send p=none exploration
+  2026-09-14T13:07:27.887Z #12 admit report:send (described) p=none exploration
+  2026-09-14T13:07:27.887Z #12 dispatch report:send (described) p=none exploration
+  2026-09-14T13:07:27.887Z #12 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Robert Schmobert)
+  HP: 22/38  Stamina: 10/16  TC: 208  Corruption: 8
+  Pack: 82 distinct rows / 184 total
+
+Weapons (19)
+  Aetheric Baton (1d6 electrical, dur 43/43, [weapon,melee,single_handed,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Pike (1d8 aetheric, dur 13/13, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 33/33, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bonebreaker Mace (1d8 bludgeoning, dur 20/20, [weapon,melee,two_handed,hammer,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Energy Blade (1d6 burn, dur 10/10, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 36/36, equipped:main, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:off, unequip:main, use(off)
+  Cudgel (1d8 bludgeoning, dur 20/20, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 7/7, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 16/16, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 34/34, [weapon,starter,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 37/37, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 31/31, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 14/14, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Dagger (1d4 burn, dur 21/21, [weapon,melee,dual_wield,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 37/39, equipped:off, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, unequip:off, use, repair
+  Pocket Knife (1d4 slashing, dur 10/11, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Rusty Shortbow (1d6 piercing, dur 27/27, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 38/38, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Short Hunting Bow (1d6 piercing, dur 35/35, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (15)
+  Aether-Walker's Cape (dur 13/13, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Strider Boots (dur 9/9, equipped:feet, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet
+  Architect's Aetheric Boots (dur 18/18, AC +2 · INT +2, [armor,feet,boots,architectural_sentinels])
+    actions: equip:feet, use, scrap, drop
+  Architect's Leg Enhancers (dur 20/20, equipped:legs, AC +2 · Resists: slashing · INT +2, [armor,legs,greaves,architectural_sentinels])
+    actions: unequip:legs
+  Architect's Observer Visor (dur 29/29, AC +1 · Resists: cold · WIS +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 8/8, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 12/12, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Mud-Warden's Vest (dur 33/35, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest, repair
+  Reclaimer's Salvage Cap (dur 28/29, equipped:head, AC +1 · INV +1, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head, repair
+  Scholar's Headband of Knowledge (dur 19/19, AC +2 · Resists: cold · INT +2, [armor,head,cloth,helmet,mud_golems])
+    actions: equip:head, use, scrap, drop
+  Seer's Veil of the Aether (dur 10/10, AC +2 · Resists: aetheric · WIS +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Sentinel's Faceguard (dur 35/35, AC +1 · Resists: slashing · HP +5 · DEX +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Traveler's Cloak (dur 21/21, AC +1 · STE +1 · STE +1, [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Wanderer's Face of Shadows (dur 27/27, AC +1 · STE +1, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 24/24, AC +1 · STR +1, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (2)
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (7)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 270/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (37)
+  Aether Crystal ×14 ([aether,crystal,climb_top])
+    actions: drop
+  Aether Crystal ×3 ([aether,crystal])
+    actions: drop
+  Aether Dust ×19 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Dust (Uncommon, [aether,loot,bonus])
+    actions: scrap, drop
+  Aetheric Shard (Uncommon, [aether,crystal])
+    actions: drop
+  ◆ Amber Droplet (Uncommon, ♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  Automaton Circuit ×3 ([automation,tech,scrap])
+    actions: drop
+  ◆ Beetle-Chitin Flake (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Bent Nail ×8 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail ([metal,junk,scrap])
+    actions: scrap, drop
+  Bone Sliver ([bone,junk,scrap])
+    actions: drop
+  ◆ Brittle Antler Fork (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Cloth Scrap ×10 ([fiber,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Copper Wire Spool (Uncommon, ♥reserved, [trophy,metal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Dried Tendon Coil (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Drone Core (Uncommon, [automation,aether,loot,bonus])
+    actions: scrap, drop
+  ◆ Faded Ribbon Coil (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Fractured Geode Half ×2 (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Hollow Quill Sheaf (Uncommon, ♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  ◆ Mud Cloth (Uncommon, [trophy,loot,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×5 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Oil-Stained Sash (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Oil-Stained Sash ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Patched Cloth ([fiber,cloth])
+    actions: drop
+  ◆ Salvager's Tether Loop ×2 (Uncommon, ♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  Scrap Metal ×15 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Smooth Stone ×4 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×4 ([organic,fiber])
+    actions: drop
+  Stick ×3 ([wood,improvised,kindling])
+    actions: drop
+  Stick ×3 ([wood,improvised,kindling])
+    actions: drop
+  Worn Tartarian Coin ×8 ([currency,metal,pre-flood])
+    actions: scrap, drop
+  Worn Tartarian Coin ×13 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore,improvised])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 369 of 1581 entries; older trimmed to fit a single email paste)
+
+[2026-09-14T13:07:06.731Z] [debug] boot: life bmu19bycdk1 started 2026-09-14T13:07:00.637Z · not an OTA apply (no handoff on disk)
+[2026-09-14T13:07:06.731Z] [debug] missions: none active · at=iskan_veil
+[2026-09-14T13:07:06.731Z] [debug] ═══ SESSION 2026-09-14T13:07:06.730Z · build 2026-09-14-1818-the-touch-reaches-the-region · previous entry moments earlier ═══
+[2026-09-14T13:07:06.580Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Robert Schmobert. I kept watch while you were gone."
+[2026-09-14T13:07:06.580Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-14T13:07:06.580Z] [debug] OTA session start: 2026-09-14-1818-the-touch-reaches-the-region.
+[2026-09-14T13:07:05.453Z] [debug] voice⏱ gap 1086ms (wait 29ms + synth 1054ms, live) "Choose your character."
+[2026-09-14T13:07:04.342Z] [debug] voice: bundled ready
+[2026-09-14T13:07:01.439Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-14T13:07:00.911Z] [debug] voice: bundled loading
+[2026-09-14T13:07:00.911Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-14T13:07:00.763Z] [debug] ota: boot check result = noUpdate
+[2026-09-14T13:07:00.762Z] [debug] ota: Already up to date
+[2026-09-14T13:07:00.677Z] [debug] ota: Checking…
+[2026-09-14T13:07:00.677Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a09fa8-151a-7ec0-ac15-a4ef0347c671
+[2026-09-14T13:06:56.584Z] [debug] appstate: inactive → background (was inactive for 626ms)
+[2026-09-14T13:06:55.959Z] [debug] appstate: active → inactive (was active for 53635ms)
+[2026-09-14T13:06:29.879Z] [arbiter] The Arbiter's voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."
+[2026-09-14T13:06:29.879Z] [arbiter] (Monarch route — claim the Iskan-Veil Core by force or by tongue. The keepers will yield to threat or to a Monarch's address.)
+[2026-09-14T13:06:29.878Z] [world] Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northwestern light comes in flat and grey through windows that open onto walls. Twice you are sure you've been here already. Twice you are wrong. Or right.
+[2026-09-14T13:06:29.876Z] [arbiter] A Monarch elder lifts the seal-ring to your hand. "Wear this. The Capital keepers will recognize the family. Each one yields one Core. If a Capital refuses, you have authority to take the Core by other means. The family has not lost a Core yet to a refusing keeper."
+[2026-09-14T13:06:29.873Z] [combat] 3 Mudlings close on you. Tap the right-side panel to cycle targets.
+[2026-09-14T13:06:29.873Z] [world] [Iskan-Veil] north: open ground · east: The Monarch's Waystation (3 tiles, 8 hours) · south: Reclaimer's Stake (2 tiles, 5 hours) · west: open ground
+[2026-09-14T13:06:29.869Z] [system] Weather effect — Ash Storm: -1 STR
+[2026-09-14T13:06:29.867Z] [combat] Distance: close / arm's reach. Crude Golem Greatsword ✓ in range · Plasma Thrower ✓ in range.
+[2026-09-14T13:06:29.866Z] [world] You've left The Monarch's Waystation and entered Iskan-Veil. The corridor you came in by is not behind you. This is normal here. Keep walking. It's morning. 3 Mudlings are already here. east leads to The Monarch's Waystation; south leads to Reclaimer's Stake. Nothing named to the north or west.
+[2026-09-14T13:06:29.861Z] [arbiter] The Arbiter takes you in. "Iskan-Veil is lethal country. The things that wake here pull above your weight. 38 HP carries you through Varakush (danger 1). Visit a Lost Capital (Asgardar, Samarran, Nimari, Drakova, Voronov, Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil) to learn what the Cores demand. Or move on until you've got your legs under you."
+[2026-09-14T13:06:29.855Z] [debug] spawn: gear=[Mud Grip Wand, Mud Shortsword, Sentinel's Gauntlets] window=10 roster=new
+[2026-09-14T13:06:29.849Z] [debug] missions: none active · at=iskan_veil travelTo=iskan_veil
+[2026-09-14T13:06:29.849Z] [debug] scene: loc=iskan_veil hub=- arrival=y opening=n passing=n
+[2026-09-14T13:06:29.848Z] [world] Etched into a fallen lintel you find a map drawn in false ink — the Labyrinth of Shadows. (Type ENTER LABYRINTH to attempt it.)
+[2026-09-14T13:06:29.847Z] [world] You walk north. You arrive at Iskan-Veil.
+[2026-09-14T13:06:29.834Z] [debug] ui: tap "→ ISKAN-VEIL"
+[2026-09-14T13:06:28.586Z] [world] You hit the ground moving. Whatever was up there keeps the height.
+[2026-09-14T13:06:28.585Z] [world] You kick off the rope and take the wall in one desperate line — 2 tiers at double burn (-4 stamina).
+[2026-09-14T13:06:28.584Z] [debug] train: dexterity (escape check) → progress 42/100
+[2026-09-14T13:06:28.584Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T13:06:28.580Z] [debug] skillcheck: escape d20=15 DEX 6 = 21 vs Pursuit 16 — True Tartarians Raider 1 (d20 8 + SPD 8) → PASS
+[2026-09-14T13:06:28.572Z] [debug] dice⏱ skill_check: shown +50ms, tapped +623ms, settled +837ms = 1510ms
+[2026-09-14T13:06:27.735Z] [debug] ui: tap "roll"
+[2026-09-14T13:06:27.065Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T13:06:27.056Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=1
+[2026-09-14T13:06:27.055Z] [player] flee
+[2026-09-14T13:06:27.035Z] [debug] ui: tap "flee 43%"
+[2026-09-14T13:06:25.893Z] [arbiter] The Arbiter looks around. "Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here."
+[2026-09-14T13:06:25.889Z] [world] Below, True Tartarians Raider 2 and 1 other circle the base — nothing down there can reach you.
+[2026-09-14T13:06:25.889Z] [combat] True Tartarians Raider 3 and 2 others close the distance.
+[2026-09-14T13:06:25.887Z] [world] You break to run — and turning your back hands them the opening. No parry up here — swing back, or try the flee again.
+[2026-09-14T13:06:25.886Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T13:06:25.881Z] [debug] skillcheck: escape d20=8 DEX 6 = 14 vs Pursuit 19 — True Tartarians Raider 1 (d20 11 + SPD 8) → FAIL
+[2026-09-14T13:06:25.872Z] [debug] dice⏱ skill_check: shown +50ms, tapped +601ms, settled +837ms = 1488ms
+[2026-09-14T13:06:25.035Z] [debug] ui: tap "roll"
+[2026-09-14T13:06:24.479Z] [debug] persist sizes(KB): total=159 player=30 wm=34[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=88 scene=8
+[2026-09-14T13:06:24.386Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T13:06:24.378Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=1
+[2026-09-14T13:06:24.377Z] [player] flee
+[2026-09-14T13:06:24.368Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-09-14T13:06:24.351Z] [debug] ui: tap "flee 43%"
+[2026-09-14T13:06:19.221Z] [cognitive] CLIMB  (76ms)
+[2026-09-14T13:06:19.118Z] [arbiter] "The True Tartarians do not forgive a friend of the Mud Monarchs," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-14T13:06:19.117Z] [world] A True Tartarians war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Mud Monarchs.
+[2026-09-14T13:06:19.112Z] [system] ⏳ Time passed: 30 min
+[2026-09-14T13:06:19.111Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T13:06:19.111Z] [world] An old pilgrim sits cross-legged, palms up to the sky. They don't open their eyes as you arrive. "Sit. I won't make you stay long. I have something you should know before the Aether tells you the harder way."
+[2026-09-14T13:06:19.108Z] [world] You reach the top of the rope (tier 2/2). The view changes; the room reads differently from here.
+[2026-09-14T13:06:19.107Z] [world] You haul up the rope hand over hand. Tier 2/2 cleared.
+[2026-09-14T13:06:19.103Z] [debug] parser: intent=climb conf=1.00 verb=climb target=rope resolved=rope range=- enemies=0 hooks=2
+[2026-09-14T13:06:19.103Z] [player] climb rope
+[2026-09-14T13:06:19.067Z] [debug] ui: tap "climb up (1/2)"
+[2026-09-14T13:06:17.773Z] [cognitive] CLIMB  (59ms)
+[2026-09-14T13:06:17.714Z] [system] ⏳ Time passed: 30 min
+[2026-09-14T13:06:17.713Z] [world] Dust eyes the rope, then settles at its base. He is not built for the climb.
+[2026-09-14T13:06:17.712Z] [world] You reach the first hold of the rope (tier 1/2). Higher still to go.
+[2026-09-14T13:06:17.712Z] [world] You haul up the rope hand over hand. Tier 1/2 cleared.
+[2026-09-14T13:06:17.707Z] [debug] parser: intent=climb conf=1.00 verb=climb target=rope resolved=rope range=- enemies=0 hooks=2
+[2026-09-14T13:06:17.707Z] [player] climb rope
+[2026-09-14T13:06:16.401Z] [debug] ui: tap "climb"
+[2026-09-14T13:06:13.841Z] [cognitive] neutral  (61ms)
+[2026-09-14T13:06:13.779Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-14T13:06:13.778Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=2
+[2026-09-14T13:06:13.777Z] [player] investigate footprint
+[2026-09-14T13:06:12.317Z] [debug] ui: tap "investigate"
+[2026-09-14T13:06:10.866Z] [reward]     • Cloth Scrap (Common)
+[2026-09-14T13:06:10.866Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-14T13:06:10.865Z] [reward]     • Oil-Stained Sash (Common)
+[2026-09-14T13:06:10.865Z] [reward] ✦ Salvage haul:
+[2026-09-14T13:06:10.864Z] [world] You break the table apart. Among the pieces, something worth keeping.
+[2026-09-14T13:06:10.864Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-09-14T13:06:10.863Z] [world] Wedged into the fire pit, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-14T13:06:10.863Z] [world] You work the barrel apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-14T13:06:10.856Z] [reward] ✦ Found Third Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-09-14T13:06:10.086Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-14T13:06:10.086Z] [world] You lift the Scrap Metal clear.
+[2026-09-14T13:06:10.085Z] [reward] ✦ Climbing Rope (Common).
+[2026-09-14T13:06:10.084Z] [world] You pick up the Climbing Rope.
+[2026-09-14T13:06:09.439Z] [reward] ✦ Plasma Dagger (Common).
+[2026-09-14T13:06:09.439Z] [world] You take the Plasma Dagger from where it lay.
+[2026-09-14T13:06:08.705Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter looks around. "The seneschal logs your name with…"
+[2026-09-14T13:06:08.705Z] [arbiter] The Arbiter looks around. "The seneschal logs your name without asking it. The Monarchs' ledgers have their ways."
+[2026-09-14T13:06:08.704Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T13:06:08.703Z] [world] You tilt the rim. A residue of something long-evaporated coats the inside — sour, organic, old.
+[2026-09-14T13:06:08.702Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=barrel resolved=barrel range=- enemies=0 hooks=2
+[2026-09-14T13:06:08.701Z] [player] investigate barrel
+[2026-09-14T13:06:08.334Z] [debug] ui: tap "take / salvage"
+[2026-09-14T13:06:07.458Z] [world] You look the Plasma Dagger over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-14T13:06:07.456Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=plasma dagger resolved=Plasma Dagger range=- enemies=0 hooks=2
+[2026-09-14T13:06:07.455Z] [player] investigate Plasma Dagger
+[2026-09-14T13:06:07.406Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-14T13:06:06.183Z] [debug] ui: tap "investigate"
+[2026-09-14T13:06:05.382Z] [world] A circular Tartarian vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim — but not gone.
+[2026-09-14T13:06:05.382Z] [reward] ✦ Recovered Aether Crystal x3.
+[2026-09-14T13:06:05.382Z] [world] Among the papers, old Tartarian charts of a stretch of coastline that exists on no current map. The cartographer's mark in every corner is a single Aetheric eye, open.
+[2026-09-14T13:06:05.381Z] [world] The sky tightens. Violet thread above, blue thread below, both pulled taut by a hand you cannot see. An Aether-storm cell, small but dense, has crystallised right on top of you. For one long minute you taste an hour of your own life out of sequence — a morning that has not arrived, a meal you have not eaten — and when the storm releases you the ground at your feet is scattered with what it forgot to keep.
+[2026-09-14T13:06:05.380Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-14T13:06:05.379Z] [debug] spawn: gear=[Plasma Dagger] window=10 roster=new
+[2026-09-14T13:06:05.366Z] [debug] ui: tap "→ ISKAN-VEIL"
+[2026-09-14T13:06:04.139Z] [debug] boot: life bmu199aiy81 started 2026-09-14T13:04:56.458Z · FOLLOWED AN OTA APPLY 126ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-14T13:06:04.139Z] [debug] missions: none active · at=monarch_waystation travelTo=iskan_veil
+[2026-09-14T13:06:04.139Z] [debug] ═══ SESSION 2026-09-14T13:06:04.138Z · build 2026-09-14-1818-the-touch-reaches-the-region · updated from 2026-09-14-1816-player-actions-keep-the-clock-honest · previous entry moments earlier ═══
+[2026-09-14T13:06:04.011Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Robert Schmobert. The road kept your place. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-14T13:06:04.008Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.
+[2026-09-14T13:06:04.008Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-14T13:06:04.008Z] [debug] OTA session start: 2026-09-14-1818-the-touch-reaches-the-region.
+[2026-09-14T13:06:04.008Z] [debug] OTA applied: 2026-09-14-1816-player-actions-keep-the-clock-honest → 2026-09-14-1818-the-touch-reaches-the-region.
+[2026-09-14T13:06:02.323Z] [debug] appstate: background → active (was background for 35430ms)
+[2026-09-14T13:05:26.893Z] [debug] appstate: inactive → background (was inactive for 814ms)
+[2026-09-14T13:05:26.079Z] [debug] appstate: active → inactive (was active for 29598ms)
+[2026-09-14T13:05:24.650Z] [debug] voice⏱ gap 962ms (wait 0ms + synth 941ms, live) "Choose your character."
+[2026-09-14T13:05:01.999Z] [debug] voice⏱ gap 1107ms (wait 66ms + synth 1038ms, live) "Choose your character."
+[2026-09-14T13:05:00.846Z] [debug] voice: bundled ready
+[2026-09-14T13:04:57.232Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-14T13:04:56.769Z] [debug] voice: bundled loading
+[2026-09-14T13:04:56.769Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-14T13:04:56.627Z] [debug] ota: boot check result = noUpdate
+[2026-09-14T13:04:56.627Z] [debug] ota: Already up to date
+[2026-09-14T13:04:56.484Z] [debug] ota: Checking…
+[2026-09-14T13:04:56.484Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a09fa8-151a-7ec0-ac15-a4ef0347c671
+[2026-09-14T13:04:56.332Z] [debug] ota: Restarting to apply…
+[2026-09-14T13:04:56.332Z] [debug] ota: Saving progress…
+[2026-09-14T13:04:56.165Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-14T13:04:55.416Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-14T13:04:54.655Z] [debug] ota: Checking…
+[2026-09-14T13:04:54.655Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a09d9f-80d6-75a7-98f7-a487ac2b2e76
+[2026-09-14T02:53:31.888Z] [debug] appstate: active → inactive (was active for 763ms)
+[2026-09-14T02:53:31.124Z] [debug] appstate: background → active (was background for 1271ms)
+[2026-09-14T02:53:29.853Z] [debug] appstate: inactive → background (was inactive for 625ms)
+[2026-09-14T02:53:29.229Z] [debug] appstate: active → inactive (was active for 25773ms)
+[2026-09-14T02:53:24.374Z] [debug] send-log: #mu0neuouwhq2 — DELIVERED (inline, no attachments): beacon out, 8/8 parts accepted (54781 chars) — flush said yes, transport took every part
+[2026-09-14T02:53:08.901Z] [debug] boot: life bmu0neeg5vi started 2026-09-14T02:53:03.269Z · not an OTA apply (no handoff on disk)
+[2026-09-14T02:53:08.901Z] [debug] missions: none active · at=monarch_waystation travelTo=iskan_veil
+[2026-09-14T02:53:08.900Z] [debug] ═══ SESSION 2026-09-14T02:53:08.898Z · build 2026-09-14-1816-player-actions-keep-the-clock-honest · previous entry moments earlier ═══
+[2026-09-14T02:53:08.809Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Robert Schmobert. I kept watch while you were gone."
+[2026-09-14T02:53:08.809Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-14T02:53:08.809Z] [debug] OTA session start: 2026-09-14-1816-player-actions-keep-the-clock-honest.
+[2026-09-14T02:53:07.898Z] [debug] voice⏱ gap 1040ms (wait 34ms + synth 1004ms, live) "Choose your character."
+[2026-09-14T02:53:06.832Z] [debug] voice: bundled ready
+[2026-09-14T02:53:04.048Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-14T02:53:03.589Z] [debug] voice: bundled loading
+[2026-09-14T02:53:03.589Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-14T02:53:03.463Z] [debug] ota: boot check result = noUpdate
+[2026-09-14T02:53:03.463Z] [debug] ota: Already up to date
+[2026-09-14T02:53:03.455Z] [debug] appstate: inactive → active (was inactive for 159ms)
+[2026-09-14T02:53:03.305Z] [debug] ota: Checking…
+[2026-09-14T02:53:03.305Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a09d9f-80d6-75a7-98f7-a487ac2b2e76
+[2026-09-14T02:53:01.038Z] [debug] appstate: inactive → background (was inactive for 670ms)
+[2026-09-14T02:53:00.368Z] [debug] appstate: active → inactive (was active for 43818ms)
+[2026-09-14T02:52:50.676Z] [reward] ✦ For your persistence — Aetheric Dust (Uncommon).
+[2026-09-14T02:52:50.675Z] [reward] ✦ +35 TC, Patched Cloth, Aetheric Shard.
+[2026-09-14T02:52:50.675Z] [world] ★★ STORY THREAD COMPLETE — The lockbox cracks open. Inside — a smaller pouch of coin, a wrapped bundle of cloth, and a faintly humming shard.
+[2026-09-14T02:52:50.673Z] [debug] route: hook intercept (kind=wagon, target="wagon") — original intent=investigate
+[2026-09-14T02:52:50.673Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wagon resolved=wagon range=- enemies=0 hooks=1
+[2026-09-14T02:52:50.672Z] [player] investigate wagon
+[2026-09-14T02:52:50.633Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-14T02:52:49.096Z] [debug] ui: tap "investigate"
+[2026-09-14T02:52:37.560Z] [debug] send-log: #mu0ndukgzmqa — DELIVERED (inline, no attachments): beacon out, 8/8 parts accepted (54328 chars) — flush said yes, transport took every part
+[2026-09-14T02:52:23.352Z] [debug] boot: life bmu0ndedg0s started 2026-09-14T02:52:16.516Z · not an OTA apply (no handoff on disk)
+[2026-09-14T02:52:23.352Z] [debug] missions: none active · at=monarch_waystation travelTo=iskan_veil
+[2026-09-14T02:52:23.351Z] [debug] ═══ SESSION 2026-09-14T02:52:23.350Z · build 2026-09-14-1816-player-actions-keep-the-clock-honest · previous entry moments earlier ═══
+[2026-09-14T02:52:23.258Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Robert Schmobert. We've still got ground to cover, you and I."
+[2026-09-14T02:52:23.258Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-14T02:52:23.258Z] [debug] OTA session start: 2026-09-14-1816-player-actions-keep-the-clock-honest.
+[2026-09-14T02:52:21.208Z] [debug] voice⏱ gap 1064ms (wait 60ms + synth 1002ms, live) "Choose your character."
+[2026-09-14T02:52:20.111Z] [debug] voice: bundled ready
+[2026-09-14T02:52:17.315Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-14T02:52:16.810Z] [debug] voice: bundled loading
+[2026-09-14T02:52:16.810Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-14T02:52:16.626Z] [debug] ota: boot check result = noUpdate
+[2026-09-14T02:52:16.626Z] [debug] ota: Already up to date
+[2026-09-14T02:52:16.556Z] [debug] ota: Checking…
+[2026-09-14T02:52:16.556Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a09d9f-80d6-75a7-98f7-a487ac2b2e76
+[2026-09-14T02:52:12.598Z] [debug] appstate: inactive → background (was inactive for 735ms)
+[2026-09-14T02:52:11.864Z] [debug] appstate: active → inactive (was active for 227247ms)
+[2026-09-14T02:51:58.641Z] [world] ★ STORY THREAD (step 1) — You climb onto the broken axle. The wagon bed is half-emptied but the lockbox under the driver's bench is still sealed.
+[2026-09-14T02:51:58.639Z] [debug] route: hook intercept (kind=wagon, target="wagon") — original intent=investigate
+[2026-09-14T02:51:58.638Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wagon resolved=wagon range=- enemies=0 hooks=1
+[2026-09-14T02:51:58.637Z] [player] investigate wagon
+[2026-09-14T02:51:57.178Z] [debug] ui: tap "investigate"
+[2026-09-14T02:51:54.903Z] [dog_quest] The Arbiter studies the new pair. "Dust, then. The chain is off. The road is open."
+[2026-09-14T02:51:54.901Z] [world] Dust circles three times and curls beside you. His breathing slows to yours.
+[2026-09-14T02:51:54.899Z] [world] A Mutt. Dust. The name settles on the dog like a coat.
+[2026-09-14T02:51:32.598Z] [combat] Unaligned Poacher deals 9 bludgeoning damage. You have 22 HP remaining.
+[2026-09-14T02:51:32.556Z] [reward] +18 TC pried from the dust.
+[2026-09-14T02:51:32.555Z] [dog_quest] The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-09-14T02:51:32.554Z] [reward] Unaligned Poacher defeated. You recover Scrap Metal ×2, Mud Cloth.
+[2026-09-14T02:51:32.552Z] [combat] The killing blow with the plasma thrower: 8. Unaligned Poacher drops where it stood.
+[2026-09-14T02:51:32.550Z] [combat] You — d20 → 9 + WIS 13 + 2 (point blank) perfect opening (2× dice) = 24 vs Unaligned Poacher AC 9 — ✓ HIT
+[2026-09-14T02:51:32.549Z] [combat] Unaligned Poacher — d20 → 20 + ATK 4 = 24 vs your AC 19 — ✓ CRITICAL HIT
+[2026-09-14T02:51:32.548Z] [world] Unaligned Poacher moves first. The pressure is immediate.
+[2026-09-14T02:51:32.482Z] [debug] dice⏱ damage: shown +52ms, tapped +560ms, settled +820ms = 1432ms
+[2026-09-14T02:51:31.662Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:31.048Z] [debug] dice⏱ attack: shown +50ms, tapped +562ms, settled +820ms = 1432ms
+[2026-09-14T02:51:30.228Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:29.615Z] [debug] dice⏱ initiative: shown +20ms, tapped +821ms, settled +820ms = 1661ms
+[2026-09-14T02:51:28.795Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:27.955Z] [system] ⏳ Time passed: 6 min
+[2026-09-14T02:51:27.955Z] [world] Your plasma thrower comes around in an arc; Unaligned Poacher squares up to meet it.
+[2026-09-14T02:51:27.952Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-14T02:51:27.951Z] [debug] attack: target=Unaligned Poacher range=close reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-14T02:51:27.949Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma thrower resolved=Plasma Thrower range=close enemies=1 hooks=1
+[2026-09-14T02:51:27.948Z] [player] attack with the off-hand plasma thrower
+[2026-09-14T02:51:27.878Z] [debug] ui: tap "plasma thrower 🔥"
+[2026-09-14T02:51:27.035Z] [system] ⏳ Time passed: 6 min
+[2026-09-14T02:51:27.028Z] [combat] Dodge — d20 → 8 + DEX 6 = 14 vs ATK 9. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-14T02:51:27.028Z] [combat] Unaligned Poacher — d20 → 5 + ATK 4 = 9 vs your AC 19 — ✗ EVADED
+[2026-09-14T02:51:27.022Z] [world] You commit to the dodge. Slip Unaligned Poacher's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-14T02:51:27.019Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-14T02:51:27.018Z] [player] dodge
+[2026-09-14T02:51:26.995Z] [debug] ui: tap "dodge"
+[2026-09-14T02:51:20.831Z] [combat] Unaligned Poacher deals 5 bludgeoning damage. You have 31 HP remaining.
+[2026-09-14T02:51:20.801Z] [combat] The plasma thrower cuts air. Unaligned Poacher answers immediately.
+[2026-09-14T02:51:20.800Z] [combat] You — d20 → 1 + WIS 13 + 2 (point blank) = 16 vs Unaligned Poacher AC 9 — ✗ FUMBLE
+[2026-09-14T02:51:20.799Z] [combat] Unaligned Poacher — d20 → 16 + ATK 4 = 20 vs your AC 19 — ✓ HIT
+[2026-09-14T02:51:20.798Z] [world] Unaligned Poacher moves first. The pressure is immediate.
+[2026-09-14T02:51:20.732Z] [debug] dice⏱ attack: shown +51ms, tapped +429ms, settled +820ms = 1300ms
+[2026-09-14T02:51:19.912Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:19.431Z] [debug] dice⏱ initiative: shown +19ms, tapped +824ms, settled +819ms = 1662ms
+[2026-09-14T02:51:18.612Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:17.819Z] [debug] persist sizes(KB): total=143 player=27 wm=27[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2
+[2026-09-14T02:51:17.771Z] [system] ⏳ Time passed: 6 min
+[2026-09-14T02:51:17.770Z] [world] You raise the plasma thrower toward Unaligned Poacher. The room narrows around the both of you.
+[2026-09-14T02:51:17.766Z] [debug] attack: target=Unaligned Poacher range=close reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-14T02:51:17.764Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma thrower resolved=Plasma Thrower range=close enemies=1 hooks=1
+[2026-09-14T02:51:17.764Z] [player] attack with the off-hand plasma thrower
+[2026-09-14T02:51:17.695Z] [debug] ui: tap "plasma thrower 🔥"
+[2026-09-14T02:51:16.612Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T02:51:16.612Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:51:16.612Z] [combat] Unaligned Poacher — d20 → 6 + ATK 4 = 10 vs your AC 19 — ✗ MISS
+[2026-09-14T02:51:16.611Z] [world] You close the gap with Unaligned Poacher. (range: close / arm's reach)
+[2026-09-14T02:51:16.610Z] [debug] move: field advance target=Unaligned Poacher d 1.50->0.50 band mid->close
+[2026-09-14T02:51:16.609Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0
+[2026-09-14T02:51:16.606Z] [debug] parser: intent=advance conf=1.00 verb=approach target=unaligned poacher resolved=Unaligned Poacher range=mid enemies=1 hooks=1
+[2026-09-14T02:51:16.606Z] [player] approach Unaligned Poacher
+[2026-09-14T02:51:16.545Z] [debug] ui: tap "approach"
+[2026-09-14T02:51:12.631Z] [combat] Unaligned Poacher deals 2 bludgeoning damage [edge of reach — halved]. You have 36 HP remaining.
+[2026-09-14T02:51:12.601Z] [combat] Unaligned Poacher — d20 → 17 + ATK 4 = 21 vs your AC 19 — ✓ HIT
+[2026-09-14T02:51:12.600Z] [combat] Clean hit with the plasma thrower for 6. Unaligned Poacher has 8 left and does not back away.
+[2026-09-14T02:51:12.598Z] [combat] You — d20 → 13 + WIS 13 = 26 vs Unaligned Poacher AC 9 — ✓ HIT
+[2026-09-14T02:51:12.598Z] [world] You seize the initiative. Unaligned Poacher has no time to react.
+[2026-09-14T02:51:12.532Z] [debug] dice⏱ damage: shown +52ms, tapped +611ms, settled +820ms = 1483ms
+[2026-09-14T02:51:11.712Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:11.048Z] [debug] dice⏱ attack: shown +45ms, tapped +500ms, settled +820ms = 1365ms
+[2026-09-14T02:51:10.228Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:09.682Z] [debug] dice⏱ initiative: shown +26ms, tapped +849ms, settled +837ms = 1712ms
+[2026-09-14T02:51:08.845Z] [debug] ui: tap "roll"
+[2026-09-14T02:51:07.971Z] [system] ⏳ Time passed: 6 min
+[2026-09-14T02:51:07.971Z] [world] You raise the plasma thrower toward Unaligned Poacher. The room narrows around the both of you.
+[2026-09-14T02:51:07.965Z] [debug] attack: target=Unaligned Poacher range=mid reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-14T02:51:07.963Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma thrower resolved=Plasma Thrower range=mid enemies=1 hooks=1
+[2026-09-14T02:51:07.963Z] [player] attack with the off-hand plasma thrower
+[2026-09-14T02:51:07.895Z] [debug] ui: tap "plasma thrower 🔥"
+[2026-09-14T02:51:00.287Z] [dog_quest] The wagon shifts as you reach it — and behind it the Mud Monarch Enforcer steps out, a leash in one hand, a shepherd lashed to a wheel and snarling against the cord. "Walk on, stranger. Or stay, and lose."
+[2026-09-14T02:51:00.282Z] [player] investigate wagon
+[2026-09-14T02:50:58.928Z] [debug] ui: tap "investigate"
+[2026-09-14T02:50:58.112Z] [cognitive] SWIM  (71ms)
+[2026-09-14T02:50:58.041Z] [system] ⏳ Time passed: 24 min
+[2026-09-14T02:50:58.040Z] [reward] You scrape at the silt with the pocket knife. ✦ Recovered Mud Fragment (Common).
+[2026-09-14T02:50:58.037Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=1
+[2026-09-14T02:50:58.036Z] [player] investigate the mud
+[2026-09-14T02:50:56.778Z] [debug] ui: tap "investigate"
+[2026-09-14T02:50:54.696Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-14T02:50:54.695Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-09-14T02:50:54.695Z] [reward]     • Aether Crystal (Common)
+[2026-09-14T02:50:54.695Z] [reward] ✦ Salvage haul:
+[2026-09-14T02:50:54.694Z] [world] You salvage the fire pit. The take is small but real.
+[2026-09-14T02:50:54.694Z] [world] You break the bench apart. Among the pieces, something worth keeping.
+[2026-09-14T02:50:54.693Z] [world] You work the banner over. A part of it comes loose, intact.
+[2026-09-14T02:50:53.900Z] [cognitive] neutral  (65ms)
+[2026-09-14T02:50:53.833Z] [arbiter] "Threads in Tartaria don't wait long," the Arbiter says quietly. "The wagon won't either."
+[2026-09-14T02:50:53.833Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:50:53.832Z] [world] You study the fire pit and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-14T02:50:53.832Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fire pit resolved=fire pit range=- enemies=0 hooks=1
+[2026-09-14T02:50:53.831Z] [player] investigate fire pit
+[2026-09-14T02:50:53.511Z] [debug] ui: tap "take / salvage"
+[2026-09-14T02:50:52.649Z] [cognitive] neutral  (61ms)
+[2026-09-14T02:50:52.585Z] [debug] investigate: "table" marked searched
+[2026-09-14T02:50:52.584Z] [world] Your study of the table draws your eye to something past it — A wagon, abandoned and broken-axled, leans into the mud ahead.
+[2026-09-14T02:50:52.584Z] [world] You crouch beside the table. The silt has half-swallowed it.
+[2026-09-14T02:50:52.584Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=table resolved=table range=- enemies=0 hooks=0
+[2026-09-14T02:50:52.583Z] [player] investigate table
+[2026-09-14T02:50:51.244Z] [debug] ui: tap "investigate"
+[2026-09-14T02:50:50.478Z] [debug] ui: tap "Hall"
+[2026-09-14T02:50:49.548Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.
+[2026-09-14T02:50:49.547Z] [world] You step inside the stripped garrison, into the great hall.
+[2026-09-14T02:50:49.544Z] [debug] ui: tap "ENTER"
+[2026-09-14T02:50:47.890Z] [world] The thread you were following waits where you left it.
+[2026-09-14T02:50:47.889Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.
+[2026-09-14T02:50:47.887Z] [debug] spawn: gear=[Iron Buckler] window=10 roster=new
+[2026-09-14T02:50:47.861Z] [debug] ui: tap "→ ISKAN-VEIL"
+[2026-09-14T02:50:46.828Z] [debug] ui: tap "less ▾"
+[2026-09-14T02:50:42.795Z] [debug] persist sizes(KB): total=148 player=27 wm=32[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=2
+[2026-09-14T02:50:21.035Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T02:50:14.835Z] [debug] stats: STR13 DEX4 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+2 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots amulet=Aetheric Locket
+[2026-09-14T02:49:58.401Z] [debug] stats: STR13 DEX2 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers amulet=Aetheric Locket
+[2026-09-14T02:49:55.383Z] [debug] stats: STR13 DEX2 INT11 WIS13 CHA3 STE0 | gear: INT+1,WIS+3,STR+2 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets amulet=Aetheric Locket
+[2026-09-14T02:49:48.367Z] [debug] stats: STR12 DEX2 INT11 WIS13 CHA3 STE0 | gear: INT+1,WIS+3,STR+1 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest amulet=Aetheric Locket
+[2026-09-14T02:49:34.614Z] [world] You rack Sentinel Core Plate on your bandolier. Ready to throw.
+[2026-09-14T02:49:27.547Z] [world] You clip Pulse Scanner into your scanner pouch. It runs whenever you search.
+[2026-09-14T02:49:17.783Z] [debug] persist sizes(KB): total=146 player=27 wm=32[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=2
+[2026-09-14T02:49:17.664Z] [world] You clip Aetheric Scanner into your scanner pouch. It runs whenever you search.
+[2026-09-14T02:49:06.043Z] [debug] ui: tap "inventory"
+[2026-09-14T02:49:04.827Z] [debug] ui: tap "more ▸"
+[2026-09-14T02:49:03.096Z] [cognitive] READY  (61ms)
+[2026-09-14T02:49:03.033Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T02:49:03.033Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:49:03.033Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-14T02:49:03.032Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=2
+[2026-09-14T02:49:03.031Z] [player] investigate watch fire
+[2026-09-14T02:49:01.094Z] [debug] ui: tap "investigate"
+[2026-09-14T02:48:58.645Z] [reward] ✦ Scholar's Headband of Knowledge (Common).
+[2026-09-14T02:48:58.645Z] [world] You lift the Scholar's Headband of Knowledge clear.
+[2026-09-14T02:48:58.636Z] [reward] ✦ Plasma Cutter (Common).
+[2026-09-14T02:48:58.636Z] [world] You pick up the Plasma Cutter.
+[2026-09-14T02:48:58.632Z] [reward] ✦ Bonebreaker Mace (Common).
+[2026-09-14T02:48:58.632Z] [world] You take the Bonebreaker Mace from where it lay.
+[2026-09-14T02:48:57.874Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-14T02:48:57.874Z] [reward]     • Stick (Common)
+[2026-09-14T02:48:57.873Z] [reward] ✦ Salvage haul:
+[2026-09-14T02:48:57.873Z] [world] You break the table apart. Among the pieces, something worth keeping.
+[2026-09-14T02:48:57.872Z] [world] Slim pickings on the marker. You pocket a Stick on the way out.
+[2026-09-14T02:48:56.725Z] [cognitive] neutral  (61ms)
+[2026-09-14T02:48:56.663Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T02:48:56.663Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T02:48:56.663Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:48:56.662Z] [world] The Plasma Cutter resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-14T02:48:56.661Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=plasma cutter resolved=Plasma Cutter range=- enemies=0 hooks=2
+[2026-09-14T02:48:56.660Z] [player] investigate Plasma Cutter
+[2026-09-14T02:48:55.464Z] [cognitive] DISENGAGE · ATTACK  (56ms)
+[2026-09-14T02:48:55.407Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T02:48:55.407Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:48:55.404Z] [world] You study the Bonebreaker Mace. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-09-14T02:48:55.404Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bonebreaker mace resolved=Bonebreaker Mace range=- enemies=0 hooks=2
+[2026-09-14T02:48:55.403Z] [player] investigate Bonebreaker Mace
+[2026-09-14T02:48:55.060Z] [debug] ui: tap "take / salvage"
+[2026-09-14T02:48:54.208Z] [cognitive] neutral  (54ms)
+[2026-09-14T02:48:54.153Z] [arbiter] The Arbiter watches. "I saw the way you came at that."
+[2026-09-14T02:48:54.153Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-14T02:48:54.152Z] [world] The Scholar's Headband of Knowledge reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-14T02:48:54.150Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=scholar headband knowledge resolved=Scholar's Headband of Knowledge range=- enemies=0 hooks=2
+[2026-09-14T02:48:54.147Z] [player] investigate Scholar's Headband of Knowledge
+[2026-09-14T02:48:54.082Z] [debug] qwen: SKIPPED this session — completion-crash guard tripped (1 crash inside a Qwen completion)
+[2026-09-14T02:48:52.610Z] [debug] ui: tap "investigate"
+[2026-09-14T02:48:50.671Z] [world] A line of pale-blue fungus blooms across the ground ahead — the True Tartarians grow this where they walk often.
+[2026-09-14T02:48:50.670Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-14T02:48:50.669Z] [debug] spawn: gear=[Scholar's Headband of Knowledge, Bonebreaker Mace, Plasma Cutter] window=10 roster=new
+[2026-09-14T02:48:50.643Z] [debug] ui: tap "→ ISKAN-VEIL"
+[2026-09-14T02:48:36.683Z] [debug] send-log: #mu0n8onethhe — DELIVERED (inline, no attachments): beacon out, 19/19 parts accepted (139380 chars) — flush said yes, transport took every part
+[2026-09-14T02:48:31.078Z] [debug] boot: life bmu0n8far0p started 2026-09-14T02:48:24.435Z · not an OTA apply (no handoff on disk)
+[2026-09-14T02:48:31.078Z] [debug] missions: none active · at=monarch_waystation travelTo=iskan_veil
+[2026-09-14T02:48:31.078Z] [debug] ═══ SESSION 2026-09-14T02:48:31.077Z · build 2026-09-14-1816-player-actions-keep-the-clock-honest · previous entry moments earlier ═══
+
+=== END REPORT ===
