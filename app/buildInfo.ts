@@ -30548,7 +30548,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // two stamps as OTA-1807, no sprint feed, no homework preemption, no
 // `uiIdleSince` policy change, no gameplay behaviour altered — return values
 // pass through untouched.
-export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
+// ── OTA-1817 — THE PACK KEEPS ITS READING WINDOW (Baker item 13, job B) ───────
+// Two clocks, two meanings, and until OTA-1816 they could not touch each other.
+// `uiIdleSince` — "the player is reading a stationary screen" — is armed by
+// exactly one caller in the app: the pack, once, on mount. OTA-1816 put
+// `noteHumanInteraction` on sixteen pack seams, and that primitive clears the
+// idle stamp. Correct — it is pinned behaviour since OTA-1807 and the player
+// really is acting — but there was no way back. MEASURED on 994bf018: the FIRST
+// equip / drop / scrap / stow left the field null for the REST of the visit, so
+// item-description homework and the interactive synth requester both stayed dead
+// until the player left the pack and came back. The pack's whole purpose is the
+// description written ahead of the tap, and using the pack switched it off.
+//
+// Owner ruling: a pack action IS human activity and MUST keep clearing the
+// window, but it must not END eligibility for the visit. One pack-local effect
+// now reads Job A's own clock and re-arms OTA-1126's `markUiIdle` once the
+// action settles. The stamp is FRESH, never the old one resumed, so the existing
+// ≥1500 ms threshold is served in full and can never be bypassed by acting.
+//
+// Two existing primitives, no new mechanism, no second activity architecture.
+// Job A's 39-action membership, `lastPlayerActionAt`, sprint accounting,
+// homework preemption, navigation and pending-roll policy are all untouched.
+export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';

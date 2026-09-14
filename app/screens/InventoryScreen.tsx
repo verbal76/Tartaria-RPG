@@ -265,6 +265,49 @@ export function InventoryScreen() {
     mark(true);
     return () => { mark(false); };
   }, []);
+  // ⚠⚠⚠ OTA-1817 (Baker item 13, job B) — AND THE WINDOW COMES BACK.
+  //
+  // The effect above arms the pack's reading window ONCE, on mount, with `[]`
+  // deps. That was complete until OTA-1816: before it, nothing on this screen
+  // could clear `uiIdleSince`, so "armed once" and "armed for the visit" were
+  // the same sentence. OTA-1816 put `noteHumanInteraction` on sixteen pack
+  // seams, and that primitive clears the idle stamp — correctly, it is pinned
+  // behaviour since OTA-1807 and the player really is acting. But there was no
+  // way back: MEASURED on 994bf018, the FIRST equip / drop / scrap / stow left
+  // `uiIdleSince` null for the REST of the mounted visit, and both readers of
+  // that field — the item-description homework slot and the interactive synth
+  // requester — stayed dead until the player left the pack and came back.
+  //
+  // That killed the one feature this window exists for: the description written
+  // ahead of the tap. Neither OTA-1126 nor OTA-1807 decided it; it fell out of
+  // the primitive's new reach, and OTA-1816's own header still claims it makes
+  // "no `uiIdleSince` policy change". Owner ruling, 2026-09-14: a pack action IS
+  // human activity and MUST keep clearing the window, but it must not END
+  // eligibility for the visit — once it settles, a FRESH window is armed and the
+  // existing threshold starts again from the new stamp.
+  //
+  // ⚠⚠ WHY THIS SEAM AND NOT SIXTEEN. Re-arming at each pack action would be
+  // Job A's many-doors mistake again, and wrapping the wrapper would be a second
+  // activity architecture. This READS Job A's clock — the one authority that
+  // already knows a human acted — and hands the answer to OTA-1126's own
+  // `markUiIdle`, which is already idempotent-when-stamped. Two existing
+  // primitives, no new mechanism, no global semantics touched.
+  //
+  // ⚠ THE STAMP IS FRESH, NOT RESTORED. `markUiIdle(true)` stamps `Date.now()`
+  // only when the field is null, so the dwell restarts from the action rather
+  // than resuming the pre-action clock — the ≥1500 ms homework threshold is
+  // served in full and can never be bypassed by acting.
+  //
+  // ⚠ IT CANNOT FIRE AFTER THE PACK CLOSES. React runs no effect for an
+  // unmounted component, and the cleanup above still nulls the stamp. No pack
+  // MUTATION navigates away either — `setScreen` appears once on this screen,
+  // on the BACK button, which OTA-1816 deliberately kept off the membership
+  // list — so there is no action that both stamps and leaves.
+  const lastPlayerActionAt = useGameStore((s) => s.lastPlayerActionAt);
+  useEffect(() => {
+    if (lastPlayerActionAt === null) return;
+    useGameStore.getState().markUiIdle(true);
+  }, [lastPlayerActionAt]);
   // OTA-087 — search query + sort axis state. Ephemeral (not
   // persisted across sessions); resets to defaults on each
   // mount. Query is a case-insensitive substring match against
