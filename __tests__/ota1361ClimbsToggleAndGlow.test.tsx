@@ -341,14 +341,44 @@ describe('OTA-1361 — the towers toggle, and the active mission glows', () => {
     }
   });
 
-  it('⚠⚠ THE OWNER\'S ASK: the ACTIVE button glows, and every toggle site uses it', () => {
+  it('⚠⚠ THE OWNER\'S ASK, AS IT NOW STANDS: the ACTIVE state is carried by the WORDS, and every toggle site uses it', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'screens', 'ContractsScreen.tsx'), 'utf8');
-    // A real glow, not just another border colour: fill + halo, on both platforms.
+    /**
+     * ⚠⚠⚠ SUPERSEDED BY OTA-1821 (TARGET 7) ON THE OWNER'S DIRECT RULING — and
+     * SUPERSEDED, not relaxed to let an implementation through.
+     *
+     * THIS ASSERTION USED TO DEMAND THE GLOW. OTA-1361's ask was "the set active
+     * buttons should glow on missions", built as FOUR layers: a tinted fill, a
+     * brighter rim at double width, a box glow, and a text halo. This test pinned
+     * the first three — shadowColor / shadowRadius / elevation / backgroundColor
+     * on `trackBtnOn`.
+     *
+     * THE OWNER HAS NOW RULED THE OPPOSITE, FROM THE DEVICE: three of those four
+     * layers draw the PERIMETER, and an active control stopped reading as the same
+     * physical key — the depth was replaced by a lit outline, so the button
+     * appeared to flatten into a glowing frame. The body must read the same whether
+     * the contract is running or not; only the WORDS may say which.
+     *
+     * ⚠ THE REPLACEMENT IS STRICTLY STRONGER THAN "IT GLOWS". "trackBtnOn contains
+     * a shadow" was satisfied by any glow of any size beside any amount of other
+     * dressing. The new rule is an EQUALITY — the active state must contribute
+     * NOTHING to the body — so it also catches every half-measure the old form
+     * could not: a fill kept while the glow goes, a rim widened without a shadow,
+     * or any new perimeter key added here later.
+     *
+     * ⚠ THE FOURTH LAYER SURVIVES AND IS STILL PINNED. `textShadowColor:` was
+     * always part of this test and still passes: the halo is now the WHOLE active
+     * signal rather than one of four. OTA-1821 §4 pins its colour and weight, and
+     * §3.5 proves on a real render that the two states' words differ.
+     */
     const on = src.slice(src.indexOf('trackBtnOn: {'), src.indexOf('trackBtnOff:'));
-    expect(on).toContain("shadowColor: '#54d6c4'");
-    expect(on).toContain('shadowRadius');
-    expect(on).toContain('elevation');
-    expect(on).toContain('backgroundColor');
+    // the slice runs to the next declaration, so drop the comment that sits between
+    expect(on.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').replace(/\s/g, ''))
+      .toBe('trackBtnOn:{},');
+    for (const perimeter of ['shadowColor', 'shadowRadius', 'elevation', 'backgroundColor', 'borderColor', 'borderWidth']) {
+      expect(on).not.toContain(`${perimeter}:`);
+    }
+    // the one OTA-1361 layer the owner kept — and now the only active signal
     expect(src).toContain('textShadowColor:');
     // Every toggle picks the lit style when active — the old shape only ever
     // styled the OFF state, so "active" was the absence of dressing.
