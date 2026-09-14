@@ -83,8 +83,8 @@ const ANCHOR_PATTERNS = [
 const ALLOW = [
   {
     file: 'app/screens/MapScreen.tsx',
-    line: 684, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more; OTA-1802's Pressable + depth imports moved it two more; OTA-1804 moved it NINETEEN more
-    // ⚠⚠ THIS ENTRY HAS NOW DRIFTED FOUR TIMES FOR THE SAME REASON — code added
+    line: 685, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more; OTA-1802's Pressable + depth imports moved it two more; OTA-1804 moved it NINETEEN more; OTA-1816's activity-accounting import moved it one more
+    // ⚠⚠ THIS ENTRY HAS NOW DRIFTED FIVE TIMES FOR THE SAME REASON — code added
     // ABOVE it — which says the ALLOWLIST KEY is the brittle part, not the code it
     // exempts. A file+line key turns any unrelated import into a red gate on a line
     // nobody touched, and the fix is always to edit this number, which is exactly
@@ -102,6 +102,18 @@ const ALLOW = [
     // gate went red on a purely additive visual pass that never read
     // currentLocationId. This re-pin is MAINTENANCE OF A STANDING EXCEPTION on
     // owner ruling — not a new exception, and not authorisation for one.
+    //
+    // ⚠⚠⚠ AND THE FIFTH DRIFT IS THE CHEAPEST ONE YET, which is the point. OTA-1816
+    // added ONE import line to MapScreen — `useHumanAction` from state/humanActivity,
+    // so a TRAVEL TO press accounts the player's activity — six hundred lines above
+    // this statement and about nothing but a timestamp. 684 + 1 = 685. The exempted
+    // statement is again BYTE-IDENTICAL: md5 7614f6948a93f4ea13e5ff102dcf43c4 at both
+    // dec37739:684 and 6c1bda29:685, the same hash recorded for the fourth drift. A
+    // single import now costs a red REQUIRED gate, so the text-keyed fix named above
+    // is no longer theoretical debt — it is the next thing that should happen to this
+    // file. Still not done here, for the same reason as last time: the surrounding
+    // work is a scoped activity-accounting repair, and widening a gate inside one is
+    // how gates become decoration. Maintenance of the standing exception, nothing more.
     // RESOLVING THE CURRENT LOCATION'S RECORD, not testing a position. This is the
     // "which place's rules apply to me" question — it looks up the row for the last
     // named place so the screen can read its name, tags and description. Nothing
