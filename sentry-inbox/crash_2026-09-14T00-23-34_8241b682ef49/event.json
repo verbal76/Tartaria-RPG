@@ -1,0 +1,239 @@
+{
+  "id": "8241b682ef49432f9a52008076b87e74",
+  "groupID": "7717706963",
+  "eventID": "8241b682ef49432f9a52008076b87e74",
+  "projectID": "4511945117532160",
+  "size": 3447,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process reclaimed while idle on the title screen \u2014 no game was in progress (23s after boot, app background, stage qwen:deferred)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-14-1814-the-report-screen-joins-the-trace",
+  "message": "Process reclaimed while idle on the title screen \u2014 no game was in progress (23s after boot, app background, stage qwen:deferred)",
+  "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (23s after boot, app background, stage qwen:deferred)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "48efc01d908348c9b72a93e70c46a76e",
+      "span_id": "82f847edf18d1c56",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 2949,
+    "id": "1789345414481_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "appstate:active\u2192background",
+    "lastPhaseAgeMs": 0,
+    "lastScreen": "title",
+    "launchAfterOta": false,
+    "launchAgeMs": 22707,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 22707,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (23s after boot, app background, stage qwen:deferred)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-14-1814-the-report-screen-joins-the-trace"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-14-1814-the-report-screen-joins-the-trace"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-14-1814-the-report-screen-joins-the-trace"
+    },
+    {
+      "key": "stage",
+      "value": "appstate:active\u2192background"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-14T00:25:51.134722Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-14T00:23:34.481000Z",
+  "fingerprints": [
+    "8c219da47ebaa917d481ecf80fb9f9a4"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1969923563,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-13T21:14:47.906887Z",
+    "dateReleased": "2026-09-13T21:20:51.142375Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "53655ccad6b01351b5800fd44af2e1b85f29094c",
+      "message": "OTA-1814 \u2014 the report screen joins the trace\n\nOBSERVATIONAL TELEMETRY ONLY.\nGAMEPLAY FREEZE REPAIR ATTEMPTED: NO.\nREPORT FREEZE REPAIR ATTEMPTED: NO.\nNeither freeze is fixed; neither cause is known.\n\nWHAT THE HEALTHY APPLE CONTROL EXPOSED. Robert Schmobert's OTA-1813 run on a 2022\niPhone SE (bundle mu096euu9i87, 8/8 parts, 56,188 chars) proved the instrument\nworks: four interactions, zero orphans, T0\u2192T1 in 0\u20131ms, logUiTap and T2 stamped\nin the same millisecond, and a stamina refusal whose `reject` matched the store's\nown line one millisecond later. It also showed where the instrument was BLIND,\nand the blind spot was exactly where the OTHER freeze lives \u2014 AboutScreen carried\nZERO touch-path coverage, so the post-report freeze that reproduced 2/2 on Build\n189 would have left no trace of any kind.\n\nFOUR SEAMS, EACH ANSWERING A QUESTION NOTHING ELSE COULD:\n\n  T0 on AboutScreen        Did a touch reach the report screen at all? Nothing\n                           observed this surface before.\n\n  M0 on the composer card  PROVEN NECESSARY, not assumed. KeyboardSafeCard\n                           renders a native <Modal>, so its content is hosted\n                           OUTSIDE AboutScreen's tree and T0 structurally cannot\n                           see it \u2014 the same RN mechanism already proven for\n                           SearchModal / GatherModal / ClimbModal. OPT-IN via one\n                           optional prop: five modals share that card and only\n                           the report composer passes it, so the other four\n                           render byte-identically to 1813.\n\n  T1/T2 on SEND and CANCEL Did the control receive the press, and did its handler\n                           run? Every control on the report path was\n                           uninstrumented, which made a bare T0 there always the\n                           useless reading.\n\n  admit/reject + pres      Did the async send RESOLVE, and did the receipt get\n                           REQUESTED and then actually SHOWN?\n\n`pres` IS THE ONE NEW WORD, and it is one rather than four because the phase\nrides the existing bounded `reason` field: requested / shown / dismiss / dismissed.\n`requested` without `shown` means React never committed the receipt; `shown`\nwithout `dismissed` means it committed and the way out never completed. Different\nfaults, different repairs, and no stage in 1813 could separate them.\n\nTHE ID IS HELD ACROSS THE AWAIT. `currentTouchId` is age-bounded at 1.5s and the\nsend can take seconds, so the interaction id is captured at dispatch into a REF \u2014\nnot state, nothing here may cause a render \u2014 and reused for the resolution and\nevery receipt stage. One physical tap stays ONE interaction id from press to\ndismissal, which is what makes the trace readable as a single story.\n\nTHE SENT REPORT STILL CANNOT DESCRIBE ITS OWN AFTERMATH, and this OTA does not\npretend otherwise. The payload is composed before the receipt exists, so every\nstage from `admit` onward reaches a reader on the NEXT boot under `prior boot:`.\nThe existing persistence already carries them \u2014 one write in flight, leading plus\none coalesced trailing \u2014 so NOTHING about persistence was changed or redesigned.\n\nTHE RECEIPT'S OK TAP NEEDED NO EDIT, because OTA-1812 made that receipt INLINE:\nit renders inside AboutScreen's own tree, so the new root observer sees the tap.\nHad it stayed a native <Modal> it would not. That is a real consequence of 1812,\nand it is why no separate dismiss-requested stage was minted \u2014 `root` with no\n`dismissed` already carries the meaning, and OTA-1812's pinned element is\nuntouched.\n\nA REFUSAL IS STILL ONLY WRITTEN WHERE SOURCE PROVES ONE. The composer's `canSend`\nguard is NOT recorded: the SEND key is `disabled` in that state, so RN never runs\nthe handler and the branch is defensive and unreachable. The recorded rejections\nare the report's OWN returned statuses \u2014 unchanged / off / unconfigured / failed \u2014\ndata the composer hands back rather than a verdict invented here.\n\nUNEXERCISED IS NOT BROKEN. Robert's session never opened Search/Gather/Climb and\nnever took a deferred submit, so M0 and armed/fired have no device evidence yet.\nSource coverage for all three sheets was re-read at HEAD, found correct, and left\nexactly as it was. Nothing was changed merely because one session did not use it.\n\nOBSERVER EFFECT. Root observers return false and claim no responder; no gameplay\nstate is mutated; no action is serialised, debounced, or re-admitted; no modal\ndismissal, ML ownership or navigation behaviour changes; no per-stage awaited\nstorage write; no recurring timer; no new React or Zustand render pressure \u2014 the\none effect added rides a commit that already happens. Ring and fields stay\nbounded.\n\nVERIFICATION. 22/22 check gates green. typecheck:ci clean; typecheck:tests at\nbaseline 201 (NOT raised); lint clean. New suite ota1814TheReportScreenJoinsTheTrace\n32/32 over ten sections. Four negative controls each went red on a reversed\nproduction condition and green again \u2014 the About root observer claiming the\nresponder, the composer's M0 removed, `shown` collapsed into `requested`, and a\nfabricated rejection on the unreachable canSend guard \u2014 and none remains in the\ntree. Full fast surface 1358/1358 suites, 14,393 tests, re-run on this exact tree.\n\nWHAT IS NOT CLAIMED. No test here can present a native iOS modal or reproduce\neither freeze. This OTA only makes the next reproduction legible; the answer\nstill requires a device.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-13T21:08:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-14-1814-the-report-screen-joins-the-trace",
+          "shortVersion": "tartaria@4.32.11+2026-09-14-1814-the-report-screen-joins-the-trace",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-13T21:20:51.142375Z",
+          "dateCreated": "2026-09-13T21:14:47.906887Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "158076186",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-13T21:20:51.375809Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-14-1814-the-report-screen-joins-the-trace",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-14-1814-the-report-screen-joins-the-trace",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-14-1814-the-report-screen-joins-the-trace",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-14-1814-the-report-screen-joins-the-trace)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "fed9b670f161420d883ccad1b01e3827"
+}
