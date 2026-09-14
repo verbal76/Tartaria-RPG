@@ -1,0 +1,813 @@
+Bug Report — Robert Schmobert · (2026-09-14-1820-the-sections-rest-raised-and-remember) · Good run
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-14T20:15:57.704Z
+Character: Robert Schmobert
+Slot ID: slot_mu090tcc_kwag6q
+Race: Tartarian Giants
+Location: Reclaimer's Stake
+HP: 15/39
+
+--- DESCRIPTION ---
+Good run
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-14T20:15:57.614Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 189
+  AAB: (build 189)
+  OTA: (2026-09-14-1820-the-sections-rest-raised-and-remember)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-14T20:09:52.238Z
+  Last init success: 2026-09-14T20:09:56.219Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: RECOVERED — a retry survived a clean run; AI narration re-enabled
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (count reset — it described a previous build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu1ofkc7fr · started 2026-09-14T20:09:43.351Z
+  Followed an OTA apply 131ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠ Memory warnings: 1 this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 2.9s · 0 job kinds queued >3s · worst 14.0ms/prompt-token · 1 generation thrown away (0.1s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 98 jobs · worst wait 5.1s (homework) · 2 past 3s
+  App state trail: active → inactive → active → inactive → background → active
+Model contexts
+  Live now: 0
+  Opened: 1 · Released: 1 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 152MB · last 152MB · net +140MB over 47 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/11 · ctx 0 · app=active · native voice running q1 · warns 0
+    +12.8s ctx-event — heap 24MB gc 0ms/41 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+    +12.8s watch-start — heap 24MB gc 0ms/43 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +22.9s heap-move — heap 32MB gc 0ms/66 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +27.9s heap-move — heap 40MB gc 0ms/85 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +47.9s heap-move — heap 48MB gc 0ms/116 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +62.9s heap-move — heap 56MB gc 0ms/139 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +77.9s heap-move — heap 64MB gc 0ms/167 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +87.9s heap-move — heap 72MB gc 0ms/198 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +97.9s heap-move — heap 80MB gc 0ms/223 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +112.5s gen-settled [investigate_lore ok] — heap 92MB gc 0ms/266 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +155.8s gen-settled [investigate_lore ok] — heap 92MB gc 0ms/362 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +156.9s gen-settled [investigate_lore ok] — heap 92MB gc 0ms/371 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +161.2s gen-settled [investigate_lore ok] — heap 92MB gc 0ms/388 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +174.3s gen-settled [investigate_lore ok] — heap 92MB gc 0ms/429 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +180.2s gen-settled [narration:scene_intro_fi] — heap 92MB gc 0ms/453 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q1 · warns 0
+   +182.5s gen-settled [investigate_lore ok] — heap 96MB gc 0ms/471 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+   +183.4s gen-settled [investigate_lore ok] — heap 100MB gc 0ms/475 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +198.7s appstate [active→inactive] — heap 104MB gc 0ms/491 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+   +201.5s appstate [inactive→active] — heap 104MB gc 0ms/493 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +212.4s appstate [active→inactive] — heap 108MB gc 0ms/509 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+   +214.0s appstate [inactive→active] — heap 112MB gc 0ms/511 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +224.7s gen-settled [investigate_lore ok] — heap 120MB gc 0ms/543 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +225.5s gen-settled [investigate_lore ok] — heap 124MB gc 0ms/554 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +233.1s heap-move — heap 132MB gc 0ms/573 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +243.2s heap-move — heap 140MB gc 0ms/592 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +253.2s heap-move — heap 148MB gc 0ms/627 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +260.3s appstate [active→inactive] — heap 152MB gc 0ms/633 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+   +261.0s appstate [inactive→background] — heap 152MB gc 0ms/636 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+   +261.9s appstate [background→active] — heap 152MB gc 0ms/640 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +271.9s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/671 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +273.2s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/686 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +280.5s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/712 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +289.6s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/739 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +294.3s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/762 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +321.8s gen-settled [narration:scene_intro_fi] — heap 152MB gc 1ms/806 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +327.1s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/828 · ctx 1 ≈425MB est · app=active · native investigate_lore running q4 · warns 0
+   +328.0s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/831 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+   +329.7s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/837 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +339.2s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/870 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +340.6s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/879 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +359.1s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/927 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +360.3s mem-warning — heap 152MB gc 1ms/935 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 1
+   +360.3s gen-settled [investigate_lore ok] — heap 152MB gc 1ms/935 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 1
+   +360.4s ctx-event — heap 152MB gc 1ms/935 · ctx 0 · app=active · native teardown running q0 · warns 1
+   +360.4s mem-warn-settled [freed-ctx] — heap 152MB gc 1ms/935 · ctx 0 · app=active · native idle q0 · warns 1
+Touch path
+  prior boot:
+  2026-09-14T13:07:15.378Z #5 root p=none exploration
+  2026-09-14T13:07:16.340Z #6 root p=none exploration
+  2026-09-14T13:07:17.991Z #7 root p=none exploration
+  2026-09-14T13:07:17.991Z #8 modal p=none exploration
+  2026-09-14T13:07:19.454Z #9 root p=none exploration
+  2026-09-14T13:07:19.454Z #10 modal p=none exploration
+  2026-09-14T13:07:27.810Z #11 root p=none exploration
+  2026-09-14T13:07:27.810Z #12 modal p=none exploration
+  2026-09-14T13:07:27.811Z #12 in report:send p=none exploration
+  2026-09-14T13:07:27.887Z #12 enter report:send p=none exploration
+  2026-09-14T13:07:27.887Z #12 admit report:send (described) p=none exploration
+  2026-09-14T13:07:27.887Z #12 dispatch report:send (described) p=none exploration
+  2026-09-14T13:07:27.887Z #12 dispatch report:send (compose) p=none exploration
+  2026-09-14T13:07:27.920Z #12 done report:send (handed-off) p=none exploration
+  2026-09-14T13:07:27.986Z #12 admit report:send (sent) p=none exploration
+  2026-09-14T13:07:27.986Z #12 done report:send (resolved) p=none exploration
+  2026-09-14T13:07:27.986Z #12 pres report:receipt (requested) p=none exploration
+  2026-09-14T13:07:27.991Z #12 pres report:receipt (shown) p=none exploration
+  2026-09-14T13:07:28.876Z #13 root p=none exploration
+  2026-09-14T13:07:28.990Z #12 pres report:receipt (dismissed) p=none exploration
+  2026-09-14T13:07:30.927Z #14 root p=none exploration
+  2026-09-14T13:07:31.659Z #15 root p=none exploration
+  2026-09-14T13:07:32.611Z #16 root p=none exploration
+  2026-09-14T13:07:36.209Z #17 root p=none exploration
+  this boot:
+  2026-09-14T20:15:40.309Z #272 done quick:investigate (callback) p=none exploration
+  2026-09-14T20:15:40.943Z #273 root p=S exploration
+  2026-09-14T20:15:40.943Z #274 modal p=S exploration
+  2026-09-14T20:15:40.944Z #274 in search:all p=S exploration
+  2026-09-14T20:15:41.074Z #274 enter search:all p=S exploration
+  2026-09-14T20:15:41.075Z #274 admit search:all (bulk) p=S exploration
+  2026-09-14T20:15:41.075Z #274 dispatch search:all (bulk) p=S exploration
+  2026-09-14T20:15:41.075Z #274 done search:all (bulk) p=S exploration
+  2026-09-14T20:15:42.957Z #275 root p=none exploration
+  2026-09-14T20:15:44.236Z #276 root p=none exploration
+  2026-09-14T20:15:48.893Z #277 root p=none exploration
+  2026-09-14T20:15:49.625Z #278 root p=none exploration
+  2026-09-14T20:15:50.516Z #279 root p=none exploration
+  2026-09-14T20:15:52.295Z #280 root p=none exploration
+  2026-09-14T20:15:52.296Z #281 modal p=none exploration
+  2026-09-14T20:15:53.296Z #282 root p=none exploration
+  2026-09-14T20:15:53.296Z #283 modal p=none exploration
+  2026-09-14T20:15:57.529Z #284 root p=none exploration
+  2026-09-14T20:15:57.530Z #285 modal p=none exploration
+  2026-09-14T20:15:57.530Z #285 in report:send p=none exploration
+  2026-09-14T20:15:57.611Z #285 enter report:send p=none exploration
+  2026-09-14T20:15:57.612Z #285 admit report:send (described) p=none exploration
+  2026-09-14T20:15:57.613Z #285 dispatch report:send (described) p=none exploration
+  2026-09-14T20:15:57.613Z #285 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Robert Schmobert)
+  HP: 15/39  Stamina: 13/16  TC: 231  Corruption: 8
+  Pack: 111 distinct rows / 338 total
+  Dog: Dust (Mutt) loyalty 90 HP 19/19
+
+Weapons (25)
+  Aetheric Baton (1d6 electrical, dur 43/43, [weapon,melee,single_handed,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Pike (1d8 aetheric, dur 13/13, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 33/33, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bonebreaker Mace (1d8 bludgeoning, dur 20/20, [weapon,melee,two_handed,hammer,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Energy Blade (1d6 burn, dur 10/10, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 35/36, equipped:main, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:off, unequip:main, use(off), repair
+  Crude Golem Greatsword (2d6 slashing, dur 33/33, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 20/20, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 7/7, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 16/16, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 11/11, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shortsword (1d6 slashing, dur 12/12, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 34/34, [weapon,starter,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 37/37, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 31/31, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 14/14, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Dagger (1d4 burn, dur 21/21, [weapon,melee,dual_wield,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 39/39, equipped:off, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, unequip:off, use
+  Plasma Thrower (1d6 burn, dur 21/21, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pocket Knife (1d4 slashing, dur 11/11, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pyric Wand (1d6 burn, dur 38/38, [weapon,runecaster])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rust Dagger (1d4 slashing, dur 28/28, [weapon,melee,dual_wield,knife,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusty Shortbow (1d6 piercing, dur 27/27, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 38/38, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Short Hunting Bow (1d6 piercing, dur 35/35, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (23)
+  Aether-Walker's Cape (dur 10/13, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, repair, drop
+  Aetheric Strider Boots (dur 7/9, equipped:feet, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet, repair
+  Architect's Aetheric Boots (dur 18/18, AC +2 · INT +2, [armor,feet,boots,architectural_sentinels])
+    actions: equip:feet, use, scrap, drop
+  Architect's Leg Enhancers (dur 18/20, equipped:legs, AC +2 · Resists: slashing · INT +2, [armor,legs,greaves,architectural_sentinels])
+    actions: unequip:legs, repair
+  Architect's Observer Visor (dur 29/29, AC +1 · Resists: cold · WIS +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 8/8, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 12/12, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Explorer's Worn Headgear (dur 33/33, AC +1 · Resists: cold · WIS +1, [armor,head,cloth,helmet,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Lost Seeker's Gloves (dur 33/33, AC +1 · INT +1, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+  Mud-Warden's Vest (dur 33/35, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest, repair
+  Reclaimer's Boots (dur 16/16, AC +2 · DEX +2 · STE +2, [armor,feet,boots,reclaimers,stealth])
+    actions: equip:feet, use, scrap, drop
+  Reclaimer's Salvage Cap (dur 27/29, equipped:head, AC +1 · INV +1, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head, repair
+  Salvager's Worn Greaves (dur 30/30, AC +1 · Resists: slashing · INT +1, [armor,legs,greaves,reclaimers])
+    actions: equip:legs, use, scrap, drop
+  Scholar's Headband of Knowledge (dur 19/19, AC +2 · Resists: cold · INT +2, [armor,head,cloth,helmet,mud_golems])
+    actions: equip:head, use, scrap, drop
+  Seer's Veil of the Aether (dur 10/10, AC +2 · Resists: aetheric · WIS +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Sentinel's Faceguard (dur 35/35, AC +1 · Resists: slashing · HP +5 · DEX +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Sentinel's Repair Cap (dur 36/36, AC +1 · WIS +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Stone-Stride Greaves (dur 22/22, AC +2 · Resists: bludgeoning · HP +5 · DEX +2, [armor,legs,greaves,mud_golems])
+    actions: equip:legs, use, scrap, drop
+  Stone-Strider Boots (dur 27/27, AC +1 · Resists: bludgeoning · HP +5 · DEX +1, [armor,feet,boots,mud_golems])
+    actions: equip:feet, use, scrap, drop
+  Traveler's Cloak (dur 21/21, AC +1 · STE +1 · STE +1, [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Wanderer's Armor of Wisdom (dur 32/32, AC +1 · STR +1, [armor,chest,plate,unknowing_masses])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Face of Shadows (dur 27/27, AC +1 · STE +1, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 22/24, AC +1 · STR +1, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, repair, drop
+
+Shields (1)
+  Mud Heater Shield (1d4 bludgeoning, dur 100/100, [weapon,shield,dual_wield,mud_dwellers])
+    actions: equip:off, use(off), scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (2)
+  Blue Aetheric Fungus ×3 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (6)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 240/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (51)
+  Aether Crystal ×25 ([aether,crystal,climb_top])
+    actions: drop
+  Aether Crystal ×3 ([aether,crystal])
+    actions: drop
+  Aether Dust ×23 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Dust (Uncommon, [aether,loot,bonus])
+    actions: scrap, drop
+  Aetheric Shard ×5 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetheric Sludge ×2 ([mud,aether,loot])
+    actions: scrap, drop
+  ◆ Amber Droplet (Uncommon, ♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  Automaton Circuit ×3 ([automation,tech,scrap])
+    actions: drop
+  ◆ Beetle-Chitin Flake (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Bent Nail ×10 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ([thrown,stone,improvised,heavy])
+    actions: drop
+  Bone Sliver ×2 ([bone,junk,scrap])
+    actions: drop
+  ◆ Brittle Antler Fork (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  ◆ Brittle Antler Fork ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  Cloth Scrap ×13 ([fiber,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Copper Wire Spool (Uncommon, ♥reserved, [trophy,metal])
+    actions: scrap, release-from-fusion, drop
+  Disease Sample (Uncommon, [organic,alchemy,vermin,throwable,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  ◆ Dried Tendon Coil (♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  Drone Core (Uncommon, [automation,aether,loot,bonus])
+    actions: scrap, drop
+  ◆ Faded Ribbon Coil (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Fractured Geode Half ×2 (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Fractured Geode Half ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Hollow Quill Sheaf (Uncommon, ♥reserved, [trophy,organic])
+    actions: scrap, release-from-fusion, drop
+  ◆ Minor Relic ×3 ([aether,ancient,trophy,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Mud Cloth (Uncommon, [trophy,loot,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×20 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Oil-Stained Sash (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Oil-Stained Sash ×2 ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Patched Cloth ([fiber,cloth])
+    actions: drop
+  ◆ Rat Fur ([organic,fur,vermin,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ River-Worn Pebble Set ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Salvager's Tether Loop ×2 (Uncommon, ♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  Scrap Metal ×35 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Small Rock ([thrown,stone,improvised])
+    actions: drop
+  ◆ Smoked Glass Chip ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  Smooth Stone ×18 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×10 ([organic,fiber])
+    actions: drop
+  ◆ Splintered Haf
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 401 of 2661 entries; older trimmed to fit a single email paste)
+
+[2026-09-14T20:15:56.245Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-09-14T20:15:48.058Z] [debug] boot: life bmu1ofkc7fr started 2026-09-14T20:09:43.351Z · FOLLOWED AN OTA APPLY 131ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-14T20:15:48.058Z] [debug] missions: · at=reclaimer_stake travelTo=asgardar
+[2026-09-14T20:15:48.058Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass
+[2026-09-14T20:15:48.058Z] [debug] ═══ SESSION 2026-09-14T20:15:48.055Z · build 2026-09-14-1820-the-sections-rest-raised-and-remember · previous entry moments earlier ═══
+[2026-09-14T20:15:47.981Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Robert Schmobert. We've still got ground to cover, you and I."
+[2026-09-14T20:15:47.981Z] [world] You step back into Reclaimer's Stake. The world waits for your move.
+[2026-09-14T20:15:47.981Z] [debug] OTA session start: 2026-09-14-1820-the-sections-rest-raised-and-remember.
+[2026-09-14T20:15:45.693Z] [debug] voice⏱ gap 1227ms (wait 0ms + synth 1208ms, live) "Choose your character."
+[2026-09-14T20:15:44.438Z] [debug] persist sizes(KB): total=170 player=37 wm=42[rooms=20 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=89 scene=3
+[2026-09-14T20:15:43.738Z] [debug] memory: released the Qwen context (~425MB est) in response to the warning; narration falls back to templates until it recovers.
+[2026-09-14T20:15:43.737Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-14T20:15:43.693Z] [debug] qwen⏱ investigate_lore ok 885ms read 295ms/write 547ms in 126t→out 19t thr2 2.3ms/t (86ch)
+[2026-09-14T20:15:43.651Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='ready' · voice='ready' · reloads=0 · save=169KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-14T20:15:42.810Z] [cognitive] neutral  (55ms)
+[2026-09-14T20:15:42.753Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T20:15:42.753Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-14T20:15:42.752Z] [world] Broken stone and dried mortar. The wreckage gives up no secrets — the secrets fell with the building that owned them.
+[2026-09-14T20:15:42.751Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=board resolved=board range=- enemies=0 hooks=1
+[2026-09-14T20:15:42.751Z] [player] investigate board
+[2026-09-14T20:15:42.492Z] [debug] qwen⏱ investigate_lore ok 891ms read 273ms/write 612ms in 126t→out 34t thr2 2.2ms/t (148ch)
+[2026-09-14T20:15:41.584Z] [cognitive] neutral  (40ms)
+[2026-09-14T20:15:41.518Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:15:41.518Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T20:15:41.518Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-14T20:15:41.517Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-14T20:15:41.514Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=1
+[2026-09-14T20:15:41.513Z] [player] investigate ladder
+[2026-09-14T20:15:40.308Z] [debug] ui: tap "investigate"
+[2026-09-14T20:15:39.328Z] [reward]     • Smooth Stone (Common)
+[2026-09-14T20:15:39.328Z] [reward]     • Worn Tartarian Coin x7 (Common)
+[2026-09-14T20:15:39.327Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-14T20:15:39.327Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:39.326Z] [world] You strip the standing water carefully. Something usable comes free in your hand.
+[2026-09-14T20:15:39.326Z] [world] You work the crate over. A part of it comes loose, intact.
+[2026-09-14T20:15:39.325Z] [world] You work the banner over. A part of it comes loose, intact.
+[2026-09-14T20:15:38.629Z] [reward] ✦ Stone-Strider Boots (Common).
+[2026-09-14T20:15:38.629Z] [world] You turn the Stone-Strider Boots over once, then keep it.
+[2026-09-14T20:15:38.628Z] [reward] ✦ Reclaimer's Boots (Common).
+[2026-09-14T20:15:38.628Z] [world] The Reclaimer's Boots fits the hand better than it has any right to.
+[2026-09-14T20:15:38.577Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:15:37.524Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:15:36.126Z] [world] It follows to the edge of whatever it calls its own, and no further.
+[2026-09-14T20:15:36.125Z] [debug] train: dexterity (escape check) → progress 96/100
+[2026-09-14T20:15:36.125Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T20:15:36.120Z] [debug] skillcheck: escape d20=11 DEX 6 = 17 vs Pursuit 9 — Reclaimer Ambusher (d20 2 + SPD 7) → PASS
+[2026-09-14T20:15:36.112Z] [debug] dice⏱ skill_check: shown +48ms, tapped +707ms, settled +820ms = 1575ms
+[2026-09-14T20:15:35.292Z] [debug] ui: tap "roll"
+[2026-09-14T20:15:34.540Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:15:34.529Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-14T20:15:34.529Z] [player] flee
+[2026-09-14T20:15:34.508Z] [debug] ui: tap "flee 48%"
+[2026-09-14T20:15:28.279Z] [world] Some part of you has been keeping the place bookmarked.
+[2026-09-14T20:15:28.279Z] [combat] Reclaimer Ambusher steps out of the shadows of the place — Crossbow Volley ready, 1D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)
+[2026-09-14T20:15:28.269Z] [reward] ✦ Recovered Worn Tartarian Coin x14.
+[2026-09-14T20:15:28.269Z] [world] Scratched on the cave wall: a tally of marks in three colours. Whatever they were counting, the count was high.
+[2026-09-14T20:15:28.268Z] [world] A natural cave mouth, low, half-curtained by a tarp pulled aside. Inside: a cold cookfire, three bedrolls, a strongbox kicked open in haste. Someone left in a hurry — but someone else is on their way back, and you can hear footsteps in the throat of the cave behind you.
+[2026-09-14T20:15:28.266Z] [world] You push south. The wind has a voice today; mostly it just murmurs old syllables you don't quite catch.
+[2026-09-14T20:15:28.263Z] [debug] spawn: gear=[Stone-Strider Boots, Reclaimer's Boots] window=10 roster=new
+[2026-09-14T20:15:28.241Z] [debug] ui: tap "→ ASGARDAR"
+[2026-09-14T20:15:27.824Z] [debug] persist sizes(KB): total=169 player=36 wm=40[rooms=20 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=89 scene=3
+[2026-09-14T20:15:27.789Z] [cognitive] REST  (60ms)
+[2026-09-14T20:15:27.709Z] [system] ⏳ Time passed: 8h
+[2026-09-14T20:15:27.708Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:15:27.707Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 5, evening)
+[2026-09-14T20:15:27.707Z] [world] Dust tests three spots and settles on the one nearest your boot.
+[2026-09-14T20:15:27.705Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-14T20:15:27.705Z] [player] rest
+[2026-09-14T20:15:27.691Z] [debug] ui: tap "rest"
+[2026-09-14T20:15:27.240Z] [cognitive] REST  (58ms)
+[2026-09-14T20:15:27.163Z] [system] ⏳ Time passed: 8h
+[2026-09-14T20:15:27.162Z] [arbiter] The Arbiter looks around. "Everything here smells of rope, oil and wet earth — the Guild's incense."
+[2026-09-14T20:15:27.162Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-14T20:15:27.160Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-14T20:15:27.159Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 5, morning)
+[2026-09-14T20:15:27.159Z] [world] Dust paws the ground flat before trusting it, then folds down onto it.
+[2026-09-14T20:15:27.156Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-14T20:15:27.156Z] [player] rest
+[2026-09-14T20:15:27.141Z] [debug] ui: tap "rest"
+[2026-09-14T20:15:24.898Z] [reward] ✦ Crude Golem Greatsword (Common).
+[2026-09-14T20:15:24.898Z] [world] The Crude Golem Greatsword is cold through your glove.
+[2026-09-14T20:15:24.057Z] [reward]     • Aetheric Cloth (Uncommon)
+[2026-09-14T20:15:24.057Z] [reward]     • Smooth Stone x3 (Common)
+[2026-09-14T20:15:24.057Z] [reward]     • Scrap Metal x4 (Common)
+[2026-09-14T20:15:24.056Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:24.056Z] [world] You salvage the tent. The take is small but real.
+[2026-09-14T20:15:24.056Z] [world] You strip the standing water carefully. Something usable comes free in your hand.
+[2026-09-14T20:15:24.056Z] [world] You strip the jagged submerged giant statue carefully. Something usable comes free in your hand.
+[2026-09-14T20:15:24.056Z] [world] You salvage the half-buried wagon. The take is small but real.
+[2026-09-14T20:15:24.056Z] [world] You work the cart over. A part of it comes loose, intact.
+[2026-09-14T20:15:23.980Z] [debug] qwen⏱ investigate_lore ok 1192ms read 359ms/write 824ms in 127t→out 37t thr2 2.8ms/t (168ch)
+[2026-09-14T20:15:23.073Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:15:22.789Z] [cognitive] neutral  (60ms)
+[2026-09-14T20:15:22.727Z] [world] You look the smelter over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-14T20:15:22.726Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=smelter resolved=smelter range=- enemies=0 hooks=1
+[2026-09-14T20:15:22.726Z] [player] investigate smelter
+[2026-09-14T20:15:22.548Z] [debug] native queue: 91 jobs · worst wait 5.1s (homework) · 2 past 3s · running investigate_lore 1.0s
+[2026-09-14T20:15:22.548Z] [debug] qwen⏱ stats — investigate_lore n18 avg1.7s max4.3s read0.6s/write0.7s in127t→out33t ms/tok 2.1-13.9 | narration:scene_intro_fill n2 avg5.8s max11.5s read10.5s/write1.0s ⚠1unusable in755t→out17t ms/tok 14.0-14.0 cap1 ⏸1 ✂1/0.1s || WASTED 1 calls / 0.1s
+[2026-09-14T20:15:22.548Z] [debug] qwen⏱ investigate_lore ok 988ms read 303ms/write 677ms in 126t→out 31t thr2 2.4ms/t (141ch)
+[2026-09-14T20:15:22.264Z] [world] You had a question here. You still have it.
+[2026-09-14T20:15:22.264Z] [reward] ✦ Recovered Blue Aetheric Fungus x3.
+[2026-09-14T20:15:22.263Z] [world] Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road.
+[2026-09-14T20:15:22.263Z] [world] A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.
+[2026-09-14T20:15:22.262Z] [world] You step south. Somewhere distant, something settles — a stone giving up, or a structure remembering it once stood.
+[2026-09-14T20:15:22.261Z] [debug] spawn: gear=[Crude Golem Greatsword] window=10 roster=new
+[2026-09-14T20:15:22.257Z] [debug] ui: tap "→ ASGARDAR"
+[2026-09-14T20:15:21.561Z] [cognitive] neutral  (65ms)
+[2026-09-14T20:15:21.494Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-14T20:15:21.493Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-14T20:15:21.491Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=1
+[2026-09-14T20:15:21.491Z] [player] investigate footprint
+[2026-09-14T20:15:20.258Z] [debug] ui: tap "investigate"
+[2026-09-14T20:15:18.665Z] [reward]     • Mud Fragment x3 (Common)
+[2026-09-14T20:15:18.665Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-14T20:15:18.664Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-09-14T20:15:18.664Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-14T20:15:18.664Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-14T20:15:18.664Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:18.663Z] [world] You salvage the standing water. The take is small but real.
+[2026-09-14T20:15:18.663Z] [world] You break the signpost apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:18.662Z] [world] You strip the desk carefully. Something usable comes free in your hand.
+[2026-09-14T20:15:18.662Z] [world] You break the cart apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:18.662Z] [world] You break the broken obsidian pillar apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:17.991Z] [reward] ✦ Salvager's Worn Greaves (Common).
+[2026-09-14T20:15:17.991Z] [world] The Salvager's Worn Greaves is lighter than it looks, which is its own kind of warning.
+[2026-09-14T20:15:16.740Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:15:16.031Z] [world] Your eye goes back to it before you decide to look.
+[2026-09-14T20:15:16.031Z] [world] You walk south. The silence has the weight of old metal. Your breath is the only thing that disagrees.
+[2026-09-14T20:15:16.030Z] [debug] spawn: gear=[Salvager's Worn Greaves] window=10 roster=new
+[2026-09-14T20:15:16.023Z] [debug] ui: tap "→ ASGARDAR"
+[2026-09-14T20:15:15.141Z] [reward] ✦ Legacy of Power — you channel Aether into the Pocket Knife. It mends to full.
+[2026-09-14T20:15:14.340Z] [debug] ui: tap "✦ ability"
+[2026-09-14T20:15:13.473Z] [debug] persist sizes(KB): total=162 player=36 wm=33[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=90 scene=3
+[2026-09-14T20:15:13.392Z] [reward] ✦ Wanderer's Armor of Wisdom (Common).
+[2026-09-14T20:15:13.392Z] [world] The Wanderer's Armor of Wisdom is heavier than it looks. Most things down here are.
+[2026-09-14T20:15:13.391Z] [reward] ✦ Explorer's Worn Headgear (Common).
+[2026-09-14T20:15:13.391Z] [world] Whatever the Explorer's Worn Headgear was lying against, it lets go without much argument.
+[2026-09-14T20:15:13.391Z] [reward] ✦ Mud Heater Shield (Common).
+[2026-09-14T20:15:13.391Z] [world] The Mud Heater Shield had settled into the ground. You unsettle it.
+[2026-09-14T20:15:13.081Z] [debug] qwen⏱ investigate_lore ok 4292ms wait 2538ms read 388ms/write 1355ms in 127t→out 59t thr2 3.1ms/t (253ch)
+[2026-09-14T20:15:12.695Z] [reward]     • Aether Crystal (Common)
+[2026-09-14T20:15:12.695Z] [reward]     • Mud Fragment x3 (Common)
+[2026-09-14T20:15:12.695Z] [reward]     • Stick x2 (Common)
+[2026-09-14T20:15:12.695Z] [reward]     • Brittle Antler Fork (Common)
+[2026-09-14T20:15:12.695Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:12.695Z] [world] You salvage the standing water. The take is small but real.
+[2026-09-14T20:15:12.695Z] [world] You break the rubble apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:12.695Z] [world] You salvage the desk. The take is small but real.
+[2026-09-14T20:15:12.694Z] [world] You lever something loose from the anvil post — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-14T20:15:11.423Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:15:11.326Z] [debug] qwen⏱ investigate_lore ok 3761ms wait 2939ms read 349ms/write 466ms in 126t→out 21t thr2 2.8ms/t (129ch)
+[2026-09-14T20:15:10.505Z] [cognitive] SWIM  (1776ms)
+[2026-09-14T20:15:10.473Z] [debug] qwen⏱ investigate_lore ok 4129ms wait 1711ms read 1755ms/write 656ms in 126t→out 28t thr2 13.9ms/t (130ch)
+[2026-09-14T20:15:10.264Z] [world] It sits where it sat. Patient is the wrong word — it simply does not move.
+[2026-09-14T20:15:10.264Z] [world] If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice.
+[2026-09-14T20:15:10.264Z] [arbiter] The Aetherkin's voice fits between the breaths you would take. 'Leave them their coin. The mud takes payment in patience.'
+[2026-09-14T20:15:10.263Z] [world] An Aetherkin stands with its back to you, very still, facing a section of buried wall where the silhouettes of the Entombed are pressed into the Aetherstone like coins into wax. Twelve of them. Maybe fourteen. The Aetherkin does not turn when you approach. The pressure in the air says it is aware of you and does not yet care.
+[2026-09-14T20:15:10.263Z] [world] You press south. Clouds drag along the horizon like silt in still water, slow and indifferent.
+[2026-09-14T20:15:10.262Z] [debug] spawn: gear=[Explorer's Worn Headgear, Mud Heater Shield, Wanderer's Armor of Wisdom] window=10 roster=new
+[2026-09-14T20:15:10.257Z] [debug] ui: tap "→ ASGARDAR"
+[2026-09-14T20:15:09.140Z] [world] You step back outside, leaving flooded house behind.
+[2026-09-14T20:15:09.140Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-14T20:15:08.727Z] [world] You study the floodwater and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-14T20:15:08.726Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floodwater resolved=floodwater range=- enemies=0 hooks=0
+[2026-09-14T20:15:08.726Z] [player] investigate floodwater
+[2026-09-14T20:15:08.055Z] [cognitive] neutral  (549ms)
+[2026-09-14T20:15:08.033Z] [cognitive] neutral  (1755ms)
+[2026-09-14T20:15:07.657Z] [debug] ui: tap "Kitchen"
+[2026-09-14T20:15:07.504Z] [world] The stove resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-14T20:15:07.504Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stove resolved=stove range=- enemies=0 hooks=0
+[2026-09-14T20:15:07.503Z] [player] investigate stove
+[2026-09-14T20:15:06.280Z] [world] Dust shakes off the worst of it and falls back in beside you.
+[2026-09-14T20:15:06.276Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.
+[2026-09-14T20:15:06.275Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cupboard resolved=cupboard range=- enemies=0 hooks=0
+[2026-09-14T20:15:06.275Z] [player] investigate cupboard
+[2026-09-14T20:15:05.211Z] [debug] homework: scene_intro "Reclaimer's Stake" ✓ 11628ms
+[2026-09-14T20:15:05.181Z] [debug] qwen⏱ narration:scene_intro_fill ok 11546ms read 10549ms/write 979ms in 755t→out 33t thr1 14.0ms/t HIT-CAP (156ch)
+[2026-09-14T20:15:05.090Z] [debug] ui: tap "investigate"
+[2026-09-14T20:15:04.259Z] [reward]     • Scrap Metal (Common)
+[2026-09-14T20:15:04.259Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-14T20:15:04.259Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:04.259Z] [world] You break the pot apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:04.259Z] [world] You break the hearth apart. Among the pieces, something worth keeping.
+[2026-09-14T20:15:03.390Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:15:02.523Z] [world] Floodwater laps at a tilted hearth. Swollen cupboards hang open, their contents long since taken by the silt. A cast pot still sits on the cold stove.
+[2026-09-14T20:15:02.523Z] [world] You step inside the empty freeholding, into the kitchen.
+[2026-09-14T20:15:02.523Z] [debug] ui: tap "ENTER"
+[2026-09-14T20:15:00.891Z] [reward] ✦ Lost Seeker's Gloves (Common).
+[2026-09-14T20:15:00.890Z] [world] You work the Lost Seeker's Gloves loose from where the mud had it.
+[2026-09-14T20:15:00.028Z] [reward]     • Mud Fragment (Common)
+[2026-09-14T20:15:00.028Z] [reward]     • Aether Crystal (Common)
+[2026-09-14T20:15:00.027Z] [reward]     • River-Worn Pebble Set (Common)
+[2026-09-14T20:15:00.027Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:15:00.027Z] [world] You crack the weathered aetheric drone shell open. A page slides out — paper somehow dry, ink somehow still legible.
+[2026-09-14T20:15:00.027Z] [world] You work the stone marker over. A part of it comes loose, intact.
+[2026-09-14T20:15:00.027Z] [world] You work the standing water over. A part of it comes loose, intact.
+[2026-09-14T20:15:00.027Z] [world] You work the salt-crusted lockbox apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-14T20:15:00.026Z] [reward] ✦ Found Verse Two — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-14T20:14:58.789Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:14:58.045Z] [world] Whatever you turned over here is still turned over.
+[2026-09-14T20:14:58.045Z] [world] You move south under a sky the color of rust. Whatever sun there was has been wrung out by the haze.
+[2026-09-14T20:14:58.044Z] [debug] spawn: gear=[Lost Seeker's Gloves] window=10 roster=new
+[2026-09-14T20:14:58.039Z] [debug] ui: tap "→ ASGARDAR"
+[2026-09-14T20:14:55.073Z] [world] You step back outside, leaving shed behind.
+[2026-09-14T20:14:55.073Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-14T20:14:54.340Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.
+[2026-09-14T20:14:54.340Z] [world] You step into the shed.
+[2026-09-14T20:14:54.339Z] [debug] ui: tap "↙ Shed ✓"
+[2026-09-14T20:14:53.585Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-14T20:14:53.079Z] [world] Somebody slept in here long after the shed stopped being a shed — a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.
+[2026-09-14T20:14:53.078Z] [world] You step into the bedroom.
+[2026-09-14T20:14:53.074Z] [debug] ui: tap "↗ Bedroom ✓"
+[2026-09-14T20:14:48.862Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.
+[2026-09-14T20:14:48.861Z] [world] You step into the shed.
+[2026-09-14T20:14:48.858Z] [debug] ui: tap "↖ Shed ✓"
+[2026-09-14T20:14:45.997Z] [cognitive] USE_ITEM · THROW  (58ms)
+[2026-09-14T20:14:45.939Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:14:45.938Z] [world] You fix the Aetheric Torch's aetheric light on the obelisk. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the obelisk — investigate it and it will give up something rare.
+[2026-09-14T20:14:45.936Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=aetheric torch resolved=Aetheric Torch range=- enemies=0 hooks=1
+[2026-09-14T20:14:45.936Z] [player] use Aetheric Torch
+[2026-09-14T20:14:45.890Z] [debug] ui: tap "use aetheric torch"
+[2026-09-14T20:14:44.330Z] [debug] persist sizes(KB): total=160 player=34 wm=33[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=91 scene=2
+[2026-09-14T20:14:44.229Z] [reward] ✦ Legacy of Power — you channel Aether into the Plasma Thrower. It mends to full.
+[2026-09-14T20:14:42.191Z] [debug] ui: tap "✦ ability"
+[2026-09-14T20:14:40.726Z] [cognitive] CLIMB  (37ms)
+[2026-09-14T20:14:40.668Z] [system] ⏳ Time passed: 30 min
+[2026-09-14T20:14:40.666Z] [world] You reach the top of the ladder (tier 2/2). The view changes; the room reads differently from here.
+[2026-09-14T20:14:40.665Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 2/2 cleared.
+[2026-09-14T20:14:40.661Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=1
+[2026-09-14T20:14:40.661Z] [player] climb ladder
+[2026-09-14T20:14:40.623Z] [debug] ui: tap "climb up (1/2)"
+[2026-09-14T20:14:39.236Z] [cognitive] CLIMB  (62ms)
+[2026-09-14T20:14:39.173Z] [system] ⏳ Time passed: 30 min
+[2026-09-14T20:14:39.173Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:39.173Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T20:14:39.172Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-09-14T20:14:39.172Z] [world] Dust eyes the ladder, then settles at its base. He is not built for the climb.
+[2026-09-14T20:14:39.171Z] [world] You reach the first hold of the ladder (tier 1/2). Higher still to go.
+[2026-09-14T20:14:39.170Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 1/2 cleared.
+[2026-09-14T20:14:39.165Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=1
+[2026-09-14T20:14:39.165Z] [player] climb ladder
+[2026-09-14T20:14:37.682Z] [debug] qwen⏱ investigate_lore ok 956ms read 305ms/write 643ms in 126t→out 34t thr2 2.4ms/t (155ch)
+[2026-09-14T20:14:37.622Z] [debug] ui: tap "climb"
+[2026-09-14T20:14:36.774Z] [reward]     • Splintered Haft End (Common)
+[2026-09-14T20:14:36.774Z] [reward]     • Aether Crystal (Common)
+[2026-09-14T20:14:36.774Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:14:36.774Z] [world] You work the strongbox apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-14T20:14:36.773Z] [world] You salvage the crate. The take is small but real.
+[2026-09-14T20:14:36.727Z] [cognitive] neutral  (62ms)
+[2026-09-14T20:14:36.664Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:36.663Z] [world] The lid is warped, the contents are unknown until you try. The latch held — that's either reassuring or sinister, depending on what's inside.
+[2026-09-14T20:14:36.663Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crate resolved=crate range=- enemies=0 hooks=1
+[2026-09-14T20:14:36.662Z] [player] investigate crate
+[2026-09-14T20:14:35.774Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:14:35.484Z] [cognitive] neutral  (72ms)
+[2026-09-14T20:14:35.411Z] [debug] investigate: "ladder" marked searched
+[2026-09-14T20:14:35.410Z] [world] Your study of the ladder draws your eye to something past it — A toppled obelisk lies on its side, runes faded but not yet silent.
+[2026-09-14T20:14:35.409Z] [world] You crouch beside the ladder. The silt has half-swallowed it.
+[2026-09-14T20:14:35.408Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0
+[2026-09-14T20:14:35.407Z] [player] investigate ladder
+[2026-09-14T20:14:34.207Z] [debug] ui: tap "investigate"
+[2026-09-14T20:14:33.512Z] [arbiter] The Arbiter tilts their head. "I do not see a 'tins' here. Choose words carefully — try: ladder, crate, strongbox."
+[2026-09-14T20:14:33.484Z] [cognitive] neutral  (47ms)
+[2026-09-14T20:14:33.436Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tins resolved=- range=- enemies=0 hooks=0
+[2026-09-14T20:14:33.435Z] [player] investigate tins
+[2026-09-14T20:14:33.362Z] [world] Beneath the lifted boards, a ladder drops into a cramped stone cellar. Whoever dug it did not want it found.
+[2026-09-14T20:14:33.361Z] [world] You step into the hidden cellar.
+[2026-09-14T20:14:33.357Z] [debug] ui: tap "↓ Cellar"
+[2026-09-14T20:14:33.019Z] [debug] qwen⏱ investigate_lore ok 767ms read 268ms/write 491ms in 126t→out 28t thr2 2.1ms/t (130ch)
+[2026-09-14T20:14:32.253Z] [cognitive] neutral  (69ms)
+[2026-09-14T20:14:32.183Z] [reward] ✦ Worn Tartarian Coin from the shelves.
+[2026-09-14T20:14:32.182Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not. Tucked into the seam: a worn tartarian coin.
+[2026-09-14T20:14:32.180Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=shelves range=- enemies=0 hooks=0
+[2026-09-14T20:14:32.180Z] [player] investigate shelves
+[2026-09-14T20:14:30.106Z] [debug] ui: tap "investigate"
+[2026-09-14T20:14:28.670Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-14T20:14:28.670Z] [reward]     • Aether Crystal (Common)
+[2026-09-14T20:14:28.670Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:14:28.669Z] [world] You break the sacking apart. Among the pieces, something worth keeping.
+[2026-09-14T20:14:28.669Z] [world] You work the bottles over. A part of it comes loose, intact.
+[2026-09-14T20:14:27.723Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:14:26.728Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.
+[2026-09-14T20:14:26.727Z] [world] You step into the storage.
+[2026-09-14T20:14:26.723Z] [debug] ui: tap "↓ Storage"
+[2026-09-14T20:14:25.610Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-14T20:14:25.610Z] [reward]     • Mud Fragment x2 (Common)
+[2026-09-14T20:14:25.610Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:14:25.609Z] [world] You work the lamp over. A part of it comes loose, intact.
+[2026-09-14T20:14:25.609Z] [world] You work the jars over. A part of it comes loose, intact.
+[2026-09-14T20:14:25.609Z] [world] You strip the bed carefully. Something usable comes free in your hand.
+[2026-09-14T20:14:25.379Z] [world] Hidden until now: The Hidden Cellar opens up. It joins the rooms you can reach.
+[2026-09-14T20:14:25.377Z] [player] investigate floorboards
+[2026-09-14T20:14:24.806Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:14:24.290Z] [debug] persist sizes(KB): total=159 player=34 wm=31[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=92 scene=2
+[2026-09-14T20:14:24.256Z] [arbiter] The Arbiter tilts their head. "I do not see a 'pegs' here. Choose words carefully — try: bed, cupboard, jars, lamp."
+[2026-09-14T20:14:24.231Z] [cognitive] neutral  (63ms)
+[2026-09-14T20:14:24.167Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:24.166Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T20:14:24.166Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-14T20:14:24.164Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=- range=- enemies=0 hooks=0
+[2026-09-14T20:14:24.164Z] [player] investigate pegs
+[2026-09-14T20:14:23.837Z] [debug] qwen⏱ investigate_lore ok 858ms read 272ms/write 579ms in 126t→out 31t thr2 2.2ms/t (150ch)
+[2026-09-14T20:14:23.339Z] [world] Somebody slept in here long after the shed stopped being a shed — a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.
+[2026-09-14T20:14:23.339Z] [world] You step into the bedroom.
+[2026-09-14T20:14:23.338Z] [debug] ui: tap "↗ Bedroom"
+[2026-09-14T20:14:22.980Z] [cognitive] neutral  (64ms)
+[2026-09-14T20:14:22.915Z] [world] You take the measure of the tools. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-14T20:14:22.913Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=tools range=- enemies=0 hooks=1
+[2026-09-14T20:14:22.912Z] [player] investigate tools
+[2026-09-14T20:14:21.731Z] [cognitive] neutral  (58ms)
+[2026-09-14T20:14:21.673Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:21.672Z] [debug] investigate: "workbench" marked searched
+[2026-09-14T20:14:21.671Z] [world] Your study of the workbench draws your eye to something past it — Far to the east, an Architectural Sentinel paces a ruined wall — patrol pattern, by the book, never deviating.
+[2026-09-14T20:14:21.671Z] [world] You crouch beside the workbench. The silt has half-swallowed it.
+[2026-09-14T20:14:21.670Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=workbench resolved=workbench range=- enemies=0 hooks=0
+[2026-09-14T20:14:21.669Z] [player] investigate workbench
+[2026-09-14T20:14:20.322Z] [debug] ui: tap "investigate"
+[2026-09-14T20:14:19.310Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.
+[2026-09-14T20:14:19.309Z] [world] You step inside a tin-roof shed, into the shed.
+[2026-09-14T20:14:19.306Z] [debug] ui: tap "ENTER"
+[2026-09-14T20:14:17.577Z] [reward]     • Cloth Scrap (Common)
+[2026-09-14T20:14:17.576Z] [reward]     • Mud Fragment x6 (Common)
+[2026-09-14T20:14:17.576Z] [reward]     • Smoked Glass Chip (Common)
+[2026-09-14T20:14:17.576Z] [reward] ✦ Salvage haul:
+[2026-09-14T20:14:17.575Z] [world] The stone marker yields little of value, though a Cloth Scrap ends up in your pack.
+[2026-09-14T20:14:17.575Z] [world] You strip the standing water carefully. Something usable comes free in your hand.
+[2026-09-14T20:14:17.574Z] [world] You break the signpost apart. Among the pieces, something worth keeping.
+[2026-09-14T20:14:17.574Z] [world] You work the firepit apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-14T20:14:16.880Z] [reward] ✦ Sentinel's Repair Cap (Common).
+[2026-09-14T20:14:16.880Z] [world] The Sentinel's Repair Cap was half under something. It is not now.
+[2026-09-14T20:14:16.878Z] [reward] ✦ Rust Dagger (Common).
+[2026-09-14T20:14:16.878Z] [world] The Rust Dagger comes up out of the silt with a small sucking protest.
+[2026-09-14T20:14:16.875Z] [reward] ✦ Pyric Wand (Common).
+[2026-09-14T20:14:16.875Z] [world] You claim the Pyric Wand.
+[2026-09-14T20:14:16.580Z] [debug] qwen⏱ investigate_lore ok 1068ms read 309ms/write 673ms in 127t→out 37t thr2 2.4ms/t (169ch)
+[2026-09-14T20:14:15.590Z] [cognitive] neutral  (63ms)
+[2026-09-14T20:14:15.562Z] [cognitive] ATTACK · DISENGAGE · AIM  (114ms)
+[2026-09-14T20:14:15.527Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:14:15.526Z] [reward] ✦ Oil-Stained Sash (Common).
+[2026-09-14T20:14:15.526Z] [world] Tucked inside the anvil post: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-14T20:14:15.525Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=anvil post resolved=anvil post range=- enemies=0 hooks=1
+[2026-09-14T20:14:15.525Z] [player] salvage anvil post
+[2026-09-14T20:14:15.447Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:15.447Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-14T20:14:15.447Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-14T20:14:15.446Z] [world] You study the Rust Dagger. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-09-14T20:14:15.446Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rust dagger resolved=Rust Dagger range=- enemies=0 hooks=1
+[2026-09-14T20:14:15.446Z] [player] investigate Rust Dagger
+[2026-09-14T20:14:15.258Z] [debug] qwen⏱ investigate_lore ok 974ms read 332ms/write 629ms in 129t→out 32t thr2 2.6ms/t (139ch)
+[2026-09-14T20:14:14.621Z] [debug] ui: tap "take / salvage"
+[2026-09-14T20:14:14.285Z] [cognitive] neutral  (74ms)
+[2026-09-14T20:14:14.210Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-14T20:14:14.210Z] [arbiter] "Threads in Tartaria don't wait long," the Arbiter says quietly. "The spire won't either."
+[2026-09-14T20:14:14.210Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-14T20:14:14.209Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-09-14T20:14:14.208Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sentinel repair cap resolved=Sentinel's Repair Cap range=- enemies=0 hooks=1
+[2026-09-14T20:14:14.207Z] [player] investigate Sentinel's Repair Cap
+[2026-09-14T20:14:12.239Z] [debug] ui: tap "investigate"
+[2026-09-14T20:14:08.591Z] [world] You take the gap while there is a gap to take.
+[2026-09-14T20:14:08.590Z] [debug] train: dexterity (escape check) → progress 78/100
+[2026-09-14T20:14:08.589Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T20:14:08.584Z] [debug] skillcheck: escape d20=16 DEX 6 = 22 vs Pursuit 17 — Mud Monarch (d20 10 + SPD 7) → PASS
+[2026-09-14T20:14:08.576Z] [debug] dice⏱ skill_check: shown +50ms, tapped +618ms, settled +838ms = 1506ms
+[2026-09-14T20:14:07.738Z] [debug] ui: tap "roll"
+[2026-09-14T20:14:07.181Z] [debug] persist sizes(KB): total=162 player=33 wm=31[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=94 scene=4
+[2026-09-14T20:14:07.073Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:14:07.064Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-14T20:14:07.064Z] [player] flee
+[2026-09-14T20:14:07.055Z] [system] braced — will not go down again fades.
+[2026-09-14T20:14:07.040Z] [debug] ui: tap "flee 48%"
+[2026-09-14T20:14:05.248Z] [debug] appstate: background → active (was background for 908ms)
+[2026-09-14T20:14:04.339Z] [debug] appstate: inactive → background (was inactive for 712ms)
+[2026-09-14T20:14:03.628Z] [debug] appstate: active → inactive (was active for 46250ms)
+[2026-09-14T20:13:57.155Z] [debug] ui: tap "inventory"
+[2026-09-14T20:13:55.670Z] [combat] Mud Monarch deals 4 slashing damage [armor −51%]. You have 3 HP remaining.
+[2026-09-14T20:13:55.597Z] [combat] Mud Monarch — d20 → 17 + ATK 8 = 25 vs your AC 19 — ✓ HIT
+[2026-09-14T20:13:55.591Z] [world] You break to run — and turning your back hands them the opening. Try 'dodge' to set a parry, 'attack' to commit, or 'flee' again to break contact.
+[2026-09-14T20:13:55.591Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T20:13:55.584Z] [debug] skillcheck: escape d20=7 DEX 6 = 13 vs Pursuit 14 — Mud Monarch (d20 7 + SPD 7) → FAIL
+[2026-09-14T20:13:55.575Z] [debug] dice⏱ skill_check: shown +60ms, tapped +626ms, settled +837ms = 1523ms
+[2026-09-14T20:13:54.738Z] [debug] ui: tap "roll"
+[2026-09-14T20:13:54.055Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:13:54.046Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-14T20:13:54.045Z] [player] flee
+[2026-09-14T20:13:54.037Z] [system] bleeding fades.
+[2026-09-14T20:13:54.022Z] [debug] ui: tap "flee 48%"
+[2026-09-14T20:13:53.246Z] [combat] Mud Monarch deals 3 slashing damage [armor −51%]. You have 7 HP remaining.
+[2026-09-14T20:13:53.176Z] [combat] Mud Monarch — d20 → 18 + ATK 8 = 26 vs your AC 19 — ✓ HIT
+[2026-09-14T20:13:53.172Z] [world] You break to run — and turning your back hands them the opening. Try 'dodge' to set a parry, 'attack' to commit, or 'flee' again to break contact.
+[2026-09-14T20:13:53.171Z] [debug] stats: STR13 DEX6 INT13 WIS13 CHA3 STE0 | gear: INT+3,WIS+3,STR+2,DEX+4 | worn: main=Crude Golem Greatsword off=Plasma Thrower head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Aetheric Strider Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-14T20:13:53.167Z] [debug] skillcheck: escape d20=5 DEX 6 = 11 vs Pursuit 13 — Mud Monarch (d20 6 + SPD 7) → FAIL
+[2026-09-14T20:13:53.159Z] [debug] dice⏱ skill_check: shown +49ms, tapped +586ms, settled +837ms = 1472ms
+[2026-09-14T20:13:52.322Z] [debug] ui: tap "roll"
+[2026-09-14T20:13:51.690Z] [system] ⏳ Time passed: 15 min
+[2026-09-14T20:13:51.681Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-14T20:13:51.681Z] [player] flee
+[2026-09-14T20:13:51.670Z] [system] stunned fades.
+[2026-09-14T20:13:51.655Z] [debug] ui: tap "flee 48%"
+[2026-09-14T20:13:50.565Z] [combat] Mud Monarch's strike leaves you stunned.
+[2026-09-14T20:13:50.565Z] [combat] Mud Monarch deals 6 slashing damage [armor −51%]. You have 10 HP remaining.
+[2026-09-14T20:13:50.493Z] [combat] Mud Monarch — d20 → 13 + ATK 8 = 21 vs your AC 19 — ✓ HIT
+
+=== END REPORT ===
