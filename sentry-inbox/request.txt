@@ -186,3 +186,46 @@ Pull everything currently reachable. Report:
 
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion, and nothing retrieved may be attributed to any open freeze.
+
+────────────────────────────────────────────────────────────────────────────
+REQUEST 2026-09-14 (second pull, owner-initiated) — ANOTHER REPORT IS WAITING
+The owner says a further log is sitting in Sentry that no agent has read yet.
+The previous pull landed 28e9fab8; anything newer than that is the point of this
+one. Authority at request time: 74085993 (OTA-1822).
+
+⚠ THE OWNER HAS DESCRIBED THE PENDING REPORT AS A HEALTHY, NON-FREEZING SESSION,
+and that is EVIDENCE IN ITS OWN RIGHT rather than a null result. A clean run on a
+build carrying OTA-1819's presentation edges is the control case the freeze work
+has never had. Report it as such; do NOT treat "nothing crashed" as nothing to
+say, and do NOT reach for a freeze explanation it cannot support.
+
+Pull everything reachable and report:
+
+1. WHAT IS NEW SINCE 28e9fab8, by bundle, with event timestamps. If the newest
+   event still predates that commit, say so plainly.
+
+2. THE OTA EACH BUNDLE RAN, read from OTA_BUILD_ID verbatim, never inferred from
+   dates. 1819 through 1822 land within hours of each other, so the stamp is the
+   only thing that separates them.
+
+3. THE HEALTHY SESSION, described on its own terms: how long it ran, what the
+   player did, whether it ended by the player's hand or otherwise. A session that
+   ends cleanly is the baseline every freeze trace is measured against.
+
+4. PRESENTATION EDGES — any `pres` entries in a touch-path trace (mount/unmount
+   for chapter:<phase>, fork:<id>, hint:combat_readout), reported as written,
+   including any mount with no matching unmount. In a HEALTHY log these show what
+   the normal open/close rhythm looks like, which is exactly what a frozen one
+   has to be compared against.
+
+5. NATIVE QUEUE LINES, verbatim — job count, worst wait, running job. Three
+   samples exist in the tree today (worst wait 0.0s and 1.9s, at 47 and 63 jobs).
+   More samples are the only thing that can move Baker #8 off "harmful starvation
+   NOT PROVEN", in either direction. Report numbers; interpret nothing.
+
+6. SCRUB AND ASSEMBLY ACCOUNTING as usual — per-bundle part counts, completeness
+   on the relay's own pagination and issue-walk evidence, redactions. A partially
+   assembled bundle is evidence about the relay and must be reported, not stitched.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion, and nothing retrieved may be attributed to any open freeze.
