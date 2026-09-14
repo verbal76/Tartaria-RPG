@@ -192,6 +192,7 @@ describe('OTA-1241 — the intro names what the player looked at', () => {
 import { hasSalvageYield } from '../app/engine/salvagePools';
 import { findCatalogItem } from '../app/engine/crafting';
 import { isClimbable } from '../app/engine/interactionTags';
+import { classifyNoun } from '../app/engine/sceneNounMaterial';
 
 const WATER = /pool|puddle|crevice|spring|pond|standing water|water/i;
 type Home = 'take' | 'salvage' | 'climb' | 'water' | 'none';
@@ -202,13 +203,89 @@ const homeFor = (n: string): Home =>
         : WATER.test(n) ? 'water'
           : 'none';
 
+/** ⚠⚠⚠ OWNER RULING, 2026-09-14 — WHAT THIS RATIO IS ACTUALLY MEASURING.
+ *
+ *  The denominator used to be EVERY authored noun, and that made the number
+ *  partly a lie. OTA-1815 repaired the salvage classifier so a pattern must
+ *  match a WORD rather than a fragment, and 31 nouns lost the salvage home they
+ *  had only ever held by accident — "urn" inside bURN scar, "rack" inside
+ *  cRACK, "rib" inside scRIBe. Nearly all of them are TRACES AND PLACES:
+ *  seven `<x> crack` geological features, four `track` variants, burn marks,
+ *  a fog, a roofline, a crater, an alcove, a camp, a scrape, a joint.
+ *
+ *  The suite two tests below already says those must stay homeless — *"places
+ *  and traces, not objects, and INVESTIGATE stays their verb"*. So the old
+ *  ratio punished the repair for agreeing with this file's own stated rule: the
+ *  coverage figure was being SUBSIDISED BY WRONG MATCHES.
+ *
+ *  Owner: the ratchet measures SALVAGEABLE PHYSICAL-OBJECT coverage, not
+ *  universal coverage of every authored interactable.
+ *
+ *  ⚠⚠ THE POPULATION IS DECIDED BY AN EXISTING AUTHORITY, NOT BY A LIST WRITTEN
+ *  HERE. `sceneNounMaterial.classifyNoun` already ships in the attack/break path
+ *  and answers "what is this thing made of"; it returns `unknown` for anything it
+ *  cannot read as matter. It is INDEPENDENT of salvagePools, so using it is not
+ *  circular — the thing being measured cannot decide what gets measured. Nothing
+ *  about its behaviour is changed by this suite reading it.
+ *
+ *  ⚠ AND IT IS DELIBERATELY CONSERVATIVE. It recognises 278 of the 1,128 nouns;
+ *  668 more are homed but come back `unknown`, so this measures a SUBSET of the
+ *  real object population — a floor, not a full census. Widening the object
+ *  authority is separate work and is NOT done here, because every way of
+ *  widening it is a judgement about what counts as a thing. */
+const isPhysicalObject = (n: string): boolean => classifyNoun(n).material !== 'unknown';
+
 describe('OTA-1242 — every noun the world places, censused', () => {
-  it('⚠⚠ the homeless share is DOWN, and pinned as a ceiling so it cannot creep back', () => {
+  it('⚠⚠ the homeless share of PHYSICAL OBJECTS is pinned as a ceiling so it cannot creep back', () => {
     const v = vocabulary();
-    const homeless = v.filter((n) => homeFor(n) === 'none');
-    // Was 394/975. Pinned as a fraction rather than a raw count so adding nouns to
-    // the world does not fail this by arithmetic — but adding UNHOMED ones does.
-    expect(homeless.length / v.length).toBeLessThan(0.16);
+    const objects = v.filter(isPhysicalObject);
+    const homeless = objects.filter((n) => homeFor(n) === 'none');
+    // ⚠ THE CEILING IS UNCHANGED AT 0.16. Only the population was corrected, and
+    // the test below proves that correction is load-bearing rather than
+    // convenient. Pinned as a fraction so adding nouns to the world does not
+    // fail this by arithmetic — but adding UNHOMED OBJECTS does.
+    expect(homeless.length / objects.length).toBeLessThan(0.16);
+  });
+
+  it('⚠⚠⚠ and the exclusion is LOAD-BEARING — drop it and this same ceiling fails', () => {
+    // The permanent negative control. If the denominator goes back to every
+    // authored noun, the ratio climbs over the very ceiling above. That is the
+    // whole reason the population had to be corrected instead of the number.
+    // ⚠ Should this ever fall below 0.16 on its own, the trace nouns have been
+    // given homes by some later work — come and read this comment before
+    // deleting the test, because the exclusion may no longer be needed.
+    const v = vocabulary();
+    const homelessEverything = v.filter((n) => homeFor(n) === 'none');
+    expect(homelessEverything.length / v.length).toBeGreaterThan(0.16);
+  });
+
+  it('⚠⚠ the excluded nouns are excluded for being TRACES, not for being awkward', () => {
+    // Every noun this file already names as correctly-homeless must fall outside
+    // the object population — otherwise the predicate is not tracking meaning.
+    for (const trace of ['blood stain', 'fog bank', 'corridor', 'footprint', 'chalk dust',
+                         'echo', 'horizon', 'static field', 'oil stain', 'smear']) {
+      expect(`${trace}:${isPhysicalObject(trace)}`).toBe(`${trace}:false`);
+    }
+    // …and the nouns OTA-1815 newly un-homed are the same kind of thing.
+    for (const trace of ['cave crack', 'tide crack', 'wader track', 'burn scar', 'shimmering fog',
+                         'roofline', 'clearing floor', 'scribe alcove', 'trapper camp', 'raft scrape']) {
+      expect(`${trace}:${isPhysicalObject(trace)}`).toBe(`${trace}:false`);
+    }
+    // …while things made of something stay INSIDE it, homed or not.
+    for (const obj of ['anvil', 'statue', 'skeleton', 'lantern', 'crate', 'banner']) {
+      expect(`${obj}:${isPhysicalObject(obj)}`).toBe(`${obj}:true`);
+    }
+  });
+
+  it('⚠⚠ the homeless physical objects are named, so a NEW one cannot hide under the ceiling', () => {
+    // ⚠ The ceiling alone would tolerate 44 of these. This is the tooth: the
+    // membership is pinned, so one new unhomed object fails immediately.
+    // ⚠ These two are NOT given a salvage home here — inventing one to make a
+    // percentage look better is the exact move the owner ruled out. A log is
+    // wood the pools do not name; whether it becomes salvage is a Job-2 call.
+    const v = vocabulary();
+    const homeless = v.filter((n) => isPhysicalObject(n) && homeFor(n) === 'none');
+    expect(homeless.sort()).toEqual(['experiment log', 'log']);
   });
 
   it('⚠⚠ the nouns the owner named by hand all have a home now', () => {

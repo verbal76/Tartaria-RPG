@@ -30493,7 +30493,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `canSend` guard is NOT recorded: the SEND key is `disabled` in that state, so
 // the branch is defensive and unreachable. The recorded rejections are the
 // report's own returned statuses — unchanged / off / unconfigured / failed.
-export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
+// ⚠⚠⚠ OTA-1815 — A SALVAGE WORD IS A WHOLE WORD. Room salvage decided which
+// economic pool a noun belonged to with `lower.includes(pattern)` over an
+// ordered array, first hit wins. That is not a shortcut with an edge case; it is
+// a classifier that cannot tell a word from a fragment, and the corpus says so:
+// of the 1,203 authored interactables, 196 carried a match that existed only
+// INSIDE another word.
+//
+//   "urn" lives in bURNt / joURNal / fURNace / fURNiture / bURN scar — all TOMB
+//   "rack" lives in cRACKed — `cracked statue` was FURNITURE
+//   "bow" opens "bowl" — a bowl was a WEAPON
+//   "rib" opens "scRIBe" — `scribe's quill` was a TOMB
+//   "rag" ends "cRAG" and sits inside "fRAGment"
+//
+// ⚠⚠ AND A CONDITION COULD OUTRANK AN OBJECT. Every `junk_salvage` pattern is a
+// state word — rusted, broken, cracked, weathered, buried — and
+// `salvageableSpawns.FLAVOR_ADJECTIVES` PREPENDS those same words to curated
+// salvageables at spawn time. The game manufactured "broken throne" and then
+// classified it as junk BY THE ADJECTIVE IT HAD JUST GLUED ON.
+//
+// THE RESOLVER: a pattern matches a WORD — itself, an inflection (rib→ribs,
+// rust→rusted), or a compound head (micro·SCOPE, counter·WEIGHT) behind two
+// measured floors that keep "bridge"→ridge and "track"→rack out. Then three
+// DECLARED rules, in place of array order doing undeclared work: a condition
+// never outranks a physical identity; a multi-word phrase outranks a single
+// word; and only then the pool order. Eight compound nouns too short for the
+// floors are named explicitly, and seven of the eight land where they already
+// did — the override replaces an accident with a reason, not an outcome.
+//
+// ⚠ AMBIGUITY IS EXPOSED, NOT ERASED. `classifySalvageNoun` reports every family
+// that matched; 133 nouns are genuinely claimed by more than one. A jar is still
+// a container and a glass vessel and this OTA does not rule on which — the
+// census asserts ZERO accidental collisions and asserts NOTHING about ambiguity.
+//
+// ⚠ NOTHING ABOUT THE ECONOMY MOVED. Same pools, same items, same weights, same
+// quantities, same 5% junk branch, 18% curio valve, Aetheric Torch rare find,
+// sigil path, costs and TAKE boundaries — pinned by a frozen fingerprint. 63
+// nouns were REROUTED to an existing pool; 45 that only ever matched by accident
+// now match nothing, which is the defect leaving rather than a new one arriving.
+export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1813-the-tap-says-how-far-it-got';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1812-the-receipt-stops-opening-a-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-13-1811-the-slate-takes-the-weight';

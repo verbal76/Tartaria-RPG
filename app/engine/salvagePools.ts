@@ -43,9 +43,12 @@ interface PoolEntry {
 interface SalvagePool {
   /** Pool identifier — for debug logging + test introspection. */
   id: string;
-  /** Substring patterns; the FIRST pool whose any-pattern matches
-   *  the noun (case-insensitive) is selected. Order matters —
-   *  more specific pools should come before general ones. */
+  /** Word-boundary patterns. A pattern matches when it appears in the
+   *  noun as a WHOLE WORD (or inflection, or compound head) — never as
+   *  a fragment inside another word. When several pools match, the
+   *  precedence rules in `classifySalvageNoun` decide, and this array's
+   *  position is only the LAST of those rules. See the classifier note
+   *  below for why order stopped being the whole answer. */
   patterns: string[];
   /** Weighted item pool. Weights need not sum to 100; the picker
    *  normalises. min/max set the quantity range (inclusive). */
@@ -572,14 +575,187 @@ const JUNK_LINES: string[] = [
   'You scavenge {target} thoroughly. One {item} survives the sorting.',
 ];
 
-function pickPool(noun: string): SalvagePool | null {
-  const lower = noun.toLowerCase();
-  for (const pool of POOLS) {
-    for (const pat of pool.patterns) {
-      if (lower.includes(pat)) return pool;
+// ─────────────────────────────────────────────────────────────────────────────
+// THE CLASSIFIER
+//
+// ⚠⚠⚠ WHAT IT REPLACED, AND WHY THAT WAS A DEFECT RATHER THAN A SIMPLIFICATION.
+// This was `lower.includes(pat)` over the pools in array order, first hit wins.
+// Two consequences, both measured against the 1,203-noun authored interactable
+// corpus rather than reasoned about:
+//
+//   196 nouns carried at least one match that existed ONLY inside another word.
+//   `burnt tome` and `journal` and `burn scar` all became TOMB, because "urn"
+//   lives inside "bURNt" / "joURNal" / "bURN". `cracked statue` became
+//   FURNITURE, because "rack" lives inside "cRACKed". `bowl` became a WEAPON,
+//   because "bow" opens it. `bone fragment` became FABRIC via "fRAGment".
+//   `scribe's quill` became TOMB via "scRIBe".
+//
+// ⚠ AND THE ORDER WAS DOING WORK NOBODY DECLARED. Whichever accident sat
+// earliest in the array won, so the taxonomy's meaning depended on its layout.
+//
+// The rule now: a pattern matches a WORD, never a fragment. Where several pools
+// still match, three declared rules decide, in order.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** ⚠ THE POOL WHOSE PATTERNS ARE NOT OBJECTS. Every `junk_salvage` pattern is a
+ *  CONDITION — rusted, broken, cracked, weathered, buried, shattered. That is not
+ *  an incidental reading of the list: `salvageableSpawns.ts` keeps the same words
+ *  in `FLAVOR_ADJECTIVES` and PREPENDS them to curated salvageables at spawn
+ *  time, so "cracked vault relic pedestal" is a string the game manufactures.
+ *  A word the spawner glued on for flavour must not decide what the thing IS.
+ *
+ *  ⚠ It keeps its job as the LAST RESORT: when a condition word is all a noun
+ *  has — "rusted remnant", "scrap heap" — junk_salvage still wins, exactly as
+ *  before. It is demoted, never removed. */
+const CONDITION_POOL_ID = 'junk_salvage';
+
+/** Inflections a pattern may pick up and still be the same word. Deliberately
+ *  short: every entry here is a plural or a participle, so `rib`→"ribs" and
+ *  `rust`→"rusted" still match while `bow`→"bowl" and `table`→"tablet" cannot. */
+const INFLECTIONS = ['', 's', 'es', 'ed', 'ing'] as const;
+
+/** ⚠⚠ COMPOUND HEADS, AND THE TWO FLOORS THAT MAKE THEM SAFE. English puts the
+ *  head of a compound last — a microSCOPE is a scope, a counterWEIGHT is a
+ *  weight, a cipherSTONE is a stone — so a pattern that ends a longer word is
+ *  usually a real classification and dropping it would lose matches the old
+ *  code got right. Two floors keep coincidences out, and both were measured:
+ *
+ *    · the pattern must be ≥5 chars, or `ring` claims "shimmeRING",
+ *      "cleaRING" and "whispeRING" for fixture_metal;
+ *    · the remaining prefix must be ≥3 chars, or `ridge` claims "bridge",
+ *      `rack` claims "track" and `rag` claims "crag".
+ *
+ *  Under both floors the corpus yields 14 compound-head matches and every one
+ *  of them is a genuine compound. */
+const COMPOUND_HEAD_MIN = 5;
+const COMPOUND_PREFIX_MIN = 3;
+
+/** Split on anything that is not a letter or digit, so "salt-crusted lockbox"
+ *  and "salt crusted lockbox" tokenise identically — the hyphenated patterns
+ *  (`half-buried`, `mud-glazed`) depend on that. */
+function words(text: string): string[] {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
+}
+
+function wordMatches(word: string, patternWord: string): boolean {
+  if (word === patternWord) return true;
+  if (patternWord.length >= 3 && word.startsWith(patternWord)) {
+    if ((INFLECTIONS as readonly string[]).includes(word.slice(patternWord.length))) return true;
+  }
+  if (patternWord.length >= COMPOUND_HEAD_MIN) {
+    for (const inflection of INFLECTIONS) {
+      const tail = patternWord + inflection;
+      if (word.length - tail.length >= COMPOUND_PREFIX_MIN && word.endsWith(tail)) return true;
     }
   }
-  return null;
+  return false;
+}
+
+/** Tokenised patterns, built once. A multi-word pattern must match consecutive
+ *  words ("circuit panel", "rune glass"), which is what makes it more specific
+ *  evidence than either word alone. */
+const PATTERN_WORDS = new Map<string, string[]>();
+function patternWords(pattern: string): string[] {
+  let w = PATTERN_WORDS.get(pattern);
+  if (!w) { w = words(pattern); PATTERN_WORDS.set(pattern, w); }
+  return w;
+}
+
+function patternMatches(nounWords: string[], pattern: string): boolean {
+  const pw = patternWords(pattern);
+  if (pw.length === 0) return false;
+  for (let i = 0; i + pw.length <= nounWords.length; i++) {
+    let ok = true;
+    for (let j = 0; j < pw.length; j++) {
+      if (!wordMatches(nounWords[i + j]!, pw[j]!)) { ok = false; break; }
+    }
+    if (ok) return true;
+  }
+  return false;
+}
+
+/** ⚠ THE OVERRIDES, AND WHY THERE ARE ONLY EIGHT. Each is a closed compound
+ *  whose head is too short for the floors above (`bow`, `box`, `door`) or whose
+ *  pattern is its PREFIX rather than its head (`lamp`post, `candle`holder,
+ *  `tarp`aulin, `sign`post). No general rule separates those from "crag" and
+ *  "kitchen" without a lexicon, so they are named.
+ *
+ *  ⚠ SEVEN OF THE EIGHT CHANGE NOTHING. They land in the pool the shipped
+ *  classifier already reached — the override only replaces an accident with a
+ *  reason. `furniture` is the one that moves: it resolved to TOMB, because "urn"
+ *  sits inside "fURNiture", and it now resolves to the pool of its own name.
+ *
+ *  ⚠ NOTHING AMBIGUOUS IS IN HERE. `bridge`, `spike`, `staircase` and the other
+ *  nouns this repair leaves unmatched are NOT listed: each needs a construction
+ *  -vs-context ruling that is not this job's to make. They are reported instead. */
+const NOUN_OVERRIDES: ReadonlyMap<string, string> = new Map([
+  ['longbow', 'weapon_scrap'],
+  ['mailbox', 'container'],
+  ['lamppost', 'light'],
+  ['candleholder', 'devotional'],
+  ['trapdoor', 'furniture'],
+  ['tarpaulin', 'fabric'],
+  ['signpost', 'stonework'],
+  ['furniture', 'furniture'],
+]);
+
+export interface SalvageClassification {
+  poolId: string;
+  /** The pattern that won, or '<override>'. */
+  pattern: string;
+  /** Every pool that matched at a word boundary, condition pool included. */
+  families: string[];
+  /** More than one NON-CONDITION family matched — genuine ambiguity, exposed
+   *  rather than hidden behind array order. The winner is still deterministic. */
+  ambiguous: boolean;
+}
+
+/** ⚠⚠ THE ONE CLASSIFICATION AUTHORITY. `pickPool` and therefore both
+ *  `hasSalvageYield` and `rollSalvagePool` resolve through this and nothing
+ *  else, so the question "does this yield?" and the question "yield what?"
+ *  can never be answered by two different matchers. */
+export function classifySalvageNoun(noun: string): SalvageClassification | null {
+  const nounWords = words(noun);
+  if (nounWords.length === 0) return null;
+
+  const override = NOUN_OVERRIDES.get(nounWords.join(' '));
+  if (override) return { poolId: override, pattern: '<override>', families: [override], ambiguous: false };
+
+  interface Hit { poolId: string; rank: number; pattern: string; span: number }
+  const hits: Hit[] = [];
+  POOLS.forEach((pool, rank) => {
+    // ⚠ THE LONGEST match in this pool, not the first one found. A pool may hold
+    // both `panel` and `circuit panel`; stopping at whichever the array lists
+    // first would hand RULE 2 a single word and the phrase would never compete.
+    let best: Hit | null = null;
+    for (const pattern of pool.patterns) {
+      if (!patternMatches(nounWords, pattern)) continue;
+      const span = patternWords(pattern).length;
+      if (!best || span > best.span) best = { poolId: pool.id, rank, pattern, span };
+    }
+    if (best) hits.push(best);
+  });
+  if (hits.length === 0) return null;
+
+  // RULE 1 — a condition word never outranks a physical identity.
+  const identity = hits.filter((h) => h.poolId !== CONDITION_POOL_ID);
+  const contenders = identity.length > 0 ? identity : hits;
+  // RULE 2 — a multi-word phrase is more specific evidence than a single word.
+  // RULE 3 — and only then, the declared pool order above.
+  const winner = contenders.slice().sort((a, b) => (b.span - a.span) || (a.rank - b.rank))[0]!;
+
+  return {
+    poolId: winner.poolId,
+    pattern: winner.pattern,
+    families: hits.map((h) => h.poolId),
+    ambiguous: identity.length > 1,
+  };
+}
+
+function pickPool(noun: string): SalvagePool | null {
+  const hit = classifySalvageNoun(noun);
+  if (!hit) return null;
+  return POOLS.find((p) => p.id === hit.poolId) ?? null;
 }
 
 /** ⚠⚠ OTA-1368 — THE ARTICLE IS ADDED HERE, SO NO TEMPLATE MAY ADD ITS OWN.
@@ -736,4 +912,10 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
 }
 
 /** Exposed for tests. */
-export const __TEST_ONLY__ = { POOLS, NOTHING_CHANCE };
+export const __TEST_ONLY__ = {
+  POOLS, NOTHING_CHANCE,
+  // ⚠ Exposed so a suite can prove the two public entry points share ONE
+  // resolver, and so the census can walk the corpus through the real matcher
+  // instead of a copy of it that would drift.
+  pickPool, CONDITION_POOL_ID, NOUN_OVERRIDES, COMPOUND_HEAD_MIN, COMPOUND_PREFIX_MIN,
+};
