@@ -1,4 +1,7 @@
 import { useHumanAction, humanGetState } from '../state/humanActivity';
+// ⚠⚠ OTA-1818 — the Equip trace. See the block above `chooseSlot` for what this
+// screen can and cannot yet witness, and why the gap is named rather than faked.
+import { noteRootTouch, setTouchPathContext, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
@@ -823,9 +826,35 @@ export function InventoryScreen() {
     }, 2800);
     return () => clearTimeout(t);
   }, [scrapResult]);
+  // ⚠⚠⚠ OTA-1818 — THE EQUIP CHAIN, AND THE TWO STAGES IT HONESTLY CANNOT CARRY.
+  //
+  // An owner report titled "Froze equipping armor" retained nothing about the
+  // interaction that froze. This records what this screen can actually witness:
+  // T2 (the handler ran), T4 (the store call went out) and T5 (it returned), all
+  // on the id T0 above minted for the finger.
+  //
+  // ⚠⚠ WHAT IS DELIBERATELY ABSENT, because recording it would mean inventing it:
+  //   · T1 (press-in). The Equip buttons are DATA, not JSX here — `buildModalButtons`
+  //     returns `{ label, onPress, tone }` and BrandedModal renders `onPress={b.onPress}`.
+  //     Neither the descriptor nor the renderer carries `onPressIn`, so a press-in
+  //     stage would require editing BrandedModal.tsx — outside this job's authorised
+  //     files. NAMED, NOT FAKED: the root→handler interval stays blind for Equip.
+  //   · M0 (modal root). Same reason — BrandedModal exposes no capture hook, and
+  //     adding one is that same fourth file.
+  //   · T3A/T3R. There is no truthful admission or refusal HERE: the block reasons
+  //     (quest-locked, reserved, gift) are computed upstream and REMOVE the button
+  //     rather than refuse the press, and `if (!pending) return` is a defensive nil
+  //     guard, not a player-facing refusal. This file's own rule is that `reject` is
+  //     written only where source proves a real handler refusal, so it is omitted.
+  //
+  // ⚠ EQUIP BEHAVIOUR IS UNCHANGED. Same guard, same call, same arguments, same
+  // `setPending(null)`. The stages observe and step aside.
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
+    const tp = noteHandlerEnter(`equip:${slot}`);
+    noteStage(tp, 'dispatch', { control: `equip:${slot}`, reason: 'equip' });
     equipItem(pending.item.name, slot, pending.item.id);
+    noteStage(tp, 'done', { control: `equip:${slot}`, reason: 'equip' });
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -1769,8 +1798,25 @@ export function InventoryScreen() {
     return null;
   };
 
+  // ⚠⚠⚠ OTA-1818 — THIS SCREEN USED TO BE INVISIBLE TO THE TOUCH TRACE. An owner
+  // report titled "Froze equipping armor" (2026-09-14) retained NOTHING about the
+  // interaction that froze: the pack carried zero touch-path references, so its
+  // last recorded stage was a `quick:craft` back on Exploration and every stage
+  // after it was stamped with the wrong screen. Setting the context from render
+  // is cheap, bounded, wakes no subscriber, and makes every stage below truthful
+  // about where it happened.
+  setTouchPathContext({ screen: 'inventory', presentation: pending ? 'item' : 'none' });
+
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      /* ⚠⚠ OTA-1818 — T0 FOR THE PACK, the same observer Exploration has carried
+         since OTA-1813: capture phase, RETURNS FALSE, never becomes the responder,
+         mints one interaction id for the finger. Without it the Equip handler below
+         would have no root touch to claim and would honestly report `orphan` — true,
+         but far less useful than knowing the touch reached the app at all. */
+      onStartShouldSetResponderCapture={() => { noteRootTouch('root'); return false; }}
+    >
       {/* ⚠ OTA-1154 — GIFT MODE BANNER. The player arrived here from a GIVE
           affordance in the world, so the pack has to say why it opened and offer
           a way back out. Without this the inventory looks identical to a normal

@@ -93,7 +93,32 @@ export type TouchStage =
    *  never committed the receipt; `shown` without `dismissed` means it committed
    *  and the way out never completed. Those are different faults with different
    *  repairs, and no existing stage can tell them apart. */
-  | 'pres';
+  | 'pres'
+  /** ⚠⚠⚠ OTA-1818 — DID THE TOUCH REACH THE REGION IT WAS AIMED AT? ONE new
+   *  word, exactly as `pres` was, with the region carried in the bounded
+   *  `control` field: 'controls' | 'feed'.
+   *
+   *  ⚠⚠ THE BLIND INTERVAL IT CLOSES. Four freeze reports (E2-E5 of 2026-09-14 —
+   *  terminal root-only runs of 19 / 24 / 16 / 4) end identically: the preceding
+   *  action completes, the presentation token returns to `none`, `root` keeps
+   *  arriving, and no `in` ever follows — while JS stays demonstrably alive (one
+   *  window finished a 13,388 ms narration and spoke it aloud). Everything
+   *  between `root` and `in` is responder negotiation and hit testing, and the
+   *  app observed none of it.
+   *
+   *  ⚠⚠⚠ AND IT IS TWO REGIONS, BECAUSE ONE WOULD LIE. A healthy tap on the
+   *  transcript legitimately produces `root` with no `in` — MEASURED in this same
+   *  corpus (bundle mu0m8svi4x46: entries #6/#7/#8 root-only, then #9 `in
+   *  quick:inventory` entirely healthy). So "root, no controls, no in" cannot
+   *  mean interception by itself. Recording the FEED as well is what separates
+   *  "the player tapped the log" from "the touch reached neither interactive
+   *  region"; without it this instrument would manufacture false evidence out of
+   *  ordinary play.
+   *
+   *  ⚠ IT CLASSIFIES NOTHING. The stage records which region observed the touch.
+   *  What an ABSENCE means is the reader's job — production code does not get to
+   *  decide the cause of a freeze. */
+  | 'content';
 
 export interface TouchPathEntry {
   /** Monotonic per-boot sequence — proves ordering even if two wall times tie. */
@@ -213,6 +238,56 @@ export function claimTouch(now: number = Date.now()): { id: number; orphan: bool
     return { id: p.id, orphan: false };
   }
   return { id: nextId++, orphan: true };
+}
+
+/**
+ * ⚠⚠⚠ OTA-1818 — THE SAME QUESTION `claimTouch` ASKS, WITHOUT TAKING ANYTHING.
+ * Returns the id of the newest eligible unclaimed root touch, or null.
+ *
+ * ⚠⚠ EVERY DIFFERENCE FROM `claimTouch` IS DELIBERATE AND LOAD-BEARING:
+ *   · it does NOT set `claimed`, so the real T1 still finds the touch and
+ *     T0→content→T1→T2 stay ONE interaction. Consuming here would make every
+ *     instrumented control report `orphan` — the instrument would destroy the
+ *     correlation it exists to record;
+ *   · it does NOT mint on failure. `claimTouch` invents an id because a handler
+ *     that ran IS evidence and must be recorded somehow; a region observer that
+ *     found no root touch has nothing to say, and saying it anyway would put a
+ *     second interaction in the ring for one finger;
+ *   · it does NOT touch `heldPressIn` or `lastEntered` — those belong to the
+ *     handler hand-off and are none of a capture observer's business.
+ *
+ * ⚠ SAME AGE BOUNDARY as the claim path, on purpose: a region must not attach
+ * itself to a touch too old for a handler to claim, or the two would disagree
+ * about which interaction is current.
+ *
+ * ⚠ NEWEST-FIRST, matching `claimTouch`, so under rapid multi-touch the region
+ * and the control describe the SAME finger.
+ */
+export function peekPendingTouchId(now: number = Date.now()): number | null {
+  for (let k = pending.length - 1; k >= 0; k--) {
+    const p = pending[k]!;
+    if (p.claimed) continue;
+    if (now - p.at > TOUCH_CLAIM_MAX_AGE_MS) continue;
+    return p.id;
+  }
+  return null;
+}
+
+/**
+ * ⚠⚠ OTA-1818 — one region observation for the touch already in flight. The
+ * whole point is what it does NOT do: no responder claim, no id minted, no
+ * store read, no work when there is nothing to attach to.
+ *
+ * ⚠ CALLERS MUST RETURN FALSE from `onStartShouldSetResponderCapture`, exactly
+ * as the root observer does. This function cannot enforce that, so the focused
+ * suite does — including a negative control that claims the responder and
+ * proves the child control stops receiving its press-in.
+ */
+export function noteContentTouch(region: string, now: number = Date.now()): number | null {
+  const id = peekPendingTouchId(now);
+  if (id === null) return null;
+  noteStage(id, 'content', { control: region });
+  return id;
 }
 
 /**

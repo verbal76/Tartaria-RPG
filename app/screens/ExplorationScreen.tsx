@@ -76,7 +76,7 @@ import {
 } from '../engine/feedActionChip';
 import { ClimbModal } from '../components/ClimbModal';
 // ⚠ OTA-1813 — observational only; see app/diagnostics/touchPath.ts.
-import { noteRootTouch, setTouchPathContext, resetTouchCorrelation, currentTouchId, noteStage } from '../diagnostics/touchPath';
+import { noteRootTouch, setTouchPathContext, resetTouchCorrelation, currentTouchId, noteStage, noteContentTouch } from '../diagnostics/touchPath';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
@@ -2262,7 +2262,28 @@ export function ExplorationScreen() {
           ⚠ ORDER MATTERS: the watermark is rendered FIRST so it sits behind the
           text; the corners are rendered LAST so the frame reads on top of both.
           Both are `pointerEvents="none"`. */}
-      <TutorialTarget area="feed" style={[styles.feed, tartariaKitStyles.panelFrame]}>
+      <TutorialTarget
+        area="feed"
+        style={[styles.feed, tartariaKitStyles.panelFrame]}
+        /* ⚠⚠⚠ OTA-1818 — AND THE FEED, BECAUSE THE CONTROLS MARKER ALONE WOULD
+           LIE. A healthy tap on the transcript produces a root touch and no
+           press-in: MEASURED in the freeze corpus itself (bundle mu0m8svi4x46,
+           entries #6/#7/#8 root-only, then #9 `in quick:inventory` perfectly
+           healthy). Without this second region, that ordinary tap is byte-identical
+           to a touch being intercepted above gameplay, and the instrument would
+           manufacture evidence out of someone reading their own log.
+
+           ⚠⚠ WITH IT, an absence means something: root with NEITHER region is the
+           only shape that says the touch reached no instrumented gameplay area at
+           all. The stage still records a fact and stops — nothing here decides what
+           caused anything.
+
+           ⚠ `TutorialTarget` extends ViewProps and spreads `{...rest}` onto its
+           Animated.View in BOTH the highlighted and unhighlighted branches, so this
+           observer is live whether or not the tutorial is pointing at the feed.
+           Capture, returns false, claims nothing, reuses the in-flight id. */
+        onStartShouldSetResponderCapture={() => { noteContentTouch('feed'); return false; }}
+      >
         <FactionWatermark factionId={player?.factionId} />
         <AdventureFeed
           entries={gameLog}
@@ -2335,7 +2356,25 @@ export function ExplorationScreen() {
           and this is the only placement that gives him one. */}
       <MissionEncounterCard />
 
-      <View style={styles.controls}>
+      <View
+        style={styles.controls}
+        /* ⚠⚠⚠ OTA-1818 — DID THE TOUCH REACH THE CONTROLS STRIP? This is the
+           smallest host that sits BELOW the app-root T0 observer and ABOVE every
+           instrumented gameplay control (the dice roller, the did-you-mean chips
+           and InputBox, which owns `quick:`/`travel:`). Between T0 and a control's
+           press-in lies all of responder negotiation and hit testing, and four
+           freeze reports died somewhere inside it with nothing recorded.
+
+           ⚠⚠ IT OBSERVES AND STEPS ASIDE, exactly like T0: capture phase, RETURNS
+           FALSE, never becomes the responder. `styles.controls` is `{ gap: 6 }` and
+           stays that way — no wrapper, no layout, no z-order, no pointerEvents.
+
+           ⚠ AND IT REUSES THE TOUCH ALREADY IN FLIGHT. `noteContentTouch` peeks the
+           pending root id WITHOUT claiming it, so the real T1 still claims it and
+           T0→content→T1→T2 remain one interaction. When no eligible root touch
+           exists it records NOTHING rather than minting a second one. */
+        onStartShouldSetResponderCapture={() => { noteContentTouch('controls'); return false; }}
+      >
         {pendingRolls ? (
           <DiceRoller
             state={pendingRolls}

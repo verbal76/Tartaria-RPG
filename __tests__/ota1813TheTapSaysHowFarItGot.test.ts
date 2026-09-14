@@ -82,12 +82,25 @@ describe('OTA-1813 §1 — T0 observes and takes nothing', () => {
    * the player actually pressed — an instrument that breaks the thing it
    * measures, and the single worst outcome this change could have. The `false`
    * is the safety property, so it is pinned inside the handler's own block. */
+  /* ⚠⚠⚠ OTA-1818 — THE WINDOW IS THE HANDLER, NOT THE SUBTREE UNDER IT. These two
+   * assertions used to take their text from `blockAt(..., 'opener')`, which walks
+   * braces from the prop's own `{` until they balance — and in JSX that is the
+   * whole ELEMENT, children included. MEASURED on this file: the root observer's
+   * window ran 3,052 characters and the controls host's ran 29,714, swallowing an
+   * unrelated `.filter((n) => { … return true; })` noun predicate 290 lines below.
+   * The claim was never wrong; the window was, and it only ever passed because the
+   * first subtree happened to contain no `return true`.
+   *
+   * ⚠⚠ THIS IS STRICTER, NOT LOOSER. `CAPTURE_HANDLER` matches the arrow body and
+   * nothing else, and `[^{}]*` additionally PINS that a capture handler stays a
+   * flat one-liner — a nested block in one would now fail to match at all rather
+   * than quietly widening the window again. */
+  const CAPTURE_HANDLER = /onStartShouldSetResponderCapture=\{\(\) => \{([^{}]*)\}\}/g;
+
   it('the Exploration root capture handler returns false', () => {
-    const handler = blockAt(
-      EXPLORATION,
-      'onStartShouldSetResponderCapture={() => {',
-      { mode: 'opener' },
-    );
+    const m = new RegExp(CAPTURE_HANDLER.source).exec(EXPLORATION);
+    expect(m).not.toBeNull();
+    const handler = m![1]!;
     expect(handler).toContain('noteRootTouch');
     expect(handler).toMatch(/return\s+false\s*;/);
     expect(handler).not.toMatch(/return\s+true\b/);
@@ -95,12 +108,14 @@ describe('OTA-1813 §1 — T0 observes and takes nothing', () => {
 
   it('no capture handler anywhere in this OTA returns true', () => {
     for (const [name, src] of [['ExplorationScreen', EXPLORATION] as const, ...MODALS]) {
-      const opens = [...src.matchAll(/onStartShouldSetResponderCapture=\{\(\) => \{/g)];
-      expect(opens.length).toBeGreaterThan(0);
-      for (const m of opens) {
-        const body = blockAt(src, 'onStartShouldSetResponderCapture={() => {', {
-          mode: 'opener', from: m.index!,
-        });
+      // ⚠ Every opener must ALSO match the precise handler shape — an opener that
+      // no longer closes as a flat `{() => { … }}` is itself a failure, not a skip.
+      const openers = [...src.matchAll(/onStartShouldSetResponderCapture=\{\(\) => \{/g)];
+      const handlers = [...src.matchAll(new RegExp(CAPTURE_HANDLER.source, 'g'))];
+      expect(openers.length).toBeGreaterThan(0);
+      expect(`${name}: ${handlers.length}`).toBe(`${name}: ${openers.length}`);
+      for (const m of handlers) {
+        const body = m[1]!;
         expect(`${name}: ${body}`).toMatch(/return\s+false\s*;/);
         expect(`${name}: ${body}`).not.toMatch(/return\s+true\b/);
       }

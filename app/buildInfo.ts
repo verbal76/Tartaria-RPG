@@ -30569,7 +30569,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Two existing primitives, no new mechanism, no second activity architecture.
 // Job A's 39-action membership, `lastPlayerActionAt`, sprint accounting,
 // homework preemption, navigation and pending-roll policy are all untouched.
-export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';
+// ── OTA-1818 — THE TOUCH REACHES THE REGION (Apple freeze telemetry) ─────────
+// TELEMETRY ONLY. NOT A FREEZE REPAIR, and nothing here claims one.
+//
+// Four freeze reports of 2026-09-14 (E2-E5, terminal root-only runs of 19/24/16/4)
+// end identically: the preceding action completes, the presentation token returns
+// to `none`, `root` keeps arriving, and no `in` ever follows — while JS stays
+// demonstrably alive (one window finished a 13,388 ms narration and spoke it
+// aloud, and Qwen was explicitly SKIPPED in two of the four, so native inference
+// is not a required cause). Everything between the app root and a control's
+// press-in is responder negotiation and hit testing, and the app observed none
+// of it. This adds the missing observation and nothing else.
+//
+// ⚠⚠ TWO REGIONS, NOT ONE, because one would lie: a healthy tap on the transcript
+// legitimately produces `root` with no `in` — MEASURED in the same corpus (bundle
+// mu0m8svi4x46, entries #6/#7/#8, then #9 perfectly healthy). Recording the FEED
+// as well is what separates "the player tapped the log" from "the touch reached
+// neither interactive region".
+//
+// ⚠ THE PACK JOINS THE TRACE TOO. An owner report titled "Froze equipping armor"
+// retained nothing, because InventoryScreen carried zero touch-path references.
+// It now sets its own screen context, observes its root, and records the Equip
+// handler/dispatch/return. Press-in and the modal root are NOT recorded there and
+// are named as still-blind rather than faked — the button is data, and its
+// renderer exposes no press-in hook.
+//
+// Every observer runs at capture phase and RETURNS FALSE. No responder is
+// claimed, no layout, pointerEvents, z-order, navigation, gameplay or store state
+// changes, no new storage key, no new timer, no write per stage.
+export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1814-the-report-screen-joins-the-trace';
