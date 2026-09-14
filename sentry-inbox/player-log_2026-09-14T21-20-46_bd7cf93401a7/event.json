@@ -1,0 +1,294 @@
+{
+  "id": "bd7cf93401a74d3797510a73c3f76e67",
+  "groupID": "7732184627",
+  "eventID": "bd7cf93401a74d3797510a73c3f76e67",
+  "projectID": "4511945117532160",
+  "size": 4049,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-14-1821-the-words-say-which-is-running #mu1qyxpamlra"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-14-1821-the-words-say-which-is-running",
+  "message": "player-log-beacon 2026-09-14-1821-the-words-say-which-is-running #mu1qyxpamlra",
+  "title": "player-log-beacon 2026-09-14-1821-the-words-say-which-is-running #mu1qyxpamlra",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-14T21:20:29Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealmsHAL",
+      "app_version": "2.4.1",
+      "app_build": "189",
+      "app_memory": 1070792704,
+      "in_foreground": true,
+      "app_id": "459151B4-D999-3BFE-91D9-284FCB28BC8D",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 100.0,
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 84934656,
+      "usable_memory": 3526606848,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9d15aaa3c8714d4190a7f82618d6cc98",
+      "span_id": "95d1c32ab2a99758",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-14-1821-the-words-say-which-is-running #mu1qyxpamlra"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mu1qyxpamlra"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-14-1821-the-words-say-which-is-running"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-14-1821-the-words-say-which-is-running"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-14T21:20:46.471254Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-14T21:20:46.380000Z",
+  "fingerprints": [
+    "68868da7f46b233e3db68097374e2c4f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1971852497,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-14T20:48:54.913538Z",
+    "dateReleased": "2026-09-14T20:54:22.236934Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "e7d23a0f8265038c0ff848e1812efdd6b973fb7a",
+      "message": "OTA-1821 \u2014 supersede OTA-1361's glow assertion on the owner's Target 7 ruling\n\nCI 2156 caught what my local validation missed, and it caught the RIGHT thing.\n`jest shard 3/4 (fast \u00b7 required)` went red on ota1361ClimbsToggleAndGlow:348,\nwhich pinned `shadowColor: '#54d6c4'`, `shadowRadius`, `elevation` and\n`backgroundColor` on `trackBtnOn` \u2014 the exact glow Target 7 was instructed to\nremove. Publish was skipped, so nothing reached Golem and nothing reached HAL.\n\n\u26a0 MY PROCESS GAP, STATED PLAINLY. I ran the contracts + control-language\nregression set (140/140) but never searched for suites that pin the trackBtn\nSTYLE FAMILY \u2014 the very seam I was repairing. A one-line grep would have found\nthis before the push. The search has now been done: exactly TWO suites reference\n`trackBtn` \u2014 ota1361 and OTA-1821's own \u2014 so the blast radius is bounded and\nfully enumerated rather than assumed.\n\n\u26a0\u26a0 SUPERSEDED, NOT WEAKENED, AND THE REPLACEMENT IS STRICTLY STRONGER. The old\nform (\"trackBtnOn contains a shadow\") was satisfied by any glow of any size\nbeside any amount of other dressing. The new form is an EQUALITY \u2014 the active\nstate must contribute NOTHING to the body \u2014 which additionally catches every\nhalf-measure the old assertion could not see: a fill kept while the glow goes, a\nrim widened without a shadow, or any perimeter key added here later. It is\naccompanied by an explicit not-contains sweep over all six perimeter keys.\n\nPROVEN TO STILL BITE, in both directions, rather than asserted: restoring the\nOTA-1361 glow on the working tree turns the superseding assertion RED (1 failed,\n8 passed), and ContractsScreen.tsx was restored with md5 verified back to\n38cd2a2c623ce508acbaf29d0cec8810.\n\n\u26a0 THE FOURTH LAYER SURVIVES AND IS STILL PINNED BY THIS SUITE. `textShadowColor:`\nwas always one of this test's assertions and still passes unchanged \u2014 the halo is\nnow the WHOLE active signal rather than one of four. The second half of the test\nis untouched and still true: no `!tracked &&` shape, and at least three call sites\nusing the On/Off pair. My repair touched no call site, so those never moved.\n\nThe test's title changed because the old one had become false: it said \"the ACTIVE\nbutton glows\". It now says the active state is carried by the WORDS.\n\nNO PRODUCTION CHANGE. This commit touches one test file. ContractsScreen.tsx and\napp/buildInfo.ts are byte-identical to 2c07d1e2; the OTA-1821 stamp and the style\nrepair are unchanged, so the application state that reaches Golem and HAL is the\nstate that was validated.\n\nValidation on the exact tree being pushed: full fast surface 1366/1366 suites,\n14,567 passed, 3 skipped, ZERO failures \u2014 run locally this time, which is the\nstep whose absence let the first push through. ota1361 + ota1821 together 35/35.\n22/22 gates by exit code. typecheck:ci clean. lint clean. Tests ratchet at\nbaseline 201.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-14T20:41:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-14-1821-the-words-say-which-is-running",
+          "shortVersion": "tartaria@4.32.11+2026-09-14-1821-the-words-say-which-is-running",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-14T20:54:22.236934Z",
+          "dateCreated": "2026-09-14T20:48:54.913538Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "158411161",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-14T20:54:22.602827Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-14-1821-the-words-say-which-is-running",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-14-1821-the-words-say-which-is-running",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-14-1821-the-words-say-which-is-running",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-14-1821-the-words-say-which-is-running)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
