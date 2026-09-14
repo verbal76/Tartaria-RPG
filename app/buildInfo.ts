@@ -30597,7 +30597,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Every observer runs at capture phase and RETURNS FALSE. No responder is
 // claimed, no layout, pointerEvents, z-order, navigation, gameplay or store state
 // changes, no new storage key, no new timer, no write per stage.
-export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';
+// ── OTA-1819 — THE PRESENTATION SAYS WHEN IT OPENED (Class H telemetry) ──────
+// TELEMETRY ONLY. NOT A FREEZE REPAIR, and nothing here claims one.
+//
+// ⚠⚠⚠ EVERY SIGNAL THIS INSTRUMENT HAD WAS KEYED TO A TOUCH, AND A CLASS H
+// INTERVAL HAS NO TOUCHES. Natural freeze #1 (bundle mu19cjefamkg, iPhone SE 3rd
+// gen, iOS 26.5.2, environment hal) ended with a COMPLETE T0→T5 chain — travel to
+// Iskan-Veil, done at 13:06:29.881Z — and then 26.08 s of nothing at all, while
+// the owner pressed a visible "Got it" button about twenty times and the JS
+// thread stayed alive enough to write its own AppState line at 13:06:55.959Z.
+// Zero terminal root-only runs, unlike Class G's 19/24/16/4. T0, `content` and M0
+// are all touch-keyed, so in exactly the interval that matters every one of them
+// is silent BY CONSTRUCTION. No amount of touch telemetry can answer this.
+//
+// So this records a presentation EDGE instead — written when React's own
+// predicate changes, whether or not a finger ever lands again. On the next Class
+// H event the prior-boot trace can say which of the three event-relevant
+// presentations was logically open when the touches stopped.
+//
+// ⚠⚠ WHAT A `mount` MEANS. The authoritative React predicate went from absent to
+// present. It does NOT mean UIKit finished presenting anything — that is the very
+// gap under investigation, and an instrument that assumed the answer would be
+// worthless. Two of the three are native <Modal>s whose content sits outside the
+// screen's tree; the third is an ordinary in-tree overlay.
+//
+// ⚠ ONE FILE, ONE SEAM, ONE EXISTING WORD. `pres` is OTA-1814's stage for a
+// presentation changing state; `append` already persists on EVERY entry through
+// the same coalesced path the touch stages use. No new storage key, no new timer,
+// no second diagnostic architecture, no touchPath change at all. Interaction id 0
+// is used because `nextId` starts at 1 — it reads as "this record belongs to no
+// touch", which is the whole point.
+//
+// ⚠ THE SEED IS SILENT, AND SO IS TEARDOWN. The chapter and fork overlays are
+// owned by App.tsx, ABOVE the screen router, so arriving with one already up must
+// not be recorded as its mount and leaving with one still up must not be recorded
+// as its unmount. Only transitions seen while Exploration is mounted are claimed.
+// KNOWN LIMIT, recorded rather than hidden: an edge occurring while the player is
+// on another screen is not observed.
+//
+// Passive throughout: no setter is called, no visibility, responder, pointerEvents
+// or layout changes, no store write, no navigation, no story mutation.
+export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1818-the-touch-reaches-the-region';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1817-the-pack-keeps-its-reading-window';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1816-player-actions-keep-the-clock-honest';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1815-a-salvage-word-is-a-whole-word';

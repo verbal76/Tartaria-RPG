@@ -1230,6 +1230,66 @@ export function ExplorationScreen() {
     { id: TEACH.procedure_text_first.id, when: !modalOwnsBeat && (player?.inventory ?? []).some((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0) },
   ]) as TeachingId | null;
 
+  /* ⚠⚠⚠ OTA-1819 — WHICH PRESENTATION WAS UP WHEN THE TOUCHES STOPPED.
+   *
+   * ⚠⚠ EVERY OTHER SIGNAL IN THIS INSTRUMENT IS KEYED TO A TOUCH, AND A CLASS H
+   * INTERVAL HAS NO TOUCHES. Natural freeze #1 (bundle mu19cjefamkg) ended with a
+   * complete T0→T5 chain at 13:06:29.881Z and then 26.08 s of nothing, while the
+   * owner pressed a visible button ~20 times and the JS thread stayed alive enough
+   * to write its AppState line at 13:06:55.959Z. T0, `content` and M0 are all
+   * touch-keyed, so every one of them is silent by construction in exactly the
+   * interval we need to read. This records a presentation EDGE instead, which is
+   * written whether or not a finger ever lands again.
+   *
+   * ⚠⚠ WHAT `mount` MEANS, AND WHAT IT DOES NOT. It means the authoritative React
+   * predicate went from absent to present. It does NOT mean UIKit finished
+   * presenting anything — that is the very gap under investigation, and an
+   * instrument that assumed the answer would be worthless. `unmount` is the same
+   * claim reversed.
+   *
+   * ⚠ IT OBSERVES; IT NEVER ACTS. No setter is called, no visibility changes, no
+   * responder prop, no pointerEvents, no layout, no store write. The two native
+   * cards are owned by App.tsx and are only READ here, through the store fields
+   * that already decide whether they render.
+   *
+   * ⚠⚠ THE SEED IS SILENT ON PURPOSE. `null` means this screen is mounting, not
+   * that a presentation opened: the chapter and fork overlays live ABOVE the screen
+   * router, so arriving here with one already up must not be recorded as its mount,
+   * and leaving with one still up must not be recorded as its unmount. Only
+   * transitions seen while this screen is mounted are claimed. KNOWN LIMIT, stated
+   * rather than hidden: an edge that happens while the player is on another screen
+   * is not observed at all.
+   *
+   * ⚠ `#0` IS NOT AN INTERACTION. `nextId` starts at 1, so 0 can never collide with
+   * a real touch id; it reads as "this record belongs to no touch", which is the
+   * whole point. `pres` is OTA-1814's existing word for a presentation changing
+   * state, and `append` persists on EVERY entry through the same coalesced path the
+   * touch stages already use — no second architecture, no new key, no timer.
+   *
+   * ⚠ ON AN IDENTITY CHANGE THE OLD ONE CLOSES FIRST: unmount(old) then mount(new),
+   * so the trace can never read as two of the same kind open at once. */
+  const chapterPhase = useGameStore((s) => s.chapterCard?.phase ?? null);
+  const forkId = useGameStore((s) => s.pendingFork?.id ?? null);
+  const lastPresentation = useRef<Record<'chapter' | 'fork' | 'hint', string | null> | null>(null);
+  useEffect(() => {
+    const next = {
+      chapter: chapterPhase === null ? null : `chapter:${chapterPhase}`,
+      fork: forkId === null ? null : `fork:${forkId}`,
+      hint: screenTeaching === TEACH.combat_readout.id ? 'hint:combat_readout' : null,
+    };
+    const prev = lastPresentation.current;
+    lastPresentation.current = next;
+    if (prev === null) return; // seed — see above
+    for (const slot of ['chapter', 'fork', 'hint'] as const) {
+      const was = prev[slot];
+      const now = next[slot];
+      if (was === now) continue;
+      const tree = slot === 'hint' ? 'tree' : 'native';
+      if (was !== null) noteStage(0, 'pres', { control: was, reason: `unmount:${tree}` });
+      if (now !== null) noteStage(0, 'pres', { control: now, reason: `mount:${tree}` });
+    }
+  }, [chapterPhase, forkId, screenTeaching]);
+
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
   // enemy the player is currently looking at.
