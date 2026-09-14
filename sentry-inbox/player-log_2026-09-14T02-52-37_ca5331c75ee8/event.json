@@ -1,0 +1,313 @@
+{
+  "id": "ca5331c75ee841c3b6f39c8dafbb0799",
+  "groupID": "7730539609",
+  "eventID": "ca5331c75ee841c3b6f39c8dafbb0799",
+  "projectID": "4511945117532160",
+  "size": 9215,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-14-1816-player-actions-keep-the-clock-honest #mu0ndukgzmqa [inline 8/8]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-14-1816-player-actions-keep-the-clock-honest",
+  "message": "player-log 2026-09-14-1816-player-actions-keep-the-clock-honest #mu0ndukgzmqa [inline 8/8]",
+  "title": "player-log 2026-09-14-1816-player-actions-keep-the-clock-honest #mu0ndukgzmqa [inline 8/8]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-14T02:52:16Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealmsHAL",
+      "app_version": "2.4.1",
+      "app_build": "189",
+      "app_memory": 1047281664,
+      "in_foreground": true,
+      "app_id": "459151B4-D999-3BFE-91D9-284FCB28BC8D",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 45.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 167165952,
+      "usable_memory": 3478306816,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "e3aaa4feaaae4802a7c110d28fba869f",
+      "span_id": "868c4c7b32044b87",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tg6-NTQ-uMj-c1W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1jc-mFm-dCB-jb2-5mP-TEu-MDA-gdm-VyY-j1j-cmF-mdC-B0Y-XJn-ZXQ-9cH-Vsc-2Ug-c2N-hbm-5lc-iBy-ZXN-vbH-ZlZ-D0t-IHJ-hbm-dlP-S0g-ZW5-lbW-llc-z0w-IGh-vb2-tzP-TAK-WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tg6-NTQ-uMj-c0W-l0g-W3B-sYX-llc-l0g-Y3J-hZn-QgU-HVs-c2U-gU2-Nhb-m5l-cgp-bMj-AyN-i0w-OS0-xNF-QwM-jox-ODo-0OC-4zO-TZa-XSB-bZG-Vid-Wdd-IGh-vbW-V3b-3Jr-OiB-zY2-VuZ-V9p-bnR-yby-AiV-Ghl-IFJ-lYX-Zlc-idz-IEN-yZX-N0I-iDi-nJM-gNT-U4M-21z-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tg6-NDg-uMz-g3W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-G5h-cnJ-hdG-lvb-jpz-Y2V-uZV-9pb-nRy-b19-maW-xsI-G9r-IDU-1Nj-Jtc-yBy-ZWF-kID-Q4O-DVt-cy9-3cm-l0Z-SA2-NTh-tcy-Bpb-iA2-ODl-04o-aSb-3V0-IDM-zdC-B0a-HIx-IDc-uMW-1zL-3Qg-SEl-ULU-NBU-CAo-MTU-xY2-gpC-lsy-MDI-2LT-A5L-TE0-VDA-yOj-E4O-jQy-Ljg-xNV-pdI-Ftk-ZWJ-1Z1-0ga-G9t-ZXd-vcm-s6I-Glu-dHJ-vLW-Zpb-Gwg-YXJ-tZW-QgY-WZ0-ZXI-gNj-AwM-G1z-IGl-kbG-UKW-zIw-MjY-tMD-ktM-TRU-MDI-6MT-g6M-jgu-ODg-4Wl-0gW-2Rl-YnV-nXS-B1a-Tog-dGF-wIC-Jjc-mFm-dCI-K",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tg6-MjQ-uMT-E0W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-TQ0-IHB-sYX-llc-j0y-MyB-3bT-0zM-lty-b29-tcz-0xN-CBl-dmV-udH-M9M-CBt-ZW1-vcz-0wI-G5w-Y3M-9MS-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MC-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-04N-yBz-Y2V-uZT-0yC-lsy-MDI-2LT-A5L-TE0-VDA-yOj-E4O-jIz-Ljk-5NV-pdI-Ftk-ZWJ-1Z1-0gc-3Rh-dHM-6IF-NUU-jEy-IER-FWD-IgS-U5U-MTE-gV0-lTM-TIg-Q0h-BMy-BTV-EUw-IHw-gZ2-Vhc-jog-SU5-UKz-EsV-0lT-KzI-sU1-RSK-zEg-fCB-3b3-JuO-iBt-YWl-uPU-Nyd-WRl-IEd-vbG-VtI-Edy-ZWF-0c3-dvc-mQg-b2Z-mPV-BsY-XNt-YSB-UaH-Jvd-2Vy-IGh-lYW-Q9U-mVj-bGF-pbW-VyJ-3Mg-U2F-sdm-FnZ-SBD-YXA-gY2-hlc-3Q9-TXV-kLV-dhc-mRl-bid-zIF-Zlc-3QK",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tg6-MDk-uOT-YwW-l0g-W2R-lYn-VnX-SBz-dGF-0cz-ogU-1RS-MTM-gRE-VYM-iBJ-TlQ-xMS-BXS-VMx-MSB-DSE-EzI-FNU-RTA-gfC-BnZ-WFy-OiB-JTl-QrM-SxX-SVM-rMS-xTV-FIr-MiB-8IH-dvc-m46-IG1-haW-49Q-3J1-ZGU-gR2-9sZ-W0g-R3J-lYX-Rzd-29y-ZCB-vZm-Y9Q-3Vk-Z2V-sIG-hlY-WQ9-UmV-jbG-Fpb-WVy-J3M-gU2-Fsd-mFn-ZSB-DYX-AgY-2hl-c3Q-9TX-VkL-Vdh-cmR-lbi-dzI-FZl-c3Q-KWz-IwM-jYt-MDk-tMT-RUM-DI6-MTc-6NT-guM-zM0-Wl0-gW2-RlY-nVn-XSB-ob2-1ld-29y-azo-gc2-Nlb-mVf-aW5-0cm-8gI-lRo-ZSB-Nb2-5hc-mNo-J3M-gV2-F5c-3Rh-dGl-vbi-Ig4-pyT-IDY-5MG-1zC-g==",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-NTg-uMz-I3W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-G5h-cnJ-hdG-lvb-jpz-Y2V-uZV-9pb-nRy-b19-maW-xsI-G9r-IDY-3MG-1zI-HJl-YWQ-gMG-1zL-3dy-aXR-lID-Y1M-m1z-IGl-uID-Y4M-3Ti-hpJ-vdX-QgM-zR0-IHR-ocj-EgS-ElU-LUN-BUC-AoM-TQ4-Y2g-pCl-syM-DI2-LTA-5LT-E0V-DAy-OjE-3Oj-U3L-jY0-NVp-dIF-tkZ-WJ1-Z10-gaG-9tZ-Xdv-cms-6IG-lud-HJv-LWZ-pbG-wgY-XJt-ZWQ-gYW-Z0Z-XIg-NjA-wMG-1zI-Glk-bGU-KWz-IwM-jYt-MDk-tMT-RUM-DI6-MTc-6Mz-UuN-DY5-Wl0-gW2-RlY-nVn-XSB-1aT-ogd-GFw-ICJ-pbn-Zlb-nRv-cnk-iCl-syM-DI2-LTA-5LT-E0V-DAy-OjE-3Oj-IxL-jky-N1p-dIF-tkZ-WJ1-Z10-gaG-9tZ-Xdv-cms-6IH-NjZ-W5l-X2l-udH-JvI-CJU-aGU-gTW-9uY-XJj-aCd-zIF-dhe-XN0-YXR-pb2-4iI-OKc-kyA-5Mz-Awb-XMK",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-MjE-uOT-AzW-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-G5h-cnJ-hdG-lvb-jpz-Y2V-uZV-9pb-nRy-b19-maW-xsI-G9r-IDk-yNj-Ztc-yBy-ZWF-kID-g1N-Tdt-cy9-3cm-l0Z-SA2-ODh-tcy-Bpb-iA2-ODN-04o-aSb-3V0-IDM-zdC-B0a-HIx-IDE-yLj-Vtc-y90-IEh-JVC-1DQ-VAg-KDE-1OG-NoK-Qpb-MjA-yNi-0wO-S0x-NFQ-wMj-oxN-zoy-MC4-0NT-BaX-SBb-d29-ybG-RdI-Flv-dSB-sZX-Qgd-Ghl-IGN-vbn-Zlc-nNh-dGl-vbi-Bnb-yBh-bmQ-gTm-Vsb-CBv-ZiB-0aG-UgT-G9u-ZyB-Sb2-FkI-Gdl-dHM-gYm-Fja-yB0-byB-pdC-4KW-zIw-MjY-tMD-ktM-TRU-MDI-6MT-c6M-TUu-NTY-3Wl-0gW-2Rl-YnV-nXS-B1a-Tog-dGF-wIC-Jtb-3Jl-IOK-WuC-IK",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-MTM-uOT-AzW-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-V0I-GNv-dXJ-zZS-Bmb-3Ig-SXN-rYW-4tV-mVp-bC4-gNS-B0a-Wxl-cyD-igJ-QgY-WJv-dXQ-gMT-Mga-G91-cnM-gb2-Ygd-HJh-dmV-sLC-Bhb-Gwg-aW4-uIF-Rhc-CB0-aGU-g4o-aSI-ElT-S0F-OLV-ZFS-Uwg-YnV-0dG-9uI-G9u-IHR-oZS-B0c-mF2-ZWw-gcm-93I-HRv-IHB-yZX-NzI-G9u-OyB-TVE-9QI-FRS-QVZ-FTC-B0b-yBo-YWx-0Lg-pbM-jAy-Ni0-wOS-0xN-FQw-Mjo-xNz-oxM-i42-Mjd-aXS-BbZ-GVi-dWd-dIG-hvb-WV3-b3J-rOi-Bpb-nRy-by1-maW-xsI-GFy-bWV-kIG-Fmd-GVy-IDY-wMD-Btc-yBp-ZGx-lCl-syM-DI2-LTA-5LT-E0V-DAy-OjE-3Oj-A3L-jYy-MFp-dIF-tkZ-WJ1-Z10-gYX-Jia-XRl-cjo-gYW-1ia-WVu-dCB-oZW-xkI-Cho-ZSB-qdX-N0I-HNw-b2t-lKQ-o=",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-MDY-uMT-g2W-l0g-W2R-lYn-VnX-SBj-dHg-6IE-9QR-U5F-RCD-igJ-Qgb-Gl2-ZT0-xIC-hvc-GVu-ZWQ-9MS-ByZ-Wxl-YXN-lZD-0wK-SDi-iYg-0Mj-VNQ-iBl-c3Q-KWz-IwM-jYt-MDk-tMT-RUM-DI6-MTc-6MD-MuM-zM0-Wl0-gW2-NvZ-25p-dGl-2ZV-0gU-1dJ-TSA-gKD-Q3b-XMp-Cls-yMD-I2L-TA5-LTE-0VD-AyO-jE3-OjA-zLj-I4N-lpd-IFt-hcm-Jpd-GVy-XSB-UaG-UgQ-XJi-aXR-lci-Bsb-29r-cyB-hcm-91b-mQu-ICJ-UaG-Ugc-2Vu-ZXN-jaG-FsI-Gxv-Z3M-geW-91c-iBu-YW1-lIH-dpd-Ghv-dXQ-gYX-Nra-W5n-IGl-0Li-BUa-GUg-TW9-uYX-Jja-HMn-IGx-lZG-dlc-nMg-aGF-2ZS-B0a-GVp-ciB-3YX-lzL-iIK-WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-MDM-uMj-g2W-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iB0-ZW1-wbG-F0Z-SAo-cmV-hc2-9uP-XF3-ZW4-tbm-90L-XJl-YWR-5KQ-o=",
+      "WzI-wMj-YtM-Dkt-MTR-UMD-I6M-Tc6-MDM-uMj-gzW-l0g-W3d-vcm-xkX-SBZ-b3U-gZ2-l2Z-SB0-aGU-gd2-F0Z-XJz-a2l-uIH-lvd-XIg-ZnV-sbC-Bhd-HRl-bnR-pb2-4uI-El0-IHJ-ldH-Vyb-nMg-dGh-lIG-dlc-3R1-cmU-gYn-kgY-mVp-bmc-gZX-hhY-3Rs-eSB-3aG-F0I-Gl0-IGF-wcG-Vhc-nMg-dG8-gYm-UuC-go9-PT0-gRU-5EI-FJF-UE9-SVC-A9P-T0="
+    ],
+    "chunkChars": 2761,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-14-1816-player-actions-keep-the-clock-honest #mu0ndukgzmqa [inline 8/8]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mu0ndukgzmqa"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-14-1816-player-actions-keep-the-clock-honest"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "8"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-14-1816-player-actions-keep-the-clock-honest"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-14T02:52:39.000963Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-14T02:52:37.522000Z",
+  "fingerprints": [
+    "d1aada30de3fb1e52c7a94937c17c707"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1970114920,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-14T01:47:31.382122Z",
+    "dateReleased": "2026-09-14T01:54:37.475370Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "994bf0187afb0197415c9541625419efd64e7dc4",
+      "message": "check:standingat \u2014 re-pin the MapScreen exemption after OTA-1816's import\n\nMAINTENANCE OF A STANDING EXCEPTION. One integer, 684 -> 685, plus the\nprovenance beside it. No gate widened, no new exemption, no app source.\n\nOTA-1816 added one import line to MapScreen \u2014 useHumanAction from\nstate/humanActivity, so a TRAVEL TO press accounts the player's activity \u2014\nsix hundred lines above the exempted statement and about nothing but a\ntimestamp. The allowlist is keyed file+line, so the required gate went red on\na statement nobody touched.\n\nBYTE-IDENTICAL, VERIFIED RATHER THAN ASSERTED: md5 7614f6948a93f4ea13e5ff102dcf43c4\nat both dec37739:684 and 6c1bda29:685 \u2014 the same hash this file already records\nfor the fourth drift.\n\nThis is the FIFTH drift for the same reason, and the cheapest yet: a single\nimport now costs a red required gate. The text-keyed fix named in this file\nsince the fourth drift is therefore no longer theoretical debt. It is still not\ndone here, for the reason the file itself gives \u2014 widening a gate inside a\nscoped repair is how gates become decoration.\n\n\u26a0 The publication anchor already covers what follows. This is a scripts-only\ncommit behind a bundle change that failed CI, which is exactly the stranded-\nbundle shape OTA-1804 hit on this same gate; the anchor measures from the last\ncommit published to golem, so 6c1bda29's app/ changes stay inside the range.\n\n22/22 gates green, re-run by exit code.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-14T01:41:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-14-1816-player-actions-keep-the-clock-honest",
+          "shortVersion": "tartaria@4.32.11+2026-09-14-1816-player-actions-keep-the-clock-honest",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-14T01:54:37.475370Z",
+          "dateCreated": "2026-09-14T01:47:31.382122Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "158114589",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-14T01:54:37.741179Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-14-1816-player-actions-keep-the-clock-honest",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-14-1816-player-actions-keep-the-clock-honest",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-14-1816-player-actions-keep-the-clock-honest",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-14-1816-player-actions-keep-the-clock-honest)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "dfb5b086766441468ef1dff351af923a",
+  "previousEventID": "aa50663b39cf4c0491c6a713358d9c34"
+}
