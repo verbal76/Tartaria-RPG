@@ -30708,7 +30708,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shadow out from under the card. The travel now rides `dossierRim`, the thing
 // the player perceives as the card, so the record still depresses and the shadow
 // stays where the resting card put it. Nothing was flattened to hide it.
-export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
+
+// ⚠⚠⚠ OTA-1823 / BUILD 190 — THE MICROSCOPE, AND THE ONE STAMP IN THIS FILE
+// THAT DOES NOT TELL THE WHOLE STORY BY ITSELF.
+//
+// THIS IS DIAGNOSTIC INSTRUMENTATION. IT IS NOT A MEMORY REPAIR. Nothing it
+// adds frees, disposes, reloads, evicts, schedules, cancels or throttles
+// anything; the game behaves identically with it and without it. What changes
+// is that the process finally becomes observable.
+//
+// ⚠⚠ THE BLIND SPOT IT CLOSES, quoted from the instrument that had to admit to
+// it. app/diagnostics/memoryTimeline.ts, shipped as OTA-1809, says:
+//
+//     "process RSS is not reachable from this runtime without a new native
+//      dependency (checked against package.json: no device-info, no
+//      expo-device, and Sentry exposes no live-memory read)"
+//
+// Hermes can only count the JS heap. The ~400 MB llama context, the voice model
+// and every ONNX arena are NATIVE allocations it cannot see — so a session could
+// sit at a flat 60 MB JS heap while the process walked toward the ~1.85–1.89 GB
+// the three iPhone XR jetsam reports name, and every memory instrument this app
+// owned would have reported nothing wrong. `modules/tartaria-memory` IS that
+// missing native dependency.
+//
+// ⚠⚠⚠ TWO HALVES OF ONE CHANGE, AND NEITHER SUBSTITUTES FOR THE OTHER.
+//   · OTA-1823 is the JS half — the facade, the event vocabulary, the derived
+//     semantics and the report block. It is an INERT NO-OP on any bundle whose
+//     binary lacks the native module, which is every device in the field today.
+//   · BUILD 190 is the native half, and only a fresh iOS binary can carry it.
+// An OTA cannot deliver a native module, and a native binary is not an OTA.
+// A device reading this stamp with an empty flight-recorder section is running
+// this bundle on an older binary — and the report says that in those words
+// rather than leaving the section blank.
+//
+// ⚠ WHAT THE EVIDENCE SAYS, and the labels matter more than the numbers:
+//     HISTORICAL JETSAM PROCESS PRESSURE ......................... PROVEN
+//     LIVE CLASS-H MEMORY CAUSATION ............................. UNKNOWN
+// Nothing here may be read as "memory caused the Apple freeze". The recorder
+// exists so the NEXT report can answer that question instead of re-posing it.
+export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1819-the-presentation-says-when-it-opened';

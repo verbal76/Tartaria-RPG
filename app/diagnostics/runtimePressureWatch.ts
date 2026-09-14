@@ -69,7 +69,20 @@ import { APPROX_CONTEXT_MB, contextLedger } from '../ai/generation/contextLedger
 // changes is that a reader can now see what memory was doing at each of them,
 // and whether it came back down. See app/diagnostics/memoryTimeline.ts.
 import { noteMemoryMark, noteMemoryMarkIfMoved, setMemoryWarnCounter } from './memoryTimeline';
+// ⚠ BUILD 190 — the native recorder's control and annotation doors. Every one
+// of them is a safe no-op when the native module is absent, which is the normal
+// state on Android, on web, in Expo Go and in every jest run.
+import {
+  MEM_KIND, annotateMemory, beginMemoryBurst, memoryHeartbeat, primeMemoryFlight,
+  startNativeMemoryRecorder, stopNativeMemoryRecorder,
+} from './nativeMemoryRecorder';
+import { OTA_BUILD_ID } from '../buildInfo';
 import type { GameStore } from '../state/gameStore';
+
+/** ⚠ BUILD 190 — tick counter for the once-a-minute primed snapshot. Module
+ *  scope, not closure scope, so a watch restart does not reset the cadence into
+ *  a burst of priming. */
+let primeTicks = 0;
 
 type SetState = (
   partial: Partial<GameStore> | ((state: GameStore) => Partial<GameStore>),
@@ -183,6 +196,10 @@ export function stopRuntimePressureWatch(): void {
   rpStopFrameClock();
   if (rpMemorySub) { try { rpMemorySub.remove(); } catch { /* ignore */ } rpMemorySub = null; }
   if (rpAppStateSub) { try { rpAppStateSub.remove(); } catch { /* ignore */ } rpAppStateSub = null; }
+  // ⚠ BUILD 190 — the native recorder's timer and its lifecycle observers stop
+  // here too, so the OTA-1798 property ("the instruments stop when the app
+  // does") holds for the native side as well as the JS side.
+  try { stopNativeMemoryRecorder(); } catch { /* teardown never throws */ }
 }
 
 export function startRuntimePressureWatch(
@@ -207,6 +224,20 @@ export function startRuntimePressureWatch(
   setMemoryWarnCounter(() => rpMemoryWarnings);
   noteMemoryMark('watch-start');
 
+  // ⚠⚠⚠ BUILD 190 — THE NATIVE RECORDER STARTS AND STOPS WITH THIS WATCH, AND
+  // THAT PAIRING IS DELIBERATE RATHER THAN CONVENIENT. OTA-1798's whole finding
+  // was that instruments which start at boot and never stop leave timers and
+  // observers running past teardown; binding the recorder to the one watch this
+  // app already starts AND stops means it inherits a lifecycle that has been
+  // proven to terminate. `stopRuntimePressureWatch` stops it.
+  //
+  // ⚠ A no-op wherever the native module is absent — Android, web, Expo Go,
+  // jest — and it cannot throw. See nativeMemoryRecorder: that absence is the
+  // ordinary case the whole facade is written around, not an error path.
+  try {
+    startNativeMemoryRecorder(OTA_BUILD_ID);
+  } catch { /* an instrument never breaks a boot */ }
+
   // ⚠⚠ THE ONE THE OWNER ASKED FOR, AND NOTHING IN THIS APP LISTENED FOR IT BEFORE.
   // On iOS the OS warns before it stalls the app and again before it kills it, so this is
   // the highest-value signal available for a frozen-but-alive report — and it was being
@@ -220,6 +251,23 @@ export function startRuntimePressureWatch(
       // warning LINE names the engine and the voice but has never carried a
       // memory figure of any kind; this is that figure, beside them.
       noteMemoryMark('mem-warning');
+      // ⚠⚠ BUILD 190 — THE JS SIDE OF THE WARNING, AND IT IS NOT A DUPLICATE OF
+      // THE NATIVE ONE. The native module has its own
+      // `didReceiveMemoryWarningNotification` observer and raises its own event
+      // plus a checkpoint plus a burst; this annotation is the JS runtime saying
+      // "I saw it too, and here is where I was when I did". If the native event
+      // appears and this one does not, JS never got the notification — which is
+      // itself a finding about the runtime, not about memory.
+      //
+      // ⚠ The burst is requested from both sides ON PURPOSE. Bursts share ONE
+      // deadline, so a second request extends rather than stacks, and asking
+      // twice costs one counter increment and buys the case where one of the two
+      // observers never fires.
+      try {
+        annotateMemory(MEM_KIND.JS_MEMORY_WARNING, rpMemoryWarnings);
+        beginMemoryBurst(10_000);
+        void primeMemoryFlight();
+      } catch { /* an instrument never breaks the warning path */ }
       const t = Date.now();
       const since = rpLastMemoryWarningAt == null ? null : t - rpLastMemoryWarningAt;
       rpLastMemoryWarningAt = t;
@@ -468,6 +516,39 @@ export function startRuntimePressureWatch(
     // ⚠ LAST, after the verdict: the stall edge is the older instrument and
     // nothing added here may sit between a stall and the line that reports it.
     try { noteMemoryMarkIfMoved(); } catch { /* an instrument never breaks the watch */ }
+
+    // ⚠⚠⚠ BUILD 190 — THREE THINGS RIDE THIS EXISTING TICK, AND NOT ONE OF THEM
+    // CREATES A TIMER. The native recorder has its own queue and its own clock;
+    // what it cannot do from there is know whether JS is still alive, or what
+    // Hermes thinks its heap is. Both of those have to come from here.
+    try {
+      // 1. ⚠⚠ THE LIVENESS PROOF, AND IT IS THE CHEAPEST HIGH-VALUE SIGNAL IN
+      // THE WHOLE BUILD. This tick IS the JS thread running. When it stops
+      // arriving, native keeps sampling on its own queue and flags those
+      // samples STALE — so a run of stale-flagged samples is a JS stall
+      // OBSERVED FROM OUTSIDE THE RUNTIME THAT STALLED, which is precisely the
+      // measurement no JS-side instrument can ever make about itself. That is
+      // the Class H blind spot, and this one call is what opens it.
+      memoryHeartbeat();
+
+      // 2. The coarse Hermes figure, carried into the native trace so the two
+      // series sit on one timeline. ⚠ Bucketed to MB and clamped: `code` is a
+      // 16-bit field, and a JS heap is never near 65 GB.
+      if (hermesNow) {
+        annotateMemory(MEM_KIND.HERMES_HEAP, Math.round(hermesNow.heapBytes / 1048576));
+      }
+
+      // 3. ⚠ THE PRIMED SNAPSHOT, ON ITS OWN SLOW CLOCK. `aboutSummary` is
+      // synchronous and the native read is not, so the report prints the most
+      // recent primed snapshot with its age beside it. Priming every tick would
+      // allocate a 512-row array every five seconds for a report nobody is
+      // reading; every twelfth tick is once a minute, which is fresher than any
+      // bug report needs and costs almost nothing.
+      // ⚠ Deliberately NOT awaited — this tick must not become asynchronous.
+      primeTicks += 1;
+      if (primeTicks % 12 === 0) { void primeMemoryFlight(); }
+    } catch { /* an instrument never breaks the watch */ }
+
     crumbAtLastSample = crumbNow;
     hermesAtLastSample = hermesNow; // OTA-1696
     rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);

@@ -18,6 +18,26 @@ yarn-error.*
 *.orig.*
 ios/
 android/
+
+# ⚠⚠⚠ BUILD 190 — THE UN-IGNORE, AND IT IS LOAD-BEARING RATHER THAN TIDY.
+#
+# `ios/` above is UNANCHORED, so git matches it at EVERY depth — including
+# `modules/tartaria-memory/ios/`, where this repository's only Tartaria-owned
+# Swift lives. The first `git add modules/` staged the module's three JSON/TS
+# files and SILENTLY DROPPED all four .swift files and the podspec. That would
+# have pushed a local Expo module with no native source in it: autolinking finds
+# expo-module.config.json, names `TartariaMemoryModule`, and the build dies on an
+# EAS worker twenty minutes later with nothing in the diff to explain it.
+#
+# The rule above is correct and stays: `ios/` AT THE PROJECT ROOT is Expo CNG's
+# generated prebuild output and must never be committed. This negation re-admits
+# ONLY native source we author ourselves, under `modules/`.
+#
+# ⚠ THE DIRECTORY ITSELF HAS TO BE NEGATED, not the files inside it. Git does
+# not descend into an excluded directory, so a `!modules/*/ios/**` written
+# against the files alone is never consulted — the walk stops at the parent.
+!modules/*/ios/
+
 .tmp/
 coverage/
 .tartaria-tmp/

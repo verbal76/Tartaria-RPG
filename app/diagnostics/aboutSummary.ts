@@ -110,6 +110,7 @@ function touchPathBlock(): string {
 }
 import { peekTouchPath, priorTouchPath, touchPathLines } from './touchPath';
 import { memoryTimelineSummary } from './memoryTimeline';
+import { memoryFlightBlock } from './nativeMemoryRecorder';
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
 import { crashLedgerSummary } from './crashLedger';
@@ -256,6 +257,22 @@ export function buildBasicDeviceSummary(): string {
     // every cycle. LAST in the report because it is the longest block and the
     // counts above are what a triage reader looks at first.
     memoryTimelineBlock(),
+    // ⚠⚠⚠ BUILD 190 — AND THE ONE BLOCK THAT CAN SEE WHAT HERMES CANNOT.
+    //
+    // Every memory figure above this line is the JS HEAP. memoryTimeline's own
+    // header says why: "process RSS is not reachable from this runtime without
+    // a new native dependency". Build 190 IS that dependency. The ~400 MB llama
+    // context, the voice model and every ONNX arena are native allocations
+    // Hermes cannot count, so a session could sit at a flat 60 MB JS heap while
+    // the process walked toward the ~1.85–1.89 GB the jetsam reports name — and
+    // every block above would have reported nothing wrong.
+    //
+    // ⚠⚠ IT ALSO CARRIES THE ONE TRACE A JETSAM KILL CAN LEAVE. A process killed
+    // for memory gets no unwind and no chance to send anything, so the session
+    // that recorded the decisive evidence is exactly the one that can never
+    // report it. The PREVIOUS LIFE line inside this block is the durable
+    // checkpoint written before that death and read back on the next boot.
+    memoryFlightBlock(),
     // ⚠⚠⚠ OTA-1813 — and the one block about the PLAYER rather than the process.
     // Placed last, beside the other long block, for the same triage reason.
     touchPathBlock(),

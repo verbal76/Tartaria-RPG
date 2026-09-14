@@ -48,6 +48,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // ⚠ PURE READ ONLY. `touchLateMs` computes a number and mutates nothing, so
 // borrowing it here cannot disturb tapClock's own slot or its `⏱+Nms` suffix.
 import { touchLateMs } from './tapClock';
+// ⚠ BUILD 190 — correlation only. A safe no-op wherever the native recorder is
+// absent, and it cannot throw; see the BUILD190_STAGE_KIND note below `noteStage`.
+import { MEM_KIND, annotateMemory } from './nativeMemoryRecorder';
 
 /** Bump when the entry shape changes; a reader that does not know the version
  *  should say so rather than mis-read old bytes. */
@@ -361,7 +364,51 @@ export function noteStage(
   });
 }
 
+/**
+ * ⚠⚠⚠ BUILD 190 — THE FOUR CORNERS, AND THE FOUR THAT ARE DELIBERATELY ABSENT.
+ *
+ * The native memory recorder correlates against T0 / T2 / T4 / T5 ONLY. This
+ * chain has eight stages, and annotating all of them would put an event in a
+ * 64-slot ring for every finger movement, evicting the rare annotations — a
+ * context init, a memory warning — that the ring exists to hold. It would also
+ * bury the signal: four events per tap is a trace a human can read, eight is a
+ * log.
+ *
+ * These four are the load-bearing corners of one interaction:
+ *     root      the touch arrived at all
+ *     enter     JS ran the control's code
+ *     dispatch  the admitted operation went out
+ *     done      the authoritative sync part returned
+ * A footprint step between any adjacent pair localises the cost to ONE span,
+ * which is the entire point of correlating.
+ *
+ * `modal`, `in`, `admit` and `reject` are NOT annotated, and that is a choice
+ * rather than an oversight: each refines a corner already covered, and none can
+ * carry a memory cost the corners either side of it do not already bracket.
+ *
+ * ⚠ A TABLE RATHER THAN A SWITCH, so a stage added to this chain in future is
+ * silently NOT annotated. That is the safe default: a new stage that deserves
+ * correlation has to be added here deliberately.
+ */
+const BUILD190_STAGE_KIND: Partial<Record<TouchStage, number>> = {
+  root: MEM_KIND.T0_ROOT_TOUCH,
+  enter: MEM_KIND.T2_HANDLER_ENTER,
+  dispatch: MEM_KIND.T4_DISPATCH,
+  done: MEM_KIND.T5_DONE,
+};
+
 function append(partial: { i: number; st: TouchStage; c?: string; r?: string; d?: number; o?: true }): void {
+  // ⚠ FIRST, AND IN ITS OWN TRY. It must never be able to stop a stage being
+  // recorded — the touch path is the older instrument and it outranks this one.
+  // The call reads a clock and hands off to the native queue; it does no Mach
+  // work on this thread, which matters because this thread is usually the JS
+  // thread mid-gesture.
+  try {
+    const kind = BUILD190_STAGE_KIND[partial.st];
+    // `code` carries the interaction id, so a memory event can be tied back to
+    // the exact tap in the touch-path block of the same report.
+    if (kind !== undefined) annotateMemory(kind, partial.i & 0xffff);
+  } catch { /* an instrument never breaks another instrument */ }
   try {
     const e: TouchPathEntry = {
       s: ++seq,

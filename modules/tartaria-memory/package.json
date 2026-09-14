@@ -1,0 +1,11 @@
+{
+  "name": "tartaria-memory",
+  "version": "1.0.0",
+  "description": "Build 190 — native memory flight recorder. Diagnostic instrumentation only: it measures the process, it does not manage it.",
+  "main": "index.ts",
+  "license": "UNLICENSED",
+  "private": true,
+  "author": "Hot Attic Games",
+  "homepage": "https://github.com/verbal76/Tartaria-RPG",
+  "platforms": ["ios"]
+}

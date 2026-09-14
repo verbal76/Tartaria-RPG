@@ -30,7 +30,7 @@
  * ⚠ WHAT DID NOT CHANGE: two bodies, same code, same order, same comments.
  */
 import { qwen } from '../../ai/engines';
-import { setContextLedgerSink } from '../../ai/generation/contextLedger';
+import { contextLedger, setContextLedgerSink } from '../../ai/generation/contextLedger';
 import {
   qwenCallCount,
   qwenJobStats,
@@ -56,6 +56,8 @@ import { setLastBootBreadcrumb } from '../../diagnostics/runtimePressure';
 // ⚠ OTA-1809 (Baker #3A) — the bounded memory timeline. Marked from the two
 // sinks installed below, which already fire on exactly the events #3A needs.
 import { noteMemoryMark } from '../../diagnostics/memoryTimeline';
+// ⚠ BUILD 190 — annotation only. Safe no-ops when the native recorder is absent.
+import { MEM_KIND, annotateMemory, beginMemoryBurst } from '../../diagnostics/nativeMemoryRecorder';
 import { getCrashedSlotIds, loadSaveLoadHealth } from '../../diagnostics/saveLoadHealth';
 import { createCharacter, type CreateCharacterInput } from '../../engine/character';
 import { buildArbiterSceneIntro, buildOpening } from '../../engine/narrativeGenerator';
@@ -435,6 +437,29 @@ export const createBootSlice = (
       // and its outcome, with the heap and the live-context count beside it. The
       // `qwen⏱` line above is untouched, and nothing about the generation moves.
       try { noteMemoryMark('gen-settled', `${r.job} ${r.outcome}`); } catch { /* never break a generation */ }
+      // ⚠⚠ BUILD 190 — THE SAME SEAM, ON THE NATIVE TRACE. The mark above
+      // carries the HERMES heap; a generation's real cost is the native llama
+      // work Hermes cannot see, so this is the annotation that can show it.
+      //
+      // ⚠ THE BURST IS REQUESTED AT SETTLEMENT RATHER THAN AT START, and that is
+      // the interesting choice. Settlement is when a context may be released,
+      // and whether the process actually GIVES THAT MEMORY BACK is exactly the
+      // question a 1 Hz sampler is too coarse to answer. Three seconds of 100 ms
+      // sampling across the release is what separates "freed" from "freed
+      // nothing" — the distinction OTA-1809's `mem-warn-settled` row could only
+      // ask about after the fact.
+      //
+      // ⚠⚠⚠ THIS MEASURES THE EXISTING LLAMA CONFIGURATION AND CHANGES NONE OF
+      // IT. No n_ctx, no n_gpu_layers, no mlock, no batch or ubatch, no thread
+      // count, no model, no quantization, no context lifecycle, no load or
+      // release timing, no scheduler ownership, no priority, no cancellation, no
+      // teardown, no Metal setting and no prompt. Nothing about this generation
+      // moves. An instrument that changed the thing it measures would be
+      // reporting on itself.
+      try {
+        annotateMemory(MEM_KIND.QWEN_GEN_SETTLED, Math.max(0, Math.round(Number(r.outTokens) || 0)));
+        beginMemoryBurst(3_000);
+      } catch { /* never break a generation */ }
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
         // ⚠⚠ LAG-3 — AND THE QUEUE'S OWN LINE BESIDE THE GENERATIONS'. The
@@ -470,6 +495,28 @@ export const createBootSlice = (
       // itself for the live count, so no part of this depends on parsing the
       // line — the line stays the human-readable record, the row is the data.
       try { noteMemoryMark('ctx-event'); } catch { /* an instrument never breaks a boot */ }
+      // ⚠⚠⚠ BUILD 190 — AND THIS IS THE SINGLE MOST VALUABLE ANNOTATION IN THE
+      // WHOLE BUILD. A llama context is the biggest allocation this app makes —
+      // roughly 400 MB — and it is ENTIRELY INVISIBLE to Hermes, so the mark on
+      // the line above records a JS heap that barely twitches while the process
+      // moves by most of half a gigabyte.
+      //
+      // ⚠⚠ THE BURST IS THE POINT, NOT THE EVENT. At the 1 Hz cadence a context
+      // open or close is one sample wide, which cannot distinguish "allocated
+      // and held" from "allocated, and the previous one was released a moment
+      // later". Three seconds of 100 ms sampling across the transition is what
+      // makes the two readable apart — and those two want completely different
+      // repairs, which is exactly the guess #3B was forbidden from making.
+      //
+      // ⚠ `code` is the live context count from the ledger, so the trace carries
+      // how many were open at the moment, not merely that something happened.
+      try {
+        annotateMemory(
+          MEM_KIND.QWEN_CONTEXT_INIT,
+          (() => { try { return contextLedger().live; } catch { return 0; } })(),
+        );
+        beginMemoryBurst(3_000);
+      } catch { /* an instrument never breaks a boot */ }
     });
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
