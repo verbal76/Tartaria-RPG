@@ -111,3 +111,35 @@ Wanted from the bundle:
     its dismissal, and CRITICALLY whether any touch or action evidence continues AFTER the receipt
 Fetch everything newer than the last synced bundle. Part completeness per bundle on the relay's
 own pagination and issue-walk evidence, as usual.
+pull: 2026-09-14T03:0xZ — EIGHT OR NINE LOGS IN FLIGHT, ARRIVAL TIME UNKNOWN. Owner: "we have
+probably around 8 or 9 logs in flight but I don't know how long it takes for them to hit." This is
+a RETRIEVAL, not a diagnosis — pull first, classify afterwards.
+⚠ THE HOURLY CLOCK HAS ALREADY LOOKED TWICE AND FOUND NOTHING. Runs 221 (01:27Z) and 222 (02:19Z)
+both completed SUCCESS and committed nothing; the newest evidence in the tree is still dec37739 at
+00:37:50Z from run 220 (00:36Z), which is also the last time VERDICT.txt moved. So either the logs
+have not reached Sentry yet, or they landed somewhere this relay does not read. Fetch everything
+newer than the 2026-09-14T00:37:50Z sync.
+WHAT IS LIVE, so build stamps read correctly — both shipped tonight, both on Golem AND HAL, and
+NEITHER has owner device verification yet, so a log carrying either stamp is also that line's
+device receipt:
+  OTA-1816  2026-09-14-1816-player-actions-keep-the-clock-honest   6c1bda29
+  OTA-1817  2026-09-14-1817-the-pack-keeps-its-reading-window      ea3ecb7f
+Wanted from this pull, in order:
+1. COUNT AND STAMP FIRST. How many distinct records arrived, each one's OTA_BUILD_ID, and which
+   line it came from. IF FEWER THAN EIGHT ARRIVED, SAY SO PLAINLY with the newest timestamp seen —
+   a short or empty pull is the answer to the owner's actual question and must not be reported
+   around. Distinguish "Sentry has nothing" from "the relay could not assemble it".
+2. ANY RECORD STAMPED 1816 OR 1817 — the first logs from the activity-accounting work. Read them
+   as ORDINARY logs: what the player did, what the engine did, what looks wrong. Do NOT go hunting
+   for confirmation that either repair worked; a healthy log proves the app ran and nothing more.
+3. NATIVE DEATHS / TERMINATIONS, if any: name the action, room and screen each carries. A record
+   that cannot name an action is itself the finding. Do NOT connect any of it to the iPhone SE
+   gameplay freeze or the report-screen freeze — both remain UNKNOWN and separately tracked, and
+   neither is attributable to Baker #13.
+4. THE PACK, because OTA-1817 changed when its homework window re-arms: item-description homework
+   activity while the inventory screen was open, and anything reading as the window failing to
+   return after an equip/drop/scrap/stow. Report what the log says; claim no causation either way.
+5. SCRUB AND ASSEMBLY ACCOUNTING as usual — per-bundle part counts, completeness on the relay's own
+   pagination and issue-walk evidence, and any redactions. A partially assembled bundle is evidence
+   about the relay and must be reported rather than quietly stitched.
+Nothing here authorizes a repair, a native build, an OTA or a promotion.
