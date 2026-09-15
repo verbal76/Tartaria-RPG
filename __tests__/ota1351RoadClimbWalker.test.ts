@@ -100,9 +100,41 @@ describe('OTA-1351 — a great climb reached by road, not by teleport', () => {
 
     // B7's two recovery conditions, exercised the honest way: clear any arrival
     // fight, take a fresh look, and the tower must be in the room.
+    //
+    // ⚠ OTA-1351 / API 36 — THE MISSING STEP IS THE RECOMPOSE, AND THE PREMISE
+    // IS NOW STATED RATHER THAN HOPED FOR.
+    //
+    // gameStore's OTA-910 block admits the great-climb prop only into a scene
+    // COMPOSED while the room is peaceful (`gc && gcUnlocked && !hubRoomId &&
+    // !hasEnemies`, gameStore.ts). `look around` is an INVESTIGATE action: it
+    // READS the noun pool, it does not recompose it. So an arrival that
+    // happened to roll a fight hides the tower for as long as that scene
+    // object lives, and emptying `enemies` afterwards cannot put it back,
+    // because nothing recomposes — the two lines above believed a fresh look
+    // did. Whether a given arrival rolls a fight is a draw off the seeded
+    // Math.random stream, so this walker was riding the stream's goodwill.
+    // The API 36 migration moved that stream — app/ and this file are
+    // byte-identical to 015c3237, only node_modules changed — the arrival at
+    // Thametan's Tower started rolling an Aetheric Minotaur and a Chart
+    // Runner, and the walker went red without a line of gameplay changing.
+    //
+    // So compose the peaceful scene explicitly, and assert the premise before
+    // leaning on it. The loop is a belt: a recompose here has never once
+    // rolled a fight in measurement (5/5 on the live stream, and with the
+    // draw pinned at both 0.0001 and 0.999 — a fight this recent suppresses
+    // the next encounter), but if that ever changes this fails on the premise
+    // line with "expected length 0", not mysteriously on the noun list.
     store.setState((s) => ({
       currentScene: { ...s.currentScene!, enemies: [], enemyHps: [], range: null } as never,
     }));
+    store.getState().beginScene();
+    for (let peace = 0; peace < 20 && (store.getState().currentScene?.enemies?.length ?? 0) > 0; peace++) {
+      store.setState((s) => ({
+        currentScene: { ...s.currentScene!, enemies: [], enemyHps: [], range: null } as never,
+      }));
+      store.getState().beginScene();
+    }
+    expect(store.getState().currentScene?.enemies ?? []).toHaveLength(0);
     store.getState().submitPlayerAction('look around');
     const nouns = (store.getState().currentScene?.ambientNouns ?? []).map((n) => String(n).toLowerCase());
     expect(nouns.some((n) => climb.tokens.some((t: string) => n.includes(t)) || n.includes(climb.noun.toLowerCase()))).toBe(true);
