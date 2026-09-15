@@ -149,8 +149,18 @@ describe('OTA-1515 — THE ROOT CAUSE: the SDK ignores the deadline we hand it',
   // `await s.flush(10_000)` was never a ten-second wait. It was no wait at all,
   // in the worst sense — an unbounded one.
   const RN_SDK = join(ROOT, 'node_modules', '@sentry', 'react-native', 'dist', 'js', 'sdk.js');
+  // ⚠ THE FILE MOVED; THE SENTENCE DID NOT. @sentry/react-native 6.10.0 -> ~7.2.0
+  // brings @sentry/core 10.12.0, which folded `build/cjs/utils-hoist/` back into
+  // `build/cjs/utils/` — the old directory does not exist at all now. The
+  // documented behaviour this pin reads is unchanged and still lands on one line:
+  // "not passing anything) will make the promise wait as long as it takes". Only
+  // the path segment moves here; the assertion below is untouched, because the
+  // point of this describe is that the answer is READABLE IN THE VENDOR SOURCE,
+  // and no public API states it — it is a doc comment on makePromiseBuffer.drain.
+  // ⚠⚠ This is a vendor-internal path by necessity, so it will move again. When it
+  // does, the fix is to follow the file, never to soften the assertion.
   const CORE_BUF = join(
-    ROOT, 'node_modules', '@sentry', 'core', 'build', 'cjs', 'utils-hoist', 'promisebuffer.js',
+    ROOT, 'node_modules', '@sentry', 'core', 'build', 'cjs', 'utils', 'promisebuffer.js',
   );
 
   it('⚠⚠⚠ THE VENDOR PROOF: RN flush() takes no arguments, so our timeout is discarded', () => {
