@@ -16,7 +16,7 @@
 // guarded require() at the top and bail. Callers must check
 // isInAppInstallAvailable() before exposing the INSTALL NOW button.
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 let cachedAvailability: boolean | null = null;
 

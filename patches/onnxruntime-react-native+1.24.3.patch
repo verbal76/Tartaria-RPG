@@ -1,0 +1,21 @@
+diff --git a/node_modules/onnxruntime-react-native/android/build.gradle b/node_modules/onnxruntime-react-native/android/build.gradle
+index 41b4359..2994128 100644
+--- a/node_modules/onnxruntime-react-native/android/build.gradle
++++ b/node_modules/onnxruntime-react-native/android/build.gradle
+@@ -89,7 +89,15 @@ android {
+             "-DORT_EXTENSIONS_ENABLED=${ortExtensionsEnabled}",
+             "-DREACT_NATIVE_VERSION=${REACT_NATIVE_VERSION}",
+             "-DUSE_QNN=${useQnn}",
+-            "-DUSE_NNAPI=${!useQnn}"
++            "-DUSE_NNAPI=${!useQnn}",
++            // Tartaria Realms patch (API 36 / Android 16 KB page-size compliance).
++            // NDK r27 makes 16 KB ELF alignment OPT-IN via this CMake variable, read
++            // by android.toolchain.cmake at CONFIGURE time. onnxruntime-react-native
++            // never opts in at any published version, so the locally compiled JSI
++            // bridge libonnxruntimejsi.so linked at p_align 0x1000 while the PREBUILT
++            // core libonnxruntime.so (extracted from the pinned onnxruntime-android AAR)
++            // was already 0x4000. Scoped to this module; cannot relink the core.
++            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+         } else {
+           arguments "-DNODE_MODULES_DIR=${nodeModules}",
+             "-DORT_EXTENSIONS_ENABLED=${ortExtensionsEnabled}",
