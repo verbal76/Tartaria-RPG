@@ -1,43 +1,45 @@
-name: API36 · Gate 5 Expo53/RN0.79 coherence + 16 KB proof (temporary, NOT published)
+name: API36 · Gate 6 Expo54/RN0.81 coherence + 16 KB proof (temporary, NOT published)
 
 # ⚠⚠⚠ TEMPORARY EXPERIMENT ON THE RADIOACTIVE BRANCH `api36-config-proof`.
 # NEVER MERGE. NEVER PROMOTE. NEVER PUBLISH. No OTA, no Play, no iOS, no Heavy CI.
 #
 # THE QUESTION:
-#   Does the coherent Expo SDK 53 / React Native 0.79 graph build a production-style
-#   ARM64 AAB against compileSdk 36 / targetSdk 36, and is every packaged native
-#   library 16 KB page-aligned?
+#   Can Tartaria move ONE MORE coherent platform generation — Expo SDK 54 / RN 0.81 —
+#   and what happens to the 16 KB ELF picture when it does?
 #
-# WHY SDK 53 IS THE NEXT RUNG, WITH THE GATE 4 MECHANISM NAMED EXACTLY:
-#   Gate 4 (Expo52 + RN0.77) failed at project configuration inside expo-modules-core
-#   2.2.3 with "Starting in Kotlin 2.0, the Compose Compiler Gradle plugin is required".
-#   The precise mechanism: expo-modules-core 2.2.3 applies that plugin behind the guard
-#       if (KOTLIN_MAJOR_VERSION >= 2) { apply plugin: 'org.jetbrains.kotlin.plugin.compose' }
-#   KOTLIN_MAJOR_VERSION derives from the `android.kotlinVersion` Gradle property, which
-#   Tartaria's own app.json pinned to 1.9.25 — so the guard read 1 and the plugin was
-#   NOT applied, while the actual Kotlin Gradle Plugin on the classpath was 2.0.21 from
-#   RN 0.77's version catalog. Pin and reality disagreed.
-#   expo-modules-core 2.5.0 (SDK 53) replaces that guard with `shouldIncludeCompose` and
-#   applies the plugin unconditionally when compose is on. AND this experiment REMOVES
-#   the 1.9.25 pin from app.json, so RN 0.79's own Kotlin 2.0.21 governs end to end.
+# GATE 5 IS A PRESERVED PROVEN FALLBACK AND IS NOT BEING REPAIRED HERE.
+#   Gate 5 (22affe8a, run 34927691187) = classification B: Expo 53.0.27 / RN 0.79.6 /
+#   React 19.0.0 / AGP 8.8.2 / Kotlin 2.0.21 / Gradle 8.13 / NDK 27.1.12297006 built a
+#   signed production arm64 AAB on compileSdk+targetSdk 36 with 22 PASS / 7 FAIL of 29.
 #
-# ⚠ THE NDK IS NOT FORCED. Gate 3 used r28 and Gate 4 forced r28; this run does NOT.
-# It reads whatever ndkVersion the coherent Expo53/RN0.79 graph actually selects from
-# the GENERATED project and installs exactly that. 16 KB compliance is the acceptance
-# requirement — an NDK version is not a proof and is not a goal.
+# ⚠⚠ THE SEVEN RESIDUALS ARE DELIBERATELY NOT FIXED IN THIS GATE.
+#   llama.rn 0.4.8               -> librnllama{,_v8,_v8_2_fp16,_v8_2_fp16_dotprod,
+#                                    _v8_4_fp16_dotprod,_v8_4_fp16_dotprod_i8mm}.so
+#   onnxruntime-react-native 1.24.3 -> libonnxruntimejsi.so
+#   Gate 6 asks whether the platform can move first. Those three packages
+#   (llama.rn, onnxruntime-react-native, react-native-executorch) are HELD AT THEIR
+#   GATE 5 RANGES, proven from expo@54.0.37's bundledNativeModules.json: none of the
+#   three appears there, so SDK 54 does not constrain them and no movement is justified.
+#   The ONNX Android core stays pinned at 1.22.0 (factory behaviour).
 #
-# ⚠⚠ NO MANUAL PAGE-SIZE LINKER FLAGS. No -Wl,-z,max-page-size=16384, no
-# common-page-size. A step greps every generated link rule to PROVE none was added.
+# ⚠ THE NDK IS NOT FORCED. RN 0.81.5's own catalog selects ndkVersion 27.1.12297006 —
+# the SAME NDK Gate 5 used. That is read from the graph, not imposed, and r28 is NOT
+# substituted merely because it is newer. The artifact decides compliance.
+#
+# ⚠⚠ NO MANUAL PAGE-SIZE LINKER FLAGS, no Folly patches, no Kotlin/AGP pins, no
+# ReactAndroid/Hermes/fbjni/Fresco overrides. app.json is BYTE-IDENTICAL to Gate 5.
 #
 # ⚠ ONE BUILD ATTEMPT. On the first meaningful failure the run captures the failing
-# task, the first non-cascade diagnostic and the boundary, then STOPS. It does not
-# upgrade packages, patch sources, change Kotlin/AGP/NDK, or substitute artifacts.
+# task, the first non-cascade diagnostic and the boundary, then STOPS.
 
 on:
-  # ⚠ GATE 5 IS CLOSED AND PRESERVED AS THE PROVEN FALLBACK RUNG (classification B:
-  # build PASS, 22/29 ELF, packaging PASS). Its push trigger is REMOVED so Gate 6's
-  # package.json / app.json delta cannot re-fire it and cannot overwrite its evidence.
-  # Kept dispatch-only so the run stays exactly reproducible.
+  push:
+    branches:
+      - api36-config-proof
+    paths:
+      - '.github/workflows/api36-expo54-rn081.yml'
+      - 'package.json'
+      - 'app.json'
   workflow_dispatch:
 
 permissions:
@@ -45,7 +47,7 @@ permissions:
 
 jobs:
   coherence:
-    name: Expo53 + RN0.79 coherence + 16 KB proof (API 36, arm64-v8a)
+    name: Expo54 + RN0.81 coherence + 16 KB proof (API 36, arm64-v8a)
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
@@ -91,7 +93,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: STEP 1/2 — resolve the Expo53 graph (lockfile regenerated)
+      - name: STEP 1/2 — resolve the Expo54 graph (lockfile regenerated)
         run: npm install --no-audit --no-fund
 
       - name: STEP 2 — CASCADE AUDIT — exactly how far did the graph move?
@@ -121,15 +123,17 @@ jobs:
             printf '%-46s %s\n' "$p" "$V"
           done
           echo "=== STEP 2 WATCHLIST — these must NOT have moved ==="
-          echo "  llama.rn / onnxruntime-react-native / react-native-executorch were left at their"
-          echo "  committed ranges because Expo SDK 53 does not constrain them."
-          echo "  @sentry/react-native DID move: Expo SDK 53 constrains it to ~6.14.0."
+          echo "  llama.rn / onnxruntime-react-native / react-native-executorch HELD AT GATE 5 RANGES."
+          echo "  PROOF: none of the three appears in expo@54.0.37 bundledNativeModules.json,"
+          echo "  so SDK 54 does not constrain them and no movement is justified."
+          echo "  @sentry/react-native DID move: SDK 54 constrains it to ~7.2.0 (major 6 -> 7)."
+          echo "  ONNX Android core remains workflow-pinned at 1.22.0."
           echo "=== EXPO'S OWN COHERENCE OPINION (expo install --check, NON-MUTATING) ==="
           npx expo install --check 2>&1 | head -40
-          echo "(a clean result here means Expo itself considers the graph coherent for SDK 53)"
+          echo "(a clean result here means Expo itself considers the graph coherent for SDK 54)"
           set -e
 
-      - name: STEP 3 — REPORT the toolchain RN 0.79 owns (NOT patched, NOT forced)
+      - name: STEP 3 — REPORT the toolchain RN 0.81 owns (NOT patched, NOT forced)
         run: |
           set +e
           for f in node_modules/react-native/gradle/libs.versions.toml \
@@ -138,8 +142,8 @@ jobs:
             if [ ! -f "$f" ]; then echo "(absent)"; continue; fi
             grep -E '^(kotlin|agp|gradle|ndkVersion)' "$f"
           done
-          echo "  -> These are RN 0.79's own values. Gate 5 does NOT patch them."
-          echo "  -> The app.json kotlinVersion pin was REMOVED so nothing contradicts them."
+          echo "  -> These are RN 0.81's own values. Gate 6 does NOT patch them."
+          echo "  -> app.json carries no kotlinVersion pin (removed at Gate 5); nothing contradicts them."
           set -e
 
       - name: ONNX pin (latest.integration -> 1.22.0) — factory behaviour retained
@@ -212,11 +216,16 @@ jobs:
           "$ANDROID_HOME/ndk/$SEL/toolchains/llvm/prebuilt/linux-x86_64/bin/ld.lld" --version | head -1
           echo "ndk=$SEL" >> "$GITHUB_OUTPUT"
 
-      - name: Install Android platform 36 + build-tools 35.0.0
+      - name: Install Android platform 36 + build-tools (35.0.0 declared, 36.0.0 provisioned)
         run: |
           SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          "$SDKM" "platforms;android-36" "build-tools;35.0.0" >/dev/null || echo "::warning::platform/build-tools install reported a problem"
-          ls -1 "$ANDROID_HOME/platforms"
+          # app.json still DECLARES buildToolsVersion 35.0.0 — unchanged from Gate 5.
+          # 36.0.0 is merely PROVISIONED so that a missing SDK component cannot be
+          # mistaken for an AGP 8.11 / compileSdk 36 incompatibility finding.
+          "$SDKM" "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0" >/dev/null \
+            || echo "::warning::platform/build-tools install reported a problem"
+          echo "--- platforms ---";   ls -1 "$ANDROID_HOME/platforms"
+          echo "--- build-tools ---"; ls -1 "$ANDROID_HOME/build-tools"
 
       - name: STEP 3 — effective toolchain proof from the GENERATED project
         working-directory: android
@@ -385,6 +394,25 @@ jobs:
             HIT=$(printf '%s\n' "${SOS[@]}" | xargs -r -n1 basename 2>/dev/null | grep -i "^${fam}" | tr '\n' ' ')
             printf '  %-28s %s\n' "$fam" "${HIT:-ABSENT-FROM-THIS-INVENTORY}"
           done
+          echo "=== CRITICAL SEVEN-LIBRARY GATE 5 DIFFERENTIAL ==="
+          echo "  Gate 5 residuals were ALL 0x1000. Each is reported FAIL-REMAINS / NOW-PASS / GONE."
+          for lib in librnllama.so librnllama_v8.so librnllama_v8_2_fp16.so \
+                     librnllama_v8_2_fp16_dotprod.so librnllama_v8_4_fp16_dotprod.so \
+                     librnllama_v8_4_fp16_dotprod_i8mm.so libonnxruntimejsi.so; do
+            HIT=$(printf '%s\n' "${SOS[@]}" | grep -m1 "/$lib$" || true)
+            if [ -z "$HIT" ]; then
+              printf '  %-42s GONE (absent from Gate 6 inventory — renamed/restructured/dropped)\n' "$lib"
+            else
+              A=$(readelf -lW "$HIT" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+              D=$(printf '%d' "$A" 2>/dev/null || echo 0)
+              if [ "$D" -ge 16384 ] 2>/dev/null; then
+                printf '  %-42s NOW-PASS  gate5=0x1000 gate6=%s  ⚠ trace the build reason before attributing cause\n' "$lib" "$A"
+              else
+                printf '  %-42s FAIL-REMAINS  gate5=0x1000 gate6=%s\n' "$lib" "$A"
+              fi
+            fi
+          done
+          echo "  (These libraries were NOT modified to improve the score.)"
           [ "$BAD" -eq 0 ] && echo "ALL PACKAGED ELFs 16 KB ALIGNED" || echo "::warning::$BAD library/libraries below 0x4000"
           set -e
 
@@ -450,5 +478,5 @@ jobs:
       - name: STOP MARKER
         if: always()
         run: |
-          echo "GATE 5 COMPLETE — EVIDENCE ONLY. Artifact inspected and DISCARDED."
-          echo "NOT performed: Play, OTA, Golem publication, HAL promotion, GitHub Release, iOS, Heavy CI, merge, Gate 6."
+          echo "GATE 6 COMPLETE — EVIDENCE ONLY. Artifact inspected and DISCARDED."
+          echo "NOT performed: Play, OTA, Golem publication, HAL promotion, GitHub Release, iOS, Heavy CI, merge, llama fix, ONNX fix, further gates."
