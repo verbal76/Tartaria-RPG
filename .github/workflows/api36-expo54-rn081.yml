@@ -480,3 +480,6 @@ jobs:
         run: |
           echo "GATE 6 COMPLETE — EVIDENCE ONLY. Artifact inspected and DISCARDED."
           echo "NOT performed: Play, OTA, Golem publication, HAL promotion, GitHub Release, iOS, Heavy CI, merge, llama fix, ONNX fix, further gates."
+
+# (harness note: re-pushed to re-deliver the push event — GitHub did not register or
+#  queue this workflow on commit ec8c2298 after ~12 minutes. No experiment input changed.)
