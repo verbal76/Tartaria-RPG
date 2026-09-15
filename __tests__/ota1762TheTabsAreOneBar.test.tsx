@@ -66,7 +66,14 @@ const TABS = [
   { key: 'craft', label: 'CRAFT' },
   { key: 'repair', label: 'REPAIR' },
 ] as const;
-const mount = (el: React.ReactElement) => renderer.create(el);
+// ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+// create leaves zero children, so toJSON() is null and .root throws. The full
+// note is in ota1233OnePicker.test.tsx.
+const mount = (el: React.ReactElement) => {
+  let t!: ReturnType<typeof renderer.create>;
+  renderer.act(() => { t = renderer.create(el); });
+  return t;
+};
 
 // ═══ 1. THE VALUES THREE SCREENS AGREED ON ═══════════════════════════════════
 describe('the chip carries what Crafting, Guidance and Vendor already drew', () => {
