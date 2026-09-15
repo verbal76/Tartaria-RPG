@@ -1,0 +1,57 @@
+name: Android Build (Tartaria Realms)
+
+# ⚠⚠⚠ STUB ON main — THE REAL WORKFLOW LIVES ON golem-line (where the code is).
+#
+# Same pattern, same reason, as build-ios.yml / build-ios-native.yml /
+# submit-ios.yml already on this branch: GitHub surfaces a `workflow_dispatch`
+# "Run workflow" control ONLY for a definition present on the DEFAULT branch.
+# build-apk.yml had never been committed to main, so the Android factory's
+# Actions page rendered its run history with no way to fire it. Every APK and
+# AAB this repository ever made was fired by a push or a [build-aab] marker,
+# which need no default-branch presence — which is exactly why nobody noticed.
+#
+# ⚠ THE NAME AND THE INPUTS ARE COPIED, NOT RETYPED. `name:` is byte-identical
+# to golem-line's so this binds to the existing workflow entity and its run
+# history. The two inputs are verbatim from golem-line's definition — same
+# names, types, option lists and defaults — because the dispatch form renders
+# from the DEFAULT branch's definition, and a reduced form could not express
+# profile=preview + line=golem.
+#
+# ⚠⚠⚠ IT CANNOT BUILD. No checkout, no Node, no npm ci, no Gradle, no keystore,
+# no secrets. A misfire against main costs one runner-second and a red X.
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (preview = APK, production = AAB)'
+        required: false
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+      line:
+        description: 'Product line (golem = dev phone, hal = live testers, steam = PC, html = web)'
+        required: false
+        default: 'golem'
+        type: choice
+        options:
+          - golem
+          - hal
+          - steam
+          - html
+
+permissions:
+  contents: read
+
+jobs:
+  refuse:
+    name: Refuse to run against main — re-dispatch against the source branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Loud refusal
+        run: |
+          echo "::error::This workflow was fired against 'main', which holds no application code — only the pointer docs and these dispatch stubs."
+          echo "::error::Nothing was built. Re-dispatch with a source branch selected."
+          exit 1
