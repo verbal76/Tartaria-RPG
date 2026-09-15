@@ -313,37 +313,37 @@ jobs:
           W=/tmp/g3; rm -rf $W; mkdir -p $W; unzip -q "$AAB" 'base/lib/*' -d $W
           # Gate 2 baseline: name|align|size  (sizes from run 34921420109 log)
           cat > /tmp/gate2.txt <<'EOF'
-libandroidx.graphics.path.so|0x4000|10096
-libappmodules.so|0x1000|385824
-libc++_shared.so|0x1000|1330832
-libcpuinfo.so|0x4000|57560
-libexecutorch.so|0x4000|12951208
-libexpo-av.so|0x1000|96616
-libexpo-modules-core.so|0x1000|1400936
-libfbjni.so|0x1000|185352
-libgifimage.so|0x1000|274856
-libhermes.so|0x1000|2273184
-libhermestooling.so|0x1000|156976
-libimagepipeline.so|0x1000|8544
-libjsi.so|0x1000|372432
-libnative-filters.so|0x1000|23144
-libnative-imagetranscoder.so|0x1000|545672
-libonnxruntime.so|0x4000|18214224
-libonnxruntimejsi.so|0x1000|317072
-libpthreadpool.so|0x4000|59296
-libreact-native-executorch.so|0x1000|11641312
-libreact_codegen_safeareacontext.so|0x1000|178576
-libreactnative.so|0x1000|6451736
-librnllama.so|0x1000|2146072
-librnllama_v8.so|0x1000|2146072
-librnllama_v8_2_fp16.so|0x1000|2142600
-librnllama_v8_2_fp16_dotprod.so|0x1000|2144904
-librnllama_v8_4_fp16_dotprod.so|0x1000|2144904
-librnllama_v8_4_fp16_dotprod_i8mm.so|0x1000|2147336
-libsentry-android.so|0x4000|16072
-libsentry.so|0x4000|1219960
-libstatic-webp.so|0x1000|460520
-EOF
+          libandroidx.graphics.path.so|0x4000|10096
+          libappmodules.so|0x1000|385824
+          libc++_shared.so|0x1000|1330832
+          libcpuinfo.so|0x4000|57560
+          libexecutorch.so|0x4000|12951208
+          libexpo-av.so|0x1000|96616
+          libexpo-modules-core.so|0x1000|1400936
+          libfbjni.so|0x1000|185352
+          libgifimage.so|0x1000|274856
+          libhermes.so|0x1000|2273184
+          libhermestooling.so|0x1000|156976
+          libimagepipeline.so|0x1000|8544
+          libjsi.so|0x1000|372432
+          libnative-filters.so|0x1000|23144
+          libnative-imagetranscoder.so|0x1000|545672
+          libonnxruntime.so|0x4000|18214224
+          libonnxruntimejsi.so|0x1000|317072
+          libpthreadpool.so|0x4000|59296
+          libreact-native-executorch.so|0x1000|11641312
+          libreact_codegen_safeareacontext.so|0x1000|178576
+          libreactnative.so|0x1000|6451736
+          librnllama.so|0x1000|2146072
+          librnllama_v8.so|0x1000|2146072
+          librnllama_v8_2_fp16.so|0x1000|2142600
+          librnllama_v8_2_fp16_dotprod.so|0x1000|2144904
+          librnllama_v8_4_fp16_dotprod.so|0x1000|2144904
+          librnllama_v8_4_fp16_dotprod_i8mm.so|0x1000|2147336
+          libsentry-android.so|0x4000|16072
+          libsentry.so|0x4000|1219960
+          libstatic-webp.so|0x1000|460520
+          EOF
           IMMUTABLE="libhermes.so libhermestooling.so libreactnative.so libjsi.so libfbjni.so libimagepipeline.so libgifimage.so libnative-filters.so libnative-imagetranscoder.so libstatic-webp.so"
           LOCAL12="librnllama.so librnllama_v8.so librnllama_v8_2_fp16.so librnllama_v8_2_fp16_dotprod.so librnllama_v8_4_fp16_dotprod.so librnllama_v8_4_fp16_dotprod_i8mm.so libappmodules.so libexpo-modules-core.so libexpo-av.so libreact-native-executorch.so libonnxruntimejsi.so libreact_codegen_safeareacontext.so"
           printf '%-42s %-8s %-8s %-11s %-11s %s\n' LIBRARY G2_ALIGN G3_ALIGN G2_SIZE G3_SIZE CLASS
