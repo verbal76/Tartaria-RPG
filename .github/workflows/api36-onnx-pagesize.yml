@@ -1,0 +1,714 @@
+name: API36 · Gate 9 ONNX JSI flexible-page-size proof (temporary, NOT published)
+
+# ⚠⚠⚠ TEMPORARY EXPERIMENT ON THE RADIOACTIVE BRANCH `api36-config-proof`.
+# NEVER MERGE. NEVER PROMOTE. NEVER PUBLISH. No OTA, no Play, no iOS, no Heavy CI.
+#
+# THE QUESTION — THE LAST ONE.
+#   Gate 7B (278afcef, run 34961015210) repaired llama.rn 0.4.8 with a single NDK r27
+#   opt-in and measured 28 PASS / 1 FAIL of 29 ARM64 ELFs. The ONLY remaining failure:
+#       libonnxruntimejsi.so   p_align 0x1000
+#   Control, already compliant:
+#       libonnxruntime.so      p_align 0x4000
+#
+# GATE 8 ARCHAEOLOGY (read-only) ESTABLISHED, FROM THE PACKAGE'S OWN BUILD STRUCTURE:
+#   · libonnxruntimejsi.so is LOCALLY COMPILED. onnxruntime-react-native 1.24.3 ships
+#     ZERO .so files; android/CMakeLists.txt declares `add_library(onnxruntimejsi SHARED)`
+#     over cpp-adapter.cpp + cpp/{JsiMain,InferenceSessionHostObject,JsiUtils,SessionUtils,
+#     TensorUtils}.cpp plus React Native's own jsi.cpp. The name matches the CMake target.
+#   · libonnxruntime.so is PREBUILT: the package's `extractLibs` task unzips it out of the
+#     com.microsoft.onnxruntime:onnxruntime-android AAR. Maven Central's 1.22.0 AAR ships it
+#     at p_align 0x4000 already — Microsoft aligned it, this build did not. AGP strips it on
+#     the way in, which changes the hash and preserves p_align.
+#   · The package contains NO flexible-page-size opt-in and NO manual page-size linker
+#     repair, at ANY published version from 1.19.2 through 1.24.3. 1.24.3 IS dist-tag latest.
+#     So there is no upgrade that carries the fix, and never has been.
+#   · NDK is INHERITED from rootProject (27.1.12297006 — the same one llama used), where
+#     16 KB alignment is OPT-IN. Never opting in is exactly why the shim links at 0x1000.
+#
+# THE ONE AUTHORIZED FUNCTIONAL CHANGE — ONE CMAKE ARGUMENT
+#   patches/onnxruntime-react-native+1.24.3.patch adds a single element to the EXISTING
+#   android.defaultConfig.externalNativeBuild.cmake arguments list, inside the
+#   `REACT_NATIVE_MINOR_VERSION >= 71` branch (RN 0.81.5 gives 81, so that branch is taken):
+#
+#       "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+#
+#   That is the NDK r27 opt-in, read by android.toolchain.cmake at CONFIGURE time — NOT a
+#   linker flag. It is a per-Gradle-module property and cannot reach any other native module.
+#   It cannot relink the PREBUILT core, which is copied, never compiled here.
+#
+# ⚠ THE PATCH WAS GENERATED AGAINST A PRISTINE 1.24.3 TREE, BEFORE the workflow's later
+#   `latest.integration -> 1.22.0` rewrite, so the core pin is NOT baked into the patch.
+#   A step below proves the rewrite still succeeds AFTER patch-package has run.
+#
+# ⚠⚠ HELD CONSTANT: onnxruntime-react-native 1.24.3, ONNX Android core 1.22.0, llama.rn
+#   0.4.8 (including Gate 7B's patch, asserted unchanged), react-native-executorch 0.8.4,
+#   Expo 54.0.37, RN 0.81.5, React 19.1.0, expo-modules-core 3.0.30, AGP 8.11.0, Kotlin
+#   2.1.20, Gradle 8.14.3, NDK 27.1.12297006, compileSdk/targetSdk 36, New Arch, Hermes,
+#   arm64-v8a, MaxMetaspaceSize 1g. No application source, no SemanticEmbeddingService,
+#   no model files, no inference behaviour.
+#
+# ⚠ ONE BUILD ATTEMPT. On the first meaningful failure the run captures the failing task,
+# the first non-cascade diagnostic and the boundary, then STOPS. No recursive repair.
+
+on:
+  push:
+    branches:
+      - api36-config-proof
+    paths:
+      # ⚠ Gate 9 does NOT touch package.json or app.json — the dependency and application
+      # state is held constant — so this filter is its own file plus its own patch.
+      - '.github/workflows/api36-onnx-pagesize.yml'
+      - 'patches/onnxruntime-react-native+1.24.3.patch'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coherence:
+    name: ONNX JSI flexible-page-size proof (API 36, arm64-v8a)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TARTARIA_LINE: golem
+      TARTARIA_STORE_BUILD: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          echo "Before:"; df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          echo "After:"; df -h /
+
+      - name: STEP 2 — CONTROL, before anything is resolved
+        run: |
+          echo "=== committed inputs (sha256) ==="
+          sha256sum app.json package.json package-lock.json
+          cp package-lock.json /tmp/lock.before.json
+          echo "=== declared versions as committed ==="
+          node -e "
+            const p=require('./package.json').dependencies;
+            for (const k of Object.keys(p).sort()) console.log(k.padEnd(42), p[k]);
+          "
+          echo "=== app.json expo-build-properties (kotlinVersion pin must be ABSENT) ==="
+          node -e "
+            const a=require('./app.json').expo;
+            const bp=(a.plugins||[]).find(p=>Array.isArray(p)&&String(p[0]).includes('build-properties'));
+            console.log(JSON.stringify(bp?bp[1]:null));
+            console.log('newArchEnabled:', a.newArchEnabled);
+          "
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: STEP 1/2 — resolve the Expo54 graph (lockfile regenerated)
+        run: |
+          set -o pipefail
+          npm install --no-audit --no-fund --foreground-scripts 2>&1 | tee /tmp/npm-install.log
+
+      - name: "PATCH VALIDATION — assertions 1,2,3,4,7,8 (5 and 6 run after the ONNX pin)"
+        run: |
+          set -euo pipefail
+          O=node_modules/onnxruntime-react-native
+          L=node_modules/llama.rn
+          G=$O/android/build.gradle
+
+          echo "=== ASSERTION 1 — resolved onnxruntime-react-native is EXACTLY 1.24.3 ==="
+          V=$(node -e "console.log(require('./node_modules/onnxruntime-react-native/package.json').version)")
+          echo "  resolved: $V"
+          [ "$V" = "1.24.3" ] || { echo "::error::onnxruntime-react-native is $V, expected 1.24.3. STOPPING."; exit 1; }
+
+          echo "=== ASSERTION 2 — patch-package applied BOTH patches cleanly at postinstall ==="
+          echo "--- patch-package lines from the install log (--foreground-scripts) ---"
+          grep -E 'onnxruntime-react-native@1\.24\.3|llama\.rn@0\.4\.8|patch-package|Applying patches' /tmp/npm-install.log | sed 's/^/  /' || true
+          echo "--- (tail of install log, for diagnosis if the assertion below fails) ---"
+          tail -25 /tmp/npm-install.log | sed 's/^/  /'
+          grep -q 'onnxruntime-react-native@1.24.3' /tmp/npm-install.log \
+            || { echo "::error::patch-package did not report applying the ONNX patch. STOPPING."; exit 1; }
+          grep -q 'llama.rn@0.4.8' /tmp/npm-install.log \
+            || { echo "::error::patch-package did not report applying the llama patch. STOPPING."; exit 1; }
+          if grep -qiE '\*\*ERROR\*\*|Failed to apply patch' /tmp/npm-install.log; then
+            echo "::error::patch-package reported a failed patch. STOPPING."; exit 1
+          fi
+
+          echo "=== ASSERTION 3 — the flag occurs EXACTLY ONCE in ONNX's own build.gradle ==="
+          N=$(grep -c 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON' "$G" || echo 0)
+          echo "  occurrences: $N"
+          [ "$N" = "1" ] || { echo "::error::Expected exactly 1 flag occurrence, found $N. STOPPING."; exit 1; }
+
+          echo "=== ASSERTION 4 — the flag sits INSIDE the RN >= 71 CMake argument branch ==="
+          IFL=$(grep -n 'REACT_NATIVE_MINOR_VERSION >= 71' "$G" | head -1 | cut -d: -f1)
+          ELL=$(awk -v s="$IFL" 'NR>s && /^        \} else \{/{print NR; exit}' "$G")
+          FLL=$(grep -n 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON' "$G" | head -1 | cut -d: -f1)
+          echo "  if(>=71) line=$IFL   else line=$ELL   flag line=$FLL"
+          if [ -z "$IFL" ] || [ -z "$ELL" ] || [ -z "$FLL" ]; then
+            echo "::error::Could not locate the branch window. STOPPING."; exit 1
+          fi
+          if [ "$FLL" -gt "$IFL" ] && [ "$FLL" -lt "$ELL" ]; then
+            echo "  ASSERTION 4 PASS — the argument is in the branch RN 0.81.5 takes"
+          else
+            echo "::error::The flag is NOT inside the RN >= 71 branch. STOPPING."; exit 1
+          fi
+          sed -n "${IFL},${ELL}p" "$G" | sed 's/^/    /'
+
+          echo "=== ASSERTION 7 — NO manual max-page-size / common-page-size linker flag ==="
+          if grep -rn 'max-page-size\|common-page-size' "$O" "$L" app.json package.json 2>/dev/null; then
+            echo "::error::A manual page-size LINKER flag exists. That is not the authorized change."; exit 1
+          fi
+          echo "  (none — the change is the NDK opt-in only)"
+
+          echo "=== ASSERTION 8 — Gate 7B's llama patch is PRESENT and UNCHANGED ==="
+          LV=$(node -e "console.log(require('./node_modules/llama.rn/package.json').version)")
+          [ "$LV" = "0.4.8" ] || { echo "::error::llama.rn is $LV, expected 0.4.8. STOPPING."; exit 1; }
+          A=$(grep -c '^    # build_library("rnllama_v8_4_fp16_dotprod_sve"' $L/android/src/main/CMakeLists.txt || echo 0)
+          B=$(grep -c 'boolean hasSve = false;' $L/android/src/main/java/com/rnllama/LlamaContext.java || echo 0)
+          C=$(grep -c 'getSelectedVariant\|getTartariaDiag' $L/android/src/main/java/com/rnllama/LlamaContext.java || echo 0)
+          D=$(grep -c 'loadedVariant' $L/android/src/main/java/com/rnllama/RNLlama.java || echo 0)
+          E=$(grep -c 'cpuDiag' $L/android/src/main/java/com/rnllama/RNLlama.java || echo 0)
+          F=$(grep -c 'loadedVariant\|cpuDiag' $L/src/index.ts || echo 0)
+          LN=$(grep -c 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON' $L/android/build.gradle || echo 0)
+          printf '  llama SVE suppression      : %s\n' "$A"
+          printf '  llama hasSve=false guard   : %s\n' "$B"
+          printf '  llama native diag accessors: %s\n' "$C"
+          printf '  llama loadedVariant        : %s\n' "$D"
+          printf '  llama cpuDiag              : %s\n' "$E"
+          printf '  llama diag fields (index)  : %s\n' "$F"
+          printf '  llama page-size opt-in     : %s\n' "$LN"
+          for n in "$A" "$B" "$C" "$D" "$E" "$F" "$LN"; do
+            [ "$n" -ge 1 ] || { echo "::error::Gate 7B's llama patch did NOT survive intact. STOPPING."; exit 1; }
+          done
+          echo "  the six-kernel ARM64 family (SVE pair still suppressed):"
+          grep -E '^\s*#?\s*build_library\("rnllama' $L/android/src/main/CMakeLists.txt | sed 's/^/    /'
+
+          echo "=== PRE-PIN STATE — latest.integration must still be present for the pin to act on ==="
+          grep -n 'latest\.integration' "$G" | sed 's/^/  /' \
+            || { echo "::error::latest.integration is absent BEFORE the pin — the patch must not have rewritten it. STOPPING."; exit 1; }
+
+      - name: STEP 2 — CASCADE AUDIT — exactly how far did the graph move?
+        run: |
+          set +e
+          node -e "
+            const fs=require('fs');
+            const before=JSON.parse(fs.readFileSync('/tmp/lock.before.json','utf8')).packages||{};
+            const after=JSON.parse(fs.readFileSync('package-lock.json','utf8')).packages||{};
+            const bk=Object.keys(before), ak=Object.keys(after);
+            const changed=[],added=[],removed=[];
+            for(const k of ak){ if(!(k in before)) added.push(k);
+              else if(before[k].version!==after[k].version) changed.push(k+'  '+before[k].version+' -> '+after[k].version); }
+            for(const k of bk){ if(!(k in after)) removed.push(k); }
+            console.log('packages before:',bk.length,' after:',ak.length);
+            console.log('ADDED:',added.length,'  REMOVED:',removed.length,'  VERSION-CHANGED:',changed.length);
+            console.log('--- version changes (all) ---');
+            changed.sort().forEach(l=>console.log('  '+l));
+            console.log('--- added (first 80) ---'); added.sort().slice(0,80).forEach(l=>console.log('  '+l));
+            console.log('--- removed (first 80) ---'); removed.sort().slice(0,80).forEach(l=>console.log('  '+l));
+          "
+          echo "=== RESOLVED TOP-LEVEL VERSIONS (what actually installed) ==="
+          for p in react-native react react-dom expo expo-modules-core expo-updates expo-av \
+                   expo-build-properties react-native-safe-area-context @react-native-async-storage/async-storage \
+                   llama.rn onnxruntime-react-native react-native-executorch @sentry/react-native expo-speech-recognition; do
+            V=$(node -e "try{console.log(require('./node_modules/$p/package.json').version)}catch(e){console.log('(absent)')}")
+            printf '%-46s %s\n' "$p" "$V"
+          done
+          echo "=== STEP 2 WATCHLIST — these must NOT have moved ==="
+          echo "  llama.rn / onnxruntime-react-native / react-native-executorch HELD AT GATE 5 RANGES."
+          echo "  PROOF: none of the three appears in expo@54.0.37 bundledNativeModules.json,"
+          echo "  so SDK 54 does not constrain them and no movement is justified."
+          echo "  @sentry/react-native DID move: SDK 54 constrains it to ~7.2.0 (major 6 -> 7)."
+          echo "  ONNX Android core remains workflow-pinned at 1.22.0."
+          echo "=== EXPO'S OWN COHERENCE OPINION (expo install --check, NON-MUTATING) ==="
+          npx expo install --check 2>&1 | head -40
+          echo "(a clean result here means Expo itself considers the graph coherent for SDK 54)"
+          set -e
+
+      - name: STEP 3 — REPORT the toolchain RN 0.81 owns (NOT patched, NOT forced)
+        run: |
+          set +e
+          for f in node_modules/react-native/gradle/libs.versions.toml \
+                   node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml; do
+            echo "--- $f ---"
+            if [ ! -f "$f" ]; then echo "(absent)"; continue; fi
+            grep -E '^(kotlin|agp|gradle|ndkVersion)' "$f"
+          done
+          echo "  -> These are RN 0.81's own values. Gate 6 does NOT patch them."
+          echo "  -> app.json carries no kotlinVersion pin (removed at Gate 5); nothing contradicts them."
+          set -e
+
+      - name: ONNX pin (latest.integration -> 1.22.0) — factory behaviour retained
+        run: |
+          set +e
+          ORT=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ -f "$ORT" ]; then
+            sed -i "s/latest\.integration/1.22.0/g" "$ORT"
+            grep -n "1.22.0" "$ORT" | head -5
+          else
+            echo "::warning::$ORT absent"
+          fi
+          set -e
+
+      - name: "ONNX PIN VERIFICATION — assertions 5 and 6 (AFTER patch-package AND the pin)"
+        run: |
+          set -euo pipefail
+          G=node_modules/onnxruntime-react-native/android/build.gradle
+          echo "=== ASSERTION 5 — the latest.integration -> 1.22.0 rewrite still succeeded ==="
+          if grep -q 'latest\.integration' "$G"; then
+            echo "::error::latest.integration still present after the pin step. STOPPING."; exit 1
+          fi
+          echo "  (no latest.integration remains)"
+          echo "=== ASSERTION 6 — the core coordinate is EXACTLY onnxruntime-android:1.22.0@aar ==="
+          grep -n 'com.microsoft.onnxruntime' "$G" | sed 's/^/  /'
+          grep -q 'extractLibs "com.microsoft.onnxruntime:onnxruntime-android:1.22.0@aar"' "$G" \
+            || { echo "::error::The ONNX core coordinate is not exactly 1.22.0@aar. STOPPING."; exit 1; }
+          echo "  ASSERTION 6 PASS"
+          echo "=== and the ONE flag survived the pin rewrite, still exactly once ==="
+          N=$(grep -c 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON' "$G" || echo 0)
+          echo "  occurrences: $N"
+          [ "$N" = "1" ] || { echo "::error::Flag count is $N after the pin, expected 1. STOPPING."; exit 1; }
+
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          node -e "
+            const fs=require('fs');
+            const app=JSON.parse(fs.readFileSync('app.json','utf8'));
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = ${{ github.run_number }};
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          echo "android.versionCode = ${{ github.run_number }}"
+
+      - name: Show the resolved identity being built
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('package: '+(c.android&&c.android.package));console.log('version: '+c.version);console.log('newArch: '+c.newArchEnabled);})"
+
+      - name: STEP 3 — Generate native Android project (prebuild --clean)
+        run: npx expo prebuild --platform android --no-install --clean
+
+      - name: "STEP 3 — NDK: read what the graph SELECTED, then install exactly that"
+        id: ndk
+        run: |
+          set -euo pipefail
+          BG=android/build.gradle
+          echo "=== generated android/build.gradle ndk/sdk lines ==="
+          grep -nE 'ndkVersion|compileSdk|targetSdk|buildToolsVersion|kotlinVersion' "$BG" || echo "(no ext block — SDK53 template moved these)"
+          SEL=$(grep -oP 'ndkVersion\s*=\s*"\K[^"]+' "$BG" | head -1 || true)
+          PROV="generated project android/build.gradle (PROVEN)"
+          if [ -z "$SEL" ]; then
+            SEL=$(grep -oP '^android\.ndkVersion=\K.*' android/gradle.properties 2>/dev/null | head -1 || true)
+            PROV="generated android/gradle.properties (PROVEN)"
+          fi
+          if [ -z "$SEL" ]; then
+            SEL=$(grep -oP '^ndkVersion = "\K[^"]+' node_modules/react-native/gradle/libs.versions.toml | head -1 || true)
+            PROV="react-native version catalog (SOURCE-DERIVED fallback — generated project pinned none)"
+          fi
+          if [ -z "$SEL" ]; then
+            echo "::error::Could not determine the NDK the graph selects. STOPPING rather than guessing."
+            exit 1
+          fi
+          echo "NDK SELECTED BY THE COHERENT GRAPH: $SEL"
+          echo "PROVENANCE: $PROV"
+          echo "NOT FORCED. Gate 3/Gate 4 used 28.2.13676358; this run does not impose it."
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          if [ ! -d "$ANDROID_HOME/ndk/$SEL" ]; then
+            "$SDKM" "ndk;$SEL" >/dev/null || { echo "::error::Could not install ndk;$SEL"; exit 1; }
+          fi
+          if [ ! -f "$ANDROID_HOME/ndk/$SEL/source.properties" ]; then
+            echo "::error::ndk;$SEL not present after install. STOPPING (no substitution)."
+            exit 1
+          fi
+          echo "=== NDK ACTUALLY USED: $ANDROID_HOME/ndk/$SEL ==="
+          cat "$ANDROID_HOME/ndk/$SEL/source.properties"
+          "$ANDROID_HOME/ndk/$SEL/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" --version | head -2
+          "$ANDROID_HOME/ndk/$SEL/toolchains/llvm/prebuilt/linux-x86_64/bin/ld.lld" --version | head -1
+          echo "ndk=$SEL" >> "$GITHUB_OUTPUT"
+
+      - name: Install Android platform 36 + build-tools (35.0.0 declared, 36.0.0 provisioned)
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          # app.json still DECLARES buildToolsVersion 35.0.0 — unchanged from Gate 5.
+          # 36.0.0 is merely PROVISIONED so that a missing SDK component cannot be
+          # mistaken for an AGP 8.11 / compileSdk 36 incompatibility finding.
+          "$SDKM" "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0" >/dev/null \
+            || echo "::warning::platform/build-tools install reported a problem"
+          echo "--- platforms ---";   ls -1 "$ANDROID_HOME/platforms"
+          echo "--- build-tools ---"; ls -1 "$ANDROID_HOME/build-tools"
+
+      - name: STEP 3 — effective toolchain proof from the GENERATED project
+        working-directory: android
+        run: |
+          set +e
+          echo "=== gradle.properties (SDK / arch / engine) ==="
+          grep -E '^(android\.|newArchEnabled|hermesEnabled|reactNativeArchitectures|expo\.useLegacyPackaging)' gradle.properties
+          echo "=== Gradle wrapper ==="
+          grep -h distributionUrl gradle/wrapper/gradle-wrapper.properties
+          echo "=== AGP + Kotlin resolved from RN catalog ==="
+          grep -E '^(agp|kotlin)' ../node_modules/react-native/gradle/libs.versions.toml
+          echo "=== app/build.gradle identity ==="
+          grep -nE 'ndkVersion|compileSdk|targetSdkVersion|namespace|applicationId|versionCode|versionName' app/build.gradle | head -20
+          echo "=== suppression flags present? (expect NONE — nothing is being hidden) ==="
+          grep -iE 'suppress' gradle.properties || echo "(none)"
+          set -e
+
+      - name: "⚠ THE ONE HARNESS CHANGE — MaxMetaspaceSize 512m -> 1g (lintVital NOT disabled)"
+        run: |
+          set -euo pipefail
+          GP=android/gradle.properties
+          echo "=== jvmargs BEFORE (as generated by the SDK 54 template) ==="
+          grep -n '^org\.gradle\.jvmargs' "$GP" || echo "(no explicit jvmargs line)"
+          BEFORE=$(grep -c 'MaxMetaspaceSize=512m' "$GP" || true)
+          if [ "$BEFORE" -ne 1 ]; then
+            echo "::error::Expected exactly one MaxMetaspaceSize=512m in $GP, found $BEFORE."
+            echo "::error::Gate 6's observed condition is not reproduced. STOPPING rather than guessing."
+            exit 1
+          fi
+          sed -i 's/MaxMetaspaceSize=512m/MaxMetaspaceSize=1g/' "$GP"
+          echo "=== jvmargs AFTER ==="
+          grep -n '^org\.gradle\.jvmargs' "$GP"
+          echo "=== proof the change is EXACTLY one token ==="
+          grep -c 'MaxMetaspaceSize=1g' "$GP"
+          grep -c 'Xmx2048m' "$GP"
+          echo "  heap unchanged at -Xmx2048m: every Gate 6 OOM was Metaspace, none was heap."
+          echo "=== proof lintVital is NOT disabled anywhere ==="
+          grep -rn 'lintVital\|checkReleaseBuilds\|abortOnError' "$GP" android/app/build.gradle || \
+            echo "  (no lint suppression present — lintVital runs exactly as in Gate 6)"
+          echo "=== runner memory headroom ==="
+          free -m | head -2
+
+      - name: Configure release signing (production AAB)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_PROD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+          ANDROID_PROD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+          ANDROID_PROD_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+          ANDROID_PROD_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ANDROID_PROD_KEYSTORE_BASE64:-}" ]; then
+            KS_BASE64="$ANDROID_PROD_KEYSTORE_BASE64"; KS_PASSWORD="$ANDROID_PROD_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_PROD_KEY_ALIAS"; KS_KEY_PASSWORD="$ANDROID_PROD_KEY_PASSWORD"
+            KS_NAME="tartaria-prod-upload.keystore"
+          else
+            KS_BASE64="${ANDROID_KEYSTORE_BASE64:-}"; KS_PASSWORD="${ANDROID_KEYSTORE_PASSWORD:-}"
+            KS_ALIAS="${ANDROID_KEY_ALIAS:-}"; KS_KEY_PASSWORD="${ANDROID_KEY_PASSWORD:-}"
+            KS_NAME="tartaria-upload.keystore"
+          fi
+          if [ -z "${KS_BASE64:-}" ]; then
+            echo "::warning::no keystore secret on this branch"
+            echo "SIGNING_OK=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          echo "$KS_BASE64" | base64 -d > "android/app/$KS_NAME"
+          keytool -list -keystore "android/app/$KS_NAME" -storepass "$KS_PASSWORD" >/dev/null 2>&1 \
+            || { echo "::error::keystore did not unlock"; exit 1; }
+          keytool -list -v -keystore "android/app/$KS_NAME" -storepass "$KS_PASSWORD" 2>/dev/null \
+            | grep -E "Alias|SHA256" | head -10 || true
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=$KS_NAME"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$KS_ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$KS_PASSWORD"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$KS_KEY_PASSWORD"
+          } >> android/gradle.properties
+          python3 <<'PY'
+          import pathlib, re
+          p = pathlib.Path("android/app/build.gradle"); src = p.read_text()
+          block = """
+              release {
+                  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                      storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                      storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                      keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                      keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+                  }
+              }
+          """.rstrip() + "\n"
+          m = re.search(r"signingConfigs\s*\{", src)
+          if not m:
+              raise SystemExit("signingConfigs block not found - RN 0.79 template changed")
+          src = src[:m.end()] + block + src[m.end():]
+          src = re.sub(r"signingConfig\s+signingConfigs\.debug",
+                       "signingConfig signingConfigs.release", src, count=0)
+          p.write_text(src)
+          print("release signingConfig injected; debug signingConfig references redirected")
+          PY
+          grep -n "signingConfig" android/app/build.gradle | head -10
+          echo "SIGNING_OK=true" >> "$GITHUB_ENV"
+          echo "KS_NAME=$KS_NAME" >> "$GITHUB_ENV"
+          echo "KS_PASSWORD=$KS_PASSWORD" >> "$GITHUB_ENV"
+          echo "KS_ALIAS=$KS_ALIAS" >> "$GITHUB_ENV"
+          echo "KS_KEY_PASSWORD=$KS_KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: STEP 4 — ONE BUILD ATTEMPT — bundleRelease (production AAB, arm64-v8a)
+        id: build
+        working-directory: android
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          ./gradlew bundleRelease --no-daemon --stacktrace -PreactNativeArchitectures=arm64-v8a 2>&1 | tee /tmp/b5.log
+          echo "GRADLE EXIT: $?"
+
+      - name: STEP 4 — FAILURE CAPTURE + CLASSIFICATION (first non-cascade diagnostic)
+        if: failure()
+        run: |
+          set +e
+          L=/tmp/b5.log
+          [ -f "$L" ] || { echo "no build log"; exit 0; }
+          echo "=== FAILING GRADLE TASK ==="
+          grep -nE "Execution failed for task|^> Task .*FAILED" "$L" | tail -20
+          echo "=== WHAT WENT WRONG (all blocks) ==="
+          grep -n -A25 "What went wrong" "$L" | head -120
+          echo "=== WHERE (script/file) ==="
+          grep -n -A3 '^\* Where:' "$L" | head -40
+          echo "=== FIRST NON-CASCADE DIAGNOSTICS ==="
+          grep -nE 'error:|fatal error:|ld\.lld:|clang.*error|ninja: build stopped|CMake Error' "$L" | head -40
+          echo "=== NATIVE / CMAKE TARGET CONTEXT ==="
+          grep -nE 'CMake|ninja|\.cpp:|\.c:|\.h:|C/C\+\+' "$L" | head -40
+          echo "=== BOUNDARY CLASSIFICATION HINTS ==="
+          echo "--- Expo/RN platform ---"
+          grep -inE 'expo-modules-core|expo-modules-autolinking|react-native|react-android|hermes|folly|ReactAndroid|fbjni|fresco' "$L" | head -25
+          echo "--- third-party dependency ---"
+          grep -inE 'llama|onnx|executorch|sentry|safe-area|async-storage|speech' "$L" | head -25
+          echo "--- Tartaria source ---"
+          grep -inE 'com/hotatticgames|tartaria|appmodules' "$L" | head -15
+          echo "--- native toolchain ---"
+          grep -inE 'ndk|libc\+\+|toolchain|sysroot|API level' "$L" | head -15
+          echo "--- artifact/signing ---"
+          grep -inE 'keystore|signing|jarsigner|apksigner' "$L" | head -15
+          echo "=== TAIL ==="
+          tail -60 "$L"
+          set -e
+
+      - name: "FLAG-REACHED-ONNX-CMAKE PROOF + WIDENED LEAK SCAN (reads generated native config)"
+        if: always()
+        run: |
+          set +e
+          echo "=================================================================="
+          echo " A. DID THE ARGUMENT REACH THE ONNX RN BRIDGE'S CMAKE INVOCATION?"
+          echo "=================================================================="
+          ONNX_CXX=node_modules/onnxruntime-react-native/android/.cxx
+          echo "--- generated config tree present? ---"
+          find "$ONNX_CXX" -maxdepth 4 -type d 2>/dev/null | head -10 | sed 's/^/  /'
+          FOUND=0
+          for f in $(find "$ONNX_CXX" -type f \
+                       \( -name 'CMakeCache.txt' -o -name 'metadata_generation_command.txt' \
+                          -o -name 'build_command.txt' -o -name '*command*.txt' \) 2>/dev/null); do
+            if grep -q 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES' "$f"; then
+              echo "  HIT: $f"
+              grep -o 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES[:=A-Za-z ]*' "$f" | sort -u | sed 's/^/       /'
+              FOUND=1
+            fi
+          done
+          if [ "$FOUND" = "1" ]; then
+            echo "FLAG REACHED ONNX CMAKE CONFIGURATION: PROVEN (generated native config)"
+          else
+            echo "::warning::flag not located in ONNX .cxx metadata; searching the build log instead"
+            grep -o 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES[:=A-Za-z ]*' /tmp/b5.log 2>/dev/null | sort -u | head
+            echo "FLAG REACHED ONNX CMAKE CONFIGURATION: NOT PROVEN"
+          fi
+          echo "--- the CMake target this module builds ---"
+          grep -n 'add_library' -A2 node_modules/onnxruntime-react-native/android/CMakeLists.txt | head -6 | sed 's/^/  /'
+
+          echo
+          echo "=================================================================="
+          echo " B. WIDENED LEAK SCAN — every generated native config tree"
+          echo "    (Gate 7B scanned only android/.cxx, which was narrower than its"
+          echo "     wording implied. This scans node_modules/*/android/.cxx too.)"
+          echo "=================================================================="
+          TREES=$(find android/.cxx node_modules/*/android/.cxx node_modules/*/*/android/.cxx \
+                    -maxdepth 0 -type d 2>/dev/null)
+          echo "--- native config trees discovered ---"
+          for t in $TREES; do echo "  $t"; done
+          echo "--- per-module verdict ---"
+          for t in $TREES; do
+            MOD=$(echo "$t" | sed 's#/android/.cxx##')
+            HITS=$(find "$t" -type f \( -name 'CMakeCache.txt' -o -name '*command*.txt' \) 2>/dev/null \
+                     -exec grep -l 'ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES' {} \; 2>/dev/null | wc -l)
+            case "$MOD" in
+              *onnxruntime-react-native)
+                if [ "$HITS" -gt 0 ]; then echo "  EXPECTED  : $MOD  ($HITS file(s)) — THE AUTHORIZED ONNX OPT-IN"
+                else echo "  MISSING   : $MOD (0) — the ONNX opt-in did NOT reach this module"; fi ;;
+              *llama.rn)
+                if [ "$HITS" -gt 0 ]; then echo "  EXPECTED  : $MOD  ($HITS file(s)) — Gate 7B's PRE-EXISTING llama opt-in, NOT a leak"
+                else echo "  NOTE      : $MOD (0) — llama config not regenerated this run"; fi ;;
+              *)
+                if [ "$HITS" -gt 0 ]; then echo "  ⚠ LEAKED-TO: $MOD  ($HITS file(s)) — UNEXPECTED, INVESTIGATE"
+                else echo "  clean     : $MOD (0)"; fi ;;
+            esac
+          done
+          echo "  (only onnxruntime-react-native and llama.rn may show hits; anything else is a leak)"
+          set -e
+
+      - name: STEP 5 — ELF COMPLIANCE, read from the ACTUAL AAB
+        if: success()
+        run: |
+          set +e
+          AAB=$(find android/app/build/outputs/bundle -name '*.aab' | head -1)
+          if [ -z "$AAB" ]; then
+            echo "ELF COMPLIANCE: NOT TESTED — NO ARTIFACT PRODUCED"
+            exit 1
+          fi
+          echo "AAB: $AAB"
+          rm -rf /tmp/x && mkdir -p /tmp/x && unzip -q -o "$AAB" -d /tmp/x
+          mapfile -t SOS < <(find /tmp/x -name '*.so' | sort)
+          echo "PACKAGED ARM64 NATIVE LIBRARY COUNT: ${#SOS[@]}  (enumerated, not assumed)"
+          echo "=== NO MANUAL PAGE-SIZE FLAG PROOF ==="
+          grep -rl 'max-page-size\|common-page-size' android/app/build android/*/build 2>/dev/null | head -5 \
+            || echo "(no generated link rule mentions max-page-size/common-page-size — none was added)"
+          echo
+          printf '%-46s %-12s %-10s %-26s %s\n' LIBRARY ALIGNS VERDICT PROVENANCE SHA256
+          OK=0; BAD=0
+          for so in "${SOS[@]}"; do
+            NAME=$(basename "$so")
+            ALIGNS=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | tr '\n' ' ')
+            MINA=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+            DEC=$(printf '%d' "$MINA" 2>/dev/null || echo 0)
+            if [ "$DEC" -ge 16384 ] 2>/dev/null; then OK=$((OK+1)); V=PASS; else BAD=$((BAD+1)); V=FAIL; fi
+            if find android -path '*/build/intermediates/*' -name "$NAME" 2>/dev/null | head -1 | grep -q .; then
+              PROV="LOCALLY-LINKED"
+            elif find ~/.gradle/caches -name "$NAME" 2>/dev/null | head -1 | grep -q .; then
+              PROV="IMMUTABLE-PREBUILT(AAR)"
+            else
+              PROV="UNKNOWN-PROVENANCE"
+            fi
+            SHA=$(sha256sum "$so" | cut -c1-16)
+            printf '%-46s %-12s %-10s %-26s %s\n' "$NAME" "$ALIGNS" "$V" "$PROV" "$SHA"
+          done
+          echo
+          echo "16 KB ELF RESULT: $OK PASS / $BAD FAIL of ${#SOS[@]} inspected"
+          echo "=== REQUIRED FAMILY ACCOUNTING ==="
+          for fam in libreactnative libhermes libfbjni libimagepipeline libnative-filters libnative-imagetranscoder \
+                     librrc_ libllama librnllama libonnxruntime libexecutorch libRNExecuTorch libappmodules \
+                     libexpo-modules-core libsafeareacontext libsentry libc++_shared; do
+            HIT=$(printf '%s\n' "${SOS[@]}" | xargs -r -n1 basename 2>/dev/null | grep -i "^${fam}" | tr '\n' ' ')
+            printf '  %-28s %s\n' "$fam" "${HIT:-ABSENT-FROM-THIS-INVENTORY}"
+          done
+          echo "=== GATE 9 DIFFERENTIAL vs GATE 7B (278afcef, run 34961015210) ==="
+          echo "  Baseline is GATE 7B, measured: 28 PASS / 1 FAIL of 29."
+          cat > /tmp/g7b.txt <<'BASE'
+          libonnxruntimejsi.so|0x1000|825c317f1204f385|PRIMARY-TARGET
+          libonnxruntime.so|0x4000|3fc3e79539f06f67|CORE-CONTROL
+          librnllama.so|0x4000|64416c6a16a11571|LLAMA-CONTROL
+          librnllama_v8.so|0x4000|e537f8eed57cb27c|LLAMA-CONTROL
+          librnllama_v8_2_fp16.so|0x4000|b684eef43f72c630|LLAMA-CONTROL
+          librnllama_v8_2_fp16_dotprod.so|0x4000|5f5e489fd3e04549|LLAMA-CONTROL
+          librnllama_v8_4_fp16_dotprod.so|0x4000|76ba313db7f26fe2|LLAMA-CONTROL
+          librnllama_v8_4_fp16_dotprod_i8mm.so|0x4000|f1b02bbddf1f0af1|LLAMA-CONTROL
+          BASE
+          printf '  %-40s %-8s %-8s %-9s %-18s %-18s %s\n' LIBRARY ROLE G7B G9 G7B_SHA256 G9_SHA256 VERDICT
+          while IFS='|' read -r lib b7 s7 role; do
+            HIT=$(printf '%s\n' "${SOS[@]}" | grep -m1 "/$lib$" || true)
+            if [ -z "$HIT" ]; then
+              printf '  %-40s %-8s %-8s %-9s %-18s %-18s %s\n' "$lib" "$role" "$b7" "-" "$s7" "-" "GONE — ABSENT FROM THIS INVENTORY"
+              continue
+            fi
+            A=$(readelf -lW "$HIT" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+            D=$(printf '%d' "$A" 2>/dev/null || echo 0)
+            S9=$(sha256sum "$HIT" | cut -c1-16)
+            if [ "$D" -ge 16384 ] 2>/dev/null; then PF=PASS; else PF=FAIL; fi
+            if [ "$s7" = "$S9" ]; then BYTES="bytes-identical"; else BYTES="bytes-CHANGED"; fi
+            case "$role" in
+              PRIMARY-TARGET)
+                if [ "$PF" = PASS ]; then VER="REPAIRED 0x1000 -> $A ($BYTES)"; else VER="STILL FAILING at $A ($BYTES)"; fi ;;
+              CORE-CONTROL)
+                if [ "$PF" = PASS ] && [ "$s7" = "$S9" ]; then VER="CONTROL HELD — compliant AND unchanged"
+                elif [ "$PF" = PASS ]; then VER="::warning:: compliant but bytes CHANGED — investigate"
+                else VER="::error:: CORE REGRESSED to $A — CONTAMINATION"; fi ;;
+              LLAMA-CONTROL)
+                if [ "$PF" = PASS ]; then VER="LLAMA HELD at $A ($BYTES)"; else VER="::error:: LLAMA REGRESSED to $A"; fi ;;
+            esac
+            printf '  %-40s %-8s %-8s %-9s %-18s %-18s %s\n' "$lib" "$role" "$b7" "$A" "$s7" "$S9" "$VER"
+          done < /tmp/g7b.txt
+          echo
+          echo "=== ONNX CORE PROVENANCE — prebuilt, from the pinned 1.22.0 AAR ==="
+          AARSO=$(find node_modules/onnxruntime-react-native/android/build -path '*onnxruntime-android*' -name 'libonnxruntime.so' -path '*arm64-v8a*' 2>/dev/null | head -1)
+          if [ -n "$AARSO" ]; then
+            echo "  extracted AAR source : $AARSO"
+            echo "  AAR copy p_align     : $(readelf -lW "$AARSO" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)"
+            echo "  AAR copy sha256      : $(sha256sum "$AARSO" | cut -c1-16)  (packaged copy differs ONLY by AGP strip)"
+          else
+            echo "  (extracted AAR path not found post-build — the coordinate assertion above still stands)"
+          fi
+          echo "  (No library was modified to improve the score. ONNX core, llama and every"
+          echo "   other module were held constant; only the ONNX JSI bridge was re-configured.)"
+          [ "$BAD" -eq 0 ] && echo "ALL PACKAGED ELFs 16 KB ALIGNED" || echo "::warning::$BAD library/libraries below 0x4000"
+          set -e
+
+      - name: STEP 6 — PACKAGING PROOF (bundletool + zipalign -c -P 16)
+        if: success()
+        run: |
+          set +e
+          AAB=$(find android/app/build/outputs/bundle -name '*.aab' | head -1)
+          [ -z "$AAB" ] && { echo "PACKAGING: NOT TESTED — NO ARTIFACT"; exit 0; }
+          BT=/tmp/bundletool.jar
+          curl -sSL -o "$BT" https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar
+          if [ ! -s "$BT" ]; then
+            echo "PACKAGING RESULT: UNKNOWN — bundletool could not be downloaded in this environment"
+            exit 0
+          fi
+          java -jar "$BT" build-apks --bundle="$AAB" --output=/tmp/u.apks --mode=universal \
+            --ks="android/app/${KS_NAME:-none}" --ks-pass=pass:"${KS_PASSWORD:-}" \
+            --ks-key-alias="${KS_ALIAS:-}" --key-pass=pass:"${KS_KEY_PASSWORD:-}" 2>&1 | tail -5 \
+            || java -jar "$BT" build-apks --bundle="$AAB" --output=/tmp/u.apks --mode=universal 2>&1 | tail -5
+          if [ ! -s /tmp/u.apks ]; then
+            echo "PACKAGING RESULT: UNKNOWN — build-apks produced no output"
+            exit 0
+          fi
+          rm -rf /tmp/apks && mkdir -p /tmp/apks && unzip -q -o /tmp/u.apks -d /tmp/apks
+          UAPK=$(find /tmp/apks -name 'universal.apk' | head -1)
+          [ -z "$UAPK" ] && { echo "PACKAGING RESULT: UNKNOWN — no universal.apk"; exit 0; }
+          ZA=$(find "$ANDROID_HOME/build-tools" -name zipalign | sort | tail -1)
+          echo "=== zipalign -c -P 16 -v 4 (16 KB packaging check) ==="
+          "$ZA" -c -P 16 -v 4 "$UAPK" > /tmp/za.txt 2>&1
+          RC=$?
+          tail -20 /tmp/za.txt
+          grep -c 'BAD' /tmp/za.txt 2>/dev/null | sed 's/^/BAD entries: /'
+          if [ "$RC" -eq 0 ]; then echo "PACKAGING RESULT: PASS — APK native libraries are 16 KB aligned"
+          else echo "PACKAGING RESULT: FAIL — zipalign -P 16 rejected the APK (exit $RC)"; fi
+          set -e
+
+      - name: STEP 7 — ARTIFACT IDENTITY (no publication)
+        if: success()
+        run: |
+          set +e
+          AAB=$(find android/app/build/outputs/bundle -name '*.aab' | head -1)
+          [ -z "$AAB" ] && { echo "NO ARTIFACT"; exit 0; }
+          echo "AAB path : $AAB"
+          echo "AAB size : $(stat -c%s "$AAB") bytes"
+          echo "AAB sha256: $(sha256sum "$AAB" | cut -d' ' -f1)"
+          BT=/tmp/bundletool.jar
+          if [ -s "$BT" ]; then
+            echo "=== bundletool dump manifest ==="
+            java -jar "$BT" dump manifest --bundle="$AAB" 2>/dev/null | head -30
+          else
+            echo "manifest identity: UNKNOWN — bundletool unavailable"
+          fi
+          echo "=== packaged ABIs ==="
+          unzip -l "$AAB" | grep -oE 'lib/[a-z0-9_-]+/' | sort -u
+          echo "=== signer identity ==="
+          if [ -n "${KS_NAME:-}" ] && [ -f "android/app/$KS_NAME" ]; then
+            keytool -list -v -keystore "android/app/$KS_NAME" -storepass "$KS_PASSWORD" 2>/dev/null | grep -E 'Alias|SHA256' | head -4
+          else
+            echo "PRODUCTION SIGNING NOT PROVEN — no keystore on this branch"
+          fi
+          set -e
+
+      - name: STOP MARKER
+        if: always()
+        run: |
+          echo "GATE 9 COMPLETE — EVIDENCE ONLY. Artifact inspected and DISCARDED."
+          echo "NOT performed: Play, OTA, Golem publication, HAL promotion, GitHub Release, iOS, Heavy CI, merge, Golem migration, HAL promotion, clean-migration implementation."

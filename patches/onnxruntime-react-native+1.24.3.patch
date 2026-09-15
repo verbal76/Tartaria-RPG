@@ -1,0 +1,22 @@
+diff --git a/node_modules/onnxruntime-react-native/android/build.gradle b/node_modules/onnxruntime-react-native/android/build.gradle
+index 41b4359..1704687 100644
+--- a/node_modules/onnxruntime-react-native/android/build.gradle
++++ b/node_modules/onnxruntime-react-native/android/build.gradle
+@@ -89,7 +89,16 @@ android {
+             "-DORT_EXTENSIONS_ENABLED=${ortExtensionsEnabled}",
+             "-DREACT_NATIVE_VERSION=${REACT_NATIVE_VERSION}",
+             "-DUSE_QNN=${useQnn}",
+-            "-DUSE_NNAPI=${!useQnn}"
++            "-DUSE_NNAPI=${!useQnn}",
++            // Tartaria Realms patch (API 36 / Android 16 KB page-size compliance).
++            // NDK r27 makes 16 KB ELF alignment OPT-IN via this CMake variable, which
++            // android.toolchain.cmake reads at CONFIGURE time. onnxruntime-react-native
++            // never opts in at any published version, so the locally compiled JSI bridge
++            // libonnxruntimejsi.so links at p_align 0x1000 while the PREBUILT ONNX core
++            // libonnxruntime.so (from the pinned onnxruntime-android 1.22.0 AAR) is
++            // already 0x4000. This argument is scoped to this Gradle module alone and
++            // cannot relink the prebuilt core. It is the NDK opt-in, NOT a linker flag.
++            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+         } else {
+           arguments "-DNODE_MODULES_DIR=${nodeModules}",
+             "-DORT_EXTENSIONS_ENABLED=${ortExtensionsEnabled}",
