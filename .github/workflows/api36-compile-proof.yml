@@ -1,0 +1,353 @@
+name: API36 · Production AAB compile proof (temporary, NOT published)
+
+# ⚠⚠⚠ TEMPORARY EXPERIMENT on the throwaway branch `api36-config-proof`.
+# NEVER MERGE THIS BRANCH — it also carries a neutralized ci.yml.
+#
+# Gate 1 proved prebuild GENERATES an API 36 project. Gate 1.5 proved AGP 8.6.0
+# CONFIGURES against compileSdk 36 (BUILD SUCCESSFUL, exit 0, zero compile-SDK
+# diagnostics, no suppression flag). Neither touched a single line of C++.
+#
+# THIS RUN FORCES THE COMPLETE NATIVE DEPENDENCY GRAPH TO PROVE ITSELF:
+# React Native, Hermes, New Architecture codegen, llama.rn, ONNX Runtime,
+# ExecuTorch, Expo native modules, Sentry, speech/audio, and every transitive
+# JNI/C/C++ library — compiled and packaged against API 36.
+#
+# ⚠ IT IS A BUILD PROOF, NOT A PUBLICATION. No Play upload, no Play automation,
+# no OTA, no promotion. The AAB is inspected and discarded.
+#
+# ⚠⚠ STOP AT THE FIRST MATERIAL FAILURE. Nothing here retries with a changed
+# dependency or toolchain. The entire point is to find the FIRST real seam.
+
+on:
+  push:
+    branches:
+      - api36-config-proof
+    paths:
+      - '.github/workflows/api36-compile-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Production AAB compile proof (API 36)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TARTARIA_LINE: golem
+      TARTARIA_STORE_BUILD: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          echo "Before:"; df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          echo "After:"; df -h /
+
+      # ⚠⚠⚠ NDK PREREQUISITE — EXACT VERSION OR STOP.
+      # The generated project pins ndkVersion 26.1.10909125. Gate 1.5 observed
+      # the runner carrying 28.2.13676358 and 29.0.14206865. Substituting either
+      # would silently change the native toolchain under llama.rn / ONNX /
+      # ExecuTorch and invalidate the whole proof, so this step installs the
+      # EXACT requested NDK and FAILS HARD if it cannot be obtained.
+      - name: NDK PREREQUISITE — install and verify EXACTLY ndk;26.1.10909125
+        run: |
+          set -euo pipefail
+          REQUIRED=26.1.10909125
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "--- NDKs present BEFORE ---"; ls -1 "$ANDROID_HOME/ndk" 2>/dev/null || echo "(none)"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          if [ -d "$ANDROID_HOME/ndk/$REQUIRED" ]; then
+            echo "Exact NDK $REQUIRED already present."
+          else
+            echo "=== installing ndk;$REQUIRED ==="
+            "$SDKM" "ndk;$REQUIRED"
+          fi
+          echo "--- NDKs present AFTER ---"; ls -1 "$ANDROID_HOME/ndk" 2>/dev/null || echo "(none)"
+          if [ ! -d "$ANDROID_HOME/ndk/$REQUIRED" ]; then
+            echo "::error::REQUESTED NDK $REQUIRED UNAVAILABLE. Not substituting another NDK. STOPPING."
+            exit 1
+          fi
+          echo "=== EXACT NDK PROOF ==="
+          echo "path: $ANDROID_HOME/ndk/$REQUIRED"
+          cat "$ANDROID_HOME/ndk/$REQUIRED/source.properties"
+
+      - name: Install Android platform 36 + build-tools 35.0.0
+        run: |
+          set -euo pipefail
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          "$SDKM" "platforms;android-36" "build-tools;35.0.0"
+          echo "--- platforms ---";   ls -1 "$ANDROID_HOME/platforms"
+          echo "--- build-tools ---"; ls -1 "$ANDROID_HOME/build-tools"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = ${{ github.run_number }};
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          echo "android.versionCode = ${{ github.run_number }}"
+
+      # ⚠ FACTORY REPRODUCTION 1 — Kotlin catalogs (verbatim from build-apk.yml)
+      - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs
+        run: |
+          RN_CATALOG=node_modules/react-native/gradle/libs.versions.toml
+          GP_CATALOG=node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+          for f in "$RN_CATALOG" "$GP_CATALOG"; do
+            if [ ! -f "$f" ]; then echo "::error::Expected catalog $f not found"; exit 1; fi
+            sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
+            grep '^kotlin' "$f"
+            if ! grep -q '^kotlin = "1.9.25"$' "$f"; then echo "::error::Patch did not apply to $f"; exit 1; fi
+          done
+
+      # ⚠ FACTORY REPRODUCTION 2 — ONNX pin (verbatim from build-apk.yml)
+      - name: Pin onnxruntime-android version (latest.integration -> 1.22.0)
+        run: |
+          ORT_VERSION=1.22.0
+          ORT_GRADLE=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ ! -f "$ORT_GRADLE" ]; then echo "::error::Expected $ORT_GRADLE not found"; exit 1; fi
+          sed -i "s/latest\.integration/${ORT_VERSION}/g" "$ORT_GRADLE"
+          echo "--- resolved ORT declarations ---"; grep -n "$ORT_VERSION" "$ORT_GRADLE" || true
+          if grep -q "latest.integration" "$ORT_GRADLE"; then echo "::error::latest.integration still present"; exit 1; fi
+
+      - name: Show the resolved identity actually being built
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('package: '+(c.android&&c.android.package));console.log('version: '+c.version);console.log('vcode:   '+(c.android&&c.android.versionCode));console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));})"
+
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Verify Kotlin propagated; confirm SDK inputs
+        run: |
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+          echo "=== effective SDK / arch inputs ==="
+          grep -E '^(android\.(compileSdkVersion|targetSdkVersion|buildToolsVersion|kotlinVersion)|newArchEnabled|hermesEnabled|reactNativeArchitectures|expo\.useLegacyPackaging)' android/gradle.properties
+          echo "=== ndkVersion requested by generated project ==="
+          grep -n 'ndkVersion' android/build.gradle
+
+      # ⚠ FACTORY REPRODUCTION 3 — release signing (verbatim shape from
+      # build-apk.yml). Secrets are masked by Actions; only certificate
+      # FINGERPRINTS are printed, never key material.
+      - name: Configure release signing (production AAB)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_PROD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+          ANDROID_PROD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+          ANDROID_PROD_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+          ANDROID_PROD_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ANDROID_PROD_KEYSTORE_BASE64:-}" ]; then
+            echo "Using ANDROID_PROD_* keystore (production-specific upload key)."
+            KS_BASE64="$ANDROID_PROD_KEYSTORE_BASE64"; KS_PASSWORD="$ANDROID_PROD_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_PROD_KEY_ALIAS"; KS_KEY_PASSWORD="$ANDROID_PROD_KEY_PASSWORD"
+            KS_NAME="tartaria-prod-upload.keystore"
+          else
+            echo "ANDROID_PROD_KEYSTORE_BASE64 not set; falling back to shared ANDROID_KEYSTORE_BASE64."
+            KS_BASE64="${ANDROID_KEYSTORE_BASE64:-}"; KS_PASSWORD="${ANDROID_KEYSTORE_PASSWORD:-}"
+            KS_ALIAS="${ANDROID_KEY_ALIAS:-}"; KS_KEY_PASSWORD="${ANDROID_KEY_PASSWORD:-}"
+            KS_NAME="tartaria-upload.keystore"
+          fi
+          if [ -z "${KS_BASE64:-}" ]; then
+            echo "::warning::NO KEYSTORE SECRET AVAILABLE TO THIS BRANCH."
+            echo "PRODUCTION_SIGNING_AVAILABLE=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          KEYSTORE_PATH=android/app/$KS_NAME
+          echo "$KS_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "Keystore decoded: $(stat -c%s "$KEYSTORE_PATH") bytes ($KS_NAME)"
+          keytool -list -keystore "$KEYSTORE_PATH" -storepass "$KS_PASSWORD" > /dev/null 2>&1 \
+            || { echo "::error::Keystore did not unlock."; exit 1; }
+          echo "--- Cert fingerprint(s) for $KS_NAME ---"
+          keytool -list -v -keystore "$KEYSTORE_PATH" -storepass "$KS_PASSWORD" 2>/dev/null \
+            | grep -E "Alias|SHA256" | head -20 || true
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=$KS_NAME"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$KS_ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$KS_PASSWORD"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$KS_KEY_PASSWORD"
+          } >> android/gradle.properties
+          BG=android/app/build.gradle
+          if ! grep -q "signingConfigs.debug" "$BG"; then
+            echo "::error::Expected 'signingConfigs.debug' in $BG."; exit 1
+          fi
+          python3 <<'PY'
+          import pathlib, re
+          p = pathlib.Path("android/app/build.gradle")
+          src = p.read_text()
+          release_signing_block = """
+              release {
+                  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                      storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                      storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                      keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                      keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+                  }
+              }
+          """.rstrip() + "\n"
+          def find_block(text, header_re, after=0):
+              m = re.search(header_re, text[after:])
+              if not m: return None
+              start = after + m.end(); depth = 1; i = start
+              while i < len(text) and depth > 0:
+                  c = text[i]
+                  if c == '{': depth += 1
+                  elif c == '}': depth -= 1
+                  i += 1
+              if depth != 0: return None
+              return after + m.end() - 1, i - 1
+          sc = find_block(src, r"signingConfigs\s*\{")
+          if not sc: raise SystemExit("Could not locate signingConfigs block")
+          src = src[:sc[1]] + release_signing_block + src[sc[1]:]
+          bt = find_block(src, r"buildTypes\s*\{")
+          if not bt: raise SystemExit("Could not locate buildTypes block")
+          rel = find_block(src, r"\brelease\s*\{", after=bt[0])
+          if not rel or rel[1] > bt[1]: raise SystemExit("Could not locate buildTypes.release")
+          inside = src[rel[0]:rel[1]]
+          new_inside, n = re.subn(r"signingConfig\s+signingConfigs\.debug",
+                                  "signingConfig signingConfigs.release", inside, count=1)
+          if n != 1: raise SystemExit("buildTypes.release has no signingConfigs.debug to repoint")
+          src = src[:rel[0]] + new_inside + src[rel[1]:]
+          p.write_text(src)
+          print("build.gradle patched for release signing.")
+          PY
+          echo "PRODUCTION_SIGNING_AVAILABLE=true" >> "$GITHUB_ENV"
+
+      - name: Resolve the ONNX native artifact Gradle will actually use
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:dependencies --configuration releaseRuntimeClasspath --no-daemon 2>&1 \
+            | grep -iE 'onnxruntime|executorch|llama' | sort -u || echo "(no matching lines)"
+
+      # ⚠⚠ THE COMPILE GATE. arm64-v8a only, exactly as the factory builds.
+      - name: COMPILE GATE — bundleRelease (production AAB, arm64-v8a)
+        id: bundle
+        working-directory: android
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+        run: |
+          set -o pipefail
+          START=$(date -u +%s)
+          ./gradlew bundleRelease --no-daemon --stacktrace \
+            -Pandroid.kotlinVersion=1.9.25 \
+            -PkotlinVersion=1.9.25 \
+            -PreactNativeArchitectures=arm64-v8a 2>&1 | tee /tmp/bundle.log
+          RC=$?
+          END=$(date -u +%s)
+          echo "BUNDLE EXIT: $RC"
+          echo "BUILD DURATION: $((END-START))s"
+          echo "duration=$((END-START))" >> "$GITHUB_OUTPUT"
+
+      - name: FAILURE CAPTURE (first material failure)
+        if: failure()
+        run: |
+          L=/tmp/bundle.log
+          [ -f "$L" ] || { echo "no bundle log"; exit 0; }
+          echo "================ FAILING TASK ================"
+          grep -nE "^> Task .*(FAILED)|Execution failed for task" "$L" | tail -20 || echo "(none)"
+          echo "================ WHAT WENT WRONG ================"
+          grep -n -A 30 "What went wrong" "$L" | head -80 || echo "(none)"
+          echo "================ C/C++ / JNI / LINK ================"
+          grep -inE "ninja|clang|cmake|\.so|undefined reference|ld:|jni|abi" "$L" | head -60 || echo "(none)"
+          echo "================ COMPONENT HINTS ================"
+          grep -inE "llama|onnx|executorch|hermes|codegen|sentry" "$L" | head -60 || echo "(none)"
+          echo "================ TAIL ================"
+          tail -120 "$L"
+
+      - name: ARTIFACT PROOF — identity, signing, ABI, native libraries
+        if: success()
+        run: |
+          set -euo pipefail
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          echo "=== 1-3. AAB EXISTS / PATH / SHA-256 ==="
+          ls -l "$AAB"
+          sha256sum "$AAB"
+          AAPT2="$ANDROID_HOME/build-tools/35.0.0/aapt2"
+          echo "=== 4-7. IDENTITY FROM THE ARTIFACT (aapt2 on the bundle manifest) ==="
+          "$AAPT2" dump xmltree --file base/manifest/AndroidManifest.xml "$AAB" 2>/dev/null \
+            | grep -iE 'package|versionCode|versionName|targetSdkVersion|compileSdkVersion|minSdkVersion' | head -20 \
+            || echo "::warning::aapt2 xmltree dump unavailable — identity UNKNOWN from artifact"
+          echo "=== 8-9. SIGNING ==="
+          if jarsigner -verify "$AAB" > /dev/null 2>&1; then
+            echo "jarsigner -verify: PASS"
+            CERT=$(jarsigner -verify -verbose -certs "$AAB" 2>&1 | grep -A1 "X.509" | head -10 || true)
+            echo "$CERT"
+            if echo "$CERT" | grep -q "Tartaria Realms Debug"; then
+              echo "::error::AAB signed with the DEBUG keystore."; exit 1
+            fi
+            echo "SIGNED WITH A NON-DEBUG CERTIFICATE."
+          else
+            echo "::warning::AAB is NOT signed (jarsigner -verify failed) — PRODUCTION SIGNING NOT PROVEN"
+          fi
+          echo "=== 10-12. ABI + NATIVE LIBRARY INVENTORY ==="
+          unzip -l "$AAB" | grep -E '\.so$' | awk '{print $4, $1}' | sort
+          echo "--- ABI directories present ---"
+          unzip -l "$AAB" | grep -oE 'base/lib/[^/]+' | sort -u
+          echo "--- .so count ---"
+          unzip -l "$AAB" | grep -cE '\.so$'
+          echo "=== 13-15. COMPONENT PRESENCE ==="
+          for c in onnxruntime llama executorch hermes rnllama; do
+            printf '%-14s ' "$c"; unzip -l "$AAB" | grep -icE "$c" || echo 0
+          done
+
+      - name: 16 KB PAGE-SIZE GATE — ELF load-segment alignment
+        if: success()
+        run: |
+          set -uo pipefail
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          WORK=/tmp/aabx; rm -rf "$WORK"; mkdir -p "$WORK"
+          unzip -q "$AAB" 'base/lib/*' -d "$WORK" || true
+          echo "=== NATIVE LIBRARIES CHECKED ==="
+          find "$WORK" -name '*.so' | sort | sed "s|$WORK/||"
+          TOTAL=0; OK=0; BAD=0
+          echo "=== ELF LOAD-SEGMENT ALIGNMENT (need p_align >= 0x4000 = 16384) ==="
+          while IFS= read -r so; do
+            TOTAL=$((TOTAL+1))
+            ALIGNS=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | tr '\n' ' ')
+            MINA=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+            DEC=$(printf '%d' "$MINA" 2>/dev/null || echo 0)
+            if [ "$DEC" -ge 16384 ] 2>/dev/null; then OK=$((OK+1)); VERDICT=OK; else BAD=$((BAD+1)); VERDICT="TOO-SMALL"; fi
+            printf '%-70s aligns=%-24s %s\n' "$(basename "$so")" "$ALIGNS" "$VERDICT"
+          done < <(find "$WORK" -name '*.so' | sort)
+          echo "=== SUMMARY ==="
+          echo "checked=$TOTAL  aligned16k=$OK  under16k=$BAD"
+          echo "=== PACKAGING ALIGNMENT (declared) ==="
+          grep -E '^expo\.useLegacyPackaging' android/gradle.properties || echo "(not set)"
+          echo "⚠ PACKAGING ALIGNMENT inside a generated APK is NOT proven by this step."
+          echo "⚠ It requires bundletool build-apks + zipalign -c -P 16 and is reported UNKNOWN unless run."
+
+      - name: STOP MARKER
+        if: always()
+        run: |
+          echo "COMPILE PROOF COMPLETE — artifact inspected and DISCARDED."
+          echo "NOT performed: Play upload, Play automation, OTA, promotion, publication, merge."

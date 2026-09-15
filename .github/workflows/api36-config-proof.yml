@@ -36,6 +36,12 @@ on:
   push:
     branches:
       - api36-config-proof
+    # ⚠ Narrowed after the Gate 1.5 result was captured: this proof is DONE, so
+    # it re-fires only if its own file changes. Without this, adding the Gate 2
+    # compile-proof workflow to the same branch would pointlessly re-run a
+    # question already answered (BUILD SUCCESSFUL, exit 0).
+    paths:
+      - '.github/workflows/api36-config-proof.yml'
   workflow_dispatch:
 
 permissions:
