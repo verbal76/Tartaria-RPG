@@ -297,3 +297,393 @@ been made.
 
 ⚠ **PR #7 is open and stale** — a June draft merging `golem-line` *into*
 `HaL2001`. Merging it would overwrite the branch that was just archived.
+
+---
+
+# 8. NATIVE RELEASE OPERATIONS
+
+**Added 2026-09-15. Application authority at the time of writing: OTA-1824,
+`015c323726bb5aed4401fd8adf364fa5400177d7`.** This supersedes the OTA-1823
+authority (`5b819d98`) that the earlier Android archaeology used. Sections 1–7
+above are the *census* of every build path; this section is the *operating
+procedure* for the two that put a native binary in a human's hands.
+
+The Apple path below is not a proposal. It ran end to end on 2026-09-15 and the
+build is live in TestFlight. The Android path is recovered from source and is
+**documented but not re-proven by this section** — the distinction is kept
+explicit throughout, because this repository's recurring failure mode is a
+capability that quietly stopped existing while the documentation still promised
+it.
+
+---
+
+## ⚠⚠⚠ 8.0 THE OWNER-UI NAMING RULE — READ BEFORE WRITING ANY INSTRUCTION
+
+**Kevin does not select workflows by YAML filename.** He reads the workflow list
+in the GitHub Actions UI, where each entry shows its **visible name** — the
+`name:` at the top of the file, rendered in white.
+
+Every owner-facing instruction therefore **leads with the visible name**:
+
+> ✅ **CORRECT** — GitHub → Actions → **"iOS Build (Tartaria Realms)"** → Run workflow
+> ❌ **WRONG** — "Run `build-ios.yml`"
+
+> ✅ **CORRECT** — GitHub → Actions → **"Android Build (Tartaria Realms)"** → Run workflow
+> ❌ **WRONG** — "Run `build-apk.yml`"
+
+The YAML filename may appear **parenthetically**, or in an agent/engineering
+reference block. It must never be the owner's primary navigation instruction.
+**Future agents: preserve this rule.** It is not a style preference — a filename
+is not a thing Kevin can click.
+
+### ⚠⚠ THE TRAP INSIDE THE RULE: do not read the owner's name off the API
+
+**An agent cannot see Kevin's screen, and the obvious proxy for it is wrong.**
+
+The GitHub Actions API method `list_workflows` returns a `name` per workflow, and
+it is tempting to treat that as "what the UI shows". **It is not.** That field can
+be stale for years, and on this repository one entry is:
+
+| workflow | `list_workflows` says | its RUNS carry | **what Kevin's sidebar shows** |
+|---|---|---|---|
+| `build-ios.yml` | `iOS Build (Tartaria Realms)` | same | same |
+| `submit-ios.yml` | `Publish · iOS → TestFlight` | — | same |
+| **`build-apk.yml`** | **`Build Android APK`** ← **STALE** | `Android Build (Tartaria Realms)` | **`Android Build (Tartaria Realms)`** |
+
+The cause is visible in the data: that list entry was last updated **2026-05-15**,
+and `build-apk.yml` **does not exist on the repository's default branch (`main`)**,
+so GitHub has never refreshed the entry from a default-branch version. The trunk
+carries `name: Android Build (Tartaria Realms)`, which is what runs display — and,
+**confirmed by the owner on 2026-09-15, what the sidebar displays too.** The API
+row is the only thing carrying the dead name.
+
+⚠⚠ **THE RULE FOR AGENTS, and it is the opposite of the intuitive one:**
+
+> **Read the owner-facing workflow name from `name:` in the workflow file on the
+> trunk (`golem-line`) — not from `list_workflows`.** The file is the authority.
+> The API list entry is a cache that nothing on this repository invalidates.
+
+Cross-check it against a recent run's `name` if you want a second reading; runs
+and the file agree. `list_workflows` is the outlier, and an instruction built on
+it sends Kevin looking for a string that is not on his screen.
+
+⚠ A direct link is **not** a violation of the naming rule, and is a good belt-and-
+braces addition for a workflow he runs rarely. The rule forbids making Kevin
+*search a list by filename*; a link is one click and cannot be misread.
+`https://github.com/verbal76/Tartaria-RPG/actions/workflows/build-apk.yml`
+
+---
+
+## 8.1 APPLE / TESTFLIGHT — THE OWNER BUTTON
+
+**This is the canonical owner-initiated native Apple release path.**
+
+> **GitHub → Actions → "iOS Build (Tartaria Realms)" → Run workflow**
+> *(engineering reference: `.github/workflows/build-ios.yml`)*
+
+Then configure the four fields:
+
+| field | value | notes |
+|---|---|---|
+| **Use workflow from** (Ref) | `golem-line` | the trunk |
+| **Profile** | `production` | `preview` cannot reach TestFlight — see §2's profile/channel table |
+| **Submit** | `true` | adds `--auto-submit` |
+| **Line** | `hal` | ⚠ **must be set explicitly** — the input defaults to `golem` |
+
+### ⚠⚠ BEFORE PRESSING RUN WORKFLOW — confirm the source
+
+The dispatch UI offers **branches and tags only**; you cannot select a SHA.
+`actions/checkout@v4` in this workflow takes no `ref:`, so it builds **whatever
+the selected branch's tip is at dispatch time**. Confirm that tip *is* the
+intended validated authority before pressing the button:
+
+```
+git ls-remote origin refs/heads/golem-line
+```
+
+That SHA must equal the application authority you mean to ship. If someone has
+pushed since CI went green, you would be building something else, and nothing in
+the run would say so.
+
+### ⚠⚠⚠ THE GREEN CHECKMARK DOES NOT MEAN THE BUILD SUCCEEDED
+
+`build-ios.yml` invokes `eas build … --no-wait`. The step returns **the moment
+EAS accepts the job**, so the GitHub run finishes in roughly **90 seconds** and
+goes green having compiled nothing.
+
+**This is proven, not theoretical.** Run **196** (`5b819d98`) reports
+`conclusion: success` in GitHub Actions — and the build it queued, EAS build
+**197**, died at `** ARCHIVE FAILED **` with five Swift errors. A green run and a
+dead binary, on the same dispatch.
+
+**Where the real outcome lives:** the run log prints two URLs. Read those, not
+the checkmark.
+
+```
+See logs: https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds/<build-id>
+Submission details: https://expo.dev/accounts/hot-attic-games/projects/tartaria-/submissions/<submission-id>
+```
+
+⚠ `expo.dev` is **blocked by the agent network egress proxy**, so an agent
+session cannot open either link. An agent may read the GitHub run log (which
+carries the build id, the build number and the submission id) and must then
+either ask the owner for the EAS/App Store Connect outcome or report it as
+unverified. **Do not report "build succeeded" from a green Actions run.**
+
+### ⚠ DO NOT MANUALLY RUN "Publish · iOS → TestFlight"
+
+The workflow visible as **"Publish · iOS → TestFlight"** (`submit-ios.yml`) is
+**not the normal first button**, and must not be prescribed as a routine
+follow-up step after a successful build with `submit=true`.
+
+OTA-1824 proved that the canonical iOS build workflow performs the whole chain
+itself: native build → IPA → automatic Apple submission → Apple processing →
+TestFlight availability. Telling Kevin to run the submit workflow afterwards
+invites a duplicate submission for a build Apple already has.
+
+**Use it only** when evidence shows a *successful* native build did not perform
+its expected automatic submission — i.e. the EAS build completed but no
+submission exists. That is a repair path, not a step.
+
+### THE PROVEN EXAMPLE — OTA-1824
+
+Recorded so the chain never has to be re-derived:
+
+| stage | evidence |
+|---|---|
+| application authority | `015c323726bb5aed4401fd8adf364fa5400177d7` |
+| required CI | run **2162** (id 34911463993) — all 8 required jobs SUCCESS |
+| Golem publication | publisher run **1396** (id 34911749773) — release `tartaria@4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted`, revision `015c323726bb`, deploy `golem` |
+| HAL promotion | `promotions` record at `3983a991`; promote run **19** (id 34912895642) |
+| HAL publication | publisher run **1397** (id 34912940555) — same release, revision `015c323726bb`, `OTA complete for line 'hal' — 3 target(s)`, deploy `hal` |
+| owner dispatch | build-ios run **198** (id 34913585498), `workflow_dispatch`, at `015c3237` |
+| build number stamped | `Bumping expo.ios.buildNumber from 198 to 199` |
+| EAS build | id `4a62f6ee-2158-49b9-be5f-c27d07dc1541`, `Build number: 199` |
+| native Swift compile | **SUCCESS** |
+| production IPA | **SUCCESS** |
+| automatic submission | `✔ Scheduled iOS submission`, id `db3e37e2-de28-40cc-9064-9b7eb3525f11` |
+| Apple processing | **COMPLETE** |
+| TestFlight | **LIVE — actual Apple Build 199** |
+
+Bundle id resolved to the bare store id `com.hotatticgames.tartarprim` — the
+production flip described in §5 — not the `.hal2001` suffix. That is correct for
+an App Store Connect build and is *not* the same identity as the Android HAL
+sideload in §8.2.
+
+⚠ The log line `No complete App Store Connect credentials, skipping TestFlight
+setup` appears on this **successful** run. It refers to a different credential
+set and did **not** block submission — the submission was scheduled four lines
+later. Do not "fix" it.
+
+### ⚠⚠ BUILD NUMBERS ARE READ, NEVER PREDICTED
+
+Step 7 stamps `app.expo.ios.buildNumber = github.run_number`, and EAS
+`autoIncrement` then adds one. Observed: run 188 → Build 189 · run 196 → Build
+197 · run 198 → Build 199.
+
+**That history is not a licence to predict.** A skipped run still consumes a
+run_number, the stamping step could change, and EAS owns the increment. **Always
+read the actual assigned number from the run log** (`Bumping expo.ios.buildNumber
+from N to M`, or `Build number: M`) and report *that*. A predicted number stated
+as fact is how an agent ends up claiming a binary that does not exist — see the
+"Build 190" episode, where the number was unreachable and saying otherwise would
+have been a fiction.
+
+**Do not alter the build-number mechanic** to force a particular number. The
+stamping step's own comment documents the Apple duplicate-rejection regression it
+exists to prevent.
+
+---
+
+## 8.2 ANDROID HAL APK — THE OWNER BUTTON
+
+> **GitHub → Actions → "Android Build (Tartaria Realms)" → Run workflow**
+> *(engineering reference: `.github/workflows/build-apk.yml`. An older name,
+> "Build Android APK", survives only in the `list_workflows` API row — it is not
+> on the owner's screen; see §8.0.)*
+
+For the normal HAL sideload / update APK:
+
+| field | value |
+|---|---|
+| **Use workflow from** (Ref) | the exact validated source — confirm the tip as in §8.1 |
+| **Profile** | `preview` |
+| **Line** | `hal` |
+
+### ⚠ THE PROFILE INPUT IS OVERRIDDEN WHEN LINE = HAL
+
+Selecting `preview` matches what the workflow does anyway. The `Determine build
+profile and tag` step resolves in this order:
+
+1. `refs/tags/v*` → `production`
+2. commit message contains `[build-aab]` → `production`
+3. **`TARTARIA_LINE == hal` → `preview`, tag `Hal2001-<run_number>`**
+4. otherwise → the `profile` input
+
+So on a dispatch with `line: hal`, rule 3 fires and the `profile` input is not
+consulted. This is a safety property worth knowing: **you cannot accidentally
+produce a HAL-suffixed production AAB via the line input.** Selecting `preview`
+is correct and also inert.
+
+### Expected pipeline
+
+```
+exact source (actions/checkout, no ref: → the dispatched SHA)
+  → npm ci
+  → Android versionCode = github.run_number     (baked into the manifest; OTA cannot override)
+  → Kotlin 1.9.25 pinned in both version catalogs
+  → onnxruntime-android pinned to 1.22.0        (avoids the latest.integration XML parser bug)
+  → npx expo prebuild --platform android
+  → stable HAL keystore reconstructed from base64 + build.gradle signing patch
+  → ./gradlew assembleRelease  (arm64-v8a only)
+  → signed HAL APK
+  → GitHub Actions artifact (90-day retention)
+  → GitHub Release, tag Hal2001-<run_number>, targeted at $GITHUB_SHA
+```
+
+| | |
+|---|---|
+| **Application ID** | `com.hotatticgames.tartarprim.hal2001` *(resolved through `app.config.js`, verified 2026-09-15)* |
+| **Channel** | `hal2001` |
+| **App name** | `Tartaria Realms HAL` |
+| **Filename shape** | `tartaria-realms-Hal2001-<run_number>.apk` |
+
+### ⚠⚠ HAL PREVIEW AND GOLEM PREVIEW ARE DELIBERATELY DIFFERENT
+
+They share a profile name and nothing else.
+
+| | HAL preview | Golem preview |
+|---|---|---|
+| signing | **stable HAL upload key** (`ANDROID_KEYSTORE_*`) | **debug-signed fallback**, fresh key per build |
+| upgrade behaviour | **updates an existing HAL install in place** | Android refuses the upgrade; uninstall first |
+| package | `…tartarprim.hal2001` | `…tartarprim.golem` (separate install) |
+| tag | `Hal2001-N` | `golem-apk-N` |
+
+The condition that does this is `profile == 'production' || TARTARIA_LINE == 'hal'`.
+**Never present the Golem preview APK to Kevin as the normal HAL update APK** —
+it installs and runs, and then refuses to upgrade, which looks like a device
+problem rather than a wrong artifact.
+
+⚠ This exact coupling was a live defect once (OTA-1388): the condition read
+`github.ref_name == 'HaL2001'`, so on the trunk a `line: hal` APK skipped release
+signing and came out debug-signed. Nothing went red. You found out when a
+tester's install refused the update.
+
+### ⚠ ORDINARY PUSHES DO NOT BUILD ANDROID — THIS IS CORRECT
+
+The job gate makes an Android build **opt-in on the trunk**. A push to
+`golem-line` builds only when the commit title carries `[build-apk]`,
+`[build-aab]` or `[golem-apk]`; otherwise the job reports **skipped**.
+
+An Android build is 30–60 minutes of runner time. The trunk takes every commit
+for all four products, so firing on every push would be a standing charge. A
+skipped Android job on an ordinary OTA push is the gate working.
+
+**Do not "fix" this** because an OTA push produced a skipped Android run. Example
+for recognition: run **470** on the OTA-1824 push — `conclusion: skipped`, as
+designed.
+
+⚠ Note also the `paths-ignore` list (`app/**`, `assets/**`, `scripts/**`,
+`__tests__/**`, `**.md`, …). An OTA-stamp-only commit touches nothing outside it,
+so a marker alone starts **nothing** — §1's "trigger touch" applies.
+
+---
+
+## 8.3 ANDROID SIGNING REFERENCE — SECRET **NAMES** ONLY
+
+**No secret value is documented here, and none may be added.** Do not print,
+echo, commit, decode or otherwise retrieve any of these.
+
+| secret name | source-derived purpose |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | base64 of the shared HAL upload keystore; decoded to `android/app/tartaria-upload.keystore`. Signs the **HAL sideload APK**, and the production AAB when no `*_PROD_*` set exists. |
+| `ANDROID_KEYSTORE_PASSWORD` | store password for the above; also used for the `keytool -list` unlock check |
+| `ANDROID_KEY_ALIAS` | key alias within that keystore → `MYAPP_UPLOAD_KEY_ALIAS` |
+| `ANDROID_KEY_PASSWORD` | key password → `MYAPP_UPLOAD_KEY_PASSWORD` |
+| `ANDROID_PROD_KEYSTORE_BASE64` | base64 of a **separate production upload keystore**, used only when `profile == production` **and** this secret is non-empty; decoded to `tartaria-prod-upload.keystore`. Exists because Play Console pins the signing key per package, and the store listing may have been created with a different key than HAL's. |
+| `ANDROID_PROD_KEYSTORE_PASSWORD` | store password for the production keystore |
+| `ANDROID_PROD_KEY_ALIAS` | key alias within the production keystore |
+| `ANDROID_PROD_KEY_PASSWORD` | key password within the production keystore |
+| `GITHUB_TOKEN` | Actions-issued token; used **only** by `gh release create` to publish the Release and attach the artifact. Not a signing credential. |
+
+**Guarded fallback, as written:** if `profile == production` and
+`ANDROID_PROD_KEYSTORE_BASE64` is empty, the build **falls back to the shared
+`ANDROID_KEYSTORE_*` set** and prints a warning that Play Console may reject the
+AAB with a wrong-signing-certificate error. If no keystore secret is available at
+all, the build **fails hard** rather than shipping a debug-signed artifact.
+
+### ⚠⚠ PRESENCE AND VALIDITY CANNOT BE INFERRED FROM SOURCE
+
+Workflow source shows which secret names are *referenced*. It cannot show whether
+a secret is **set**, whether its value **decodes to a valid keystore**, or whether
+the password **unlocks** it. GitHub redacts values, and an unset secret
+interpolates to an empty string that looks identical to a configured one.
+
+**The build itself is the validation boundary.** The workflow is built around
+this: it decodes, runs `keytool -list` to prove the keystore unlocks, prints the
+certificate SHA-256 fingerprint for cross-checking against Play Console, and for
+production runs `jarsigner -verify` plus a check that the signer CN is **not**
+`CN=Tartaria Realms Debug`. Each failure is a hard stop.
+
+So: **never report Android signing as "configured" or "working" on the strength of
+reading this file.** Only a run says that.
+
+---
+
+## 8.4 GOOGLE PLAY CONSOLE / TESTING — WHAT IS AND IS NOT PROVEN
+
+This section is deliberately narrow. Read the labels as written.
+
+### PROVEN — the workflow can produce a production AAB
+
+| | |
+|---|---|
+| **Store application ID** | `com.hotatticgames.tartarprim` (the **bare** id, no line suffix) |
+| **How it is reached** | `profile == production` sets `TARTARIA_STORE_BUILD=1`; `app.config.js` resolves the bare id. ⚠ §5: this flip used to be a workflow step rewriting `app.json` and was silently dead for a while. It lives in the config layer now. **Do not move it back.** |
+| **Gradle task** | `bundleRelease` |
+| **Signing** | production credentials when present, with the §8.3 guarded fallback |
+| **Verification** | `jarsigner -verify` + debug-CN rejection, both hard failures |
+| **Where the AAB lands** | a GitHub Actions artifact **and** a GitHub Release, tag `aab-build-<run_number>` (or the pushed `v*` tag) |
+
+### ⚠⚠⚠ NOT PROVEN — there is no automatic Play Console upload
+
+The Codex investigation did not establish an existing automatic upload from the
+completed production AAB into a Google Play Console testing track.
+
+Searching the source independently on 2026-09-15 agrees, and can say slightly
+more — **no upload mechanism is written anywhere**:
+
+* no `upload-google-play` / `r0adkll` action, no `fastlane supply`, no
+  `androidpublisher` call, no service-account secret, no `track:` selector
+  anywhere in `.github/workflows/`
+* `eas.json`'s `submit` block contains **`production.ios` only** — there is no
+  `android` submit configuration at all
+* the workflow's own GitHub Release note ends the chain by instructing a human:
+  *"Play Store AAB bundle — upload to Google Play Console."*
+
+**The production AAB path terminates at a GitHub Release.** Getting it into a
+Play Console testing track is a manual human step, and this document does not
+claim otherwise.
+
+⚠ **Do not document a Play Console testing-track delivery as existing, working,
+or automatic.** Do not describe an Android release chain that ends "→ internal
+testing track" by analogy with the Apple chain in §8.1. The Apple chain is proven
+end to end; the Android chain is **not**, and the asymmetry is the finding.
+
+⚠ **The bounded negative.** Source proves no upload *step is written*. It cannot
+prove nobody uploads by hand, and it cannot prove a track does or does not exist
+in the Play Console — that console is outside this repository and outside an agent
+session's reach. If the state of the Play Console matters, **ask the owner**; do
+not infer it from source, and do not infer it from the absence of an error.
+
+### Open, and named rather than quietly assumed
+
+* Whether a Play Console testing track exists and what is on it — **UNKNOWN from
+  here.**
+* Whether `ANDROID_PROD_*` is populated, and therefore whether a production AAB
+  would be signed with the key the listing expects — **UNKNOWN from here** (§8.3;
+  the build is the boundary).
+* Whether the recovered Android factory still builds green — **NOT RE-PROVEN.**
+  No Android build was started for this documentation pass, by instruction. The
+  last recorded Android runs are `skipped` push runs, which prove the gate works
+  and nothing about the build.

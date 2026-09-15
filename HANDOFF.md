@@ -911,6 +911,25 @@ Written 2026-08-20 (OTA-1390) after the branch collapse: every workflow, what
 triggers it, what it produces, which secrets it needs. Two things in it are worth
 knowing before touching anything.
 
+⚠⚠⚠ **`docs/WORKFLOWS.md` §8 — NATIVE RELEASE OPERATIONS — is the operating
+procedure for the two owner buttons that put a native binary in a human's hands.**
+Added 2026-09-15 after OTA-1824 ran the Apple chain end to end to TestFlight Build
+199. Read §8 before writing any owner-facing build instruction. Three rules there
+are load-bearing and easy to get wrong from memory:
+
+* **§8.0 — lead every owner instruction with the workflow's VISIBLE NAME**
+  ("iOS Build (Tartaria Realms)", "Android Build (Tartaria Realms)"), never the
+  YAML filename. Kevin does not select workflows by filename. ⚠ Read that name
+  from `name:` in the workflow file **on the trunk** — NOT from the Actions API's
+  `list_workflows`, whose `name` can be years stale and on `build-apk.yml`
+  currently is.
+* **§8.1 — a green `build-ios` run does NOT mean the build succeeded.** It uses
+  `--no-wait` and returns in ~90 s. Run 196 is green in Actions and the EAS build
+  it queued died at `** ARCHIVE FAILED **`. Read the EAS build id from the log.
+* **§8.4 — there is NO automatic Google Play Console upload.** The production AAB
+  chain terminates at a GitHub Release. Do not document a testing-track delivery
+  by analogy with the Apple chain.
+
 * **A marker alone does not always start a workflow.** `build-apk.yml` and
   `build-ios.yml` path-ignore `app/**` and `**.md`, so an OTA-stamp commit starts
   nothing at all and the marker is never read. Edit `.github/build-trigger.txt` in
