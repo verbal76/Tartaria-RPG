@@ -32,12 +32,9 @@ name: API36 · Expo52 RN0.77 coherence proof (temporary, NOT published)
 # report, not something to hide or force back.
 
 on:
-  push:
-    branches:
-      - api36-config-proof
-    paths:
-      - '.github/workflows/api36-rn077-coherence.yml'
-      - 'package.json'
+  # ⚠ GATE 4 IS CLOSED (classification D — Expo52/RN0.77 coherence failure).
+  # Its push trigger is REMOVED so that Gate 5's package.json delta cannot re-fire a
+  # question already answered. Kept dispatch-only so the run is still reproducible.
   workflow_dispatch:
 
 permissions:
