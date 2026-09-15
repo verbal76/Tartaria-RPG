@@ -21,6 +21,17 @@
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+// ⚠⚠ THE MOCK HAS TO NAME THE PATH PRODUCTION IMPORTS — pendingBundle.ts:55
+// reads `expo-file-system/legacy` (the Expo 54 move), and jest resolves that to
+// a DIFFERENT module object from `expo-file-system`, so the mock below never
+// intercepted it. Measured, not assumed: with only the mock below registered,
+// `require('expo-file-system/legacy').writeAsStringAsync` is NOT a jest mock,
+// its `documentDirectory` is null, and a write through it RESOLVES WITHOUT
+// THROWING while the fake disk stays empty. That silence is why this read as a
+// logic fault — every persist appeared to succeed and every read came back
+// null. Same mock object, second specifier; no new behaviour is mocked and no
+// production file is touched. (OTA-1177 / OTA-1452 carry the same line.)
+jest.mock('expo-file-system/legacy', () => require('expo-file-system'));
 jest.mock('expo-file-system', () => {
   const store = new Map<string, string>();
   return {
