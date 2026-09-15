@@ -21,6 +21,25 @@
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+// ⚠ OTA-1042 / OTA-1792 — expo-av NEEDS AN EXPLICIT MOCK NOW; IT DID NOT BEFORE.
+// expo-av's entry is `export default requireNativeModule('ExponentAV')`, and that
+// line is BYTE-IDENTICAL in 15.0.2 and 16.0.8 — the package did not change. What
+// changed is the harness: jest-expo 52 shipped an ExponentAV entry in its native
+// module mock table, and jest-expo 54's table does not (it carries one entry,
+// NativeUnimoduleProxy). So the import that used to be answered by the preset now
+// throws "Cannot find native module 'ExponentAV'" at require time, before a single
+// test runs. This suite reaches expo-av only transitively and asserts nothing about
+// audio; the mock below is the same two-call shape the other 543 suites already
+// carry, and the same surface the preset used to provide.
+jest.mock('expo-av', () => ({
+  Audio: {
+    setAudioModeAsync: jest.fn(),
+    Sound: class {
+      static createAsync: () => Promise<{ sound: { playAsync: () => void; unloadAsync: () => void } }> =
+        jest.fn(async () => ({ sound: { playAsync: jest.fn(), unloadAsync: jest.fn() } }));
+    },
+  },
+}));
 jest.mock('expo-speech', () => ({
   speak: jest.fn(),
   stop: jest.fn(),
