@@ -1,0 +1,408 @@
+name: API36 · Expo52 RN0.77 coherence proof (temporary, NOT published)
+
+# ⚠⚠⚠ TEMPORARY EXPERIMENT on the radioactive branch `api36-config-proof`.
+# NEVER MERGE — this branch carries a neutralized ci.yml.
+# ⚠ PROOF BUILD, NOT A MIGRATION AND NOT AUTHORIZATION TO MIGRATE.
+#
+# THE QUESTION, and only this one:
+#   Does the smallest Expo-SUPPORTED coherent boundary — Expo SDK 52 +
+#   React Native 0.77, at API 36 with NDK r28 — produce a 16 KB-compliant
+#   production-style ARM64 AAB WITHOUT additional native surgery?
+#
+# WHY 0.77 AND NOT A FLAG. Gate 2 built at RN 0.76.3 / NDK r26 and got 7/30
+# ELF-compliant; ten of the failures are Maven/AAR prebuilts no flag we control
+# can reach. Gate 3 moved only the NDK to r28 and did not reach an artifact at
+# all: RN 0.76.3's vendored Folly instantiates std::basic_string_view<unsigned
+# char> and r28's libc++ no longer defines char_traits<unsigned char>.
+#
+# SOURCE DELTA IS TWO LINES of package.json, and they are the documented opt-in
+# from Expo's own changelog "React Native 0.77 is now available with Expo SDK 52":
+# expo >= 52.0.27 (here ~52.0.49) and react-native 0.77.3. React is UNCHANGED at
+# 18.3.1 because RN 0.77 peers on ^18.2.0. Expo Go is irrelevant — Tartaria ships
+# a native/development build.
+#
+# ⚠⚠ NOTHING IS FORCED. react-android, hermes-android, fbjni and Fresco are NOT
+# pinned by hand; they must fall out of the coherent RN 0.77 graph or the
+# experiment has failed and will say so. NO -Wl,-z,max-page-size flag is added:
+# the point is what the boundary does NATURALLY.
+#
+# ⚠ TOLERANCES, because RN 0.77 legitimately owns its own template. The Kotlin
+# catalog pin and the NDK swap read what is actually there and report it rather
+# than asserting Gate 2's values; a divergence is an experimental CONSEQUENCE to
+# report, not something to hide or force back.
+
+on:
+  push:
+    branches:
+      - api36-config-proof
+    paths:
+      - '.github/workflows/api36-rn077-coherence.yml'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NDK_R28: '28.2.13676358'
+
+jobs:
+  coherence:
+    name: Expo52 + RN0.77 coherence proof (API 36, NDK r28, arm64-v8a)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TARTARIA_LINE: golem
+      TARTARIA_STORE_BUILD: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          echo "Before:"; df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          echo "After:"; df -h /
+
+      - name: STEP 2 — CONTROL, before anything is resolved
+        run: |
+          echo "=== committed inputs (sha256) ==="
+          sha256sum app.json package.json package-lock.json
+          echo "=== declared versions as committed ==="
+          node -e "
+            const d=require('./package.json').dependencies;
+            ['expo','react-native','react','react-dom','llama.rn','onnxruntime-react-native',
+             'react-native-executorch','expo-av','react-native-safe-area-context',
+             '@sentry/react-native','expo-speech-recognition']
+              .forEach(k=>console.log((k+'                                  ').slice(0,36)+(d[k]||'(absent)')));"
+          cp package-lock.json /tmp/lock.before.json
+
+      - name: NDK PRECONDITION — obtain and verify EXACTLY r28
+        run: |
+          set -euo pipefail
+          echo "NDK REQUESTED: $NDK_R28"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          [ -d "$ANDROID_HOME/ndk/$NDK_R28" ] || "$SDKM" "ndk;$NDK_R28"
+          if [ ! -d "$ANDROID_HOME/ndk/$NDK_R28" ]; then
+            echo "::error::REQUESTED NDK $NDK_R28 UNAVAILABLE. Not substituting. STOPPING."; exit 1
+          fi
+          echo "=== NDK ACTUALLY USED: $ANDROID_HOME/ndk/$NDK_R28 ==="
+          cat "$ANDROID_HOME/ndk/$NDK_R28/source.properties"
+          TC="$ANDROID_HOME/ndk/$NDK_R28/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          echo "=== clang ==="; "$TC/clang" --version
+          echo "=== ld.lld ==="; "$TC/ld.lld" --version
+
+      - name: Install Android platform 36 + build-tools 35.0.0
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0"
+          ls -1 "$ANDROID_HOME/platforms"; ls -1 "$ANDROID_HOME/build-tools"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with: { java-version: '17', distribution: 'temurin' }
+
+      # ⚠ npm install, not npm ci: the lockfile is deliberately stale relative to
+      # the two-line opt-in. The very next step measures how far the graph moved.
+      - name: STEP 4 — resolve the RN 0.77 graph
+        run: npm install --no-audit --no-fund
+
+      - name: STEP 4 — CASCADE CONTROL — how far did the graph actually move?
+        run: |
+          set +e
+          node -e "
+            const fs=require('fs');
+            const before=JSON.parse(fs.readFileSync('/tmp/lock.before.json','utf8')).packages||{};
+            const after=JSON.parse(fs.readFileSync('package-lock.json','utf8')).packages||{};
+            const bk=Object.keys(before), ak=Object.keys(after);
+            const changed=[],added=[],removed=[];
+            for(const k of ak){ if(!(k in before)) added.push(k);
+              else if(before[k].version!==after[k].version) changed.push(k+'  '+before[k].version+' -> '+after[k].version); }
+            for(const k of bk){ if(!(k in after)) removed.push(k); }
+            console.log('packages before:',bk.length,' after:',ak.length);
+            console.log('ADDED:',added.length,'  REMOVED:',removed.length,'  VERSION-CHANGED:',changed.length);
+            console.log('--- version changes (all) ---');
+            changed.sort().forEach(l=>console.log('  '+l));
+            console.log('--- added (first 60) ---'); added.sort().slice(0,60).forEach(l=>console.log('  '+l));
+            console.log('--- removed (first 60) ---'); removed.sort().slice(0,60).forEach(l=>console.log('  '+l));
+          "
+          echo "=== RESOLVED TOP-LEVEL VERSIONS (what actually installed) ==="
+          for p in react-native react expo expo-modules-core expo-av react-native-safe-area-context \
+                   llama.rn onnxruntime-react-native react-native-executorch @sentry/react-native; do
+            V=$(node -e "try{console.log(require('./node_modules/$p/package.json').version)}catch(e){console.log('(absent)')}")
+            printf '%-42s %s\n' "$p" "$V"
+          done
+          echo "=== EXPO'S OWN COHERENCE OPINION (expo install --check, NON-MUTATING) ==="
+          npx expo install --check 2>&1 | head -40
+          echo "(a clean result here means Expo considers the graph coherent for SDK 52)"
+          set -e
+
+      - name: Kotlin catalog — REPORT what RN 0.77 ships, pin only if it is the factory's 1.9.24
+        run: |
+          set +e
+          for f in node_modules/react-native/gradle/libs.versions.toml \
+                   node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml; do
+            echo "--- $f ---"
+            if [ ! -f "$f" ]; then echo "(absent)"; continue; fi
+            grep -E '^(kotlin|agp|gradle)' "$f"
+            if grep -q '^kotlin = "1.9.24"$' "$f"; then
+              sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
+              echo "  -> factory pin applied (1.9.24 -> 1.9.25)"
+            else
+              echo "  -> NOT 1.9.24; RN 0.77 owns this value. NOT forced. Recorded as an experimental consequence."
+            fi
+          done
+          set -e
+
+      - name: ONNX pin (latest.integration -> 1.22.0) — factory behaviour retained
+        run: |
+          set +e
+          ORT=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ -f "$ORT" ]; then
+            sed -i "s/latest\.integration/1.22.0/g" "$ORT"
+            grep -n "1.22.0" "$ORT" | head -5
+          else
+            echo "::warning::$ORT absent"
+          fi
+          set -e
+
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          node -e "
+            const fs=require('fs');const a=JSON.parse(fs.readFileSync('app.json','utf8'));
+            a.expo.android=a.expo.android||{}; a.expo.android.versionCode=${{ github.run_number }};
+            fs.writeFileSync('app.json',JSON.stringify(a,null,2));"
+
+      - name: Show the resolved identity being built
+        run: |
+          npx expo config --type public --json | node -e "
+            let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);
+            console.log('package: '+(c.android&&c.android.package));
+            console.log('version: '+c.version);
+            console.log('vcode:   '+(c.android&&c.android.versionCode));});"
+
+      # ⚠ --clean is Expo's documented requirement for the RN 0.77 opt-in under CNG.
+      - name: Generate native Android project (prebuild --clean, as Expo documents for 0.77)
+        run: npx expo prebuild --platform android --no-install --clean
+
+      - name: NDK SWAP — generated project only, exactly one line, whatever RN 0.77 defaulted to
+        run: |
+          set -euo pipefail
+          BG=android/build.gradle
+          echo "=== ndkVersion RN 0.77's template chose ==="; grep -n 'ndkVersion' "$BG"
+          CUR=$(grep -oP 'ndkVersion\s*=\s*"\K[^"]+' "$BG" | head -1)
+          echo "current=$CUR  target=$NDK_R28"
+          cp "$BG" /tmp/bg.before
+          if [ "$CUR" = "$NDK_R28" ]; then
+            echo "RN 0.77 ALREADY selects $NDK_R28 — no swap needed (recorded as a consequence)."
+          else
+            sed -i "s/ndkVersion = \"$CUR\"/ndkVersion = \"$NDK_R28\"/" "$BG"
+            M=$(diff /tmp/bg.before "$BG" | grep -c '^[<>]' || true)
+            echo "changed-line-markers=$M (expect 2)"
+            [ "$M" = "2" ] || { echo "::error::NDK swap touched more than one line. STOPPING."; exit 1; }
+          fi
+          grep -n 'ndkVersion' "$BG"
+
+      - name: STEP 5 — effective toolchain proof from the GENERATED project
+        run: |
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+          echo "=== gradle.properties (SDK / arch / arch flags) ==="
+          grep -E '^(android\.|newArchEnabled|hermesEnabled|reactNativeArchitectures|expo\.useLegacyPackaging)' android/gradle.properties
+          echo "=== android/build.gradle ext ==="
+          sed -n '1,30p' android/build.gradle
+          echo "=== Gradle wrapper ==="
+          grep distributionUrl android/gradle/wrapper/gradle-wrapper.properties
+          echo "=== AGP resolved from RN catalog ==="
+          grep -E '^agp' node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml || true
+          echo "=== app/build.gradle identity ==="
+          grep -nE 'applicationId|namespace|versionCode|versionName|compileSdk|targetSdk|ndkVersion' android/app/build.gradle | head -20
+
+      - name: Configure release signing (production AAB)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_PROD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+          ANDROID_PROD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+          ANDROID_PROD_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+          ANDROID_PROD_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ANDROID_PROD_KEYSTORE_BASE64:-}" ]; then
+            KS_BASE64="$ANDROID_PROD_KEYSTORE_BASE64"; KS_PASSWORD="$ANDROID_PROD_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_PROD_KEY_ALIAS"; KS_KEY_PASSWORD="$ANDROID_PROD_KEY_PASSWORD"
+            KS_NAME="tartaria-prod-upload.keystore"
+          else
+            KS_BASE64="${ANDROID_KEYSTORE_BASE64:-}"; KS_PASSWORD="${ANDROID_KEYSTORE_PASSWORD:-}"
+            KS_ALIAS="${ANDROID_KEY_ALIAS:-}"; KS_KEY_PASSWORD="${ANDROID_KEY_PASSWORD:-}"
+            KS_NAME="tartaria-upload.keystore"
+          fi
+          if [ -z "${KS_BASE64:-}" ]; then
+            echo "::warning::no keystore secret"; echo "SIGNING_OK=false" >> "$GITHUB_ENV"; exit 0
+          fi
+          echo "$KS_BASE64" | base64 -d > "android/app/$KS_NAME"
+          keytool -list -keystore "android/app/$KS_NAME" -storepass "$KS_PASSWORD" >/dev/null 2>&1 \
+            || { echo "::error::keystore did not unlock"; exit 1; }
+          keytool -list -v -keystore "android/app/$KS_NAME" -storepass "$KS_PASSWORD" 2>/dev/null \
+            | grep -E "Alias|SHA256" | head -10 || true
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=$KS_NAME"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$KS_ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$KS_PASSWORD"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$KS_KEY_PASSWORD"
+          } >> android/gradle.properties
+          python3 <<'PY'
+          import pathlib, re
+          p = pathlib.Path("android/app/build.gradle"); src = p.read_text()
+          block = """
+              release {
+                  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                      storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                      storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                      keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                      keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+                  }
+              }
+          """.rstrip() + "\n"
+          def blk(t, rx, after=0):
+              m = re.search(rx, t[after:])
+              if not m: return None
+              i = after + m.end(); d = 1
+              while i < len(t) and d > 0:
+                  if t[i] == '{': d += 1
+                  elif t[i] == '}': d -= 1
+                  i += 1
+              return (after + m.end() - 1, i - 1) if d == 0 else None
+          sc = blk(src, r"signingConfigs\s*\{")
+          if not sc: raise SystemExit("signingConfigs block not found — RN 0.77 template changed")
+          src = src[:sc[1]] + block + src[sc[1]:]
+          bt = blk(src, r"buildTypes\s*\{"); rel = blk(src, r"\brelease\s*\{", after=bt[0])
+          inner, n = re.subn(r"signingConfig\s+signingConfigs\.debug",
+                             "signingConfig signingConfigs.release", src[rel[0]:rel[1]], count=1)
+          if n != 1: raise SystemExit("release signingConfig not repointed — RN 0.77 template changed")
+          p.write_text(src[:rel[0]] + inner + src[rel[1]:]); print("signing patched")
+          PY
+          echo "SIGNING_OK=true" >> "$GITHUB_ENV"
+
+      - name: STEP 6 — BUILD bundleRelease (production AAB, arm64-v8a)
+        working-directory: android
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          S=$(date -u +%s)
+          ./gradlew bundleRelease --no-daemon --stacktrace \
+            -PreactNativeArchitectures=arm64-v8a 2>&1 | tee /tmp/b4.log
+          echo "BUILD DURATION: $(( $(date -u +%s) - S ))s"
+
+      - name: FAILURE CAPTURE + CLASSIFICATION (first material failure)
+        if: failure()
+        run: |
+          L=/tmp/b4.log; [ -f "$L" ] || { echo "no build log"; exit 0; }
+          echo "=== FAILING TASK ==="; grep -nE "Execution failed for task|^> Task .*FAILED" "$L" | tail -20
+          echo "=== WHAT WENT WRONG ==="; grep -n -A30 "What went wrong" "$L" | head -80
+          echo "=== FIRST ERRORS ==="; grep -nE "error:|FAILED|Caused by" "$L" | head -40
+          echo "=== BOUNDARY HINTS (RN / Expo / Tartaria / third-party native) ==="
+          grep -inE "react-native|react-android|hermes|folly|expo|llama|onnx|executorch|sentry|fresco|fbjni|appmodules|codegen" "$L" | head -60
+          echo "=== TAIL ==="; tail -120 "$L"
+
+      - name: STEP 7 — ELF COMPLIANCE, read from the actual AAB
+        if: success()
+        run: |
+          set -uo pipefail
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          echo "=== AAB ==="; ls -l "$AAB"; sha256sum "$AAB"
+          W=/tmp/g4; rm -rf $W; mkdir -p $W; unzip -q "$AAB" 'base/lib/*' -d $W
+          echo "=== ABI DIRECTORIES ==="; unzip -l "$AAB" | grep -oE 'base/lib/[^/]+' | sort -u
+          TOT=0; OK=0; BAD=0
+          printf '%-44s %-10s %-11s %s\n' LIBRARY ALIGN SIZE VERDICT
+          while IFS= read -r so; do
+            TOT=$((TOT+1)); B=$(basename "$so")
+            AL=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | tr '\n' ' ')
+            MIN=$(readelf -lW "$so" 2>/dev/null | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+            DEC=$(printf '%d' "$MIN" 2>/dev/null || echo 0)
+            if [ "$DEC" -ge 16384 ] 2>/dev/null; then OK=$((OK+1)); V=PASS; else BAD=$((BAD+1)); V="FAIL(<16K)"; fi
+            printf '%-44s %-10s %-11s %s\n' "$B" "$AL" "$(stat -c%s "$so")" "$V"
+          done < <(find $W -name '*.so' | sort)
+          echo; echo "=== TOTALS ==="; echo "total=$TOT  pass(>=0x4000)=$OK  fail(0x1000)=$BAD"
+          echo; echo "=== PER-LIBRARY SHA-256 ==="
+          find $W -name '*.so' | sort | xargs sha256sum | sed "s|$W/base/lib/arm64-v8a/||"
+          echo; echo "=== TEN FORMER IMMUTABLE AAR FAILURES ==="
+          for B in libhermes.so libhermestooling.so libreactnative.so libjsi.so libfbjni.so \
+                   libimagepipeline.so libgifimage.so libnative-filters.so \
+                   libnative-imagetranscoder.so libstatic-webp.so; do
+            F="$W/base/lib/arm64-v8a/$B"
+            if [ -f "$F" ]; then
+              A=$(readelf -lW "$F" | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+              printf '  %-34s %-10s %s\n' "$B" "$A" "$([ $(printf '%d' $A) -ge 16384 ] && echo PASS || echo FAIL)"
+            else printf '  %-34s %s\n' "$B" "ABSENT in RN 0.77 inventory"; fi
+          done
+          echo; echo "=== TWELVE FORMER LOCAL FAILURES ==="
+          for B in librnllama.so librnllama_v8.so librnllama_v8_2_fp16.so librnllama_v8_2_fp16_dotprod.so \
+                   librnllama_v8_4_fp16_dotprod.so librnllama_v8_4_fp16_dotprod_i8mm.so libappmodules.so \
+                   libexpo-modules-core.so libexpo-av.so libreact-native-executorch.so \
+                   libonnxruntimejsi.so libreact_codegen_safeareacontext.so; do
+            F="$W/base/lib/arm64-v8a/$B"
+            if [ -f "$F" ]; then
+              A=$(readelf -lW "$F" | awk '$1=="LOAD"{print $NF}' | sort -u | head -1)
+              printf '  %-40s %-10s %s\n' "$B" "$A" "$([ $(printf '%d' $A) -ge 16384 ] && echo PASS || echo FAIL)"
+            else printf '  %-40s %s\n' "$B" "ABSENT"; fi
+          done
+          echo; echo "=== SPECIAL — libc++_shared.so (NDK-supplied) ==="
+          F="$W/base/lib/arm64-v8a/libc++_shared.so"
+          [ -f "$F" ] && readelf -lW "$F" | awk '$1=="LOAD"{print "  LOAD align: "$NF}' | sort -u || echo "  ABSENT"
+          echo; echo "=== PROVENANCE (which Gradle-cached AAR each .so came from) ==="
+          for so in $(find $W -name '*.so' | sort); do
+            B=$(basename "$so")
+            SRC=$(find "$HOME/.gradle/caches" -name "$B" -path '*arm64-v8a*' 2>/dev/null | head -1)
+            printf '  %-40s %s\n' "$B" "$(echo "$SRC" | grep -oE 'transformed/[^/]+' | head -1)"
+          done 2>/dev/null | head -40
+
+      - name: STEP 8 + 9 — PACKAGING PROOF and ARTIFACT IDENTITY
+        if: success()
+        run: |
+          set +e
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          URL=$(curl -sSL https://api.github.com/repos/google/bundletool/releases/latest \
+                | grep -oE '"browser_download_url": *"[^"]*bundletool-all[^"]*\.jar"' \
+                | head -1 | sed 's/.*": *"//; s/"$//')
+          echo "bundletool: $URL"
+          if [ -z "$URL" ]; then echo "PACKAGING 16 KB: UNKNOWN — bundletool URL unresolved"; exit 0; fi
+          curl -sSL -o /tmp/bt.jar "$URL" || { echo "PACKAGING 16 KB: UNKNOWN — download failed"; exit 0; }
+          echo "=== bundletool version ==="; java -jar /tmp/bt.jar version
+          echo "=== STEP 9 — ARTIFACT IDENTITY (bundletool dump manifest) ==="
+          java -jar /tmp/bt.jar dump manifest --bundle="$AAB" 2>&1 \
+            | grep -iE 'package=|versionCode|versionName|targetSdk|compileSdk|minSdk' | head -20
+          echo "=== signing ==="
+          jarsigner -verify "$AAB" >/dev/null 2>&1 && echo "jarsigner -verify: PASS" || echo "jarsigner -verify: FAIL/UNSIGNED"
+          jarsigner -verify -verbose -certs "$AAB" 2>/dev/null | grep -A1 "X.509" | head -4
+          echo "=== STEP 8 — build-apks (universal, NOT published) ==="
+          rm -f /tmp/o.apks
+          java -jar /tmp/bt.jar build-apks --bundle="$AAB" --output=/tmp/o.apks --mode=universal
+          RC=$?
+          if [ $RC -ne 0 ]; then echo "PACKAGING 16 KB: UNKNOWN — build-apks rc=$RC"; exit 0; fi
+          rm -rf /tmp/apks; mkdir -p /tmp/apks; unzip -q -o /tmp/o.apks -d /tmp/apks
+          APK=$(find /tmp/apks -name '*.apk' | head -1); echo "APK: $APK"; ls -l "$APK"
+          ZA="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          echo "=== zipalign -c -P 16 -v 4 ==="
+          "$ZA" -c -P 16 -v 4 "$APK" > /tmp/za.txt 2>&1; ZRC=$?
+          grep -iE '\.so|Verification' /tmp/za.txt | tail -40
+          echo "zipalign exit: $ZRC"
+          [ $ZRC -eq 0 ] && echo "PACKAGING 16 KB: PASS" || echo "PACKAGING 16 KB: FAIL"
+          set -e
+
+      - name: STOP MARKER
+        if: always()
+        run: |
+          echo "GATE 4 COMPLETE — PROOF ONLY. Artifact inspected and DISCARDED."
+          echo "NOT performed: Play, OTA, Golem publication, HAL promotion, GitHub Release, iOS, Heavy CI, merge."
