@@ -30746,7 +30746,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     LIVE CLASS-H MEMORY CAUSATION ............................. UNKNOWN
 // Nothing here may be read as "memory caused the Apple freeze". The recorder
 // exists so the NEXT report can answer that question instead of re-posing it.
-export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
+// ⚠⚠⚠ OTA-1824 — THE HELPER IS CALLED, NOT QUOTED. A NATIVE COMPILE REPAIR
+// THAT NONETHELESS EARNS ITS OWN STAMP, AND THE REASON IS OTA-1482.
+//
+// OTA-1823 reached both lines and the owner dispatched the production HAL
+// build. EAS build 197 (54f56b3e-02a0-46fd-a085-878b76be5cca, Xcode 26.2 /
+// iPhoneOS26.2.sdk) died at ** ARCHIVE FAILED ** with five copies of
+//
+//     generic parameter 'T' could not be inferred
+//
+// at MemoryFlightRecorder.swift:381, :403, :462, :706 and :740 — all five the
+// same line, `let N = MemoryFlightRecorder.n`. Binding a generic function to a
+// `let` without applying it asks Swift for a function VALUE, which needs a
+// concrete type; with no argument and no context there is nothing to fix `T`
+// to. The helper is now applied directly at all 63 call sites, where `T` is
+// inferred from the argument. NO MEASUREMENT CHANGED — every value still passes
+// through Int(clamping:).
+//
+// ⚠⚠ WHY THIS IS NOT A SILENT RE-PUBLISH UNDER 1823. The repair is Swift-only
+// and the JS bundle is BYTE-IDENTICAL to OTA-1823's, so "no new OTA is owed" is
+// the tempting answer. It is the wrong one. `modules/**` is not in ci.yml's
+// publish-ignore list, so this push DOES dispatch the publisher and a new update
+// group DOES reach both channels — and OTA_BUILD_ID is the value the device
+// DISPLAYS and the just-updated toast keys on. Shipping a new bundle under a
+// stamp the device already carries would look exactly like no update arriving,
+// which is precisely the defect OTA-1482 exists to prevent. The stamp names the
+// PUBLISHED AUTHORITY, not the diff's file extensions.
+//
+// ⚠ THE LOCKED ARCHITECTURE IS UNTOUCHED. Capacities, cadences, the single
+// shared burst deadline, every signal, the two-slot checkpoint, MetricKit, the
+// exclusion list and the llama prohibition are all exactly as 1823 shipped
+// them; §2 of ota1824TheHelperIsCalledNotQuoted re-asserts each one rather than
+// trusting that a Swift edit left them alone.
+export const OTA_BUILD_ID = '2026-09-15-1824-the-helper-is-called-not-quoted';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1820-the-sections-rest-raised-and-remember';

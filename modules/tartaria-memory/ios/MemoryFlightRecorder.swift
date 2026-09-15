@@ -199,6 +199,39 @@ struct TMHealth {
   var jsStaleSamples: UInt64 = 0
 }
 
+// MARK: - The one numeric boundary
+
+/// ⚠ EVERY NUMBER LEAVES THIS MODULE AS AN `Int`. The rings hold UInt64 because
+/// that is what Mach returns, but the JS bridge marshals NSNumber and an
+/// unsigned 64-bit value is the one integer shape that can surprise it. Clamping
+/// here — once, at the only boundary that crosses out of Swift — keeps every
+/// dictionary below trivially bridgeable. Every quantity we report (bytes of a
+/// process, milliseconds of a session) is orders of magnitude inside Int64, so
+/// the clamp is a type conversion and never a silent truncation of a reading.
+///
+/// ⚠⚠ IT IS CALLED, NEVER REFERENCED UNAPPLIED, AND THAT IS WHY IT LIVES HERE
+/// AS A PLAIN FUNCTION RATHER THAN BEHIND A LOCAL ALIAS.
+///
+/// Build 197 (EAS 54f56b3e) failed `** ARCHIVE FAILED **` with five copies of
+///
+///     generic parameter 'T' could not be inferred
+///
+/// at MemoryFlightRecorder.swift:381, :403, :462, :706 and :740 — every one of
+/// them the line `let N = MemoryFlightRecorder.n`. Binding a generic function to
+/// a `let` without applying it asks Swift to build a function VALUE, and a
+/// function value must have a concrete type; with no argument and no contextual
+/// type there is nothing from which to fix `T`, so the type checker refuses. The
+/// five call-site aliases were a readability convenience and cost a 25-minute
+/// round trip on an EAS macOS worker.
+///
+/// Applied directly — `tmInt(s.footprint)` — `T` is inferred from the argument
+/// at each of the sixty call sites, which is the ordinary way generics resolve.
+/// ⚠ NO MEASUREMENT CHANGED: every value still passes through `Int(clamping:)`,
+/// exactly as before. This is a spelling repair, not a semantic one.
+@inline(__always) private func tmInt<T: BinaryInteger>(_ v: T) -> Int {
+  return Int(clamping: v)
+}
+
 // MARK: - The recorder
 
 final class MemoryFlightRecorder {
@@ -361,36 +394,23 @@ final class MemoryFlightRecorder {
     return queue.sync { (sampleSeq, eventSeq) }
   }
 
-  /// ⚠ EVERY NUMBER LEAVES THIS CLASS AS AN `Int`. The rings hold UInt64
-  /// because that is what Mach returns, but the JS bridge marshals NSNumber and
-  /// an unsigned 64-bit value is the one integer shape that can surprise it.
-  /// Clamping here — once, at the only boundary that crosses out of Swift —
-  /// keeps every dictionary below trivially bridgeable. Every quantity we
-  /// report (bytes of a process, milliseconds of a session) is orders of
-  /// magnitude inside Int64, so the clamp is a type conversion and never a
-  /// silent truncation of a real reading.
-  @inline(__always) private static func n<T: BinaryInteger>(_ v: T) -> Int {
-    return Int(clamping: v)
-  }
-
   /// One immediate read, taken on the recorder queue. Used by the report for a
   /// "right now" line, not by the sampler.
   func snapshotNow() -> [String: Any] {
     return queue.sync {
       let vm = MemoryFlightRecorder.readVM()
-      let N = MemoryFlightRecorder.n
       return [
         "ok": vm != nil,
-        "footprint": N(vm?.footprint ?? 0),
-        "resident": N(vm?.resident ?? 0),
-        "residentPeak": N(vm?.peak ?? 0),
-        "available": N(MemoryFlightRecorder.readAvailable()),
-        "observedHighWater": N(observedHighWater),
-        "baseline": N(baselineFootprint),
-        "phase": N(phase),
-        "thermal": N(MemoryFlightRecorder.readThermal()),
+        "footprint": tmInt(vm?.footprint ?? 0),
+        "resident": tmInt(vm?.resident ?? 0),
+        "residentPeak": tmInt(vm?.peak ?? 0),
+        "available": tmInt(MemoryFlightRecorder.readAvailable()),
+        "observedHighWater": tmInt(observedHighWater),
+        "baseline": tmInt(baselineFootprint),
+        "phase": tmInt(phase),
+        "thermal": tmInt(MemoryFlightRecorder.readThermal()),
         "started": started,
-        "uptimeMs": N(started ? (MemoryFlightRecorder.uptimeMs() &- startUptimeMs) : 0),
+        "uptimeMs": tmInt(started ? (MemoryFlightRecorder.uptimeMs() &- startUptimeMs) : 0),
       ]
     }
   }
@@ -400,7 +420,6 @@ final class MemoryFlightRecorder {
   /// argument a caller passes can make it return more.
   func drain(sampleUpTo: UInt64, eventUpTo: UInt64) -> [String: Any] {
     return queue.sync {
-      let N = MemoryFlightRecorder.n
       var sampleRows: [[String: Any]] = []
       let sHi = min(sampleUpTo, sampleSeq)
       let sLo = sHi > UInt64(TM_SAMPLE_CAPACITY) ? sHi &- UInt64(TM_SAMPLE_CAPACITY) : 0
@@ -409,18 +428,18 @@ final class MemoryFlightRecorder {
       while i < sHi {
         let s = samples[Int(i % UInt64(TM_SAMPLE_CAPACITY))]
         sampleRows.append([
-          "seq": N(i),
-          "t": N(s.t),
-          "footprint": N(s.footprint),
-          "resident": N(s.resident),
-          "residentPeak": N(s.residentPeak),
-          "available": N(s.available),
-          "mallocInUse": N(s.mallocInUse),
-          "mallocAllocated": N(s.mallocAllocated),
-          "mallocBlocks": N(s.mallocBlocks),
-          "phase": N(s.phase),
-          "thermal": N(s.thermal),
-          "flags": N(s.flags),
+          "seq": tmInt(i),
+          "t": tmInt(s.t),
+          "footprint": tmInt(s.footprint),
+          "resident": tmInt(s.resident),
+          "residentPeak": tmInt(s.residentPeak),
+          "available": tmInt(s.available),
+          "mallocInUse": tmInt(s.mallocInUse),
+          "mallocAllocated": tmInt(s.mallocAllocated),
+          "mallocBlocks": tmInt(s.mallocBlocks),
+          "phase": tmInt(s.phase),
+          "thermal": tmInt(s.thermal),
+          "flags": tmInt(s.flags),
         ])
         i &+= 1
       }
@@ -433,13 +452,13 @@ final class MemoryFlightRecorder {
       while j < eHi {
         let e = events[Int(j % UInt64(TM_EVENT_CAPACITY))]
         eventRows.append([
-          "seq": N(j),
-          "t": N(e.t),
-          "footprint": N(e.footprint),
-          "sampleSeq": N(e.sampleSeq),
-          "kind": N(e.kind),
-          "code": N(e.code),
-          "phase": N(e.phase),
+          "seq": tmInt(j),
+          "t": tmInt(e.t),
+          "footprint": tmInt(e.footprint),
+          "sampleSeq": tmInt(e.sampleSeq),
+          "kind": tmInt(e.kind),
+          "code": tmInt(e.code),
+          "phase": tmInt(e.phase),
         ])
         j &+= 1
       }
@@ -448,7 +467,7 @@ final class MemoryFlightRecorder {
         "samples": sampleRows,
         "events": eventRows,
         "health": healthDictLocked(),
-        "startWallMs": N(startWallMs),
+        "startWallMs": tmInt(startWallMs),
         "capacity": ["samples": TM_SAMPLE_CAPACITY, "events": TM_EVENT_CAPACITY],
       ]
     }
@@ -459,22 +478,21 @@ final class MemoryFlightRecorder {
   }
 
   private func healthDictLocked() -> [String: Any] {
-    let N = MemoryFlightRecorder.n
     return [
-      "samplesTaken": N(health.samplesTaken),
-      "samplesDropped": N(health.samplesDropped),
-      "eventsRecorded": N(health.eventsRecorded),
-      "eventsDropped": N(health.eventsDropped),
-      "machFailures": N(health.machFailures),
-      "burstsStarted": N(health.burstsStarted),
-      "burstsExtended": N(health.burstsExtended),
-      "memoryWarnings": N(health.memoryWarnings),
-      "checkpointWrites": N(health.checkpointWrites),
-      "checkpointFailures": N(health.checkpointFailures),
-      "mallocSamples": N(health.mallocSamples),
-      "jsStaleSamples": N(health.jsStaleSamples),
-      "sampleSeq": N(sampleSeq),
-      "eventSeq": N(eventSeq),
+      "samplesTaken": tmInt(health.samplesTaken),
+      "samplesDropped": tmInt(health.samplesDropped),
+      "eventsRecorded": tmInt(health.eventsRecorded),
+      "eventsDropped": tmInt(health.eventsDropped),
+      "machFailures": tmInt(health.machFailures),
+      "burstsStarted": tmInt(health.burstsStarted),
+      "burstsExtended": tmInt(health.burstsExtended),
+      "memoryWarnings": tmInt(health.memoryWarnings),
+      "checkpointWrites": tmInt(health.checkpointWrites),
+      "checkpointFailures": tmInt(health.checkpointFailures),
+      "mallocSamples": tmInt(health.mallocSamples),
+      "jsStaleSamples": tmInt(health.jsStaleSamples),
+      "sampleSeq": tmInt(sampleSeq),
+      "eventSeq": tmInt(eventSeq),
       "cadenceMs": currentCadenceMs,
       "started": started,
     ]
@@ -703,26 +721,25 @@ final class MemoryFlightRecorder {
 
   private func writeCheckpointLocked(reason: UInt16) {
     let vm = MemoryFlightRecorder.readVM()
-    let N = MemoryFlightRecorder.n
     let payload: [String: Any] = [
       "v": 1,
       "buildTag": buildTag,
-      "reason": N(reason),
-      "wallMs": N(UInt64(Date().timeIntervalSince1970 * 1000.0)),
-      "sessionStartWallMs": N(startWallMs),
-      "uptimeMs": N(MemoryFlightRecorder.uptimeMs() &- startUptimeMs),
-      "footprint": N(vm?.footprint ?? 0),
-      "resident": N(vm?.resident ?? 0),
-      "residentPeak": N(vm?.peak ?? 0),
-      "available": N(MemoryFlightRecorder.readAvailable()),
-      "observedHighWater": N(observedHighWater),
-      "baseline": N(baselineFootprint),
-      "phase": N(phase),
-      "thermal": N(MemoryFlightRecorder.readThermal()),
-      "memoryWarnings": N(health.memoryWarnings),
-      "samplesTaken": N(health.samplesTaken),
-      "machFailures": N(health.machFailures),
-      "jsStaleSamples": N(health.jsStaleSamples),
+      "reason": tmInt(reason),
+      "wallMs": tmInt(UInt64(Date().timeIntervalSince1970 * 1000.0)),
+      "sessionStartWallMs": tmInt(startWallMs),
+      "uptimeMs": tmInt(MemoryFlightRecorder.uptimeMs() &- startUptimeMs),
+      "footprint": tmInt(vm?.footprint ?? 0),
+      "resident": tmInt(vm?.resident ?? 0),
+      "residentPeak": tmInt(vm?.peak ?? 0),
+      "available": tmInt(MemoryFlightRecorder.readAvailable()),
+      "observedHighWater": tmInt(observedHighWater),
+      "baseline": tmInt(baselineFootprint),
+      "phase": tmInt(phase),
+      "thermal": tmInt(MemoryFlightRecorder.readThermal()),
+      "memoryWarnings": tmInt(health.memoryWarnings),
+      "samplesTaken": tmInt(health.samplesTaken),
+      "machFailures": tmInt(health.machFailures),
+      "jsStaleSamples": tmInt(health.jsStaleSamples),
       "lastEvents": recentEventCodesLocked(),
     ]
     if MemoryCheckpointStore.shared.write(payload) {
@@ -737,7 +754,6 @@ final class MemoryFlightRecorder {
   /// before it can tell us anything, and a Jetsam kill mid-write of a large
   /// file is exactly the corruption the two-slot scheme exists to survive.
   private func recentEventCodesLocked() -> [[String: Any]] {
-    let N = MemoryFlightRecorder.n
     var out: [[String: Any]] = []
     let hi = eventSeq
     let want: UInt64 = 8
@@ -745,7 +761,7 @@ final class MemoryFlightRecorder {
     var i = lo
     while i < hi {
       let e = events[Int(i % UInt64(TM_EVENT_CAPACITY))]
-      out.append(["t": N(e.t), "kind": N(e.kind), "code": N(e.code), "footprint": N(e.footprint)])
+      out.append(["t": tmInt(e.t), "kind": tmInt(e.kind), "code": tmInt(e.code), "footprint": tmInt(e.footprint)])
       i &+= 1
     }
     return out
