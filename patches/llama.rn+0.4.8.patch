@@ -1,3 +1,22 @@
+diff --git a/node_modules/llama.rn/android/build.gradle b/node_modules/llama.rn/android/build.gradle
+index 7cb9361..a4bf97a 100644
+--- a/node_modules/llama.rn/android/build.gradle
++++ b/node_modules/llama.rn/android/build.gradle
+@@ -51,6 +51,14 @@ android {
+     externalNativeBuild {
+       cmake {
+         abiFilters (*reactNativeArchitectures())
++        // Tartaria Realms patch (API 36 / Android 16 KB page-size compliance).
++        // NDK r27 makes 16 KB ELF alignment OPT-IN. llama.rn 0.4.8 never opts in,
++        // so its six ARM64 kernels link at p_align 0x1000 while every other native
++        // library in the app links at 0x4000. This is the same argument upstream
++        // llama.rn adds in 0.7.0; expressed here against 0.4.8's identical
++        // defaultConfig.externalNativeBuild.cmake block so the kernel family, the
++        // SVE crash suppression and the Tartaria diagnostics all stay exactly as they are.
++        arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+       }
+     }
+   }
 diff --git a/node_modules/llama.rn/android/src/main/CMakeLists.txt b/node_modules/llama.rn/android/src/main/CMakeLists.txt
 index 8a206b3..1166beb 100644
 --- a/node_modules/llama.rn/android/src/main/CMakeLists.txt
