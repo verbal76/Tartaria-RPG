@@ -1,0 +1,194 @@
+name: API36 · Gradle configuration proof (temporary)
+
+# ⚠⚠⚠ TEMPORARY EXPERIMENT. This workflow exists ONLY on the throwaway branch
+# `api36-config-proof` and must NEVER be merged into golem-line or main.
+#
+# IT ANSWERS EXACTLY ONE QUESTION, and deliberately nothing else:
+#
+#   Can the authoritative Android factory's generated project — AGP 8.6.0 on
+#   Gradle 8.10.2, Kotlin 1.9.25, Build Tools 35.0.0 — CONFIGURE with
+#   compileSdk 36 / targetSdk 36 on the real GitHub Actions Android runner?
+#
+# Gate 1 (local) proved prebuild GENERATES a credible API 36 project, but the
+# container had no Android SDK and dl.google.com was blocked, so every
+# Gradle-configuration-time diagnostic was UNKNOWN. This run converts that
+# UNKNOWN into evidence.
+#
+# ⚠ IT STOPS AT CONFIGURATION. No assembleRelease, no bundleRelease, no APK,
+# no AAB, no signing, no upload, no Play. `:app:tasks` forces AGP to configure
+# the Android application module — which is where an unsupported-compileSdk
+# diagnostic surfaces — and then the job ends.
+#
+# ⚠⚠ WARNINGS ARE NOT SUPPRESSED, ON PURPOSE. `android.suppressUnsupportedCompileSdk`
+# is deliberately NOT set. A warning that AGP 8.6.0 was not tested against
+# compileSdk 36 is evidence we want to READ, not hide. The distinction the
+# report must preserve is:
+#     SUPPORTED/TESTED BY TOOLCHAIN   (may be false)
+#     CONFIGURATION ACTUALLY SUCCEEDED (may be true anyway)
+# These are different questions and this run answers the second one.
+#
+# ⚠ THE TWO GATE 1 DIVERGENCES ARE REPRODUCED HERE. Gate 1 ran prebuild without
+# build-apk.yml's two node_modules patch steps. Both are copied verbatim below
+# (Kotlin catalogs, onnxruntime pin) so the generated project matches what the
+# real factory would produce.
+
+on:
+  push:
+    branches:
+      - api36-config-proof
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    name: Configure generated API36 project (no compile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # ⚠ Mirrors Gate 1 exactly: the production store path. STORE_BUILD=1 makes
+      # app.config.js resolve the bare Play package rather than a line suffix.
+      TARTARIA_LINE: golem
+      TARTARIA_STORE_BUILD: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          echo "Before:"; df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          echo "After:"; df -h /
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = ${{ github.run_number }};
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          echo "android.versionCode = ${{ github.run_number }}"
+
+      # ⚠ DIVERGENCE FIX 1 — copied verbatim from build-apk.yml.
+      - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs (Compose compiler compat)
+        run: |
+          RN_CATALOG=node_modules/react-native/gradle/libs.versions.toml
+          GP_CATALOG=node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+          for f in "$RN_CATALOG" "$GP_CATALOG"; do
+            if [ ! -f "$f" ]; then echo "::error::Expected catalog $f not found"; exit 1; fi
+            echo "--- before: $f ---"; grep '^kotlin' "$f" || true
+            sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
+            echo "--- after: $f ---"; grep '^kotlin' "$f" || true
+            if ! grep -q '^kotlin = "1.9.25"$' "$f"; then echo "::error::Patch did not apply to $f"; exit 1; fi
+          done
+
+      # ⚠ DIVERGENCE FIX 2 — copied verbatim from build-apk.yml.
+      - name: Pin onnxruntime-android version (avoid latest.integration XML parser bug)
+        run: |
+          ORT_VERSION=1.22.0
+          ORT_GRADLE=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ ! -f "$ORT_GRADLE" ]; then echo "::error::Expected $ORT_GRADLE not found"; exit 1; fi
+          echo "--- before ---"; grep -n "latest.integration" "$ORT_GRADLE" || true
+          sed -i "s/latest\.integration/${ORT_VERSION}/g" "$ORT_GRADLE"
+          echo "--- after ---"; grep -n "$ORT_VERSION" "$ORT_GRADLE" || true
+          if grep -q "latest.integration" "$ORT_GRADLE"; then echo "::error::latest.integration still present"; exit 1; fi
+
+      - name: Show the resolved identity actually being configured
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('package: '+(c.android&&c.android.package));console.log('version: '+c.version);console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));})"
+
+      - name: Generate native Android project (the authoritative seam)
+        run: npx expo prebuild --platform android --no-install
+
+      # ⚠ Reproduces build-apk.yml's post-prebuild Kotlin step, INCLUDING its
+      # suppressKotlinVersionCompatibilityCheck line. That flag suppresses a
+      # KOTLIN-vs-Compose check only. It does NOT and must not suppress any
+      # compileSdk/AGP diagnostic — that is the whole point of this run.
+      - name: Verify Kotlin 1.9.25 propagated through prebuild
+        run: |
+          echo "--- node_modules catalogs ---"
+          grep '^kotlin' node_modules/react-native/gradle/libs.versions.toml
+          grep '^kotlin' node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+          echo "--- android/gradle.properties kotlin lines ---"
+          grep -i kotlin android/gradle.properties || true
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+
+      - name: Android SDK inventory BEFORE, then install platform 36
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "--- platforms present ---";    ls -1 "$ANDROID_HOME/platforms" 2>/dev/null || echo "(none)"
+          echo "--- build-tools present ---";  ls -1 "$ANDROID_HOME/build-tools" 2>/dev/null || echo "(none)"
+          echo "--- ndk present ---";          ls -1 "$ANDROID_HOME/ndk" 2>/dev/null || echo "(none)"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          echo "=== installing platforms;android-36 + build-tools;35.0.0 ==="
+          "$SDKM" "platforms;android-36" "build-tools;35.0.0" || echo "::warning::platform/build-tools install reported a problem"
+          echo "=== installing ndk;26.1.10909125 (best effort; only needed for native compile) ==="
+          "$SDKM" "ndk;26.1.10909125" || echo "::warning::NDK 26.1.10909125 install reported a problem (configuration may still succeed)"
+          echo "--- platforms AFTER ---";  ls -1 "$ANDROID_HOME/platforms" 2>/dev/null || echo "(none)"
+          echo "--- ndk AFTER ---";        ls -1 "$ANDROID_HOME/ndk" 2>/dev/null || echo "(none)"
+
+      - name: Toolchain versions (verbatim)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --version --no-daemon
+          echo "=== effective SDK inputs in generated gradle.properties ==="
+          grep -E '^android\.(compileSdkVersion|targetSdkVersion|buildToolsVersion|kotlinVersion)' gradle.properties
+          echo "=== suppression flags present? (expect ONLY the kotlin one) ==="
+          grep -iE 'suppress' gradle.properties || echo "(none)"
+
+      # ⚠⚠ THE PROOF ITSELF. `:app:tasks` forces AGP to configure the Android
+      # application module against compileSdk 36. It performs NO compilation.
+      - name: GRADLE CONFIGURATION PROOF — :app:tasks (no compile)
+        id: configure
+        working-directory: android
+        run: |
+          set -o pipefail
+          ./gradlew :app:tasks --no-daemon --stacktrace 2>&1 | tee /tmp/configure.log
+          echo "GRADLE EXIT: $?"
+
+      - name: Diagnostic extraction (runs even on failure)
+        if: always()
+        working-directory: android
+        run: |
+          L=/tmp/configure.log
+          echo "================ COMPILE-SDK / API36 DIAGNOSTICS ================"
+          grep -inE 'compileSdk|compile sdk|not tested|we recommend|api 36|android-36|suppressUnsupportedCompileSdk' "$L" || echo "(none found)"
+          echo "================ AGP / GRADLE / KOTLIN COMPATIBILITY ================"
+          grep -inE 'Android Gradle Plugin|AGP|Gradle version|Kotlin version|incompatible|requires Gradle|requires JDK|deprecat' "$L" || echo "(none found)"
+          echo "================ NDK ================"
+          grep -inE 'NDK|ndkVersion|not configured' "$L" || echo "(none found)"
+          echo "================ WARNINGS ================"
+          grep -inE '^w:|warning' "$L" | head -60 || echo "(none found)"
+          echo "================ FAILURES ================"
+          grep -inE 'FAILURE|What went wrong|Caused by|error:' "$L" | head -60 || echo "(none found)"
+          echo "================ TAIL ================"
+          tail -40 "$L"
+
+      - name: STOP MARKER
+        if: always()
+        run: |
+          echo "CONFIGURATION PROOF COMPLETE."
+          echo "Deliberately NOT performed: assembleRelease, bundleRelease, signing, artifact upload, Play upload."

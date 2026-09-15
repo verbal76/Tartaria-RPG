@@ -56,16 +56,20 @@ name: CI
 #                            own validation and its own publish.
 
 on:
-  push:
-    # ⚠ `!promotions` — the ONE excluded branch. `promotions` is the HAL
-    # promotion control plane (see promote.yml): a ledger of exact-SHA
-    # requests, not game source. Running the full test surface there would
-    # validate a README, not a game. The SHA it promotes is validated by
-    # Change A's receipt inside the publisher, read from that SHA's own
-    # checkout. ciPromotionIsNotAMutation holds this list to exactly these
-    # two entries so the exclusion can never widen into a CI bypass.
-    branches: ['**', '!promotions']
-  pull_request:
+  # ⚠⚠⚠ TEMPORARY, AND ONLY ON THE THROWAWAY BRANCH `api36-config-proof`.
+  #
+  # The push and pull_request triggers are removed HERE ONLY. On golem-line
+  # this block is untouched and still reads `branches: ['**', '!promotions']`.
+  # THIS BRANCH MUST NEVER BE MERGED — merging it would disable CI repo-wide,
+  # which is the single most damaging edit anyone could make to this file.
+  #
+  # WHY: ci.yml matches '**', so pushing the API36 configuration-proof branch
+  # would drag the whole JS surface — eight required jobs AND the heavy-sims
+  # lane — into a run that exists solely to ask whether AGP 8.6.0 can
+  # configure against compileSdk 36. The owner's brief for this experiment
+  # says NO Heavy CI, and the JS surface is irrelevant to a Gradle
+  # configuration question: not one line of TypeScript changed on this branch.
+  # The only source delta is two integers in app.json.
   workflow_dispatch:
 
 concurrency:
