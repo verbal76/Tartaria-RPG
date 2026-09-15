@@ -139,7 +139,30 @@ describe('OTA-1017 — losing initiative means they swing first', () => {
   it('a volley that kills you means your swing never lands', async () => {
     const store = await boot();
     armFight(1); // one hit ends it
-    store.getState().concludeRolls(steps(false), 'attack');
+    // ⚠⚠⚠ THE VOLLEY HAS TO ACTUALLY KILL, AND A SEEDED STREAM DOES NOT PROMISE
+    // THAT. The foe's swing is a real d20 against the player's AC 10 — about a
+    // 70% hit — drawn from jest.setup.js's seeded PRNG. WHICH number it lands on
+    // depends on how many draws everything before it consumed, so this test was
+    // reading a coin flip that had always come up heads. Under Expo 54 the boot
+    // path consumes a different count, the same seed reached a 1, the foe
+    // FUMBLED, the player lived on 1 hp — and the swing landed, correctly.
+    //
+    // ⚠⚠ THE ORDER WAS NEVER WRONG, and that was measured before this line was
+    // written: forcing the foe to hit puts the player on 0 hp with no player
+    // roll printed at all; letting it miss leaves the player up and swinging.
+    // Both are right. So the roll is pinned — the local Math.random override
+    // jest.setup.js documents for exactly this — and the kill the test's name
+    // depends on is now ASSERTED below instead of assumed.
+    const realRandom = Math.random;
+    Math.random = () => 0.9; // d20 -> 19: a hit, deliberately not a crit
+    try {
+      store.getState().concludeRolls(steps(false), 'attack');
+    } finally {
+      Math.random = realRandom;
+    }
+    // ⚠ THE PREMISE, NOW LOAD-BEARING: the volley really did drop you. Without
+    // this the test could only ever fail confusingly when the foe missed.
+    expect(store.getState().player!.hp).toBeLessThanOrEqual(0);
     const texts = store.getState().gameLog.map((e) => e.text);
     // They got there first: no player attack roll was ever printed.
     expect(texts.some((t) => /^You — d20/.test(t))).toBe(false);
