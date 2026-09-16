@@ -386,10 +386,44 @@ Then configure the four fields:
 
 | field | value | notes |
 |---|---|---|
-| **Use workflow from** (Ref) | `golem-line` | the trunk |
+| **Use workflow from** (Ref) | `golem-line` *(or a fix branch — see below)* | ⚠ **defaults to `golem-line` and silently stays there** |
 | **Profile** | `production` | `preview` cannot reach TestFlight — see §2's profile/channel table |
 | **Submit** | `true` | adds `--auto-submit` |
 | **Line** | `hal` | ⚠ **must be set explicitly** — the input defaults to `golem` |
+
+### ⚠⚠⚠ THE REF FIELD IS THE ONE THAT GETS MISSED — 2026-09-16
+
+**This cost three EAS builds and roughly seventy-five minutes in one session.**
+The 2.5.0 baseline needed a one-line native fix that lived on a branch. Three
+separate dispatches were made believing the branch was selected; all three built
+`golem-line`, which did not carry the fix, and all three died ~25 minutes later
+with the identical Xcode error. Only the fourth dispatch actually selected the
+branch, and it archived first time.
+
+Why it is easy to miss: **"Use workflow from" is a separate control from the
+workflow inputs**, it defaults to the repository's usual branch, and the failure
+is invisible for 25 minutes because the GitHub run goes green either way (see
+the checkmark warning below).
+
+**Two habits make it cheap instead of expensive:**
+
+1. **Verify within ~90 seconds, not 25 minutes.** The moment the run appears,
+   read its head branch and SHA. An agent can do this immediately:
+   ```
+   mcp__github__actions_list → list_workflow_runs → build-ios.yml
+   # check: head_branch and head_sha are the intended source
+   ```
+   Wrong branch → cancel and re-dispatch, cost seconds. This check is mandatory
+   for an agent watching a dispatch; do not wait for the EAS outcome to discover
+   the source was wrong.
+2. **If the ref cannot be made to stick, merge the fix to the trunk instead** and
+   dispatch with the default. See §8.1.1 for when that trade is right.
+
+⚠ **AN AGENT CANNOT DISPATCH THIS ITSELF.** `actions_run_trigger` returns
+`403 Resource not accessible by integration` — the session token carries
+`actions: read` but not `actions: write`. This is the same limitation that makes
+the OTA publisher run as `github-actions[bot]`. Do not retry it; report it and
+hand the owner the exact field values.
 
 ### ⚠⚠ BEFORE PRESSING RUN WORKFLOW — confirm the source
 
@@ -446,6 +480,99 @@ invites a duplicate submission for a build Apple already has.
 its expected automatic submission — i.e. the EAS build completed but no
 submission exists. That is a repair path, not a step.
 
+## 8.1.1 WHEN THE ARCHIVE FAILS — THE NATIVE-FIX LOOP
+
+A native compile failure cannot be reproduced in an agent session (Linux, no
+Xcode, no CocoaPods) and costs ~25 minutes per attempt on the EAS worker. The
+loop that worked, twice now (OTA-1824's Swift repair, and the C++20 repair
+below), is:
+
+1. **Read the Xcode log, not the EAS summary.** The EAS error banner lists
+   *symptoms*, often fourteen of them. The log names one failing `CompileC` unit.
+   That unit is the defect; everything else is cascade.
+2. **Prove the cause differentially.** Ask why *only that* target failed when its
+   neighbours compiled. In both cases the answer was a per-target build setting,
+   and the pods that behaved differently were the evidence.
+3. **Put the repair on a branch off the trunk tip**, not on the trunk.
+4. **Dispatch with Ref = that branch** (this is the step that keeps getting
+   missed — see the warning above).
+5. **Merge to the trunk only after the archive succeeds.** An unproven native fix
+   on `golem-line` helps nobody and can publish an OTA on the way in.
+
+### ⚠ WHY A NATIVE FIX GOES ON A BRANCH FIRST — THE OTA IT WOULD OTHERWISE PUBLISH
+
+`patches/*` is **deliberately not** in `ci.yml`'s publish-ignore list
+(`ci.yml:439`), because a patch file can carry a bundled hunk — the llama.rn
+patch also patches `src/index.ts`, which *is* in the bundle. So a push of a
+patch-only change to `golem-line` **does dispatch the publisher**, and with no
+line marker in the merge title it republishes to **golem** under whatever stamp
+the tree already carries. That is the OTA-1482 shape: the device receives an
+update that changes nothing it can see.
+
+That is a *cosmetic* cost on the dev phone, not a correctness one — but it is a
+real reason to keep an unproven native fix off the trunk. Once the archive is
+proven, take the cost knowingly and merge.
+
+⚠ **Audit the merge message for bracketed markers before pushing.** A commit
+body that merely *quotes* a marker in prose is inert for the publisher (which
+reads `head -1` only — OTA-1419), but `build-apk.yml` and `build-ios.yml` read
+the **whole** `head_commit.message` in their job-level `if`, so a stray marker in
+a body can start a 30–60 minute native build nobody asked for. Check it:
+
+```
+git log -1 --format=%B | grep -oE "\[(build-aab|build-apk|build-ios|submit-ios|golem-apk|line-hal|ota-hal)\]"
+```
+
+Empty output, or rewrite the message.
+
+### ⚠⚠ PREFLIGHT MUST READ PER-POD COMPILER FLAGS
+
+A pre-dispatch preflight that checks dependency coherence, iOS autolinking,
+deployment targets and resolved Expo config **is not sufficient** and was not
+sufficient on 2026-09-16: it returned PASS on a tree that could not archive.
+
+The defect was a build *setting*, not a dependency: `llama.rn`'s podspec pinned
+`OTHER_CPLUSPLUSFLAGS` to `-std=c++17`, which lands last on the clang command
+line and overrides `CLANG_CXX_LANGUAGE_STANDARD`. Add this to any native
+preflight:
+
+```
+grep -rn "std=c++\|CLANG_CXX_LANGUAGE_STANDARD" node_modules/*/[a-z-]*.podspec modules/*/ios/*.podspec
+```
+
+Any pod pinning a standard **below** what React Native requires
+(`react-native/scripts/cocoapods/helpers.rb` → `min_ios_version_supported` and
+`cxx_language_standard`) is a build failure waiting for the next RN upgrade.
+
+### THE PROVEN EXAMPLE — BUILD 208, THE API 36 iOS BASELINE (2026-09-16)
+
+The first iOS binary produced on the migrated native stack — Expo 54 /
+RN 0.81.5 / React 19.1.0 / new architecture — with `llama.rn` 0.4.8,
+`onnxruntime-react-native` 1.24.3 and `react-native-executorch` 0.8.5 all
+compiling together.
+
+| stage | evidence |
+|---|---|
+| trunk at dispatch | `c94f9c5b` — **could not archive**, see below |
+| the defect | `ReactCommon/react/bridging/Base.h:65` `requires is_jsi_v<JSArgT>` → `unknown type name 'requires'`; a C++20 requires-clause compiled as C++17 |
+| failing unit | exactly one: `CompileC …/llama-rn.build/…/RNLlama.o` (the 2nd failure is the archive cascade) |
+| differential proof | `react-native-executorch` sets `CLANG_CXX_LANGUAGE_STANDARD = c++20` (podspec:49) → clean · `onnxruntime-react-native`, `react-native-safe-area-context` set no override, inherit RN's c++20 → clean · **`llama-rn` was the only pod forcing c++17, and the only failure** |
+| why it never bit before | at RN 0.76.3 that header used SFINAE, not concepts; and llama.rn only pulls it when `RCT_NEW_ARCH_ENABLED=1`. Needs new arch **+** RN 0.81 **+** llama.rn 0.4.8 together |
+| repair | one flag in `patches/llama.rn+0.4.8.patch`: `-std=c++17` → `-std=c++20`, commit `3d43bb82`, PR #27 |
+| wasted attempts | build-ios runs **204** and **206** both built `golem-line` (no fix) and failed identically ~25 min in — the Ref trap above |
+| owner dispatch | build-ios run **207** (id 35097047822) — Ref `claude/ios-cxx20-llama-rn` @ `3d43bb82` |
+| build number stamped | run 207 → **Build 208** |
+| EAS build | id `94cd6c60-5322-48a3-8191-29e7ee41538b`, `App Version: 2.5.0`, `Build number: 208` |
+| native compile + archive | **SUCCESS** — cleared the exact gate every prior attempt failed |
+| automatic submission | `✔ Scheduled iOS submission`, id `942f0c09-1d53-4980-bd05-f0604a25063f` |
+| TestFlight | **LIVE — Apple Build 208 / 2.5.0, green** |
+| trunk merge, after proof | `c7ba369a` — CI run **2200** green; publisher run **1399** `Environment: golem`, `deploy recorded for environment 'golem'` — HAL untouched, as intended |
+
+⚠ Identity note: this is the first iOS build to resolve `name` to the **listing**
+name "Tartaria Realms" rather than the line's "Tartaria Realms HAL" (the
+store-name ruling of 2026-09-16). Bundle id is the bare
+`com.hotatticgames.tartarprim`, as it has always been for production.
+
 ### THE PROVEN EXAMPLE — OTA-1824
 
 Recorded so the chain never has to be re-derived:
@@ -480,7 +607,11 @@ later. Do not "fix" it.
 
 Step 7 stamps `app.expo.ios.buildNumber = github.run_number`, and EAS
 `autoIncrement` then adds one. Observed: run 188 → Build 189 · run 196 → Build
-197 · run 198 → Build 199.
+197 · run 198 → Build 199 · run 204 → Build 205 · run 207 → Build 208.
+
+⚠ Note what the 204/206/207 sequence shows: **every dispatch consumes a number,
+including the ones that fail**, and so does a push that merely skips. Three
+failed attempts at one binary moved the number by three.
 
 **That history is not a licence to predict.** A skipped run still consumes a
 run_number, the stamping step could change, and EAS owns the increment. **Always
