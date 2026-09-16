@@ -1,0 +1,498 @@
+=== TARTARIA LOG · 44185 CHARS · BEGIN ===
+[2026-06-16T12:25:47.995Z] [debug] APK session start: 2026-06-12-622.
+[2026-06-16T12:25:48.029Z] [world] You walk under the colors of the Servants of the Giants, Unknowing Masses blood in your veins. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.
+[2026-06-16T12:25:48.030Z] [world] Tomb Vigil rises out of the silt at the edge of the Giant-Watch Shrine. You arrive at The Vigil Door. A stone arch wreathed in chains and lit by a single Giant-burnished lantern. The keeper inclines their head as you pass; speech is for the inner halls.
+[2026-06-16T12:25:48.030Z] [world] The outpost's lanterns sway in a draft that should not reach this far inside. An iron fog presses on the world — -1 DEX. What you do here is yours to choose.
+[2026-06-16T12:25:48.031Z] [world] You've stood here before. (visit 2)
+[2026-06-16T12:25:48.032Z] [world] Paths: north to Court · east to Forge · west to Refectory. (Type 'leave outpost' to head into the wilds.)
+[2026-06-16T12:25:48.032Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mqgm8afp_k2ka3w left intact
+[2026-06-16T12:25:48.033Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mqgm8afp_k2ka3w left intact
+[2026-06-16T12:25:48.175Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-06-16T12:25:55.854Z] [player] Verbal
+[2026-06-16T12:25:55.856Z] [arbiter] "Well met, Verbal. To business."
+[2026-06-16T12:25:55.859Z] [arbiter] "A cudgel, by your boots. Tap TAKE. You'll want a weapon."
+[2026-06-16T12:25:58.920Z] [player] take cudgel
+[2026-06-16T12:25:58.923Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.
+[2026-06-16T12:25:58.924Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-06-16T12:25:58.926Z] [arbiter] "Good. Keep it close."
+[2026-06-16T12:25:58.928Z] [arbiter] "Now the rope, on the shelf. This time, type it. I've written the command. Tap ACT."
+[2026-06-16T12:26:00.037Z] [player] take rope
+[2026-06-16T12:26:00.041Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-06-16T12:26:00.044Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-06-16T12:26:00.046Z] [arbiter] "Good. That rope earns its keep."
+[2026-06-16T12:26:00.049Z] [arbiter] "That broken plate is worth more in pieces. Tap SALVAGE."
+[2026-06-16T12:26:02.252Z] [player] salvage broken chest plate
+[2026-06-16T12:26:02.254Z] [world] You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.
+[2026-06-16T12:26:02.255Z] [reward] ✦ Plate Fragment x2 (Common). [scrapped]
+[2026-06-16T12:26:02.256Z] [arbiter] "There. Ruins always pay out."
+[2026-06-16T12:26:02.258Z] [arbiter] "Now the rope earns its keep. Tap CLIMB. You go up in stages, each pull burns stamina, and empty means a fall. Top out, then climb back down."
+[2026-06-16T12:26:04.924Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-06-16T12:26:05.050Z] [player] climb cracked dormant architectural sentinel
+[2026-06-16T12:26:05.051Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked dormant architectural sentinel resolved=cracked dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-16T12:26:05.058Z] [world] You loop your Reclaimer's Rope around the cracked dormant architectural sentinel and walk the line. Tier 1/4 cleared.
+[2026-06-16T12:26:05.058Z] [world] You reach the first hold of the cracked dormant architectural sentinel (tier 1/4). Higher still to go.
+[2026-06-16T12:26:05.059Z] [system] ⏳ Time passed: 30 min
+[2026-06-16T12:26:06.527Z] [player] climb cracked dormant architectural sentinel
+[2026-06-16T12:26:06.527Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked dormant architectural sentinel resolved=cracked dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-16T12:26:06.532Z] [world] You loop your Reclaimer's Rope around the cracked dormant architectural sentinel and walk the line. Tier 2/4 cleared.
+[2026-06-16T12:26:06.533Z] [world] You reach the next hold of the cracked dormant architectural sentinel (tier 2/4). Higher still to go.
+[2026-06-16T12:26:06.533Z] [system] ⏳ Time passed: 30 min
+[2026-06-16T12:26:07.197Z] [player] climb cracked dormant architectural sentinel
+[2026-06-16T12:26:07.198Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked dormant architectural sentinel resolved=cracked dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-16T12:26:07.203Z] [world] You loop your Reclaimer's Rope around the cracked dormant architectural sentinel and walk the line. Tier 3/4 cleared.
+[2026-06-16T12:26:07.203Z] [world] You reach the last stretch of the cracked dormant architectural sentinel (tier 3/4). Higher still to go.
+[2026-06-16T12:26:07.204Z] [system] ⏳ Time passed: 30 min
+[2026-06-16T12:26:07.869Z] [player] climb cracked dormant architectural sentinel
+[2026-06-16T12:26:07.870Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked dormant architectural sentinel resolved=cracked dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-16T12:26:07.875Z] [world] You loop your Reclaimer's Rope around the cracked dormant architectural sentinel and walk the line. Tier 4/4 cleared.
+[2026-06-16T12:26:07.876Z] [world] You reach the top of the cracked dormant architectural sentinel (tier 4/4). The view changes; the room reads differently from here.
+[2026-06-16T12:26:07.876Z] [system] ⏳ Time passed: 30 min
+[2026-06-16T12:26:08.712Z] [player] climb down
+[2026-06-16T12:26:08.714Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-16T12:26:08.715Z] [world] You make your way back down the cracked dormant architectural sentinel. Boots back on the ground.
+[2026-06-16T12:26:08.717Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-06-16T12:26:08.719Z] [system] ⏳ Time passed: 15 min
+[2026-06-16T12:26:10.951Z] [player] investigate door
+[2026-06-16T12:26:10.955Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-06-16T12:26:10.958Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call."
+[2026-06-16T12:26:13.082Z] [arbiter] "Take your time, then. Pick this place clean if you like. When you're ready to begin, tap EXIT or type 'leave outpost', and I'll set you on the road."
+[2026-06-29T22:26:42.822Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-29T22:26:42.822Z] [debug] voice: bundled loading
+[2026-06-29T22:26:53.935Z] [debug] voice: bundled ready
+[2026-06-29T22:31:32.700Z] [debug] OTA applied: 2026-06-12-622 → 2026-06-29-646-coating-land-rule.
+[2026-06-29T22:31:32.700Z] [debug] OTA session start: 2026-06-29-646-coating-land-rule.
+[2026-06-29T22:31:32.701Z] [world] You step back into Giant-Watch Shrine. The world waits for your move.
+[2026-06-29T22:31:32.701Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.
+[2026-06-29T22:31:32.702Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Verbal. The road kept your place."
+[2026-06-29T22:31:32.915Z] [reward] ✦ A Resurrection Gem is set aside for Verbal — the buried world keeps its own. (2 held)
+[2026-06-29T22:31:32.959Z] [reward] ✦ A crash-test kit lands in Verbal's pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.
+[2026-06-29T22:31:37.970Z] [world] You take the Reclaimer's Gloves from where it lay.
+[2026-06-29T22:31:37.971Z] [reward] ✦ Reclaimer's Gloves (Common).
+[2026-06-29T22:31:40.488Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-06-29T22:31:40.521Z] [player] salvage table
+[2026-06-29T22:31:40.524Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=table resolved=table range=- enemies=0 hooks=0
+[2026-06-29T22:31:40.525Z] [world] Slim pickings on the table. You pocket a Bent Nail on the way out.
+[2026-06-29T22:31:40.528Z] [reward] ✦ Bent Nail (Common).
+[2026-06-29T22:31:40.529Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-06-29T22:31:40.530Z] [arbiter] The Arbiter sips at nothing. "A real find changes the shape of the room. The rest is dust."
+[2026-06-29T22:31:40.539Z] [system] ⏳ Time passed: 15 min
+[2026-06-29T22:31:40.639Z] [cognitive] neutral  (103ms)
+[2026-06-29T22:31:42.566Z] [reward] ✦ Beginner's Luck — +3 WIS for 3 rounds.
+[2026-06-29T22:31:47.121Z] [player] investigate the floor
+[2026-06-29T22:31:47.122Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:31:47.129Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-06-29T22:31:47.129Z] [reward] ✦ Small Rock.
+[2026-06-29T22:31:47.311Z] [cognitive] neutral  (174ms)
+[2026-06-29T22:31:49.175Z] [player] investigate brick
+[2026-06-29T22:31:49.176Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=brick resolved=brick range=- enemies=0 hooks=0
+[2026-06-29T22:31:49.177Z] [world] Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere.
+[2026-06-29T22:31:49.263Z] [cognitive] neutral  (78ms)
+[2026-06-29T22:31:51.264Z] [system] Beginner's Luck fades.
+[2026-06-29T22:31:51.289Z] [player] investigate sign
+[2026-06-29T22:31:51.291Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sign resolved=sign range=- enemies=0 hooks=0
+[2026-06-29T22:31:51.293Z] [world] The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.
+[2026-06-29T22:31:51.479Z] [cognitive] neutral  (176ms)
+[2026-06-29T22:31:55.800Z] [player] go north
+[2026-06-29T22:31:55.801Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:31:55.802Z] [world] You head on to the Court.
+[2026-06-29T22:31:55.816Z] [world] Tomb Vigil — The Tomb-Lit Court. A round chamber lit only by tomb-lanterns, each named after a sleeping Giant. The map-stone in the middle marks where the Giants lie.
+[2026-06-29T22:31:55.816Z] [world] You've stood here before. (visit 2)
+[2026-06-29T22:31:55.817Z] [world] Paths: north to Workshop · south to Vigil · east to Forge · west to Refectory. (Type 'leave outpost' to head into the wilds.)
+[2026-06-29T22:31:55.817Z] [system] Weather effect — Whisper Fog: -1 WIS
+[2026-06-29T22:31:55.850Z] [world] [Giant-Watch Shrine] north: open ground · east: Cradle of Dusk (5 days' travel) · south: Zharak's Teeth (6 days' travel) · west: Builders' Survey Camp (6 days' travel)
+[2026-06-29T22:31:55.854Z] [debug] arbiter: template (reason=cooldown)
+[2026-06-29T22:31:55.854Z] [arbiter] "The north," the Arbiter says. "Tell me what you mean to do with it."
+[2026-06-29T22:31:55.930Z] [cognitive] TRAVEL  (73ms)
+[2026-06-29T22:31:58.167Z] [world] You take the Force Wave from where it lay.
+[2026-06-29T22:31:58.168Z] [reward] ✦ Force Wave (Common).
+[2026-06-29T22:31:58.181Z] [world] You take the Rusty Shortbow from where it lay.
+[2026-06-29T22:31:58.182Z] [reward] ✦ Rusty Shortbow (Common).
+[2026-06-29T22:31:58.186Z] [world] You take the Golem-Bound Armor from where it lay.
+[2026-06-29T22:31:58.186Z] [reward] ✦ Golem-Bound Armor (Common).
+[2026-06-29T22:31:58.356Z] [debug] persist sizes(KB): total=25 player=6 wm=2[rooms=1 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=15 scene=2
+[2026-06-29T22:32:00.692Z] [player] salvage bench
+[2026-06-29T22:32:00.694Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=bench resolved=bench range=- enemies=0 hooks=0
+[2026-06-29T22:32:00.697Z] [world] You salvage the bench. The take is small but real.
+[2026-06-29T22:32:00.702Z] [reward] ✦ Stick (Common).
+[2026-06-29T22:32:00.704Z] [system] ⏳ Time passed: 15 min
+[2026-06-29T22:32:00.792Z] [cognitive] neutral  (86ms)
+[2026-06-29T22:32:03.483Z] [player] climb half-buried dormant architectural sentinel
+[2026-06-29T22:32:03.484Z] [debug] parser: intent=climb conf=1.00 verb=climb target=half buried dormant architectural sentinel resolved=half-buried dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:03.531Z] [world] You loop your Reclaimer's Rope around the half-buried dormant architectural sentinel and walk the line. Tier 1/4 cleared.
+[2026-06-29T22:32:03.534Z] [world] You reach the first hold of the half-buried dormant architectural sentinel (tier 1/4). Higher still to go.
+[2026-06-29T22:32:03.537Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:03.636Z] [cognitive] CAUTIOUSNESS · RESOLVE · FEAR · HIDE · SEARCH · REST · RETREAT · TRAVEL  (97ms)
+[2026-06-29T22:32:04.804Z] [player] climb half-buried dormant architectural sentinel
+[2026-06-29T22:32:04.805Z] [debug] parser: intent=climb conf=1.00 verb=climb target=half buried dormant architectural sentinel resolved=half-buried dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:04.818Z] [world] You loop your Reclaimer's Rope around the half-buried dormant architectural sentinel and walk the line. Tier 2/4 cleared.
+[2026-06-29T22:32:04.818Z] [world] You reach the next hold of the half-buried dormant architectural sentinel (tier 2/4). Higher still to go.
+[2026-06-29T22:32:04.819Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:04.886Z] [cognitive] CAUTIOUSNESS · RESOLVE · FEAR · HIDE · SEARCH · REST · RETREAT · TRAVEL  (65ms)
+[2026-06-29T22:32:05.601Z] [player] climb half-buried dormant architectural sentinel
+[2026-06-29T22:32:05.602Z] [debug] parser: intent=climb conf=1.00 verb=climb target=half buried dormant architectural sentinel resolved=half-buried dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:05.614Z] [world] You loop your Reclaimer's Rope around the half-buried dormant architectural sentinel and walk the line. Tier 3/4 cleared.
+[2026-06-29T22:32:05.615Z] [world] You reach the last stretch of the half-buried dormant architectural sentinel (tier 3/4). Higher still to go.
+[2026-06-29T22:32:05.616Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:05.683Z] [cognitive] CAUTIOUSNESS · RESOLVE · FEAR · HIDE · SEARCH · REST · RETREAT · TRAVEL  (65ms)
+[2026-06-29T22:32:06.237Z] [player] climb half-buried dormant architectural sentinel
+[2026-06-29T22:32:06.237Z] [debug] parser: intent=climb conf=1.00 verb=climb target=half buried dormant architectural sentinel resolved=half-buried dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:06.253Z] [world] You loop your Reclaimer's Rope around the half-buried dormant architectural sentinel and walk the line. Tier 4/4 cleared.
+[2026-06-29T22:32:06.254Z] [world] You reach the top of the half-buried dormant architectural sentinel (tier 4/4). The view changes; the room reads differently from here.
+[2026-06-29T22:32:06.256Z] [reward] ✦ First Aid Kit (Uncommon) — tucked into a crack at the top of the half-buried dormant architectural sentinel.
+[2026-06-29T22:32:06.262Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:06.444Z] [cognitive] CAUTIOUSNESS · RESOLVE · FEAR · HIDE · SEARCH · REST · RETREAT · TRAVEL  (174ms)
+[2026-06-29T22:32:07.280Z] [player] climb down
+[2026-06-29T22:32:07.282Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:07.283Z] [world] You make your way back down the half-buried dormant architectural sentinel. Boots back on the ground.
+[2026-06-29T22:32:07.285Z] [system] ⏳ Time passed: 15 min
+[2026-06-29T22:32:07.358Z] [cognitive] CLIMB  (72ms)
+[2026-06-29T22:32:08.438Z] [player] rest
+[2026-06-29T22:32:08.440Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:08.446Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 1, afternoon)
+[2026-06-29T22:32:08.458Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-06-29T22:32:08.459Z] [arbiter] "Rest. The ruins are patient with the still." the Arbiter says.
+[2026-06-29T22:32:08.461Z] [system] ⏳ Time passed: 8h
+[2026-06-29T22:32:08.538Z] [cognitive] REST  (76ms)
+[2026-06-29T22:32:10.748Z] [player] investigate the floor
+[2026-06-29T22:32:10.750Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:10.761Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.
+[2026-06-29T22:32:10.973Z] [cognitive] neutral  (204ms)
+[2026-06-29T22:32:11.180Z] [debug] persist sizes(KB): total=34 player=7 wm=2[rooms=1 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=24 scene=2
+[2026-06-29T22:32:13.432Z] [player] investigate map-stone
+[2026-06-29T22:32:13.434Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=map stone resolved=map-stone range=- enemies=0 hooks=0
+[2026-06-29T22:32:13.437Z] [world] The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.
+[2026-06-29T22:32:13.530Z] [cognitive] CURIOSITY · SEARCH · TALK  (89ms)
+[2026-06-29T22:32:15.442Z] [player] go north
+[2026-06-29T22:32:15.443Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:15.443Z] [world] You head on to the Workshop.
+[2026-06-29T22:32:15.453Z] [world] Tomb Vigil — The Vigil Workshop. Tarek keeps the Giant-tomb torches lit and the Aether-pumps inside them serviced. Most of what he repairs has been working for a thousand years already.
+[2026-06-29T22:32:15.454Z] [world] You've stood here before. (visit 2)
+[2026-06-29T22:32:15.456Z] [world] Paths: north to Reliquary · south to Court · east to Forge · west to Records. (Type 'leave outpost' to head into the wilds.)
+[2026-06-29T22:32:15.457Z] [system] Weather effect — Glass Hail: -1 DEX
+[2026-06-29T22:32:15.474Z] [world] [Giant-Watch Shrine] north: open ground · east: Cradle of Dusk (5 days' travel) · south: Zharak's Teeth (6 days' travel) · west: Builders' Survey Camp (6 days' travel)
+[2026-06-29T22:32:15.475Z] [world] Tarek the Tinkerer is still at their post — pack open, wares laid out. They nod without looking up.
+[2026-06-29T22:32:15.476Z] [world] Tarek the Tinkerer offers a contract: "Scrap Run." (Say 'accept scrap' or open Contracts for details.)
+[2026-06-29T22:32:15.477Z] [world] Tarek the Tinkerer points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-06-29T22:32:15.478Z] [world] Tarek the Tinkerer nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-06-29T22:32:15.496Z] [debug] arbiter: template (reason=busy)
+[2026-06-29T22:32:15.496Z] [arbiter] The Arbiter watches you and the north both. "Your move."
+[2026-06-29T22:32:15.690Z] [cognitive] TRAVEL  (185ms)
+[2026-06-29T22:32:18.110Z] [world] You take the Repeater Crossbow from where it lay.
+[2026-06-29T22:32:18.110Z] [reward] ✦ Repeater Crossbow (Common).
+[2026-06-29T22:32:18.121Z] [world] You take the Traveler's Cloak from where it lay.
+[2026-06-29T22:32:18.122Z] [reward] ✦ Traveler's Cloak (Common).
+[2026-06-29T22:32:20.443Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-06-29T22:32:20.707Z] [player] climb broken dormant architectural sentinel
+[2026-06-29T22:32:20.709Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken dormant architectural sentinel resolved=broken dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:20.744Z] [world] You loop your Reclaimer's Rope around the broken dormant architectural sentinel and walk the line. Tier 1/4 cleared.
+[2026-06-29T22:32:20.745Z] [world] You reach the first hold of the broken dormant architectural sentinel (tier 1/4). Higher still to go.
+[2026-06-29T22:32:20.746Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:21.132Z] [cognitive] CAUTIOUSNESS · FEAR · HIDE · RETREAT · REST · SEARCH  (378ms)
+[2026-06-29T22:32:22.753Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-06-29T22:32:22.836Z] [player] climb broken dormant architectural sentinel
+[2026-06-29T22:32:22.837Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken dormant architectural sentinel resolved=broken dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:22.855Z] [world] You loop your Reclaimer's Rope around the broken dormant architectural sentinel and walk the line. Tier 2/4 cleared.
+[2026-06-29T22:32:22.855Z] [world] You reach the next hold of the broken dormant architectural sentinel (tier 2/4). Higher still to go.
+[2026-06-29T22:32:22.856Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:22.934Z] [cognitive] CAUTIOUSNESS · FEAR · HIDE · RETREAT · REST · SEARCH  (76ms)
+[2026-06-29T22:32:23.726Z] [player] climb broken dormant architectural sentinel
+[2026-06-29T22:32:23.726Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken dormant architectural sentinel resolved=broken dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:23.740Z] [world] You loop your Reclaimer's Rope around the broken dormant architectural sentinel and walk the line. Tier 3/4 cleared.
+[2026-06-29T22:32:23.741Z] [world] You reach the last stretch of the broken dormant architectural sentinel (tier 3/4). Higher still to go.
+[2026-06-29T22:32:23.742Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-06-29T22:32:23.742Z] [arbiter] "The Aetherstone watches calm minds with less interest. Use that." the Arbiter says.
+[2026-06-29T22:32:23.743Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:23.819Z] [cognitive] CAUTIOUSNESS · FEAR · HIDE · RETREAT · REST · SEARCH  (74ms)
+[2026-06-29T22:32:24.445Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-06-29T22:32:24.531Z] [player] climb broken dormant architectural sentinel
+[2026-06-29T22:32:24.532Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken dormant architectural sentinel resolved=broken dormant architectural sentinel range=- enemies=0 hooks=0
+[2026-06-29T22:32:24.545Z] [world] You loop your Reclaimer's Rope around the broken dormant architectural sentinel and walk the line. Tier 4/4 cleared.
+[2026-06-29T22:32:24.546Z] [world] You reach the top of the broken dormant architectural sentinel (tier 4/4). The view changes; the room reads differently from here.
+[2026-06-29T22:32:24.546Z] [system] ⏳ Time passed: 30 min
+[2026-06-29T22:32:24.615Z] [cognitive] CAUTIOUSNESS · FEAR · HIDE · RETREAT · REST · SEARCH  (66ms)
+[2026-06-29T22:32:24.950Z] [arbiter] You look around the abandoned vigil-shrine with a cold smile, the ground tugging at every buckle and bracket.
+[2026-06-29T22:32:24.951Z] [debug] arbiter: ambient ✓ 35769ms
+[2026-06-29T22:32:25.507Z] [player] climb down
+[2026-06-29T22:32:25.509Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:25.511Z] [world] You make your way back down the broken dormant architectural sentinel. Boots back on the ground.
+[2026-06-29T22:32:25.512Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-06-29T22:32:25.512Z] [arbiter] "The desert walks with you," the Arbiter says, and goes back to his cup.
+[2026-06-29T22:32:25.513Z] [system] ⏳ Time passed: 15 min
+[2026-06-29T22:32:25.712Z] [cognitive] CLIMB  (190ms)
+[2026-06-29T22:32:28.106Z] [player] investigate the floor
+[2026-06-29T22:32:28.108Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:32:28.113Z] [world] Something shifted while you were turned away — a Mudling breaks cover, fast and low. (range: close)
+[2026-06-29T22:32:28.114Z] [combat] Mudling — Mud Whip ready, 1D6 damage on a hit.
+[2026-06-29T22:32:28.115Z] [debug] enemy: Mudling hp=18 ac=? atk=Mud Whip dmg=1D6 rarity=Common danger=?
+[2026-06-29T22:32:28.308Z] [cognitive] neutral  (189ms)
+[2026-06-29T22:32:28.462Z] [debug] persist sizes(KB): total=48 player=7 wm=3[rooms=2 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=35 scene=3
+[2026-06-29T22:32:41.234Z] [debug] stats: STR6 DEX7 INT4 WIS6 CHA4 STE3 | gear: STR+1 | worn: main=Repeater Crossbow
+[2026-06-29T22:32:46.572Z] [world] You set the Repeater Crossbow aside to free your off hand for the Force Wave.
+[2026-06-29T22:32:46.610Z] [debug] stats: STR5 DEX7 INT5 WIS6 CHA4 STE3 | gear: INT+1 | worn: off=Force Wave
+[2026-06-29T22:32:53.361Z] [debug] stats: STR5 DEX7 INT5 WIS6 CHA4 STE3 | gear: INT+1 | worn: off=Force Wave chest=Golem-Bound Armor
+[2026-06-29T22:32:57.612Z] [debug] stats: STR5 DEX8 INT5 WIS6 CHA4 STE3 | gear: DEX+1,INT+1 | worn: off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves
+[2026-06-29T22:33:00.990Z] [debug] stats: STR5 DEX10 INT5 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+1 | worn: off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:08.736Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-06-29T22:33:08.812Z] [player] approach Mudling
+[2026-06-29T22:33:08.813Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mudling resolved=Mudling range=mid enemies=1 hooks=0
+[2026-06-29T22:33:08.824Z] [debug] move: advance from range=mid enemies=1 weather=Glass Hail cost=1 partial=0
+[2026-06-29T22:33:08.826Z] [debug] move: range mid -> close
+[2026-06-29T22:33:08.827Z] [world] You close the gap with Mudling. (range: close / arm's reach)
+[2026-06-29T22:33:08.830Z] [combat] Mudling — d20 → 12 + ATK 5 = 17 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:08.833Z] [debug] arbiter: template (reason=combat)
+[2026-06-29T22:33:08.834Z] [arbiter] The Arbiter watches the mudling. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-06-29T22:33:09.029Z] [combat] Mudling deals 7 bludgeoning damage. You have 34 HP remaining.
+[2026-06-29T22:33:09.128Z] [cognitive] SWIM  (287ms)
+[2026-06-29T22:33:10.329Z] [player] attack with the off-hand force wave
+[2026-06-29T22:33:10.330Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand force wave resolved=Force Wave range=close enemies=1 hooks=0
+[2026-06-29T22:33:10.331Z] [world] You shift grip and bring up the Force Wave.
+[2026-06-29T22:33:10.378Z] [debug] stats: STR5 DEX10 INT6 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+2 | worn: main=Force Wave off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:10.387Z] [debug] attack: target=Mudling range=close reach.bands=[far,mid,close] reach.label=Force Wave bareHand=false
+[2026-06-29T22:33:10.389Z] [arbiter] Glass Hail hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-06-29T22:33:10.391Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:10.411Z] [world] You raise the force wave toward Mudling. The room narrows around the both of you.
+[2026-06-29T22:33:10.412Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:10.546Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK · THROW · TAKE_COVER  (126ms)
+[2026-06-29T22:33:10.771Z] [debug] persist sizes(KB): total=52 player=7 wm=3[rooms=2 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=39 scene=3
+[2026-06-29T22:33:15.492Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:15.494Z] [combat] You — d20 → 9 + INT 5 − 1 (Glass Hail) = 13 vs Mudling AC 9 — ✓ HIT
+[2026-06-29T22:33:15.498Z] [combat] force flares — +3 on hit.
+[2026-06-29T22:33:15.501Z] [combat] Your strike with the force wave lands for 9. Mudling staggers — 9 HP remaining. It answers.
+[2026-06-29T22:33:15.502Z] [combat] Mudling is left exposed — easier to hit.
+[2026-06-29T22:33:15.503Z] [combat] Mudling — d20 → 19 + ATK 5 = 24 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:15.728Z] [combat] Mudling deals 4 bludgeoning damage. You have 30 HP remaining.
+[2026-06-29T22:33:18.121Z] [player] attack with the off-hand force wave
+[2026-06-29T22:33:18.124Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand force wave resolved=Force Wave range=close enemies=1 hooks=0
+[2026-06-29T22:33:18.131Z] [world] You shift grip and bring up the Force Wave.
+[2026-06-29T22:33:18.165Z] [debug] stats: STR5 DEX10 INT6 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+2 | worn: main=Force Wave off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:18.170Z] [debug] attack: target=Mudling range=close reach.bands=[far,mid,close] reach.label=Force Wave bareHand=false
+[2026-06-29T22:33:18.173Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:18.173Z] [debug] attack: status mods tired -1
+[2026-06-29T22:33:18.204Z] [world] Your force wave comes around in an arc; Mudling reads it but does not move yet.
+[2026-06-29T22:33:18.206Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:18.452Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK · THROW · TAKE_COVER  (237ms)
+[2026-06-29T22:33:23.699Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:23.700Z] [combat] You — d20 → 13 + INT 5 − 1 (Glass Hail) tired -1 = 16 vs Mudling AC 7 — ✓ HIT
+[2026-06-29T22:33:23.700Z] [combat] Mudling reads the swing and twists clear — the blow finds nothing. (dodged, quick)
+[2026-06-29T22:33:23.701Z] [combat] Mudling — d20 → 10 + ATK 5 = 15 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:23.814Z] [combat] Mudling deals 4 bludgeoning damage. You have 26 HP remaining.
+[2026-06-29T22:33:26.790Z] [player] punch
+[2026-06-29T22:33:26.791Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=0
+[2026-06-29T22:33:26.793Z] [debug] attack: target=Mudling range=close reach.bands=[close] reach.label=Bare hands bareHand=true
+[2026-06-29T22:33:26.795Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:26.797Z] [debug] attack: status mods tired -1
+[2026-06-29T22:33:26.842Z] [world] You close on Mudling. The room narrows around the both of you.
+[2026-06-29T22:33:26.844Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:27.105Z] [cognitive] DISENGAGE  (258ms)
+[2026-06-29T22:33:30.147Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:30.148Z] [combat] You — d20 → 1 + STR 5 − 1 (Glass Hail) tired -1 = 4 vs Mudling AC 7 — ✗ FUMBLE
+[2026-06-29T22:33:30.149Z] [combat] Your strike cuts air. Mudling answers immediately.
+[2026-06-29T22:33:30.151Z] [combat] Mudling — d20 → 2 + ATK 5 = 7 vs your AC 14 — ✗ MISS
+[2026-06-29T22:33:30.152Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The mudling is patient. Be patienter."
+[2026-06-29T22:33:31.617Z] [player] attack with the off-hand force wave
+[2026-06-29T22:33:31.620Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand force wave resolved=Force Wave range=close enemies=1 hooks=0
+[2026-06-29T22:33:31.625Z] [world] You shift grip and bring up the Force Wave.
+[2026-06-29T22:33:31.664Z] [debug] stats: STR5 DEX10 INT6 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+2 | worn: main=Force Wave off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:31.670Z] [debug] attack: target=Mudling range=close reach.bands=[far,mid,close] reach.label=Force Wave bareHand=false
+[2026-06-29T22:33:31.671Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:31.672Z] [debug] attack: status mods tired -1
+[2026-06-29T22:33:31.692Z] [world] You raise the force wave toward Mudling. The room narrows around the both of you.
+[2026-06-29T22:33:31.692Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:31.807Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK · THROW · TAKE_COVER  (104ms)
+[2026-06-29T22:33:35.407Z] [world] Mudling moves first. The pressure is immediate.
+[2026-06-29T22:33:35.407Z] [combat] You — d20 → 2 + INT 5 − 1 (Glass Hail) tired -1 = 5 vs Mudling AC 7 — ✗ MISS
+[2026-06-29T22:33:35.408Z] [combat] Your strike with the force wave glances off. Mudling seizes the opening.
+[2026-06-29T22:33:35.409Z] [combat] Mudling — d20 → 11 + ATK 5 = 16 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:35.410Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-06-29T22:33:35.536Z] [combat] Mudling deals 2 bludgeoning damage. You have 24 HP remaining.
+[2026-06-29T22:33:35.763Z] [debug] persist sizes(KB): total=60 player=7 wm=3[rooms=2 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=47 scene=3
+[2026-06-29T22:33:36.957Z] [player] dodge
+[2026-06-29T22:33:36.958Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-06-29T22:33:36.960Z] [world] You set your stance. The next Mudling swing — you intend to turn into your own.
+[2026-06-29T22:33:36.962Z] [combat] Mudling — d20 → 3 + ATK 5 = 8 vs your AC 14 — ✗ MISS
+[2026-06-29T22:33:37.133Z] [cognitive] neutral  (165ms)
+[2026-06-29T22:33:37.862Z] [system] dodging (parry) fades.
+[2026-06-29T22:33:38.056Z] [player] attack with the off-hand force wave
+[2026-06-29T22:33:38.057Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand force wave resolved=Force Wave range=close enemies=1 hooks=0
+[2026-06-29T22:33:38.058Z] [world] You shift grip and bring up the Force Wave.
+[2026-06-29T22:33:38.076Z] [debug] stats: STR5 DEX10 INT6 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+2 | worn: main=Force Wave off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:38.082Z] [debug] attack: target=Mudling range=close reach.bands=[far,mid,close] reach.label=Force Wave bareHand=false
+[2026-06-29T22:33:38.083Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:38.083Z] [debug] attack: status mods exhausted -2
+[2026-06-29T22:33:38.102Z] [world] Your force wave comes around in an arc; Mudling reads it but does not move yet.
+[2026-06-29T22:33:38.103Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:38.193Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK · THROW · TAKE_COVER  (87ms)
+[2026-06-29T22:33:43.284Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:43.285Z] [combat] You — d20 → 15 + INT 5 − 1 (Glass Hail) exhausted -2 = 17 vs Mudling AC 7 — ✓ HIT
+[2026-06-29T22:33:43.286Z] [combat] Clean hit with the force wave for 6. Mudling has 3 left and does not back away.
+[2026-06-29T22:33:43.287Z] [combat] Mudling — d20 → 15 + ATK 5 = 20 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:43.433Z] [combat] Mudling deals 0 bludgeoning damage. You have 24 HP remaining.
+[2026-06-29T22:33:43.433Z] [combat] Parry — d20 → 15 + DEX 10 = 25 vs ATK 20. ✓ Slipped clean (no weapon to counter).
+[2026-06-29T22:33:46.500Z] [player] kick
+[2026-06-29T22:33:46.501Z] [debug] parser: intent=attack conf=1.00 verb=kick target=- resolved=- range=close enemies=1 hooks=0
+[2026-06-29T22:33:46.503Z] [debug] attack: target=Mudling range=close reach.bands=[close] reach.label=Bare hands bareHand=true
+[2026-06-29T22:33:46.504Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:46.505Z] [debug] attack: status mods exhausted -2
+[2026-06-29T22:33:46.549Z] [world] Mudling fixes on you. You commit to the strike.
+[2026-06-29T22:33:46.553Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:46.675Z] [cognitive] DISENGAGE  (120ms)
+[2026-06-29T22:33:49.762Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:49.763Z] [combat] You — d20 → 1 + STR 5 − 1 (Glass Hail) exhausted -2 = 3 vs Mudling AC 7 — ✗ FUMBLE
+[2026-06-29T22:33:49.764Z] [combat] Half a beat too slow. Mudling steps inside your reach.
+[2026-06-29T22:33:49.768Z] [combat] Mudling — d20 → 10 + ATK 5 = 15 vs your AC 14 — ✓ HIT
+[2026-06-29T22:33:49.979Z] [combat] Mudling deals 1 bludgeoning damage. You have 23 HP remaining.
+[2026-06-29T22:33:52.067Z] [player] attack with the off-hand force wave
+[2026-06-29T22:33:52.068Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand force wave resolved=Force Wave range=close enemies=1 hooks=0
+[2026-06-29T22:33:52.068Z] [world] You shift grip and bring up the Force Wave.
+[2026-06-29T22:33:52.082Z] [debug] stats: STR5 DEX10 INT6 WIS6 CHA4 STE5 | gear: DEX+3,STE+2,INT+2 | worn: main=Force Wave off=Force Wave chest=Golem-Bound Armor hands=Reclaimer's Gloves cloak=Traveler's Cloak
+[2026-06-29T22:33:52.087Z] [debug] attack: target=Mudling range=close reach.bands=[far,mid,close] reach.label=Force Wave bareHand=false
+[2026-06-29T22:33:52.088Z] [debug] attack: visibility penalty −1 (Glass Hail)
+[2026-06-29T22:33:52.088Z] [debug] attack: status mods exhausted -2
+[2026-06-29T22:33:52.102Z] [world] You commit forward with the force wave. Mudling watches your hands.
+[2026-06-29T22:33:52.102Z] [system] ⏳ Time passed: 6 min
+[2026-06-29T22:33:52.175Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK · THROW · TAKE_COVER  (70ms)
+[2026-06-29T22:33:57.157Z] [world] You seize the initiative. Mudling has no time to react.
+[2026-06-29T22:33:57.157Z] [combat] You — d20 → 19 + INT 5 − 1 (Glass Hail) exhausted -2 = 21 vs Mudling AC 7 — ✓ HIT
+[2026-06-29T22:33:57.158Z] [combat] force flares — +1 on hit.
+[2026-06-29T22:33:57.159Z] [combat] Final strike with the force wave for 7. Mudling is still. The Aetherstone hums on, indifferent.
+[2026-06-29T22:33:57.162Z] [reward] Mudling defeated. You recover Aetheric Sludge ×2.
+[2026-06-29T22:33:57.164Z] [reward] +7 TC pried from the dust.
+[2026-06-29T22:33:57.563Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-06-29T22:33:57.563Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter watches the blow land or fail. "Both are answers…"
+[2026-06-29T22:33:57.910Z] [debug] persist sizes(KB): total=68 player=7 wm=3[rooms=2 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=56 scene=3
+[2026-06-29T22:34:00.605Z] [player] investigate the floor
+[2026-06-29T22:34:00.606Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-29T22:34:00.608Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-06-29T22:34:00.609Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-06-29T22:34:00.609Z] [arbiter] "Kill if you must. Remember what was killed for." the Arbiter says.
+[2026-06-29T22:34:00.714Z] [cognitive] neutral  (98ms)
+[2026-06-29T22:34:02.693Z] [player] investigate runecaster
+[2026-06-29T22:34:02.694Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=runecaster resolved=runecaster range=- enemies=0 hooks=0
+[2026-06-29T22:34:02.697Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade. Tucked into the seam: a bent nail.
+[2026-06-29T22:34:02.697Z] [reward] ✦ Bent Nail from the runecaster.
+[2026-06-29T22:34:02.823Z] [cognitive] AGGRESSION · USE_ITEM · ATTACK · RELOAD  (117ms)
+[2026-06-29T22:34:04.555Z] [player] investigate spool
+[2026-06-29T22:34:04.558Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=spool resolved=spool range=- enemies=0 hooks=0
+[2026-06-29T22:34:04.560Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-06-29T22:34:04.787Z] [cognitive] neutral  (217ms)
+[2026-06-29T22:34:06.484Z] [player] investigate tool
+[2026-06-29T22:34:06.486Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tool resolved=tool range=- enemies=0 hooks=0
+[2026-06-29T22:34:06.489Z] [world] You look the tool over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.
+[2026-06-29T22:34:06.610Z] [cognitive] neutral  (114ms)
+[2026-06-29T22:34:20.322Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-29T22:34:20.323Z] [debug] voice: bundled loading
+[2026-08-24T12:43:10.155Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a033be-637b-7972-8409-1849d4642c16
+[2026-08-24T12:43:10.156Z] [debug] ota: Checking…
+[2026-08-24T12:43:10.287Z] [debug] ota: Already up to date
+[2026-08-24T12:43:10.288Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T12:43:10.346Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T12:43:10.347Z] [debug] voice: bundled loading
+[2026-08-24T19:11:37.344Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a033be-637b-7972-8409-1849d4642c16
+[2026-08-24T19:11:37.345Z] [debug] ota: Checking…
+[2026-08-24T19:11:38.045Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-24T19:11:38.142Z] [debug] ota: Saving progress…
+[2026-08-24T19:11:38.143Z] [debug] ota: Restarting to apply…
+[2026-08-24T19:11:38.479Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0352d-09f8-712a-82e2-f6de324d7e23
+[2026-08-24T19:11:38.479Z] [debug] ota: Checking…
+[2026-08-24T19:11:38.563Z] [debug] ota: Already up to date
+[2026-08-24T19:11:38.564Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T19:11:38.637Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T19:11:38.638Z] [debug] voice: bundled loading
+[2026-08-24T19:11:49.590Z] [debug] voice: bundled ready
+[2026-09-16T06:01:37.991Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0352d-09f8-712a-82e2-f6de324d7e23
+[2026-09-16T06:01:37.992Z] [debug] ota: Checking…
+[2026-09-16T06:01:41.232Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-16T06:01:41.399Z] [debug] ota: Saving progress…
+[2026-09-16T06:01:41.400Z] [debug] ota: Restarting to apply…
+[2026-09-16T06:01:41.503Z] [debug] ota: boot check result = applied
+[2026-09-16T06:01:41.749Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0a273-de01-76ed-a538-e7a22d1ac390
+[2026-09-16T06:01:41.750Z] [debug] ota: Checking…
+[2026-09-16T06:01:41.877Z] [debug] ota: Already up to date
+[2026-09-16T06:01:41.877Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T06:01:41.951Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-16T06:01:41.952Z] [debug] voice: bundled loading
+[2026-09-16T06:01:42.486Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-16T06:01:52.040Z] [debug] voice: bundled ready
+[2026-09-16T06:04:50.176Z] [debug] appstate: active → background (was active for 188445ms)
+[2026-09-16T06:05:32.406Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0a273-de01-76ed-a538-e7a22d1ac390
+[2026-09-16T06:05:32.407Z] [debug] ota: Checking…
+[2026-09-16T06:05:32.885Z] [debug] ota: Already up to date
+[2026-09-16T06:05:32.885Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T06:05:33.133Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T06:05:33.134Z] [debug] voice: bundled idle
+[2026-09-16T06:05:33.142Z] [debug] native-sdk verdict: non-boolean (null) — native side had not resolved the last run yet
+[2026-09-16T06:05:44.574Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T06:05:44.576Z] [world] You step back into Giant-Watch Shrine. The world waits for your move.
+[2026-09-16T06:05:44.577Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.
+[2026-09-16T06:05:44.605Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-16T06:05:44.606Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+
+=== END LOG · 44185 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: SM-A146U
+  Platform: android 35
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 384×856 / screen 384×856 @ 2.8125x density
+  Captured at: 2026-09-16T06:05:45.254Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-15-1824-the-helper-is-called-not-quoted)
+  Boot stage: tts:done
+
+ML runtime health
+  Status: auto-disabled after 3 failures — 3 boots that never came back (template narration in use)
+  Crash count: 3
+  Last init attempt: never
+  Last init success: 2026-06-29T22:34:23.427Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=false sveUsed=false i8mm=false v84raw=false v84used=false blocklisted=false qwenSafeKernel=false soc=MT6833 hw=mt6833 model=SM-A146U sdk=35 kernel=6.6.89-android15-8-abA146USQSIEZE5-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu3p5mylyq · started 2026-09-16T06:05:32.157Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 1 recorded (newest last)
+  • 2026-08-24T19:11:41.779Z (32334m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-24-1492-sent-means-arrived · stage ctx-open
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: ctx-open · 0ms into the action
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 12MB · last 12MB · net +0MB over 1 mark
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot:
+  2026-09-16T06:01:50.720Z #1 root
+  2026-09-16T06:01:51.703Z #2 root
+  2026-09-16T06:01:52.551Z #3 root
+  2026-09-16T06:01:53.568Z #4 root
+  this boot: (no stages yet)
