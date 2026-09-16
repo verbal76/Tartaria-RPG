@@ -77,20 +77,26 @@ import { blockAt } from '../test-utils/srcBlock';
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 function renderRoom(chips: { noun: string }[], leadNouns: string[]) {
-  const tree = trackedCreate(
-    <GatherModal
-      visible
-      player={null}
-      chips={chips}
-      leadNouns={leadNouns}
-      onTake={() => {}}
-      onSalvage={() => {}}
-      onTakeAll={() => {}}
-      onSalvageAll={() => {}}
-      onInvestigate={() => {}}
-      onCancel={() => {}}
-    />,
-  );
+  // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+  // create leaves zero children, so toJSON() is null and .root throws. The full
+  // note is in ota1233OnePicker.test.tsx.
+  let tree!: ReturnType<typeof trackedCreate>;
+  renderer.act(() => {
+    tree = trackedCreate(
+      <GatherModal
+        visible
+        player={null}
+        chips={chips}
+        leadNouns={leadNouns}
+        onTake={() => {}}
+        onSalvage={() => {}}
+        onTakeAll={() => {}}
+        onSalvageAll={() => {}}
+        onInvestigate={() => {}}
+        onCancel={() => {}}
+      />,
+    );
+  });
   const out: string[] = [];
   const walk = (n: unknown): void => {
     if (typeof n === 'string') { out.push(n); return; }

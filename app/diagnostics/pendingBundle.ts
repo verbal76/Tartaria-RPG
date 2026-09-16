@@ -52,7 +52,7 @@
  * newest bundle contains what the older ones knew. Queueing several would
  * multiply the disk and upload cost for evidence already inside the newest.
  */
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { reportingEnabled } from './crashReporter';
 // ⚠⚠⚠ OTA-1519 — the retry sends what the BUTTON sends, and the button no
 // longer carries attachments. See the call site.

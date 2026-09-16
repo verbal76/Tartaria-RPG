@@ -32,6 +32,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 import React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
+  act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown; unmount(): void };
 };
 import { GatherModal } from '../app/components/GatherModal';
@@ -145,13 +146,19 @@ describe('OTA-1252 — a free hand is a free slot', () => {
 
 describe('OTA-1252 — RENDERED: the row names the hand', () => {
   function tailFor(player: unknown, noun: string): string {
-    const tree = renderer.create(
-      <GatherModal
-        visible player={player as never} chips={[{ noun }]} leadNouns={[]}
-        onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
-        onInvestigate={() => {}} onCancel={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <GatherModal
+            visible player={player as never} chips={[{ noun }]} leadNouns={[]}
+            onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+            onInvestigate={() => {}} onCancel={() => {}}
+          />,
+        );
+    });
     const out: string[] = [];
     const walk = (n: unknown): void => {
       if (typeof n === 'string') { out.push(n); return; }

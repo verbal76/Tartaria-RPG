@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const MODEL_DIR_NAME = 'tartaria-models/';
 const MODEL_FILE_NAME = 'model_quantized.onnx';
@@ -110,7 +110,7 @@ export class ModelDownloader {
    *  delete it so the caller will re-download cleanly. Parity with
    *  the Qwen and Kokoro recovery paths. */
   private async existsWithMinSize(path: string, minBytes: number): Promise<boolean> {
-    const info = await FileSystem.getInfoAsync(path, { size: true });
+    const info = await FileSystem.getInfoAsync(path);
     if (!info.exists) return false;
     const size = (info as { size?: number }).size ?? 0;
     if (size >= minBytes) return true;
@@ -193,7 +193,7 @@ export class ModelDownloader {
     if (root) {
       const ggufPath = root + QWEN_CACHE_SUBDIR + QWEN_GGUF_FILE_NAME;
       try {
-        const info = await FileSystem.getInfoAsync(ggufPath, { size: true });
+        const info = await FileSystem.getInfoAsync(ggufPath);
         if (info.exists) {
           sizeBytes = (info as { size?: number }).size ?? null;
         }

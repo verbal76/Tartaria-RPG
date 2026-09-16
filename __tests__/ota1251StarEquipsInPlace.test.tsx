@@ -36,6 +36,7 @@ import { storeSource } from '../test-utils/storeSource';
 import React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
+  act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown; unmount(): void };
 };
 import { GatherModal } from '../app/components/GatherModal';
@@ -47,13 +48,19 @@ import { blockAt } from '../test-utils/srcBlock';
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 function textOf(chips: { noun: string }[], player: unknown) {
-  const tree = renderer.create(
-    <GatherModal
-      visible player={player as never} chips={chips} leadNouns={[]}
-      onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
-      onInvestigate={() => {}} onCancel={() => {}}
-    />,
-  );
+  // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+  // create leaves zero children, so toJSON() is null and .root throws. The full
+  // note is in ota1233OnePicker.test.tsx.
+  let tree!: ReturnType<typeof renderer.create>;
+  renderer.act(() => {
+    tree = renderer.create(
+      <GatherModal
+        visible player={player as never} chips={chips} leadNouns={[]}
+        onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+        onInvestigate={() => {}} onCancel={() => {}}
+      />,
+    );
+  });
   const out: string[] = [];
   const walk = (n: unknown): void => {
     if (typeof n === 'string') { out.push(n); return; }
@@ -125,13 +132,19 @@ describe('OTA-1251 — RENDERED: the row says what the tap does', () => {
   });
 
   it('⚠ the screen reader is told the whole action, not half of it', () => {
-    const tree = renderer.create(
-      <GatherModal
-        visible player={BARE as never} chips={[{ noun: "Mud-Warden's Vest" }]} leadNouns={[]}
-        onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
-        onInvestigate={() => {}} onCancel={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <GatherModal
+            visible player={BARE as never} chips={[{ noun: "Mud-Warden's Vest" }]} leadNouns={[]}
+            onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+            onInvestigate={() => {}} onCancel={() => {}}
+          />,
+        );
+    });
     const labels = (tree as unknown as { root: { findAll(f: (n: { props: Record<string, unknown> }) => boolean): Array<{ props: Record<string, unknown> }> } })
       .root.findAll((n) => typeof n.props?.accessibilityLabel === 'string')
       .map((n) => String(n.props.accessibilityLabel));

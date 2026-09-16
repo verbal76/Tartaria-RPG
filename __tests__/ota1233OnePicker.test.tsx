@@ -31,6 +31,7 @@ import React from 'react';
 // one to buy a convenience.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
+  act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown };
 };
 
@@ -70,19 +71,34 @@ import { join } from 'path';
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 function renderRoom(chips: { noun: string; consumed?: boolean }[], player = null) {
-  const tree = trackedCreate(
-    <GatherModal
-      visible
-      player={player}
-      chips={chips}
-      onTake={() => {}}
-      onSalvage={() => {}}
-      onTakeAll={() => {}}
-      onSalvageAll={() => {}}
-      onInvestigate={() => {}}
-      onCancel={() => {}}
-    />,
-  );
+  // ⚠⚠⚠ REACT 19 — THE MOUNT COMMITS INSIDE act(), NOT INSIDE create().
+  // Under React 18 `create()` flushed the legacy-root mount synchronously and
+  // the tree was readable on the very next line. React 19 defers that commit,
+  // so a bare create leaves the container with ZERO CHILDREN: `toJSON()` is
+  // null — the walker below then joins to '' and every toContain fails against
+  // an empty string — and `.root` throws "Can't access .root on unmounted test
+  // renderer", whose wording is a lie: it means nothing has COMMITTED, not that
+  // anything unmounted (react-test-renderer.development.js, the `root` getter,
+  // `0 === children.length`). The component is untouched; only the harness
+  // contract moved. Sibling call sites in this repo already wrapped create in
+  // act and stayed green straight through the migration — which is how this
+  // family was told apart from a real behaviour change.
+  let tree!: ReturnType<typeof trackedCreate>;
+  renderer.act(() => {
+    tree = trackedCreate(
+      <GatherModal
+        visible
+        player={player}
+        chips={chips}
+        onTake={() => {}}
+        onSalvage={() => {}}
+        onTakeAll={() => {}}
+        onSalvageAll={() => {}}
+        onInvestigate={() => {}}
+        onCancel={() => {}}
+      />,
+    );
+  });
   const out: string[] = [];
   const walk = (n: unknown): void => {
     if (typeof n === 'string') { out.push(n); return; }

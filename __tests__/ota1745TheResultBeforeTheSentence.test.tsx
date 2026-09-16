@@ -112,8 +112,13 @@ afterEach(async () => {
     await renderer.act(async () => { try { t.unmount(); } catch { /* already gone */ } });
   }
 });
+// ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+// create leaves zero children, so .root throws "Can't access .root on unmounted
+// test renderer", which means nothing COMMITTED, not that anything unmounted.
+// The full note is in ota1233OnePicker.test.tsx.
 const mount = (el: React.ReactElement) => {
-  const t = renderer.create(el);
+  let t!: ReturnType<typeof renderer.create>;
+  renderer.act(() => { t = renderer.create(el); });
   mounted.push(t);
   return t;
 };

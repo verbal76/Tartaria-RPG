@@ -200,33 +200,6 @@ jobs:
           echo "android.versionCode = ${{ github.run_number }} — baked into APK"
           grep -A2 '"android"' app.json | head -10
 
-      - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs (Compose compiler compat)
-        run: |
-          # The real Kotlin version source is libs.versions.toml in two node_modules
-          # locations — NOT android/build.gradle (its classpath line has no version).
-          # @react-native/gradle-plugin compiles itself against the version in
-          # its own libs.versions.toml, and the app pulls in kotlin-gradle-plugin
-          # transitively from that artifact. So patch both catalogs before prebuild.
-
-          RN_CATALOG=node_modules/react-native/gradle/libs.versions.toml
-          GP_CATALOG=node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
-
-          for f in "$RN_CATALOG" "$GP_CATALOG"; do
-            if [ ! -f "$f" ]; then
-              echo "::error::Expected catalog $f not found"
-              exit 1
-            fi
-            echo "--- before: $f ---"
-            grep '^kotlin' "$f" || true
-            sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
-            echo "--- after: $f ---"
-            grep '^kotlin' "$f" || true
-            if ! grep -q '^kotlin = "1.9.25"$' "$f"; then
-              echo "::error::Patch did not apply to $f"
-              exit 1
-            fi
-          done
-
       - name: Pin onnxruntime-android version (avoid latest.integration XML parser bug)
         run: |
           # onnxruntime-react-native ships with three "latest.integration" dynamic
@@ -354,29 +327,79 @@ jobs:
           fi
           echo "channel=$CH" >> "$GITHUB_OUTPUT"
 
+      # ⚠ API 36 MIGRATION — the runner image is not guaranteed to carry platform 36.
+      # Until now this workflow provisioned no SDK at all and relied on the image.
+      # compileSdk 36 needs platforms;android-36 present, and a missing component
+      # would masquerade as an AGP 8.11 / compileSdk 36 incompatibility. Guarded:
+      # a provisioning hiccup warns, it does not fail the build before we know.
+      - name: Provision Android platform 36 + build-tools 35.0.0
+        run: |
+          set +e
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKM" ]; then
+            echo "::warning::sdkmanager not found at $SDKM — relying on the runner image"
+          else
+            "$SDKM" "platforms;android-36" "build-tools;35.0.0" >/dev/null \
+              || echo "::warning::platform/build-tools install reported a problem"
+          fi
+          echo "--- platforms ---";   ls -1 "$ANDROID_HOME/platforms"   2>/dev/null
+          echo "--- build-tools ---"; ls -1 "$ANDROID_HOME/build-tools" 2>/dev/null
+          set -e
+
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Verify Kotlin 1.9.25 propagated through prebuild
+      # ⚠ API 36 MIGRATION — this step used to force Kotlin 1.9.25 and append
+      # kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25 to the generated
+      # gradle.properties. Under RN 0.81 the coherent graph selects Kotlin 2.1.20
+      # on its own (Gate 4 proved the pin was the failure, Gate 5 proved removal
+      # works, Gate 9 built 29/29 with it gone). It is now READ-ONLY: it reports
+      # what the graph actually selected and forces nothing.
+      - name: Report the toolchain the graph selected (READ-ONLY — nothing forced)
         run: |
-          echo "--- node_modules catalog (source of truth) ---"
-          grep '^kotlin' node_modules/react-native/gradle/libs.versions.toml
-          grep '^kotlin' node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+          set +e
+          echo "--- RN version catalog (source of truth) ---"
+          grep -E '^(kotlin|agp|ndkVersion) ' node_modules/react-native/gradle/libs.versions.toml
+          echo "--- generated android/gradle.properties ---"
+          grep -E 'compileSdkVersion|targetSdkVersion|buildToolsVersion|newArchEnabled|hermesEnabled' android/gradle.properties
+          echo "--- gradle wrapper ---"
+          grep distributionUrl android/gradle/wrapper/gradle-wrapper.properties
+          echo "--- ndkVersion as the app module reads it ---"
+          grep -n 'ndkVersion' android/app/build.gradle
+          echo "--- assert NO stale Kotlin 1.9.25 forcing survives anywhere ---"
+          if grep -rn '1\.9\.25' android/ 2>/dev/null; then
+            echo "::error::A stale Kotlin 1.9.25 pin survives in the generated project."; exit 1
+          fi
+          echo "  (none — Kotlin is whatever RN 0.81 selected)"
+          set -e
 
-          echo "--- android/build.gradle kotlinVersion ext ---"
-          grep -n kotlinVersion android/build.gradle || true
-
-          echo "--- android/gradle.properties kotlin lines ---"
-          grep -i kotlin android/gradle.properties || true
-
-          # Final guard: a no-op when versions match, but if anything upstream
-          # still mismatches at compile time, suppress the Compose-compiler check.
-          # Ensure the file ends with a newline before appending — Expo's
-          # propertiesListToString writes the last entry without a trailing \n,
-          # and a bare `echo >>` would concatenate onto that last line.
-          # (Caused a build break when withJetifier landed its entries last.)
-          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
-          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+      # ⚠ METASPACE (Gate 6 / 6B). SDK 54 runs lintVital across every module on a
+      # release build (Gate 5 SDK53: 0 such tasks, Gate 6 SDK54: 15) and that
+      # fan-out exhausted the 512 MiB cap the Expo template writes. Gate 6B, 7B and
+      # 9 all built with 1 GiB. This factory sets its own -Xmx via GRADLE_OPTS, so
+      # which source governs org.gradle.jvmargs is a precedence question rather than
+      # a measured fact — so BOTH are set to the proven value and the build reports
+      # which one it actually used. lintVital is NOT disabled.
+      - name: "Metaspace: raise the generated cap to the proven 1g, and report it"
+        run: |
+          set -euo pipefail
+          GP=android/gradle.properties
+          echo "--- before ---"; grep -i jvmargs "$GP" || echo "  (no jvmargs line)"
+          BEFORE=$(grep -c 'MaxMetaspaceSize=512m' "$GP" || true)
+          if [ "$BEFORE" = "1" ]; then
+            sed -i 's/MaxMetaspaceSize=512m/MaxMetaspaceSize=1g/' "$GP"
+            echo "  patched the template cap 512m -> 1g"
+          else
+            echo "::warning::expected exactly one MaxMetaspaceSize=512m, found $BEFORE — leaving the file alone"
+          fi
+          echo "--- after ---"; grep -i jvmargs "$GP" || true
+          echo "--- GRADLE_OPTS this job will export ---"
+          echo "  -Xmx4g -XX:MaxMetaspaceSize=1g (set on the Gradle build step)"
+          echo "--- lintVital must still be enabled ---"
+          if grep -rn 'checkReleaseBuilds *false\|lintVital.*enabled *false\|abortOnError *false' android/app/build.gradle android/gradle.properties 2>/dev/null; then
+            echo "::error::lint appears to have been disabled. That is not an authorized change."; exit 1
+          fi
+          echo "  (lintVital enabled)"
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
@@ -635,8 +658,7 @@ jobs:
       - name: Gradle build (Tartaria Realms)
         working-directory: android
         env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
-          KOTLIN_VERSION: "1.9.25"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dorg.gradle.daemon=false"
         run: |
           chmod +x gradlew
           # OTA-252 — retry wrapper. Build 251 failed at the gradle
@@ -657,8 +679,6 @@ jobs:
           for attempt in 1 2 3; do
             echo "--- Gradle attempt $attempt of 3 ---"
             if ./gradlew $GRADLE_TASK --no-daemon --stacktrace \
-                -Pandroid.kotlinVersion=1.9.25 \
-                -PkotlinVersion=1.9.25 \
                 -PreactNativeArchitectures=arm64-v8a; then
                 # arb156 — arm64-v8a ONLY. x86_64 is emulator/Chromebook-only —
                 # no Android PHONE uses it, yet shipping it doubled every native

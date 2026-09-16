@@ -32,7 +32,10 @@ import { WhisperCompleteModal } from '../app/components/WhisperCompleteModal';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
-  create(el: React.ReactElement): { root: { findAllByType(t: unknown): { props: Record<string, unknown> }[] }; unmount(): void };
+  create(el: React.ReactElement): {
+    root: { findAll(f: (n: { type: unknown }) => boolean): { props: Record<string, unknown> }[] };
+    unmount(): void;
+  };
   act(cb: () => void): void;
 };
 
@@ -164,10 +167,27 @@ describe('OTA-1791 — the boundary: four files of the same name are NOT this co
 
 describe('OTA-1791 — a rendered pill carries the depth under press', () => {
   it('WhisperCompleteModal\'s CLOSE pill rests lit-on-top and presses lit-on-bottom, settling by the governed distance', () => {
-    const tree = renderer.create(
-      <WhisperCompleteModal visible title="A whisper" lines={['done']} rewards={['✦ 3 coins']} onClose={() => {}} />,
-    );
-    const pills = tree.root.findAllByType(Pressable);
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <WhisperCompleteModal visible title="A whisper" lines={['done']} rewards={['✦ 3 coins']} onClose={() => {}} />,
+        );
+    });
+    // ⚠⚠ REACT 19 / RN 0.81 — `Pressable` IS STILL IN THE TREE; THE MATCHER'S
+    // IDENTITY MOVED. RN 0.76 exported memo(forwardRef(Pressable)); RN 0.81
+    // exports memo(Pressable), because React 19 passes ref as an ordinary prop
+    // and the forwardRef is gone. A memo around a PLAIN function is a
+    // SimpleMemoComponent, whose fiber `type` is the inner function — and
+    // findAllByType compares `node.type === type` exactly, so the memo wrapper
+    // no longer matches. memo(X).type IS X, so accepting either is the same
+    // node this assertion has always meant; the tree still renders one
+    // Pressable carrying one function style, which is what everything below
+    // reads. Text, Image and Modal are unaffected and match as they always did.
+    const PRESSABLE: unknown[] = [Pressable, (Pressable as unknown as { type?: unknown }).type];
+    const pills = tree.root.findAll((n) => PRESSABLE.includes(n.type));
     expect(pills.length).toBeGreaterThanOrEqual(1);
     const styleFn = pills[pills.length - 1]!.props.style as (s: { pressed: boolean }) => unknown;
     expect(typeof styleFn).toBe('function');

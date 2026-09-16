@@ -55,7 +55,14 @@ const textOf = (n: TestNode): string => {
       : ((x as TestNode | null)?.children ? w((x as TestNode).children) : '');
   return w(n.children);
 };
-const mount = (el: React.ReactElement) => renderer.create(el);
+// ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+// create leaves zero children, so toJSON() is null and .root throws. The full
+// note is in ota1233OnePicker.test.tsx.
+const mount = (el: React.ReactElement) => {
+  let t!: ReturnType<typeof renderer.create>;
+  renderer.act(() => { t = renderer.create(el); });
+  return t;
+};
 const hosts = (t: ReturnType<typeof mount>, p: (n: TestNode) => boolean) =>
   t.root.findAll((n) => typeof n.type === 'string' && p(n));
 

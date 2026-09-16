@@ -350,16 +350,22 @@ describe('OTA-1743 — the class: a boot that fails is reported, not eternal', (
     // without ever reaching Settings.
     expect(APP).toContain('__TARTARIA_BOOT_STAGE');
     expect(APP).toContain('stalled: true');
-    const tree = renderer.create(
-      <BootTroubleScreen
-        stage="hydrate:start"
-        message={null}
-        stalled
-        onRetry={() => {}}
-        onCheckForUpdate={() => 'No update available yet.'}
-        onCopyDiagnostic={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <BootTroubleScreen
+            stage="hydrate:start"
+            message={null}
+            stalled
+            onRetry={() => {}}
+            onCheckForUpdate={() => 'No update available yet.'}
+            onCopyDiagnostic={() => {}}
+          />,
+        );
+    });
     mounted.push(tree);
     const text = allText(tree);
     expect(text).toContain('hydrate:start');
@@ -370,14 +376,20 @@ describe('OTA-1743 — the class: a boot that fails is reported, not eternal', (
 
   it('⚠⚠ RETRY re-runs hydration, and hydration is idempotent', async () => {
     let calls = 0;
-    const tree = renderer.create(
-      <BootTroubleScreen
-        stage="hydrate:failed" message="boom" stalled={false}
-        onRetry={() => { calls += 1; }}
-        onCheckForUpdate={() => 'x'}
-        onCopyDiagnostic={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <BootTroubleScreen
+            stage="hydrate:failed" message="boom" stalled={false}
+            onRetry={() => { calls += 1; }}
+            onCheckForUpdate={() => 'x'}
+            onCopyDiagnostic={() => {}}
+          />,
+        );
+    });
     mounted.push(tree);
     const retry = tree.root.findAll((n) => typeof n.props.onPress === 'function' && textOf(n).includes('TRY STARTING AGAIN'))[0]!;
     await renderer.act(async () => { (retry.props.onPress as () => void)(); });
@@ -396,14 +408,20 @@ describe('OTA-1743 — the class: a boot that fails is reported, not eternal', (
     // never resolves never checks. This button is the JS-side repair door.
     expect(APP.indexOf('void hydrate()')).toBeLessThan(APP.indexOf("setStage('ota:check')"));
     let asked = 0;
-    const tree = renderer.create(
-      <BootTroubleScreen
-        stage="hydrate:failed" message="boom" stalled={false}
-        onRetry={() => {}}
-        onCheckForUpdate={() => { asked += 1; return 'Update downloaded — close Tartaria and open it again.'; }}
-        onCopyDiagnostic={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BootTroubleScreen
+          stage="hydrate:failed" message="boom" stalled={false}
+          onRetry={() => {}}
+          onCheckForUpdate={() => { asked += 1; return 'Update downloaded — close Tartaria and open it again.'; }}
+          onCopyDiagnostic={() => {}}
+        />,
+      );
+    });
     mounted.push(tree);
     const btn = tree.root.findAll((n) => typeof n.props.onPress === 'function' && textOf(n).includes('CHECK FOR AN UPDATE'))[0]!;
     await renderer.act(async () => { (btn.props.onPress as () => void)(); });

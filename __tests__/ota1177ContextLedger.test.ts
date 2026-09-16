@@ -28,6 +28,14 @@
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+// ⚠ OTA-1177 / OTA-1452 — THE MOCK HAS TO NAME THE PATH PRODUCTION IMPORTS.
+// LlamaRuntime imports `expo-file-system/legacy` (the Expo 54 move), so a mock
+// registered only against `expo-file-system` no longer intercepts: getInfoAsync
+// returned undefined and `initialize()` threw on `info.exists` before the fake
+// module's gate. In this suite that rejection arrived while the deliberately
+// un-awaited load was still in flight, so Node killed the worker outright.
+// Same mock object, second specifier — no new behaviour is mocked.
+jest.mock('expo-file-system/legacy', () => require('expo-file-system'));
 jest.mock('expo-file-system', () => ({
   documentDirectory: '/tmp/', cacheDirectory: '/tmp/',
   getInfoAsync: jest.fn(async () => ({ exists: true, size: 1 })),
