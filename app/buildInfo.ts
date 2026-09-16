@@ -30787,7 +30787,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // owner used by hand. It is an ACCELERATOR, not a rescue — OTA-1705's ladder
 // would have healed the same device at boot 6; this grants the trial at boot 1.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-15-1824-the-helper-is-called-not-quoted';
-export const OTA_BUILD_ID = '2026-09-16-1825-the-old-verdict-does-not-survive-the-binary';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-16-1825-the-old-verdict-does-not-survive-the-binary';
+export const OTA_BUILD_ID = '2026-09-16-1826-the-outer-paints-what-the-rim-vacates';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

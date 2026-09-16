@@ -759,7 +759,7 @@ export function TitleScreen() {
                below the record for exactly as long as the finger was down.
                The travel now rides the RIM — the thing a player perceives as the
                card — so the shadow stays where the resting card put it. */
-            style={({ pressed }) => [styles.dossierOuter, !bootGateOpen && styles.btnDisabled]}
+            style={({ pressed }) => [styles.dossierOuter, !bootGateOpen && styles.btnDisabled, item.dead && styles.dossierOuterDead]}
             onPress={() => setExpandedSlotId(item.slotId)}
             disabled={!bootGateOpen}
             accessibilityRole="button"
@@ -823,7 +823,7 @@ export function TitleScreen() {
           Everything inside stays `pointerEvents="none"` as before, so the plate
           is still the one tap target and the second tap still LOADS. */}
       <Pressable
-        style={({ pressed }) => [styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled]}
+        style={({ pressed }) => [styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled, item.dead && styles.dossierOuterDead]}
         onPress={() => onSlotTap(item)}
         disabled={!bootGateOpen}
         accessibilityRole="button"
@@ -1679,18 +1679,54 @@ const styles = StyleSheet.create({
    * ⚠ NOTHING IS LOST ON ANDROID: the depth here was never the drop shadow, it
    * is the rim — top edge lit, bottom edge near-black — over a recessed face,
    * which is the construction the whole kit is built on. */
+  /* ⚠⚠⚠ OTA-1826 — THE OUTER PAINTS THE 3dp THE RIM VACATES.
+   *
+   * Owner, on the Pixel and earlier on Apple: pressing a character record
+   * exposes a black rectangle along the record's TOP edge, for exactly as long
+   * as the finger is down.
+   *
+   * ⚠ THIS IS THE THIRD APPEARANCE OF ONE GEOMETRY, and the file already
+   * describes the other two in its own words. TSettle's rest bug left inactive
+   * cards parked 4dp low and produced "the strip of parent left uncovered above
+   * each card" — the seam the owner photographed above the gold rim. OTA-1822
+   * then moved the travel OFF this view to stop the shadow sliding out from
+   * under the card, which cured a black bar BELOW and, by the same arithmetic,
+   * moved the uncovered strip to the TOP. It traded edges rather than closing
+   * the hole.
+   *
+   * THE MECHANISM, and it needs no platform to explain it: `dossierRim` is the
+   * only layer in this subtree that PAINTS. This view carried a shadow and
+   * nothing else. `kit.controlPressed` translates the rim down 3dp, so a 3dp
+   * strip of THIS view's frame is uncovered, and it was transparent — the
+   * screen `container` is `backgroundColor: 'transparent'`, so what showed
+   * through was the app backdrop (Android, where `elevation` is deliberately
+   * absent) and, on iOS, that backdrop plus the #000 drop shadow this view
+   * anchors. Both read as a black rectangle, which is why it appeared on both.
+   *
+   * THE REPAIR IS THE HOLE, NOT THE TRAVEL. The outer now carries the rim's own
+   * resting fill and radius, so the strip the rim vacates is the card's own
+   * material. The rim fills the outer exactly (no padding here), so at rest and
+   * on release this is invisible; the travel is untouched at translateY(3) and
+   * the press reads exactly as before. Nothing about the shadow moved. */
   dossierOuter: {
     marginVertical: 3,
+    borderRadius: 4,
+    backgroundColor: '#232527',
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
   },
   dossierOuterOpen: {
+    backgroundColor: '#443925',
     shadowOpacity: 0.62,
     shadowRadius: 11,
     shadowOffset: { width: 0, height: 6 },
   },
+  /* ⚠ A dead record's rim is rust, not alloy — without this the strip it
+   * vacates would be the live card's grey sitting above a rust plate. Same
+   * shared authority, not a per-record patch. */
+  dossierOuterDead: { backgroundColor: '#33201D' },
   /* ⚠⚠ PHONE-FIX — A RECORD AT REST IS ALLOY. Owner: keep steering away from
    * medieval/bronze. An unselected record is a machined plate under a dead
    * coating — cool grey rim, light on the top edge, near-black at the bottom —
