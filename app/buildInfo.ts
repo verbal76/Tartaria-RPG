@@ -30778,7 +30778,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exclusion list and the llama prohibition are all exactly as 1823 shipped
 // them; §2 of ota1824TheHelperIsCalledNotQuoted re-asserts each one rather than
 // trusting that a Swift edit left them alone.
-export const OTA_BUILD_ID = '2026-09-15-1824-the-helper-is-called-not-quoted';
+// OTA-1825 — the old verdict does not survive the binary. Play build 476
+// replaced the API 35 native architecture IN PLACE and kept the data sandbox, so
+// a device the OLD binary had benched woke on the NEW one still carrying the old
+// verdict (SM-A146U: "auto-disabled after 3 failures" on a repaired runtime).
+// The API 36 transition amnesty clears that ONCE per device, gated on the native
+// versionName and a persisted marker, and completes the RELOAD AI sequence the
+// owner used by hand. It is an ACCELERATOR, not a rescue — OTA-1705's ladder
+// would have healed the same device at boot 6; this grants the trial at boot 1.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-15-1824-the-helper-is-called-not-quoted';
+export const OTA_BUILD_ID = '2026-09-16-1825-the-old-verdict-does-not-survive-the-binary';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

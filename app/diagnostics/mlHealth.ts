@@ -42,6 +42,10 @@
 // when the last attempt/success was.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// ⚠ The API 36 transition amnesty reads the NATIVE app version, so the gate is
+// the binary's own versionName and not something a bundle can claim. Already a
+// dependency of this diagnostics layer (aboutSummary.ts reads it the same way).
+import * as Application from 'expo-application';
 // OTA-985 — the build stamp the voice-crash count is scoped to. buildInfo imports
 // nothing, so this cannot cycle.
 import { OTA_BUILD_ID } from '../buildInfo';
@@ -1092,6 +1096,87 @@ export async function resetMLHealth(): Promise<void> {
     cached.qwenNextRetryInBoots = null;
     cached.genRetryingThisBoot = false;
     cached.genNextRetryInBoots = null;
+  }
+}
+
+// ⚠⚠⚠ THE API 36 TRANSITION AMNESTY — ONE FRESH ATTEMPT, ONCE, PER DEVICE.
+//
+// Play build 476 replaced the API 35 native architecture in place. The update
+// keeps the data sandbox, so a device that had been benched by the OLD binary
+// woke up on the NEW one still carrying the old binary's verdict: a Samsung
+// SM-A146U reported "auto-disabled after 3 failures, crashCount 3, classifier
+// skipped, Qwen not initialized" on a runtime whose fault had been fixed.
+// Pressing RELOAD AI cleared it and the same device came up active, crashCount
+// 0, Qwen ready, one native context opened. So the binary was healthy and the
+// only thing wrong was a sentence handed down by a binary that no longer exists.
+//
+// ⚠ THIS IS AN ACCELERATOR, NOT A RESCUE, and saying so is the honest framing.
+// OTA-1705's ladder (GEN_RETRY_BASE_BOOTS above) already benches for five cold
+// boots and then spends one trying again — with the native fault repaired that
+// trial would have succeeded on its own. This grants at boot 1 the same single
+// trial the ladder grants at boot 6. It does not weaken the guard: the counters
+// are cleared once, the thresholds are untouched, and a genuine failure under
+// 476 disables the device again exactly as before.
+//
+// ⚠⚠ THE MARKER IS WRITTEN ON EVERY FIRST 2.5.0 BOOT, INCLUDING A HEALTHY ONE,
+// AND THAT IS THE WHOLE SAFETY PROPERTY. "Reset when disabled and unmarked"
+// alone leaves a healthy device unmarked forever — so a REAL disable earned
+// months later under 476 would still satisfy "disabled + unmarked" and get
+// wiped, which is precisely the bypass this must not become. The marker means
+// "the transition check has run on this device", never "a reset happened".
+//
+// ⚠ Gated on the NATIVE version, not the bundle's. Application.nativeApplication-
+// Version is the APK's versionName — 2.5.0 on build 476, 2.4.1 on the binary it
+// replaced — so an OTA cannot talk its way past this, and a 2.4.1 install stays
+// eligible for the day it updates rather than burning its marker early.
+const KEY_RESET_MIGRATION_2_5_0 = 'tartaria.ml.resetMigration_2_5_0_done';
+
+/** The keys whose presence means "the old installation had already judged this
+ *  device". Read raw and with no side effects — deliberately NOT loadMLHealth(),
+ *  which is the crash DETECTOR and would fold this read into that decision. */
+async function hasLegacyMLDisableState(): Promise<boolean> {
+  const [disabled, crashes, qwenDisabled, qwenCrashes, ttsDisabled] = await Promise.all([
+    AsyncStorage.getItem(KEY_DISABLED),
+    AsyncStorage.getItem(KEY_CRASH_COUNT),
+    AsyncStorage.getItem(KEY_QWEN_DISABLED),
+    AsyncStorage.getItem(KEY_QWEN_CRASH_COUNT),
+    AsyncStorage.getItem(KEY_TTS_DISABLED),
+  ]);
+  const positive = (v: string | null): boolean => {
+    if (v === null) return false;
+    const n = Number.parseInt(v, 10);
+    return Number.isFinite(n) && n > 0;
+  };
+  return disabled === 'true' || qwenDisabled === 'true' || ttsDisabled === 'true'
+    || positive(crashes) || positive(qwenCrashes);
+}
+
+/**
+ * Runs the one-time API 36 transition amnesty.
+ *
+ * @returns true only when a reset was actually performed, so the caller can
+ *          complete the RELOAD AI sequence (store status + bootQwen). False
+ *          means nothing was cleared — healthy device, already migrated, or not
+ *          a 2.5.x binary.
+ */
+export async function runMLResetMigrationIfNeeded(
+  appVersion: string | null = Application.nativeApplicationVersion,
+): Promise<boolean> {
+  try {
+    // Not the migrated binary: do nothing AND leave the marker unwritten.
+    if (!appVersion || !appVersion.startsWith('2.5.')) return false;
+    if (await AsyncStorage.getItem(KEY_RESET_MIGRATION_2_5_0)) return false;
+
+    const legacy = await hasLegacyMLDisableState();
+    if (legacy) await resetMLHealth();
+
+    // ⚠ Always, even when nothing was cleared. See the marker note above.
+    await AsyncStorage.setItem(KEY_RESET_MIGRATION_2_5_0, new Date().toISOString());
+    return legacy;
+  } catch {
+    // A storage fault must never be the reason the app fails to boot. Leaving
+    // the marker unwritten simply means the check is retried next launch.
+    return false;
   }
 }
 
