@@ -131,8 +131,18 @@ describe('Phase 1 — the second plane is apparent depth, and it costs no geomet
     const bottomP = flat(tartariaKitStyles.controlPlaneBottomPressed);
     expect(top.backgroundColor).toBe(T.controlFaceLit);
     expect(bottom.backgroundColor).toBe(T.controlSidewall);
-    expect(topP.backgroundColor).toBe(T.controlSidewall);
+    /* ⚠⚠⚠ AMENDED BY OTA-1829. `topP` was pinned to `controlSidewall` — the
+     * same two-thirds-opaque black the sidewall wears. On a near-black face
+     * that composites to the face, so the pressed top band read as ABSENT
+     * rather than shaded, which is the "top of the button disappears" the owner
+     * reported on the STORE / TALK / GIFT row. The claim this test exists to
+     * make — the planes INVERT, so the light that was above is now below —
+     * is unchanged and is asserted more strictly below than it was before. */
+    expect(topP.backgroundColor).toBeTruthy();
+    expect(topP.backgroundColor).not.toBe(top.backgroundColor);
     expect(bottomP.backgroundColor).toBe(T.controlFaceLit);
+    // the inversion itself: the resting TOP light is what the pressed BOTTOM wears
+    expect(bottomP.backgroundColor).toBe(top.backgroundColor);
     // …and the resting ring's own inversion is untouched by any of it.
     const resting = flat(tartariaKitStyles.controlResting);
     const pressed = flat(tartariaKitStyles.controlPressed);

@@ -121,9 +121,23 @@ describe('1. the canon: what a Tartaria key does under a finger', () => {
     expect(restBottom.height as number).toBeGreaterThan(restTop.height as number);
     expect(restBottom.bottom).toBe(1);
     expect(flat(kit.controlPlaneContact).backgroundColor).toBe(T.controlContact);
-    // Pressed: the side is now the TOP band, the light is underneath, and the
-    // side is a fraction of its resting height.
-    expect(downTop.backgroundColor).toBe(T.controlSidewall);
+    /* ⚠⚠⚠ AMENDED BY OTA-1829 — A CORRECTION, NOT A CLIMBDOWN.
+     * This asserted the pressed TOP band was `controlSidewall`, a
+     * two-thirds-opaque black. That was a true description of Phase 2 as built,
+     * and it pinned the half that turned out to BE the defect: over a near-black
+     * face that black composites to the face, so the band did not read as a
+     * shaded side — it read as GONE. Owner, with a repro on the STORE / TALK /
+     * GIFT row: *"when you hit the store button the top of it disappears."*
+     *
+     * The load-bearing claims were always "the light MOVES to the lower edge"
+     * and "the side loses height", and both survive untouched below. The pin
+     * now reads the PROPERTY instead of the spelling: the top band is still
+     * drawn, still changes under the finger, and is dimmer than at rest. */
+    expect(downTop.backgroundColor).toBeTruthy();
+    expect(downTop.backgroundColor).not.toBe(restTop.backgroundColor);
+    const alphaOf = (c: unknown) => Number(/,\s*([\d.]+)\s*\)\s*$/.exec(String(c))?.[1] ?? NaN);
+    expect(alphaOf(downTop.backgroundColor)).toBeLessThan(alphaOf(restTop.backgroundColor));
+    expect(alphaOf(downTop.backgroundColor)).toBeGreaterThan(0);
     expect(downBottom.backgroundColor).toBe(T.controlFaceLit);
     expect(downTop.height as number).toBeLessThan(restBottom.height as number);
     expect(downBottom.height as number).toBeLessThanOrEqual(restTop.height as number);

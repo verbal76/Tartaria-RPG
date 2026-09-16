@@ -1523,9 +1523,36 @@ const kit = StyleSheet.create({
    * insufficient."* So on press the sidewall COLLAPSES from 3dp to 1dp, the
    * contact band is not drawn at all, the shaded side moves ABOVE the face, and
    * the whole control travels 2dp (up from 1.5). The key visibly loses height. */
+  /* ⚠⚠⚠ OTA-1829 — THIS BAND IS THE "TOP PIECE THAT DISAPPEARS", AND IT IS THE
+   * WHOLE CLASS. Owner, with a repro: the exploration row where STORE sits
+   * beside FUSE CRUCIBLE, and the three-button STORE / TALK / GIFT row —
+   * *"when you hit the store button the top of it disappears."*
+   *
+   * ⚠⚠ THE MECHANISM, AND OTA-1828'S CENSUS WALKED STRAIGHT PAST IT. That pass
+   * read border pairs and pronounced 154 `ctl` controls correct. It never read
+   * the PLANES. At rest `controlPlaneTop` paints a 2dp band of `controlFaceLit`
+   * across the top of every planed control — that light band IS the top edge a
+   * player sees. Pressed, this style replaced it with `controlSidewall`, a
+   * two-thirds-opaque black, over a face that is already near-black. It
+   * composites to the face. The top piece does not darken; it VANISHES. ~250
+   * planed controls across 54 files did this, on every screen in the game.
+   *
+   * ⚠⚠ AND IT IS EXACTLY WHY THE CHARACTER SCREEN LOOKS RIGHT. The dossier
+   * wears NO planes — it inverts border colours only, so its top edge is always
+   * drawn. The authority never had this defect; everything else had it. That
+   * asymmetry IS the owner's report, and no per-screen patching would have
+   * found it, because it was never per-screen.
+   *
+   * ⚠ THE REPAIR KEEPS THE PRESS AND KEEPS THE EDGE. The light MOVES rather
+   * than switching off: the top drops to `controlLit` — an existing token, 0.20
+   * against the resting 0.38 — while `controlPlaneBottomPressed` below takes
+   * the full `controlFaceLit`. Every geometry cue Phase 2 bought survives: the
+   * band still grows 2dp → 3dp, the sidewall still collapses, the contact band
+   * is still not drawn, the control still travels. Nothing is minted, no idle
+   * appearance moves, and the only difference is DURING a press. */
   controlPlaneTopPressed: {
     position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-    backgroundColor: T.controlSidewall, borderTopLeftRadius: 3, borderTopRightRadius: 3,
+    backgroundColor: T.controlLit, borderTopLeftRadius: 3, borderTopRightRadius: 3,
   },
   controlPlaneBottomPressed: {
     position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
