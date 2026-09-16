@@ -1,0 +1,323 @@
+Bug Report — Verbal · (2026-09-15-1824-the-helper-is-called-not-quoted) · 474
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-16T04:14:48.509Z
+Character: Verbal
+Slot ID: slot_mu3l259m_3iqqs5
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 44/44
+
+--- DESCRIPTION ---
+474
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-16T04:14:48.461Z
+
+Install
+  App ID: com.hotatticgames.tartarprim.golem
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 474
+  AAB: (build 474)
+  OTA: (2026-09-15-1824-the-helper-is-called-not-quoted)
+  Boot stage: qwen:failed
+
+ML runtime health
+  Status: degraded — 1 load that failed in the open — last: GGUF download failed: Software caused connection abort (gguf 208.3MB on disk (~398MB nominal); NO SENTINEL; disk free 59.8GB) (1/2 before auto-disable)
+  Crash count: 0
+  Last init attempt: never
+  Last init success: 2026-09-16T04:11:51.551Z
+  Crashes-before-disable threshold: 2
+  Observed load failures: 1 (last 2026-09-16T04:12:22.022Z)
+  Last load failure cause: GGUF download failed: Software caused connection abort (gguf 208.3MB on disk (~398MB nominal); NO SENTINEL; disk free 59.8GB)
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu3l13ddfa · started 2026-09-16T04:10:01.681Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 105.6s (cognition) · 1 past 3s
+  App state trail: background → active → background → active
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: failed
+  Why: GGUF download failed: Software caused connection abort (gguf 208.3MB on disk (~398MB nominal); NO SENTINEL; disk free 59.8GB)
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 36MB · last 32MB · net +20MB over 8 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/9 · ctx 0 · app=active · native voice running q1 · warns 0
+    +65.2s heap-move — heap 28MB gc 0ms/29 · ctx 0 · app=active · native voice running q1 · warns 0
+   +134.8s appstate [active→background] — heap 32MB gc 0ms/129 · ctx 0 · app=background · native idle q0 · warns 0
+   +140.3s watch-start — heap 36MB gc 0ms/140 · ctx 0 · app=background · native idle q0 · warns 0
+   +250.2s appstate [background→active] — heap 32MB gc 1ms/144 · ctx 0 · app=active · native idle q0 · warns 0
+   +265.1s appstate [active→background] — heap 32MB gc 1ms/151 · ctx 0 · app=background · native idle q0 · warns 0
+   +278.9s appstate [background→active] — heap 32MB gc 1ms/152 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot: (no trace loaded)
+  this boot:
+  2026-09-16T04:14:20.930Z #52 in report:send ⏱+31ms p=none exploration
+  2026-09-16T04:14:21.052Z #52 enter report:send p=none exploration
+  2026-09-16T04:14:21.053Z #52 admit report:send (fulllog) p=none exploration
+  2026-09-16T04:14:21.053Z #52 dispatch report:send (fulllog) p=none exploration
+  2026-09-16T04:14:21.053Z #52 dispatch report:send (compose) p=none exploration
+  2026-09-16T04:14:21.101Z #52 done report:send (handed-off) p=none exploration
+  2026-09-16T04:14:21.222Z #52 admit report:send (sent) p=none exploration
+  2026-09-16T04:14:21.222Z #52 done report:send (resolved) p=none exploration
+  2026-09-16T04:14:21.222Z #52 pres report:receipt (requested) p=none exploration
+  2026-09-16T04:14:21.234Z #52 pres report:receipt (shown) p=none exploration
+  2026-09-16T04:14:22.235Z #53 root p=none exploration
+  2026-09-16T04:14:22.387Z #52 pres report:receipt (dismissed) p=none exploration
+  2026-09-16T04:14:41.373Z #54 root p=none exploration active
+  2026-09-16T04:14:42.435Z #55 root p=none exploration active
+  2026-09-16T04:14:42.437Z #56 modal p=none exploration active
+  2026-09-16T04:14:43.226Z #57 root p=none exploration active
+  2026-09-16T04:14:43.229Z #58 modal p=none exploration active
+  2026-09-16T04:14:48.375Z #59 root p=none exploration active
+  2026-09-16T04:14:48.375Z #60 modal p=none exploration active
+  2026-09-16T04:14:48.375Z #60 in report:send ⏱+19ms p=none exploration active
+  2026-09-16T04:14:48.458Z #60 enter report:send p=none exploration active
+  2026-09-16T04:14:48.459Z #60 admit report:send (described) p=none exploration active
+  2026-09-16T04:14:48.459Z #60 dispatch report:send (described) p=none exploration active
+  2026-09-16T04:14:48.459Z #60 dispatch report:send (compose) p=none exploration active
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+
+--- INVENTORY ---
+Inventory (Verbal)
+  HP: 44/44  Stamina: 1/12  TC: 165  Corruption: 0
+  Pack: 30 distinct rows / 104 total
+
+Weapons (5)
+  Bone Splitter Axe (1d8 slashing, dur 13/13, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 16/16, equipped:off, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, unequip:off, use
+  Mud-fist Wraps (1d10 bludgeoning, dur 35/35, equipped:main, [weapon,starter])
+    actions: equip:off, unequip:main, use(off)
+  Pocket Knife (1d4 slashing, dur 12/12, [weapon,starter,knife,tool])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 29/29, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (3)
+  Mud-Warden's Vest (dur 26/26, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 24/24, equipped:head, AC +1 · INT +1, [armor])
+    actions: unequip:head
+  Wanderer's Face of Shadows (dur 20/20, AC +2 · STE +2, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (6)
+  Bioluminescent Fungus ×20 (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  First Aid Kit ×10 (Uncommon, [healing,crafted,gift])
+    actions: use(apply), drop
+  Smoke-Cured Jerky Strip ×20 ([food,treat,dog_treat,gift])
+    actions: use(eat), drop
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Trail Rations ×20 ([food,gift])
+    actions: use(eat), drop
+  Water Bottle ×2 ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Torch (Reveals hidden scene hooks, [light])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Rope ([climb,rope,fiber])
+    actions: use, scrap, drop
+
+Materials (4)
+  Aether Crystal ([aether,crystal])
+    actions: drop
+  Aether Dust ([aether,dust,distillable])
+    actions: drop
+  Scrap Metal ×2 ([metal])
+    actions: drop
+  Worn Tartarian Coin ×5 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (7)
+  Skyreacher Map 1 of 5 — Grand Spire (Uncommon, [gift,map,skyreacher])
+    actions: use, drop
+  Skyreacher Map 2 of 5 — Asgardar Spire (Uncommon, [gift,map,skyreacher])
+    actions: use, drop
+  Skyreacher Map 3 of 5 — Obsidian Monolith (Uncommon, [gift,map,skyreacher])
+    actions: use, drop
+  Skyreacher Map 4 of 5 — Thametan Tower (Uncommon, [gift,map,skyreacher])
+    actions: use, drop
+  Skyreacher Map 5 of 5 — Zharak Fang (Uncommon, [gift,map,skyreacher])
+    actions: use, drop
+  ◆ Smoked Glass Chip ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Splintered Haft End ([trophy])
+    actions: save-for-fusion, drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — full log, 120 entries)
+
+[2026-09-16T04:14:40.635Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #2).
+[2026-09-16T04:14:40.630Z] [debug] appstate: background → active (was background for 13822ms)
+[2026-09-16T04:14:32.223Z] [debug] qwen-watchdog: reinit #1 settled in 10181ms → status='failed'.
+[2026-09-16T04:14:26.807Z] [debug] appstate: active → background (was active for 14903ms)
+[2026-09-16T04:14:22.039Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #1).
+[2026-09-16T04:14:21.207Z] [debug] send-log: #mu3l6nkdnob4 — DELIVERED (inline, no attachments): beacon out, 3/3 parts accepted (21222 chars) — flush said yes, transport took every part
+[2026-09-16T04:14:11.982Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-09-16T04:14:11.904Z] [debug] appstate: background → active (was background for 109881ms)
+[2026-09-16T04:12:22.022Z] [debug] qwen: LOAD FAILED — GGUF download failed: Software caused connection abort (gguf 208.3MB on disk (~398MB nominal); NO SENTINEL; disk free 59.8GB)
+[2026-09-16T04:12:16.542Z] [debug] appstate: active → background (was active for 134807ms)
+[2026-09-16T04:11:58.173Z] [reward]     • Aether Dust (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Splintered Haft End (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Aether Crystal (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Smoked Glass Chip (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-09-16T04:11:58.173Z] [reward] ✦ Salvage haul:
+[2026-09-16T04:11:58.172Z] [world] You salvage the tilted capacitor coil rack. The take is small but real.
+[2026-09-16T04:11:58.172Z] [world] You strip the table carefully. Something usable comes free in your hand.
+[2026-09-16T04:11:58.172Z] [world] You salvage the stripped sentinel diagnostic console. The take is small but real.
+[2026-09-16T04:11:58.172Z] [world] You work the sign apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-16T04:11:58.172Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-16T04:11:58.172Z] [world] Tucked inside the gate: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-16T04:11:58.171Z] [world] You work the brick over. A part of it comes loose, intact.
+[2026-09-16T04:11:57.439Z] [debug] persist sizes(KB): total=61 player=28 wm=18[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=13 scene=2
+[2026-09-16T04:11:57.322Z] [reward] ✦ Wanderer's Face of Shadows (Common).
+[2026-09-16T04:11:57.322Z] [world] You lift the Wanderer's Face of Shadows clear.
+[2026-09-16T04:11:57.319Z] [reward] ✦ Salvaged Bow (Common).
+[2026-09-16T04:11:57.319Z] [world] You pick up the Salvaged Bow.
+[2026-09-16T04:11:57.311Z] [reward] ✦ Bone Splitter Axe (Common).
+[2026-09-16T04:11:57.311Z] [world] You take the Bone Splitter Axe from where it lay.
+[2026-09-16T04:11:55.190Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-16T04:11:51.552Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-16T04:11:50.875Z] [debug] voice: bundled ready
+[2026-09-16T04:11:49.462Z] [arbiter] "Take your time. Tap EXIT when you're ready."
+[2026-09-16T04:11:49.149Z] [debug] voice: bundled loading
+[2026-09-16T04:11:47.378Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call. Out there every step costs 1 stamina and a little time; REST brings it back."
+[2026-09-16T04:11:47.377Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-09-16T04:11:47.377Z] [player] investigate door
+[2026-09-16T04:11:45.660Z] [debug] ui: tap "investigate" ⏱+13ms
+[2026-09-16T04:11:44.374Z] [system] ⏳ Time passed: 15 min
+[2026-09-16T04:11:44.373Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-09-16T04:11:44.373Z] [world] You make your way back down the arch. Boots back on the ground.
+[2026-09-16T04:11:44.371Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-16T04:11:44.371Z] [player] climb down
+[2026-09-16T04:11:44.345Z] [debug] ui: tap "climb down" ⏱+12ms
+[2026-09-16T04:11:43.349Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:43.348Z] [reward] ✦ A small pouch, tucked where only a climber would look — 15 TC. High places keep things for whoever bothers to reach them.
+[2026-09-16T04:11:43.347Z] [world] You reach the top of the arch (tier 3/3). The view changes; the room reads differently from here.
+[2026-09-16T04:11:43.347Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 3/3 cleared.
+[2026-09-16T04:11:43.343Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:43.342Z] [player] climb arch
+[2026-09-16T04:11:43.313Z] [debug] ui: tap "climb up (2/3)" ⏱+16ms
+[2026-09-16T04:11:42.530Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:42.530Z] [world] You reach the last stretch of the arch (tier 2/3). Higher still to go.
+[2026-09-16T04:11:42.529Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 2/3 cleared.
+[2026-09-16T04:11:42.527Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:42.526Z] [player] climb arch
+[2026-09-16T04:11:42.511Z] [debug] ui: tap "climb up (1/3)" ⏱+24ms
+[2026-09-16T04:11:40.001Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:40.001Z] [world] You reach the first hold of the arch (tier 1/3). Higher still to go.
+[2026-09-16T04:11:40.000Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 1/3 cleared.
+[2026-09-16T04:11:39.996Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:39.996Z] [player] climb arch
+[2026-09-16T04:11:38.527Z] [debug] ui: tap "climb" ⏱+23ms
+[2026-09-16T04:11:37.412Z] [arbiter] "Now the rope earns its keep. Tap CLIMB — top out, then climb back down."
+[2026-09-16T04:11:37.411Z] [reward] ✦ Plate Fragment x2 (Common). [salvaged]
+[2026-09-16T04:11:37.411Z] [world] You pop the rusted plate off its strap and it comes apart along old hammer-marks.
+[2026-09-16T04:11:37.410Z] [player] salvage broken chest plate
+[2026-09-16T04:11:35.559Z] [debug] ui: tap "take / salvage" ⏱+14ms
+[2026-09-16T04:11:34.213Z] [arbiter] "That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."
+[2026-09-16T04:11:34.212Z] [arbiter] "Good. That rope earns its keep."
+[2026-09-16T04:11:34.212Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-09-16T04:11:34.211Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-09-16T04:11:34.210Z] [player] take rope
+[2026-09-16T04:11:25.816Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=5
+[2026-09-16T04:11:25.759Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=5
+[2026-09-16T04:11:25.633Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=5
+[2026-09-16T04:11:22.500Z] [arbiter] "Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."
+[2026-09-16T04:11:22.499Z] [debug] stats: STR5 DEX7 INT2 WIS7 CHA5 STE0 | gear: INT+1,WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-16T04:11:22.493Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-09-16T04:11:22.493Z] [world] You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.
+[2026-09-16T04:11:22.491Z] [debug] ui: tap "★ Take & wear Reclaimer's Salvage Cap — your head slot is bare"
+[2026-09-16T04:11:20.917Z] [arbiter] "Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it's on your head."
+[2026-09-16T04:11:20.830Z] [debug] stats: STR5 DEX7 INT1 WIS7 CHA5 STE0 | gear: WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel chest=Mud-Warden's Vest
+[2026-09-16T04:11:20.827Z] [reward] ✦ Mud-Warden's Vest (Common).
+[2026-09-16T04:11:20.827Z] [world] You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.
+[2026-09-16T04:11:20.826Z] [player] take Mud-Warden's Vest
+[2026-09-16T04:11:19.039Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-16T04:11:17.134Z] [arbiter] "That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."
+[2026-09-16T04:11:17.132Z] [arbiter] "Good. Keep it close."
+[2026-09-16T04:11:17.132Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-09-16T04:11:17.131Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your off hand without thinking.
+[2026-09-16T04:11:17.127Z] [player] take cudgel
+[2026-09-16T04:11:13.789Z] [debug] ui: tap "take / salvage" ⏱+17ms
+[2026-09-16T04:11:12.519Z] [arbiter] "A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You'll want a weapon."
+[2026-09-16T04:11:12.518Z] [world] One shelf of books doesn't match the others — same spines, no dust, and they don't quite sit flush against the wall.
+[2026-09-16T04:11:12.517Z] [world] You look around. You're in The Atrium (The Monarch's Waystation). You see: Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows, sign, brick, gate, arch, lantern, tilted capacitor coil rack, stripped sentinel diagnostic console, table. Exits: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-16T04:11:12.516Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:11:12.515Z] [player] look
+[2026-09-16T04:11:12.505Z] [debug] ui: tap "look around you" ⏱+19ms
+[2026-09-16T04:11:11.244Z] [reward] ✦ A Resurrection Gem is set aside for Verbal — the buried world keeps its own. (2 held)
+[2026-09-16T04:11:11.140Z] [arbiter] "First, get your bearings. Tap LOOK AROUND YOU — I'll read the room for you: what's here, your way out, and whatever you're still chasing. Use it any time you're lost."
+[2026-09-16T04:11:11.140Z] [reward] ✦ The Arbiter unrolls the whole ledger for Verbal: every hunt, mystery, storyline and faction quest is open on the board — 50 contracts and 65 faction quests — plus all five Skyreacher Maps, every great climb already charted. Test freely.
+[2026-09-16T04:11:11.139Z] [reward] ✦ A crash-test kit lands in Verbal's pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.
+[2026-09-16T04:11:11.136Z] [arbiter] "Well met, Verbal. To business."
+[2026-09-16T04:11:11.133Z] [player] Verbal
+[2026-09-16T04:11:06.028Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=0
+[2026-09-16T04:11:05.802Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=0
+[2026-09-16T04:10:58.041Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu3l259m_3iqqs5 left intact
+[2026-09-16T04:10:57.992Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-09-16T04:10:50.887Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu3l259m_3iqqs5 left intact
+[2026-09-16T04:10:50.810Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-16T04:10:50.809Z] [world] A map-stone hums softly at the center of the camp — old enough to remember roads the Flood erased. A glass hail presses on the world — -1 DEX. What you do here is yours to choose.
+[2026-09-16T04:10:50.809Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+[2026-09-16T04:10:50.809Z] [world] Of the Tartarian Giants, sworn to the Mud Monarchs: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.
+[2026-09-16T04:10:50.808Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows] window=0 roster=new
+[2026-09-16T04:10:50.803Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-16T04:10:50.803Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=y passing=n
+[2026-09-16T04:10:50.801Z] [debug] APK session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+
+=== END REPORT ===

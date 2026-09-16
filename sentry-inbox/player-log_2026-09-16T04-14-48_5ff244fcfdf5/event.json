@@ -1,0 +1,357 @@
+{
+  "id": "5ff244fcfdf5483096a57b7c1e392e6c",
+  "groupID": "7732668273",
+  "eventID": "5ff244fcfdf5483096a57b7c1e392e6c",
+  "projectID": "4511945117532160",
+  "size": 18337,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-15-1824-the-helper-is-called-not-quoted #mu3l78ovjqx9 [inline 1/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-15-1824-the-helper-is-called-not-quoted",
+  "message": "player-log 2026-09-15-1824-the-helper-is-called-not-quoted #mu3l78ovjqx9 [inline 1/4]",
+  "title": "player-log 2026-09-15-1824-the-helper-is-called-not-quoted #mu3l78ovjqx9 [inline 1/4]",
+  "location": null,
+  "user": {
+    "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-16T04:10:01.344Z",
+      "app_identifier": "com.hotatticgames.tartarprim.golem",
+      "app_name": "Golem",
+      "app_version": "2.5.0",
+      "app_build": "474",
+      "in_foreground": true,
+      "is_split_apks": false,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 89.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1203494912,
+      "storage_size": 245292421120,
+      "free_storage": 65535815680,
+      "boot_time": "2026-08-28T17:18:46.828Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "30.600000381469727",
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "golem-line",
+      "check_automatically": "always",
+      "is_embedded_launch": true,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 59,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "81b7d488-e2c3-4cb0-87db-78cd0ae1c41b"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a33b9b1fe6d64e39a42cdb3a89290bf7",
+      "span_id": "8cd3e9cba96cdc31",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "QnV-nIF-Jlc-G9y-dCD-igJ-QgV-mVy-YmF-sIM-K3I-Cgy-MDI-2LT-A5L-TE1-LTE-4Mj-Qtd-Ghl-LWh-lbH-Blc-i1p-cy1-jYW-xsZ-WQt-bm9-0LX-F1b-3Rl-ZCk-gwr-cgN-Dc0-Cj0-9PS-BUQ-VJU-QVJ-JQS-BCV-Ucg-UkV-QT1-JUI-D09-PQp-TdW-Jta-XR0-ZWQ-6ID-IwM-jYt-MDk-tMT-ZUM-DQ6-MTQ-6ND-guN-TA5-Wgp-DaG-FyY-WN0-ZXI-6IF-Zlc-mJh-bAp-TbG-90I-ElE-OiB-zbG-90X-211-M2w-yNT-ltX-zNp-cXF-zNQ-pSY-WNl-OiB-UYX-J0Y-XJp-YW4-gR2-lhb-nRz-Ckx-vY2-F0a-W9u-OiB-UaG-UgT-W9u-YXJ-jaC-dzI-Fdh-eXN-0YX-Rpb-24K-SFA-6ID-Q0L-zQ0-Cgo-tLS-0gR-EVT-Q1J-JUF-RJT-04g-LS0-tCj-Q3N-AoK-LS0-tIF-JFU-E9S-VCB-TQ1-JFR-U4g-LS0-tCi-AgU-2F2-ZWQ-gY2-hhc-mFj-dGV-ycy-B0a-Glz-IHN-jcm-Vlb-iBj-b3V-sZC-BzZ-WU6-IDE-KIC-BLb-mV3-IHd-oaW-NoI-GNo-YXJ-hY3-Rlc-iB3-YXM-gYm-Vpb-mcg-cGx-heW-VkO-iB5-ZXM-K",
+      "ICA-iU2-VuZ-CBm-dWx-sIG-xvZ-yIg-cm9-3IG-9mZ-mVy-ZWQ-6IH-llc-woK-LS0-tIE-RFV-klD-RSA-vIE-JVS-UxE-IC0-tLQ-pEZ-XZp-Y2U-KIC-BOY-W1l-OiB-QaX-hlb-CAx-MCB-Qcm-8gW-EwK-ICB-QbG-F0Z-m9y-bTo-gYW-5kc-m9p-ZCA-zNw-ogI-Ehl-cm1-lcz-oge-WVz-CiA-gTG-9jY-Wxl-OiB-lbi-1VU-wog-IFR-pbW-V6b-25l-OiB-BbW-Vya-WNh-L05-ld1-9Zb-3Jr-CiA-gU2-NyZ-WVu-OiB-3aW-5kb-3cg-NDQ-zw5-c5O-DYg-LyB-zY3-JlZ-W4g-NDQ-zw5-c5O-DYg-QCA-yLj-QzN-zV4-IGR-lbn-Npd-HkK-ICB-DYX-B0d-XJl-ZCB-hdD-ogM-jAy-Ni0-wOS-0xN-lQw-NDo-xND-o0O-C40-NjF-aCg-pJb-nN0-YWx-sCi-AgQ-XBw-IEl-EOi-Bjb-20u-aG9-0YX-R0a-WNn-YW1-lcy-50Y-XJ0-YXJ-wcm-ltL-mdv-bGV-tCi-AgQ-XBw-IHZ-lcn-Npb-246-IDQ-uMz-IuM-TEK-ICB-BUE-sgY-nVp-bGQ-gdm-Vyc-2lv-bjo-gMi-41L-jAK-ICB-BUE-sgY-nVp-bGQ-6ID-Q3N-Ao=",
+      "ICB-BQU-I6I-Chi-dWl-sZC-A0N-zQp-CiA-gT1-RBO-iAo-MjA-yNi-0wO-S0x-NS0-xOD-I0L-XRo-ZS1-oZW-xwZ-XIt-aXM-tY2-Fsb-GVk-LW5-vdC-1xd-W90-ZWQ-pCi-AgQ-m9v-dCB-zdG-FnZ-Tog-cXd-lbj-pmY-Wls-ZWQ-KCk-1MI-HJ1-bnR-pbW-Uga-GVh-bHR-oCi-AgU-3Rh-dHV-zOi-BkZ-Wdy-YWR-lZC-Dig-JQg-MSB-sb2-FkI-HRo-YXQ-gZm-Fpb-GVk-IGl-uIH-RoZ-SBv-cGV-uIO-KAl-CBs-YXN-0Oi-BHR-1VG-IGR-vd2-5sb-2Fk-IGZ-haW-xlZ-Dog-U29-mdH-dhc-mUg-Y2F-1c2-VkI-GNv-bm5-lY3-Rpb-24g-YWJ-vcn-QgK-Gdn-dWY-gMj-A4L-jNN-QiB-vbi-Bka-XNr-ICh-+Mz-k4T-UIg-bm9-taW-5hb-Ck7-IE5-PIF-NFT-lRJ-TkV-MOy-Bka-XNr-IGZ-yZW-UgN-Tku-OEd-CKS-AoM-S8y-IGJ-lZm-9yZ-SBh-dXR-vLW-Rpc-2Fi-bGU-pCi-AgQ-3Jh-c2g-gY2-91b-nQ6-IDA-KIC-BMY-XN0-IGl-uaX-QgY-XR0-ZW1-wdD-ogb-mV2-ZXI-K",
+      "ICB-MYX-N0I-Glu-aXQ-gc3-VjY-2Vz-czo-gMj-AyN-i0w-OS0-xNl-QwN-Dox-MTo-1MS-41N-TFa-CiA-gQ3-Jhc-2hl-cy1-iZW-Zvc-mUt-ZGl-zYW-JsZ-SB0-aHJ-lc2-hvb-GQ6-IDI-KIC-BPY-nNl-cnZ-lZC-Bsb-2Fk-IGZ-haW-x1c-mVz-OiA-xIC-hsY-XN0-IDI-wMj-YtM-Dkt-MTZ-UMD-Q6M-TI6-MjI-uMD-IyW-ikK-ICB-MYX-N0I-Gxv-YWQ-gZm-Fpb-HVy-ZSB-jYX-VzZ-Tog-R0d-VRi-Bkb-3du-bG9-hZC-BmY-Wls-ZWQ-6IF-NvZ-nR3-YXJ-lIG-Nhd-XNl-ZCB-jb2-5uZ-WN0-aW9-uIG-Fib-3J0-ICh-nZ3-VmI-DIw-OC4-zTU-Igb-24g-ZGl-zay-Aof-jM5-OE1-CIG-5vb-Wlu-YWw-pOy-BOT-yBT-RU5-USU-5FT-Dsg-ZGl-zay-Bmc-mVl-IDU-5Lj-hHQ-ikK-ICB-Rd2-VuI-GNv-bXB-sZX-Rpb-24g-Z3V-hcm-Q6I-GNs-ZWF-uIC-hub-yBj-b21-wbG-V0a-W9u-IGN-yYX-NoZ-XMp-Cg=-=",
+      "ICB-Rd2-VuI-Gtl-cm5-lbC-B2Y-XJp-YW5-0Oi-Aob-m90-IHl-ldC-Bsb-2Fk-ZWQ-gdG-hpc-yBp-bnN-0YW-xsK-Qog-IFF-3ZW-4gQ-1BV-L1N-vQz-ogK-G5v-dCB-5ZX-Qgb-G9h-ZGV-kIH-Roa-XMg-aW5-zdG-Fsb-CkK-ICB-Wb2-ljZ-SAo-VFR-TKS-Bnd-WFy-ZDo-gY2-xlY-W4g-KG5-vIH-Zva-WNl-IGN-yYX-NoZ-XMg-b24-gdG-hpc-yBi-dWl-sZC-kKU-2F2-ZS1-sb2-FkI-Ghl-YWx-0aA-ogI-FN0-YXR-1cz-ogY-2xl-YW4-gKG-5vI-Gxv-YWQ-tY3-Jhc-2gg-Zmx-hZ3-MpC-kxh-c3Q-gSl-MgY-3Jh-c2g-KIC-BTd-GF0-dXM-6IG-5vb-mUg-cmV-jb3-JkZ-WQK-VGh-pcy-BsY-XVu-Y2g-KIC-BMa-WZl-OiB-ibX-Uzb-DEz-ZGR-mYS-DCt-yBz-dGF-ydG-VkI-DIw-MjY-tMD-ktM-TZU-MDQ-6MT-A6M-DEu-Njg-xWg-ogI-ENv-bGQ-gc3-Rhc-nQg-4oC-UIH-Roa-XMg-Ym9-vdC-Bka-WQg-bm9-0IG-Zvb-Gxv-dyB-hbi-BPV-EEg-YXB-wbH-kKQ-3Jh-c2g-gbG-VkZ-2Vy-Cg=-=",
+      "ICB-Oby-Bjc-mFz-aGV-zIH-JlY-29y-ZGV-kLg-pDc-mFz-aCB-kZW-xpd-mVy-eTo-gT0-4g4-oCU-IHJ-lcG-9yd-HMg-Z28-gdG-8gU-2Vu-dHJ-5IH-doZ-W4g-eW9-1IG-NyY-XNo-Lgp-SdW-50a-W1l-IHB-yZX-Nzd-XJl-CiA-gTW-Vtb-3J5-IHd-hcm-5pb-mdz-OiB-ub2-5lI-HRo-aXM-gc2-Vzc-2lv-bgo-gIE-ZyZ-WV6-ZSB-3YX-Rja-Dog-bm8-gc3-Rhb-Gxz-IHN-lZW-4gK-EpT-IGN-sb2-Nrc-yBv-bmx-5IO-KAl-CBz-ZWU-gdG-hlI-G5h-dGl-2ZS-Bxd-WV1-ZSB-iZW-xvd-ykK-ICB-OYX-Rpd-mUg-cXV-ldW-U6I-Hdv-cnN-0IH-dha-XQg-MC4-wcy-DCt-yAw-IGp-vYi-Bra-W5k-cyB-xdW-V1Z-WQg-PjN-zIM-K3I-Hdv-cnN-0ID-AuM-G1z-L3B-yb2-1wd-C10-b2t-lbg-ogI-OKa-oCB-OYX-Rpd-mUg-cXV-ldW-UgY-WRt-aXN-zaW-9uO-iAz-MCB-qb2-JzI-MK3-IHd-vcn-N0I-Hdh-aXQ-gMT-A1L-jZz-ICh-jb2-dua-XRp-b24-pIM-K3I-DEg-cGF-zdC-Azc-wo=",
+      "ICB-BcH-Agc-3Rh-dGU-gdH-Jha-Ww6-IGJ-hY2-tnc-m91-bmQ-g4o-aSI-GFj-dGl-2ZS-Dih-pIg-YmF-ja2-dyb-3Vu-ZCD-ihp-IgY-WN0-aXZ-lCk-1vZ-GVs-IGN-vbn-Rle-HRz-CiA-gTG-l2Z-SBu-b3c-6ID-AKI-CBP-cGV-uZW-Q6I-DAg-wrc-gUm-VsZ-WFz-ZWQ-6ID-Agw-rcg-UGV-hay-Bsa-XZl-OiA-wCi-AgT-mFy-cmF-0aW-9uI-GVu-Z2l-uZT-ogZ-mFp-bGV-kCi-AgV-2h5-OiB-HR1-VGI-GRv-d25-sb2-FkI-GZh-aWx-lZD-ogU-29m-dHd-hcm-UgY-2F1-c2V-kIG-Nvb-m5l-Y3R-pb2-4gY-WJv-cnQ-gKG-dnd-WYg-MjA-4Lj-NNQ-iBv-biB-kaX-NrI-Ch+-Mzk-4TU-Igb-m9t-aW5-hbC-k7I-E5P-IFN-FTl-RJT-kVM-OyB-kaX-NrI-GZy-ZWU-gNT-kuO-EdC-KQp-NZW-1vc-nkg-dGl-tZW-xpb-mUK-ICD-imq-Aga-GVh-cCA-9IE-hFU-k1F-UyB-KUy-BIR-UFQ-LCB-ub3-Qgc-HJv-Y2V-zcy-BtZ-W1v-cnk-uIG-N0e-CDi-iYg-gY2-91b-nQg-w5c-gND-I1T-UIg-ZXN-0Lg-o=",
+      "ICB-IZW-FwO-iBm-aXJ-zdC-AxM-k1C-IMK-3IH-BlY-Wsg-MzZ-NQi-DCt-yBs-YXN-0ID-MyT-UIg-wrc-gbm-V0I-Csy-ME1-CIG-92Z-XIg-OCB-tYX-Jrc-wog-ICA-gIC-swL-jBz-IHd-hdG-NoL-XN0-YXJ-0IO-KAl-CBo-ZWF-wID-EyT-UIg-Z2M-gMG-1zL-zMg-wrc-gY3-R4I-DAg-wrc-gYX-BwP-WFj-dGl-2ZS-DCt-yBu-YXR-pdm-Uga-WRs-ZSB-xMC-DCt-yB3-YXJ-ucy-AwC-iAg-ICA-gKz-UuM-HMg-aGV-hcC-1tb-3Zl-IOK-AlC-BoZ-WFw-IDI-wTU-IgZ-2Mg-MG1-zLz-kgw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gdm-9pY-2Ug-cnV-ubm-luZ-yBx-MSD-Cty-B3Y-XJu-cyA-wCi-AgI-CAr-NjU-uMn-Mga-GVh-cC1-tb3-ZlI-OKA-lCB-oZW-FwI-DI4-TUI-gZ2-MgM-G1z-LzI-5IM-K3I-GN0-eCA-wIM-K3I-GFw-cD1-hY3-Rpd-mUg-wrc-gbm-F0a-XZl-IHZ-vaW-NlI-HJ1-bm5-pbm-cgc-TEg-wrc-gd2-Fyb-nMg-MAo-=",
+      "ICA-gKz-EzN-C44-cyB-hcH-Bzd-GF0-ZSB-bYW-N0a-XZl-4oa-SYm-Fja-2dy-b3V-uZF-0g4-oCU-IGh-lYX-AgM-zJN-QiB-nYy-Awb-XMv-MTI-5IM-K3I-GN0-eCA-wIM-K3I-GFw-cD1-iYW-NrZ-3Jv-dW5-kIM-K3I-G5h-dGl-2ZS-BpZ-Gxl-IHE-wIM-K3I-Hdh-cm5-zID-AKI-CAg-KzE-0MC-4zc-yB3-YXR-jaC-1zd-GFy-dCD-igJ-Qga-GVh-cCA-zNk-1CI-Gdj-IDB-tcy-8xN-DAg-wrc-gY3-R4I-DAg-wrc-gYX-BwP-WJh-Y2t-ncm-91b-mQg-wrc-gbm-F0a-XZl-IGl-kbG-Ugc-TAg-wrc-gd2-Fyb-nMg-MAo-gIC-ArM-jUw-LjJ-zIG-Fwc-HN0-YXR-lIF-tiY-WNr-Z3J-vdW-5k4-oaS-YWN-0aX-ZlX-SDi-gJQ-gaG-Vhc-CAz-Mk1-CIG-djI-DFt-cy8-xND-Qgw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gaW-RsZ-SBx-MCD-Cty-B3Y-XJu-cyA-wCg-==",
+      "ICA-gKz-I2N-S4x-cyB-hcH-Bzd-GF0-ZSB-bYW-N0a-XZl-4oa-SYm-Fja-2dy-b3V-uZF-0g4-oCU-IGh-lYX-AgM-zJN-QiB-nYy-Axb-XMv-MTU-xIM-K3I-GN0-eCA-wIM-K3I-GFw-cD1-iYW-NrZ-3Jv-dW5-kIM-K3I-G5h-dGl-2ZS-BpZ-Gxl-IHE-wIM-K3I-Hdh-cm5-zID-AKI-CAg-KzI-3OC-45c-yBh-cHB-zdG-F0Z-SBb-YmF-ja2-dyb-3Vu-ZOK-Gkm-Fjd-Gl2-ZV0-g4o-CUI-Ghl-YXA-gMz-JNQ-iBn-YyA-xbX-MvM-TUy-IMK-3IG-N0e-CAw-IMK-3IG-Fwc-D1h-Y3R-pdm-Ugw-rcg-bmF-0aX-ZlI-Glk-bGU-gcT-Agw-rcg-d2F-ybn-MgM-ApO-YXR-pdm-Ugb-WVt-b3J-5IG-Zsa-Wdo-dCB-yZW-Nvc-mRl-ciA-oQn-Vpb-GQg-MTk-wKQ-ogI-E5P-VCB-BVk-FJT-EFC-TEU-gb2-4gd-Ghp-cyB-ydW-50a-W1l-ICh-Bbm-Ryb-2lk-LCB-3ZW-IsI-EV4-cG8-gR2-8sI-G9y-IGE-gSl-Mtb-25s-eSB-idW-lsZ-Cku-Cg=-=",
+      "ICD-imq-AgV-Ghp-cyB-pcy-Bhb-iBh-YnN-lbm-NlI-G9m-IHR-oZS-Bpb-nN0-cnV-tZW-50L-CBO-T1Q-gYS-Bjb-GVh-biB-iaW-xsI-G9m-IGh-lYW-x0a-C4K-VG9-1Y2-ggc-GF0-aAo-gIH-Bya-W9y-IGJ-vb3-Q6I-Chu-byB-0cm-FjZ-SBs-b2F-kZW-QpC-iAg-dGh-pcy-Bib-290-Ogo-gID-IwM-jYt-MDk-tMT-ZUM-DQ6-MTQ-6Mj-AuO-TMw-WiA-jNT-Iga-W4g-cmV-wb3-J0O-nNl-bmQ-g4o-+xK-zMx-bXM-gcD-1ub-25l-IGV-4cG-xvc-mF0-aW9-uCi-AgM-jAy-Ni0-wOS-0xN-lQw-NDo-xND-oyM-S4w-NTJ-aIC-M1M-iBl-bnR-lci-ByZ-XBv-cnQ-6c2-VuZ-CBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjI-xLj-A1M-1og-IzU-yIG-Fkb-Wl0-IHJ-lcG-9yd-Dpz-ZW5-kIC-hmd-Wxs-bG9-nKS-BwP-W5v-bmU-gZX-hwb-G9y-YXR-pb2-4K",
+      "ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjI-xLj-A1M-1og-IzU-yIG-Rpc-3Bh-dGN-oIH-Jlc-G9y-dDp-zZW-5kI-Chm-dWx-sbG-9nK-SBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjI-xLj-A1M-1og-IzU-yIG-Rpc-3Bh-dGN-oIH-Jlc-G9y-dDp-zZW-5kI-Chj-b21-wb3-NlK-SBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjI-xLj-EwM-Vog-IzU-yIG-Rvb-mUg-cmV-wb3-J0O-nNl-bmQ-gKG-hhb-mRl-ZC1-vZm-YpI-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-gog-IDI-wMj-YtM-Dkt-MTZ-UMD-Q6M-TQ6-MjE-uMj-IyW-iAj-NTI-gYW-Rta-XQg-cmV-wb3-J0O-nNl-bmQ-gKH-Nlb-nQp-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-ZUM-DQ6-MTQ-6Mj-EuM-jIy-WiA-jNT-IgZ-G9u-ZSB-yZX-Bvc-nQ6-c2V-uZC-Aoc-mVz-b2x-2ZW-QpI-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-go=",
+      "ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjI-xLj-IyM-log-IzU-yIH-ByZ-XMg-cmV-wb3-J0O-nJl-Y2V-pcH-QgK-HJl-cXV-lc3-RlZ-Ckg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-CiA-gMj-AyN-i0w-OS0-xNl-QwN-Dox-NDo-yMS-4yM-zRa-ICM-1Mi-Bwc-mVz-IHJ-lcG-9yd-Dpy-ZWN-laX-B0I-Chz-aG9-3bi-kgc-D1u-b25-lIG-V4c-Gxv-cmF-0aW-9uC-iAg-MjA-yNi-0wO-S0x-NlQ-wND-oxN-Doy-Mi4-yMz-VaI-CM1-MyB-yb2-90I-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-gog-IDI-wMj-YtM-Dkt-MTZ-UMD-Q6M-TQ6-MjI-uMz-g3W-iAj-NTI-gcH-Jlc-yBy-ZXB-vcn-Q6c-mVj-ZWl-wdC-AoZ-Glz-bWl-zc2-VkK-SBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-xLj-M3M-1og-IzU-0IH-Jvb-3Qg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-IGF-jdG-l2Z-Qo=",
+      "ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-yLj-QzN-Vog-IzU-1IH-Jvb-3Qg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-IGF-jdG-l2Z-Qog-IDI-wMj-YtM-Dkt-MTZ-UMD-Q6M-TQ6-NDI-uND-M3W-iAj-NTY-gbW-9kY-Wwg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-IGF-jdG-l2Z-Qog-IDI-wMj-YtM-Dkt-MTZ-UMD-Q6M-TQ6-NDM-uMj-I2W-iAj-NTc-gcm-9vd-CBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24g-YWN-0aX-ZlC-iAg-MjA-yNi-0wO-S0x-NlQ-wND-oxN-Do0-My4-yMj-laI-CM1-OCB-tb2-Rhb-CBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24g-YWN-0aX-ZlC-iAg-MjA-yNi-0wO-S0x-NlQ-wND-oxN-Do0-OC4-zNz-VaI-CM1-OSB-yb2-90I-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-iBh-Y3R-pdm-UKI-CAy-MDI-2LT-A5L-TE2-VDA-0Oj-E0O-jQ4-LjM-3NV-ogI-zYw-IG1-vZG-FsI-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-iBh-Y3R-pdm-UK",
+      "ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-4Lj-M3N-Vog-IzY-wIG-luI-HJl-cG9-ydD-pzZ-W5k-IOK-PsS-sxO-W1z-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-biB-hY3-Rpd-mUK-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-4Lj-Q1O-Fog-IzY-wIG-Vud-GVy-IHJ-lcG-9yd-Dpz-ZW5-kIH-A9b-m9u-ZSB-leH-Bsb-3Jh-dGl-vbi-BhY-3Rp-dmU-KIC-AyM-DI2-LTA-5LT-E2V-DA0-OjE-0Oj-Q4L-jQ1-OVo-gIz-YwI-GFk-bWl-0IH-Jlc-G9y-dDp-zZW-5kI-Chk-ZXN-jcm-liZ-WQp-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-biB-hY3-Rpd-mUK-ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-4Lj-Q1O-Vog-IzY-wIG-Rpc-3Bh-dGN-oIH-Jlc-G9y-dDp-zZW-5kI-Chk-ZXN-jcm-liZ-WQp-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-biB-hY3-Rpd-mUK",
+      "ICA-yMD-I2L-TA5-LTE-2VD-A0O-jE0-OjQ-4Lj-Q1O-Vog-IzY-wIG-Rpc-3Bh-dGN-oIH-Jlc-G9y-dDp-zZW-5kI-Chj-b21-wb3-NlK-SBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24g-YWN-0aX-ZlC-got-LS0-gVk-9JQ-0Ug-LS0-tCi-AgV-FRT-IGV-uYW-JsZ-WQ6-IG5-vCi-AgR-W5n-aW5-lOi-Bid-W5k-bGV-kCi-AgU-mF0-ZTo-gMS-4yM-CDC-tyB-QaX-Rja-Dog-MS4-wMA-ogI-FN5-c3R-lbS-B2b-2lj-ZSB-pZD-ogK-GRl-ZmF-1bH-QpC-iAg-S29-rb3-JvI-HZv-aWN-lOi-Bhb-V9t-aWN-oYW-VsC-iAg-S29-rb3-JvI-HN0-YXR-lOi-ByZ-WFk-eQo-KLS-0tI-ElO-VkV-OVE-9SW-SAt-LS0-KSW-52Z-W50-b3J-5IC-hWZ-XJi-YWw-pCi-AgS-FA6-IDQ-0Lz-Q0I-CBT-dGF-taW-5hO-iAx-LzE-yIC-BUQ-zog-MTY-1IC-BDb-3Jy-dXB-0aW-9uO-iAw-CiA-gUG-Fja-zog-MzA-gZG-lzd-Glu-Y3Q-gcm-93c-yAv-IDE-wNC-B0b-3Rh-bAo-KV2-Vhc-G9u-cyA-oNS-kK",
+      "ICB-Cb2-5lI-FNw-bGl-0dG-VyI-EF4-ZSA-oMW-Q4I-HNs-YXN-oaW-5nL-CBk-dXI-gMT-MvM-TMs-IFt-3ZW-Fwb-24s-bWV-sZW-Usd-Hdv-X2h-hbm-RlZ-Cxh-eGU-sZ2-lhb-nRz-XSk-KIC-AgI-GFj-dGl-vbn-M6I-GVx-dWl-wOm-1ha-W4s-IGV-xdW-lwO-m9m-Ziw-gdX-NlK-G9m-Zik-sIH-Njc-mFw-LCB-kcm-9wC-iAg-Q3V-kZ2-VsI-Cgx-ZDg-gYm-x1Z-Gdl-b25-pbm-csI-GR1-ciA-xNi-8xN-iwg-ZXF-1aX-BwZ-WQ6-b2Z-mLC-Bbd-2Vh-cG9-uLG-Nsd-WIs-bWV-sZW-Usa-W1w-cm9-2aX-NlZ-Cx3-ZWl-naH-RlZ-F0p-CiA-gIC-BhY-3Rp-b25-zOi-Blc-XVp-cDp-tYW-luL-CB1-bmV-xdW-lwO-m9m-Ziw-gdX-NlC-iAg-TXV-kLW-Zpc-3Qg-V3J-hcH-MgK-DFk-MTA-gYm-x1Z-Gdl-b25-pbm-csI-GR1-ciA-zNS-8zN-Swg-ZXF-1aX-BwZ-WQ6-bWF-pbi-wgW-3dl-YXB-vbi-xzd-GFy-dGV-yXS-kK",
+      "ICA-gIG-Fjd-Glv-bnM-6IG-Vxd-Wlw-Om9-mZi-wgd-W5l-cXV-pcD-ptY-Wlu-LCB-1c2-Uob-2Zm-KQo-gIF-BvY-2tl-dCB-Lbm-lmZ-SAo-MWQ-0IH-NsY-XNo-aW5-nLC-Bkd-XIg-MTI-vMT-IsI-Ft3-ZWF-wb2-4sc-3Rh-cnR-lci-xrb-mlm-ZSx-0b2-9sX-SkK-ICA-gIG-Fjd-Glv-bnM-6IG-Vxd-Wlw-Om1-haW-4sI-GVx-dWl-wOm-9mZ-iwg-dXN-lKG-9mZ-iks-IHN-jcm-FwL-CBk-cm9-wCi-AgU-2Fs-dmF-nZW-QgQ-m93-ICg-xZD-Ygc-Gll-cmN-pbm-csI-GR1-ciA-yOS-8yO-Swg-W3d-lYX-Bvb-ixy-YW5-nZW-QsY-m93-LHN-0ZW-Fsd-Ghd-KQo-gIC-AgY-WN0-aW9-ucz-ogZ-XF1-aXA-6bW-Fpb-iwg-ZXF-1aX-A6b-2Zm-LCB-1c2-Uob-2Zm-KSw-gc2-NyY-XAs-IGR-yb3-AKC-kFy-bW9-yIC-gzK-Qo=",
+      "ICB-NdW-QtV-2Fy-ZGV-uJ3-MgV-mVz-dCA-oZH-VyI-DI2-LzI-2LC-Blc-XVp-cHB-lZD-pja-GVz-dCw-gQU-MgK-zEg-wrc-gUm-Vza-XN0-czo-gc2-xhc-2hp-bmc-gwr-cgV-0lT-ICs-xLC-BbY-XJt-b3J-dKQ-ogI-CAg-YWN-0aW-9uc-zog-dW5-lcX-Vpc-Dpj-aGV-zdA-ogI-FJl-Y2x-haW-1lc-idz-IFN-hbH-ZhZ-2Ug-Q2F-wIC-hkd-XIg-MjQ-vMj-QsI-GVx-dWl-wcG-VkO-mhl-YWQ-sIE-FDI-Csx-IMK-3IE-lOV-CAr-MSw-gW2-Fyb-W9y-XSk-KIC-AgI-GFj-dGl-vbn-M6I-HVu-ZXF-1aX-A6a-GVh-ZAo-gIF-dhb-mRl-cmV-yJ3-MgR-mFj-ZSB-vZi-BTa-GFk-b3d-zIC-hkd-XIg-MjA-vMj-AsI-EFD-ICs-yIM-K3I-FNU-RSA-rMi-wgW-2Fy-bW9-yLG-hlY-WQs-bWF-zay-xmY-WNl-LHV-ua2-5vd-2lu-Z19-tYX-NzZ-XNd-KQo-gIC-AgY-WN0-aW9-ucz-ogZ-XF1-aXA-6aG-VhZ-Cwg-dXN-lLC-BzY-3Jh-cCw-gZH-Jvc-AoK-QW1-1bG-V0c-yAm-IFJ-pbm-dzI-Cgx-KQo-=",
+      "ICB-BZX-RoZ-XJp-YyB-Mb2-NrZ-XQg-KFd-JUy-ArM-SDC-tyB-SZX-Npc-3Rz-IGF-ldG-hlc-mlj-OiD-iiJ-I5J-SBp-bmN-vbW-luZ-yBk-YW1-hZ2-Ugb-2Yg-ZWF-jaC-wgb-24g-dG9-wIG-9mI-GFy-bW9-1ci-wgW-2Rl-dGV-jdG-lvb-l0p-CiA-gIC-BhY-3Rp-b25-zOi-Blc-XVp-cDp-hbX-VsZ-XQs-IHV-zZS-wgc-2Ny-YXA-sIG-Ryb-3AK-CkN-vbn-N1b-WFi-bGV-zIC-g2K-Qog-IEJ-pb2-x1b-Wlu-ZXN-jZW-50I-EZ1-bmd-1cy-DDl-zIw-ICh-Vbm-Nvb-W1v-biw-gW2-Zvb-2Qs-Zm9-yYW-dlZ-Cxt-dXN-ocm-9vb-Sxs-aWd-odC-xhZ-XRo-ZXJ-dKQ-ogI-CAg-YWN-0aW-9uc-zog-dXN-lKG-Vhd-Cks-IGR-yb3-AKI-CBG-aXJ-zdC-BBa-WQg-S2l-0IM-OXM-TAg-KFV-uY2-9tb-W9u-LCB-baG-Vhb-Glu-Zyx-jcm-Fmd-GVk-LGd-pZn-RdK-Qog-ICA-gYW-N0a-W9u-czo-gdX-NlK-GFw-cGx-5KS-wgZ-HJv-cAo-="
+    ],
+    "chunkChars": 7285,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-15-1824-the-helper-is-called-not-quoted #mu3l78ovjqx9 [inline 1/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mu3l78ovjqx9"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-15-1824-the-helper-is-called-not-quoted"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted"
+    },
+    {
+      "key": "user",
+      "value": "id:9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "query": "user.id:\"9a8a8c0079ee4e8eba37ffa9f098cee1\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-16T04:14:47.376773Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-16T04:14:48.539000Z",
+  "fingerprints": [
+    "391250e025f3199a3209968e10da82ff"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1972142306,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-15T00:08:49.713908Z",
+    "dateReleased": "2026-09-15T00:26:49.592888Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "015c323726bb5aed4401fd8adf364fa5400177d7",
+      "message": "OTA-1824 \u2014 the helper is called, not quoted\n\nA BOUNDED NATIVE COMPILE REPAIR. One Swift file. No redesign, no feature, no\nJS byte, no llama setting, no build-number mechanic, no workflow, no credential.\n\n\u26a0\u26a0\u26a0 ROOT CAUSE, FROM THE XCODE LOG RATHER THAN THE EAS SUMMARY.\nThe owner dispatched the production HAL build at 5b819d98 (build-ios run 196,\nid 34909667987). EAS build 197 (54f56b3e-02a0-46fd-a085-878b76be5cca, Xcode\n26.2 / iPhoneOS26.2.sdk, gym 2.231.1) bundled the JavaScript successfully,\nreached Xcode, and died in \"Run fastlane\" at ** ARCHIVE FAILED ** with five\ncopies of one diagnostic:\n\n    generic parameter 'T' could not be inferred\n\nThe failing compile unit names all four of this module's files \u2014 the podspec\nsets SWIFT_COMPILATION_MODE = wholemodule, so the type checker saw the whole\nmodule and reported everything it found. It found exactly five errors, and all\nfive are the same line at MemoryFlightRecorder.swift:381, :403, :462, :706\nand :740:\n\n    let N = MemoryFlightRecorder.n\n\n\u26a0\u26a0 THE MECHANISM. `n` was `static func n<T: BinaryInteger>(_ v: T) -> Int`.\nBinding a generic function to a `let` WITHOUT APPLYING IT asks Swift to build a\nfunction VALUE, and a function value must have a concrete type. With no argument\nand no contextual type there is nothing from which to fix `T`, so the type\nchecker refuses. The five aliases were a readability convenience \u2014 `N(x)` reads\nbetter than the qualified call inside a long dictionary literal \u2014 and they cost\na 25-minute round trip on an EAS macOS worker plus one owner dispatch.\n\nALL FIVE ERRORS SHARE ONE CAUSE. There is no second defect behind them: whole-\nmodule compilation means the compiler type-checked every file before reporting,\nso these five were the complete set.\n\n\u26a0 THE OTHER LOG LINE IS NOT OURS AND IS NOT AN ERROR. Line 1304 warns\n\"Pods/Sentry-Sentry: iOS@11.0 deployment version mismatch\" \u2014 a pre-existing\nWARNING on Sentry's own pod, present before this module existed. Untouched.\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nTHE REPAIR \u2014 SMALLEST THAT COMPILES, AND IT MOVES NO MEASUREMENT\n\nThe helper becomes a file-scope function and is APPLIED at each of its 63 call\nsites, where `T` is inferred from the argument exactly as generics normally\nresolve. The five alias lines are deleted.\n\n    -  @inline(__always) private static func n<T: BinaryInteger>(_ v: T) -> Int\n    +  @inline(__always) private func tmInt<T: BinaryInteger>(_ v: T) -> Int\n\n    -      let N = MemoryFlightRecorder.n        (x5, deleted)\n    -      \"footprint\": N(vm?.footprint ?? 0),\n    +      \"footprint\": tmInt(vm?.footprint ?? 0),\n\n\u26a0\u26a0 NOT ONE MEASUREMENT CHANGED. Every value still passes through\n`Int(clamping:)`; the diff is the helper's spelling and nothing else. The\n\"measurement\" lines in the diff are the same expressions with `N(` rewritten to\n`tmInt(`. No capacity, cadence, burst rule, signal, threshold or flag moved.\n\nSCOPE AUDIT: 1 file, +93/-77. ZERO .ts/.tsx/.js/.json touched by the repair\nitself. `git diff --name-only | grep -E '\\.(ts|tsx|js|jsx|json)$'` is empty.\n\n\u26a0 THE ARCHITECTURE IS UNCHANGED, AND \u00a72 OF THE NEW SUITE PROVES IT RATHER THAN\nASSERTING IT: 512/64 capacities, 1s/5s/100ms cadences, the single shared burst\ndeadline with its 10 s ceiling, the >=1 s allocator clock, every signal\n(phys_footprint, resident_size, resident_size_peak, os_proc_available_memory,\nmalloc_zone_statistics, thermalState), annotate's no-Mach-on-the-caller rule,\nthe two-slot CRC32 checkpoint, the bridge's thirteen doors, the exclusion list\nand the llama prohibition are each re-asserted here.\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWHY THIS CARRIES 1824 AND NOT A RE-PUBLISH UNDER 1823\n\nThe repair is Swift-only and the JS bundle is BYTE-IDENTICAL to OTA-1823's, so\n\"no new OTA is owed\" is the tempting answer. It is the wrong one.\n\n`modules/**` is NOT in ci.yml's publish-ignore list, so this push DOES dispatch\nthe publisher and a new update group DOES reach both channels. OTA_BUILD_ID is\nthe value the device DISPLAYS and the one the just-updated toast keys on \u2014 so\nlanding a new bundle under a stamp the device already carries would look exactly\nlike no update arriving. That is precisely the failure OTA-1482 was written to\nstop (\"eleven OTAs published and applied while the stamp sat at 1469 and the\nowner's phone read fully up to date\"), and reproducing it deliberately to save a\nnumber would be indefensible.\n\nThe stamp names the PUBLISHED AUTHORITY, not the diff's file extensions.\n1824 verified unclaimed before stamping; 1823 demoted to SUPERSEDED, its\npublished record at 5b819d98 left exactly as it stands.\n\n\u26a0 5b819d98 IS NOT REWRITTEN. It remains the published OTA-1823 authority on both\nlines. This commit is a NEW exact application authority that supersedes it for\nthe native build; CI 2161 covers 5b819d98 and is NOT claimed to cover this tree.\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nEVIDENCE on the exact committed tree\n\n  new suite ota1824TheHelperIsCalledNotQuoted ............ 16/16\n  ota1823 (85) + ota1482 (the stamp law) re-run .......... 106/106\n  22/22 check:* gates, read BY EXIT CODE\n  check:otastamp \u2014 stamp 2026-09-15-1824 matches newest suite ota1824\n  source typecheck clean \u00b7 lint clean\n  typecheck:tests at baseline 201 \u2014 NOT raised\n  FULL TRACKED FAST SURFACE: 1321 suites passed / 1321 total\n      14,588 passed \u00b7 3 skipped \u00b7 0 failed \u00b7 498.9 s\n      (1320 at OTA-1823 plus this OTA's one new suite \u2014 reconciles exactly)\n  Heavy CI NOT RUN \u2014 a Swift spelling repair does not justify it.\n\n\u26a0\u26a0 THE SWIFT STILL CANNOT BE COMPILED HERE. Linux container, no Xcode, no\nsimulator. The strongest proportional validation available is static: the\nrepaired construct is the ordinary applied-generic form, every unapplied\nreference is gone from code, and the new ratchet fails if one returns. Only the\nnext EAS build can prove the archive succeeds, and nothing here claims it does.\n\nNEGATIVE CONTROL \u2014 NC-196, restored with md5 match and zero residue:\n  reintroduce ONE unbound generic reference exactly as build 197 carried it\n    -> 1.2 (the general ratchet) and 1.3 (the specific pin) BOTH red,\n       the other 14 green.\nThe ratchet bites the real defect, not a paraphrase of it.\n\n\u26a0 WHY THE RATCHET IS GENERAL RATHER THAN A STRING PIN. 1.2 walks every generic\nfunction the module declares and requires each mention in CODE to be followed\nimmediately by `(` or `<`. A pin on the literal text `let N =` would have\nmatched only the five lines that already burned us; this catches the next one,\nunder whatever name it is given. Comments are stripped first, so the \u26a0 block\nthat QUOTES the defective line for the next reader cannot trip it \u2014 a ratchet\nthat fires on its own explanation teaches people to delete the explanation.\n\nClassification: A the Swift repair \u00b7 B the new regression suite \u00b7 C the OTA\nstamp \u00b7 D/E/P/F: ZERO.\n\nNot touched: the flight-recorder architecture, every measurement, the JS facade,\nthe event vocabulary, the derived semantics, llama configuration, the native-ML\nscheduler, gameplay, artwork, build-ios.yml, the iOS build-number mechanic, the\npromotion control plane, and every open punch-list item.\n\n\u26a0 NO DEVICE VERIFICATION IS CLAIMED, and no archive success is claimed. The\nrecorder has still never run on hardware.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-15T00:01:57Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted",
+          "shortVersion": "tartaria@4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-15T00:26:49.592888Z",
+          "dateCreated": "2026-09-15T00:08:49.713908Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "158470578",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-15T00:26:49.896001Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-15-1824-the-helper-is-called-not-quoted",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-15-1824-the-helper-is-called-not-quoted",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-15-1824-the-helper-is-called-not-quoted)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.26.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8e0cf8033ef74b23a29aca399df932d6",
+  "previousEventID": "1d3cfc4b36f4436f9f3a12c8e91a2ffb"
+}
