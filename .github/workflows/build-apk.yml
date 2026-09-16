@@ -150,8 +150,28 @@ jobs:
       # build whose config disagreed with itself halfway through.
       # ⚠ A push (not a dispatch) carries no input, so it falls to golem — the dev
       # line. A forgotten selection builds the developer's own product, never
-      # somebody else's shipping one.
-      TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}
+      # somebody else's shipping one. That default is UNCHANGED: only the
+      # explicit marker below moves it, and only for the push that carries it.
+      #
+      # ⚠⚠ [line-hal] — THE MISSING HALF OF [build-aab], AND WHY IT HAD TO EXIST.
+      # The `[build-aab]` marker was added (see the resolution order below) so
+      # that "a sandboxed agent or anyone without tag-push permission" could
+      # trigger a Play-Store-ready AAB without the dispatch UI. It answers WHICH
+      # PROFILE. Nothing answered WHICH PRODUCT, so every marker-driven AAB was
+      # silently golem — bare store package, but `expo-channel-name: golem-line`
+      # baked in. Measured, not inferred: run 471's AAB carries exactly that, and
+      # its release note reads "line: golem". Uploading one to Play would put
+      # live testers on the dev OTA channel.
+      #
+      # Before OTA-1386 the BRANCH answered this — a push to HaL2001 built HAL.
+      # The branch collapse deleted that and replaced it for the dispatch path
+      # only, leaving the marker path with no way to say "hal". This is that
+      # replacement, in the vocabulary the repo already uses for [build-aab],
+      # [build-apk], [golem-apk] and [ota-hal].
+      #
+      # ⚠ A dispatch input still WINS — this cannot override a deliberate
+      # selection, only supply one where a push has none.
+      TARTARIA_LINE: ${{ github.event.inputs.line || (contains(github.event.head_commit.message, '[line-hal]') && 'hal') || 'golem' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

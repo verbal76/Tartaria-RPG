@@ -40,6 +40,7 @@ marker then decides what they build.
 | marker | fires | trigger touch needed? |
 |---|---|---|
 | `[build-aab]` | production AAB (Play Console) | **yes** |
+| `[line-hal]` | the build this push produces is **HAL's**: bare store package **and** channel `hal2001`. Pair with `[build-aab]` for the Play update. Without it a marker-driven AAB is **golem** and carries `expo-channel-name: golem-line`. A dispatch `line` input still wins. | with `[build-aab]` |
 | `[build-ios]` | TestFlight-ready IPA via EAS | **yes** |
 | `[submit-ios]` | + auto-submit to TestFlight (use with `[build-ios]`) | with the above |
 | `[build-ios-native]` | IPA built on a GitHub macOS runner | no |
