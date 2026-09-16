@@ -104,6 +104,20 @@ const LINES = {
  * So it lives here now, at the layer that has the last word. */
 const STORE_ID = 'com.hotatticgames.tartarprim';
 
+/** ⚠⚠ THE LISTING'S NAME — and why resolving the id was not enough.
+ *
+ * A store build already resolved to the bare id but kept the LINE's name. So a
+ * production AAB built with line=hal came out labelled "Tartaria Realms HAL" —
+ * on the listing that ordinary players install from. The suffix exists so a
+ * SIDELOAD stays an obviously separate install; it has no business on the store
+ * binary, which IS the product.
+ *
+ * Listing identity is ONE thing, not two: a store build wears the listing's name
+ * AND its id. What still makes it HAL is the channel and the product flag, and
+ * those are untouched — see the note below, which is the half that must stay
+ * true. Owner ruling 2026-09-16: the Play app is named "Tartaria Realms". */
+const STORE_NAME = 'Tartaria Realms';
+
 // ⚠ Every line id must live UNDER the store id, or a store build has nothing
 // sensible to resolve to. Checked rather than assumed: the table above invites
 // edits, and this relationship is not visible from looking at it.
@@ -127,12 +141,18 @@ if (!line) {
 }
 
 // ⚠ TARTARIA_STORE_BUILD=1 is set only by the production paths in build-apk.yml,
-// build-ios.yml and build-ios-native.yml. It changes the package / bundle id and
-// NOTHING else — name, channel and product flag stay whatever the line says,
-// because a store install is still one of the four products; it just wears the
-// listing's id.
+// build-ios.yml and build-ios-native.yml. It changes the package / bundle id AND
+// THE NAME — the two halves of the listing's identity — and NOTHING else. The
+// CHANNEL and the PRODUCT FLAG still come from the line, because a store install
+// is still one of the four products: it wears the listing's identity, but it is
+// HAL's build, pulling HAL's OTAs, with HAL's gated sharing.
+//
+// ⚠ That distinction is the whole safety property. If a store build ever moved
+// the channel too, a Play release would start pulling another product's updates.
+// scripts/verify-lines.mjs asserts both halves — what changes and what must not.
 const storeBuild = process.env.TARTARIA_STORE_BUILD === '1';
 const appId = storeBuild ? STORE_ID : line.id;
+const appName = storeBuild ? STORE_NAME : line.name;
 
 module.exports = ({ config }) => {
   // `config` is app.json's expo block, already loaded by Expo. Spread it so any
@@ -140,7 +160,7 @@ module.exports = ({ config }) => {
   const expo = { ...base.expo, ...config };
   return {
     ...expo,
-    name: line.name,
+    name: appName,
     android: { ...expo.android, package: appId },
     ios: { ...expo.ios, bundleIdentifier: appId },
     updates: {
