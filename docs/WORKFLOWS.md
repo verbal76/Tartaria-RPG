@@ -603,6 +603,72 @@ setup` appears on this **successful** run. It refers to a different credential
 set and did **not** block submission — the submission was scheduled four lines
 later. Do not "fix" it.
 
+### ⚠⚠⚠ REACHING TESTFLIGHT IS NOT REACHING TESTERS — 2026-09-16
+
+**A build can be uploaded, processed, validated, green, and installed by nobody.**
+This section exists because that had quietly been true since June.
+
+Everything above ends at *upload*. Two further steps follow that no workflow in
+this repo performs and that EAS explicitly declines:
+
+```
+upload → Apple processing → BETA APP REVIEW → assigned to a tester group → installed
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            neither of these is automated
+```
+
+That is what `No complete App Store Connect credentials, skipping TestFlight
+setup` means in practice. It does **not** block submission — the binary uploads
+fine, and the line appears on successful runs — but it is EAS saying it will not
+configure TestFlight distribution. A human does that in App Store Connect.
+
+**THE EVIDENCE, read off App Store Connect on 2026-09-16:**
+
+| build | version | status | installs |
+|---|---|---|---|
+| 208 | 2.5.0 | Waiting for Review | – |
+| 199 | 2.4.1 | **Ready to Submit** | 1 |
+| 189 | 2.4.1 | **Ready to Submit** | 1 |
+| 33 | 2.4.1 | Expired | **9** |
+| 29 | 2.4.1 | Expired | 3 |
+
+Builds 189 and 199 — the OTA-1823/1824-era binaries, recorded at the time as
+successful TestFlight deliveries — sat at **"Ready to Submit"** and were never
+submitted for review. One install each: the owner. The tester population was on
+**build 33 from June** and stayed there until its 90-day expiry.
+
+⚠⚠ **"Ready to Submit" means nobody has it.** It reads like a finished state and
+is not one. Read the STATUS and INSTALLS columns, not the upload list.
+
+⚠ **A native build alone does not strand testers — a native build plus a runtime
+bump does.** While the trunk was 2.4.1, build 33 kept receiving OTAs, which is
+why it looked healthy and why OTA-1809 was legitimately confirmed on Apple
+hardware from it. The moment the trunk moved to runtime 2.5.0,
+`runtimeVersion: appVersion` stopped serving those devices, and an
+un-distributed native build left them with no path forward at all.
+
+**THE NEW-VERSION GATE.** External testers need **Beta App Review** for each new
+*version string*, carried by that version's first build. 2.4.1 was already
+approved so its builds flowed; **2.5.0 is a new version**, so build 208 queued
+for review. Usually under 24 hours.
+
+- **Internal** testers (App Store Connect users, up to 100) skip Beta App Review
+  entirely — the fastest way to get one device onto a new binary immediately.
+- External submission of a new version also needs the **"What to Test"** notes.
+  Apple blocks the submission without them, and EAS does not write them.
+
+**AFTER EVERY NATIVE BUILD, CHECK DISTRIBUTION — DO NOT STOP AT "TESTFLIGHT".**
+An agent cannot: `expo.dev` and App Store Connect are both outside the egress
+policy. Ask the owner for the TestFlight row and read three fields:
+
+1. **STATUS** — `Ready to Submit` (nobody has it) · `Waiting for Review`
+   (queued) · available (distributed)
+2. **GROUPS** — empty means no tester can see it whatever the status says
+3. **INSTALLS** — the only field that proves a human ran the binary
+
+Report upload and processing as PASS if you like, but **distribution is a
+separate claim and needs its own evidence.**
+
 ### ⚠⚠ BUILD NUMBERS ARE READ, NEVER PREDICTED
 
 Step 7 stamps `app.expo.ios.buildNumber = github.run_number`, and EAS
