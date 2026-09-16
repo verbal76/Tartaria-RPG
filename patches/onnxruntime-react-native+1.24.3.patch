@@ -19,3 +19,13 @@ index 41b4359..2994128 100644
          } else {
            arguments "-DNODE_MODULES_DIR=${nodeModules}",
              "-DORT_EXTENSIONS_ENABLED=${ortExtensionsEnabled}",
+diff --git a/node_modules/onnxruntime-react-native/unimodule.json b/node_modules/onnxruntime-react-native/unimodule.json
+index c2bd3c0..2b1a32f 100644
+--- a/node_modules/onnxruntime-react-native/unimodule.json
++++ b/node_modules/onnxruntime-react-native/unimodule.json
+@@ -1,4 +1,4 @@
+ {
+   "name": "onnxruntime-react-native",
+-  "platforms": ["ios", "android"]
++  "platforms": ["ios"]
+ }
