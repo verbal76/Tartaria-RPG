@@ -192,7 +192,15 @@ describe('OTA-1735 - boot:qwen:deferred was an absorbing state pointing at the w
     // ⚠ NOT awaited — so audio:start, tts:start and boot:complete all run first,
     //   and mlhealth:done → cognitive:* → qwen:deferred land AFTER boot:complete.
     expectAbsent(window, 'await loadMLHealth', 'loadMLHealth()');
-    expect(window).toContain('void loadMLHealth()');
+    // ⚠⚠ OTA-1825 — THE CHAIN NOW OPENS WITH THE API 36 TRANSITION AMNESTY.
+    // runMLResetMigrationIfNeeded() settles first so the gates below read the
+    // CLEARED state instead of a verdict inherited from the replaced binary.
+    // The claim this test makes is unchanged, and it is about the PROPERTY
+    // rather than which call happens to be first: the ML chain is fired with
+    // `void`, NOTHING in this window is awaited, and loadMLHealth is still
+    // reached (pinned above). `void loadMLHealth()` was a pin on the spelling.
+    expect(window).toMatch(/void (runMLResetMigrationIfNeeded|loadMLHealth)\(/);
+    expectAbsent(window, 'await runMLResetMigrationIfNeeded', 'runMLResetMigrationIfNeeded()');
     const order = ["setStage('mlhealth:load')", "setStage('audio:start')", "setStage('tts:start')", "setStage('boot:complete')"];
     const idx = order.map((o) => APP.indexOf(o));
     expect(idx.every((v) => v > -1)).toBe(true);
