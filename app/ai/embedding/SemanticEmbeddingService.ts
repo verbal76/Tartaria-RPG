@@ -10,7 +10,7 @@ import * as ort from 'onnxruntime-react-native';
 // (the JSI binding parses the option — cpp/SessionUtils.cpp) leave the rest to
 // the game; the embed is ~60ms of work either way.
 export const COGNITION_SESSION_OPTIONS: ort.InferenceSession.SessionOptions = { intraOpNumThreads: 2, interOpNumThreads: 1 };
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 // ⚠⚠ OTA-1358 — the classifier joins the native-ML lock. It was the ONE native
 // ML engine running outside it: every inference (and every foreground-resume
 // session create) could land on top of an in-flight ~15s Qwen generation — the

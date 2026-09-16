@@ -38,6 +38,7 @@ import { Image, Text } from 'react-native';
  * which is exactly the debt that gate exists to stop growing. */
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
+  act(cb: () => void): void;
   create(el: React.ReactElement): {
     root: { findAllByType(t: unknown): { props: Record<string, unknown> }[];
             findAllByProps(p: Record<string, unknown>): { props: Record<string, unknown> }[] };
@@ -170,7 +171,13 @@ describe('the mapping is centralized and semantic', () => {
 
 // ═══ 2. LORE — THE ARTWORK REPLACED THE GLYPHS, THE TRIAL IS GONE ════════════
 describe('Lore ▸ Glyphs', () => {
-  const tree = () => renderer.create(<WeaponGlyphKey />);
+  // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+  // create leaves zero children, so .root throws. Full note in ota1233OnePicker.
+  const tree = () => {
+    let t!: ReturnType<typeof renderer.create>;
+    renderer.act(() => { t = renderer.create(<WeaponGlyphKey />); });
+    return t;
+  };
 
   test('⚠⚠⚠ every base type and every coat in play renders ARTWORK, not a character', () => {
     const r = tree();

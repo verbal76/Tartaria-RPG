@@ -8,7 +8,7 @@
 // sherpa-onnx team publishes Piper voices as tarballs at GitHub
 // Releases — we extract them on-device once.
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { getModelDir, resetPiperAvailability } from './PiperTTSManager';
 
 /** sherpa-onnx publishes prebuilt Piper voice tarballs at:

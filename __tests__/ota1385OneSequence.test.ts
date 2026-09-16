@@ -12,7 +12,9 @@
  * golem's 4.29.278 — so the obvious move (carry on counting from the trunk)
  * would have moved html players' version backwards. It is only cosmetic, which
  * is exactly why it would have shipped unnoticed: the Expo `version` that gates
- * OTA compatibility is 2.4.1 and unchanged, so nothing would have broken. It
+ * OTA compatibility was 2.4.1 and unchanged, so nothing would have broken. (That
+ * number has since moved to 2.5.0 for the API 36 native generation — see the
+ * pin at the end of this file, which records why that move was required.) It
  * would just have looked, in every About screen and every bug report and every
  * crash record, like the app had been rolled back.
  */
@@ -113,11 +115,22 @@ describe('OTA-1385 — the sequence itself', () => {
 });
 
 describe('OTA-1385 — what did NOT change', () => {
-  it('⚠⚠ the Expo version that gates OTA compatibility is untouched', () => {
+  it('⚠⚠ the Expo version that gates OTA compatibility is the API 36 boundary', () => {
     // This is the number that decides whether an OTA can land on an installed
     // binary. Moving it orphans updates. DISPLAY_VERSION is the cosmetic one and
-    // the only one this OTA touches.
-    expect(JSON.parse(src('app.json')).expo.version).toBe('2.4.1');
+    // the only one this OTA touched.
+    //
+    // ⚠⚠⚠ 2.4.1 -> 2.5.0 IS THE ONE MOVE THAT WAS REQUIRED, not a drift.
+    // `runtimeVersion` is policy:appVersion, so this number IS the runtime
+    // boundary. The Expo 54 / RN 0.81 binary would otherwise advertise the SAME
+    // runtimeVersion as the shipped RN 0.76 one, and the update server would
+    // hand each generation the other's JS bundle — a native crash in both
+    // directions, which nothing in the Android build warns about. So the new
+    // native generation takes its own boundary, and the guard here is unchanged
+    // in strength: the number is still pinned exactly, and the policy that makes
+    // it the runtime boundary is still pinned beside it. A later cosmetic bump
+    // of this field fails this test exactly as it did before.
+    expect(JSON.parse(src('app.json')).expo.version).toBe('2.5.0');
     expect(JSON.parse(src('app.json')).expo.runtimeVersion).toEqual({ policy: 'appVersion' });
   });
 

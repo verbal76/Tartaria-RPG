@@ -68,16 +68,35 @@ describe('OTA-1386 — every build workflow says which product it is building', 
     // ⚠ JOB-level, not step-level. Every step that shells out to Expo — prebuild,
     // the config reads, the bundler — has to see the same answer, or the build
     // disagrees with itself halfway through.
-    expect(y).toMatch(/\n    env:\n(?:.*\n)*?      TARTARIA_LINE: \$\{\{ github\.event\.inputs\.line \|\| '(golem|html)' \}\}/);
+    // ⚠ THE INPUT COMES FIRST AND THE DEFAULT COMES LAST. What may sit between
+    // them is a marker fallback (build-apk.yml grew one — see the next test);
+    // nothing may displace either end.
+    expect(y).toMatch(/\n    env:\n(?:.*\n)*?      TARTARIA_LINE: \$\{\{ github\.event\.inputs\.line \|\|.*'(golem|html)' \}\}/);
   });
 
   it('⚠⚠ a run with NO selection falls to golem on the native workflows', () => {
     // A push carries no input. Falling to the dev line means a forgotten
     // selection builds the developer's own product — never somebody else's
     // shipping one. The failure is a wasted build, not a mis-shipped app.
-    for (const f of ['build-apk.yml', 'build-ios.yml', 'build-ios-native.yml']) {
+    //
+    // ⚠ THE INVARIANT IS THE DEFAULT, NOT THE SPELLING. build-apk.yml now also
+    // honours a [line-hal] commit marker, because [build-aab] could say which
+    // PROFILE to build and nothing could say which PRODUCT — so every
+    // marker-driven AAB came out golem, stamping golem-line's channel into a
+    // Play-shaped binary. The iOS workflows have no such marker and keep the
+    // original spelling exactly.
+    for (const f of ['build-ios.yml', 'build-ios-native.yml']) {
       expect(wf(f)).toContain("TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}");
     }
+
+    const decl = wf('build-apk.yml').split('\n').find((l) => l.includes('TARTARIA_LINE:'))!;
+    // the dispatch input is consulted FIRST, so an explicit selection always wins
+    expect(decl).toContain('${{ github.event.inputs.line ||');
+    // …and with neither an input nor the marker it still falls to golem, LAST
+    expect(decl.trimEnd().endsWith("|| 'golem' }}")).toBe(true);
+    // the ONLY thing permitted to move it off that default is the explicit marker
+    expect(decl).toContain("contains(github.event.head_commit.message, '[line-hal]') && 'hal'");
+    expect(decl).not.toMatch(/&& '(golem|steam|html)'/);
   });
 
   it('⚠ the web workflow defaults to html instead, because that is the only reason it exists', () => {
@@ -105,18 +124,40 @@ describe('OTA-1386 — the store package flip, moved to the layer that has the l
     }
   });
 
-  it('⚠⚠ …and changes NOTHING else', () => {
-    // A store build is still one of the four products; it only wears the
-    // listing's id. If the channel moved with it, a store release would start
+  it('⚠⚠ …and changes NOTHING BEYOND THE LISTING IDENTITY', () => {
+    // A store build is still one of the four products; it wears the listing's
+    // IDENTITY. If the CHANNEL moved with it, a store release would start
     // pulling a different product's OTAs — which is the precise accident the
-    // whole collapse exists to prevent.
+    // whole collapse exists to prevent. That half is unchanged and load-bearing.
+    //
+    // ⚠ THE NAME MOVED, DELIBERATELY — owner ruling 2026-09-16. Listing identity
+    // is one thing, not two: the id resolved to the bare store id while the name
+    // stayed the line's, so a production AAB built with line=hal came out
+    // labelled "Tartaria Realms HAL" on the public listing. The suffix exists to
+    // keep a SIDELOAD an obviously separate install; it has no business on the
+    // store binary, which IS the product.
     const plain = resolveConfig({ TARTARIA_LINE: 'hal' });
     const store = resolveConfig({ TARTARIA_LINE: 'hal', TARTARIA_STORE_BUILD: '1' });
-    expect(store.name).toBe(plain.name);
+
+    expect(plain.name).toBe('Tartaria Realms HAL');
+    expect(store.name).toBe('Tartaria Realms');
+
+    // …and the half that must NOT move, asserted as strictly as before.
     expect(store.updates.requestHeaders['expo-channel-name'])
       .toBe(plain.updates.requestHeaders['expo-channel-name']);
     expect(store.extra.fallenSharing).toBe(plain.extra.fallenSharing);
     expect(store.extra.tartariaLine).toBe('hal');
+  });
+
+  it('⚠⚠ every line resolves to the SAME listing name under a store build', () => {
+    // The listing has one name, whichever line was used to build for it — the
+    // same reasoning that makes every line resolve to one bare id above.
+    for (const line of ['golem', 'hal', 'steam', 'html']) {
+      const c = resolveConfig({ TARTARIA_LINE: line, TARTARIA_STORE_BUILD: '1' });
+      expect(c.name).toBe('Tartaria Realms');
+      // and the product it actually IS still comes from the line, not the listing
+      expect(c.extra.tartariaLine).toBe(line);
+    }
   });
 
   it('⚠ an ordinary build keeps the line\'s own suffixed id', () => {

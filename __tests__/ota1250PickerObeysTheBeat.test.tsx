@@ -59,22 +59,28 @@ function mount(lockedNoun: string | null, sink: {
   taken: string[]; salvaged: string[]; sweptTake: string[][]; sweptSalvage: string[][];
   blocked: number; cancelled: number;
 }) {
-  const tree = renderer.create(
-    <GatherModal
-      visible
-      player={null}
-      chips={ROOM.map((noun) => ({ noun }))}
-      leadNouns={[]}
-      lockedNoun={lockedNoun}
-      onBlocked={() => { sink.blocked += 1; }}
-      onTake={(n) => sink.taken.push(n)}
-      onSalvage={(n) => sink.salvaged.push(n)}
-      onTakeAll={(ns) => sink.sweptTake.push(ns)}
-      onSalvageAll={(ns) => sink.sweptSalvage.push(ns)}
-      onInvestigate={() => {}}
-      onCancel={() => { sink.cancelled += 1; }}
-    />,
-  );
+  // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+  // create leaves zero children, so toJSON() is null and .root throws. The full
+  // note is in ota1233OnePicker.test.tsx.
+  let tree!: ReturnType<typeof renderer.create>;
+  renderer.act(() => {
+    tree = renderer.create(
+      <GatherModal
+        visible
+        player={null}
+        chips={ROOM.map((noun) => ({ noun }))}
+        leadNouns={[]}
+        lockedNoun={lockedNoun}
+        onBlocked={() => { sink.blocked += 1; }}
+        onTake={(n) => sink.taken.push(n)}
+        onSalvage={(n) => sink.salvaged.push(n)}
+        onTakeAll={(ns) => sink.sweptTake.push(ns)}
+        onSalvageAll={(ns) => sink.sweptSalvage.push(ns)}
+        onInvestigate={() => {}}
+        onCancel={() => { sink.cancelled += 1; }}
+      />,
+    );
+  });
   const seen = new Map<string, Press>();
   for (const n of tree.root.findAll((x) => typeof x.props?.accessibilityLabel === 'string'
     && typeof x.props?.onPress === 'function')) {
@@ -182,14 +188,20 @@ describe('OTA-1250 — RENDERED: the locked picker allows exactly one line', () 
     const sink = fresh();
     const { presses } = mount('cudgel', sink);
     expect(presses.length).toBeGreaterThan(0);
-    const tree = renderer.create(
-      <GatherModal
-        visible player={null} chips={ROOM.map((noun) => ({ noun }))} leadNouns={[]}
-        lockedNoun="cudgel" onBlocked={() => {}}
-        onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
-        onInvestigate={() => {}} onCancel={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <GatherModal
+            visible player={null} chips={ROOM.map((noun) => ({ noun }))} leadNouns={[]}
+            lockedNoun="cudgel" onBlocked={() => {}}
+            onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
+            onInvestigate={() => {}} onCancel={() => {}}
+          />,
+        );
+    });
     const out: string[] = [];
     const walk = (n: unknown): void => {
       if (typeof n === 'string') { out.push(n); return; }
@@ -250,15 +262,21 @@ describe('OTA-1250 — the prop goes spent when it is taken', () => {
 
   it('⚠⚠ a consumed chip does not render — the five-vest row is gone', () => {
     const sink = fresh();
-    const tree = renderer.create(
-      <GatherModal
-        visible player={null} leadNouns={[]}
-        chips={[{ noun: "Mud-Warden's Vest", consumed: true }, { noun: 'brick' }]}
-        lockedNoun="Mud-Warden's Vest" onBlocked={() => { sink.blocked += 1; }}
-        onTake={(n) => sink.taken.push(n)} onSalvage={() => {}}
-        onTakeAll={() => {}} onSalvageAll={() => {}} onInvestigate={() => {}} onCancel={() => {}}
-      />,
-    );
+    // ⚠ REACT 19 — the mount commits inside act(), not inside create(): a bare
+    // create leaves zero children, so toJSON() is null and .root throws. The full
+    // note is in ota1233OnePicker.test.tsx.
+    let tree!: ReturnType<typeof renderer.create>;
+    renderer.act(() => {
+        tree = renderer.create(
+          <GatherModal
+            visible player={null} leadNouns={[]}
+            chips={[{ noun: "Mud-Warden's Vest", consumed: true }, { noun: 'brick' }]}
+            lockedNoun="Mud-Warden's Vest" onBlocked={() => { sink.blocked += 1; }}
+            onTake={(n) => sink.taken.push(n)} onSalvage={() => {}}
+            onTakeAll={() => {}} onSalvageAll={() => {}} onInvestigate={() => {}} onCancel={() => {}}
+          />,
+        );
+    });
     const labels = tree.root
       .findAll((x) => typeof x.props?.accessibilityLabel === 'string')
       .map((x) => String(x.props.accessibilityLabel));

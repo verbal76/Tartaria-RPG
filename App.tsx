@@ -17,6 +17,7 @@ import {
   markMLInitSucceeded,
   clearInFlightBreadcrumbs,
   qwenGateReason, // OTA-1635 — the skip branches say why, in the log
+  runMLResetMigrationIfNeeded, // the one-time API 36 transition amnesty
 } from './app/diagnostics/mlHealth';
 import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; // OTA-1276 · LAG-1
 import { TitleScreen } from './app/screens/TitleScreen';
@@ -670,7 +671,39 @@ export default function App() {
         // playable on template narration; the player never sees
         // the "app keeps stopping" loop.
         setStage('mlhealth:load');
-        void loadMLHealth().then((health) => {
+        // ⚠⚠⚠ THE API 36 TRANSITION AMNESTY, AND IT SETTLES BEFORE THE GATES READ.
+        // Build 476 replaced the native architecture in place and KEPT the data
+        // sandbox, so a device benched by the OLD binary wakes on the NEW one
+        // still carrying the old binary's verdict — measured on an SM-A146U:
+        // "auto-disabled after 3 failures" on a runtime whose fault was fixed.
+        // runMLResetMigrationIfNeeded() clears that ONCE, gated on the native
+        // versionName and a persisted marker. See mlHealth.ts for why the marker
+        // is written even when nothing was cleared (it is the safety property).
+        //
+        // ⚠⚠ OWNER RULING 2026-09-16 — "use the button style". When it fires we
+        // complete the RELOAD AI sequence exactly as AboutScreen.tsx does:
+        // resetMLHealth(), then qwenStatus -> 'idle', then bootQwen() — which
+        // deliberately does NOT consult shouldAttemptQwen and force-loads
+        // in-session. The deferred warm below still arms; bootQwen's own
+        // "already running" early return (aiLifecycleSlice) is what stops that
+        // from allocating the model a second time.
+        //
+        // ⚠ ORDER IS LOAD-BEARING. This resolves before loadMLHealth(), so every
+        // gate below reads the CLEARED state instead of the replaced binary's.
+        void runMLResetMigrationIfNeeded().then((migrated) => {
+          if (migrated) {
+            setStage('mlhealth:migrated-2.5.0');
+            useGameStore.setState({ qwenStatus: 'idle', qwenError: null });
+            try {
+              useGameStore.getState().appendLog(
+                'debug',
+                'ml: cleared legacy pre-2.5.0 disable state once for the API 36 transition',
+              );
+            } catch { /* logging must never gate the boot */ }
+            void useGameStore.getState().bootQwen();
+          }
+          return loadMLHealth();
+        }).then((health) => {
           setStage('mlhealth:done');
           if (!shouldAttemptMLInit()) {
             // eslint-disable-next-line no-console

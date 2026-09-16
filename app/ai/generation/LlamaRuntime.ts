@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import {
   runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK, ML_PRIORITY_TEARDOWN,
   noteRejectedBeforePrefill,

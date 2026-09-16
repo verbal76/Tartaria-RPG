@@ -9,7 +9,7 @@
 // Wired at boot via initExecutorch({ resourceFetcher: createAdapter() })
 // — see app/App.tsx.
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 type ResourceSource = string | number | object;
 

@@ -33,6 +33,7 @@ const EXPECTED = {
 
 // ⚠ OTA-1386 — the bare id the Play / App Store listings are registered under.
 const STORE_ID = 'com.hotatticgames.tartarprim';
+const STORE_NAME = 'Tartaria Realms';
 
 function resolve(line, extraEnv = {}) {
   const out = execFileSync('npx', ['expo', 'config', '--type', 'public', '--json'], {
@@ -110,6 +111,13 @@ for (const line of Object.keys(EXPECTED)) {
   }
   if (cfg?.ios?.bundleIdentifier !== STORE_ID) {
     fail(`${line} (store build).ios.bundleIdentifier: expected ${STORE_ID}, got ${JSON.stringify(cfg?.ios?.bundleIdentifier)}`);
+  }
+  // ⚠⚠ THE NAME IS THE OTHER HALF OF THE LISTING'S IDENTITY. Resolving only the
+  // id left a production AAB built with line=hal labelled "Tartaria Realms HAL"
+  // on the public listing. The suffix keeps SIDELOADS apart; it does not belong
+  // on the store binary. Owner ruling 2026-09-16.
+  if (cfg?.name !== STORE_NAME) {
+    fail(`${line} (store build).name: expected ${STORE_NAME}, got ${JSON.stringify(cfg?.name)}`);
   }
   // ⚠ …and it must change NOTHING ELSE. A store build is still one of the four
   // products; it only wears the listing's id. If the channel moved too, a store

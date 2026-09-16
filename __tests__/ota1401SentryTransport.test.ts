@@ -160,10 +160,26 @@ describe('OTA-1401 — the destination is configured, once, for all four product
   });
 
   it('⚠ the dependency is pinned, and the lockfile carries it', () => {
-    expect(pkg.dependencies?.['@sentry/react-native']).toBe('6.10.0');
+    // ⚠⚠ 6.10.0 -> ~7.2.0 CAME FROM EXPO 54'S OWN TABLE, not from a bump here.
+    // expo@54.0.37's bundledNativeModules.json declares the version each SDK 54
+    // app must carry; @sentry/react-native was one of 23 moves the migration
+    // read out of it. Nothing about how this app uses Sentry changed — the
+    // behavioural claims in this suite are unedited and still pass.
+    expect(pkg.dependencies?.['@sentry/react-native']).toBe('~7.2.0');
     // OTA-1384's lesson: a package.json the lockfile does not match breaks
     // `npm ci`, which on a trunk breaks all four products at once.
     expect(src('package-lock.json')).toContain('@sentry/react-native');
+    // ⚠ THE DECLARATION IS NOW A RANGE, SO THE LOCKFILE HAS TO BE ASKED WHAT IT
+    // RESOLVED. The old `6.10.0` was exact and carried that guarantee by itself;
+    // a tilde range does not, so the resolved version is read and checked
+    // against it here rather than left implied. This keeps the test as strong as
+    // it was — npm ci still cannot silently disagree with package.json.
+    const lock = JSON.parse(src('package-lock.json')) as {
+      packages: Record<string, { version?: string }>;
+    };
+    const resolved = lock.packages['node_modules/@sentry/react-native']?.version;
+    expect(resolved).toBe('7.2.0');
+    expect(`~${resolved}`).toBe(pkg.dependencies?.['@sentry/react-native']);
   });
 });
 
