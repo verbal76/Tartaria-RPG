@@ -3046,7 +3046,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   discardBtnText: { color: '#a2977b', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
+  /* ⚠ OTA-1827 — `gap: 6`, AND ONLY 6. Owner: the milestone cells "should have
+   * some separation between them to show they are buttons, but just a bit so
+   * it's noticable". With no gap the four flex:1 cells butted edge to edge and
+   * their 1dp borders touched, so the row read as one panel divided by
+   * hairlines rather than as four controls. Six is enough to see them come
+   * apart at arm's length and small enough that nothing reflows: the cells stay
+   * flex:1 and simply share 18dp less width inside the same panel. The panel's
+   * own fill, border, radius and 10dp padding are untouched, and so is every
+   * cell style — the separation is the ROW's to give, not the cell's to claim. */
+  milestoneRow: { flexDirection: 'row', gap: 6, backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {
     flexDirection: 'row',
     backgroundColor: '#13110f',

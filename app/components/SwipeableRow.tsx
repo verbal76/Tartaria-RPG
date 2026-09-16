@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { baseColorOf, useDisplaySettings } from '../ui/displaySettings';
 
 interface Props {
   onDelete: () => void;
@@ -12,6 +13,9 @@ const SWIPE_THRESHOLD = -DELETE_WIDTH / 2;
 const SWIPE_DISMISS_THRESHOLD = -DELETE_WIDTH * 1.6;
 
 export function SwipeableRow({ onDelete, children, deleteLabel = 'Delete' }: Props) {
+  /* OTA-1827 — the sliding surface takes the player's chosen background; see the
+   * note on `surface` below for why it was a hardcoded near-black before. */
+  const display = useDisplaySettings();
   const translateX = useRef(new Animated.Value(0)).current;
   // Tracks the resting open/closed position so a pan starts from where the
   // row currently sits rather than from 0.
@@ -71,7 +75,7 @@ export function SwipeableRow({ onDelete, children, deleteLabel = 'Delete' }: Pro
         </TouchableOpacity>
       </View>
       <Animated.View
-        style={[styles.surface, { transform: [{ translateX }] }]}
+        style={[styles.surface, { backgroundColor: baseColorOf(display) }, { transform: [{ translateX }] }]}
         {...responder.panHandlers}
       >
         {children}
@@ -95,5 +99,22 @@ const styles = StyleSheet.create({
   },
   deleteBtn: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   deleteText: { color: '#e6d8b3', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  /* ⚠⚠⚠ OTA-1827 — THIS IS THE BLACK RECTANGLE, AND IT WAS A HARDCODED COLOUR.
+   *
+   * `surface` is opaque for one reason: it slides sideways over `deleteLayer`,
+   * so it must hide it completely. It does NOT need to be near-black, and
+   * `#0a0908` — which is what it was — is the black bar the owner photographed
+   * on the character choice screen. A pressed record's rim travels 3dp down
+   * (kit.controlPressed) and uncovers 3dp of whatever sits behind it; behind it
+   * is THIS view.
+   *
+   * ⚠ The colour now comes from the PLAYER'S OWN BACKGROUND SLIDERS
+   * (`baseColorOf` → hslToHex of bgHue/bgSat/bgLight, the Display settings), so
+   * the strip a press uncovers is the background they chose — continuous with
+   * the screen instead of a slab of near-black over it. Owner ruling 2026-09-16:
+   * "it should be the same color as whatever they chose for the background".
+   *
+   * ⚠ This keeps a fallback fill so a failed settings read can never leave the
+   * delete layer showing through; the inline colour overrides it in practice. */
   surface: { backgroundColor: '#0a0908' },
 });

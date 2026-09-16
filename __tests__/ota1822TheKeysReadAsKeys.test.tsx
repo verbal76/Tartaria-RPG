@@ -257,44 +257,12 @@ describe('OTA-1822 §5 — the Character Selection press stops dragging its shad
   const OUTER_COLLAPSED = () => styleArrayAt(TITLE, 'styles.dossierOuter, !bootGateOpen');
   const OUTER_OPEN = () => styleArrayAt(TITLE, 'styles.dossierOuter, styles.dossierOuterOpen');
 
-  /* ⚠⚠ AMENDED BY OTA-1826, AND THE AMENDMENT IS A WIDENING, NOT A CLIMBDOWN.
-   *
-   * This test asserted `dossierOuter` had NO backgroundColor. That was a true
-   * description of the repair as built, and it pinned the wrong half of it. The
-   * load-bearing claims here were always "the shadow-caster does not travel"
-   * (5.2) and "the rim, not the outer, owns the edge" — never "the outer paints
-   * nothing".
-   *
-   * Leaving it transparent is precisely what OTA-1826 had to fix. The rim is the
-   * only layer in this subtree that paints, so its 3dp of travel uncovered 3dp
-   * of THIS view, and a transparent strip showed the app backdrop (Android,
-   * where `elevation` is deliberately absent) or that plus the anchored #000
-   * shadow (iOS). The owner saw a black rectangle on the top edge of a pressed
-   * record on both.
-   *
-   * The pin now asserts the PROPERTY the repair rests on — the travel gap is
-   * painted, in the card's own material — plus everything the old pin was
-   * genuinely protecting. More assertions than before, not fewer. */
-  test("5.1 the shadow-caster is identified: shadow present, edge still the rim's", () => {
+  test('5.1 the shadow-caster is identified: no background, no border, a shadow', () => {
     const blk = /dossierOuter:\s*\{([^}]*)\}/.exec(TITLE)?.[1] ?? '';
     expect(blk).toMatch(/shadowColor:\s*'#000'/);
     expect(blk).toMatch(/shadowOffset/);
-    // the rim, not the outer, is the thing with an edge — unchanged claim
+    expect(blk).not.toMatch(/backgroundColor:/);
     expect(blk).not.toMatch(/borderWidth:/);
-  });
-
-  test('5.1b ⚠ OTA-1826 — the outer paints the strip the rim vacates', () => {
-    const blkOf = (name: string) =>
-      new RegExp(`${name}:\\s*\\{([^}]*)\\}`).exec(TITLE)?.[1] ?? '';
-    const fill = (s: string) => /backgroundColor:\s*'([^']+)'/.exec(s)?.[1];
-    // it must paint at all — a transparent outer IS the defect
-    expect(fill(blkOf('dossierOuter'))).toBeTruthy();
-    // and it must paint the card's own resting material, not an invented tone
-    expect(fill(blkOf('dossierOuter'))).toBe(fill(blkOf('dossierRim')));
-    // the selected record travels over its own warmer fill
-    expect(fill(blkOf('dossierOuterOpen'))).toBe(fill(blkOf('dossierRimOpen')));
-    // …and a dead record over rust, not over the live card's grey
-    expect(fill(blkOf('dossierOuterDead'))).toBe(fill(blkOf('dossierRimDead')));
   });
 
   test('5.2 ⚠ THE REPAIR: the shadow-caster no longer travels', () => {
