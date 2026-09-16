@@ -1826,6 +1826,18 @@ export function InventoryScreen() {
       {giftMode && (
         <Pressable
           onPress={cancelGiftMode}
+          /* ⚠⚠ OTA-1828 FOUND THIS AND DELIBERATELY LEFT IT. This is the one
+             `kit.ctl` control in the game whose press does not invert its
+             directional pair — it answers with an inline opacity and nothing
+             else, so its lit top edge dims with the bar instead of handing the
+             light to the lower edge. Adding `controlPressed` here WAS tried and
+             is REVERTED: this control renders `CTL_PLANES` as a constant, so the
+             travel arrived while the sidewall stayed frozen at resting height,
+             and OTA-1806's census correctly failed it as B-PARTIAL — a key that
+             moves and never loses height. Completing it means restructuring
+             these children into a `({ pressed }) => …` render prop, which is
+             OTA-1806's class to govern, not a pressed-edge repair. Recorded,
+             not rationalised into this OTA. */
           style={({ pressed }) => [kit.ctl, styles.giftModeBar, pressed && { opacity: 0.7 }]}
           accessibilityRole="button"
           accessibilityLabel={`Giving to ${giftMode.toName}. Tap to cancel.`}

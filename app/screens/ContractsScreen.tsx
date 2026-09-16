@@ -819,9 +819,33 @@ export function ContractsScreen() {
              transfer: that rim was already an asymmetric lit/dark pair, so
              borrowing generic colours would have replaced its material. This
              ring is one uniform gold, and minting a second gold to invert it
-             would invent material AND push against the gold ratchet. */
+             would invent material AND push against the gold ratchet.
+
+             ⚠⚠⚠ OTA-1828 — THE PARAGRAPH ABOVE IS SUPERSEDED BY OWNER RULING,
+             AND IT NAMED ITS OWN DEFECT WITHOUT SEEING IT. "The gold ring's top
+             and bottom go to the control language" is exactly what the owner
+             reports as broken: `controlRaisedDark` is a three-quarters-opaque
+             black — the kit owns the value — and over this card's `#13110f`
+             face it composites to the face. So the top does not DARKEN, it
+             VANISHES: three sides gold, the fourth absent — *"the button
+             therefore looks visually broken/open at the top."* The card is the
+             only gold-outlined control in the game taking the raw
+             `controlPressed` with no directional pair of its own.
+
+             ⚠ THE LITERAL IS DELIBERATELY NOT SPELLED ABOVE. OTA-1802's ratchet
+             keeps the depth values in exactly one file, and it fired on this
+             very paragraph — a scan catching its own explanation is how a repo
+             teaches the next author to delete the explanation. The token is
+             named; the kit keeps the number.
+
+             ⚠ AND THE OBJECTION IS ANSWERED RATHER THAN OVERRULED: no second
+             gold is minted. `goldDim` has been in the palette since VIS-1 and
+             already dresses `btnFlank`; `kit.goldEdgePressed` spends
+             that existing token on the top edge ONLY, after `controlPressed`,
+             so the travel and the lit lower edge still come from the one shared
+             authority. The gold ratchet does not move — this adds no literal. */
           <Pressable
-            style={({ pressed }) => [styles.mainQuestCard, pressed && kit.controlPressed]}
+            style={({ pressed }) => [styles.mainQuestCard, pressed && kit.controlPressed, pressed && kit.goldEdgePressed]}
             onPress={() => setMqExpanded((v) => !v)}
             accessibilityRole="button"
             accessibilityState={{ expanded: mqExpanded }}

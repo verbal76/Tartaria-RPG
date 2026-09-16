@@ -638,6 +638,13 @@ export function TButton({
         <Animated.View style={[kit.btnRim,
           primary && kit.btnRimPrimary,
           destructive && kit.btnRimDestructive,
+          /* ⚠ OTA-1828 — the rim answers the finger too. Each variant's pressed
+             pair rides after its resting pair, so the accent variants invert
+             inside their own family and the alloy default inverts inside its
+             own. `lift` stays last: the travel is untouched. */
+          pressed && kit.btnRimPressed,
+          pressed && primary && kit.btnRimPrimaryPressed,
+          pressed && destructive && kit.btnRimDestructivePressed,
           lift]}
         >
           <View style={[
@@ -1626,6 +1633,32 @@ const kit = StyleSheet.create({
    * to the bottom edge and the shadow to the top — which is what an object
    * pushed INTO a surface actually looks like — and the face travels 1.5dp
    * down, the same distance `TButton` has settled since VIS-1. */
+  /* ⚠⚠⚠ OTA-1828 — AN ACCENT OUTLINE MUST NOT GO TO GENERIC SHADOW AT THE TOP.
+   *
+   * `controlPressed` below is correct for the 154 controls that wear `ctl`,
+   * because those already carry a DIRECTIONAL top edge at rest
+   * (`controlRaisedLit`) — a neutral catch of light, and swapping it for the
+   * neutral shadow is exactly "the light moved". It is WRONG for a control
+   * whose idle top edge is an ACCENT, because `controlRaisedDark` is
+   * `rgba(0,0,0,0.75)`: over a near-black face that composites to the face
+   * itself, so the accent outline does not darken — it OPENS. Three sides keep
+   * the accent and the fourth is gone. That is the owner's report: *"the top
+   * edge disappears completely… the button therefore looks visually broken/open
+   * at the top."*
+   *
+   * ⚠ THE CHARACTER SCREEN ALREADY SOLVED THIS and is the authority. Its gold
+   * record does NOT press to black: `dossierRimOpenPressed` puts `#1E170F` — a
+   * warm dark still inside the gold family — on top and returns the gold to the
+   * bottom. The edge stays DEFINED because it stays in its own family.
+   *
+   * ⚠ So an accent control keeps its family on press: the top takes the dimmed
+   * gold the palette already carries (`goldDim`, #8E7548 against gold's
+   * #C9A86A), which is visibly darker than rest and visibly present on a dark
+   * face. It rides AFTER `controlPressed`, so the travel and the lit bottom
+   * still come from the one shared authority — this overrides the top edge
+   * only. Accent families that are not gold derive their own pressed tone the
+   * same way; this is not a global recolour. */
+  goldEdgePressed: { borderTopColor: T.goldDim },
   controlPressed: {
     borderTopColor: T.controlRaisedDark,
     borderBottomColor: T.controlRaisedLit,
@@ -1983,6 +2016,25 @@ const kit = StyleSheet.create({
   },
   btnRimPrimary: { borderWidth: 1, borderColor: T.rimLit, borderTopColor: T.gold, borderBottomColor: 'rgba(0,0,0,0.85)' },
   btnRimDestructive: { borderColor: T.rustRim, borderTopColor: 'rgba(224,122,95,0.55)' },
+  /* ⚠⚠⚠ OTA-1828 — THE RIM HAD A TOP EDGE AND NO PRESSED STATE AT ALL.
+   *
+   * All three rims above carry a directional lit top edge at rest — alloy,
+   * gold, rust — and until now NOTHING in `TButton` answered the finger on the
+   * rim. `btnFacePressed` inverts the FACE; the rim kept its resting light
+   * while the face beneath it went dark, so the two layers of one object
+   * disagreed about which way the light had moved. The character-selection
+   * authority does not have this seam: `dossierRimPressed` inverts the rim
+   * itself, which is the layer a player reads as the edge of the key.
+   *
+   * ⚠ EACH VARIANT INVERTS WITHIN ITS OWN FAMILY, which is the whole point —
+   * the alloy rim swaps its own neutral pair, and the two ACCENT rims hand
+   * their accent to the lower edge and take a dimmed tone of that same accent
+   * above, never a generic shadow. Gold spends the existing `goldDim`; rust
+   * spends a darkened rust at the same alpha it already uses. No geometry, no
+   * width, no travel — the 1.5dp lift is untouched and still lives on `lift`. */
+  btnRimPressed: { borderTopColor: 'rgba(0,0,0,0.75)', borderBottomColor: 'rgba(140,146,150,0.55)' },
+  btnRimPrimaryPressed: { borderTopColor: T.goldDim, borderBottomColor: T.gold },
+  btnRimDestructivePressed: { borderTopColor: 'rgba(92,44,34,0.75)', borderBottomColor: 'rgba(224,122,95,0.55)' },
   /* ⚠⚠⚠ OTA-1782 — THE ANCESTOR JOINS THE LANGUAGE IT STARTED.
    * `btnFace` has carried a lit top edge and a dark bottom edge since VIS-1,
    * and until now it was the only control in the game that did. Owner: *"This
