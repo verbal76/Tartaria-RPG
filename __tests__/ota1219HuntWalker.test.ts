@@ -247,7 +247,37 @@ describe('OTA-1219 — the hunt walker: every hunt in the catalog completes, in 
       if (escortSpawn) {
         const want = escortSpawn.enemyName;
         await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === want));
-        const pack = store.getState().currentScene!.enemies.filter((e) => e.name === want);
+        let pack = store.getState().currentScene!.enemies.filter((e) => e.name === want);
+
+        /* ⚠⚠⚠ OTA-1831 — A WANDERING PACK CAN GET THERE FIRST, AND THAT IS NOT A
+         * DEAD END. This used to demand the stage's bodies after ONE verb. But
+         * the ground is live: measured here, arriving at `cistern_intake` for
+         * hunt_dust_fiend_plains stage 3 found the scene already holding five
+         * True Tartarians Raiders, and the Bog Creeper was never placed. Not the
+         * truce belt either — hubRoomId and activeBuildingId were both null.
+         *
+         * ⚠⚠ THE ENGINE ALREADY HANDLES THIS AND SAYS SO. questSlice's spawn
+         * helper: "A frozen spawn stage self-heals: the record did not advance,
+         * so the verb re-fires the spawn once outside." Probed on the failing
+         * case — stage before 3, stage after 3, and ONE re-fire produced the
+         * pack. Nothing was lost; the beat simply had not happened yet.
+         *
+         * ⚠ SO THE WALKER DOES WHAT A PLAYER DOES: clear the ground, say it
+         * again, bounded — and assert the freeze held on every attempt. An
+         * unbounded retry would hide a real dead-end, which is the one thing
+         * this walker exists to catch; hence the cap, and the stage check inside
+         * the loop rather than only after it.
+         */
+        for (let attempt = 0; pack.length !== (escortSpawn.count ?? 1) && attempt < 3; attempt += 1) {
+          // An un-materialised stage that ALSO advanced is a lost beat, and no
+          // amount of re-firing may paper over that.
+          expect({ hunt: def.id, at: s, stage: stage() }).toEqual({ hunt: def.id, at: s, stage: s });
+          clearScene();
+          await store.getState().submitPlayerAction(verb);
+          drainRolls();
+          await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === want));
+          pack = store.getState().currentScene!.enemies.filter((e) => e.name === want);
+        }
         expect({ hunt: def.id, at: s, spawned: pack.length, wanted: escortSpawn.count ?? 1 })
           .toEqual({ hunt: def.id, at: s, spawned: escortSpawn.count ?? 1, wanted: escortSpawn.count ?? 1 });
         // Frozen on arrival — the pack standing there is not the beat being done.

@@ -436,7 +436,13 @@ jobs:
           while IFS= read -r f; do
             [ -z "$f" ] && continue
             case "$f" in
-              sentry-inbox/*|package.json|package-lock.json|app.json|app.config.js|eas.json|metro.config.js|babel.config.js|tsconfig.json|.github/*|*.md|docs/*|scripts/*|android/*|ios/*|desktop/*|web-stubs/*|__tests__/*|test-utils/*|jest.setup.js|jest.config.js|scratchpad/*) ;;
+              # ⚠ OTA-1831 added jest.teardown.js. It is jest.setup.js's sibling
+              # — setupFilesAfterEnv to its setupFiles — and just as absent from
+              # the shipped bundle, but it was created after this list was
+              # written and never added to it. Without it a harness-only commit
+              # counts as a bundle change and publishes an OTA that changes
+              # nothing a player can see.
+              sentry-inbox/*|package.json|package-lock.json|app.json|app.config.js|eas.json|metro.config.js|babel.config.js|tsconfig.json|.github/*|*.md|docs/*|scripts/*|android/*|ios/*|desktop/*|web-stubs/*|__tests__/*|test-utils/*|jest.setup.js|jest.teardown.js|jest.config.js|scratchpad/*) ;;
               *) echo "bundle path changed: $f"; TOUCHED=1 ;;
             esac
           done < <(git diff --name-only "$RANGE")

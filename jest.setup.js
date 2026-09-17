@@ -11,7 +11,9 @@
 // hand never provably converges.
 //
 // Fix: seed Math.random with a fixed, well-distributed PRNG (mulberry32), reset
-// at the start of every test file (setupFiles runs per file). Every run is then
+// at the start of every test file (setupFiles runs per file) AND before every
+// test (OTA-1831, registered from jest.teardown.js — see the block below for why
+// it could never be registered from here, and what that cost). Every run is then
 // byte-identical, so one green run means green forever — the tail can't surprise
 // a merge. This does NOT weaken coverage: tests still drive real code paths with
 // real pseudo-random inputs (a full non-repeating sequence, not a constant), and
@@ -28,11 +30,41 @@ Math.random = function seededRandom() {
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
-if (typeof beforeEach === 'function') {
-  // Re-seed before each test so ordering within a file is also reproducible and
-  // one test's draws never bleed into the next test's asserted distribution.
-  beforeEach(() => { __s = __SEED >>> 0; });
-}
+// ⚠⚠⚠ OTA-1831 — THE RE-SEED THAT NEVER REGISTERED, AND WHAT IT COST.
+//
+// This was `if (typeof beforeEach === 'function') { beforeEach(() => { __s =
+// __SEED; }); }`. `setupFiles` runs BEFORE the test framework is installed, so
+// `beforeEach` is undefined here and the guard was ALWAYS false — the per-test
+// re-seed the header above promised has never once happened. jest.teardown.js
+// recorded the dead guard and left it; this is the correction, because the
+// consequence turned out to be far worse than "ordering within a file is not
+// reproducible".
+//
+// ⚠⚠ WHAT THE SHARED STREAM WAS REALLY TRACKING. With only the per-FILE seed,
+// every test in a file draws from one continuous stream, so a test's starting
+// position is the sum of every draw before it — INCLUDING at module import.
+// Importing app/state/gameStore.ts draws ~270,000 times, and stack-bucketing
+// says >99.98% of those come from `randomIntInRange` inside the `source-map`
+// package's randomized quicksort: JEST'S OWN SOURCE-MAP MACHINERY, not product
+// code. The count is therefore a function of the SOURCE-MAP SHAPE of the loaded
+// modules. Measured on one tree, three runs: 265,813 draws every time; with four
+// lines of an unrelated appendLog call joined into one, 269,967. A 4,154-draw
+// shift out of an edit that rolls nothing.
+//
+// ⚠ SO EDITING ANY LOADED FILE MOVED EVERY SEEDED VALUE IN THE SUITE. Six suites
+// went red on a change that added no RNG call at all. Two controls proved it was
+// the layout and not the change: making the new content unreachable left all six
+// red, and a tree with NO new content that only REFORMATTED four lines went red
+// on its own. That is a landmine under every future edit, and the suite that
+// fails is never the one that moved.
+//
+// A hook has to live where hooks exist, so the re-seed is published here and
+// registered from jest.teardown.js (`setupFilesAfterEnv`, which runs after the
+// framework). Every test then starts at __SEED whatever was imported, and the
+// byte layout of the tree stops being an input to the game's dice.
+globalThis.__TARTARIA_RESEED_RANDOM__ = function reseedRandom() {
+  __s = __SEED >>> 0;
+};
 //
 // Incidental weather determinism.
 // -------------------------------

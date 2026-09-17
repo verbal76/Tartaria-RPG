@@ -9,7 +9,9 @@
 // hook has to live. (jest.setup.js's own `typeof beforeEach === 'function'`
 // re-seed guard has therefore always been false; its load-bearing per-FILE
 // re-seed happens at module scope and is unaffected. Reported, not changed
-// here.)
+// here — ⚠ OTA-1831 HAS NOW CHANGED IT, at the bottom of this file, for exactly
+// the reason this paragraph gives. The note stands as written: this is where the
+// hook had to go.)
 //
 // ⚠⚠ THE DEFECT. gameStore.setHomeworkTick(fn) arms a 5s setInterval and holds
 // the handle at module scope; setHomeworkTick(null) clears it. That disarm is
@@ -47,4 +49,21 @@ afterAll(() => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const store = require('./app/state/gameStore');
   if (typeof store.setHomeworkTick === 'function') store.setHomeworkTick(null);
+});
+
+// ⚠⚠⚠ OTA-1831 — THE PER-TEST RE-SEED, REGISTERED WHERE HOOKS EXIST.
+// jest.setup.js seeds Math.random and publishes the reset; it cannot register a
+// hook (see the top of this file). Without this line every test in a file shares
+// one stream, so its dice depend on how many draws happened earlier — and ~270k
+// of those draws per gameStore import belong to Jest's own source-map quicksort,
+// which moves whenever any loaded file's byte layout moves. That made unrelated
+// suites flip on edits that roll nothing. With it, every test starts at the same
+// seed regardless of what was imported or how it was formatted.
+// Registered from setupFilesAfterEnv, so it runs before any suite's own
+// beforeEach; a test that overrides Math.random locally still wins in its own
+// scope and restores to this baseline afterwards.
+beforeEach(() => {
+  if (typeof globalThis.__TARTARIA_RESEED_RANDOM__ === 'function') {
+    globalThis.__TARTARIA_RESEED_RANDOM__();
+  }
 });

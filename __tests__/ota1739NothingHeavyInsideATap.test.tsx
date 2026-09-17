@@ -226,6 +226,22 @@ describe('OTA-1739 (2) — invisible tokens do not re-render the exploration scr
     await renderer.act(async () => {
       tree = renderer.create(<Profiler id="explore" onRender={onRender}><ExplorationScreen /></Profiler>);
     });
+    /* ⚠⚠⚠ OTA-1831 — LET THE BOOT FINISH BEFORE COUNTING. A single flush left
+     * the store's own boot tail still landing, so the window below counted
+     * those commits as well as the one it means to measure: openCommits read 3,
+     * and the ≤1 assertion failed for a reason that had nothing to do with the
+     * generation sign. Measured: with the queue drained first it reads exactly
+     * 1 — one commit for one flip, which is the claim.
+     *
+     * ⚠⚠ THIS WAS NOT A RENDER REGRESSION AND WAS NOT CAUSED BY THE RE-SEED. On
+     * a pristine tree WITHOUT OTA-1831 this test already failed 3/3 when run on
+     * its own; it passed in a full parallel run only because the scheduling
+     * happened to land the tail outside the window. The headline claim never
+     * moved at any point: 34 streamed tokens commit the screen ZERO times,
+     * measured 0 throughout.
+     */
+    await flush();
+    await flush();
     await flush();
     // generation opens: the sign appears, so exactly one commit is expected
     commits = 0;

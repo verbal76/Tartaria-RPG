@@ -131,10 +131,50 @@ describe('OTA-1057 — an escort party has somebody at the front', () => {
   });
 
   it('the same party is the same person — a reload cannot reshuffle them', () => {
-    // Deterministic in the party's own shape, so accepting the same contract
-    // twice, or loading a save, reads as the same escort.
-    expect(spawnEscortPool(3, 20, 'pilgrims').leaderName)
-      .toBe(spawnEscortPool(3, 20, 'pilgrims').leaderName);
+    /* ⚠⚠⚠ OTA-1831 CORRECTION — THIS TEST USED TO ASSERT SOMETHING FALSE.
+     *
+     * It called `spawnEscortPool(3, 20, 'pilgrims')` TWICE and asserted the two
+     * leaders matched. They are not the same party: `escorteeMaxHp` rolls a
+     * per-member HP jitter, so two spawns produce two different `hpMax` totals,
+     * and `escortLeaderName` hashes `hpMax`. Two separately-accepted contracts
+     * SHOULD get different people — that is escort.ts working, not failing.
+     *
+     * ⚠⚠ IT PASSED FOR A REASON THAT WAS NEVER ABOUT ESCORTS. The suite draws
+     * from one seeded stream, and it happened to sit where three consecutive
+     * jitter draws summed to the same total twice running. Move the stream and
+     * the assertion flips — which is exactly what OTA-1831's per-test re-seed
+     * did, and what an unrelated edit to any loaded file had been doing all
+     * along. Expected "Ymer", received "Nell".
+     *
+     * ⚠ SO PIN THE PROMISE escort.ts ACTUALLY MAKES: "the name is drawn
+     * deterministically from the party's own SHAPE". Same shape in, same person
+     * out — and the real reload path, where a stored party re-derives the
+     * leader it was saved with. Neither depends on where the stream sits.
+     */
+    // Same shape in, same person out. The jitter is pinned across both spawns so
+    // the two parties ARE the same shape; restored afterwards to the seeded
+    // baseline, the convention jest.setup.js names.
+    const seeded = Math.random;
+    let a: string | undefined;
+    let b: string | undefined;
+    try {
+      Math.random = () => 0.5;
+      a = spawnEscortPool(3, 20, 'pilgrims').leaderName;
+      b = spawnEscortPool(3, 20, 'pilgrims').leaderName;
+    } finally {
+      Math.random = seeded;
+    }
+    expect(a).toBeTruthy();
+    expect(a).toBe(b);
+
+    // ⚠ THE RELOAD ITSELF: a save stores the party's shape, and the leader is
+    // re-derivable from it. This is the claim in the test's name, and it is the
+    // one that keeps a player walking with the same person across a reload.
+    const pool = spawnEscortPool(3, 20, 'pilgrims');
+    // `count` is optional on the type — a pre-OTA-1057 save has none — but a
+    // freshly spawned pool always carries it, and the leader is keyed on it.
+    expect(pool.count).toBe(3);
+    expect(escortLeaderName(pool.count!, pool.hpMax, pool.label)).toBe(pool.leaderName);
     expect(escortLeaderName(3, 60, 'pilgrims')).toBe(escortLeaderName(3, 60, 'pilgrims'));
   });
 
