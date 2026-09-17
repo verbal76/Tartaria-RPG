@@ -415,7 +415,7 @@ import {
   narrate as containerNarrate,
   type ContainerLootEntry,
 } from '../engine/containerLoot';
-import { pickWastelandEncounter, RECENT_ENCOUNTER_MEMORY } from '../engine/wastelandEncounters';
+import { pickWastelandEncounter, resolveKeepsake, recordKeepsakePaid, RECENT_ENCOUNTER_MEMORY } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
@@ -28176,7 +28176,8 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         } else {
           get().appendLog('world', enc.narration);
         }
-        if (enc.npcLine) get().appendLog('arbiter', enc.npcLine);
+        const keep = resolveKeepsake(enc, get().worldMemory.onceLootPaid); // OTA-1830
+        if (keep.line) get().appendLog('arbiter', keep.line);
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
         // OTA-695 — data-driven provocable encounter. When the encounter's
         // archetype carries a `provoke` block (the Aetherkin mourner's dare,
@@ -28189,7 +28190,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           const pv = enc.provoke;
           set((s) => (s.player ? { player: { ...s.player, pendingProvoke: pv } } : s));
         }
-        if (enc.loot) {
+        if (enc.loot && !keep.spent) { // OTA-1830 — the anti-farm gate
           const livePlayer = get().player;
           if (livePlayer) {
             // Collectable-fragment substitution. Per design: low spawn
@@ -28214,10 +28215,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 ? { player: { ...s.player, inventory: grantResult.inventory } }
                 : s));
               if (grantResult.accepted > 0) {
-                get().appendLog(
-                  'reward',
-                  `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`,
-                );
+                get().appendLog('reward', `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`);
+                // OTA-1830 — spent only on an ACCEPTED grant; a full pack must not burn the one chance.
+                if (enc.oncePerSaveLoot) set((st) => ({ worldMemory: { ...st.worldMemory, onceLootPaid: recordKeepsakePaid(st.worldMemory.onceLootPaid, enc.archetypeId) } }));
               }
             }
           }

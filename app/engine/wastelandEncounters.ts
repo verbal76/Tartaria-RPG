@@ -74,6 +74,25 @@ export interface WastelandArchetype {
    *  engine holds no encounter-specific enemy name or prose — a content
    *  pack authors the whole thing here. */
   provoke?: EncounterProvoke;
+  /** ⚠⚠⚠ OTA-1830 — ONCE PER SAVE, AND THE MEETING STILL HAPPENS.
+   *
+   *  Set on an archetype whose loot is a KEEPSAKE rather than a resource: the
+   *  drop is granted the first time this archetype pays out on a character and
+   *  never again, while the encounter itself stays in the rotation. Rocky is
+   *  why it exists — a memorial dog who gives you one reservation gemstone —
+   *  and the split is the whole design. Gating the PICK would have retired him
+   *  after a single meeting, which is the opposite of what a wandering dog
+   *  should do; gating the GRANT lets him keep finding you for the whole run.
+   *
+   *  ⚠ Paid-out ids live in `worldMemory.onceLootPaid`, so this is per
+   *  character and survives a reload. Absent on an older save, which reads as
+   *  "nothing paid yet" and costs nothing. The engine still holds no
+   *  encounter-specific lore — the flag is generic, and any future keepsake
+   *  can set it without touching this file. */
+  once_per_save_loot?: boolean;
+  /** Shown in place of the npc line once `once_per_save_loot` has already paid
+   *  out — the warm, no-reward version of the same meeting. */
+  repeat_line?: string;
 }
 
 /** OTA-695 — data-driven provoke payload for a provocable NPC encounter. */
@@ -117,6 +136,55 @@ export interface WastelandEncounter {
   questHook: { kind: 'hunt' | 'mystery'; id: string } | null;
   /** OTA-695 — provoke payload for a provocable NPC encounter, else null. */
   provoke: EncounterProvoke | null;
+  /** OTA-1830 — this archetype's loot is a once-per-save keepsake. The caller
+   *  consults `worldMemory.onceLootPaid` before granting. */
+  oncePerSaveLoot: boolean;
+  /** OTA-1830 — the line shown instead of `npcLine` once the keepsake has been
+   *  given. Null when the archetype authored none. */
+  repeatLine: string | null;
+}
+
+/** ⚠⚠⚠ OTA-1830 — THE ANTI-FARM RULE, AS ONE PURE FUNCTION.
+ *
+ *  True when this encounter's loot is a once-per-save keepsake that has already
+ *  been handed over on this character. The caller skips the grant and shows the
+ *  archetype's `repeat_line` instead; the encounter itself still happens.
+ *
+ *  ⚠ It lives here, not inline in the store, for one reason: it is the only
+ *  thing standing between a memorial keepsake and an infinite item source, and
+ *  a rule that matters that much should be reachable by a test without driving
+ *  a whole travel step. `paidIds` is `worldMemory.onceLootPaid`, which is
+ *  undefined on a pre-feature save and reads correctly as "nothing paid yet". */
+export function keepsakeAlreadyPaid(
+  enc: Pick<WastelandEncounter, 'archetypeId' | 'oncePerSaveLoot'>,
+  paidIds: readonly string[] | undefined,
+): boolean {
+  if (!enc.oncePerSaveLoot) return false;
+  return (paidIds ?? []).includes(enc.archetypeId);
+}
+
+/** ⚠ OTA-1830 — record a keepsake payout. Returns the new `onceLootPaid` list
+ *  with this archetype present exactly once. Pure, and out here rather than in
+ *  the store because `gameStore.ts` sits at a hard line ceiling by design: new
+ *  store code must displace old store code or move to a module. This is the
+ *  module. */
+export function recordKeepsakePaid(
+  paidIds: readonly string[] | undefined,
+  archetypeId: string,
+): string[] {
+  return [...(paidIds ?? []).filter((id) => id !== archetypeId), archetypeId];
+}
+
+/** ⚠ OTA-1830 — one call for the whole keepsake decision, because the caller
+ *  lives in a file at a hard line ceiling. Returns whether this archetype's
+ *  once-per-save loot is already spent, and which line to narrate: the giving
+ *  line the first time, the authored `repeatLine` every time after. */
+export function resolveKeepsake(
+  enc: Pick<WastelandEncounter, 'archetypeId' | 'oncePerSaveLoot' | 'npcLine' | 'repeatLine'>,
+  paidIds: readonly string[] | undefined,
+): { spent: boolean; line: string | null } {
+  const spent = keepsakeAlreadyPaid(enc, paidIds);
+  return { spent, line: spent ? (enc.repeatLine ?? enc.npcLine) : enc.npcLine };
 }
 
 interface PickOptions {
@@ -243,6 +311,8 @@ export function pickWastelandEncounter(
         enemyName,
         questHook: archetype.quest_hook ?? null,
         provoke: archetype.provoke ?? null,
+        oncePerSaveLoot: archetype.once_per_save_loot === true,
+        repeatLine: archetype.repeat_line ?? null,
       };
     }
     // If the archetype id is unknown (stale save / archetype removed),
@@ -355,6 +425,8 @@ export function pickWastelandEncounter(
     enemyName,
     questHook: archetype.quest_hook ?? null,
     provoke: archetype.provoke ?? null,
+    oncePerSaveLoot: archetype.once_per_save_loot === true,
+    repeatLine: archetype.repeat_line ?? null,
   };
 }
 

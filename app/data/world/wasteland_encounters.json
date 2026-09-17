@@ -706,5 +706,21 @@
       "'You can also turn it in to any Guild office for half the TC and full standing credit. Your call — the Aether watches either way.'"
     ],
     "lore_note": "She does not raise her voice. She does not move. She just waits. After a beat she steps aside, but her hand has not left her shoulder-bag."
+  },
+
+  "rocky_memorial": {
+    "_note": "Rocky. A memorial, not a mechanic: a good dog who wanders the flats, finds you once, and leaves you something to remember him by. ROCKY WAS A GOOD BOY.",
+    "type": "npc",
+    "weight": 3,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands", "buried"],
+    "narration": "Something comes out of the scrub at an easy trot — a dog, grey around the muzzle, tail going the whole way. He is in no hurry, and he is not afraid of you. A brass tag on his collar has one word stamped into it: ROCKY.",
+    "npc_lines": [
+      "Rocky pads over and gives you a careful sniff. Satisfied, he nudges something toward your hand: a reservation gemstone."
+    ],
+    "once_per_save_loot": true,
+    "repeat_line": "Rocky finds you again. He leans his whole weight against your shin for a moment, lets you get his ears, and trots back out to his rounds.",
+    "loot": [
+      { "name": "Reservation Gemstone", "weight": 100, "min": 1, "max": 1, "kind": "misc", "tags": ["gem","keepsake"] }
+    ]
   }
 }

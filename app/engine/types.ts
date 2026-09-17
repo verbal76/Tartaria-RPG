@@ -2151,6 +2151,13 @@ export interface WorldMemory {
    *  above is legacy — read once as migration, no longer written). Entries
    *  self-prune once stale (>= 6 game-hours old). */
   sceneWeatherByLoc?: Record<string, { id: string; rolledAtHours: number }>;
+  /** ⚠⚠ OTA-1830 — archetype ids whose ONCE-PER-SAVE keepsake has already been
+   *  handed over on this character. Rocky's reservation gemstone is the first
+   *  and, today, the only entry. It gates the GRANT, never the PICK: Rocky goes
+   *  on wandering into you for the rest of the run, he just has nothing left to
+   *  give. Absent on a pre-feature save, which reads as "nothing paid yet" and
+   *  costs nothing. Bounded by the number of authored keepsake archetypes. */
+  onceLootPaid?: string[];
   discoveredLocationIds: string[];
   /** OTA-500 — install-canon locations registered from dynamic mentions. */
   canonLocations?: CanonLocation[];
