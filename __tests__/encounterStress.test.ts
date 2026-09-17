@@ -76,7 +76,51 @@ import {
 } from '../app/engine/containerLoot';
 import { findEnemyByName } from '../app/engine/encounter';
 import { grantItem } from '../app/engine/inventory';
+import { openingRange } from '../app/state/combatResolution';
 import type { Location, InventoryItem } from '../app/engine/types';
+
+/** OTA-1832 — THE WALK OWNS ITS OWN DICE.
+ *
+ * ⚠⚠⚠ WHAT THIS REPLACED, AND WHY IT HAD TO. Test 3 below used to fall through
+ * to the AMBIENT seeded stream (jest.setup.js) once its forced prefix ran out.
+ * That stream's POSITION when the walk starts is the total number of draws taken
+ * before it — and test 3 `require`s app/state/gameStore.ts inside its own body,
+ * which draws ~265,000 times, >99.98% of them from the `source-map` package's
+ * randomized quicksort. OTA-1831 measured that count and proved it is a function
+ * of the loaded modules' SOURCE-MAP SHAPE. So the walk began wherever the byte
+ * layout of the product tree happened to put it.
+ *
+ * ⚠⚠ THAT MADE THIS SUITE A LOTTERY, AND THE RATE WAS MEASURED, NOT GUESSED.
+ * At 199353ee, twenty behaviour-free variants (n dead statements inserted at one
+ * spot in gameStore.ts, n=1..20) were run against this file. EIGHT OF TWENTY
+ * FAILED — 40%. The twelve that passed each drew a different enemy at a
+ * different try count, because every mapping-emitting edit reshuffles the whole
+ * stream. The sharpest control: adding ONE LINE OF DEAD CODE — a branch that
+ * cannot execute, guarded on a field that did not exist on that tree — turned
+ * this suite red. The failure never named the edit that moved it.
+ *
+ * ⚠ SO THE WALK NO LONGER BORROWS. Same mulberry32 jest.setup.js uses, seeded
+ * here, owned here, advanced only by this test. No import cost, no sibling suite
+ * and no future edit to any product file can move it. This does NOT weaken the
+ * test: it still drives real code with a full non-repeating pseudo-random
+ * sequence — exactly jest.setup.js's own rationale — and it now drives the SAME
+ * one on every tree, which is the entire point of having a seed.
+ *
+ * ⚠ OTA-1831 CANNOT COVER THIS ON ITS OWN, and that is not a defect in it. Its
+ * per-test re-seed fixes the stream's STARTING position; a heavy `require`
+ * INSIDE a test body then walks it forward again by a layout-derived amount
+ * before the first assertion. Any test that lazily imports the store is exposed
+ * the same way. */
+function makeWalkRandom(seed: number): () => number {
+  let s = seed >>> 0;
+  return function walkRandom() {
+    s |= 0;
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 const WASTE_ARCHETYPES = WASTE_TO.ARCHETYPES as Record<string, WastelandArchetype>;
 const CONT_ARCHETYPES = CONT_TO.ARCHETYPES as Record<string, ContainerArchetype>;
@@ -179,20 +223,30 @@ describe('encounterStress — wasteland + container systems', () => {
     // We rotate through a few high values to also vary the enemyPool
     // pick and force-trigger the encounter (rng() < 0.55 = rollChance).
     const origRandom = Math.random;
-    const realRandom = Math.random.bind(Math);
+    // OTA-1832 — the walk's own stream. See makeWalkRandom above for what this
+    // replaced (the ambient seeded stream) and what that cost: a measured 40%
+    // of behaviour-free edits to gameStore.ts turned this suite red.
+    const walkRandom = makeWalkRandom(0x776b);
     // Sequence pattern per stepDirection call (best-effort — the
     // function makes several rng calls for narration / wander before
     // pickWastelandEncounter). We use a low (force-trigger) → high
     // (force-skirmish-pick) → med (enemy-pool index) cycle and fall
-    // through to realRandom for anything past.
+    // through to the walk's own stream for anything past.
+    //
+    // ⚠ `seq` is DELIBERATELY NOT RESET between steps: the forced cycle seeds
+    // the FIRST step only, and every try after it runs on walkRandom, so the
+    // 200-try window explores varied wander / pick / placement paths instead of
+    // replaying one scripted step 200 times. The old comment here called that
+    // fall-through "real entropy" — it never was. It was jest.setup.js's seeded
+    // PRNG, shared with every other draw in the process. There is no entropy in
+    // this loop and there must not be: a blocking gate that rolls real dice is a
+    // gate that goes red on somebody else's commit.
     let seq = 0;
     Math.random = jest.fn(() => {
       const cycle = [0.1, 0.95, 0.2, 0.05, 0.9, 0.4];
       const v = cycle[seq % cycle.length]!;
       seq++;
-      // Mix in some real entropy past index 8 so wander / world-map
-      // helpers don't lock onto the same tile every step.
-      if (seq > 8) return realRandom();
+      if (seq > 8) return walkRandom();
       return v;
     }) as any;
 
@@ -239,9 +293,9 @@ describe('encounterStress — wasteland + container systems', () => {
       let triesUsed = 0;
       for (let i = 0; i < 200 && !spawned; i++) {
         triesUsed = i + 1;
-        // The deterministic prefix seeds the first attempt; from there
-        // real entropy (mock falls through to realRandom past seq=8)
-        // drives variation across the 200-try window so the larger
+        // The deterministic prefix seeds the first attempt; from there the
+        // walk's OWN seeded stream (the mock falls through to walkRandom past
+        // seq=8) drives variation across the 200-try window so the larger
         // archetype pool from the mini-dungeon batch still produces
         // at least one skirmish / bandit spawn within the budget.
         const liveScene = store.getState().currentScene;
@@ -265,7 +319,16 @@ describe('encounterStress — wasteland + container systems', () => {
         if (sc && sc.enemies.length > 0) {
           spawned = true;
           lastEnemyName = sc.enemies[0]?.name ?? null;
-          expect(sc.range).toBe('close');
+          // OTA-1832 — the scene's legacy `range` word must agree with WHERE
+          // THE BODIES ACTUALLY STAND. This used to be a hard-coded 'close',
+          // which was never a true claim: openingRange (OTA-550, re-banded by
+          // OTA-1506) reads the leader's band off the randomized stagger, and a
+          // lone body deliberately opens at 'mid'. Seven of the eight failures
+          // in the OTA-1832 sweep were this assertion, not the spawn. Reading
+          // the authority instead of a literal is STRICTER, not looser: it now
+          // fails if any spawn site ever writes a word that disagrees with the
+          // placement it just made — the exact drift OTA-1506 had to chase.
+          expect(sc.range).toBe(openingRange(sc.enemies));
           expect(sc.enemyHps.length).toBe(sc.enemies.length);
           expect(sc.activeEnemyIdx).toBeGreaterThanOrEqual(0);
           expect(sc.enemyHps[sc.activeEnemyIdx] ?? 0).toBeGreaterThan(0);
