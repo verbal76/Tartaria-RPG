@@ -10,6 +10,9 @@ import type { LadderTriple } from './worldLadder';
 // OTA-1478 — the player-tier ladder, once, as data. `dangerTier` imports
 // nothing from here, so the dependency runs one way and cannot grow a cycle.
 import { playerRarityCap } from './dangerTier';
+// OTA-1833 — creatures authored content can summon BY NAME and no tile can
+// roll. Deliberately a separate module; see namedFoes.ts for why.
+import { findNamedFoe } from './namedFoes';
 
 const enemies = enemiesData as Enemy[];
 const weather = weatherData as WeatherEntry[];
@@ -24,7 +27,11 @@ export function findEnemyByName(name: string): Enemy | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
   const match = enemies.find((e) => e.name.toLowerCase() === t);
-  if (!match) return null;
+  // ⚠⚠ OTA-1833 — then the named-only foes. They are kept OUT of enemies.json
+  // because that file is not a lookup table: it is the random spawn pool AND an
+  // input to the D1-D5 threat maths. Bestiary first, so a name the pool already
+  // owns always wins; a named-only foe can never shadow a rollable one.
+  if (!match) return findNamedFoe(t);
   return JSON.parse(JSON.stringify(match)) as Enemy;
 }
 

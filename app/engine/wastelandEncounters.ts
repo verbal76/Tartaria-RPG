@@ -79,8 +79,10 @@ export interface WastelandArchetype {
    *  Set on an archetype whose loot is a KEEPSAKE rather than a resource: the
    *  drop is granted the first time this archetype pays out on a character and
    *  never again, while the encounter itself stays in the rotation. Rocky is
-   *  why it exists — a memorial dog who gives you one reservation gemstone —
-   *  and the split is the whole design. Gating the PICK would have retired him
+   *  why it exists — a memorial dog who gives you one Resurrection Gem (⚠ the
+   *  original of this comment said "reservation gemstone", which was a
+   *  mishearing that reached a build; OTA-1833 corrected it) — and the split is
+   *  the whole design. Gating the PICK would have retired him
    *  after a single meeting, which is the opposite of what a wandering dog
    *  should do; gating the GRANT lets him keep finding you for the whole run.
    *
@@ -93,6 +95,14 @@ export interface WastelandArchetype {
   /** Shown in place of the npc line once `once_per_save_loot` has already paid
    *  out — the warm, no-reward version of the same meeting. */
   repeat_line?: string;
+  /** ⚠⚠ OTA-1833 — RESURRECTION GEMS, NOT AN INVENTORY ROW. A keepsake may pay
+   *  in the one currency that cheats death. Gems do not live in the pack: they
+   *  are an install-wide counter in saveSystem's GlobalStash, granted through
+   *  `addResurrectionGems`, and there is no such catalogue item to drop. So this
+   *  is a COUNT, not a loot entry, and it is deliberately separate from `loot`.
+   *  Owner ruling 2026-09-17: one gem PER CHARACTER — `once_per_save_loot` is
+   *  the gate, and worldMemory (per-character) is where it is written down. */
+  keepsake_gem?: number;
 }
 
 /** OTA-695 — data-driven provoke payload for a provocable NPC encounter. */
@@ -142,6 +152,9 @@ export interface WastelandEncounter {
   /** OTA-1830 — the line shown instead of `npcLine` once the keepsake has been
    *  given. Null when the archetype authored none. */
   repeatLine: string | null;
+  /** OTA-1833 — Resurrection Gems this keepsake pays, or 0. NOT loot: gems are
+   *  a stash counter, not a pack row. See `keepsake_gem` on the archetype. */
+  keepsakeGem: number;
 }
 
 /** ⚠⚠⚠ OTA-1830 — THE ANTI-FARM RULE, AS ONE PURE FUNCTION.
@@ -178,13 +191,21 @@ export function recordKeepsakePaid(
 /** ⚠ OTA-1830 — one call for the whole keepsake decision, because the caller
  *  lives in a file at a hard line ceiling. Returns whether this archetype's
  *  once-per-save loot is already spent, and which line to narrate: the giving
- *  line the first time, the authored `repeatLine` every time after. */
+ *  line the first time, the authored `repeatLine` every time after.
+ *
+ *  ⚠⚠ OTA-1833 — AND HOW MANY GEMS IT OWES, for the same reason. `gem` is the
+ *  count to hand to `addResurrectionGems`, already zeroed when the keepsake is
+ *  spent, so the store branches once instead of three times. */
 export function resolveKeepsake(
-  enc: Pick<WastelandEncounter, 'archetypeId' | 'oncePerSaveLoot' | 'npcLine' | 'repeatLine'>,
+  enc: Pick<WastelandEncounter, 'archetypeId' | 'oncePerSaveLoot' | 'npcLine' | 'repeatLine' | 'keepsakeGem'>,
   paidIds: readonly string[] | undefined,
-): { spent: boolean; line: string | null } {
+): { spent: boolean; line: string | null; gem: number } {
   const spent = keepsakeAlreadyPaid(enc, paidIds);
-  return { spent, line: spent ? (enc.repeatLine ?? enc.npcLine) : enc.npcLine };
+  return {
+    spent,
+    line: spent ? (enc.repeatLine ?? enc.npcLine) : enc.npcLine,
+    gem: spent ? 0 : Math.max(0, Math.floor(enc.keepsakeGem || 0)),
+  };
 }
 
 interface PickOptions {
@@ -313,6 +334,7 @@ export function pickWastelandEncounter(
         provoke: archetype.provoke ?? null,
         oncePerSaveLoot: archetype.once_per_save_loot === true,
         repeatLine: archetype.repeat_line ?? null,
+        keepsakeGem: archetype.keepsake_gem ?? 0,
       };
     }
     // If the archetype id is unknown (stale save / archetype removed),
@@ -427,6 +449,7 @@ export function pickWastelandEncounter(
     provoke: archetype.provoke ?? null,
     oncePerSaveLoot: archetype.once_per_save_loot === true,
     repeatLine: archetype.repeat_line ?? null,
+    keepsakeGem: archetype.keepsake_gem ?? 0,
   };
 }
 

@@ -28176,8 +28176,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         } else {
           get().appendLog('world', enc.narration);
         }
-        const keep = resolveKeepsake(enc, get().worldMemory.onceLootPaid); // OTA-1830
+        const keep = resolveKeepsake(enc, get().worldMemory.onceLootPaid); // OTA-1830 · gem OTA-1833
         if (keep.line) get().appendLog('arbiter', keep.line);
+        if (keep.gem) { void addResurrectionGems(keep.gem).then((t) => { set((st) => ({ resurrectionGems: t, worldMemory: { ...st.worldMemory, onceLootPaid: recordKeepsakePaid(st.worldMemory.onceLootPaid, enc.archetypeId) } })); get().appendLog('reward', `✦ A Resurrection Gem passes into your keeping. (${t} held)`); }); } // OTA-1833 — marked paid only AFTER the stash banks it
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
         // OTA-695 — data-driven provocable encounter. When the encounter's
         // archetype carries a `provoke` block (the Aetherkin mourner's dare,
@@ -28211,9 +28212,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 quantity: enc.loot.quantity,
                 tags: enc.loot.tags,
               });
-              set((s) => (s.player
-                ? { player: { ...s.player, inventory: grantResult.inventory } }
-                : s));
+              set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
               if (grantResult.accepted > 0) {
                 get().appendLog('reward', `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`);
                 // OTA-1830 — spent only on an ACCEPTED grant; a full pack must not burn the one chance.

@@ -709,18 +709,22 @@
   },
 
   "rocky_memorial": {
-    "_note": "Rocky. A memorial, not a mechanic: a good dog who wanders the flats, finds you once, and leaves you something to remember him by. ROCKY WAS A GOOD BOY.",
+    "_note": "Rocky. A memorial, not a mechanic: a butterscotch pitbull who wanders the flats, finds you, and gives you back the one thing that cheats death. Attack him and you will learn what was sleeping in him. ROCKY WAS A GOOD BOY.",
     "type": "npc",
     "weight": 3,
     "matchers": ["mud", "outskirts", "open", "ruin", "borderlands", "buried"],
-    "narration": "Something comes out of the scrub at an easy trot — a dog, grey around the muzzle, tail going the whole way. He is in no hurry, and he is not afraid of you. A brass tag on his collar has one word stamped into it: ROCKY.",
+    "narration": "Something comes out of the scrub at an easy trot — a butterscotch-brown pitbull in a black harness, white socks on his feet and a white mark on the back of his neck shaped almost exactly like Texas. He is in no hurry, and he is not afraid of you. The tag on the harness has one word stamped into it: ROCKY.",
     "npc_lines": [
-      "Rocky pads over and gives you a careful sniff. Satisfied, he nudges something toward your hand: a reservation gemstone."
+      "Rocky pads over and gives you a careful sniff — your knee first, then your hands. Satisfied, he sits down against your leg and lets you work loose the small bright thing knotted into his harness: a Resurrection Gem, warm from him."
     ],
     "once_per_save_loot": true,
-    "repeat_line": "Rocky finds you again. He leans his whole weight against your shin for a moment, lets you get his ears, and trots back out to his rounds.",
-    "loot": [
-      { "name": "Reservation Gemstone", "weight": 100, "min": 1, "max": 1, "kind": "misc", "tags": ["gem","keepsake"] }
-    ]
+    "keepsake_gem": 1,
+    "repeat_line": "Rocky finds you again. He has nothing left to give and does not appear to think that matters — he leans his whole weight against your shin, tail going, and watches you until you scratch his ears.",
+    "provoke": {
+      "enemy": "Rocky",
+      "nouns": ["rocky", "dog", "pitbull", "harness"],
+      "line": "You raise a hand to the dog who just gave you his one good thing. Rocky does not run and does not cower. The tail stops. The butterscotch head comes down and level, the Texas on his neck standing up in a ridge, and something under the Aether that has been asleep a very long time opens its eyes behind his. He is not a stray any more. He is what the marsh keeps.",
+      "system_line": "Rocky defends himself."
+    }
   }
 }

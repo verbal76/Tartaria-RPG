@@ -1,8 +1,16 @@
 /* ⚠⚠⚠ OTA-1830 — ROCKY.
  *
  * A memorial. He is not a quest, not a companion, and not a fight: a good dog
- * who wanders Tartaria, finds you once, sniffs you over and leaves you a single
- * reservation gemstone.
+ * who wanders Tartaria, finds you, sniffs you over and leaves you a single
+ * Resurrection Gem — and then keeps finding you, with nothing left to give but
+ * himself.
+ *
+ * ⚠⚠⚠ THIS HEADER USED TO SAY "reservation gemstone". That was a mishearing of
+ * RESURRECTION that survived every review in this file and reached a published
+ * build, where it granted an inert misc row that no catalogue contains. The
+ * owner caught it on his own phone. OTA-1833 is the correction; the tests below
+ * were amended rather than replaced, so the wrong claim stays legible next to
+ * the right one.
  *
  * ⚠⚠ THE AUTHORITY, and why it is this one. Rocky rides the EXISTING
  * data-driven wasteland-encounter system (`app/data/world/wasteland_encounters
@@ -61,19 +69,26 @@ describe('OTA-1830 §1 — Rocky exists, and he is a dog, not a fight', () => {
     expect(ROCKY.type).toBe('npc');
   });
 
-  test('1.2 ⚠ NON-HOSTILE: no enemy pool, no bandits, no provoke, no quest hook', () => {
+  test('1.2 ⚠ HE NEVER STARTS IT: no enemy pool, no bandits, no quest hook', () => {
+    /* ⚠⚠ OTA-1833 NARROWED THIS CLAIM, and the narrowing is the point. It used
+     * to assert `provoke` was undefined too — i.e. that Rocky could not fight
+     * under any circumstance. The owner's ruling is sharper than that: he is
+     * not a fight you can walk into, but he is also not something you may hit.
+     * Raise a hand and he defends himself. So the claim that survives is the
+     * one that actually matters — NOTHING ABOUT HIM CAN OPEN A FIGHT. No pool
+     * to draw a foe from, no bandits riding along, no hook. Only the player can
+     * start it, and §5 of ota1833 pins what happens when they do. */
     expect(ROCKY.enemyPool).toBeUndefined();
     expect(ROCKY.bandit_pool).toBeUndefined();
-    expect(ROCKY.provoke).toBeUndefined();
     expect(ROCKY.quest_hook).toBeUndefined();
   });
 
-  test('1.3 …and the resolved encounter spawns nothing that can fight', () => {
+  test('1.3 …and meeting him spawns nothing — the scene stays empty', () => {
     const enc = rockyEncounter();
     expect(enc).toBeTruthy();
     expect(enc!.type).toBe('npc');
+    // no body is placed by the meeting itself; provoke is armed, not fired
     expect(enc!.enemyName).toBeNull();
-    expect(enc!.provoke).toBeNull();
     expect(enc!.questHook).toBeNull();
   });
 
@@ -96,33 +111,45 @@ describe('OTA-1830 §1 — Rocky exists, and he is a dog, not a fight', () => {
 });
 
 describe('OTA-1830 §2 — the meeting, and exactly one gemstone', () => {
+  /* ⚠⚠⚠ OTA-1833 CORRECTED THIS SECTION. It used to assert a "Reservation
+   * Gemstone" — a mishearing of RESURRECTION that reached a live build. No such
+   * item exists in the catalogue, so what shipped handed the player an inert
+   * misc row. The real thing is a Resurrection Gem: an install-wide counter in
+   * saveSystem's GlobalStash, the one currency that cheats death, and not an
+   * inventory item at all. These tests now read the thing the game has. */
   test('2.1 ⚠ he is NAMED, and the beat is the sniff then the gift', () => {
     const line = (ROCKY.npc_lines as string[])[0]!;
     expect(line).toContain('Rocky');
     expect(line).toMatch(/sniff/i);
-    expect(line).toMatch(/reservation gemstone/i);
+    expect(line).toMatch(/resurrection gem/i);
+    expect(line).not.toMatch(/reservation/i);
     expect(ROCKY.narration as string).toContain('ROCKY');
   });
 
-  test('2.2 ⚠ EXACTLY ONE reservation gemstone — min and max are both 1', () => {
-    const loot = ROCKY.loot as { name: string; min: number; max: number; kind: string }[];
-    expect(loot).toHaveLength(1);
-    expect(loot[0]!.name).toBe('Reservation Gemstone');
-    expect(loot[0]!.min).toBe(1);
-    expect(loot[0]!.max).toBe(1);
-    expect(loot[0]!.kind).toBe('misc');
+  test('2.1a ⚠⚠ HE IS THE DOG IN THE PHOTOGRAPH — butterscotch pitbull, black harness', () => {
+    // ⚠ the full description is pinned in ota1833 §4, including the Texas mark.
+    const n = ROCKY.narration as string;
+    expect(n).toMatch(/butterscotch/i);
+    expect(n).toMatch(/pitbull/i);
+    expect(n).toMatch(/black harness/i);
+    expect(n).not.toMatch(/grey around the muzzle/i);
   });
 
-  test('2.3 …and the resolved encounter rolls exactly one, on any die', () => {
+  test('2.2 ⚠ EXACTLY ONE Resurrection Gem, and NO loot row at all', () => {
+    expect(ROCKY.keepsake_gem).toBe(1);
+    // ⚠ a gem is not a pack item. Authoring one as loot is what shipped broken.
+    expect(ROCKY.loot).toBeUndefined();
+  });
+
+  test('2.3 …and the resolved encounter carries exactly one, on any die', () => {
     for (const r of [0, 0.25, 0.5, 0.75, 0.999]) {
       const enc = pickWastelandEncounter(groundFor('open'), {
         stepsSinceLastEncounter: 99,
         forceArchetype: 'rocky_memorial',
         rng: () => r,
       });
-      expect(enc!.loot).toEqual(
-        expect.objectContaining({ name: 'Reservation Gemstone', quantity: 1 }),
-      );
+      expect(enc!.keepsakeGem).toBe(1);
+      expect(enc!.loot).toBeNull();
     }
   });
 
@@ -178,11 +205,11 @@ describe('OTA-1830 §3 — the gemstone cannot be farmed', () => {
     const first = resolveKeepsake(enc, undefined);
     expect(first.spent).toBe(false);
     expect(first.line).toBe(enc.npcLine);
-    expect(first.line).toMatch(/gemstone/i);
+    expect(first.line).toMatch(/resurrection gem/i);
     const later = resolveKeepsake(enc, ['rocky_memorial']);
     expect(later.spent).toBe(true);
     expect(later.line).toBe(enc.repeatLine);
-    expect(later.line).not.toMatch(/gemstone/i);
+    expect(later.line).not.toMatch(/resurrection gem/i);
   });
 
   test('3.2f recording a payout is idempotent — he is listed once, not once per meeting', () => {
@@ -198,10 +225,14 @@ describe('OTA-1830 §3 — the gemstone cannot be farmed', () => {
     expect(paid).toHaveLength(2);
   });
 
-  test('3.3 a repeat meeting has a warm, reward-free line to fall back on', () => {
+  test('3.3 ⚠ AFTER THE GEM HE STILL COMES, AND JUST WANTS A SCRATCH', () => {
+    // Owner ruling 2026-09-17: "after the gem, he just watches and wants a
+    // scratch or a petted." So the repeat line must promise nothing and ask
+    // for something — it is the whole reason the gate is on the grant.
     const repeat = ROCKY.repeat_line as string;
     expect(repeat).toContain('Rocky');
-    expect(repeat).not.toMatch(/gemstone/i);
+    expect(repeat).not.toMatch(/gem|reservation/i);
+    expect(repeat).toMatch(/scratch|ears|lean/i);
     expect(rockyEncounter()!.repeatLine).toBe(repeat);
   });
 });
@@ -214,6 +245,7 @@ describe('OTA-1830 §4 — nothing else in the world moved', () => {
     for (const [, v] of others) {
       expect(v.once_per_save_loot).toBeUndefined();
       expect(v.repeat_line).toBeUndefined();
+      expect(v.keepsake_gem).toBeUndefined();
     }
   });
 
@@ -226,6 +258,7 @@ describe('OTA-1830 §4 — nothing else in the world moved', () => {
     expect(other).toBeTruthy();
     expect(other!.oncePerSaveLoot).toBe(false);
     expect(other!.repeatLine).toBeNull();
+    expect(other!.keepsakeGem).toBe(0);
   });
 
   test('4.3 Rocky did not displace anybody — the roster only grew', () => {
@@ -252,8 +285,15 @@ describe('OTA-1830 §5 — the rule is WIRED, not merely written', () => {
     expect(store).toContain('resolveKeepsake(enc, get().worldMemory.onceLootPaid)');
   });
 
-  test('5.2 ⚠⚠ THE GRANT IS GATED — a spent keepsake withholds the loot', () => {
+  test('5.2 ⚠⚠ THE GRANT IS GATED — a spent keepsake withholds the payout', () => {
     expect(store).toContain('!keep.spent');
+  });
+
+  test('5.2a ⚠⚠⚠ OTA-1833 — THE GEM IS ACTUALLY GRANTED, through the one real path', () => {
+    // addResurrectionGems is the ONLY way a gem enters the stash. A keepsake
+    // that only logged a line would read as generous and change nothing.
+    expect(store).toContain('addResurrectionGems(keep.gem)');
+    expect(store).toContain('resurrectionGems: t');
   });
 
   test('5.3 ⚠⚠ AND THE PAYOUT IS RECORDED, so the second meeting knows', () => {
@@ -266,12 +306,32 @@ describe('OTA-1830 §5 — the rule is WIRED, not merely written', () => {
     expect(store).toContain('keep.line');
   });
 
-  test('5.5 ⚠⚠⚠ A FULL PACK MUST NOT BURN THE ONE CHANCE — the record is written only on an accepted grant', () => {
-    // The record must sit inside the accepted-grant branch. If it were written
-    // on any attempt, arriving with no room would spend Rocky's gemstone and
-    // the player would never receive it.
-    const at = store.indexOf('recordKeepsakePaid(st.worldMemory.onceLootPaid');
-    expect(at).toBeGreaterThan(-1);
+  test('5.5 ⚠⚠⚠ THE PAYOUT IS NEVER BURNED BEFORE IT LANDS — both keepsake paths', () => {
+    /* ⚠⚠ OTA-1833 SPLIT THIS TEST, because there are now two payout paths and
+     * they fail in different ways. It used to assume one, and correctly went
+     * red the moment a second appeared.
+     *
+     *  LOOT path  — the risk is a FULL PACK. grantItem can refuse, so the
+     *               record must sit inside the accepted branch or arriving with
+     *               no room spends the keepsake and hands over nothing.
+     *  GEM path   — the risk is a FAILED STASH WRITE. Gems cannot be refused
+     *               for room, but `addResurrectionGems` is async and can lose
+     *               its write, so the record must sit INSIDE the `.then` and
+     *               not beside the call. Recorded-but-not-banked costs the
+     *               player their one gem permanently, and silently.
+     */
+    const records = [...store.matchAll(/recordKeepsakePaid\(st\.worldMemory\.onceLootPaid/g)].map((m) => m.index!);
+    expect(records).toHaveLength(2);
+
+    // the GEM record is downstream of the gem call, on the resolved side of it
+    const gemCall = store.indexOf('addResurrectionGems(keep.gem)');
+    expect(gemCall).toBeGreaterThan(-1);
+    const gemRecord = records.find((i) => i > gemCall && i < gemCall + 400);
+    expect(gemRecord).toBeDefined();
+    expect(store.slice(gemCall, gemRecord!)).toContain('.then(');
+
+    // the LOOT record still sits inside the accepted-grant branch
+    const at = records[records.length - 1]!;
     const accepted = store.lastIndexOf('grantResult.accepted > 0', at);
     expect(accepted).toBeGreaterThan(-1);
     // nothing closes the branch between the guard and the record

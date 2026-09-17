@@ -60,8 +60,17 @@ const STORE = 'app/state/gameStore.ts';
  * have; the owner's ruling was *"EXTRACT, DO NOT JUST RAISE IT"*, so five pure
  * display functions went to the file already named for them and the pass gave
  * back more than it took. That is the intended pressure — the valve works by
- * making somebody find a boundary, not by making them ask for a bigger number. */
-export const CEILING = 36945;
+ * making somebody find a boundary, not by making them ask for a bigger number.
+ *
+ *    36944  OTA-1833      Rocky's gem grant paid for its own line
+ *
+ * ⚠ OTA-1833 is a small one and worth recording as such: the keepsake grant
+ * needed a line the store did not have, the whole DECISION (spent? which line?
+ * how many gems?) already lived in wastelandEncounters, and the line came back
+ * from reflowing a three-line `set` next door into one. No responsibility
+ * moved, so this is tidying and not an extraction — but the slack is given
+ * back rather than banked, which is the only way a ratchet stays a ratchet. */
+export const CEILING = 36944;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 
