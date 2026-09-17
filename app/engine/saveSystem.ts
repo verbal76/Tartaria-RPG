@@ -215,10 +215,12 @@ export function summaryFactionId(
  *  uncapped record. They are short strings; a lifetime of them costs nothing
  *  next to one save. */
 export async function recordFallenSeed(seed: string): Promise<void> {
-  const stash = await loadGlobalStash();
-  const have = stash.fallenSeeds ?? [];
-  if (have.includes(seed)) return;
-  await saveGlobalStash({ ...stash, fallenSeeds: [...have, seed] });
+  await mutateGlobalStash((stash) => {
+    const have = stash.fallenSeeds ?? [];
+    if (have.includes(seed)) return STASH_UNCHANGED;
+    stash.fallenSeeds = [...have, seed];
+    return undefined;
+  });
 }
 
 /** True when this exact character has died on this install — ever. */
@@ -233,36 +235,42 @@ export async function hasFallenSeed(seed: string): Promise<boolean> {
  *  be restored — the register still called them fallen. The Gem clears its
  *  entry: that death has been paid for. A later death re-registers it. */
 export async function clearFallenSeed(seed: string): Promise<void> {
-  const stash = await loadGlobalStash();
-  const have = stash.fallenSeeds ?? [];
-  if (!have.includes(seed)) return;
-  await saveGlobalStash({ ...stash, fallenSeeds: have.filter((x) => x !== seed) });
+  await mutateGlobalStash((stash) => {
+    const have = stash.fallenSeeds ?? [];
+    if (!have.includes(seed)) return STASH_UNCHANGED;
+    stash.fallenSeeds = have.filter((x) => x !== seed);
+    return undefined;
+  });
 }
 
 /** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
  *  new total number of fallen ever recorded within the cap window. */
 export async function recordFallen(hero: FallenHero): Promise<number> {
-  const stash = await loadGlobalStash();
-  const next = [...(stash.fallen ?? []), hero].slice(-FALLEN_CAP);
-  await saveGlobalStash({ ...stash, fallen: next });
-  return next.length;
+  const n = await mutateGlobalStash((stash) => {
+    const next = [...(stash.fallen ?? []), hero].slice(-FALLEN_CAP);
+    stash.fallen = next;
+    return next.length;
+  });
+  return n as number;
 }
 
 /** OTA-975 — mark a fallen entry (matched by death ts) put to rest. Install-wide. */
 export async function markFallenAvenged(ts: number, by: string): Promise<void> {
-  const stash = await loadGlobalStash();
-  const next = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
-  await saveGlobalStash({ ...stash, fallen: next });
+  await mutateGlobalStash((stash) => {
+    stash.fallen = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
+    return undefined;
+  });
 }
 
 /** OTA-994 — pin a SYNTHESIZED (pre-snapshot) revenant kit onto its record the
  *  first time it is generated, so a later catalog edit can never reshuffle the
  *  gear a named fallen wears. Never overwrites a real recorded kit. */
 export async function pinFallenGearNames(ts: number, gearNames: string[]): Promise<void> {
-  const stash = await loadGlobalStash();
-  const next = (stash.fallen ?? []).map((f) =>
-    (f.ts === ts && !(f.gearNames && f.gearNames.length > 0) ? { ...f, gearNames } : f));
-  await saveGlobalStash({ ...stash, fallen: next });
+  await mutateGlobalStash((stash) => {
+    stash.fallen = (stash.fallen ?? []).map((f) =>
+      (f.ts === ts && !(f.gearNames && f.gearNames.length > 0) ? { ...f, gearNames } : f));
+    return undefined;
+  });
 }
 
 /** OTA-845 — read the roll of the Fallen (newest last). */
@@ -293,11 +301,70 @@ export async function saveGlobalStash(stash: GlobalStash): Promise<void> {
   await AsyncStorage.setItem(GLOBAL_STASH_KEY, JSON.stringify(stash));
 }
 
+/** ⚠⚠⚠ OTA-1835 — THE ONE DOOR EVERY WHOLE-STASH MUTATION GOES THROUGH.
+ *
+ *  THE DEFECT THIS CLOSES, MEASURED BEFORE IT WAS WRITTEN. Every mutator below
+ *  used to be `load → modify → save` with nothing between them, and ONE PLAYER
+ *  DEATH fires several of them at once, unawaited, from combatResolution:
+ *  `recordFallenSeed`, `recordFallen`, and — on a dev-name death —
+ *  `addResurrectionGems`. They all read the SAME snapshot and then each wrote
+ *  the WHOLE object back, so the last write erased the others' fields.
+ *
+ *  A deterministic probe on the pre-repair tree:
+ *    normal death  (memorial + seed) → fallen 0 (LOST), seeds 1
+ *    dev death     (all three)       → fallen 0 (LOST), seeds 0 (LOST), gems 6
+ *  The memorial was lost on EVERY death, not merely under contention, and the
+ *  three-way case also lost the permanent fallen-seed marker — the record whose
+ *  entire job is to stop a backup undoing a death.
+ *
+ *  ⚠ WHY A QUEUE AND NOT A MERGE. Merging fields would need this layer to know
+ *  which field each caller owns, and it does not; a queue needs to know nothing
+ *  and is correct for mutators that have not been written yet. Each mutator now
+ *  runs against state loaded AFTER the previous one has been saved, so callers
+ *  keep their narrow semantic responsibility and simply stop being able to
+ *  clobber each other.
+ *
+ *  ⚠ FAILURE AND DEADLOCK. The chain is advanced in a `finally`, so a mutator
+ *  that THROWS still releases the queue and the next one runs. The rejection is
+ *  re-thrown to ITS OWN caller — a failed memorial write must never report
+ *  durable success — and a mutator that throws before `saveGlobalStash` leaves
+ *  the stored stash exactly as it was. Nothing about the lock is persisted, so
+ *  a restart begins with an empty chain and a readable stash; there is no lock
+ *  state on disk to strand.
+ *
+ *  ⚠ NOT A TRANSACTION. This serialises mutations within one JS runtime. It is
+ *  not crash atomicity between the load and the save, and it is not claimed to
+ *  be — a kill in that window still loses the in-flight mutation only. */
+let stashChain: Promise<unknown> = Promise.resolve();
+
+/** Returned by a mutator that decided there was nothing to change. The stash is
+ *  then NOT written — several callers below (an already-registered seed, an
+ *  already-earned badge) deliberately do not touch storage on a no-op, and that
+ *  stays exactly true rather than becoming a redundant identical write. */
+export const STASH_UNCHANGED = Symbol('stash-unchanged');
+
+export async function mutateGlobalStash<T>(
+  mutator: (stash: GlobalStash) => T | typeof STASH_UNCHANGED | Promise<T | typeof STASH_UNCHANGED>,
+): Promise<T | typeof STASH_UNCHANGED> {
+  const run = stashChain.then(async () => {
+    const stash = await loadGlobalStash();
+    const result = await mutator(stash);
+    if (result !== STASH_UNCHANGED) await saveGlobalStash(stash);
+    return result;
+  });
+  // The queue advances on failure too, so one rejected mutation cannot strand
+  // the ones behind it. `catch` here keeps the CHAIN unrejected; `run` itself
+  // still rejects, so the caller learns its own write failed.
+  stashChain = run.catch(() => undefined);
+  return run;
+}
+
 export async function addResurrectionGems(n: number): Promise<number> {
-  const stash = await loadGlobalStash();
-  stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
-  await saveGlobalStash(stash);
-  return stash.resurrectionGems;
+  const total = await mutateGlobalStash((stash) => {
+    stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
+    return stash.resurrectionGems;
+  });
+  return total as number;
 }
 
 /** OTA 454 — first-install Resurrection Gem seed. Idempotent: if the
@@ -306,14 +373,20 @@ export async function addResurrectionGems(n: number): Promise<number> {
  *  one-shot grant so the caller can surface a welcome line; on every
  *  subsequent boot it returns { seeded: false }. */
 export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems: number }> {
-  const stash = await loadGlobalStash();
-  if (stash.installSeeded) {
-    return { seeded: false, gems: stash.resurrectionGems };
-  }
-  stash.installSeeded = true;
-  stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
-  await saveGlobalStash(stash);
-  return { seeded: true, gems: stash.resurrectionGems };
+  let seededGems = 0;
+  const out = await mutateGlobalStash((stash) => {
+    if (stash.installSeeded) {
+      // No write: the seed already happened. Reported through the sentinel so
+      // this stays a pure read exactly as it was before OTA-1835.
+      seededGems = stash.resurrectionGems;
+      return STASH_UNCHANGED;
+    }
+    stash.installSeeded = true;
+    stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
+    return { seeded: true, gems: stash.resurrectionGems };
+  });
+  if (out === STASH_UNCHANGED) return { seeded: false, gems: seededGems };
+  return out as { seeded: boolean; gems: number };
 }
 
 // OTA-935 — arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce are RETIRED. The
@@ -327,14 +400,17 @@ export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems:
  *  Idempotent: re-recording an existing badge is a no-op. Returns
  *  the updated badge list. */
 export async function recordEndingBadge(factionId: string, ending: string): Promise<string[]> {
-  const stash = await loadGlobalStash();
   const id = `${factionId}:${ending}`;
-  const set = new Set(stash.endingBadges ?? []);
-  if (set.has(id)) return Array.from(set);
-  set.add(id);
-  stash.endingBadges = Array.from(set);
-  await saveGlobalStash(stash);
-  return stash.endingBadges;
+  let existing: string[] = [];
+  const out = await mutateGlobalStash((stash) => {
+    const set = new Set(stash.endingBadges ?? []);
+    if (set.has(id)) { existing = Array.from(set); return STASH_UNCHANGED; }
+    set.add(id);
+    stash.endingBadges = Array.from(set);
+    return stash.endingBadges;
+  });
+  if (out === STASH_UNCHANGED) return existing;
+  return out as string[];
 }
 
 let activeSlotId: string | null = null;
