@@ -1,0 +1,335 @@
+{
+  "id": "5a45d5f7be4b45e3adc82f5c8b362127",
+  "groupID": "7738599056",
+  "eventID": "5a45d5f7be4b45e3adc82f5c8b362127",
+  "projectID": "4511945117532160",
+  "size": 5049,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-17-1833-rocky-gives-the-real-thing #mu5vyoncnfyi"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-17-1833-rocky-gives-the-real-thing",
+  "message": "player-log-beacon 2026-09-17-1833-rocky-gives-the-real-thing #mu5vyoncnfyi",
+  "title": "player-log-beacon 2026-09-17-1833-rocky-gives-the-real-thing #mu5vyoncnfyi",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-17T18:51:28.916Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 100.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1372540928,
+      "storage_size": 245292421120,
+      "free_storage": 64140529664,
+      "boot_time": "2026-08-28T17:18:44.581Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": 38.5,
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 86,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0b078-6848-711e-b043-4443706e9f55"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2928fea4052f4b8d8903d486c30212e5",
+      "span_id": "8213fbd12b431243",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-17-1833-rocky-gives-the-real-thing #mu5vyoncnfyi"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mu5vyoncnfyi"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-17-1833-rocky-gives-the-real-thing"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "parts",
+      "value": "56"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-17-1833-rocky-gives-the-real-thing"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-17T18:51:37.340304Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-17T18:51:37.671000Z",
+  "fingerprints": [
+    "04f4fda4a56baa88a92fba1257a29652"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1978252517,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-17T16:57:59.950763Z",
+    "dateReleased": "2026-09-17T17:46:37.310140Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "61f104e0f4b9d2ad3663f22d19ec9ce6e88afe86",
+      "message": "OTA-1833 \u2014 Rocky gives the real thing\n\nThe owner corrected OTA-1830 from a photograph and from memory, and this is\nthat correction. Four things were wrong or missing.\n\nTHE WORD. He gives a Resurrection Gem, not a \"reservation gemstone\" \u2014 a\nmishearing that reached a build. Gone from the data, the engine comment and\nthe suite.\n\nTHE DOG. Butterscotch-brown pitbull, black harness, white socks, and a white\nmark on the back of his neck shaped almost exactly like Texas. The narration\nand the pins say so now.\n\nTHE GEM IS REAL, AND IT COMES FROM THE ONE PLACE GEMS LIVE. Resurrection\nGems are not inventory rows; they are an install-wide counter in\nsaveSystem's GlobalStash, and the only way in is addResurrectionGems. The\nkeepsake now pays through that path. `keepsake_gem` joins the archetype,\nresolveKeepsake decides spent / which line / how many gems in one place, and\nthe store spends one line calling it.\n\n  \u26a0 The archetype is marked paid only INSIDE the .then, after the stash has\n  banked the gem. Recording it first would cost a player their one gem\n  permanently on a failed write. The suite caught that.\n\nONE GEM PER CHARACTER, BUT HE KEEPS COMING BACK. Owner's ruling: after the\ngem \"he just watches and wants a scratch or a petted.\" So the encounter is\nnot once-per-save \u2014 only the gem is. Every later meeting he leans his weight\non your shin and waits to have his ears scratched.\n\nRAISE A HAND TO HIM AND FIND OUT. Owner: \"if he is attacked his stats\ninstantly change to that of the dragon from the hunt and he bites for 4d10.\"\nOTA-695's provoke block arms it; the roused form copies the Bog Dragon field\nfor field (asserted against the live dragon, not a remembered copy). Two\ndeliberate differences: the attack is Bite, and the loot table is EMPTY,\nbecause a Legendary statline with the dragon's drops would make \"attack the\nmemorial dog\" the best loot rate in the game.\n\n  \u26a0\u26a0 THE ROUSED FORM IS NOT IN enemies.json, AND THAT COST SOMETHING TO\n  LEARN. It went there first, which is the obvious place and the wrong one:\n  that file is not a bestiary the game consults, it IS the random spawn pool,\n  and two of three draw sites do not even exclude bosses. A hostile Rocky\n  became spawnable on any tile with nobody having touched him. Worse, the\n  pool is an INPUT TO THE DIFFICULTY MATHS \u2014 one extra Legendary moved the\n  owner-ruled D4 threat reference from 43.0 to 43.2. The suite caught both.\n  He now lives in engine/namedFoes.ts following the Core Guardian precedent,\n  resolved by name only, with the bestiary winning any collision. Two new\n  pins hold it: 135 rows, and the ruled D1-D5 page unmoved.\n\n  \u26a0 NOT flagged `boss`. It reads as the right flag and is a trap: a boss kill\n  carries a guaranteed Resurrection Gem, so it would mean killing Rocky PAYS\n  you the very thing he gives you for being kind to him.\n\nLands on fd8d1fe8, the green harness base. Ceiling 36945 -> 36944, paid for\nby reflowing a three-line `set` next door. Gates 23/23; typecheck 181, equal\nto clean HEAD. Full surface 1338/1338 suites, 15,111 tests. Rocky suites\n58 tests across the two files.\n\nROCKY WAS A GOOD BOY.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-17T16:50:44Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-17-1833-rocky-gives-the-real-thing",
+          "shortVersion": "tartaria@4.32.11+2026-09-17-1833-rocky-gives-the-real-thing",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-17T17:46:37.310140Z",
+          "dateCreated": "2026-09-17T16:57:59.950763Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Kevin Ernst",
+        "email": "ernstkevin@yahoo.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "159521394",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-17T17:46:37.639755Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-17-1833-rocky-gives-the-real-thing",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-17-1833-rocky-gives-the-real-thing",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-17-1833-rocky-gives-the-real-thing",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-17-1833-rocky-gives-the-real-thing)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
