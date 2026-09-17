@@ -1,4 +1,4 @@
-import { useHumanAction } from '../state/humanActivity';
+import { useHumanAction, humanGetState } from '../state/humanActivity';
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
@@ -1227,7 +1227,12 @@ export function CraftingScreen() {
           },
           {
             label: 'Craft & strip',
-            onPress: () => useGameStore.getState().confirmCraftSubstitution(),
+            // ⚠⚠ OTA-1834 (Baker 13) — humanGetState, not the bare store. This
+            // EXACT mutation already went through the accounted seam from
+            // ExplorationScreen; here it did not. One mutation, two doors, one
+            // of them invisible to the idle gates. `cancelCraftSubstitution`
+            // below stays bare on purpose — a refusal is not a gameplay turn.
+            onPress: () => humanGetState().confirmCraftSubstitution(),
             tone: 'primary',
           },
         ]}

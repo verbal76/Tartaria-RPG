@@ -102,9 +102,9 @@ Source references are **as of `61f104e0`**; line numbers drift, symbol names do 
 | **#8** | Native-ML priority / lane / shared queue policy | APP LOGIC | **REPRODUCE BEFORE CHANGING** | MEDIUM if harmful behaviour remains | Source-derived current (mechanism intact); historical only (harm) | Evaluate with current 2.5.0 evidence, particularly after #7 measurements | `app/ai/nativeMlLock.ts` — `runExclusiveNativeMl`, `ML_PRIORITY_*`. Pure TypeScript; migrated unchanged. Consumers: `LlamaRuntime.ts`, `SemanticEmbeddingService.ts` |
 | **#9** | Player preemption arriving too late for running prefill | APP LOGIC | **CLOSED BY CURRENT SOURCE** | MEDIUM if regressed | Source-derived current | No work unless a regression is reproduced | `shouldAbort` in `app/ai/generation/LlamaRuntime.ts` and `QwenGenerativeEngine.ts`; armed with the combat muzzle's own question in `app/ai/narration.ts`. A throwing predicate cannot cost a job |
 | **#10** | **AUTHORITATIVE WORDING NOT RECOVERED** | UNKNOWN | **NOT RECOVERED** | — | UNKNOWN | Future Codex archaeology | |
-| **#11** | Take / Take-All synchronous sweep / render / persistence burst | APP LOGIC | **CURRENTLY RELEVANT / REQUIRES MEASUREMENT** | MEDIUM — temporary dead-touch; no save or progression risk identified | Source-derived current | **Focused instrumentation before implementation** | `app/screens/ExplorationScreen.tsx` — `for (const n of nouns) takeDirect(n)`, one synchronous call per noun. The call site's own comment records that the sweep is not optimised |
+| **#11** | Take / Take-All synchronous sweep / render / persistence burst | APP LOGIC | **STRUCTURAL RISK ONLY — MEASURED, NOT MATERIAL** | LOW as measured — storage writes do not scale with the sweep | Source-derived current **+ measured on 2.5.0** | **NO OPTIMISATION JUSTIFIED** | `app/screens/ExplorationScreen.tsx` — `for (const n of nouns) takeDirect(n)`, one synchronous call per noun. The loop is real; the harm it was expected to cause is not. See **#11 — WHAT THE MEASUREMENT FOUND** |
 | **#12** | **AUTHORITATIVE WORDING NOT RECOVERED** | UNKNOWN | **NOT RECOVERED** | — | UNKNOWN | Future Codex archaeology | |
-| **#13** | Player activity accounting / false-idle admission | APP LOGIC | **CURRENT PROVEN DEFECT** | MEDIUM — optional ML work admitted on top of a player who is plainly still playing | **Source-derived current** | **Bounded repair** (see below) | `app/state/humanActivity.ts` — `noteHumanInteraction`, `humanGetState`, `useHumanAction`, `HUMAN_GAMEPLAY_MUTATIONS` |
+| **#13** | Player activity accounting / false-idle admission | APP LOGIC | **CLOSED BY CURRENT SOURCE** (OTA-1834) | MEDIUM if regressed | Source-derived current + regression | No work unless a regression is reproduced | Repair: **OTA-1834**. Authority `app/state/humanActivity.ts`; regression `__tests__/ota1834TheSixtyFirstDoorCannotHide.test.tsx` |
 
 ---
 
@@ -139,17 +139,77 @@ Correctly excluded and **not** part of this repair: state reads, navigation, ope
 picker, clearing a notice, refusal nudges, tutorial advancement and save/meta actions. Those
 exclusions are deliberate and pinned in the suite.
 
-**Bounded repair shape** (not started; do not begin it in the same commit as this document):
-add the six to `HUMAN_GAMEPLAY_MUTATIONS`, convert the six seams to `useHumanAction` /
-`humanGetState`, and widen the census so it walks **screens** rather than the list — so the
-sixty-seventh door cannot be added unnoted either.
+### CLOSURE — OTA-1834
+
+All six are accounted. Five take `useHumanAction`; `confirmCraftSubstitution` takes
+`humanGetState()` at **both** call sites, so the two doors of one mutation no longer
+disagree. Gameplay semantics are unchanged — the wrapper notes, then calls, passes the
+return value through untouched, and stamps even if the mutation throws.
+
+**The census is now total**, which is the part that outlives the six. It classifies every
+screen-reachable store *function* as accounted or excluded-with-a-reason and fails on a name
+in neither, naming the action and the screen. Negative control: reverting one action to a
+bare seam **and** removing it from the list — the exact "sixty-first door added unnoted" —
+fails the census by name. Restored; 25/25 green.
+
+Widening the walk from seven screens to ten surfaced one further site, `equipItem` in
+ExplorationScreen's `takeAndWear`. It is **not** a bypass: `takeDirect()` stamps first and
+the equip must stay bare so one press stamps once, exactly as OTA-1816 ruled. It is recorded
+as a named `action@Screen` exemption so it cannot spread silently.
+
+**DEFERRED, FOUND BY THE NEW CENSUS, NOT RULED HERE** — twelve screen-reachable functions
+are arguably human gameplay mutations and were outside the six the owner authorised:
+`talkToNpc`; `routeMission`, `routeGreatClimb`; `setContractActive`, `setFactionQuestActive`,
+`setGreatClimbActive`; `toggleReserveForFusion`, `toggleReserveForQuest`,
+`reserveManyForFusion`; `tutorialScreenPick`, `chooseTutorialExplore`, `chooseTutorialLeave`.
+They are classified in the suite's exclusions with a `DEFERRED` reason so the census passes
+honestly rather than silently, and they await a ruling. Sweeping them in would have widened
+the list without increasing precision.
+
+---
+
+## #11 — WHAT THE MEASUREMENT FOUND
+
+**STRUCTURAL RISK ONLY — MEASURED, NOT MATERIAL — NO OPTIMISATION JUSTIFIED.**
+
+The loop is exactly what the ledger said it was: `for (const n of nouns) takeDirect(n)` in
+ExplorationScreen, one synchronous call per noun, and `takeDirect` fires `persist()` each time.
+The expected harm was that a Take-All over a large pile would issue a storage write per noun.
+
+It does not. **Storage writes stay flat at 14–16 regardless of how many nouns the sweep takes.**
+The reason is already in the code: OTA-627's persist coalescing collapses the fan-out to the
+in-flight write plus **at most one trailing write**, and `persistTurn` resolves at the end of the
+current synchronous turn. So `persist()` *calls* scale with N and actual *writes* do not. The
+mechanism the item feared was solved before the item was measured.
+
+**What this ruling does not say.** It does not say the loop is well written, and it does not say
+a sweep is free — store commits and renders were not the measured quantity here, and a pile far
+outside the sampled range has not been observed. It says the specific cost #11 was raised to
+prevent is absent on 2.5.0, which removes the justification for changing batching, deferral,
+persistence, inventory semantics, notices, ordering or renders. Those remain forbidden without a
+fresh owner ruling backed by new evidence.
+
+**How it was measured, including the three probe defects that had to be fixed first** — because a
+measurement is only worth its instrument:
+
+1. A `store.setState` wrapper counted 1 commit for a 38-noun sweep. The store's internal `set()`
+   is a closure captured at creation and never routes through `store.setState`, so the wrapper saw
+   almost nothing. Replaced with `store.subscribe(() => { commits += 1; })`.
+2. A guessed noun list resolved 5 of 38. Replaced by loading 858 real names from
+   `app/data/items/{materials,gear,weapons,armor}.json`.
+3. A module-scope write counter threw `Cannot read properties of undefined (reading 'setItem')`
+   under jest hoisting. Replaced with a lazy `armWriteCounter()` called inside `measure()`,
+   wrapping AsyncStorage `setItem`/`multiSet`/`mergeItem` and `expo-file-system.writeAsStringAsync`.
+
+Each defect made the burst look smaller than it was. All three were fixed before the number above
+was read, and the number survived them.
 
 ---
 
 ## CURRENT 2.5.0 WORK ORDER
 
-1. **#13** — repair activity-accounting bypasses.
-2. **#11** — instrument and measure the Take / Take-All burst.
+1. ~~**#13** — repair activity-accounting bypasses.~~ **DONE — OTA-1834.**
+2. ~~**#11** — instrument and measure the Take / Take-All burst.~~ **DONE — MEASURED. Structural risk only; no optimisation justified.**
 3. **#3** — rebenchmark process memory / Jetsam on current 2.5.0 hardware.
 4. **#7** — rebenchmark Qwen prefill on llama.rn 0.4.8.
 5. **#8** — reassess the shared ML queue using current measurements.
@@ -160,10 +220,12 @@ sixty-seventh door cannot be added unnoted either.
 > **This order is based on current evidence and engineering readiness, not on presumed
 > contribution to the Apple freeze.**
 
-#13 is first because it is the only item whose defect is visible in source rather than
-inferred from a device. #11 is second and is **measurement-first** — its mechanism is proven,
-its harm is not. #3, #7 and #8 all require current-stack evidence before anyone changes code,
-because each lost its evidentiary basis to the migration.
+#13 was first because it was the only item whose defect was visible in source rather than
+inferred from a device; it is now repaired. #11 was second and was **measurement-first** — its
+mechanism was proven, its harm was not. The measurement has been taken, and the harm did not
+appear: the loop is real and the cost it was expected to impose is not there, so the item
+retires to structural risk without a repair. #3, #7 and #8 all require current-stack evidence
+before anyone changes code, because each lost its evidentiary basis to the migration.
 
 ---
 

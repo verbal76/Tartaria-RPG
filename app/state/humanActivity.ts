@@ -140,6 +140,49 @@ export const HUMAN_GAMEPLAY_MUTATIONS = [
   'repairInventoryItem', 'repairInventoryItems',
   // world board
   'acceptBounty',
+  /* ⚠⚠⚠ OTA-1834 (Baker item 13, the residual) — SIX DOORS THE LIST ITSELF
+   * COULD NOT SEE, AND THE REASON IT COULD NOT SEE THEM.
+   *
+   * OTA-1816's structural census asks, for every name ON THIS LIST, whether a
+   * screen reaches it through a bare selector. That is a real guard and it
+   * held. But it ITERATES THE LIST, so a qualifying gameplay mutation that was
+   * never added here is invisible to it — the exact hazard the header above
+   * names: "the sixty-first gets added unnoted with nothing to say so".
+   *
+   * A 2.5.0 census walked the SCREENS instead — 118 distinct store names
+   * reachable from a screen, 67 of them store functions — and six were direct
+   * human gameplay mutations on no list at all:
+   *
+   *   acceptMissionOffer       commits the contract: creates the broker mission
+   *                            AND its grid markers. Its four siblings
+   *                            (acceptHunt / Mystery / Storyline / FactionQuest)
+   *                            were already here, which is what made it visible.
+   *   declineMissionOffer      sets the persistent soft flag that suppresses the
+   *                            re-prompt. TWO doors — the button and the modal's
+   *                            onRequestClose (hardware back). Both are a person.
+   *   continueHook             advances a hook stage and pays its stage rewards.
+   *   abandonHook              marks the hook resolved and FORFEITS the remaining
+   *                            stage rewards. Irreversible, and a choice.
+   *   confirmLeaveAndTravel    leaves the outpost and sets course. `setTravelCourse`
+   *                            was already here; its yes-path was not.
+   *   confirmCraftSubstitution the substitution commit — and it reached
+   *                            `humanGetState()` from ExplorationScreen but BARE
+   *                            `useGameStore.getState()` from CraftingScreen. One
+   *                            mutation, two doors, one of them accounted.
+   *
+   * ⚠⚠ THE CENSUS IS NOW TOTAL, which is the part that outlives this OTA. The
+   * suite classifies EVERY screen-reachable store function as accounted (here)
+   * or excluded-with-a-reason, and fails on a name in neither. A future mutation
+   * cannot be added to a screen unnoted — somebody has to rule on it.
+   *
+   * ⚠ MEMBERSHIP MEANS "QUALIFYING HUMAN GAMEPLAY MUTATION", NOT "USES THE HOOK".
+   * Five of the six take `useHumanAction`; `confirmCraftSubstitution` keeps
+   * `humanGetState()` because both its call sites are imperative press handlers
+   * where a hook cannot go. Both seams account. The list names the claim, not
+   * the mechanism. */
+  'acceptMissionOffer', 'declineMissionOffer',
+  'continueHook', 'abandonHook',
+  'confirmLeaveAndTravel', 'confirmCraftSubstitution',
 ] as const;
 
 export type HumanGameplayMutation = typeof HUMAN_GAMEPLAY_MUTATIONS[number];

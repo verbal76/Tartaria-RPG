@@ -396,15 +396,21 @@ export function ExplorationScreen() {
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const pendingWhisperComplete = useGameStore((s) => s.pendingWhisperComplete);
   const dismissWhisperComplete = useGameStore((s) => s.dismissWhisperComplete);
-  const continueHook = useGameStore((s) => s.continueHook);
-  const abandonHook = useGameStore((s) => s.abandonHook);
+  // ⚠⚠ OTA-1834 (Baker 13, the residual) — these five MUTATE GAMEPLAY on a press
+  // and were reaching the store bare, so the activity clock never moved: a hook
+  // stage advanced, a mission committed, an outpost left, and every idle gate
+  // still read whatever the last typed command left behind. Their neighbours
+  // here — dismiss, cancel, and the `pending*` reads — are presentation and
+  // stay bare on purpose.
+  const continueHook = useHumanAction('continueHook');
+  const abandonHook = useHumanAction('abandonHook');
   const dismissHookContinue = useGameStore((s) => s.dismissHookContinue);
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
-  const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
+  const confirmLeaveAndTravel = useHumanAction('confirmLeaveAndTravel');
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
   const pendingMissionOffer = useGameStore((s) => s.pendingMissionOffer);
-  const acceptMissionOffer = useGameStore((s) => s.acceptMissionOffer);
-  const declineMissionOffer = useGameStore((s) => s.declineMissionOffer);
+  const acceptMissionOffer = useHumanAction('acceptMissionOffer');
+  const declineMissionOffer = useHumanAction('declineMissionOffer');
   const resolveRollStep = useHumanAction('resolveRollStep');
   const cancelPendingRolls = useHumanAction('cancelPendingRolls');
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
