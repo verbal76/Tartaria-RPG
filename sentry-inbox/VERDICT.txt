@@ -198,7 +198,7 @@
   /organizations/hot-attic-games-llc/issues/7735786886/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7738599010/events/?full=false
-    1 page(s), 34 rows — COMPLETE — ended short of a full page
+    1 page(s), 33 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7738599056/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
