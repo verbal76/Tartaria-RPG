@@ -30856,7 +30856,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cache is still `null`, so a late read cannot clobber a mutation. No key is
 // invented for a legacy keyless row, no key is regenerated or renormalised, and
 // no trust rule moved. No schema change, no migration.
-export const OTA_BUILD_ID = '2026-09-18-1840-the-house-keeps-its-key';
+// OTA-1841 — one install, one identity. `ensureInstallId()` claimed in its own
+// comment to be "minted once and never changes". Measured false. There are two
+// awaits between "nobody has an id" and "this id is ours", and nothing held the
+// door: every caller entering the cold path before the first write landed read
+// an empty disk, minted its OWN id, assigned the cache, and then returned its
+// LOCAL — not the cache, not the disk. Measured against unmodified source with
+// no instrumentation at all: two concurrent cold callers returned two different
+// ids, and a burst of sixteen returned SIXTEEN DISTINCT IDS. Worse than wasted
+// work — callers were handed ids that never became durable (returned inst_uqef…
+// while the disk kept inst_xe3b…, and the reload agreed with the disk), so
+// production code held an identity no other house was ever given. This id is
+// the mailbox address this house's dead are pushed to, the `byInstallId` on
+// every rest record, and the field `isPairedHouse()` matches a foreign payload's
+// origin against. The cold path is now serialised behind ONE in-flight promise —
+// the same shape OTA-1839 and OTA-1840 used for the ledger, paired list and
+// house name — so concurrent callers share an initialisation instead of racing
+// writes. An id already on disk is still never replaced or re-minted, and the
+// `finally` releases the in-flight slot on settle so a failed start cannot
+// poison later retries. No schema change, no migration, no pairing/seal/trust
+// or house-code semantics touched.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1840-the-house-keeps-its-key';
+export const OTA_BUILD_ID = '2026-09-18-1841-one-install-one-identity';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

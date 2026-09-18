@@ -58,18 +58,56 @@ let HOUSE: string | null = null;
 /** ⚠ The identity that keys everything. Names collide — two players both called
  *  Verbal would fuse into one house and their dead would dedupe against each
  *  other. This is minted once and never changes. */
+/* ⚠⚠⚠ #157 — "MINTED ONCE" WAS A CLAIM, NOT A GUARANTEE, AND IT WAS MEASURED
+ * FALSE. There are two awaits between "nobody has an id" and "this id is now
+ * ours", and nothing held the door: every caller that entered the cold path
+ * before the first write landed read an empty disk, minted its OWN id, and
+ * returned that local — not the cache, not the disk. Measured on this file
+ * before the fix, with no instrumentation whatsoever: sixteen concurrent cold
+ * callers produced SIXTEEN DISTINCT IDS, and callers were handed ids that never
+ * became durable (returned inst_uqef…, disk kept inst_xe3b…, and the reload
+ * agreed with the disk, not with the callers).
+ *
+ * That is an identity fork, not a wasted allocation. This id is the mailbox
+ * address this house's dead are pushed to, the `byInstallId` stamped on every
+ * rest record, and the field `isPairedHouse()` matches a foreign payload's
+ * origin against — so a fork means one install filing its dead under an id
+ * other houses were never given.
+ *
+ * The fix is the one this file already uses three times over (OTA-1839 ledger,
+ * OTA-1840 paired list and house name): serialise the cold path behind ONE
+ * in-flight promise, so concurrent callers share an initialisation instead of
+ * racing writes and accepting whichever landed last. The `finally` clears the
+ * slot on settle — including a rejection — so a failed start can never poison
+ * every later attempt.
+ *
+ * ⚠ ONE DELIBERATE DIFFERENCE from the other three: the assignment below is
+ * UNCONDITIONAL, not `if (INSTALL_ID === null)`. `cachedInstallId()` installs
+ * `''` as its "not primed yet" marker, so a `=== null` guard would see that
+ * placeholder and refuse to install the real id — the install would stay
+ * nameless for the session. An install id is write-once and never renamed, so
+ * there is no concurrent mutation for the guard to protect here anyway. */
+let INSTALL_HYDRATION: Promise<string> | null = null;
+
 export async function ensureInstallId(): Promise<string> {
   if (INSTALL_ID) return INSTALL_ID;
-  try {
-    const held = await AsyncStorage.getItem(INSTALL_KEY);
-    if (held && held.length > 0) { INSTALL_ID = held; return held; }
-  } catch { /* fall through and mint */ }
-  // No crypto dependency: install ids only need to not collide across a handful
-  // of friends, and a 96-bit random-ish string clears that by a mile.
-  const minted = `inst_${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
-  INSTALL_ID = minted;
-  try { await AsyncStorage.setItem(INSTALL_KEY, minted); } catch { /* memory-only this run */ }
-  return minted;
+  if (INSTALL_HYDRATION) return INSTALL_HYDRATION;
+  const run = (async (): Promise<string> => {
+    try {
+      const held = await AsyncStorage.getItem(INSTALL_KEY);
+      // ⚠ An id already on disk is this install's identity forever. Never
+      // replaced, never re-minted, whatever else is in flight.
+      if (held && held.length > 0) { INSTALL_ID = held; return held; }
+    } catch { /* fall through and mint */ }
+    // No crypto dependency: install ids only need to not collide across a handful
+    // of friends, and a 96-bit random-ish string clears that by a mile.
+    const minted = `inst_${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
+    INSTALL_ID = minted;
+    try { await AsyncStorage.setItem(INSTALL_KEY, minted); } catch { /* memory-only this run */ }
+    return minted;
+  })();
+  INSTALL_HYDRATION = run;
+  try { return await run; } finally { if (INSTALL_HYDRATION === run) INSTALL_HYDRATION = null; }
 }
 
 /** ⚠ This install's sending key: minted once, handed out INSIDE the house card,
@@ -326,6 +364,7 @@ export function _setIdentityForTests(installId: string | null, house: string | n
   INSTALL_ID = installId;
   HOUSE = house;
   HOUSE_HYDRATION = null;
+  INSTALL_HYDRATION = null;
 }
 
 /** ⚠⚠⚠ OTA-1838 — WHAT A REFUSED DISK SOUNDS LIKE, BECAUSE IT USED TO SOUND
