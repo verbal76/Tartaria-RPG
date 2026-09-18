@@ -37,6 +37,12 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 function pronounTemplates(): { file: string; text: string }[] {
   const files = [
     ['app', 'state', 'gameStore.ts'],
+    // ⚠⚠ OTA-1844 — THE DENSEST PRONOUN SURFACE IN THE GAME MOVED HERE. The dog's
+    // bleed-out and loyalty ladders left `gameStore` with `tickDogStatus`,
+    // byte-identically, and they are the very lines this instrument was written
+    // for. Without this row the scanner counted 13 templates instead of 33 and
+    // would have reported a clean sweep over the wrong file.
+    ['app', 'state', 'dogStatus.ts'],
     ['app', 'engine', 'dogCompanion.ts'],
     ['app', 'state', 'stageArrival.ts'],
     ['app', 'state', 'combatResolution.ts'],
@@ -84,7 +90,9 @@ describe('OTA-1714 — the four lines, rendered for every pronoun the game offer
   });
 
   it('the four templates are in the source in their corrected form', () => {
-    const g = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1844 — all four live in `dogStatus.ts` now, unchanged; this reads
+    // them where the game actually runs them.
+    const g = src('app', 'state', 'dogStatus.ts');
     expect(g.includes('{Pronoun} {isOrAre} hungry — feed {object} before the bond frays.')).toBe(true);
     expect(g.includes('{Pronoun} need{verbS} food or a poultice, soon.')).toBe(true);
     expect(g.includes('feed {object} now or {pronoun} do{verbES} not')).toBe(true);

@@ -368,9 +368,15 @@ describe('OTA-1726 - what was removed, and the evidence it was dead', () => {
   });
 
   it('NEGLECT STILL BUYS NOTHING - OTA-1717\'s rule survives the supersede', () => {
-    const at = STORE.indexOf('if (loy <= 0) {');
+    // ⚠ OTA-1844 — the loyalty ladder moved to `dogStatus.ts` with
+    // `tickDogStatus`, byte-identically. OTA-1717's rule is read where it runs.
+    // ⚠⚠ AND IT IS READ THROUGH `codeOnly`, exactly as the store read was. That
+    // branch's own comment EXPLAINS why neglect does not owe a puppy, so a raw
+    // read fails on the sentence promising the rule instead of on the rule.
+    const DOGCLOCK = codeOnly(src('app', 'state', 'dogStatus.ts'));
+    const at = DOGCLOCK.indexOf('if (loy <= 0) {');
     expect(at).toBeGreaterThan(-1);
-    const branch = STORE.slice(at, at + 900);
+    const branch = DOGCLOCK.slice(at, at + 900);
     expect(branch.includes('puppyVendorOwed')).toBe(false);
     expect(branch.includes("status: 'abandoned'")).toBe(true);
   });

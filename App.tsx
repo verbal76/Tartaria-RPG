@@ -46,6 +46,7 @@ import { ContractsScreen } from './app/screens/ContractsScreen';
 import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
+import { LastWalkModal } from './app/components/LastWalkModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
@@ -1225,6 +1226,11 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="CallDogModal">
         <CallDogModal />
+      </SilentBoundary>
+      {/* ⚠ OTA-1844 — beside CallDogModal and nothing like it: a companion
+          Fallen, non-hostile, with no counter behind any of its buttons. */}
+      <SilentBoundary tag="LastWalkModal">
+        <LastWalkModal />
       </SilentBoundary>
       <SilentBoundary tag="DiscoveryRevealModal">
         <DiscoveryRevealModal />

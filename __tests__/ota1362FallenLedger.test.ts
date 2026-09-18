@@ -325,10 +325,10 @@ describe('OTA-1362 — rest records and the wire envelope', () => {
     // The transport will hand this whatever the network gave it. A truncated
     // download must cost the sync, not the process.
     expect(() => parseLedgerPayload('{"fallen":[{"name"', NOW)).not.toThrow();
-    expect(parseLedgerPayload('{"fallen":[{"name"', NOW)).toEqual({ fallen: [], rests: [] });
-    expect(parseLedgerPayload('null', NOW)).toEqual({ fallen: [], rests: [] });
-    expect(parseLedgerPayload(undefined, NOW)).toEqual({ fallen: [], rests: [] });
-    expect(parseLedgerPayload({ fallen: 'not an array', rests: 7 }, NOW)).toEqual({ fallen: [], rests: [] });
+    expect(parseLedgerPayload('{"fallen":[{"name"', NOW)).toEqual({ fallen: [], dogs: [], rests: [] });
+    expect(parseLedgerPayload('null', NOW)).toEqual({ fallen: [], dogs: [], rests: [] });
+    expect(parseLedgerPayload(undefined, NOW)).toEqual({ fallen: [], dogs: [], rests: [] });
+    expect(parseLedgerPayload({ fallen: 'not an array', rests: 7 }, NOW)).toEqual({ fallen: [], dogs: [], rests: [] });
   });
 
   it('⚠ a real payload round-trips through JSON, keeping only what survives the door', () => {

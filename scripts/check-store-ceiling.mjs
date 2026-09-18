@@ -69,8 +69,20 @@ const STORE = 'app/state/gameStore.ts';
  * how many gems?) already lived in wastelandEncounters, and the line came back
  * from reflowing a three-line `set` next door into one. No responsibility
  * moved, so this is tidying and not an extraction — but the slack is given
- * back rather than banked, which is the only way a ratchet stays a ratchet. */
-export const CEILING = 36944;
+ * back rather than banked, which is the only way a ratchet stays a ratchet.
+ *
+ *    36837  OTA-1844      the dog's time-based fates left the store
+ *
+ * ⚠⚠ OTA-1844 IS AN EXTRACTION, and it is this valve working exactly as OTA-1790
+ * intended. The Last Walk needed store lines the store did not have — three
+ * fields, one action and six lines of spawn branch — and the rule answered the
+ * question rather than the author: *the responsibility belongs in a module
+ * outside the file.* `DOG_BLEED_OUT_HOURS` and `tickDogStatus` moved to
+ * `app/state/dogStatus.ts` BYTE-IDENTICALLY, both names re-exported so no
+ * importer had to move, because deciding when a benched dog bleeds out and when
+ * a starved one walks off is dog lifecycle and not store plumbing. 142 lines
+ * out, 35 back in, and the ceiling takes the difference instead of banking it. */
+export const CEILING = 36837;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

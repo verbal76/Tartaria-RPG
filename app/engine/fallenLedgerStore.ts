@@ -18,15 +18,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenHero } from './saveSystem';
 import { seal, sealMatches, mintSendingKey } from './fallenSeal';
 import {
+  dogFallenKey,
   fallenKey,
   isPairedHouse,
   makeHouseCode,
   MAX_EXCHANGE_BYTES,
+  mergeDogs,
   mergeFallen,
   mergeRests,
   parseHouseCode,
   parseLedgerPayload,
+  unrestedDogs,
   unrestedFallen,
+  type ForeignDog,
   type ForeignFallen,
   type PairedHouse,
   type RestRecord,
@@ -43,6 +47,10 @@ export const LEDGER_FORMAT = 1;
 export interface Ledger {
   foreign: ForeignFallen[];
   rests: RestRecord[];
+  /** ⚠ OTA-1844 — the companions this world holds, unresolved and resolved
+   *  alike. OPTIONAL deliberately: a ledger written before the Last Walk has
+   *  none, and `?? []` at every read is the entire migration. */
+  dogs?: ForeignDog[];
 }
 
 /* ⚠ OTA-1839 removed a shared `EMPTY` constant that every cache was built from
@@ -322,9 +330,10 @@ let LEDGER_HYDRATION: Promise<Ledger> | null = null;
 /** What a synchronous reader sees before the disk has answered. Frozen so it can
  *  never be mutated into something that looks like real state, and never stored
  *  in `LEDGER_CACHE` — it is an answer, not a ledger. */
-const UNHYDRATED_SNAPSHOT: Ledger = { foreign: [], rests: [] };
+const UNHYDRATED_SNAPSHOT: Ledger = { foreign: [], rests: [], dogs: [] };
 Object.freeze(UNHYDRATED_SNAPSHOT.foreign);
 Object.freeze(UNHYDRATED_SNAPSHOT.rests);
+Object.freeze(UNHYDRATED_SNAPSHOT.dogs);
 Object.freeze(UNHYDRATED_SNAPSHOT);
 
 export async function loadLedger(): Promise<Ledger> {
@@ -337,10 +346,10 @@ export async function loadLedger(): Promise<Ledger> {
       // ⚠ Re-validated on the way OFF disk too, not just off the wire. A ledger
       // written by an older build, or edited by hand on a rooted phone, is exactly
       // as untrusted as a stranger's payload.
-      if (!raw) next = { foreign: [], rests: [] };
-      else { const parsed = parseLedgerPayload(raw); next = { foreign: parsed.fallen, rests: parsed.rests }; }
+      if (!raw) next = { foreign: [], rests: [], dogs: [] };
+      else { const parsed = parseLedgerPayload(raw); next = { foreign: parsed.fallen, rests: parsed.rests, dogs: parsed.dogs }; }
     } catch {
-      next = { foreign: [], rests: [] };
+      next = { foreign: [], rests: [], dogs: [] };
     }
     // ⚠ A mutation may have landed while we were reading — `persist()` installs
     // its own result. Ours is the OLDER picture, so it does not get to win.
@@ -438,7 +447,7 @@ async function persist(l: Ledger): Promise<void> {
   let last = 'unknown';
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      await AsyncStorage.setItem(LEDGER_KEY, JSON.stringify({ v: LEDGER_FORMAT, fallen: l.foreign, rests: l.rests }));
+      await AsyncStorage.setItem(LEDGER_KEY, JSON.stringify({ v: LEDGER_FORMAT, fallen: l.foreign, dogs: l.dogs ?? [], rests: l.rests }));
       return;
     } catch (e) {
       last = String((e as { message?: unknown })?.message ?? e);
@@ -498,17 +507,30 @@ export function unwrapEnvelope(text: string): string {
 /** What this install sends out: its OWN dead, stamped with its house, plus the
  *  rests it has performed (so the players whose corpses they were learn how
  *  they ended). Never forwards other people's fallen — each house speaks for
- *  its own dead, which keeps the graph simple and provenance honest. */
+ *  its own dead, which keeps the graph simple and provenance honest.
+ *
+ *  ⚠⚠ OTA-1844 — `dogs` joins the SAME body and is therefore covered by the SAME
+ *  seal, the same house authentication and the same pairing gate. That is the
+ *  whole security story for the Last Walk: nothing was added to the envelope, no
+ *  key changed, no second trust path exists. A companion is admitted exactly
+ *  when the corpses beside it are.
+ *
+ *  ⚠ And the version does NOT move. `parseLedgerPayload` reads its keys by name,
+ *  so a friend still on an older build reads the humans and ignores the dogs —
+ *  which is the compatibility that actually matters between two phones. */
 export async function buildExportPayload(): Promise<string> {
   const installId = await ensureInstallId();
   const house = (await loadHouseName()) || 'an unnamed house';
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { loadFallen } = require('./saveSystem') as typeof import('./saveSystem');
+  const { loadFallen, loadFallenDogs } = require('./saveSystem') as typeof import('./saveSystem');
   let mine: FallenHero[] = [];
   try { mine = await loadFallen(); } catch { mine = []; }
+  let myDogs: Awaited<ReturnType<typeof loadFallenDogs>> = [];
+  try { myDogs = await loadFallenDogs(); } catch { myDogs = []; }
   const ledger = await loadLedger();
   const stamped = mine.map((f) => ({ ...f, origin: { player: house, installId } }));
-  const body = JSON.stringify({ v: LEDGER_FORMAT, house, installId, fallen: stamped, rests: ledger.rests });
+  const stampedDogs = myDogs.map((d) => ({ ...d, origin: { player: house, installId } }));
+  const body = JSON.stringify({ v: LEDGER_FORMAT, house, installId, fallen: stamped, dogs: stampedDogs, rests: ledger.rests });
   // ⚠ The seal covers the body STRING, and the reader verifies before parsing —
   // so a tampered payload never reaches the parser at all.
   const sealed = seal(await ensureSendingKey(), body);
@@ -531,6 +553,10 @@ export interface ImportOutcome {
   forged: boolean;
   /** Names of the newly-arrived, already titled for display. */
   arrivals: string[];
+  /** ⚠ OTA-1844 — companions admitted this import, counted and named apart from
+   *  the dead so no caller can blur the two into one sentence. */
+  dogsAdded: number;
+  dogArrivals: string[];
 }
 
 /** ⚠⚠ OTA-1842 — WHAT THE PLAYER IS BEING OFFERED, IN WORDS THEY DIDN'T HAVE TO
@@ -558,6 +584,10 @@ export interface ExchangePreview {
   turnedAway: number;
   /** Closure receipts that would be folded in — the news from your own dead. */
   rests: number;
+  /** ⚠ OTA-1844 — companions that would arrive, named the way the player will
+   *  see them. Kept SEPARATE from `arrivals` so no screen can accidentally
+   *  render a dog in the same breath as a Hollowed. */
+  dogArrivals: string[];
 }
 
 /** The whole decision, with no write in it: parse, authenticate, and work out
@@ -570,6 +600,9 @@ interface ExchangeDecision {
   ledger: Ledger;
   auth: AuthResult;
   wanted: ForeignFallen[];
+  /** ⚠ OTA-1844 — companions admitted under the IDENTICAL rule as the corpses
+   *  beside them. Being a dog buys no leniency anywhere in this decision. */
+  wantedDogs: ForeignDog[];
   wantedRests: RestRecord[];
   unpaired: number;
   fromHouse: string;
@@ -613,7 +646,7 @@ async function decideExchange(text: string): Promise<ExchangeDecision> {
   if (auth.kind === 'forged') {
     // Sealed, but by nobody we hold a key for. Refuse the whole payload — a
     // partial accept here would be the worst of both answers.
-    return { myInstallId, ledger, auth, wanted: [], wantedRests: [], unpaired: batch.fallen.length, fromHouse, readable };
+    return { myInstallId, ledger, auth, wanted: [], wantedDogs: [], wantedRests: [], unpaired: batch.fallen.length, fromHouse, readable };
   }
 
   const wanted = batch.fallen.filter((f) => {
@@ -631,15 +664,34 @@ async function decideExchange(text: string): Promise<ExchangeDecision> {
     return true;
   });
   const unpairedFallen = batch.fallen.length - wanted.length;
+  // ⚠⚠ OTA-1844 — THE SAME THREE QUESTIONS, ASKED OF A DOG. Paired house? Sealed
+  // by the house that owns it? Not a downgrade from a house we hold a key for?
+  // A companion that fails any of them is turned away exactly like a corpse —
+  // being a dog is not a trust exemption, and there is no second gate to slip
+  // through because this is the same function.
+  const wantedDogs = batch.dogs.filter((d) => {
+    if (!isPairedHouse(d.origin.installId, paired)) return false;
+    if (auth.kind === 'sealed' && d.origin.installId !== auth.installId) return false;
+    if (auth.kind === 'unsealed') {
+      const h = paired.find((pp) => pp.installId === d.origin.installId);
+      if (h?.key) return false;
+    }
+    return true;
+  });
   // Rests are receipts about corpses, not corpses. One from an unpaired house
   // can only ever say "someone put down a corpse you never held" — worthless
   // rather than dangerous — but it is still noise, so it is held to the same rule.
   const wantedRests = batch.rests.filter((r) => {
-    const owner = r.fallenKey.split(':')[0] ?? '';
+    // ⚠ OTA-1844 — a dog key is `dog:<installId>:<dogId>`, so the owning install
+    // is the SECOND field there and the first everywhere else. Reading it
+    // correctly is what lets a Last Walk receipt come home to the house whose
+    // dog it was, rather than arriving as a record about nobody.
+    const parts = r.fallenKey.split(':');
+    const owner = (parts[0] === 'dog' ? parts[1] : parts[0]) ?? '';
     return owner === myInstallId || isPairedHouse(owner, paired) || isPairedHouse(r.byInstallId, paired);
   });
 
-  return { myInstallId, ledger, auth, wanted, wantedRests, unpaired: unpairedFallen, fromHouse, readable };
+  return { myInstallId, ledger, auth, wanted, wantedDogs, wantedRests, unpaired: unpairedFallen, fromHouse, readable };
 }
 
 /** ⚠⚠⚠ OTA-1842 — LOOK BEFORE YOU LET THEM IN, AND CHANGE NOTHING BY LOOKING.
@@ -653,7 +705,7 @@ async function decideExchange(text: string): Promise<ExchangeDecision> {
  *  ⚠ TOTAL BY CONTRACT. A torn, hostile or enormous paste answers `refused`
  *  with a reason; it never throws at the screen that called it. */
 export async function previewPayloadText(text: string): Promise<ExchangePreview> {
-  const empty = { fromHouse: '', arrivals: [], turnedAway: 0, rests: 0 };
+  const empty = { fromHouse: '', arrivals: [], turnedAway: 0, rests: 0, dogArrivals: [] };
   if (text.length > MAX_EXCHANGE_BYTES) return { trust: 'refused', refusal: 'too-large', ...empty };
   let d: ExchangeDecision;
   try { d = await decideExchange(text); } catch { return { trust: 'refused', refusal: 'unreadable', ...empty }; }
@@ -672,10 +724,17 @@ export async function previewPayloadText(text: string): Promise<ExchangePreview>
   // for the same reasons they will be excluded on commit.
   const restsMerged = mergeRests(d.ledger.rests, d.wantedRests);
   const fallenMerged = mergeFallen(d.ledger.foreign, d.wanted, { myInstallId: d.myInstallId, rests: restsMerged.rests });
+  // ⚠ OTA-1844 — the dog merge is pure in exactly the way the fallen merge is,
+  // so asking it what WOULD arrive costs nothing and is exact. Cancel still
+  // mutates nothing: neither call has touched disk.
+  const dogsMerged = mergeDogs(d.ledger.dogs ?? [], d.wantedDogs, { myInstallId: d.myInstallId, rests: restsMerged.rests });
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { fallenTitle } = require('./fallenLedger') as typeof import('./fallenLedger');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { dogTitle } = require('./fallenDogs') as typeof import('./fallenDogs');
   const arrivals = fallenMerged.added.map((f) => fallenTitle(f));
-  if (arrivals.length === 0 && restsMerged.added.length === 0 && d.unpaired > 0) {
+  const dogArrivals = dogsMerged.added.map((x) => dogTitle(x));
+  if (arrivals.length === 0 && dogArrivals.length === 0 && restsMerged.added.length === 0 && d.unpaired > 0) {
     // Everything in it belongs to a house this install does not ride with.
     return { trust: 'refused', refusal: 'unpaired', ...empty, fromHouse: d.fromHouse, turnedAway: d.unpaired };
   }
@@ -685,6 +744,7 @@ export async function previewPayloadText(text: string): Promise<ExchangePreview>
     arrivals,
     turnedAway: d.unpaired,
     rests: restsMerged.added.length,
+    dogArrivals,
   };
 }
 
@@ -698,11 +758,12 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
   // is not a guard.
   if (text.length > MAX_EXCHANGE_BYTES) throw new FallenPayloadTooLargeError(text.length);
   const d = await decideExchange(text);
-  const { myInstallId, ledger, auth, wanted, wantedRests } = d;
+  const { myInstallId, ledger, auth, wanted, wantedDogs, wantedRests } = d;
   if (auth.kind === 'forged') {
     return {
       added: 0, rests: 0, skippedOwn: 0, skippedRested: 0, skippedDuplicate: 0,
       rejected: 0, evicted: 0, unpaired: d.unpaired, unsealed: 0, forged: true, arrivals: [],
+      dogsAdded: 0, dogArrivals: [],
     };
   }
   const unpairedFallen = d.unpaired;
@@ -712,11 +773,20 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
     myInstallId,
     rests: restsMerged.rests,
   });
+  // ⚠ OTA-1844 — companions union the same way, deduped by `dogFallenKey`, so a
+  // replayed payload adds none of them a second time and a dog this world has
+  // already walked with never comes back.
+  const dogsMerged = mergeDogs(ledger.dogs ?? [], wantedDogs, {
+    myInstallId,
+    rests: restsMerged.rests,
+  });
 
-  await persist({ foreign: fallenMerged.pool, rests: restsMerged.rests });
+  await persist({ foreign: fallenMerged.pool, dogs: dogsMerged.pool, rests: restsMerged.rests });
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { fallenTitle } = require('./fallenLedger') as typeof import('./fallenLedger');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { dogTitle } = require('./fallenDogs') as typeof import('./fallenDogs');
   return {
     added: fallenMerged.added.length,
     rests: restsMerged.added.length,
@@ -729,6 +799,8 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
     unsealed: auth.kind === 'unsealed' ? wanted.length : 0,
     forged: false,
     arrivals: fallenMerged.added.map((f) => fallenTitle(f)),
+    dogsAdded: dogsMerged.added.length,
+    dogArrivals: dogsMerged.added.map((x) => dogTitle(x)),
   };
 }
 
@@ -742,11 +814,23 @@ export async function recordRest(rest: RestRecord): Promise<void> {
   // would rise again the same session — the bug OTA-994 fixed for local fallen,
   // arriving back here for free if the pool were left alone.
   const foreign = ledger.foreign.filter((f) => fallenKey(f) !== rest.fallenKey);
-  await persist({ foreign, rests: merged.rests });
+  // ⚠ OTA-1844 — a companion leaves by the same door, for the same reason. The
+  // Last Walk's rest is an ordinary RestRecord with a `dog:` key, so this one
+  // function closes both kinds and there is no second removal path to forget.
+  const dogs = (ledger.dogs ?? []).filter((d) => dogFallenKey(d) !== rest.fallenKey);
+  await persist({ foreign, dogs, rests: merged.rests });
 }
 
 /** The foreign dead this world has not yet put down — the spawner's extra pool. */
 export function foreignPool(): ForeignFallen[] {
   const l = cachedLedger();
   return unrestedFallen(l.foreign, cachedInstallId(), l.rests);
+}
+
+/** ⚠ OTA-1844 — the companions this world has not yet walked with. A SEPARATE
+ *  pool from `foreignPool` and deliberately so: a Dog Fallen never enters the
+ *  revenant pool, so it can never be drawn as something to fight. */
+export function foreignDogPool(): ForeignDog[] {
+  const l = cachedLedger();
+  return unrestedDogs(l.dogs ?? [], cachedInstallId(), l.rests);
 }

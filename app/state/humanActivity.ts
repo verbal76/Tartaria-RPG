@@ -278,6 +278,8 @@ export const HUMAN_GAMEPLAY_MUTATIONS = [
   'confirmDogOnboarding',
   'dismissStoryIntro',
   'skipTutorial',
+  // OTA-1844 — the Last Walk's acts are human presses like any other.
+  'chooseLastWalk',
 ] as const;
 
 export type HumanGameplayMutation = typeof HUMAN_GAMEPLAY_MUTATIONS[number];

@@ -192,8 +192,13 @@ describe('OTA-1835 — §11 the restart boundary is no worse', () => {
       ?? await AsyncStorage.getItem('GLOBAL_STASH');
     const s = await loadGlobalStash();
     // Whatever the key, the parsed stash carries no queue/lock bookkeeping.
+    // ⚠ OTA-1844 — `dogsFallen` is a STASH FIELD and belongs on this list: the
+    // companions of dead handlers, install-wide precisely because a dog lives
+    // inside ONE character save and death deletes that save. What this test
+    // guards is the absence of LOCK bookkeeping, not the roster of things worth
+    // keeping, so the list grows by one and the claim is as strong as it was.
     expect(Object.keys(s).sort()).toEqual([
-      'devGemGrantedSlots', 'endingBadges', 'fallen', 'fallenSeeds',
+      'devGemGrantedSlots', 'dogsFallen', 'endingBadges', 'fallen', 'fallenSeeds',
       'installSeeded', 'resurrectionGems', 'testGiftGrantedSlots',
     ]);
     if (raw) expect(() => JSON.parse(raw)).not.toThrow();

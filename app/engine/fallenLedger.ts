@@ -688,6 +688,150 @@ export function sanitizeRestRecord(raw: unknown, now: number = Date.now()): Rest
   };
 }
 
+// ---- dog fallen ------------------------------------------------------------
+/** ⚠⚠⚠ OTA-1844 — THE LAST WALK. A dog whose handler died with it still at
+ *  their side. It is NOT a Hollowed and shares none of that pipeline: it never
+ *  enters `revenantPool`, never enters the enemies array, has no stats, no
+ *  snapshot, no gear and no drop table. The fields below are exactly the ones a
+ *  SENTENCE needs and nothing else.
+ *
+ *  ⚠⚠ THE VEST IS A WORD. `vestName` is display text and can never become an
+ *  item: a dog vest carries AC and would land straight in the receiving
+ *  player's own dog's slot, which is the farm this whole design exists to
+ *  refuse. Nothing mechanical crosses — not the stats the dog was trained to,
+ *  not its loyalty, not one coin of value.
+ *
+ *  ⚠ IT GOES THROUGH THIS FILE FOR THE SAME REASON EVERYTHING FOREIGN DOES.
+ *  The header above is not decoration: this module is the only door, every
+ *  field is read by name and clamped, and a companion record arriving from
+ *  another phone gets exactly the same treatment as a corpse. */
+export interface FallenDog {
+  /** The dog's own mint id, from `createDogCompanion`. */
+  id: string;
+  name: string;
+  breed: string;
+  pronoun: 'he' | 'she' | 'they';
+  /** The character who died with them. */
+  handler: string;
+  /** Where the pair fell. */
+  where: string;
+  /** In-game hours the handler survived — how long they had together. */
+  hours: number;
+  /** Display text ONLY. Never an item, never equippable, never priced. */
+  vestName?: string;
+  /** Wall-clock of the death that made them a Fallen. */
+  ts: number;
+  origin?: FallenOrigin;
+}
+
+/** A companion record that arrived from another phone. */
+export type ForeignDog = FallenDog & { origin: FallenOrigin };
+
+/** Companions held at once. Rarer than corpses by construction — one can only
+ *  be minted by losing a character who had a dog — but bounded all the same. */
+export const FOREIGN_DOG_CAP = 40;
+
+const PRONOUNS: readonly string[] = ['he', 'she', 'they'];
+
+/** ⚠ Stable identity, and deliberately NOT the name: two houses can both have a
+ *  Marrow, and one of them must not silently become the other. An install id
+ *  (21 chars) plus a dog id (24) keeps the whole key around 50 — comfortably
+ *  under `sanitizeRestRecord`'s 60-char `fallenKey` bound, which is what lets
+ *  dog closure ride the EXISTING rest transport with no shape change. */
+export function dogFallenKey(d: { origin?: FallenOrigin; id: string }): string {
+  return `dog:${d.origin?.installId ?? 'local'}:${d.id}`;
+}
+
+export function sanitizeForeignDog(raw: unknown, now: number = Date.now()): ForeignDog | null {
+  if (!isObj(raw)) return null;
+  const id = str(raw.id, 40);
+  const name = str(raw.name, 16);
+  if (!id || !name) return null;
+  const ts = int(raw.ts, 0, Number.MAX_SAFE_INTEGER, 0);
+  if (ts <= 0 || ts > now + MAX_CLOCK_SKEW_MS) return null;
+  const o = isObj(raw.origin) ? raw.origin : null;
+  const installId = o ? str(o.installId, 40) : '';
+  if (!installId) return null;
+  const pronoun = str(raw.pronoun, 8).toLowerCase();
+  const vestName = str(raw.vestName, 48);
+  return {
+    id,
+    name,
+    breed: str(raw.breed, 24) || 'mutt',
+    pronoun: (PRONOUNS.includes(pronoun) ? pronoun : 'they') as 'he' | 'she' | 'they',
+    handler: str(raw.handler, 32) || 'a wanderer',
+    where: str(raw.where, 64) || 'unmarked ground',
+    hours: int(raw.hours, 0, MAX_HOURS, 0),
+    ...(vestName ? { vestName } : {}),
+    ts,
+    origin: { player: o ? str(o.player, 32) : '', installId },
+  };
+}
+
+export interface MergeDogsResult {
+  pool: ForeignDog[];
+  added: ForeignDog[];
+  rejected: number;
+  skippedOwn: number;
+  skippedRested: number;
+  skippedDuplicate: number;
+  evicted: number;
+}
+
+/** The same union `mergeFallen` performs, on companions. Keyed by
+ *  `dogFallenKey`, so a replayed payload adds nothing and two same-named dogs
+ *  from different houses both survive. Eviction takes the OLDEST first, for the
+ *  same reason: the ones you have not met yet are the ones worth keeping. */
+export function mergeDogs(
+  existing: readonly ForeignDog[],
+  incoming: readonly ForeignDog[],
+  opts: { myInstallId: string; rests?: readonly RestRecord[]; cap?: number },
+): MergeDogsResult {
+  const { myInstallId } = opts;
+  const rests = opts.rests ?? [];
+  const cap = opts.cap ?? FOREIGN_DOG_CAP;
+  const pool = [...existing];
+  const held = new Set(pool.map((d) => dogFallenKey(d)));
+  const added: ForeignDog[] = [];
+  let rejected = 0;
+  let skippedOwn = 0;
+  let skippedRested = 0;
+  let skippedDuplicate = 0;
+  for (const d of incoming) {
+    if (!d || !d.origin?.installId) { rejected += 1; continue; }
+    if (d.origin.installId === myInstallId) { skippedOwn += 1; continue; }
+    const key = dogFallenKey(d);
+    if (held.has(key)) { skippedDuplicate += 1; continue; }
+    if (isRestedHere(key, myInstallId, rests)) { skippedRested += 1; continue; }
+    held.add(key);
+    pool.push(d);
+    added.push(d);
+  }
+  let evicted = 0;
+  if (pool.length > cap) {
+    pool.sort((a, b) => a.ts - b.ts);
+    evicted = pool.length - cap;
+    pool.splice(0, evicted);
+    const survived = new Set(pool.map((d) => dogFallenKey(d)));
+    for (let i = added.length - 1; i >= 0; i -= 1) {
+      if (!survived.has(dogFallenKey(added[i]!))) added.splice(i, 1);
+    }
+  }
+  return { pool, added, rejected, skippedOwn, skippedRested, skippedDuplicate, evicted };
+}
+
+/** The companions THIS world has not yet walked with. Per-world, so one dog's
+ *  death can visit several houses and each answers for itself — the owner's
+ *  multi-house ruling falls straight out of the rest key already being
+ *  `<fallenKey>|<byInstallId>`. */
+export function unrestedDogs(
+  pool: readonly ForeignDog[],
+  myInstallId: string,
+  rests: readonly RestRecord[],
+): ForeignDog[] {
+  return pool.filter((d) => !isRestedHere(dogFallenKey(d), myInstallId, rests));
+}
+
 // ---- the wire envelope -----------------------------------------------------
 /** ⚠⚠ OTA-1842 — ONE CEILING FOR EVERY WAY A PAYLOAD CAN ARRIVE.
  *
@@ -711,24 +855,38 @@ export const MAX_EXCHANGE_BYTES = 2 * 1024 * 1024;
 
 export interface LedgerPayload {
   fallen: ForeignFallen[];
+  dogs: ForeignDog[];
   rests: RestRecord[];
 }
 
 /** Parse whatever arrived. Tolerant by design: a torn file, a truncated
  *  download, or one bad record must cost only that record — never a throw on
- *  the caller's thread, and never the rest of the batch. */
+ *  the caller's thread, and never the rest of the batch.
+ *
+ *  ⚠⚠ OTA-1844 — `dogs` IS WHY NO VERSION BUMP WAS NEEDED. This has always read
+ *  its keys BY NAME and ignored everything else, so a build that predates the
+ *  Last Walk, handed a payload carrying dogs, imports the human half exactly as
+ *  it did before and silently drops the companions. Forward compatible in the
+ *  direction that actually matters — the friend who has not updated yet. */
 export function parseLedgerPayload(input: unknown, now: number = Date.now()): LedgerPayload {
   let doc: unknown = input;
   if (typeof input === 'string') {
-    try { doc = JSON.parse(input); } catch { return { fallen: [], rests: [] }; }
+    try { doc = JSON.parse(input); } catch { return { fallen: [], dogs: [], rests: [] }; }
   }
-  if (!isObj(doc)) return { fallen: [], rests: [] };
+  if (!isObj(doc)) return { fallen: [], dogs: [], rests: [] };
   const fallen: ForeignFallen[] = [];
+  const dogs: ForeignDog[] = [];
   const rests: RestRecord[] = [];
   if (Array.isArray(doc.fallen)) {
     for (const f of doc.fallen.slice(0, 500)) {
       const ok = sanitizeForeignFallen(f, now);
       if (ok) fallen.push(ok);
+    }
+  }
+  if (Array.isArray(doc.dogs)) {
+    for (const d of doc.dogs.slice(0, 200)) {
+      const ok = sanitizeForeignDog(d, now);
+      if (ok) dogs.push(ok);
     }
   }
   if (Array.isArray(doc.rests)) {
@@ -737,7 +895,7 @@ export function parseLedgerPayload(input: unknown, now: number = Date.now()): Le
       if (ok) rests.push(ok);
     }
   }
-  return { fallen, rests };
+  return { fallen, dogs, rests };
 }
 
 // ---- merge -----------------------------------------------------------------

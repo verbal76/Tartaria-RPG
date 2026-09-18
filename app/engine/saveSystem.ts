@@ -1,5 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenGearPiece, SaveState } from './types';
+// ⚠ OTA-1844 — TYPE ONLY, and that is load-bearing: `fallenLedger` imports
+// `FallenHero` from here, so a value import either way would close a cycle. A
+// type import is erased at build, so the shape is shared and nothing is.
+import type { FallenDog } from './fallenLedger';
 import { capDiskLog } from './diskLogCap';
 // OTA-1178 — import path trims like the store's persist path does; saveSlot does not.
 import { trimSaveStateToFit } from './saveTrim';
@@ -97,6 +101,17 @@ export interface GlobalStash {
    *  Uncapped on purpose: `fallen` above is a capped memorial, and a permission
    *  check that forgets is a permission check that can be waited out. */
   fallenSeeds?: string[];
+  /** ⚠⚠⚠ OTA-1844 — THE COMPANIONS THE SLOT USED TO TAKE WITH IT. A dog lives
+   *  at `player.dog`, INSIDE one character save, and death runs `clearSave()`
+   *  → `deleteSlot()`. So until this field existed, a dog who died beside its
+   *  handler was not recorded anywhere at all — the human joined the roll and
+   *  the dog was simply deleted with the file. This is install-wide for exactly
+   *  that reason: it has to outlive the slot.
+   *
+   *  ⚠ Optional, like every other field here, and it deserializes to `[]` when
+   *  absent — an install that predates the Last Walk is not migrated, it just
+   *  has no companions yet. */
+  dogsFallen?: FallenDog[];
 }
 
 /** ⚠⚠ OTA-1366 — THE CLONE. Owner: *"what I want is the exact same in every
@@ -278,6 +293,30 @@ export async function loadFallen(): Promise<FallenHero[]> {
   return (await loadGlobalStash()).fallen ?? [];
 }
 
+/** ⚠⚠⚠ OTA-1844 — append a companion to the install-wide roll, capped by the
+ *  same FALLEN_CAP the human roll uses. There is at most one of these per
+ *  character death, and only when a dog was genuinely at that character's side,
+ *  so the list grows strictly slower than the roll it sits beside.
+ *
+ *  ⚠ IDEMPOTENT BY KEY, because the death path must be safe to run twice. The
+ *  dog's own mint id plus its death stamp is the identity; a second call with
+ *  the same record replaces nothing and adds nothing. */
+export async function recordFallenDog(dog: FallenDog): Promise<number> {
+  const n = await mutateGlobalStash((stash) => {
+    const have = stash.dogsFallen ?? [];
+    if (have.some((d) => d.id === dog.id && d.ts === dog.ts)) return have.length;
+    const next = [...have, dog].slice(-FALLEN_CAP);
+    stash.dogsFallen = next;
+    return next.length;
+  });
+  return n as number;
+}
+
+/** OTA-1844 — read the roll of companions (newest last). */
+export async function loadFallenDogs(): Promise<FallenDog[]> {
+  return (await loadGlobalStash()).dogsFallen ?? [];
+}
+
 export async function loadGlobalStash(): Promise<GlobalStash> {
   try {
     const raw = await AsyncStorage.getItem(GLOBAL_STASH_KEY);
@@ -291,6 +330,9 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
       fallen: parsed.fallen ?? [],
       fallenSeeds: parsed.fallenSeeds ?? [],
+      // ⚠ OTA-1844 — absent on every install that predates the Last Walk, and
+      // an empty list is the correct answer for one. No migration.
+      dogsFallen: parsed.dogsFallen ?? [],
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };

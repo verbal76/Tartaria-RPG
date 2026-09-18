@@ -86,16 +86,26 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     // OTA-124 — both wired in handlePlayerDeath: dog with hp<=0 at
     // player-death flips to status='dead' AND puppyVendorOwed = true
     // (gated on !puppyVendorUsed). Safety net now reachable.
+    /** ⚠⚠ OTA-1844 — THE SUBJECT MOVED FILES; THE CLAIM DID NOT. Both pins below
+     *  read `gameStore.ts` because that is where the dog's bleed-out clock used
+     *  to live. It is now `app/state/dogStatus.ts`, byte-identically, and these
+     *  say what they always said: SOMEWHERE in the dog lifecycle, this flag is
+     *  flipped and this status is assigned. Reading both files is the honest
+     *  repair — narrowing to the new one would only rot again on the next
+     *  extraction, and widening the claim would let a real deletion through. */
+    const dogLifecycleSrc = (): string => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require('fs'); const path = require('path');
+      return ['../app/state/gameStore.ts', '../app/state/dogStatus.ts']
+        .map((p) => fs.readFileSync(path.resolve(__dirname, p), 'utf-8') as string)
+        .join('\n');
+    };
+
     it(
       'source contains at least one `puppyVendorOwed: true` assignment outside loadSlotIntoGame migration',
       () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const src = require('fs').readFileSync(
-          require('path').resolve(__dirname, '../app/state/gameStore.ts'),
-          'utf-8',
-        );
         // Find any setter that flips it to true.
-        const trueSetters = src.match(/puppyVendorOwed\s*:\s*true/g) ?? [];
+        const trueSetters = dogLifecycleSrc().match(/puppyVendorOwed\s*:\s*true/g) ?? [];
         expect(trueSetters.length).toBeGreaterThan(0);
       },
     );
@@ -103,15 +113,10 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     it(
       'source contains a dog status="dead" transition (combat-death path)',
       () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const src: string = require('fs').readFileSync(
-          require('path').resolve(__dirname, '../app/state/gameStore.ts'),
-          'utf-8',
-        );
         // We need an ASSIGNMENT that sets dog status to 'dead' (not a
         // comparison). Look for "status: 'dead'" preceded by `{`/`,`
         // (object literal context), excluding `=== 'dead'` comparisons.
-        const deadAssign = src.match(/status\s*:\s*'dead'/g) ?? [];
+        const deadAssign = dogLifecycleSrc().match(/status\s*:\s*'dead'/g) ?? [];
         expect(deadAssign.length).toBeGreaterThan(0);
       },
     );

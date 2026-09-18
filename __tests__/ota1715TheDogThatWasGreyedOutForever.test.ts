@@ -308,7 +308,9 @@ describe('OTA-1715 — ⚠ the fifth "they" line, in the beat that matters most'
     // has its own {isOrAre} token and the scanner was measuring bare verbs). It
     // sits in the FIRST beat of the bleed-out ladder — the line a player reads
     // while deciding whether their dog lives.
-    const g = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1844 — the bleed-out ladder moved to `dogStatus.ts` byte-identically;
+    // the line is the same line, and this reads it where it lives now.
+    const g = src('app', 'state', 'dogStatus.ts');
     expect(g.includes('h before {pronoun} {isOrAre} gone for good.')).toBe(true);
     expect(g.includes('h before {pronoun} is gone for good.')).toBe(false);
   });
@@ -318,9 +320,15 @@ describe('OTA-1715 — ⚠ the fifth "they" line, in the beat that matters most'
     // `{pronoun} has`, `{pronoun} was`, `{pronoun} does` all read as "they is".
     const files = [
       ['app', 'state', 'gameStore.ts'],
+      // ⚠ OTA-1844 — the dog's own clock lives here now, and it is the densest
+      // pronoun surface in the game. The scanner follows it rather than losing
+      // sight of the very lines it was written for.
+      ['app', 'state', 'dogStatus.ts'],
       ['app', 'engine', 'dogCompanion.ts'],
       ['app', 'state', 'stageArrival.ts'],
       ['app', 'state', 'combatResolution.ts'],
+      // ⚠ OTA-1844 — the Last Walk's own lines join the same instrument.
+      ['app', 'engine', 'fallenDogs.ts'],
     ];
     const bad: string[] = [];
     let scanned = 0;

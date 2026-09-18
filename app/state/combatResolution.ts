@@ -3100,6 +3100,35 @@ export function handlePlayerDeath(
         get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
       }
     }).catch(() => { /* the graveyard is a keepsake, never block death on it */ });
+    // ⚠⚠⚠ OTA-1844 — AND THE DOG, WHO USED TO BE DELETED WITH THE FILE.
+    //
+    // A dog lives at `player.dog`, INSIDE this save, and death runs
+    // `clearSave()` → `deleteSlot()`. So a dog who died at its handler's side
+    // was the one thing here that left no record anywhere: the character joined
+    // the roll and the companion was simply gone with the file. This writes it
+    // to the install-wide roll before the slot goes, which is the entire reason
+    // that roll had to exist.
+    //
+    // ⚠ `with_player` ONLY, and `dogIsEligibleForLastWalk` owns that gate and
+    // says why on source evidence. Nothing mechanical is copied — no stats, no
+    // loyalty, no hp, and the vest only as the word on it.
+    //
+    // ⚠ FIRE AND FORGET, exactly like the memorial above it. A disk refusal must
+    // never stop a death resolving, and a player whose character has just died
+    // has nothing useful to do with the news of a failed write.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fd = require('../engine/fallenDogs') as typeof import('../engine/fallenDogs');
+      const deadDog = player.dog;
+      if (deadDog && fd.dogIsEligibleForLastWalk(deadDog)) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { recordFallenDog } = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+        void recordFallenDog(fd.fallenDogFromCompanion({
+          dog: deadDog, handler: player.name, where: locName,
+          hours: player.hoursElapsed ?? 0, ts: hero.ts,
+        })).catch(() => { /* the companion roll is a keepsake too */ });
+      }
+    }
   }
 
   // OTA-067 — dev cheat for the project owner. If the fallen

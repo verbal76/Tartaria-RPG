@@ -36,9 +36,11 @@ import {
   isFallenPayloadTooLargeError,
   loadLedger,
   foreignPool,
+  foreignDogPool,
   type ExchangePreview,
 } from '../engine/fallenLedgerStore';
-import { fallenTitle, restRollLine, type PairedHouse, type ForeignFallen, type RestRecord } from '../engine/fallenLedger';
+import { fallenTitle, restRollLine, type PairedHouse, type ForeignDog, type ForeignFallen, type RestRecord } from '../engine/fallenLedger';
+import { dogRollLine, dogClosureHomeLine, isDogRest } from '../engine/fallenDogs';
 
 /** ⚠ Bounded on purpose — this is a roll, not an archive. §13's own rule. */
 const RESTS_SHOWN = 25;
@@ -95,6 +97,12 @@ export function FallenExchangeScreen() {
    * counter. Deferred rather than faked. */
   const [walking, setWalking] = useState<ForeignFallen[]>([]);
   const [rested, setRested] = useState<RestRecord[]>([]);
+  /* ⚠⚠ OTA-1844 — COMPANIONS GET THEIR OWN SECTION, AND THAT IS THE POINT. A
+   * dog must never read as a Hollowed: one is a fight you win, the other is a
+   * dog you stay with, and one shared list would quietly say they are the same
+   * kind of thing. Same authority and the same read-only rule — `foreignDogPool`
+   * is exactly what the encounter draws from. */
+  const [dogsWalking, setDogsWalking] = useState<ForeignDog[]>([]);
 
   const refresh = useCallback(async () => {
     setHouse(await loadHouseName());
@@ -105,8 +113,9 @@ export function FallenExchangeScreen() {
       // draws from, rather than this screen re-deriving it and drifting.
       const l = await loadLedger();
       setWalking(foreignPool());
+      setDogsWalking(foreignDogPool());
       setRested([...l.rests].sort((x, y) => y.ts - x.ts).slice(0, RESTS_SHOWN));
-    } catch { setWalking([]); setRested([]); }
+    } catch { setWalking([]); setDogsWalking([]); setRested([]); }
   }, []);
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -184,11 +193,18 @@ export function FallenExchangeScreen() {
       // "<name> child of <house>", so the only thing missing was the sentence
       // that says what those names now MEAN — that someone else's dead are in
       // the mud here, and the player will meet them.
-      setNote(out.added === 0 && out.rests === 0
+      setNote(out.added === 0 && out.rests === 0 && out.dogsAdded === 0
         ? 'Nothing new in that one — you already had them.'
         : [
           out.arrivals.length > 0
             ? `${out.arrivals.join(', ')} walk your wastes now. They died in another player's world and the mud here has them. You will meet them.`
+            : '',
+          // ⚠ OTA-1844 — its OWN sentence, and nothing in it says hunt, kill or
+          // find. A companion is not a thing waiting to be put down; it is a
+          // thing waiting. The word the arrival uses has to match what the
+          // encounter will actually ask of the player.
+          out.dogArrivals.length > 0
+            ? `${out.dogArrivals.join('; ')} may now be found in these wastes. They are not hunting anything.`
             : '',
           out.rests > 0
             ? `${out.rests === 1 ? 'One of your own dead has' : `${out.rests} of your own dead have`} been put down out there. Their story came back with this.`
@@ -329,6 +345,16 @@ export function FallenExchangeScreen() {
                 ) : (
                   <Text style={styles.desc}>No new dead in this one.</Text>
                 )}
+                {/* ⚠ OTA-1844 — companions are shown BEFORE the commit, under
+                    their own heading, so a player never presses TAKE THEM IN
+                    without knowing a dog is in there. Read-only like everything
+                    else on this card; CANCEL still runs nothing. */}
+                {preview.dogArrivals.length > 0 && (
+                  <>
+                    <Text style={styles.subHeading}>COMPANIONS</Text>
+                    {preview.dogArrivals.map((d) => <Text key={d} style={styles.arrival}>{d}</Text>)}
+                  </>
+                )}
                 {preview.rests > 0 && (
                   <Text style={styles.desc}>
                     {preview.rests} of your own dead have been put down. Their story comes back with this.
@@ -352,7 +378,7 @@ export function FallenExchangeScreen() {
 
         {/* ---- the roll: who is here, and who has been put down ---- */}
         <Text style={styles.heading}>THE ROLL</Text>
-        {walking.length === 0 && rested.length === 0 ? (
+        {walking.length === 0 && rested.length === 0 && dogsWalking.length === 0 ? (
           <Text style={styles.desc}>
             No one else&apos;s dead have walked here yet. When they do, they are named here until you put them down.
           </Text>
@@ -373,11 +399,35 @@ export function FallenExchangeScreen() {
                 ))}
               </>
             )}
+            {/* ⚠⚠ OTA-1844 — COMPANIONS, SEPARATE AND UNMISTAKABLE. Its own
+                heading, its own mark, its own sentence — a player skimming this
+                roll must never take a dog for a Hollowed. And there is no kill
+                count here, because there is nothing to count. */}
+            {dogsWalking.length > 0 && (
+              <>
+                <Text style={styles.subHeading}>COMPANIONS</Text>
+                <Text style={styles.desc}>
+                  {dogsWalking.length === 1 ? 'One waits' : `${dogsWalking.length} wait`} out there. They are not hunting
+                  anything, and nothing is owed to them but company.
+                </Text>
+                {dogsWalking.map((d) => (
+                  <View key={`d_${d.origin.installId}_${d.id}`} style={styles.rollRow}>
+                    <Text style={styles.rollName}>⌒ {dogRollLine(d)}</Text>
+                    <Text style={styles.rollMeta}>{d.breed} • fell at {d.where}</Text>
+                  </View>
+                ))}
+              </>
+            )}
             {rested.length > 0 && (
               <>
                 <Text style={styles.subHeading}>PUT TO REST</Text>
                 {rested.map((r) => (
-                  <Text key={`r_${r.fallenKey}_${r.ts}`} style={styles.rollRested}>† {restRollLine(r)}</Text>
+                  // ⚠ OTA-1844 — a dog's closure reads as a dog's closure. The
+                  // `dog:` key is what tells them apart, and the sentence that
+                  // travelled home is used verbatim rather than re-derived here.
+                  isDogRest(r)
+                    ? <Text key={`r_${r.fallenKey}_${r.ts}`} style={styles.rollRested}>⌒ {dogClosureHomeLine(r)}</Text>
+                    : <Text key={`r_${r.fallenKey}_${r.ts}`} style={styles.rollRested}>† {restRollLine(r)}</Text>
                 ))}
                 {/* ⚠ Bounded, and it says so rather than pretending to be complete. */}
                 <Text style={styles.rollNote}>The last {RESTS_SHOWN} closings. Send your dead across and this news goes with them.</Text>

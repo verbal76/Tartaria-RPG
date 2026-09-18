@@ -405,9 +405,15 @@ describe('OTA-1738 — the dog', () => {
     expect(DOG_FEEDING_LINE).toContain(DOG_LOYALTY_BANDS.join(', '));
     expect(DOG_FEEDING_LINE).toMatch(/do not come back/);
     expect(DOG_MODAL).toContain('{DOG_FEEDING_LINE}');
+    // ⚠⚠ OTA-1844 — THE CLOCK THIS CARD TEACHES NOW RUNS IN TWO FILES, and
+    // reading each half where it actually lives makes the claim tighter than it
+    // was rather than looser. The DECAY still ticks in the store's advanceTime;
+    // the WARNING BANDS moved to `dogStatus.ts` with `tickDogStatus`,
+    // byte-identically. One-file reading would grade the card against half a clock.
     const STORE = codeOnly(src('app', 'state', 'gameStore.ts'));
+    const DOGCLOCK = codeOnly(src('app', 'state', 'dogStatus.ts'));
     expect(STORE).toContain('Math.floor(oldGap / LOYALTY_DECAY_HOURS)');
-    for (let i = 0; i < DOG_LOYALTY_BANDS.length; i++) expect(STORE).toContain(`at: DOG_LOYALTY_BANDS[${i}]`);
+    for (let i = 0; i < DOG_LOYALTY_BANDS.length; i++) expect(DOGCLOCK).toContain(`at: DOG_LOYALTY_BANDS[${i}]`);
   });
 
   it('⚠ runtime: one loyalty per unfed interval, none inside it', async () => {
