@@ -17,6 +17,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 const CARD_IN_MS = 900;
@@ -42,7 +44,7 @@ const CTL_PLANES = (
 
 export function StoryForkOverlay() {
   const fork = useGameStore((s) => s.pendingFork);
-  const answer = useGameStore((s) => s.answerFork);
+  const answer = useHumanAction('answerFork');
   const drift = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {

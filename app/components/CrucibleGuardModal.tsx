@@ -21,6 +21,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 /* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
@@ -58,7 +60,7 @@ const ROW_PLANES = (
 
 export function CrucibleGuardModal() {
   const prompt = useGameStore((s) => s.crucibleGuardPrompt);
-  const resolve = useGameStore((s) => s.resolveCrucibleGuard);
+  const resolve = useHumanAction('resolveCrucibleGuard');
 
   // Ticked = "save this one". Re-seeded every time a new guard is raised, so a
   // second prompt in the same REPAIR ALL never inherits the last one's ticks.

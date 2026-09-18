@@ -227,9 +227,9 @@ export function InventoryScreen() {
     { id: TEACH.scrap_first.id, when: tutorialStepForTeaching === null && invForTeaching.some((i) => !isQuestLockedItem(i) && canScrap(i)) },
     { id: TEACH.throwables_first.id, when: !!player && invForTeaching.some((i) => isBandolierEligible(i, player).eligible || isWeaponCoatingItem(i)) },
   ]) as keyof typeof TEACH | null;
-  const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
-  const reserveManyForFusion = useGameStore((s) => s.reserveManyForFusion);
-  const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
+  const toggleReserveForFusion = useHumanAction('toggleReserveForFusion');
+  const reserveManyForFusion = useHumanAction('reserveManyForFusion');
+  const toggleReserveForQuest = useHumanAction('toggleReserveForQuest');
   const applyCoating = useHumanAction('applyCoating');
   const applyCoatingToArmor = useHumanAction('applyCoatingToArmor');
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses

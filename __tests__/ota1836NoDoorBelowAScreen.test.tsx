@@ -52,7 +52,7 @@ const TestRenderer = require('react-test-renderer') as {
   act(cb: () => void): void;
 };
 const act = TestRenderer.act;
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { useGameStore } from '../app/state/gameStore';
 import { humanGetState, useHumanAction, HUMAN_GAMEPLAY_MUTATIONS } from '../app/state/humanActivity';
@@ -69,6 +69,30 @@ const SCREENS = ['VendorScreen', 'InventoryScreen', 'ContractsScreen', 'MapScree
   'WorldScreen', 'CraftingScreen', 'ExplorationScreen', 'CharacterScreen',
   'TitleScreen', 'AboutScreen'] as const;
 const screenCode = (n: string): string => codeOnly(src('app', 'screens', `${n}.tsx`));
+
+/* ⚠⚠⚠ OTA-1836 — THE WALK COVERS COMPONENTS, AND IT IS GLOBBED ON PURPOSE.
+ *
+ * OTA-1834 made this census total over the ten SCREENS. `raiseTopic` still
+ * escaped, because it is reached from `app/components/TalkSheet.tsx` — the
+ * screen only opens the modal (`talkToNpc`, presentation), and the gameplay
+ * mutation lives one component deeper. A screen-only walk cannot see that
+ * shape by construction.
+ *
+ * ⚠ THE LIST IS READ FROM DISK, NOT TYPED HERE. A hand-maintained surface list
+ * would rebuild the exact blind spot one level up: the next component added
+ * would be invisible until somebody remembered to add it, which is the same
+ * "sixty-first door" failure this whole suite exists to abolish. Globbing means
+ * a new presentation surface is covered the moment it exists. */
+const COMPONENTS: readonly string[] = readdirSync(join(__dirname, '..', 'app', 'components'))
+  .filter((n) => n.endsWith('.tsx'))
+  .map((n) => n.replace(/\.tsx$/, ''));
+const componentCode = (n: string): string => codeOnly(src('app', 'components', `${n}.tsx`));
+
+/** Every presentation surface a press can land on: screens AND components. */
+const SURFACES: readonly { name: string; code: () => string }[] = [
+  ...SCREENS.map((n) => ({ name: n, code: () => screenCode(n) })),
+  ...COMPONENTS.map((n) => ({ name: n, code: () => componentCode(n) })),
+];
 
 /** The six this OTA repaired. */
 const THE_SIX = [
@@ -255,6 +279,32 @@ describe('OTA-1834 §5 — ML policy and Baker #9 are untouched', () => {
  *  This is the half that makes the census total. Adding a name here is a
  *  RULING and should read like one. */
 const NOT_HUMAN_GAMEPLAY: Record<string, string> = {
+  /* ⚠⚠⚠ OTA-1836 — THE COMPONENT SURFACE'S EXCLUSIONS. Each one was read, not
+   * guessed from its name; `dismissStoryIntro` proves why — it is named for a
+   * dismissal and ARMS THE TUTORIAL, so it is INCLUDED, not here. */
+  setExplorationDraft: 'input-box draft bookkeeping — the SUBMIT is the action, not each keystroke',
+  setExplorationInputActive: 'input focus bookkeeping — focusing a field is not a gameplay mutation',
+  closeTalk: 'closes the talk sheet; raiseTopic is the mutation and it is accounted',
+  closeParley: 'closes the sheet; resolveParley is the mutation and it is accounted',
+  closeGift: 'closes the gift modal — no world state',
+  closeFusionPicker: 'closes the picker; confirmFusionSelection is the commit',
+  closeAetherStatPicker: 'closes the picker; selectAetherStat is the commit',
+  closeCallDogModal: 'closes the modal; selectCallDogOption is the commit',
+  clearFusionBlockedNotice: 'clears a refusal notice — a refusal is not a turn',
+  clearMissionCompleteNotice: 'clears a notice flag',
+  dismissChapterCard: 'presentation — a card is put away',
+  dismissDedication: 'presentation — a card is put away',
+  dismissDiscoveryReveal: 'presentation — a card is put away',
+  dismissStoryReveal: 'presentation — a card is put away',
+  dismissDeath: 'session teardown to the title screen; handlePlayerDeath already wrote the slot to disk before the overlay went up, so nothing gameplay-bearing happens here',
+  requestContractsTab: 'navigation — asks a screen to open on a tab',
+  requestInventoryCategory: 'navigation — asks a screen to open on a category',
+  requestInventoryFocusItem: 'navigation — asks a screen to focus a row',
+  consumeInputDraft: 'draft bookkeeping for the input box; the submit is the action',
+  tapLockedTeaser: 'emits a deflection line and bumps a counter INSIDE the modal payload; no world state moves',
+  parleyIntoTalk: 'transition only — the parley is CLOSED, not resolved: no roll, no outcome, no cost, and the wanderer stays in the scene',
+  chooseGiftRecipient: 'staging — settles the recipient and hands off to the inventory, where giveGift (already accounted) is the commit',
+
   // presentation / dismissal / refusal — the player is closing something,
   // not changing the world.
   cancelCraftSubstitution: 'refusal — declines the substitution',
@@ -320,32 +370,22 @@ const NOT_HUMAN_GAMEPLAY: Record<string, string> = {
    * increase precision rather than sweep. They are recorded here so the census
    * passes HONESTLY — classified, not hidden — and reported for a ruling. */
   talkToNpc: 'DEFERRED — opens a conversation; may or may not be a turn',
-  routeMission: 'DEFERRED — routing, adjacent to travel',
-  routeGreatClimb: 'DEFERRED — routing, adjacent to travel',
-  setContractActive: 'DEFERRED — makes a contract the tracked one',
-  setFactionQuestActive: 'DEFERRED — makes a faction quest the tracked one',
-  setGreatClimbActive: 'DEFERRED — makes a climb the tracked one',
-  toggleReserveForFusion: 'DEFERRED — inventory reservation',
-  toggleReserveForQuest: 'DEFERRED — inventory reservation',
-  reserveManyForFusion: 'DEFERRED — inventory reservation',
   tutorialScreenPick: 'DEFERRED — tutorial choice',
-  chooseTutorialExplore: 'DEFERRED — tutorial choice',
-  chooseTutorialLeave: 'DEFERRED — tutorial choice',
 };
 
-/** Every store name a screen reaches through a BARE seam. */
+/** Every store name any SURFACE — screen or component — reaches through a BARE seam. */
 function bareReachable(): Map<string, Set<string>> {
   const hits = new Map<string, Set<string>>();
   const pats = [
     /useGameStore\(\s*\(\s*\w+\s*\)\s*=>\s*\w+\.([A-Za-z0-9_]+)\s*\)/g,
     /useGameStore\.getState\(\)\.([A-Za-z0-9_]+)\s*\(/g,
   ];
-  for (const s of SCREENS) {
-    const body = screenCode(s);
+  for (const surface of SURFACES) {
+    const body = surface.code();
     for (const re of pats) {
       for (const m of body.matchAll(re)) {
         if (!hits.has(m[1]!)) hits.set(m[1]!, new Set());
-        hits.get(m[1]!)!.add(s);
+        hits.get(m[1]!)!.add(surface.name);
       }
     }
   }

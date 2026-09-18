@@ -183,6 +183,101 @@ export const HUMAN_GAMEPLAY_MUTATIONS = [
   'acceptMissionOffer', 'declineMissionOffer',
   'continueHook', 'abandonHook',
   'confirmLeaveAndTravel', 'confirmCraftSubstitution',
+  /* ⚠⚠⚠ OTA-1836 — THE ELEVEN THE WIDENED CENSUS FOUND, AND THE ONE IT COULD NOT.
+   *
+   * OTA-1834 made the census total over SCREENS and parked twelve names as
+   * DEFERRED pending a ruling. The owner ruled them mechanically rather than
+   * one by one: a control belongs here when a human press invokes it directly
+   * AND it mutates gameplay state; presentation, navigation, passive engine
+   * work and reads do not. Ten of the twelve qualify:
+   *
+   *   routeMission / routeGreatClimb      set a course and start the auto-routing
+   *                                       chain; both persist.
+   *   setContractActive                   pausing FREEZES auto-advance and reminders.
+   *   setFactionQuestActive               single-active routing semantics.
+   *   setGreatClimbActive                 activating PAUSES every other contract.
+   *   toggleReserveForFusion / ForQuest / reserveManyForFusion
+   *                                       reservation decides what can be sold or
+   *                                       scrapped — inventory semantics, not a view.
+   *   chooseTutorialExplore               commits the beat; TWO doors (button and
+   *                                       the scrim's onRequestClose) reach it.
+   *   chooseTutorialLeave                 walks the player out of the hub, SPENDS
+   *                                       TRAVEL STAMINA and ADVANCES TIME.
+   *
+   * ⚠⚠ AND `raiseTopic`, WHICH NO SCREEN CAN SEE. The twelve were what a
+   * SCREEN-only walk could reach. `talkToNpc` is excluded — it only sets
+   * `pendingTalk`, a modal payload, and mutates nothing — but the thing BEHIND
+   * that modal does: `raiseTopic` writes `worldMemory.talkedTopics`, and it is
+   * called from `app/components/TalkSheet.tsx`, which is not a screen. So a
+   * player working through a conversation topic by topic was mutating gameplay
+   * state on every tap and reading as IDLE the whole time.
+   *   That is the general lesson, and the census now enforces it: a
+   *   presentation-only entry point (a modal opener) can hide a real gameplay
+   *   mutation one component deeper. The walk covers components, not just
+   *   screens, so the next one cannot hide the same way. */
+  'routeMission', 'routeGreatClimb',
+  'setContractActive', 'setFactionQuestActive', 'setGreatClimbActive',
+  'toggleReserveForFusion', 'toggleReserveForQuest', 'reserveManyForFusion',
+  'chooseTutorialExplore', 'chooseTutorialLeave',
+  'raiseTopic',
+  /* ⚠⚠⚠ OTA-1836 — THE COMPONENT SURFACE, WHICH HAD NEVER BEEN CENSUSED AT ALL.
+   *
+   * Widening the walk to app/components proved the eleven above were not the
+   * boundary: 53 store actions were reachable bare from presentation surfaces
+   * and classified nowhere. SEVEN OF THEM WERE ALREADY ON THIS LIST and were
+   * being reached bare anyway — acceptHunt / acceptMystery / acceptStoryline /
+   * acceptFactionQuest from the vendor and board modals, setTravelCourse from
+   * the codex, setWhisperCourse and useHealBatch from their sheets. Those are
+   * OTA-1816 violations that a screen-only census could not see: the name was
+   * ruled human gameplay long ago and the component door never stamped.
+   *
+   * The twenty-six below are the newly-qualifying ones. Each is a direct press
+   * that mutates gameplay:
+   *   accept/answer/resolve family  contracts, story forks, whispers, parleys,
+   *                                 payoffs, mission encounters, crucible guard
+   *   craftRecipe/craftRecipeBatch  ⚠ these delegate to submitPlayerAction via
+   *                                 get() — an INTERNAL call, which does NOT
+   *                                 stamp. The stamp only ever happens at the
+   *                                 surface, so the delegation is not cover.
+   *   throw / heal / loot / move    InputBox's quick buttons are direct presses
+   *   fusion commits                confirmFusionSelection, upgradeCoatingSlot
+   *   character + dog creation      name, motive, sex, aether stat, dog onboarding
+   *   dismissStoryIntro             ⚠ named "dismiss" but it ARMS THE TUTORIAL
+   *                                 hand-off and persists — read the body, not
+   *                                 the name.
+   *   skipTutorial                  persists the skip; a real progression choice
+   *
+   * ⚠ AND WHAT STAYED OFF. dismissDeath (session teardown to title; the slot was
+   * already written), chooseGiftRecipient and parleyIntoTalk (staging/transition
+   * — the commit happens elsewhere), tapLockedTeaser (a deflection line and a
+   * counter inside the modal payload), and the whole close / clear / dismiss /
+   * request-a-tab family. Presentation is not activity. */
+  'answerFork',
+  'answerMissionEncounter',
+  'summonMissionEncounter',
+  'answerWhisper',
+  'handBackWhisperGoods',
+  'resolveParley',
+  'resolvePayoff',
+  'resolveCrucibleGuard',
+  'craftRecipe',
+  'craftRecipeBatch',
+  'throwHeldWeapon',
+  'throwFromBandolier',
+  'lootKnockedOutEnemy',
+  'enterBuilding',
+  'exitBuilding',
+  'goBuildingRoom',
+  'confirmFusionSelection',
+  'upgradeCoatingSlot',
+  'selectAetherStat',
+  'selectCallDogOption',
+  'confirmGolemName',
+  'confirmMotivePick',
+  'confirmSexPick',
+  'confirmDogOnboarding',
+  'dismissStoryIntro',
+  'skipTutorial',
 ] as const;
 
 export type HumanGameplayMutation = typeof HUMAN_GAMEPLAY_MUTATIONS[number];

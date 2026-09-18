@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { rarityHexColor } from './InventoryCategorize';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { CraftQuantityModal } from './CraftQuantityModal';
 import { maxCraftableCount } from '../engine/crafting';
 import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
@@ -120,8 +122,8 @@ export function RecipesView({
   sortDirection = 'asc',
 }: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
-  const craftRecipe = useGameStore((s) => s.craftRecipe);
-  const craftRecipeBatch = useGameStore((s) => s.craftRecipeBatch);
+  const craftRecipe = useHumanAction('craftRecipe');
+  const craftRecipeBatch = useHumanAction('craftRecipeBatch');
   // OTA-983 — the recipe awaiting a COUNT. Tapping a row no longer crafts; it asks
   // how many, then makes them all and leaves the menu open (owner's ask).
   const [qtyFor, setQtyFor] = React.useState<Recipe | null>(null);

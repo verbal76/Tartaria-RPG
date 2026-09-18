@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { isTutorialLocked } from './tutorialSteps';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
@@ -69,7 +71,7 @@ const CTL_PLANES = (
 export function TutorialOverlay() {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
-  const skipTutorial = useGameStore((s) => s.skipTutorial);
+  const skipTutorial = useHumanAction('skipTutorial');
   // ⚠⚠ OTA-1799 — THE CONTEXT, NOT THE HOOK, AND FOR A REASON WORTH KEEPING.
   // `useSafeAreaInsets()` THROWS when no `SafeAreaProvider` sits above it. This
   // component is an overlay whose whole job is to be the escape hatch out of a

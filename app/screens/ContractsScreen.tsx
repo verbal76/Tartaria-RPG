@@ -199,11 +199,11 @@ export function ContractsScreen() {
   const clearContractsNotice = useGameStore((s) => s.clearContractsNotice);
   const sendContractByRunner = useHumanAction('sendContractByRunner');
   const abandonContract = useHumanAction('abandonContract');
-  const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
-  const setContractActive = useGameStore((s) => s.setContractActive);
-  const routeMission = useGameStore((s) => s.routeMission);
-  const routeGreatClimb = useGameStore((s) => s.routeGreatClimb);
-  const setGreatClimbActive = useGameStore((s) => s.setGreatClimbActive);
+  const setFactionQuestActive = useHumanAction('setFactionQuestActive');
+  const setContractActive = useHumanAction('setContractActive');
+  const routeMission = useHumanAction('routeMission');
+  const routeGreatClimb = useHumanAction('routeGreatClimb');
+  const setGreatClimbActive = useHumanAction('setGreatClimbActive');
   const discardLead = useHumanAction('discardLead');
   // OTA-1014 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.

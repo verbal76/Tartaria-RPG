@@ -57,6 +57,8 @@ const CARD = tMomentCard();
 import { useCardViewport } from './KeyboardSafeCard';
 import { keyboardInset } from '../engine/keyboardSafeCard';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { defaultDogName } from '../engine/dogCompanion';
 import { DOG_FEEDING_LINE } from './teachingRegistry'; // OTA-1738 — quoted from the loyalty clock
 // ⚠⚠⚠ OTA-1525 — THE OWNER WANTED THE SWITCH HERE TOO: "push the dog card tips
@@ -84,7 +86,7 @@ export function DogOnboardingModal() {
   const pending = useGameStore((s) => s.worldMemory.pendingDogOnboarding);
   const player = useGameStore((s) => s.player);
   const notice = useGameStore((s) => s.missionCompleteNotice);
-  const confirm = useGameStore((s) => s.confirmDogOnboarding);
+  const confirm = useHumanAction('confirmDogOnboarding');
   // null = untouched (falls back to any part-answer a wedged save carried).
   // ⚠ Local echo so the tap has visible feedback: the link is the only control
   // on this card that does not change the screen, and a control that appears to

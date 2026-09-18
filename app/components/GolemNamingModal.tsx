@@ -50,6 +50,8 @@ const CARD = tMomentCard();
 import { useCardViewport } from './KeyboardSafeCard';
 import { keyboardInset } from '../engine/keyboardSafeCard';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { suggestGolemName } from '../engine/golems';
 
 /** Beat the summon line gets to itself before the card lands. Shorter than the
@@ -61,7 +63,7 @@ export function GolemNamingModal() {
   const pending = useGameStore((s) => s.pendingGolemNaming);
   const golem = useGameStore((s) => s.player?.golem);
   const notice = useGameStore((s) => s.missionCompleteNotice);
-  const confirm = useGameStore((s) => s.confirmGolemName);
+  const confirm = useHumanAction('confirmGolemName');
   const [name, setName] = useState('');
   const [ready, setReady] = useState(false);
 

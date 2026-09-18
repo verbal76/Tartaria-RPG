@@ -12,6 +12,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 const PAGE_IN_MS = 1400;
@@ -44,7 +46,7 @@ const CTL_PLANES = ctlPlanes(false);
 
 export function StoryIntroOverlay() {
   const pages = useGameStore((s) => s.storyIntro);
-  const dismiss = useGameStore((s) => s.dismissStoryIntro);
+  const dismiss = useHumanAction('dismissStoryIntro');
   const [page, setPage] = useState(0);
   const drift = useRef(new Animated.Value(0)).current;
 

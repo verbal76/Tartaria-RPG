@@ -5,12 +5,14 @@
 
 import React from 'react';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { BrandedModal } from './BrandedModal';
 
 export function AetherStatPickerModal() {
   const visible = useGameStore((s) => s.aetherStatPickerOpen);
   const close = useGameStore((s) => s.closeAetherStatPicker);
-  const select = useGameStore((s) => s.selectAetherStat);
+  const select = useHumanAction('selectAetherStat');
 
   if (!visible) return null;
 

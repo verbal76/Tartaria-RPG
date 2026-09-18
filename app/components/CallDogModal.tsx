@@ -7,13 +7,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { BrandedModal } from './BrandedModal';
 import type { InventoryItem } from '../engine/types';
 
 export function CallDogModal() {
   const visible = useGameStore((s) => s.callDogModalOpen);
   const close = useGameStore((s) => s.closeCallDogModal);
-  const select = useGameStore((s) => s.selectCallDogOption);
+  const select = useHumanAction('selectCallDogOption');
   const player = useGameStore((s) => s.player);
   const [treatPickerOpen, setTreatPickerOpen] = useState(false);
 

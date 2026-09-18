@@ -28,6 +28,8 @@
 import React, { useMemo } from 'react';
 import { Modal, View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { armedEncounter } from '../engine/missionEncounterArm';
 import {
   choicesFor,
@@ -103,8 +105,8 @@ export function MissionEncounterCard() {
   // on every render and spins — the OTA-1549 lesson, same shape.
   const player = useGameStore((s) => s.player);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
-  const answer = useGameStore((s) => s.answerMissionEncounter);
-  const summon = useGameStore((s) => s.summonMissionEncounter);
+  const answer = useHumanAction('answerMissionEncounter');
+  const summon = useHumanAction('summonMissionEncounter');
 
   const armed = useMemo(() => armedEncounter(player), [player]);
   const st: EncounterState | null = useMemo(

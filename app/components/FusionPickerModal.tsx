@@ -6,6 +6,8 @@
 import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { canonicalItemTags } from '../engine/crafting';
 import { eligibleInputs, fusionMaterialTags, visibleFusionInputs, crucibleUpgradeVerdict, isWeaponRow, type CrucibleUpgradeKind } from '../engine/itemFusion';
 import { coatedDisplayName } from '../engine/weaponCoating';
@@ -67,8 +69,8 @@ export function FusionPickerModal() {
   const visible = useGameStore((s) => s.fusionPickerOpen);
   const inventory = useGameStore((s) => s.player?.inventory);
   const close = useGameStore((s) => s.closeFusionPicker);
-  const confirm = useGameStore((s) => s.confirmFusionSelection);
-  const upgradeCoating = useGameStore((s) => s.upgradeCoatingSlot);
+  const confirm = useHumanAction('confirmFusionSelection');
+  const upgradeCoating = useHumanAction('upgradeCoatingSlot');
   const player = useGameStore((s) => s.player);
 
   const scraps = useMemo<InventoryItem[]>(

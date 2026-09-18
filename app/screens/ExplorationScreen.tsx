@@ -352,7 +352,7 @@ export function ExplorationScreen() {
   const tutBeat = tutorialStep !== null ? (TUTORIAL_STEPS[tutorialStep]?.id ?? null) : null;
   // Door-open branch popup (explore_or_leave beat).
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
-  const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
+  const chooseTutorialExplore = useHumanAction('chooseTutorialExplore');
   // arb108 — outpost tutorial lockdown (mirrors InputBox): MAP + other
   // out-of-band controls buzz until the player makes the stay/leave choice.
   // ⚠ OTA-1249 — reads the SAME exported list InputBox does. This was an
@@ -360,7 +360,7 @@ export function ExplorationScreen() {
   // ⚠ OTA-1700 — one rule for InputBox, this screen and the Atlas's travel rows;
   // isTutorialLocked reads TUT_LOCK_BEATS once, so no reader re-types the list.
   const tutLock = isTutorialLocked(tutorialStep, tutorialExploreChosen);
-  const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
+  const chooseTutorialLeave = useHumanAction('chooseTutorialLeave');
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   // OTA-1076 — the talk/parley sheets share the DiceRoller's controls slot;
   // these drive which occupant renders. Rolls win: a parley choice that starts

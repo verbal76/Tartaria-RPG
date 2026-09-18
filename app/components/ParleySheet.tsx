@@ -15,6 +15,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { choicesFor, temperamentReadout, temperamentTell } from '../engine/parley';
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
@@ -37,7 +39,7 @@ const CTL_PLANES = ctlPlanes(false);
 
 export function ParleySheet() {
   const ctx = useGameStore((s) => s.pendingParley);
-  const resolve = useGameStore((s) => s.resolveParley);
+  const resolve = useHumanAction('resolveParley');
   const close = useGameStore((s) => s.closeParley);
   const intoTalk = useGameStore((s) => s.parleyIntoTalk);
 

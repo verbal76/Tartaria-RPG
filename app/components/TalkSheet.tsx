@@ -46,6 +46,10 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — raising a topic IS gameplay (it writes worldMemory.talkedTopics),
+// and this sheet is its only door. A screen-only census could never see this
+// file, which is why it went unaccounted; see humanActivity.ts.
+import { useHumanAction } from '../state/humanActivity';
 import { lockedTeaserLabel } from '../engine/dialogue';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
@@ -85,7 +89,7 @@ const ROW_PLANES = (
 
 export function TalkSheet() {
   const ctx = useGameStore((s) => s.pendingTalk);
-  const raise = useGameStore((s) => s.raiseTopic);
+  const raise = useHumanAction('raiseTopic');
   const close = useGameStore((s) => s.closeTalk);
   const tapTeaser = useGameStore((s) => s.tapLockedTeaser);
   const talked = useGameStore((s) => s.worldMemory.talkedTopics);

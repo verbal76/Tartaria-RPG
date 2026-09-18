@@ -15,6 +15,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. Handler, role,
@@ -29,7 +31,7 @@ const ctlPlanes = (pressed: boolean) => (
 
 export function PayoffSheet() {
   const ctx = useGameStore((s) => s.pendingPayoff);
-  const resolve = useGameStore((s) => s.resolvePayoff);
+  const resolve = useHumanAction('resolvePayoff');
   const tc = useGameStore((s) => s.player?.tc ?? 0);
 
   if (!ctx) return null;

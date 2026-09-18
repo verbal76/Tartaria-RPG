@@ -28,12 +28,14 @@ const ctlPlanes = (pressed: boolean) => (
 /** The resting planes, for a surface that has no press to report. */
 const CTL_PLANES = ctlPlanes(false);
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { getStoryMotives } from '../engine/story';
 
 export function MotivePickerModal() {
   const pending = useGameStore((s) => s.motivePickerPending);
   const player = useGameStore((s) => s.player);
-  const confirm = useGameStore((s) => s.confirmMotivePick);
+  const confirm = useHumanAction('confirmMotivePick');
   const dealt = player?.storyMotive;
   const [selected, setSelected] = useState<string | null>(null);
 

@@ -20,6 +20,8 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { T, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠⚠ PHASE 3 — THIS DIALOG WAS THE CLEAREST SPECIMEN OF THE DEPRECATED
@@ -55,7 +57,7 @@ const CTL_PLANES = ctlPlanes(false);
 
 export function SexPickerModal() {
   const player = useGameStore((s) => s.player);
-  const confirm = useGameStore((s) => s.confirmSexPick);
+  const confirm = useHumanAction('confirmSexPick');
   const [selected, setSelected] = useState<'male' | 'female' | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
