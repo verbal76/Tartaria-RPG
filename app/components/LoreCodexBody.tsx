@@ -42,7 +42,7 @@ import { fallenTitle, restRollLine, sharingUnlockedFor, type ForeignFallen, type
 import { FEATURES } from '../config/features';
 import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
-  myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
+  myHouseCode, acceptHouseCode, revokeHouse, loadPaired, isFallenPersistError,
 } from '../engine/fallenLedgerStore';
 
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
@@ -359,8 +359,17 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
       setExchangeNote(out.added === 0 && out.rests === 0
         ? `Nothing new. ${bits.join(' · ')}`
         : `${bits.join(' · ')}.${out.arrivals.length > 0 ? ` ${out.arrivals.slice(0, 3).join(', ')}${out.arrivals.length > 3 ? '…' : ''} walk now.` : ''}`);
-    } catch {
-      setExchangeNote('That paste was not a ledger.');
+    } catch (e) {
+      /* ⚠⚠ OTA-1838 — TWO DIFFERENT FAILURES, AND ONLY ONE OF THEM IS THE PASTE.
+         A refused disk used to arrive here silently as a SUCCESS: the store's
+         retry loop ran out and returned, so this screen printed "N joined your
+         wastes" over a ledger that was never written. Now it throws, and if the
+         screen kept one message the player would be told their ledger was
+         malformed and would re-paste a perfectly good one forever. The disk
+         failure says so, and says the paste is still worth keeping. */
+      setExchangeNote(isFallenPersistError(e)
+        ? 'Their dead did not reach this machine\'s disk — it refused the write, so nothing was taken in. Nothing was lost either: free some space and paste it again.'
+        : 'That paste was not a ledger.');
     } finally { setBusy(false); }
   };
 

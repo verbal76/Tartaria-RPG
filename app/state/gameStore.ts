@@ -25286,7 +25286,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                   // eslint-disable-next-line @typescript-eslint/no-require-imports
                   (require('../engine/fallenMailbox') as typeof import('../engine/fallenMailbox')).maybeAutoSync();
                 } catch { /* no mailbox configured */ }
-              }).catch(() => { /* the kill still stands; the receipt retries next export */ });
+              }).catch(() => { get().appendLog('world', `But nothing of it could be written down — the roll did not close on ${ledgerMod.fallenTitle({ name: fr.name, origin: frOrigin })}, no word goes to their house, and the mud may give them back. Free some space and put them down again.`); }); // ⚠⚠ OTA-1838 — this used to swallow the failure with "the receipt retries next export", which was never true: the retry is what did NOT happen. `recordRest` now rejects when the disk refuses all three attempts, and the ledger rolls back, so the corpse really is still standing and really can be put down again — the line above it has already claimed the roll closed, and this is the correction that keeps the transcript honest.
               get().appendLog('world', `The roll of the Hollowed closes on ${ledgerMod.fallenTitle({ name: fr.name, origin: frOrigin })}. Word of it will find their house.`);
             } else {
               rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');

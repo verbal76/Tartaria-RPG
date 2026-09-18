@@ -219,18 +219,67 @@ export function _setIdentityForTests(installId: string | null, house: string | n
   HOUSE = house;
 }
 
+/** ⚠⚠⚠ OTA-1838 — WHAT A REFUSED DISK SOUNDS LIKE, BECAUSE IT USED TO SOUND
+ *  EXACTLY LIKE SUCCESS. Every mutation here returns `Promise<void>`, and until
+ *  this existed a resolved one meant "written" and ALSO meant "not written, and
+ *  never will be". A caller cannot tell those apart, so it reported the loss as
+ *  a success. This is the smallest thing that separates them. */
+export class FallenPersistError extends Error {
+  /** What the storage layer actually said. For the log, not for the player. */
+  readonly detail: string;
+  constructor(detail: string) {
+    super('fallen ledger: the disk refused every attempt');
+    this.name = 'FallenPersistError';
+    this.detail = detail;
+  }
+}
+
+/** True for the failure above. The two callers that must tell a bad PASTE from
+ *  a bad DISK live in other files and reach this module through `require()`, so
+ *  `instanceof` alone is not a safe test — the name is checked as well. */
+export function isFallenPersistError(e: unknown): boolean {
+  if (e instanceof FallenPersistError) return true;
+  return typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'FallenPersistError';
+}
+
 async function persist(l: Ledger): Promise<void> {
+  // ⚠⚠⚠ OTA-1838 — THE CACHE MOVES FIRST AND IS PUT BACK IF THE DISK REFUSES.
+  //
+  // Moving it before the write is deliberate and is NOT the defect: the spawner
+  // reads `cachedLedger()` synchronously and cannot await, so a rested corpse
+  // must leave the pool the instant the rest is taken or it can rise again in
+  // the seconds a write is in flight. What was missing is the other half. When
+  // every attempt failed, memory was left holding a commit that never happened
+  // — and since the loop simply ran out and the function returned, the caller
+  // was told it had worked. A player on a full phone saw "3 joined your wastes"
+  // and had none of them next launch; a Hollowed "put to rest" stood back up.
+  //
+  // ⚠ WORSE THAN LOST: UNRECOVERABLE. The phantom record stayed in the cache, so
+  // the dedupe turned the honest retry away too — importing the same payload
+  // again after the disk recovered added nothing, for the rest of the session.
+  // The rollback is what makes a retry possible at all.
+  //
+  // ⚠ IT IS A COMPARE-AND-SWAP, not a blind restore. If another mutation landed
+  // while we were retrying, the cache is no longer ours to put back and we leave
+  // it alone — that write's own outcome governs it. (That two of these can
+  // interleave at all is a SEPARATE defect, the same lost-update shape OTA-1835
+  // closed for the GlobalStash. It is recorded, not fixed here.)
+  const previous = LEDGER_CACHE;
   LEDGER_CACHE = l;
   // ⚠ The write RETRIES, for the reason OTA-994 gave markAvenged: one failed
   // disk write and a corpse you already put down rises again next launch.
+  let last = 'unknown';
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       await AsyncStorage.setItem(LEDGER_KEY, JSON.stringify({ v: LEDGER_FORMAT, fallen: l.foreign, rests: l.rests }));
       return;
-    } catch {
+    } catch (e) {
+      last = String((e as { message?: unknown })?.message ?? e);
       await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
     }
   }
+  if (LEDGER_CACHE === l) LEDGER_CACHE = previous;
+  throw new FallenPersistError(last);
 }
 
 type AuthResult =

@@ -30806,7 +30806,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // drawn: the travel distance exactly, opaque, in the record's own resting
 // material and resting lit edge, mounted only while pressed.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-17-1836-no-door-below-a-screen';
-export const OTA_BUILD_ID = '2026-09-18-1837-the-record-sinks-into-something';
+// OTA-1838 — the ledger says what the disk says. `fallenLedgerStore.persist()`
+// retried a refused write three times and then fell off the end of its loop,
+// returning a resolved Promise<void> that was indistinguishable from a durable
+// commit — while the in-memory cache had already been moved before the first
+// attempt. So an import reported "N joined your wastes" over a ledger that was
+// never written, a Hollowed "put to rest" stood back up next launch with no
+// receipt to send home, and the phantom cache entry deduped the honest retry
+// away for the rest of the session. persist() now rolls the cache back (a
+// compare-and-swap, so it cannot clobber a write that landed meanwhile) and
+// throws FallenPersistError. Retry count, backoff and the success path are
+// untouched; the import screen distinguishes a refused disk from a bad paste,
+// and the closure path says so in the transcript instead of claiming the roll
+// closed. No schema change, no migration.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1837-the-record-sinks-into-something';
+export const OTA_BUILD_ID = '2026-09-18-1838-the-ledger-says-what-the-disk-says';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
