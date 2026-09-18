@@ -741,12 +741,16 @@ export function TitleScreen() {
               an 15% fade was all a tap could produce on a plate built out of a
               lit rim, a recessed face and a drop shadow.
               ⚠⚠ THE DOSSIER PRESSES IN ITS OWN MATERIAL, NOT IN THE KIT'S. The
-              outer takes `controlPressed` for the travel alone — it owns no
-              border, so the two colours that style also sets are inert here,
-              exactly as on the Inventory header — and the RIM inverts its OWN
+              RIM takes `controlPressed` for the travel and inverts its OWN
               bespoke pair. Using the kit's generic control colours would make a
               pressed record momentarily stop looking like a filed record, and
-              VIS-1's construction is protected. Same language, own light. */}
+              VIS-1's construction is protected. Same language, own light.
+              ⚠ CORRECTED BY OTA-1837. This note said the OUTER took the travel
+              "and owns no border, so the two colours that style also sets are
+              inert here". That was true of OTA-1810 and stopped being true at
+              OTA-1822, which moved the travel to the rim — which DOES own a
+              border. The stale sentence is one of the two places the reasoning
+              that exempted this card from OTA-1829 was read from. */}
           <Pressable
             /* ⚠⚠⚠ OTA-1822 — THE TRAVEL COMES OFF THE SHADOW-CASTER. Owner, from
                the device and from video: pressing a character record exposed a
@@ -767,6 +771,21 @@ export function TitleScreen() {
             accessibilityHint={`Shows ${item.playerName}'s full details`}
           >
             {({ pressed }) => (<>
+            {/* ⚠⚠⚠ OTA-1837 — THE HOUSING THE RECORD SINKS INTO. Owner, on his
+                iPhone: a pressed record depresses correctly but its TOP EDGE
+                OPENS — a dark strip appears and the card stops looking closed.
+                `dossierOuter` paints NOTHING, so once OTA-1822 moved the travel
+                onto the RIM the rim became the only painted thing in that box,
+                and a painted thing sliding 3dp down inside an unpainted parent
+                uncovers 3dp of NOTHING along the top. This band is the housing
+                that was never drawn: exactly the travel distance high, in the
+                record's own material, with the record's own lit top edge on it,
+                mounted ONLY while pressed and sitting BEHIND the rim, so a
+                resting record cannot see it. The plate still travels; the top
+                stays closed, which is the whole of the owner's requirement. */}
+            {pressed ? (
+              <View style={[styles.dossierPressEdge, item.dead && styles.dossierPressEdgeDead]} pointerEvents="none" />
+            ) : null}
             {/* ⚠ VIS-1 — the same TSettle wraps BOTH states, so React keeps one
                 instance across the expand and the animation runs on the change
                 rather than on a mount that never happens (FlatList reuses the
@@ -819,7 +838,8 @@ export function TitleScreen() {
     return (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       {/* ⚠ OTA-1810 — the SELECTED record presses the same way, in its own lit
-          material: the outer travels, the open rim inverts its own warmer pair.
+          material: the RIM travels (OTA-1822 — the outer casts the shadow and
+          must not move) and the open rim inverts its own warmer pair.
           Everything inside stays `pointerEvents="none"` as before, so the plate
           is still the one tap target and the second tap still LOADS. */}
       <Pressable
@@ -831,6 +851,16 @@ export function TitleScreen() {
         accessibilityHint={`Loads ${item.playerName}`}
       >
         {({ pressed }) => (<>
+        {/* ⚠⚠ OTA-1837 — the selected record uncovers the same 3dp and takes the
+            same housing in ITS OWN warmer light. Its shadow is the deeper one
+            (radius 11, offset 6), so the strip it opened was darker still. See
+            the collapsed record above for the mechanism. */}
+        {pressed ? (
+          <View
+            style={[styles.dossierPressEdge, styles.dossierPressEdgeOpen, item.dead && styles.dossierPressEdgeDead]}
+            pointerEvents="none"
+          />
+        ) : null}
         <TSettle active>
         <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead, pressed && kit.controlPressed, pressed && styles.dossierRimOpenPressed]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
@@ -1714,12 +1744,62 @@ const styles = StyleSheet.create({
    * control pair: exactly the resting colours, swapped, and nothing else. Using
    * `controlRaisedLit`/`Dark` here would have worked mechanically and made a
    * pressed record stop looking like a filed record for as long as the finger
-   * was down — VIS-1's construction is protected, so the material stays. The
-   * travel comes from `kit.controlPressed` on the OUTER, which owns no border,
-   * so that style's own colour pair is inert there and only its translate
-   * lands. Neither style appears at rest. */
+   * was down — VIS-1's construction is protected, so the material stays.
+   *   ⚠⚠ CORRECTED BY OTA-1837. This note used to end "the travel comes from
+   *   `kit.controlPressed` on the OUTER, which owns no border, so that style's
+   *   own colour pair is inert there and only its translate lands". That was
+   *   true until OTA-1822, which moved the travel onto the RIM to keep the
+   *   shadow still. The rim DOES own a border, so those colours are no longer
+   *   inert — they are simply overridden by this style, which is declared
+   *   later in the array. The stale sentence is why the reasoning that exempted
+   *   this card from OTA-1829 read as sound. Neither style appears at rest. */
   dossierRimPressed: { borderTopColor: '#0D0E0E', borderBottomColor: T.rimAlloy },
   dossierRimOpenPressed: { borderTopColor: '#1E170F', borderBottomColor: '#B08F55' },
+  /* ⚠⚠⚠ OTA-1837 — THE HOUSING, AND WHY THE CARD NEVER HAD ONE.
+   *
+   * `dossierOuter` paints NOTHING — no background, no border, only a margin and
+   * a shadow. OTA-1810 gave the record a travel; OTA-1822 moved that travel off
+   * the shadow-CASTER and onto the rim, which stopped a black bar appearing
+   * BELOW the card. What neither pass noticed is that the rim is then the only
+   * painted thing inside an unpainted parent, so the same 3dp it stops covering
+   * at the bottom it stops covering at the TOP. The bar was traded, not closed.
+   *
+   * ⚠⚠ AND THE BLACKNESS IS THIS VIEW'S OWN SHADOW, WHICH IS WHY IT IS APPLE.
+   * React Native honours `shadow*` on iOS only; `elevation` is deliberately
+   * absent here, so Android casts nothing. On iOS a view with a shadow and a
+   * TRANSPARENT background cannot have its shadow path precomputed — RN says so
+   * in as many words and falls back to a pixel-based shadow drawn BENEATH the
+   * layer's own content. `dossierOuter` has no content of its own, so the strip
+   * the rim stops covering is lit by nothing but #000 at 0.5. That is the black
+   * the owner photographed, and no colour chosen for the layer UNDERNEATH can
+   * reach past it — which is exactly why OTA-1827's repair, correct as it was
+   * for the slab behind the row, did not close this on his iPhone.
+   *
+   * ⚠⚠ SO THE BAND HAS TO BE OPAQUE. A translucent one composites over that
+   * same shadow and reads grey; the requirement is card material, not a tint.
+   * Every colour here is an opaque copy of the rim's OWN resting pair, per
+   * record state, so the housing is the record's material by construction and
+   * carries no dependency on the player's Display sliders at all — the strip
+   * cannot change with the theme because the theme is no longer behind it.
+   *
+   * ⚠ WHAT THE PLAYER SEES. The band is exactly the travel distance high and
+   * wears the rim's resting lit top edge, so the card's outline does not move
+   * and does not open. Inside it the plate still drops 3dp and still inverts
+   * its light to the lower edge, which is the depression. Mounted only while
+   * pressed and rendered BEFORE the rim, so it is behind the plate and a
+   * resting record cannot see it: idle is byte-for-byte unchanged. */
+  dossierPressEdge: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+    backgroundColor: '#232527',
+    borderWidth: 1, borderBottomWidth: 0,
+    borderColor: T.rim, borderTopColor: T.rimAlloy,
+    borderTopLeftRadius: 4, borderTopRightRadius: 4,
+  },
+  /* The selected record's housing is warm where the filed record's is cool, for
+   * the same reason `dossierRimOpen` is, and the dead record's is rust. Each is
+   * its rim's resting fill and resting edge pair, copied — nothing minted. */
+  dossierPressEdgeOpen: { backgroundColor: '#443925', borderColor: T.rimLit, borderTopColor: '#B08F55' },
+  dossierPressEdgeDead: { backgroundColor: '#33201D', borderColor: T.rustRim, borderTopColor: '#7A3B34' },
   dossierRimDead: { borderColor: T.rustRim, borderTopColor: '#7A3B34', borderBottomColor: '#170C0A', backgroundColor: '#33201D' },
   dossierFace: { borderRadius: 3, backgroundColor: T.face, borderTopWidth: 1, borderTopColor: T.edgeLit },
   // The selected record is not "the same card with a different border": the

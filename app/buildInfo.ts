@@ -30796,7 +30796,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-17-1833-rocky-gives-the-real-thing';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-17-1834-the-sixty-first-door-cannot-hide';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-17-1835-one-door-for-the-whole-stash';
-export const OTA_BUILD_ID = '2026-09-17-1836-no-door-below-a-screen';
+// OTA-1837 — the record sinks into something. The pressed character card had
+// no housing: `dossierOuter` paints nothing, so once OTA-1822 moved the travel
+// onto the rim the 3dp the rim stops covering at the TOP was a hole, and on iOS
+// that hole is lit by the outer's own pixel-based #000 shadow (RN cannot
+// precompute a shadow path for a transparent view, and draws the shadow beneath
+// the layer's content). OTA-1827 recoloured the slab BEHIND the row, which is
+// why Android went quiet and the owner's iPhone did not. The housing is now
+// drawn: the travel distance exactly, opaque, in the record's own resting
+// material and resting lit edge, mounted only while pressed.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-17-1836-no-door-below-a-screen';
+export const OTA_BUILD_ID = '2026-09-18-1837-the-record-sinks-into-something';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

@@ -116,9 +116,17 @@ describe('OTA-1829 §2 — every geometry cue Phase 2 bought is untouched', () =
 });
 
 describe('OTA-1829 §3 — the character-selection authority is untouched, and here is why', () => {
-  test('3.1 ⚠⚠ THE DOSSIER WEARS NO PLANES — that is why it never had the defect', () => {
+  test('3.1 ⚠⚠ THE DOSSIER WEARS NO PLANES — so this class fix does not reach it', () => {
     /* if a future pass ever gives the character record planes, it inherits this
-     * whole class of behaviour and this suite should be re-derived. */
+     * whole class of behaviour and this suite should be re-derived.
+     * ⚠⚠ AMENDED BY OTA-1837, AND THE ASSERTION IS UNCHANGED — only the reason
+     * written beside it was wrong. This test used to be titled "that is why it
+     * never had the defect", and the header above says the dossier's top edge
+     * "is always drawn". True of the BORDER and false of the CARD: pressed, the
+     * whole rim travels 3dp, so that border is drawn 3dp LOWER and nothing drew
+     * what it left behind. The record had its own version of the same complaint
+     * the entire time, and this sentence is why nobody looked. It still wears
+     * no planes, which is all this test ever actually proved. */
     const seg = (anchor: string) => {
       const i = TITLE.indexOf(anchor);
       return i < 0 ? '' : TITLE.slice(i, i + 2600);
