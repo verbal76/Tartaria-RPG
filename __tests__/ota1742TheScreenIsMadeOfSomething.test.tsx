@@ -896,6 +896,13 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
       'CraftingScreen.tsx',
       'EndingScreen.tsx',     // OTA-1802 — BACK TO TITLE / HEAD HOME, §18 classified
       'ExplorationScreen.tsx',
+      'FallenExchangeScreen.tsx', // OTA-1842 — a NEW screen, built on the kit from
+                              // its first line rather than migrated onto it. It takes
+                              // TScreenHeader, TButton and T, which is the fullest
+                              // adoption on this list; there was no hand-rolled
+                              // header or bare gold to retire, because none was ever
+                              // written. Named here, as this test requires, rather
+                              // than arriving as drift.
       'GuidanceScreen.tsx',   // OTA-1780 — cover first (1776), then migrate
       'InventoryScreen.tsx',  // OTA-1802 — group-action commands + BACK; rows stay flat
       'LogScreen.tsx',        // OTA-1780

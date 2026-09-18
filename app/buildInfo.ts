@@ -30877,7 +30877,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // poison later retries. No schema change, no migration, no pairing/seal/trust
 // or house-code semantics touched.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1840-the-house-keeps-its-key';
-export const OTA_BUILD_ID = '2026-09-18-1841-one-install-one-identity';
+export const OTA_BUILD_ID = '2026-09-18-1842-trading-not-debugging';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

@@ -2793,6 +2793,11 @@ export type ScreenName =
   | 'guidance'
   | 'contracts'
   | 'world'
+  /** ⚠ OTA-1842 — the Fallen exchange is a destination now, not a panel buried
+   *  in the Codex. It was reachable only by scrolling THE EXCHANGE out of the
+   *  lore screen — and on HAL it was not reachable at all unless the character
+   *  happened to be named Verbal or Sasmooch. */
+  | 'fallen'
   | 'ending';
 
 export interface SaveState {

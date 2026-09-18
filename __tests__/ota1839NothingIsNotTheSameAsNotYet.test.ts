@@ -347,16 +347,31 @@ describe('OTA-1839 §5 — the cache authority itself, read from source', () => 
   });
 
   it('5.4 every persist path still hydrates from disk before it writes', () => {
-    // the two mutators are the only callers of persist(), and both await the
-    // ledger first — which is what makes a synthetic empty unwritable.
-    for (const fn of ['importPayloadText', 'recordRest']) {
-      const at = STORE.indexOf(`export async function ${fn}`);
+    // The two mutators are the only callers of persist(), and neither may write
+    // a ledger nobody read — that is what makes a synthetic empty unwritable.
+    //
+    // ⚠ AMENDED BY OTA-1842, WHICH MOVED THE READ ONE CALL DEEPER RATHER THAN
+    // REMOVING IT. `importPayloadText` now shares `decideExchange` with the
+    // import preview, and that helper is what awaits the ledger. The invariant
+    // is untouched. What the old assertion actually tested was POSITION — "the
+    // await appears in this function's own body" — which is a weaker and
+    // different claim, and it is the claim that broke. Rewritten to follow the
+    // call: it still goes red the day a persist path writes blind, and no
+    // longer goes red merely because the read moved behind a helper.
+    const bodyOf = (fn: string): string => {
+      const exported = STORE.indexOf(`export async function ${fn}`);
+      const at = exported > -1 ? exported : STORE.indexOf(`async function ${fn}`);
       expect(at).toBeGreaterThan(-1);
-      const body = STORE.slice(at, at + 3000);
-      const load = body.indexOf('await loadLedger()');
-      const write = body.indexOf('await persist(');
-      expect(load).toBeGreaterThan(-1);
-      expect(write).toBeGreaterThan(load);
-    }
+      return STORE.slice(at, at + 3000);
+    };
+    // importPayloadText delegates the read, then writes after it.
+    const imp = bodyOf('importPayloadText');
+    expect(imp).toContain('decideExchange(');
+    expect(imp.indexOf('await persist(')).toBeGreaterThan(imp.indexOf('decideExchange('));
+    expect(bodyOf('decideExchange')).toContain('await loadLedger()');
+    // recordRest still reads for itself.
+    const rest = bodyOf('recordRest');
+    expect(rest.indexOf('await loadLedger()')).toBeGreaterThan(-1);
+    expect(rest.indexOf('await persist(')).toBeGreaterThan(rest.indexOf('await loadLedger()'));
   });
 });

@@ -31,6 +31,7 @@ import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
+import { FallenExchangeScreen } from './app/screens/FallenExchangeScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
 import { EndingScreen } from './app/screens/EndingScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
@@ -1573,6 +1574,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'exploration' && <ExplorationScreen />}
           {screen === 'log' && <LogScreen />}
           {screen === 'lore' && <LoreScreen />}
+          {screen === 'fallen' && <FallenExchangeScreen />}
           {screen === 'about' && <AboutScreen />}
           {screen === 'inventory' && <InventoryScreen />}
           {screen === 'character' && <CharacterScreen />}

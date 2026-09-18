@@ -234,6 +234,11 @@ const KEYBOARD_MECHANISM: Record<string, string> = {
   // — screen-level scrolls: iOS's own inset is the correct mechanism outside a
   //   native <Modal>, where it is unreliable —
   'screens/ActionReferenceScreen.tsx': 'automaticallyAdjustKeyboardInsets',
+  // ⚠ OTA-1842 — the Fallen exchange. Three fields, and LOOK AT IT sits below
+  // the paste box, so there IS a primary action the keyboard can cover — this
+  // is not a NO_ACTION_BELOW case. Same mechanism as the reference screen
+  // above, for the same reason: it is a screen, not a native <Modal>.
+  'screens/FallenExchangeScreen.tsx': 'automaticallyAdjustKeyboardInsets',
 };
 
 /** ⚠ Surfaces with a TextInput and NO primary action beneath it — nothing can be

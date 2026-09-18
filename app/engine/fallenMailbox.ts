@@ -23,6 +23,7 @@
 // is why this ships as an OTA at all — no native module, no new dependency, and
 // a failure mode that can never reach the game thread.
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MAX_EXCHANGE_BYTES } from './fallenLedger';
 import {
   buildExportPayload,
   importPayloadText,
@@ -55,8 +56,14 @@ const CONFIG_KEY = 'tartaria.fallen.mailbox.v1';
  *  than this, but the heartbeat never beats faster. */
 export const SYNC_MIN_INTERVAL_MS = 15 * 60 * 1000;
 /** A ledger is small — a few hundred KB at five houses — but a wrong URL could
- *  hand back anything, so the read is capped before it is parsed. */
-export const MAX_PAYLOAD_BYTES = 2 * 1024 * 1024;
+ *  hand back anything, so the read is capped before it is parsed.
+ *  ⚠ OTA-1842 — THE NUMBER MOVED, THE MEANING WIDENED. It now lives in
+ *  `fallenLedger.MAX_EXCHANGE_BYTES` as the one ceiling for every way a payload
+ *  arrives, because this constant only ever guarded the fetch — the pasted and
+ *  shared routes, which are the ones players actually use, had no ceiling at
+ *  all. This alias keeps the mailbox's own name readable at its call site; it
+ *  is the same value, not a second opinion. */
+export const MAX_PAYLOAD_BYTES = MAX_EXCHANGE_BYTES;
 const FETCH_TIMEOUT_MS = 15_000;
 
 export interface MailboxConfig {

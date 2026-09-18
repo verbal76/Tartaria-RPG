@@ -65,9 +65,13 @@ const LINES = {
     channel: 'hal2001',
     id: 'com.hotatticgames.tartarprim.hal2001',
     // ⚠ HAL is the live channel — the build other people are actually playing.
-    // The fallen exchange is visible only to the two names on
-    // SHARING_UNLOCK_NAMES here. Promoting it is this one word.
-    fallenSharing: 'gated',
+    // ⚠⚠ OTA-1842 — PROMOTED, AND IT WAS THIS ONE WORD. This read 'gated', which
+    // meant the exchange rendered only for a character named on
+    // SHARING_UNLOCK_NAMES — two names, in a world of testers. Owner ruling:
+    // "normal access is product-state driven, not player-name driven." All four
+    // lines are open now; the flag stays because the NEXT product difference
+    // should still be one readable expression rather than a hand-ported branch.
+    fallenSharing: 'open',
   },
   steam: {
     name: 'Tartaria Realms PC (Steam Dev)',

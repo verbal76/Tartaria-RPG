@@ -689,6 +689,26 @@ export function sanitizeRestRecord(raw: unknown, now: number = Date.now()): Rest
 }
 
 // ---- the wire envelope -----------------------------------------------------
+/** ⚠⚠ OTA-1842 — ONE CEILING FOR EVERY WAY A PAYLOAD CAN ARRIVE.
+ *
+ *  This number is not new — 2 MiB has bounded the mailbox since it was written.
+ *  What was new is WHAT it bounded. It lived in `fallenMailbox` and was applied
+ *  at exactly one place: the `res.text()` of a remote fetch. So the transport
+ *  nobody can use yet was guarded, and the transport every player actually uses
+ *  — pasting or sharing a payload by hand — had no ceiling at all.
+ *
+ *  ⚠ THE NUMBER TRANSFERS; THE OLD CONSTANT'S AUTHORITY DID NOT. Reusing a
+ *  limit whose stated meaning is "how much HTTP body we will read" as if it
+ *  already covered a pasted string would be borrowing a guarantee that was
+ *  never made. It lives here now, in the pure half both transports import, and
+ *  it says what it actually governs: the largest exchange text this game will
+ *  look at, from any source, before it is parsed.
+ *
+ *  ⚠ IT IS CHECKED BEFORE `JSON.parse`, deliberately. Past the parser a hostile
+ *  or merely enormous string has already cost the memory the ceiling exists to
+ *  refuse. */
+export const MAX_EXCHANGE_BYTES = 2 * 1024 * 1024;
+
 export interface LedgerPayload {
   fallen: ForeignFallen[];
   rests: RestRecord[];

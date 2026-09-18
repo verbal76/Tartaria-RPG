@@ -26,7 +26,13 @@ import { execFileSync } from 'node:child_process';
 
 const EXPECTED = {
   golem: { name: 'Golem', channel: 'golem-line', id: 'com.hotatticgames.tartarprim.golem', fallenSharing: 'open' },
-  hal: { name: 'Tartaria Realms HAL', channel: 'hal2001', id: 'com.hotatticgames.tartarprim.hal2001', fallenSharing: 'gated' },
+  // ⚠ OTA-1842 — HAL IS 'open' NOW. Owner ruling: Fallen Exchange graduates from
+  // a gated two-house experiment to a feature every tester can reach, and
+  // "normal access is product-state driven, not player-name driven". This table
+  // records what each line IS; the invariant it protects — four distinct
+  // identities, and a store build that changes nothing but the listing id — is
+  // unchanged, and still checks this value below.
+  hal: { name: 'Tartaria Realms HAL', channel: 'hal2001', id: 'com.hotatticgames.tartarprim.hal2001', fallenSharing: 'open' },
   steam: { name: 'Tartaria Realms PC (Steam Dev)', channel: 'steam-dev', id: 'com.hotatticgames.tartarprim.steamdev', fallenSharing: 'open' },
   html: { name: 'Tartaria Realms (Web)', channel: 'html-dev', id: 'com.hotatticgames.tartarprim.htmldev', fallenSharing: 'open' },
 };

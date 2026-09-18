@@ -100,6 +100,10 @@ const REGISTRY = [
   { file: 'app/screens/InventoryScreen.tsx', cond: 'open', trueMeans: 'open' },
   { file: 'app/screens/VendorScreen.tsx', cond: 'collapsed', trueMeans: 'closed' },
   { file: 'app/screens/WorldScreen.tsx', cond: 'collapsed[key]', trueMeans: 'closed' },
+  // ⚠ OTA-1842 — the Fallen Exchange's demoted manual road. `advanced` true =
+  // the raw-text section is showing, so ▾ is the open glyph, same as every
+  // other positively-named toggle here.
+  { file: 'app/screens/FallenExchangeScreen.tsx', cond: 'advanced', trueMeans: 'open' },
   { file: 'app/screens/AboutScreen.tsx', cond: 'advancedOpen', trueMeans: 'open' },
   { file: 'app/screens/AboutScreen.tsx', cond: 'expanded', trueMeans: 'open' },
   { file: 'app/components/RecipesView.tsx', cond: 'isCollapsed', trueMeans: 'closed' },

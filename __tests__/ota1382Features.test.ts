@@ -50,17 +50,39 @@ describe('OTA-1382 — the product flag', () => {
     // Before this, HAL carried a hand-ported gate and the other three carried
     // none — the same decision expressed as a branch difference, which is
     // exactly what made it indistinguishable from drift.
-    expect(codex).toContain(
-      "FEATURES.fallenSharing === 'open' || sharingUnlockedFor(player?.name)");
+    //
+    // ⚠ AMENDED BY OTA-1842 — THE PRODUCT DECISION MOVED, THE ARCHITECTURE DID
+    // NOT. The gate used to read `FEATURES.fallenSharing === 'open' ||
+    // sharingUnlockedFor(player?.name)`, because exchange was open on three
+    // lines and name-locked on HAL. HAL is now open too, so the second half has
+    // nothing left to admit and is gone. What this test actually protects —
+    // that all four lines differ by ONE readable expression instead of a
+    // hand-ported branch — is untouched, and is what is asserted below.
+    expect(codex).toContain("FEATURES.fallenSharing === 'open'");
     expect(codex).toContain('{exchangeUnlocked && (');
   });
 
-  it('⚠ the name check only runs on a gated build (short-circuit), and reads the CHARACTER name', () => {
-    // `'open' ||` short-circuits, so an open product never calls it. And the
-    // house name is typed INTO the gated panel, so gating on that would be a
-    // lock whose key is behind itself.
-    expect(codex).toContain("=== 'open' ||");
-    expect(codex).not.toContain('sharingUnlockedFor(house');
+  it('⚠⚠ access is a PRODUCT STATE — never a character name', () => {
+    // ⚠ AMENDED BY OTA-1842, AND STRICTER THAN WHAT IT REPLACES. The old test
+    // permitted a name check so long as it short-circuited on open builds. A
+    // name check that never runs is still a name check shipped, and it is how
+    // the feature stayed invisible to everyone not called Verbal or Sasmooch.
+    // The exchange gate may now contain NO name matcher of any kind.
+    //
+    // ⚠ This asks the IMPORT, not the file text. The OTA-1842 comment beside the
+    // gate names the removed clause on purpose — so the next reader learns why
+    // it went — and a plain substring search would grade that explanation as the
+    // defect. An identifier this file never imports is one it cannot call, which
+    // is the real protection and cannot be satisfied by rewording a comment.
+    expect(codex).not.toMatch(/import[^;]*\bsharingUnlockedFor\b/);
+    // …and the gate is the product state ALONE — no second disjunct of any kind.
+    expect(codex).toMatch(
+      /const exchangeUnlocked = FEATURES\.fallenSharing === 'open';/);
+    // ⚠ The matcher itself is NOT dead and must not be deleted. Owner tools
+    // (OTA-1489/1490 — SEND LOG) still use it, and there the semantics are
+    // correct: that is a property of the device in the hand, not a product
+    // state. Removing it from the codex must not remove it from the build.
+    expect(src('app', 'diagnostics', 'ownerTools.ts')).toContain('sharingUnlockedFor');
   });
 
   it('⚠ the matcher itself ships everywhere, so the shared code compiles everywhere', () => {

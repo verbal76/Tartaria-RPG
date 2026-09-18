@@ -21,6 +21,7 @@ import {
   fallenKey,
   isPairedHouse,
   makeHouseCode,
+  MAX_EXCHANGE_BYTES,
   mergeFallen,
   mergeRests,
   parseHouseCode,
@@ -385,6 +386,24 @@ export class FallenPersistError extends Error {
 /** True for the failure above. The two callers that must tell a bad PASTE from
  *  a bad DISK live in other files and reach this module through `require()`, so
  *  `instanceof` alone is not a safe test — the name is checked as well. */
+/** ⚠⚠ OTA-1842 — TOO BIG TO LOOK AT. A refusal, not a failure: nothing was
+ *  read, nothing was parsed, nothing was written. It is a typed error for the
+ *  same reason `FallenPersistError` is — the screen has to tell these apart to
+ *  say anything true, and a bare `throw` makes every cause look like the same
+ *  shrug. */
+export class FallenPayloadTooLargeError extends Error {
+  readonly bytes: number;
+  constructor(bytes: number) {
+    super('fallen exchange: that is too large to read');
+    this.name = 'FallenPayloadTooLargeError';
+    this.bytes = bytes;
+  }
+}
+export function isFallenPayloadTooLargeError(e: unknown): boolean {
+  if (e instanceof FallenPayloadTooLargeError) return true;
+  return typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'FallenPayloadTooLargeError';
+}
+
 export function isFallenPersistError(e: unknown): boolean {
   if (e instanceof FallenPersistError) return true;
   return typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'FallenPersistError';
@@ -514,14 +533,67 @@ export interface ImportOutcome {
   arrivals: string[];
 }
 
-/** Take a payload from anywhere — pasted, shared, or (later) fetched — and fold
- *  it in. Every record goes through the validator; a hostile or torn batch costs
- *  the batch, never the save. */
-export async function importPayloadText(text: string): Promise<ImportOutcome> {
+/** ⚠⚠ OTA-1842 — WHAT THE PLAYER IS BEING OFFERED, IN WORDS THEY DIDN'T HAVE TO
+ *  LEARN. The exchange worked and was unreadable: a valid paste mutated the save
+ *  the instant it parsed, and the only way to find out WHO was arriving was to
+ *  let them in. This is the same decision the import makes, asked without
+ *  committing it.
+ *
+ *  ⚠ THE TRUST WORDS ARE A TRANSLATION, NOT A NEW POLICY. `verified` IS
+ *  `AuthResult.kind === 'sealed'`; `legacy` IS `'unsealed'` — a house paired
+ *  before seals existed, which the engine deliberately still admits; `refused`
+ *  is every rejection the import already performs. Nothing here decides
+ *  anything: it reports what the gate below is going to do. */
+export type ExchangeTrust = 'verified' | 'legacy' | 'refused';
+
+export interface ExchangePreview {
+  trust: ExchangeTrust;
+  /** Why it was refused — for the sentence shown, never for the player to debug. */
+  refusal?: 'forged' | 'unpaired' | 'unreadable' | 'too-large';
+  /** The house sending, as they named themselves. Empty when unreadable. */
+  fromHouse: string;
+  /** Titled names of the dead that would actually arrive if confirmed. */
+  arrivals: string[];
+  /** Dead in this payload that this house may not speak for. */
+  turnedAway: number;
+  /** Closure receipts that would be folded in — the news from your own dead. */
+  rests: number;
+}
+
+/** The whole decision, with no write in it: parse, authenticate, and work out
+ *  exactly which records would be taken. `importPayloadText` runs this and then
+ *  persists; `previewPayloadText` runs this and then describes it. They cannot
+ *  disagree about trust or about which dead are wanted, because there is only
+ *  one of them. */
+interface ExchangeDecision {
+  myInstallId: string;
+  ledger: Ledger;
+  auth: AuthResult;
+  wanted: ForeignFallen[];
+  wantedRests: RestRecord[];
+  unpaired: number;
+  fromHouse: string;
+  /** ⚠⚠ OTA-1842 — DID THIS TEXT PARSE AS A DOCUMENT AT ALL?
+   *  `parseLedgerPayload` is deliberately total: garbage in, empty batch out,
+   *  never a throw. That is right for the importer — a torn paste must cost the
+   *  batch and nothing else — but it erases the ONE distinction the preview
+   *  needs. A friend's honest payload carrying no dead yet and a half-copied
+   *  string are both "nothing arrived", and telling a player their nonsense came
+   *  from a LEGACY HOUSE is worse than telling them nothing. So the readability
+   *  of the text is carried out alongside the batch rather than inferred from
+   *  its emptiness. The import path does not read it: its answer for both cases
+   *  is identical and already correct. */
+  readable: boolean;
+}
+
+async function decideExchange(text: string): Promise<ExchangeDecision> {
   const myInstallId = await ensureInstallId();
   const ledger = await loadLedger();
   const paired = await loadPaired();
-  const batch = parseLedgerPayload(unwrapEnvelope(text));
+  const inner = unwrapEnvelope(text);
+  let readable = false;
+  try { const d: unknown = JSON.parse(inner); readable = typeof d === 'object' && d !== null; } catch { readable = false; }
+  const batch = parseLedgerPayload(inner);
 
   // ⚠⚠ THE GATE. Validation says a record is SAFE; pairing says it is WANTED,
   // and they are not the same question. Before this existed, any payload that
@@ -535,13 +607,13 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
   // Verification happens over the raw STRING, before parsing, so tampered bytes
   // never reach the parser.
   const auth = authenticate(text, paired);
+  // The house as it named itself, for the preview line. Display only — the gate
+  // below trusts the install id and the seal, never this string.
+  const fromHouse = batch.fallen[0]?.origin.player ?? '';
   if (auth.kind === 'forged') {
     // Sealed, but by nobody we hold a key for. Refuse the whole payload — a
     // partial accept here would be the worst of both answers.
-    return {
-      added: 0, rests: 0, skippedOwn: 0, skippedRested: 0, skippedDuplicate: 0,
-      rejected: 0, evicted: 0, unpaired: batch.fallen.length, unsealed: 0, forged: true, arrivals: [],
-    };
+    return { myInstallId, ledger, auth, wanted: [], wantedRests: [], unpaired: batch.fallen.length, fromHouse, readable };
   }
 
   const wanted = batch.fallen.filter((f) => {
@@ -566,6 +638,74 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
     const owner = r.fallenKey.split(':')[0] ?? '';
     return owner === myInstallId || isPairedHouse(owner, paired) || isPairedHouse(r.byInstallId, paired);
   });
+
+  return { myInstallId, ledger, auth, wanted, wantedRests, unpaired: unpairedFallen, fromHouse, readable };
+}
+
+/** ⚠⚠⚠ OTA-1842 — LOOK BEFORE YOU LET THEM IN, AND CHANGE NOTHING BY LOOKING.
+ *  Runs the identical decision the import runs — same parser, same
+ *  `authenticate`, same pairing and seal filters, same merge — and stops one
+ *  line short of `persist`. That "one line short" is the whole design: a
+ *  separate describe-this-payload path could drift from the path that actually
+ *  admits records, and a preview that can say VERIFIED while the commit
+ *  disagrees is worse than no preview at all.
+ *
+ *  ⚠ TOTAL BY CONTRACT. A torn, hostile or enormous paste answers `refused`
+ *  with a reason; it never throws at the screen that called it. */
+export async function previewPayloadText(text: string): Promise<ExchangePreview> {
+  const empty = { fromHouse: '', arrivals: [], turnedAway: 0, rests: 0 };
+  if (text.length > MAX_EXCHANGE_BYTES) return { trust: 'refused', refusal: 'too-large', ...empty };
+  let d: ExchangeDecision;
+  try { d = await decideExchange(text); } catch { return { trust: 'refused', refusal: 'unreadable', ...empty }; }
+  // ⚠⚠ A TORN PASTE IS NOT A QUIET HOUSE. `parseLedgerPayload` is total, so half
+  // a copied string and an honest payload carrying no dead both come back empty
+  // — and without this line the first one is shown to the player as LEGACY HOUSE
+  // / "No new dead in this one", which reads as "your friend sent nothing"
+  // rather than "that is not an exchange". The distinction is the text's
+  // readability, never the emptiness of what came out of it.
+  if (!d.readable) return { trust: 'refused', refusal: 'unreadable', ...empty };
+  if (d.auth.kind === 'forged') {
+    return { trust: 'refused', refusal: 'forged', ...empty, fromHouse: d.fromHouse, turnedAway: d.unpaired };
+  }
+  // The merge is pure, so asking it what WOULD arrive costs nothing and is
+  // exact: duplicates, your own dead and the already-rested are excluded here
+  // for the same reasons they will be excluded on commit.
+  const restsMerged = mergeRests(d.ledger.rests, d.wantedRests);
+  const fallenMerged = mergeFallen(d.ledger.foreign, d.wanted, { myInstallId: d.myInstallId, rests: restsMerged.rests });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { fallenTitle } = require('./fallenLedger') as typeof import('./fallenLedger');
+  const arrivals = fallenMerged.added.map((f) => fallenTitle(f));
+  if (arrivals.length === 0 && restsMerged.added.length === 0 && d.unpaired > 0) {
+    // Everything in it belongs to a house this install does not ride with.
+    return { trust: 'refused', refusal: 'unpaired', ...empty, fromHouse: d.fromHouse, turnedAway: d.unpaired };
+  }
+  return {
+    trust: d.auth.kind === 'sealed' ? 'verified' : 'legacy',
+    fromHouse: d.fromHouse,
+    arrivals,
+    turnedAway: d.unpaired,
+    rests: restsMerged.added.length,
+  };
+}
+
+/** Take a payload from anywhere — pasted, shared, or (later) fetched — and fold
+ *  it in. Every record goes through the validator; a hostile or torn batch costs
+ *  the batch, never the save. */
+export async function importPayloadText(text: string): Promise<ImportOutcome> {
+  // ⚠ OTA-1842 — the ceiling is checked here too, not only in the preview. The
+  // preview is the normal road in, but this function is also the mailbox's door
+  // and a suite's direct call, and a guard that only one caller passes through
+  // is not a guard.
+  if (text.length > MAX_EXCHANGE_BYTES) throw new FallenPayloadTooLargeError(text.length);
+  const d = await decideExchange(text);
+  const { myInstallId, ledger, auth, wanted, wantedRests } = d;
+  if (auth.kind === 'forged') {
+    return {
+      added: 0, rests: 0, skippedOwn: 0, skippedRested: 0, skippedDuplicate: 0,
+      rejected: 0, evicted: 0, unpaired: d.unpaired, unsealed: 0, forged: true, arrivals: [],
+    };
+  }
+  const unpairedFallen = d.unpaired;
 
   const restsMerged = mergeRests(ledger.rests, wantedRests);
   const fallenMerged = mergeFallen(ledger.foreign, wanted, {

@@ -38,7 +38,7 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
 import * as Clipboard from 'expo-clipboard';
-import { fallenTitle, restRollLine, sharingUnlockedFor, type ForeignFallen, type RestRecord, type PairedHouse } from '../engine/fallenLedger';
+import { fallenTitle, restRollLine, type ForeignFallen, type RestRecord, type PairedHouse } from '../engine/fallenLedger';
 import { FEATURES } from '../config/features';
 import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
@@ -373,12 +373,26 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
     } finally { setBusy(false); }
   };
 
-  /** ⚠ OTA-1382 — one expression, four products. `'open'` short-circuits, so the
-   *  name check only ever runs on a gated build. It reads the CHARACTER's name,
-   *  never the house name — the house name is typed INTO the gated panel, so
-   *  gating on it would be a lock whose key is behind itself. */
-  const exchangeUnlocked =
-    FEATURES.fallenSharing === 'open' || sharingUnlockedFor(player?.name);
+  /** ⚠ OTA-1382 — one expression, four products. The four lines differ by THIS
+   *  LINE and nothing else; a hand-ported branch per product is what made the
+   *  original divergence indistinguishable from drift. */
+  /* ⚠⚠⚠ OTA-1842 — ACCESS IS A PRODUCT STATE, NEVER A PLAYER'S NAME. Owner
+   * ruling: Fallen Exchange graduates from a gated two-house experiment to a
+   * visible tester-facing feature, and "normal access is product-state driven,
+   * not player-name driven."
+   *
+   * The `|| sharingUnlockedFor(player?.name)` clause is GONE. With the flag now
+   * 'open' on every line it would have been dead code — but leaving it would
+   * have left a name-shaped door standing next to an open one, and the next
+   * person to re-gate the flag would have quietly restored a feature only two
+   * characters in the world could reach.
+   *
+   * ⚠ `sharingUnlockedFor` ITSELF IS NOT DELETED, and this is not tidiness left
+   * undone. Its real second consumer is `diagnostics/ownerTools` (OTA-1489/1490),
+   * where an unlock name marks the DEVICE as the owner's so SEND LOG appears for
+   * every character on it. That is a different question from who may trade dead,
+   * and it keeps the name list. Only this feature stopped asking. */
+  const exchangeUnlocked = FEATURES.fallenSharing === 'open';
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;

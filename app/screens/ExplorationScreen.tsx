@@ -225,11 +225,18 @@ function timeOfDayTint(hours: number): string {
 // without reading as lag (the tap still lands its feed line right after).
 const SHEET_SETTLE_MS = 400;
 
-// ⚠ OTA-1700 — the corner's three doors log the label they RENDER (ota1485's rule:
-// one derivation, never a twin string). The minimap has no text of its own; its
-// tap logs the word the Atlas is filed under.
+// ⚠ OTA-1700 — the corner's doors log the label they RENDER (ota1485's rule: one
+// derivation, never a twin string). The minimap has no text of its own; its tap
+// logs the word the Atlas is filed under. (Three doors when this was written;
+// OTA-1842 added a fourth, and the rule is what matters, not the count.)
 const CREST_WORLD_LABEL = '⚑ WORLD';
 const CREST_LORE_LABEL = '◈ LORE';
+/* ⚠⚠ OTA-1842 — THE EXCHANGE GETS A DOOR. Fallen trading existed for a long
+ * time behind a scroll inside the Codex, which is not a feature so much as a
+ * rumour. It sits beside LORE because that is where this screen already keeps
+ * its secondary destinations — no new navigation family, one more key on the
+ * rail the player already uses. */
+const CREST_FALLEN_LABEL = '☗ FALLEN';
 const MINIMAP_TAP_LABEL = 'map';
 
 export function ExplorationScreen() {
@@ -1619,6 +1626,13 @@ export function ExplorationScreen() {
                 compact
                 style={styles.crestNavBtn}
                 onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }}
+              />
+              <TButton
+                label={CREST_FALLEN_LABEL}
+                variant="utility"
+                compact
+                style={styles.crestNavBtn}
+                onPress={() => { logUiTap(CREST_FALLEN_LABEL); setScreen('fallen'); }}
               />
             </>
           )}
