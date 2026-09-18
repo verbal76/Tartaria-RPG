@@ -17,6 +17,8 @@ import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, isTutorialLocked } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { humanGetState, useHumanAction } from '../state/humanActivity';
 import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695 — the tap has a clock
 // ⚠ OTA-1813 — observational only. These record WHERE a touch got to; none of
 // them admits, rejects, delays or reorders anything, and tapClock above is
@@ -480,10 +482,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const buildingRevealed = useGameStore((s) => s.buildingRevealed);
   // arb36 — enterable structure discovered on the current wild tile.
   const sceneBuilding = useGameStore((s) => s.currentScene?.sceneBuilding ?? null);
-  const enterBuilding = useGameStore((s) => s.enterBuilding);
-  const goBuildingRoom = useGameStore((s) => s.goBuildingRoom);
+  const enterBuilding = useHumanAction('enterBuilding');
+  const goBuildingRoom = useHumanAction('goBuildingRoom');
   const buildingVisited = useGameStore((s) => s.buildingVisited);
-  const exitBuilding = useGameStore((s) => s.exitBuilding);
+  const exitBuilding = useHumanAction('exitBuilding');
   const buildingRooms = useMemo(
     () => (activeBuildingId
       // OTA-787 — navHidden rooms (the market square you land in) aren't tabs;
@@ -1049,7 +1051,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   store's dedicated hand-throw (same full pipeline the bandolier
                   rides — throwable reach, authored dice, consume-on-hit). */}
               {throwSpearItem ? (
-                <QuickBtn label="throw spear" onPress={() => useGameStore.getState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)} />
+                <QuickBtn label="throw spear" onPress={() => humanGetState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)} />
               ) : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
@@ -1063,7 +1065,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
               {knockedOutPresent ? (
-                <QuickBtn label="loot" tone="ready" onPress={() => useGameStore.getState().lootKnockedOutEnemy()} />
+                <QuickBtn label="loot" tone="ready" onPress={() => humanGetState().lootKnockedOutEnemy()} />
               ) : null}
               {/* arb110 — bandolier: opens a popup of racked throwables to hurl. */}
               {bandolierItems.length > 0 ? (
@@ -1280,7 +1282,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             return (
               <Pressable
                 key={it.id}
-                onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name, it.id); }}
+                onPress={() => { setBandolierOpen(false); humanGetState().throwFromBandolier(it.name, it.id); }}
                 style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange, pressed && tartariaKitStyles.controlPressed]}
               >
 {({ pressed }) => (<>
@@ -1331,13 +1333,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // dog, so there is nothing to ask — one target, no question.
                 if (medkitRoleOf(it) === 'golem') {
                   setMedkitOpen(false);
-                  useGameStore.getState().useHealBatch(it.name, 'golem', 1);
+                  humanGetState().useHealBatch(it.name, 'golem', 1);
                   return;
                 }
                 // ⚠ OTA-1662 — with a dog beside you the tap ASKS; alone it acts.
                 if (medkitDog) { setMedkitPick(it.id); return; }
                 setMedkitOpen(false);
-                useGameStore.getState().useHealBatch(it.name, 'self', 1);
+                humanGetState().useHealBatch(it.name, 'self', 1);
               }}
               style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
             >
@@ -1364,7 +1366,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               // `submitPlayerAction('feed dog …')`, which returns on its first
               // line while a roll is pending; that is the same defect 1658
               // fixed here, and it is fixed there in this OTA too.
-              useGameStore.getState().useHealBatch(it.name, target, 1);
+              humanGetState().useHealBatch(it.name, target, 1);
             };
             return (
               <>

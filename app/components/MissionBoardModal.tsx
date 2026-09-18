@@ -9,6 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { availableFactionQuests, neutralBoardPostings } from '../engine/factionQuests';
 import { getStanding, FACTIONS } from '../engine/factions';
 
@@ -53,7 +55,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
   const factionStanding = useGameStore((s) => s.player?.factionStanding);
   const activeIds = useGameStore((s) => s.player?.activeFactionQuestIds);
   const completedIds = useGameStore((s) => s.player?.completedFactionQuestIds);
-  const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
+  const acceptFactionQuest = useHumanAction('acceptFactionQuest');
 
   // ⚠⚠⚠ OTA-1475 — `faction: null` IS THE HIDDEN MARKET'S NEUTRAL POST. Owner:
   // "all of the factions should be able to post there without interaction from

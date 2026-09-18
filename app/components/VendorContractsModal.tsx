@@ -9,6 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { availableHunts, huntBoardWithReasons } from '../engine/hunts';
 import { availableMysteries } from '../engine/mysteries';
@@ -91,10 +93,10 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
   const completedMysteryIds = useGameStore((s) => s.player?.completedMysteryIds);
   const activeStorylines = useGameStore((s) => s.player?.activeStorylines);
   const completedStorylineIds = useGameStore((s) => s.player?.completedStorylineIds);
-  const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
-  const acceptHunt = useGameStore((s) => s.acceptHunt);
-  const acceptMystery = useGameStore((s) => s.acceptMystery);
-  const acceptStoryline = useGameStore((s) => s.acceptStoryline);
+  const acceptFactionQuest = useHumanAction('acceptFactionQuest');
+  const acceptHunt = useHumanAction('acceptHunt');
+  const acceptMystery = useHumanAction('acceptMystery');
+  const acceptStoryline = useHumanAction('acceptStoryline');
 
   const sections = useMemo(() => {
     // A market broker posts EVERY faction's board (+ faction-agnostic work);

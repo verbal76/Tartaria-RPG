@@ -32,6 +32,8 @@ import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
@@ -172,7 +174,7 @@ export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
   const [hubRefusalDest, setHubRefusalDest] = useState<string | null>(null);
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
-  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const setTravelCourse = useHumanAction('setTravelCourse');
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);

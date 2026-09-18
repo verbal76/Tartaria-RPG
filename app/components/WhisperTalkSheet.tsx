@@ -42,6 +42,8 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
+import { useHumanAction } from '../state/humanActivity';
 import { findChain, pronounForms, whisperRouteTarget } from '../engine/whispers';
 import { playerGridCell } from '../state/playerGrid';
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
@@ -82,13 +84,13 @@ const ROW_PLANES = (
 export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
-  const answer = useGameStore((s) => s.answerWhisper);
-  const handBack = useGameStore((s) => s.handBackWhisperGoods);
+  const answer = useHumanAction('answerWhisper');
+  const handBack = useHumanAction('handBackWhisperGoods');
   // OTA-1549 — the course is set from INSIDE the conversation. Owner: "from
   // that talking screen, we should be able to Auto route and accept from that
   // instead of typing … that button should be highlighted inside the talk
   // screen. same as the auto route button."
-  const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
+  const setWhisperCourse = useHumanAction('setWhisperCourse');
   const setScreen = useGameStore((s) => s.setScreen);
   // The player's ABSOLUTE cell (arb47 / OTA-1542), subscribed so the course
   // button knows when you are already standing on the objective.
