@@ -134,6 +134,16 @@ same place: a write to `pendingDogOnboarding`.
   OTA; MINOR on a feature wave — scheme + ledger in VERSION.md).
 - **All gates before every push:** typecheck:ci, lint, typecheck:tests
   ratchet, targeted jest, full fast suite (HANDOFF §3).
+- **⚠⚠ RUN EVERY SUITE TRACKABLY — OWNER RULE, 2026-09-18.** Never pipe a
+  jest run through `tail`/`head`/`grep` or anything else that buffers the
+  stream. The owner wants per-suite progression visible *while it runs*, so
+  a stall is detectable and distinguishable from slow work. **"The process
+  is probably alive" is not an acceptable status report.** Run the full
+  surface `--verbose` into a log file, watch that file, and report real
+  progress from it; when a run is backgrounded, arm a stall detector rather
+  than inferring health from CPU time after the fact. **Report size is NOT
+  a concern** — the owner funnels this output onward for review, so verbose
+  is wanted, not merely tolerated.
 
 ## Playtest-log triage
 
