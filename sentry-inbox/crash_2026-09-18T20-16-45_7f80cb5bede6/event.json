@@ -1,0 +1,356 @@
+{
+  "id": "7f80cb5bede64b9d998eb6fda478b7f9",
+  "groupID": "7717706963",
+  "eventID": "7f80cb5bede64b9d998eb6fda478b7f9",
+  "projectID": "4511945117532160",
+  "size": 5589,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: tap \"\u25c8 LORE\""
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-18-1843-who-the-fallen-was",
+  "message": "Process died with no orderly exit while: tap \"\u25c8 LORE\"",
+  "title": "Process died with no orderly exit while: tap \"\u25c8 LORE\"",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-18T20:36:24.425Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 94.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1887498240,
+      "storage_size": 245292421120,
+      "free_storage": 58284474368,
+      "boot_time": "2026-08-28T17:18:44.581Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "34.900001525878906",
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 29,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0b60c-0e18-732d-867e-aeb905855cb4"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86dcfba9393f46369c58e47551381db1",
+      "span_id": "bde4cc021b31f1b3",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "actionAgeMs": 70239,
+    "id": "1789762605657_native-death",
+    "lastAction": "tap \"\u25c8 LORE\"",
+    "lastPhase": "appstate:active\u2192background",
+    "lastPhaseAgeMs": 0,
+    "lastRoom": "samarran",
+    "lastScreen": "lore",
+    "launchAfterOta": true,
+    "launchAgeMs": 94479,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 416,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "no",
+    "sinceBootMs": 94479,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: tap \"\u25c8 LORE\""
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-18-1843-who-the-fallen-was"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-18-1843-who-the-fallen-was"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-18-1843-who-the-fallen-was"
+    },
+    {
+      "key": "stage",
+      "value": "appstate:active\u2192background"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-18T20:36:23.632206Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-18T20:16:45.657000Z",
+  "fingerprints": [
+    "8c219da47ebaa917d481ecf80fb9f9a4"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1980692244,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-18T19:40:36.112586Z",
+    "dateReleased": "2026-09-18T19:45:59.182455Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "bd323d34f5b896ca7ccb3994c0a0f662c3a0fd01",
+      "message": "OTA-1843 \u2014 who the Fallen was\n\nOTA-1362 put `origin.player` on every foreign corpse. Eleven OTAs later, not one\nplayer-facing sentence said it.\n\nThe emergence beat, the Arbiter's identification, the enemy's own flavor, the\ndefeat lines, the reclaim reward \u2014 every one of them named the character, the\nground they fell on, their epitaph and their kill count, and NONE of them named\nthe person whose game they came out of. A Hollowed a friend sent across read\nexactly like one grown from your own dead. The single fact the whole mechanic\nexists for \u2014 THIS WAS ANOTHER REAL PLAYER'S CHARACTER \u2014 was the one fact the\ngame kept to itself.\n\n\u26a0 NOTHING HERE READS A FIELD THAT WAS NOT ALREADY THERE. These are the same\nrecords, finally saying out loud what they hold. No schema change, no migration.\n\nTHE ENCOUNTER. A signature leads the beats and only for a foreign corpse:\n\"\u2617 ONE OF THE FALLEN \u2014 <name> child of <house>. This one walked in another\nplayer's world before it walked in yours.\" The Arbiter's identification carries\nthe house too, because a banner can be scrolled past and the identification is\nthe beat that says what you are fighting. The enemy's flavor gains one clause.\nYour own dead gain nothing \u2014 their lines are byte-identical to what shipped,\nand the suite asserts that character for character.\n\n\u26a0 NO CRYPTOGRAPHIC STATE IN COMBAT. Seal, key, verified/legacy \u2014 none of it\nappears in a single line the mud prints. Those words belong to the exchange\nscreen. Out here the only question is whose name is on it.\n\nTHE BLADE. A reclaimed piece now says whose hand it was in, written into\n`description` \u2014 a field the item model already had and already persists. Which\nforced the real question: two Legendary swords of the same name off two\ndifferent corpses are not one sword, and before this they merged into one row\nand one of the two names was simply gone. A reclaimed piece is tagged `fallen`\nand `inventory.stackCompatible` treats that tag as per-instance, exactly as it\nalready treats a coating or a rolled stat. It lives there and not beside the\nreclaim because OTA-1737 made that function the one authority on \"are these the\nsame kind of thing\", and a second opinion is exactly what that OTA removed.\n\n\u26a0 THE FIRST CUT OF THAT RULE WAS WRONG AND THE FULL SURFACE CAUGHT IT. It read\n\"descriptions differ \u2192 never merge\", with a comment asserting that could only\nsplit a stack that was already lying about its contents. It could not. OTA-958's\ntorch proves it: a starting Aetheric Torch carries its catalog description and\none taken off a tile does not, so the same object in two rows stopped stacking\nand `take` looked like it granted twice. OTA-1737 had already written down this\nexact hazard about the tag set, measured on that same suite. The marker tag is\nthe test now, and nothing that stacked yesterday changes.\n\nTHE CLOSURE. Defeat IS the rest here \u2014 the store writes the rest record on the\nsame beat it prints the closing lines \u2014 so that beat is the only moment the\nplayer has to understand that another person is about to be told their\ncharacter's story ended. It now says so, and says what will be sent: who put\nthem down, where the ground closed, that it is finished. Null for your own dead,\nbecause nothing travels and promising a word to a house that does not exist\nwould make the transcript a liar.\n\nARRIVAL AND THE ROLL. Taking a payload in used to report counts. It now reads as\nwhat it is \u2014 \"<name> child of <house> walk your wastes now. They died in another\nplayer's world and the mud here has them. You will meet them.\" And the exchange\nscreen grew THE ROLL: who is still walking, and the last 25 closings. Read-only,\noff the ledger the exchange already writes. No new key, no new record.\n\n\u26a0 WHAT IS NOT THERE, AND WHY. \"Encountered\" and \"defeated\" are absent from the\nroll on purpose: nothing durable distinguishes them from \"rested\", because\ndefeat IS the rest. A row for either would duplicate what is shown or need a new\npersisted counter. Deferred rather than faked.\n\n\u26a0 NO FARMING. A foreign corpse still yields its weapon and an EMPTY armour pool\n\u2014 OTA-1362's faucet limit, re-asserted here because a \"make Fallen feel good\"\npass is exactly the pass that would quietly open it. No coin, no XP, no second\nreward path, and the Hollowed is still a one-time event. The identity is the\nreward.\n\nTHE STORE CEILING SHAPED THE ARCHITECTURE, CORRECTLY. The first cut added 27\nlines to a file with zero headroom. Its rule \u2014 \"the responsibility belongs in a\nmodule outside the file\" \u2014 is the right one: deciding which lines print, on\nwhich channel, in what order is presentation and belongs next to the sentences.\n`revenantArrivalLog` and `revenantRestLog` now own that, all three store sites\nare SHORTER than they were, and the hook-spawn route gained a signature it never\nhad, because there is one authority instead of three hand-ordered copies.\n\nValidation: new suite ota1843WhoTheFallenWas 31/31, with a negative twin for\nevery claim (ordinary enemy, your own dead, ordinary stacking); Fallen and\ninventory regressions 262/262; four negative controls red then restored\nhash-clean \u2014 NC-A initially passed because the house still arrived via the\nArbiter, so the signature-specific test was verified to catch it rather than\nassumed; typecheck at the 181 baseline; 25/25 local gates.\n\nSecurity and exchange untouched: the seal, the pairing and the acceptance gate\ncarry no OTA-1843 marker, and the admitted/turned-away table is re-asserted.\nThis pass begins after a corpse is already accepted.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-18T19:33:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-18-1843-who-the-fallen-was",
+          "shortVersion": "tartaria@4.32.11+2026-09-18-1843-who-the-fallen-was",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-18T19:45:59.182455Z",
+          "dateCreated": "2026-09-18T19:40:36.112586Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "159905360",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-18T19:45:59.458115Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-18-1843-who-the-fallen-was",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-18-1843-who-the-fallen-was",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-18-1843-who-the-fallen-was",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-18-1843-who-the-fallen-was)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "52d88eea59b44558bfa04fedd22c6d30"
+}
