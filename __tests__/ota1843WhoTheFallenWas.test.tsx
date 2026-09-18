@@ -382,8 +382,8 @@ describe('OTA-1843 §G — the screen', () => {
     await beHouseB(a.card);
     const s = await mountExchange();
     await s.type('Incoming exchange', a.payload);
-    await s.press('LOOK AT IT');
-    await s.press('TAKE THEM IN');
+    await s.press('VIEW ENTRY');
+    await s.press('ACCEPT');
     const shown = s.texts().join('\n');
     expect(shown).toContain('Francis child of Sasmooch');
     expect(shown).toContain('walk your wastes now');

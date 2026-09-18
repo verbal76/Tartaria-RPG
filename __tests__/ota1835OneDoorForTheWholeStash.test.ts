@@ -197,9 +197,13 @@ describe('OTA-1835 — §11 the restart boundary is no worse', () => {
     // inside ONE character save and death deletes that save. What this test
     // guards is the absence of LOCK bookkeeping, not the roster of things worth
     // keeping, so the list grows by one and the claim is as strong as it was.
+    // ⚠ OTA-1845 — and `ledgerVisits` joins it for the SAME reason: a Ledger
+    // Entry can be accepted from the title screen with no character loaded, so
+    // the riders still owed a meeting have to outlive the slot too. Still not
+    // lock bookkeeping; still the same claim.
     expect(Object.keys(s).sort()).toEqual([
       'devGemGrantedSlots', 'dogsFallen', 'endingBadges', 'fallen', 'fallenSeeds',
-      'installSeeded', 'resurrectionGems', 'testGiftGrantedSlots',
+      'installSeeded', 'ledgerVisits', 'resurrectionGems', 'testGiftGrantedSlots',
     ]);
     if (raw) expect(() => JSON.parse(raw)).not.toThrow();
   });

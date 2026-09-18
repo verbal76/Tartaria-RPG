@@ -47,6 +47,8 @@ import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
 import { LastWalkModal } from './app/components/LastWalkModal';
+import { LedgerVisitModal } from './app/components/LedgerVisitModal';
+import { startLedgerRouting } from './app/state/ledgerRoute';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
@@ -1141,6 +1143,21 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  /* ⚠⚠⚠ OTA-1845 — SOMEBODY IS FINALLY STANDING AT THE DOOR.
+   *
+   * The scheme has been baked into every binary since the scaffold commit and
+   * nothing in JavaScript has ever listened for it, so an opened invitation
+   * launched the app to its ordinary first screen and the link evaporated. This
+   * covers both deliveries: `getInitialURL` for a COLD launch, the `url` event
+   * for a WARM one.
+   *
+   * ⚠ IT TEARS DOWN, for the reason OTA-1798 gave: an instrument that does not
+   * stop when the app does is a leak, and this one is a native subscription.
+   *
+   * ⚠ AND IT ACCEPTS NOTHING. The most a link does is put the Ledger screen up
+   * with a house card already in the box; the pairing gate still decides. */
+  useEffect(() => startLedgerRouting((s) => useGameStore.getState().setScreen(s as never)), []);
+
   // OTA-857 — the world's REAL-TIME heartbeat. The war used to advance only when
   // the player took actions that burned in-game hours, so a player who opened the
   // World board and watched saw a frozen feed ("still nothing populating"). This
@@ -1231,6 +1248,11 @@ export default function App() {
           Fallen, non-hostile, with no counter behind any of its buttons. */}
       <SilentBoundary tag="LastWalkModal">
         <LastWalkModal />
+      </SilentBoundary>
+      {/* ⚠ OTA-1845 — a living player's character, not a Fallen and not an
+          enemy: no stats behind it, no counter behind either button. */}
+      <SilentBoundary tag="LedgerVisitModal">
+        <LedgerVisitModal />
       </SilentBoundary>
       <SilentBoundary tag="DiscoveryRevealModal">
         <DiscoveryRevealModal />

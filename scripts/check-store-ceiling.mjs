@@ -81,8 +81,19 @@ const STORE = 'app/state/gameStore.ts';
  * `app/state/dogStatus.ts` BYTE-IDENTICALLY, both names re-exported so no
  * importer had to move, because deciding when a benched dog bleeds out and when
  * a starved one walks off is dog lifecycle and not store plumbing. 142 lines
- * out, 35 back in, and the ceiling takes the difference instead of banking it. */
-export const CEILING = 36837;
+ * out, 35 back in, and the ceiling takes the difference instead of banking it.
+ *
+ *    36815  OTA-1845      the Endless Stair left the store
+ *
+ * ⚠⚠ THE VALVE WORKED A SECOND TIME, ONE OTA LATER, and that is the point of it.
+ * The Ledger's rider needed two fields, one action and a movement-beat call, and
+ * the file had ZERO headroom — so the rule answered again: a self-contained DEX
+ * trial with its own retry policy and its own three-dive counter is a
+ * responsibility, and it was in the store only because that is where it happened
+ * to be typed. `handleTrapDive` moved to `app/state/trapDive.ts`, body
+ * byte-identical, the name re-exported so no importer moved. 51 lines out, 29
+ * back in, and again the ceiling takes the difference rather than banking it. */
+export const CEILING = 36815;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

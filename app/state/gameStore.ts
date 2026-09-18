@@ -43,6 +43,12 @@ import { tickDogStatus } from './dogStatus';
 // ⚠ OTA-1844 — the Last Walk decides and speaks for itself. The store opens the
 // encounter and forwards the player's choice; nothing else about it is here.
 import * as lastWalk from './lastWalk';
+// ⚠ OTA-1845 — the rider's queue decides and speaks for itself, same shape.
+import * as ledgerVisits from './ledgerVisits';
+// ⚠ OTA-1845 — the Endless Stair moved out to pay for the lines above; the name
+// is re-exported so no importer had to move with it.
+export { handleTrapDive } from './trapDive';
+import { handleTrapDive } from './trapDive';
 import { STAMINA_COSTS } from '../engine/staminaCosts'; // OTA-1738
 import { PITY_KILL_INTERVAL } from '../engine/resurrectionRules'; // OTA-1738
 import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
@@ -2650,57 +2656,6 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
   }
 }
 
-// arb55 — Trap Dives of the Endless Stair (Shadow Diver). Unlike the one-shot
-// title trials this is a RETRYABLE DEX gauntlet: each dive is a single d20 + DEX
-// vs DC 13. A CLEAN dive (pass) banks one of the three you need — trapCleanDives
-// accumulates persistently on the player, so the three can be earned across
-// separate visits. A tripped trap (fail) springs for 1d6 (never lethal — the
-// stair lets you try again) and banks nothing. Scouting is free and reports the
-// DC + clean dives banked. At three clean dives recordTitleProgress awards
-// Shadow Diver. `isDive` = the player committed a dive; otherwise it's a scout.
-function handleTrapDive(getStore: StoreGet, setStore: StoreSet, isDive: boolean): void {
-  const player = getStore().player;
-  if (!player) return;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const tc = require('../engine/titleChallenges');
-  const dex = effectiveStats(player).dexterity ?? 0;
-  const dc = 13;
-  const banked = player.titleProgress?.trapCleanDives ?? 0;
-
-  if (banked >= 3) {
-    getStore().appendLog('world', 'You have run the stair clean three times over — its traps hold no more names for you. (Shadow Diver is already yours.)');
-    return;
-  }
-
-  // ── SCOUT (free) ──────────────────────────────────────────────────────────
-  if (!isDive) {
-    getStore().appendLog(
-      'world',
-      `The stair drops away into trap-laced dark. Each dive is a single d20 + DEX (yours: ${dex}) against DC ${dc} — read the pressure-plates and time the fall. ` +
-      `Clean dives banked: ${banked}/3. (DIVE THE STAIR to attempt one — a miss springs the trap but costs you no run; you can dive again.)`,
-    );
-    return;
-  }
-
-  // ── DIVE (retryable) ──────────────────────────────────────────────────────
-  const r = tc.rollCheck(dex, dc);
-  const rollLine = `(d20 ${r.roll} + DEX ${dex} = ${r.total} vs DC ${dc})`;
-  if (r.success) {
-    const nowBanked = banked + 1;
-    if (nowBanked >= 3) {
-      getStore().appendLog('world', `You read the last plate a heartbeat before it reads you and roll clear onto the landing. Three dives, none sprung — you move through this place like it was built for you. ${rollLine}`);
-    } else {
-      getStore().appendLog('world', `You thread the dive clean — plates unsprung, rope true. That's ${nowBanked}/3. ${rollLine}`);
-    }
-    recordTitleProgress(getStore, setStore, { trapCleanDives: 1 });
-  } else {
-    const dmg = 1 + Math.floor(Math.random() * 6);
-    const newHp = Math.max(1, player.hp - dmg); // non-lethal — the stair lets you try again
-    setStore((s) => (s.player ? { player: { ...s.player, hp: newHp } } : s));
-    getStore().appendLog('world', `A plate gives under your heel — a whir of darts, a dropped step. The trap springs for ${dmg} (${newHp}/${player.hpMax} HP). Still ${banked}/3 clean; steady yourself and dive again. ${rollLine}`);
-    checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, getStore, setStore);
-  }
-}
 
 // arb53 — Guild Broker (Parley Ground). Two non-allied faction leaders each
 // demand their faction's coveted relic; fetch both and return to seal the
@@ -7870,6 +7825,11 @@ export interface GameStore {
   lastWalkDog: import('../engine/fallenLedger').ForeignDog | null;
   lastWalkGiven: import('../engine/fallenDogs').LastWalkAct[];
   chooseLastWalk: (choice: import('../engine/fallenDogs').LastWalkChoice) => void;
+  /** ⚠ OTA-1845 — the sender standing in front of the player right now. NOT an
+   *  enemy and not in any scene array: a rider has no stats, no HP and no drop
+   *  table, so there is nothing here for a combat surface to reach. */
+  ledgerVisitor: import('../engine/senderIntro').LedgerVisit | null;
+  answerLedgerVisit: (reply: boolean) => void;
 
   /** OTA-808 — PARLEY. A pending two-button social choice against a wild NPC or the
    *  animal you're fighting. Set when the player opens a parley with a GENERIC social
@@ -8234,6 +8194,8 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   lastWalkDog: null,
   lastWalkGiven: [],
   chooseLastWalk: (choice) => { lastWalk.chooseLastWalk(get, set, choice); },
+  ledgerVisitor: null,
+  answerLedgerVisit: (reply) => { ledgerVisits.answerLedgerVisit(get, set, reply); },
 
   // OTA-1060 — GIFTS. See engine/gifting.ts for the three exploits this shape
   // exists to close (gift-farm, trash-flood, buy-back loop).
@@ -27755,6 +27717,22 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             get().appendLog('debug', `spawn: fallen_whisper rumor ${fr.name}@${fr.ts} pool=${rvPool.length}`);
           }
         }
+      }
+      // ⚠⚠⚠ OTA-1845 — THE QUALIFYING MOVEMENT, AND IT IS THIS ONE AND NO OTHER.
+      // §13 asks for the bound to be counted from the EXISTING movement
+      // authority rather than a second one, so it is counted here: inside
+      // `stepDirection`, after the step has been taken, on the same
+      // `peacefulWild` ground the Fallen spawner above already judged. A menu,
+      // an inventory screen or any other non-movement action never reaches this
+      // line and therefore cannot consume the countdown.
+      //
+      // ⚠ `!revenantBeatFired` is the "do not interrupt" half: a Hollowed or a
+      // Last Walk has just claimed this beat, and a rider walking into it would
+      // be two moments on one step. The countdown is not spent either — it is
+      // simply not a qualifying movement — so nothing is lost.
+      if (peacefulWild && !revenantBeatFired && !get().ledgerVisitor) {
+        const due = ledgerVisits.tickLedgerVisit();
+        if (due) ledgerVisits.openLedgerVisit(get, set, due);
       }
       const sTileKey = livePlayer ? `${livePlayer.currentLocationId}:${livePlayer.mapX}:${livePlayer.mapY}` : '';
       const sRolled = get().worldMemory.strandedEscortRolledTiles ?? [];

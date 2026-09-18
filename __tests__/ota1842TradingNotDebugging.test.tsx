@@ -37,7 +37,7 @@ import React from 'react';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Share } from 'react-native';
+import { Linking, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
   loadPaired,
@@ -340,13 +340,26 @@ describe('OTA-1842 §C — pairing: same engine, new words', () => {
     expect(viaScreen[0]?.key).toBe(a.key);           // the key itself, not just a row
   });
 
-  it('C.2 ⚠ SEND MY HOUSE CARD hands the engine\'s own code to the share sheet', async () => {
+  /* ⚠⚠ OTA-1845 — THE BUTTON IS NOW "SEND REQUEST" AND IT OPENS A LETTER, so
+   * this pin follows the control rather than its old label. The claim is
+   * unchanged and is if anything stronger: whatever surface the invitation goes
+   * out through, what it carries is the ENGINE'S OWN house code — this screen
+   * never mints, reformats or re-derives one. Both roads are checked because
+   * the OTA deliberately keeps both: mail where a mail client exists, the share
+   * sheet where it does not. */
+  it('C.2 ⚠ SEND REQUEST hands the engine\'s own code out, whichever road it takes', async () => {
     await beB_alone();
-    const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
+    const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as never);
     const s = await mountExchange();
-    await s.press('SEND MY HOUSE CARD');
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect((spy.mock.calls[0]![0] as { message: string }).message).toBe(await myHouseCode());
+    await s.press('SEND REQUEST');
+    const sent = [
+      ...share.mock.calls.map((c) => (c[0] as { message: string }).message),
+      ...open.mock.calls.map((c) => decodeURIComponent(String(c[0]))),
+    ].join('\n');
+    expect(share.mock.calls.length + open.mock.calls.length).toBe(1);
+    expect(sent).toContain(await myHouseCode());
+    open.mockRestore();
   });
 
   it('C.3 ⚠ your own card is refused, and said so plainly', async () => {
@@ -370,7 +383,7 @@ describe('OTA-1842 §D — preview before commit', () => {
     const before = await ledgerOnDisk();
     const s = await mountExchange();
     await s.type('Incoming exchange', a.payload);
-    await s.press('LOOK AT IT');
+    await s.press('VIEW ENTRY');
     expect(readsLike(s.texts(), 'Francis')).toBe(true);
     expect(readsLike(s.texts(), TRUST_LABEL.verified)).toBe(true);
     expect(await ledgerOnDisk()).toEqual(before);                 // ← the whole point
@@ -382,11 +395,11 @@ describe('OTA-1842 §D — preview before commit', () => {
     await beB_ridingWithA(a.card);
     const s = await mountExchange();
     await s.type('Incoming exchange', a.payload);
-    await s.press('LOOK AT IT');
-    await s.press('TAKE THEM IN');
+    await s.press('VIEW ENTRY');
+    await s.press('ACCEPT');
     expect((await ledgerOnDisk()).fallen).toHaveLength(1);
     // ⚠ And the preview is gone, so the confirm cannot be pressed a second time.
-    expect(s.byLabel('TAKE THEM IN')).toHaveLength(0);
+    expect(s.byLabel('ACCEPT')).toHaveLength(0);
   });
 
   it('D.3 ⚠⚠⚠ MATRIX 7 — CANCEL takes in nothing, and changes nothing', async () => {
@@ -395,8 +408,8 @@ describe('OTA-1842 §D — preview before commit', () => {
     const before = await ledgerOnDisk();
     const s = await mountExchange();
     await s.type('Incoming exchange', a.payload);
-    await s.press('LOOK AT IT');
-    await s.press('CANCEL');
+    await s.press('VIEW ENTRY');
+    await s.press('DECLINE');
     expect(await ledgerOnDisk()).toEqual(before);
     expect((await loadLedger()).foreign).toHaveLength(0);
     expect(readsLike(s.texts(), 'Nothing was taken in')).toBe(true);
@@ -476,7 +489,7 @@ describe('OTA-1842 §E — trust, refusal and the ceiling', () => {
     const before = await ledgerOnDisk();
     const s = await mountExchange();
     await s.type('Incoming exchange', '{"v":1,"fallen":[  <-- not a document at all');
-    await s.press('LOOK AT IT');
+    await s.press('VIEW ENTRY');
     expect(readsLike(s.texts(), TRUST_LABEL.refused)).toBe(true);
     expect(await ledgerOnDisk()).toEqual(before);
     const p = await previewPayloadText('{"v":1,"fallen":[  <--');
@@ -550,25 +563,43 @@ describe('OTA-1842 §E — trust, refusal and the ceiling', () => {
 // §F — MATRIX 14-17: SENDING, AND WHERE THE RAW TEXT WENT
 // ═══════════════════════════════════════════════════════════════════════════
 describe('OTA-1842 §F — the send half', () => {
-  it('F.1 ⚠⚠ MATRIX 16 — SEND MY DEAD goes through the OS share sheet the app already uses', async () => {
+  it('F.1 ⚠⚠ MATRIX 16 — SHARE ENTRY goes through the OS share sheet the app already uses', async () => {
     // ⚠ RN core `Share` — the same abstraction `ui/backupCharacter`, TitleScreen
     // and LogScreen already ship. No native expansion was required, and none was
     // made: expo-sharing, QR and camera packages are all absent from this tree.
     const a = await houseA();
     const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
     const s = await mountExchange();
-    await s.press('SEND MY DEAD');
+    await s.press('SHARE ENTRY');
     expect(spy).toHaveBeenCalledTimes(1);
-    expect((spy.mock.calls[0]![0] as { message: string }).message).toBe(a.payload);
+    const sent = (spy.mock.calls[0]![0] as { message: string }).message;
+    /* ⚠⚠ OTA-1845 — THIS PIN NO LONGER COMPARES THE WHOLE STRING, AND THAT IS A
+     * REAL DIFFERENCE RATHER THAN A WEAKENING. With a character loaded the body
+     * now also carries the living sender, so an equality against
+     * `buildExportPayload()` called with NO sender would be asserting that the
+     * introduction does not ship. What the test actually cared about is intact
+     * and checked piece by piece: it is a SEALED ENVELOPE from this install,
+     * and the dead inside it are the engine's own, not something this screen
+     * assembled. */
+    const env = JSON.parse(sent) as { v: number; from: string; seal: string; body: string };
+    const ref = JSON.parse(a.body) as { fallen: unknown[]; dogs: unknown[]; rests: unknown[] };
+    const body = JSON.parse(env.body) as { fallen: unknown[]; dogs: unknown[]; rests: unknown[]; sender?: { name: string } };
+    expect(env.from).toBe('inst-A');
+    expect(typeof env.seal).toBe('string');
+    expect(body.fallen).toEqual(ref.fallen);
+    expect(body.dogs).toEqual(ref.dogs);
+    expect(body.rests).toEqual(ref.rests);
+    // and the one thing 1845 added: a person, not a payload field the screen invented.
+    expect(typeof body.sender?.name).toBe('string');
   });
 
   it('F.2 ⚠ MATRIX 14 — and the screen says what was sent and what to expect back', async () => {
     await houseA();
     jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
     const s = await mountExchange();
-    await s.press('SEND MY DEAD');
+    await s.press('SHARE ENTRY');
     expect(readsLike(s.texts(), 'Sent.')).toBe(true);
-    expect(readsLike(s.texts(), 'send the result back')).toBe(true);
+    expect(readsLike(s.texts(), 'send the closure back')).toBe(true);
   });
 
   it('F.3 ⚠⚠ MATRIX 15 — the raw payload is NOT on the normal road', async () => {
@@ -577,7 +608,7 @@ describe('OTA-1842 §F — the send half', () => {
     await houseA();
     const s = await mountExchange();
     expect(s.byLabel('COPY RAW EXCHANGE')).toHaveLength(0);
-    expect(s.byLabel('SEND MY DEAD')).toHaveLength(1);
+    expect(s.byLabel('SHARE ENTRY')).toHaveLength(1);
   });
 
   it('F.4 ⚠ MATRIX 17 — but the manual fallback is still there for whoever needs it', async () => {
@@ -686,10 +717,10 @@ describe('OTA-1842 §H — nothing moved that was not meant to move', () => {
       await s.type('Their house card', a.card);
       await s.press('ACCEPT THEIR CARD');
       jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
-      await s.press('SEND MY DEAD');
+      await s.press('SHARE ENTRY');
       await s.type('Incoming exchange', a.payload);
-      await s.press('LOOK AT IT');
-      await s.press('TAKE THEM IN');
+      await s.press('VIEW ENTRY');
+      await s.press('ACCEPT');
       expect((await ledgerOnDisk()).fallen).toHaveLength(1);
       expect(boom).not.toHaveBeenCalled();
     } finally {
@@ -702,7 +733,7 @@ describe('OTA-1842 §H — nothing moved that was not meant to move', () => {
     await beB_ridingWithA(a.card);
     const s = await mountExchange();
     await s.type('Incoming exchange', a.payload);
-    await s.press('LOOK AT IT');
+    await s.press('VIEW ENTRY');
     const shown = s.texts().join('\n').toLowerCase();
     for (const word of ['hmac', 'installid', 'install id', 'json', 'payload', 'hash', 'base64', 'hmac-sha']) {
       expect(shown).not.toContain(word);

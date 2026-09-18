@@ -18,7 +18,7 @@
 // clipboard. A player may choose a destination that uses the internet; that is
 // their transport, not Tartaria's infrastructure.
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, Share, Linking } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { TScreenHeader, TButton, T } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
@@ -41,6 +41,11 @@ import {
 } from '../engine/fallenLedgerStore';
 import { fallenTitle, restRollLine, type PairedHouse, type ForeignDog, type ForeignFallen, type RestRecord } from '../engine/fallenLedger';
 import { dogRollLine, dogClosureHomeLine, isDogRest } from '../engine/fallenDogs';
+// ⚠ OTA-1845 — the invitation's words and its link, in one pure place.
+import { buildInviteMailto, buildRequestLink, inviteBody, inviteShareText, inviteSubject } from '../engine/ledgerLinks';
+import { senderSnapshotFrom } from '../engine/senderIntro';
+import { queueFromImport } from '../state/ledgerVisits';
+import { onPendingHouseCard, takePendingHouseCard } from '../state/ledgerRoute';
 
 /** ⚠ Bounded on purpose — this is a roll, not an archive. §13's own rule. */
 const RESTS_SHOWN = 25;
@@ -120,13 +125,57 @@ export function FallenExchangeScreen() {
   useEffect(() => { void refresh(); }, [refresh]);
 
   // ---- pairing -------------------------------------------------------------
-  const shareMyCard = useCallback(async () => {
+  /* ⚠⚠⚠ OTA-1845 — SEND REQUEST IS NOW A LETTER A PERSON WRITES AND SENDS.
+   *
+   * It opens the operating system's own mail compose with the subject and body
+   * already filled in, and stops there. Tartaria does not send it: there is no
+   * SMTP, no API mailer, no relay and no background service anywhere in this
+   * path, and the recipient field is left EMPTY so the player chooses who they
+   * are asking. The precedent is INVITE PLAYTESTER in the About screen, under
+   * OTA-1665's ruling that mail carries "a short human request to a person".
+   *
+   * ⚠ THE MESSAGE CARRIES BOTH ROADS. Many mail clients render a custom-scheme
+   * link as plain text rather than something tappable, so the body holds the
+   * OPEN IN TARTARIA link AND the house card itself. Tapping is a shortcut;
+   * pasting still works. Neither is a dead end.
+   *
+   * ⚠ AND IT FALLS BACK TO THE SHARE SHEET RATHER THAN FAILING. A device with
+   * no mail client is not an error state — it is a device that will send this
+   * through messages instead. */
+  const shareMyCard = useCallback(async (viaMail: boolean) => {
     setBusy(true);
     try {
       const code = await myHouseCode();
-      await Share.share({ message: code, title: 'My house card — Tartaria' });
-      setNote('Your house card is on its way. When they accept it, have them send you theirs.');
-    } catch { setNote('Could not share your house card.'); } finally { setBusy(false); }
+      const me = useGameStore.getState().player;
+      const subject = inviteSubject(house);
+      const body = inviteBody({
+        character: me?.name,
+        house,
+        card: code,
+        link: buildRequestLink(code),
+      });
+      if (viaMail) {
+        const url = buildInviteMailto(subject, body);
+        const ok = await Linking.canOpenURL(url).catch(() => false);
+        if (ok) {
+          await Linking.openURL(url);
+          setNote('Your request is in your mail app. Choose who you are asking and send it yourself.');
+          return;
+        }
+      }
+      await Share.share({ message: inviteShareText(subject, body), title: 'A request — Tartaria' });
+      setNote('Your request is on its way. When they accept it, have them send you theirs.');
+    } catch { setNote('Could not open a way to send that request.'); } finally { setBusy(false); }
+  }, [house]);
+
+  /* ⚠⚠ A LINK THAT ACTUALLY ARRIVED. `startLedgerRouting` parsed it, refused
+   *  everything that was not one of ours, and left the card here. All this does
+   *  is put it in the box — the player still presses ACCEPT, and the pairing
+   *  gate still decides. Nothing about a link accepts anything. */
+  useEffect(() => {
+    const take = () => { const c = takePendingHouseCard(); if (c) { setCodeIn(c); setNote('A house has asked to ride with you. Look at their card and decide.'); } };
+    take();
+    return onPendingHouseCard(take);
   }, []);
 
   const acceptCard = useCallback(async () => {
@@ -159,9 +208,24 @@ export function FallenExchangeScreen() {
   const sendMyDead = useCallback(async () => {
     setBusy(true);
     try {
-      const payload = await buildExportPayload();
-      await Share.share({ message: payload, title: 'My fallen — Tartaria' });
-      setNote('Sent. When they put your dead down, ask them to send the result back.');
+      /* ⚠⚠ OTA-1845 — THE LIVING CHARACTER RIDES WITH THE DEAD, as three
+       * presentation fields and nothing else. No stats, no hit points, no
+       * inventory, no currency, no gear, no quest state — there is no field
+       * here to put them in. It is what makes the rider who turns up in the
+       * receiving world a person rather than a house name.
+       *
+       * ⚠ AND IT IS ABSENT WHEN THERE IS NO CHARACTER. This screen opens from
+       * the title screen too; `senderSnapshotFrom` answers null, the key is
+       * left out of the body entirely, and the receiving side names the house
+       * instead. That is honest, not degraded. */
+      const me = useGameStore.getState().player;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const races = require('../data/races/races.json') as Array<{ id: string; name: string }>;
+      const payload = await buildExportPayload(
+        senderSnapshotFrom(me, races.find((r) => r.id === me?.raceId)?.name ?? me?.raceId) ?? undefined,
+      );
+      await Share.share({ message: payload, title: 'An entry from my Ledger — Tartaria' });
+      setNote('Sent. When they put your dead down, ask them to send the closure back.');
     } catch { setNote('Could not gather your dead. Try again.'); } finally { setBusy(false); }
   }, []);
 
@@ -185,6 +249,14 @@ export function FallenExchangeScreen() {
     setBusy(true);
     try {
       const out = await importPayloadText(incoming);
+      /* ⚠⚠⚠ OTA-1845 — ACCEPTING IS WHAT QUEUES THE RIDER, AND ONLY A GENUINELY
+       * NEW ARRIVAL DOES IT. `queueFromImport` refuses a forged payload, an
+       * empty sending id, and — the one that makes replay idempotent for free —
+       * an import that added nothing. Re-accepting the same Entry adds zero,
+       * because the merge has deduped by key since OTA-1362, so no second rider
+       * is ever queued for the same dead. DECLINE never reaches this line at
+       * all: it does not call the import. */
+      queueFromImport(out);
       setPreview(null);
       setIncoming('');
       // ⚠⚠ OTA-1843 — ARRIVAL IS A MOMENT, NOT A COUNT. This used to read
@@ -231,7 +303,7 @@ export function FallenExchangeScreen() {
   return (
     <View style={styles.container}>
       <TScreenHeader
-        title="FALLEN EXCHANGE"
+        title="THE LEDGER OF THE FALLEN"
         onBack={() => setScreen(inSession ? 'exploration' : 'title')}
         accessibilityLabel="Back"
       />
@@ -270,7 +342,7 @@ export function FallenExchangeScreen() {
         <Text style={styles.heading}>HOUSES YOU RIDE WITH</Text>
         {paired.length === 0 ? (
           <Text style={styles.desc}>
-            You ride alone. Send a friend your house card and accept theirs — then your dead can cross.
+            You ride alone. Send a friend a request and accept theirs — then your dead can cross.
           </Text>
         ) : (
           paired.map((h) => (
@@ -284,7 +356,7 @@ export function FallenExchangeScreen() {
           ))
         )}
         <View style={styles.actions}>
-          <TButton label="SEND MY HOUSE CARD" variant="utility" compact disabled={busy} onPress={() => { void shareMyCard(); }} />
+          <TButton label="SEND REQUEST" variant="utility" compact disabled={busy} onPress={() => { void shareMyCard(true); }} />
           <TButton label="ACCEPT THEIR CARD" variant="utility" compact disabled={busy} onPress={() => { void acceptCard(); }} />
         </View>
         <TextInput
@@ -298,31 +370,31 @@ export function FallenExchangeScreen() {
         />
 
         {/* ---- send ---- */}
-        <Text style={styles.heading}>SEND YOUR DEAD</Text>
+        <Text style={styles.heading}>SEND ENTRY</Text>
         <Text style={styles.desc}>
-          Hands your fallen to whichever app you choose — messages, mail, AirDrop, anything on the sheet.
+          Hands an entry from your Ledger to whichever app you choose — messages, mail, AirDrop, anything on the sheet.
         </Text>
-        <TButton label="SEND MY DEAD" variant="utility" compact disabled={busy} onPress={() => { void sendMyDead(); }} />
+        <TButton label="SHARE ENTRY" variant="utility" compact disabled={busy} onPress={() => { void sendMyDead(); }} />
 
         {/* ---- receive ---- */}
-        <Text style={styles.heading}>RECEIVE</Text>
+        <Text style={styles.heading}>ENTRY RECEIVED</Text>
         {preview === null ? (
           <>
             <Text style={styles.desc}>
-              Paste what they sent you and look at it first — nothing is taken in until you say so.
+              Paste the entry they sent and view it first — nothing is taken in until you accept it.
             </Text>
             <TextInput
               style={styles.payloadBox}
               value={incoming}
               onChangeText={setIncoming}
-              placeholder="paste what they sent (or leave blank to use the clipboard)"
+              placeholder="paste their entry (or leave blank to use the clipboard)"
               placeholderTextColor="#7a705c"
               multiline
               autoCapitalize="none"
               autoCorrect={false}
               accessibilityLabel="Incoming exchange"
             />
-            <TButton label="LOOK AT IT" variant="utility" compact disabled={busy} onPress={() => { void look(); }} />
+            <TButton label="VIEW ENTRY" variant="utility" compact disabled={busy} onPress={() => { void look(); }} />
           </>
         ) : (
           /* ⚠⚠ THE PREVIEW. This is the screen the whole OTA exists for: who is
@@ -339,7 +411,13 @@ export function FallenExchangeScreen() {
               </>
             ) : (
               <>
-                <Text style={styles.from}>from {preview.fromHouse || 'an unnamed house'}</Text>
+                {/* ⚠ OTA-1845 — a person, before the commit. Knowing who is
+                    asking is part of deciding whether to say yes. */}
+                <Text style={styles.from}>
+                  {preview.senderName
+                    ? `from ${preview.senderName} of ${preview.fromHouse || 'an unnamed house'}`
+                    : `from ${preview.fromHouse || 'an unnamed house'}`}
+                </Text>
                 {preview.arrivals.length > 0 ? (
                   preview.arrivals.map((a) => <Text key={a} style={styles.arrival}>{a}</Text>)
                 ) : (
@@ -366,8 +444,8 @@ export function FallenExchangeScreen() {
                   </Text>
                 )}
                 <View style={styles.actions}>
-                  <TButton label="TAKE THEM IN" variant="utility" compact disabled={busy} onPress={() => { void acceptPreviewed(); }} />
-                  <TButton label="CANCEL" variant="utility" compact disabled={busy} onPress={cancelPreview} />
+                  <TButton label="ACCEPT" variant="utility" compact disabled={busy} onPress={() => { void acceptPreviewed(); }} />
+                  <TButton label="DECLINE" variant="utility" compact disabled={busy} onPress={cancelPreview} />
                 </View>
               </>
             )}

@@ -39,6 +39,9 @@
 // item shape — a revenant's blade crossing the wire loses its coatings, and
 // that is a cheap price for deleting a whole validation surface.
 import type { FallenHero } from './saveSystem';
+// ⚠ OTA-1845 — `senderIntro` is pure and imports nothing at runtime, so this
+// value edge reaches no module and cannot close a cycle with `saveSystem`.
+import { sanitizeSenderSnapshot, type SenderSnapshot } from './senderIntro';
 import type { FallenGearPiece, Rarity } from './types';
 import { FUSION_CLAMPS } from './itemFusion';
 import { RING_SLOTS } from './equipment';
@@ -857,6 +860,15 @@ export interface LedgerPayload {
   fallen: ForeignFallen[];
   dogs: ForeignDog[];
   rests: RestRecord[];
+  /** ⚠⚠ OTA-1845 — WHO IS STILL STANDING, as opposed to who died. Optional, and
+   *  ABSENT is an ordinary answer for two honest reasons: a payload written
+   *  before this OTA has no such key, and a player who shared from the title
+   *  screen had no living character to describe. It is set only when one
+   *  actually parsed, so an empty batch is still exactly
+   *  `{ fallen: [], dogs: [], rests: [] }` — nothing that already reads this
+   *  shape has to change, which is the same forward-compatibility argument
+   *  `dogs` made in OTA-1844. */
+  sender?: SenderSnapshot;
 }
 
 /** Parse whatever arrived. Tolerant by design: a torn file, a truncated
@@ -895,7 +907,12 @@ export function parseLedgerPayload(input: unknown, now: number = Date.now()): Le
       if (ok) rests.push(ok);
     }
   }
-  return { fallen, dogs, rests };
+  // ⚠ OTA-1845 — read BY NAME like everything above it, and rebuilt through the
+  // same kind of bounded sanitizer. An older build handed a payload carrying a
+  // sender simply never looks for the key; this build handed one without it gets
+  // `undefined`, which the introduction already treats as "name the house".
+  const sender = sanitizeSenderSnapshot(doc.sender);
+  return { fallen, dogs, rests, ...(sender ? { sender } : {}) };
 }
 
 // ---- merge -----------------------------------------------------------------

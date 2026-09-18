@@ -4,6 +4,11 @@ import type { FallenGearPiece, SaveState } from './types';
 // `FallenHero` from here, so a value import either way would close a cycle. A
 // type import is erased at build, so the shape is shared and nothing is.
 import type { FallenDog } from './fallenLedger';
+// ⚠ OTA-1845 — SAFE AS A VALUE IMPORT, and checked rather than assumed:
+// `senderIntro` is pure and its ONLY import is a type import of two log shapes,
+// which is erased at build. It therefore reaches nothing at runtime and cannot
+// close the cycle the line above exists to avoid.
+import { reviveVisit, type LedgerVisit } from './senderIntro';
 import { capDiskLog } from './diskLogCap';
 // OTA-1178 — import path trims like the store's persist path does; saveSlot does not.
 import { trimSaveStateToFit } from './saveTrim';
@@ -112,6 +117,22 @@ export interface GlobalStash {
    *  absent — an install that predates the Last Walk is not migrated, it just
    *  has no companions yet. */
   dogsFallen?: FallenDog[];
+  /** ⚠⚠⚠ OTA-1845 — RIDERS WAITING TO BE MET, AND WHY THEY LIVE OUT HERE.
+   *
+   *  A Ledger Entry can be accepted from the TITLE screen, with no character
+   *  loaded at all — the exchange's own back button says so, routing to 'title'
+   *  when there is no session. So the queue of senders waiting to walk up
+   *  cannot live in `worldMemory`: the moment that matters, accepting, may
+   *  happen when there is no world memory to write it to.
+   *
+   *  ⚠⚠ AND IT IS WRITTEN THROUGH `mutateGlobalStash`, which is the whole
+   *  concurrency story. OTA-1835 replaced every load-modify-save on this object
+   *  with one serialised queue, so an accept landing beside a death cannot lose
+   *  either write — and this OTA inherits that instead of reasoning about it a
+   *  second time.
+   *
+   *  ⚠ Optional and absent-deserializes-to-empty, like every field beside it. */
+  ledgerVisits?: LedgerVisit[];
 }
 
 /** ⚠⚠ OTA-1366 — THE CLONE. Owner: *"what I want is the exact same in every
@@ -317,6 +338,31 @@ export async function loadFallenDogs(): Promise<FallenDog[]> {
   return (await loadGlobalStash()).dogsFallen ?? [];
 }
 
+/** ⚠⚠⚠ OTA-1845 — REPLACE THE WAITING RIDERS, UNDER THE SERIALISED DOOR.
+ *
+ *  Both callers — queueing a visit after an accept, and dropping one after it
+ *  has happened — hand in the WHOLE next list, computed by the pure functions
+ *  in `senderIntro`. That is deliberate: the decision about what the list
+ *  should become (merge by house, bound, order) belongs with the rules, and
+ *  what belongs here is only that the write cannot lose a neighbour's.
+ *
+ *  ⚠ `mutateGlobalStash` is the neighbour-safety. It reloads inside the queue,
+ *  so a visit written while a death is writing a memorial no longer erases it —
+ *  the defect OTA-1835 measured and closed for every other field on this
+ *  object. Nothing here re-implements that; it just uses the door. */
+export async function setLedgerVisits(next: readonly LedgerVisit[]): Promise<number> {
+  const n = await mutateGlobalStash((stash) => {
+    stash.ledgerVisits = [...next];
+    return stash.ledgerVisits.length;
+  });
+  return n as number;
+}
+
+/** OTA-1845 — the riders this install still owes a meeting to. */
+export async function loadLedgerVisits(): Promise<LedgerVisit[]> {
+  return (await loadGlobalStash()).ledgerVisits ?? [];
+}
+
 export async function loadGlobalStash(): Promise<GlobalStash> {
   try {
     const raw = await AsyncStorage.getItem(GLOBAL_STASH_KEY);
@@ -333,6 +379,10 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       // ⚠ OTA-1844 — absent on every install that predates the Last Walk, and
       // an empty list is the correct answer for one. No migration.
       dogsFallen: parsed.dogsFallen ?? [],
+      // ⚠ OTA-1845 — rebuilt row by row rather than trusted, so a hand-edited
+      // or truncated save cannot park a visit with a 9,999-step countdown or a
+      // sender snapshot carrying fields this game does not know about.
+      ledgerVisits: (Array.isArray(parsed.ledgerVisits) ? parsed.ledgerVisits : []).flatMap(reviveVisit),
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };

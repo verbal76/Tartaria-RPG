@@ -280,6 +280,9 @@ export const HUMAN_GAMEPLAY_MUTATIONS = [
   'skipTutorial',
   // OTA-1844 — the Last Walk's acts are human presses like any other.
   'chooseLastWalk',
+  // ⚠ OTA-1845 — answering a rider is a real player action: it writes log lines
+  // and clears the visitor, so the activity accounting must see it.
+  'answerLedgerVisit',
 ] as const;
 
 export type HumanGameplayMutation = typeof HUMAN_GAMEPLAY_MUTATIONS[number];

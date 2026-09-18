@@ -35,6 +35,9 @@ import {
   type PairedHouse,
   type RestRecord,
 } from './fallenLedger';
+// ⚠ OTA-1845 — the sender snapshot's one sanitizer, used on the way out and on
+// the way in, so the shape this install writes is the shape it would admit.
+import { sanitizeSenderSnapshot, type SenderSnapshot } from './senderIntro';
 
 const LEDGER_KEY = 'tartaria.fallenLedger.v1';
 const INSTALL_KEY = 'tartaria.fallen.installId.v1';
@@ -517,8 +520,20 @@ export function unwrapEnvelope(text: string): string {
  *
  *  ⚠ And the version does NOT move. `parseLedgerPayload` reads its keys by name,
  *  so a friend still on an older build reads the humans and ignores the dogs —
- *  which is the compatibility that actually matters between two phones. */
-export async function buildExportPayload(): Promise<string> {
+ *  which is the compatibility that actually matters between two phones.
+ *
+ *  ⚠⚠ OTA-1845 — `sender` RIDES IN THE SAME BODY, WHICH IS THE ENTIRE SECURITY
+ *  STORY FOR THE INTRODUCTION. The seal covers the body STRING, so the snapshot
+ *  is sealed, authenticated and pairing-gated by the three lines that already
+ *  admit a corpse. No key changed, no envelope field was added, no second trust
+ *  path exists — and the version does not move, for the reason above.
+ *
+ *  ⚠ IT IS AN ARGUMENT, NOT A LOOKUP. The living character belongs to the game
+ *  store, and this module must not reach into it: the exchange can be opened
+ *  from the TITLE screen, where there is no character at all. Callers that have
+ *  one pass it; callers that do not pass nothing, and nothing is a correct
+ *  answer that the receiving side already handles by naming the house instead. */
+export async function buildExportPayload(sender?: SenderSnapshot): Promise<string> {
   const installId = await ensureInstallId();
   const house = (await loadHouseName()) || 'an unnamed house';
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -530,7 +545,15 @@ export async function buildExportPayload(): Promise<string> {
   const ledger = await loadLedger();
   const stamped = mine.map((f) => ({ ...f, origin: { player: house, installId } }));
   const stampedDogs = myDogs.map((d) => ({ ...d, origin: { player: house, installId } }));
-  const body = JSON.stringify({ v: LEDGER_FORMAT, house, installId, fallen: stamped, dogs: stampedDogs, rests: ledger.rests });
+  const clean = sanitizeSenderSnapshot(sender);
+  const body = JSON.stringify({
+    v: LEDGER_FORMAT, house, installId, fallen: stamped, dogs: stampedDogs, rests: ledger.rests,
+    // ⚠ Sanitised on the way OUT as well as the way in. This install is the one
+    // that wrote it, but a bounded, rebuilt snapshot is what the receiving end
+    // is entitled to — and it keeps the key absent entirely when there is no
+    // living character, rather than shipping an empty object.
+    ...(clean ? { sender: clean } : {}),
+  });
   // ⚠ The seal covers the body STRING, and the reader verifies before parsing —
   // so a tampered payload never reaches the parser at all.
   const sealed = seal(await ensureSendingKey(), body);
@@ -557,6 +580,14 @@ export interface ImportOutcome {
    *  the dead so no caller can blur the two into one sentence. */
   dogsAdded: number;
   dogArrivals: string[];
+  /** ⚠⚠ OTA-1845 — WHO THIS CAME FROM, so the caller can queue the rider who is
+   *  going to come and ask about them. The install id is the dedupe identity;
+   *  the house and the snapshot are what the rider is called when they arrive.
+   *  All three are reported, none are acted on here — the introduction is a
+   *  world event and this module owns the ledger, not the world. */
+  fromHouse: string;
+  fromInstallId: string;
+  sender?: SenderSnapshot;
 }
 
 /** ⚠⚠ OTA-1842 — WHAT THE PLAYER IS BEING OFFERED, IN WORDS THEY DIDN'T HAVE TO
@@ -588,6 +619,10 @@ export interface ExchangePreview {
    *  see them. Kept SEPARATE from `arrivals` so no screen can accidentally
    *  render a dog in the same breath as a Hollowed. */
   dogArrivals: string[];
+  /** ⚠ OTA-1845 — who is asking, shown on the preview card BEFORE the commit so
+   *  the player knows a person is behind this Entry and not only a list of
+   *  names. Absent when the payload carries no snapshot, which is ordinary. */
+  senderName?: string;
 }
 
 /** The whole decision, with no write in it: parse, authenticate, and work out
@@ -606,6 +641,16 @@ interface ExchangeDecision {
   wantedRests: RestRecord[];
   unpaired: number;
   fromHouse: string;
+  /** ⚠⚠ OTA-1845 — WHICH INSTALL THIS ACTUALLY CAME FROM, and it is taken from
+   *  the RECORDS THAT WERE WANTED, never from the envelope's own `from` claim.
+   *  It is the identity the introduction queue dedupes on, so it has to be the
+   *  one the gate above already trusted: a house that passed pairing and, when
+   *  sealed, passed the seal. Empty when nothing was wanted, which is exactly
+   *  when no rider should be queued. */
+  fromInstallId: string;
+  /** ⚠ OTA-1845 — the living character behind the payload, if it carried one.
+   *  Absent is ordinary: an older build, or a share sent from the title screen. */
+  sender?: SenderSnapshot;
   /** ⚠⚠ OTA-1842 — DID THIS TEXT PARSE AS A DOCUMENT AT ALL?
    *  `parseLedgerPayload` is deliberately total: garbage in, empty batch out,
    *  never a throw. That is right for the importer — a torn paste must cost the
@@ -646,7 +691,7 @@ async function decideExchange(text: string): Promise<ExchangeDecision> {
   if (auth.kind === 'forged') {
     // Sealed, but by nobody we hold a key for. Refuse the whole payload — a
     // partial accept here would be the worst of both answers.
-    return { myInstallId, ledger, auth, wanted: [], wantedDogs: [], wantedRests: [], unpaired: batch.fallen.length, fromHouse, readable };
+    return { myInstallId, ledger, auth, wanted: [], wantedDogs: [], wantedRests: [], unpaired: batch.fallen.length, fromHouse, fromInstallId: '', readable };
   }
 
   const wanted = batch.fallen.filter((f) => {
@@ -691,7 +736,22 @@ async function decideExchange(text: string): Promise<ExchangeDecision> {
     return owner === myInstallId || isPairedHouse(owner, paired) || isPairedHouse(r.byInstallId, paired);
   });
 
-  return { myInstallId, ledger, auth, wanted, wantedDogs, wantedRests, unpaired: unpairedFallen, fromHouse, readable };
+  // ⚠⚠ OTA-1845 — THE SENDING INSTALL, READ OFF WHAT SURVIVED THE GATE. A sealed
+  // payload names it outright; an unsealed one from a keyless house is named by
+  // the records that were actually wanted. Either way this is a house that has
+  // already been admitted, so the introduction queue cannot be addressed by a
+  // stranger — and it is empty when nothing was wanted, which is the same thing
+  // as "there is no rider to expect".
+  const fromInstallId = auth.kind === 'sealed'
+    ? auth.installId
+    : (wanted[0]?.origin.installId ?? wantedDogs[0]?.origin.installId ?? '');
+
+  return {
+    myInstallId, ledger, auth, wanted, wantedDogs, wantedRests,
+    unpaired: unpairedFallen, fromHouse, fromInstallId,
+    ...(batch.sender ? { sender: batch.sender } : {}),
+    readable,
+  };
 }
 
 /** ⚠⚠⚠ OTA-1842 — LOOK BEFORE YOU LET THEM IN, AND CHANGE NOTHING BY LOOKING.
@@ -745,6 +805,7 @@ export async function previewPayloadText(text: string): Promise<ExchangePreview>
     turnedAway: d.unpaired,
     rests: restsMerged.added.length,
     dogArrivals,
+    ...(d.sender ? { senderName: d.sender.name } : {}),
   };
 }
 
@@ -764,6 +825,9 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
       added: 0, rests: 0, skippedOwn: 0, skippedRested: 0, skippedDuplicate: 0,
       rejected: 0, evicted: 0, unpaired: d.unpaired, unsealed: 0, forged: true, arrivals: [],
       dogsAdded: 0, dogArrivals: [],
+      // ⚠ A forged payload names NOBODY. Reporting its claimed house here would
+      // hand a forger the one field the introduction queue keys on.
+      fromHouse: '', fromInstallId: '',
     };
   }
   const unpairedFallen = d.unpaired;
@@ -801,6 +865,9 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
     arrivals: fallenMerged.added.map((f) => fallenTitle(f)),
     dogsAdded: dogsMerged.added.length,
     dogArrivals: dogsMerged.added.map((x) => dogTitle(x)),
+    fromHouse: d.fromHouse,
+    fromInstallId: d.fromInstallId,
+    ...(d.sender ? { sender: d.sender } : {}),
   };
 }
 
