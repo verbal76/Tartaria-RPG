@@ -44,7 +44,12 @@ export interface Ledger {
   rests: RestRecord[];
 }
 
-const EMPTY: Ledger = { foreign: [], rests: [] };
+/* ⚠ OTA-1839 removed a shared `EMPTY` constant that every cache was built from
+ * with `{ ...EMPTY }`. A spread copies the OBJECT but keeps the SAME two array
+ * references, so every "fresh empty" ledger shared one pair of arrays. Nothing
+ * mutated them in place, so it never bit — but a cache is now built from its own
+ * literals, and the one empty object that still exists is frozen and canonical
+ * for exactly one purpose: saying "not hydrated yet". See the disk section. */
 
 // ---- identity --------------------------------------------------------------
 let INSTALL_ID: string | null = null;
@@ -185,35 +190,75 @@ export async function revokeHouse(installId: string): Promise<void> {
 }
 
 // ---- disk ------------------------------------------------------------------
+/* ⚠⚠⚠ OTA-1839 — `null` MEANS "WE HAVE NOT LOOKED AT THE DISK YET", AND NOTHING
+ * ELSE IS ALLOWED TO MEAN THAT.
+ *
+ * This used to hold either `null` or a ledger, and that is one state short. The
+ * moment anything needed a ledger SYNCHRONOUSLY, `cachedLedger()` minted an
+ * empty one and installed it as canonical — after which "we never looked" and
+ * "we looked and there was nothing" were the same value, and `loadLedger()`'s
+ * opening `if (LEDGER_CACHE) return LEDGER_CACHE` handed the placeholder back
+ * without ever reaching the disk. The `void loadLedger()` on the very next
+ * expression could not save it: it saw the truthy cache that had just been
+ * installed one statement earlier.
+ *
+ * ⚠⚠ AND EVERY WRITE WRITES THE WHOLE LEDGER, so this was not merely a reading
+ * fault. A player's foreign dead sat safely on disk, invisible, until the next
+ * ordinary import or rest merged into the synthetic empty and wrote it over the
+ * top of them. Measured: one import of a different corpse, and the corpse
+ * already on disk was gone for good.
+ *
+ * Only the hydration below may install a canonical cache. A synchronous reader
+ * gets a frozen snapshot it cannot install and cannot mutate, and the hydration
+ * it kicks off still reaches the disk — so the spawner's first, too-early look
+ * costs one frame of foreign revenants and nothing else. */
 let LEDGER_CACHE: Ledger | null = null;
+
+/** The single in-flight disk read, so two cold callers cannot start two. */
+let LEDGER_HYDRATION: Promise<Ledger> | null = null;
+
+/** What a synchronous reader sees before the disk has answered. Frozen so it can
+ *  never be mutated into something that looks like real state, and never stored
+ *  in `LEDGER_CACHE` — it is an answer, not a ledger. */
+const UNHYDRATED_SNAPSHOT: Ledger = { foreign: [], rests: [] };
+Object.freeze(UNHYDRATED_SNAPSHOT.foreign);
+Object.freeze(UNHYDRATED_SNAPSHOT.rests);
+Object.freeze(UNHYDRATED_SNAPSHOT);
 
 export async function loadLedger(): Promise<Ledger> {
   if (LEDGER_CACHE) return LEDGER_CACHE;
-  try {
-    const raw = await AsyncStorage.getItem(LEDGER_KEY);
-    if (!raw) { LEDGER_CACHE = { ...EMPTY }; return LEDGER_CACHE; }
-    // ⚠ Re-validated on the way OFF disk too, not just off the wire. A ledger
-    // written by an older build, or edited by hand on a rooted phone, is exactly
-    // as untrusted as a stranger's payload.
-    const parsed = parseLedgerPayload(raw);
-    LEDGER_CACHE = { foreign: parsed.fallen, rests: parsed.rests };
-  } catch {
-    LEDGER_CACHE = { ...EMPTY };
-  }
-  return LEDGER_CACHE;
+  if (LEDGER_HYDRATION) return LEDGER_HYDRATION;
+  const run = (async (): Promise<Ledger> => {
+    let next: Ledger;
+    try {
+      const raw = await AsyncStorage.getItem(LEDGER_KEY);
+      // ⚠ Re-validated on the way OFF disk too, not just off the wire. A ledger
+      // written by an older build, or edited by hand on a rooted phone, is exactly
+      // as untrusted as a stranger's payload.
+      if (!raw) next = { foreign: [], rests: [] };
+      else { const parsed = parseLedgerPayload(raw); next = { foreign: parsed.fallen, rests: parsed.rests }; }
+    } catch {
+      next = { foreign: [], rests: [] };
+    }
+    // ⚠ A mutation may have landed while we were reading — `persist()` installs
+    // its own result. Ours is the OLDER picture, so it does not get to win.
+    if (LEDGER_CACHE === null) LEDGER_CACHE = next;
+    return LEDGER_CACHE;
+  })();
+  LEDGER_HYDRATION = run;
+  try { return await run; } finally { if (LEDGER_HYDRATION === run) LEDGER_HYDRATION = null; }
 }
 
-/** Sync accessor for the spawner. Empty until primed. */
+/** ⚠ Sync accessor for the spawner, which cannot await. Before the disk has
+ *  answered this is EMPTY AND SAYS SO — it installs nothing, so the hydration it
+ *  starts still reads the disk and the next look is the real roll. */
 export function cachedLedger(): Ledger {
-  if (LEDGER_CACHE === null) { LEDGER_CACHE = { ...EMPTY }; void loadLedger(); }
-  return LEDGER_CACHE;
-}
-
-export function primeLedgerCache(): void {
+  if (LEDGER_CACHE) return LEDGER_CACHE;
   void loadLedger();
+  return UNHYDRATED_SNAPSHOT;
 }
 
-export function _setLedgerForTests(l: Ledger | null): void { LEDGER_CACHE = l; }
+export function _setLedgerForTests(l: Ledger | null): void { LEDGER_CACHE = l; LEDGER_HYDRATION = null; }
 export function _setIdentityForTests(installId: string | null, house: string | null): void {
   INSTALL_ID = installId;
   HOUSE = house;

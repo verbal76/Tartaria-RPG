@@ -30820,7 +30820,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and the closure path says so in the transcript instead of claiming the roll
 // closed. No schema change, no migration.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1837-the-record-sinks-into-something';
-export const OTA_BUILD_ID = '2026-09-18-1838-the-ledger-says-what-the-disk-says';
+// OTA-1839 — nothing is not the same as not yet. `LEDGER_CACHE` held `null` or a
+// ledger, which is one state short: the moment anything read the ledger
+// SYNCHRONOUSLY, `cachedLedger()` minted an empty one and installed it as
+// canonical, and `loadLedger()`'s opening `if (LEDGER_CACHE) return` then handed
+// that placeholder back without ever reaching the disk. Since every write writes
+// the WHOLE ledger, the next ordinary import or rest merged into the synthetic
+// empty and wrote it over a disk that still held the player's foreign dead —
+// measured: one import of a different corpse and the corpse already on disk was
+// gone. Only hydration may install a cache now; a sync reader gets a frozen
+// snapshot it cannot install, hydration is serialised behind one in-flight
+// promise, and a late read cannot clobber a mutation that landed meanwhile. The
+// dead `primeLedgerCache()` — zero callers — is deleted rather than wired up.
+// No schema change, no migration, OTA-1838's failure semantics untouched.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1838-the-ledger-says-what-the-disk-says';
+export const OTA_BUILD_ID = '2026-09-18-1839-nothing-is-not-the-same-as-not-yet';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
