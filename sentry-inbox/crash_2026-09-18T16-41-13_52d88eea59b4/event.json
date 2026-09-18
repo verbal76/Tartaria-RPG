@@ -1,0 +1,352 @@
+{
+  "id": "52d88eea59b44558bfa04fedd22c6d30",
+  "groupID": "7717706963",
+  "eventID": "52d88eea59b44558bfa04fedd22c6d30",
+  "projectID": "4511945117532160",
+  "size": 5728,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process reclaimed while idle on the title screen \u2014 no game was in progress (5s after boot, app background, stage qwen:deferred)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-18-1840-the-house-keeps-its-key",
+  "message": "Process reclaimed while idle on the title screen \u2014 no game was in progress (5s after boot, app background, stage qwen:deferred)",
+  "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (5s after boot, app background, stage qwen:deferred)",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-18T18:30:00.800Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 100.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1702866944,
+      "storage_size": 245292421120,
+      "free_storage": 58459897856,
+      "boot_time": "2026-08-28T17:18:44.580Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "36.20000076293945",
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 32,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0b509-247a-7bec-9ecd-bcd310c54d62"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "73cd5aef3a6a4c7c85d7acb791f20108",
+      "span_id": "8c8d89aafbacbc6a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "actionAgeMs": 4958,
+    "id": "1789749673847_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "appstate:active\u2192background",
+    "lastPhaseAgeMs": 0,
+    "lastScreen": "title",
+    "launchAfterOta": false,
+    "launchAgeMs": 5002,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "no",
+    "sinceBootMs": 5002,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (5s after boot, app background, stage qwen:deferred)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-18-1840-the-house-keeps-its-key"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-18-1840-the-house-keeps-its-key"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-18-1840-the-house-keeps-its-key"
+    },
+    {
+      "key": "stage",
+      "value": "appstate:active\u2192background"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-18T18:29:59.945550Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-18T16:41:13.847000Z",
+  "fingerprints": [
+    "8c219da47ebaa917d481ecf80fb9f9a4"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1980169119,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-18T14:53:14.422417Z",
+    "dateReleased": "2026-09-18T15:02:55.927649Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "1ea1bc0083bab002f2d3355a7323b0a9c9f360ef",
+      "message": "OTA-1840 \u2014 the house keeps its key\n\nThree faults on the pairing authority, one root: a cache that holds `null | T`\nis one state short, and a row rebuilt from a field whitelist keeps only the\nfields somebody remembered to list.\n\n(A) KEY PRESERVATION. `loadPaired()` rebuilt each stored row as\n{player, installId, addedTs} and never copied `key`, while `persistPaired()`\nwrites the whole row with JSON.stringify \u2014 so a sealed pairing's key reached\nthe disk intact and was discarded on the way back. This was worse than a lost\nverification. With every key gone the install holds NO keys at all, and a\nphone holding no keys is by design a phone from before seals existed: it\nadmits an unsealed payload. The restart turned a REFUSAL INTO AN ACCEPTANCE.\nMeasured pre-repair: a forged payload, refused before the restart, was\naccepted after it (forged false, added 1).\n\n(B) PAIRED LIST. `cachedPaired()` installed `[]` as the answer and\n`loadPaired()` early-returns on a truthy PAIRED, so one synchronous look\nbefore the disk answered left the install unpaired for the session. Measured:\nan arriving corpse turned away as a stranger (added 0 of 1), and the next\nwrite persisted the empty list over the real one (House A erased).\n\n(C) HOUSE NAME. `cachedHouseName()` did the same with `''`; this install's\ndead rode out to other players' rolls stamped \"an unnamed house\" while the\nname sat on disk.\n\nAll three take OTA-1839's state model: `null` means unhydrated, a sync reader\ngets a non-installing fallback (frozen UNHYDRATED_PAIRED / literal ''),\nhydration is serialised behind one in-flight promise, and it installs only if\nthe cache is still `null` so a late read cannot clobber a mutation that landed\nmeanwhile. Row revival is factored into revivePairedRow, which CARRIES the\nstored key \u2014 the trim and 64-char bound are exactly what parseHouseCode\nalready applied on the way in, so it is idempotent and cannot turn a real key\ninto a different one.\n\nSecurity policy is untouched: no change to the HMAC, key derivation, seal\nformat, house-code format, trust classification, or the acceptance rules for\nforeign payloads. No key is invented for a legacy keyless row \u2014 an old TAR1\ncard stays paired and unsealed, a keyless house is still admitted as unsealed\nrather than silently authenticated, and an unpaired house is still refused.\nNo schema change, no migration; the on-disk format already carried the key.\n\nNew suite ota1840TheHouseKeepsItsKey: 26 tests, 14 red before the repair.\nThree negative controls, one per defect, each red at the tests that name it\nand restored hash-clean. Test 6.5 was rewritten during the work: it had taken\na 1400-char window after loadPaired and required the substring \"key\", which\nPAIRED_KEY alone satisfies \u2014 it pinned nothing and would have passed on the\nbroken code. It now writes a key to disk by hand and demands it back byte for\nbyte.\n\nAdjacent, reported not absorbed: cachedInstallId() still installs '', the same\nshape. It is not a live defect ('' is falsy, so ensureInstallId still reaches\nthe disk), but two concurrent cold calls could in principle mint two ids.\nIdentity/trust, outside this task's scope.\n\nValidation: focused 26/26; Fallen + seal + OTA-1838/1839 regressions 143/143;\ntypecheck 181 (pre-existing baseline, unchanged); 25/25 local gates; full fast\nsurface 1344/1344 suites, 15,248 passed / 3 skipped, no failures and no flakes.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-18T14:45:39Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-18-1840-the-house-keeps-its-key",
+          "shortVersion": "tartaria@4.32.11+2026-09-18-1840-the-house-keeps-its-key",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-18T15:02:55.927649Z",
+          "dateCreated": "2026-09-18T14:53:14.422417Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "159820052",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-18T15:02:56.285284Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-18-1840-the-house-keeps-its-key",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-18-1840-the-house-keeps-its-key",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-18-1840-the-house-keeps-its-key",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-18-1840-the-house-keeps-its-key)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "1227a49a9d9240cf97515eda7ee3873b"
+}
