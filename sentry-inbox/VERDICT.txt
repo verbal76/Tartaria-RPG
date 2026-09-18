@@ -1,10 +1,6 @@
 
 ════ VERDICT ════
-  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
-    issue 7727714504 events FAILED: <urlopen error [Errno 104] Connection reset by peer>
-    issue 7720699931 events FAILED: <urlopen error [Errno 104] Connection reset by peer>
-    issue 7716182492 events FAILED: <urlopen error [Errno 104] Connection reset by peer>
-    issue 7713395354 events FAILED: <urlopen error [Errno 104] Connection reset by peer>
+  every fetch this run succeeded
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
     1 page(s), 35 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
@@ -19,6 +15,8 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713140002/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7713395354/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713395378/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713395383/events/?full=false
@@ -89,6 +87,8 @@
     1 page(s), 56 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7716124843/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7716182492/events/?full=false
+    1 page(s), 56 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7716182536/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7716289652/events/?full=false
@@ -121,6 +121,8 @@
     1 page(s), 9 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7720492015/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7720699931/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7720700141/events/?full=false
     1 page(s), 30 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7720700222/events/?full=false
@@ -145,6 +147,8 @@
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7727458630/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
+  /organizations/hot-attic-games-llc/issues/7727714504/events/?full=false
+    1 page(s), 8 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7727714551/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7729887067/events/?full=false
