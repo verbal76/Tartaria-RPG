@@ -34,9 +34,14 @@ import {
   importPayloadText,
   isFallenPersistError,
   isFallenPayloadTooLargeError,
+  loadLedger,
+  foreignPool,
   type ExchangePreview,
 } from '../engine/fallenLedgerStore';
-import type { PairedHouse } from '../engine/fallenLedger';
+import { fallenTitle, restRollLine, type PairedHouse, type ForeignFallen, type RestRecord } from '../engine/fallenLedger';
+
+/** ⚠ Bounded on purpose — this is a roll, not an archive. §13's own rule. */
+const RESTS_SHOWN = 25;
 
 /** ⚠ THE TRUST WORDS. Each is a translation of one state the engine already
  *  computes — never a judgement made here. `verified` is a seal this install
@@ -77,10 +82,31 @@ export function FallenExchangeScreen() {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [advanced, setAdvanced] = useState(false);
+  /* ⚠⚠ OTA-1843 — THE ROLL, READ-ONLY, OUT OF STATE THAT ALREADY PERSISTS.
+   * `walking` is the un-rested foreign dead; `rested` is the append-only rest
+   * roll. Both come straight off the ledger this screen already loads — no new
+   * key, no new record, no migration. That is the whole reason this history
+   * could ship at all: the two things the save durably knows are WHO IS STILL
+   * HERE and WHO HAS BEEN PUT DOWN, so those are the two things it shows.
+   * ⚠ "encountered" and "defeated" are NOT here, and their absence is honest:
+   * nothing durable distinguishes them. Defeat IS the rest — the store writes
+   * the rest record on the same beat it prints the closing lines — so a
+   * "defeated" row would either duplicate "rested" or need a new persisted
+   * counter. Deferred rather than faked. */
+  const [walking, setWalking] = useState<ForeignFallen[]>([]);
+  const [rested, setRested] = useState<RestRecord[]>([]);
 
   const refresh = useCallback(async () => {
     setHouse(await loadHouseName());
     setPaired(await loadPaired());
+    try {
+      // ⚠ `loadLedger` first so the sync cache is hydrated; `foreignPool` then
+      // answers "who is still walking" through the SAME authority the spawner
+      // draws from, rather than this screen re-deriving it and drifting.
+      const l = await loadLedger();
+      setWalking(foreignPool());
+      setRested([...l.rests].sort((x, y) => y.ts - x.ts).slice(0, RESTS_SHOWN));
+    } catch { setWalking([]); setRested([]); }
   }, []);
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -152,9 +178,22 @@ export function FallenExchangeScreen() {
       const out = await importPayloadText(incoming);
       setPreview(null);
       setIncoming('');
+      // ⚠⚠ OTA-1843 — ARRIVAL IS A MOMENT, NOT A COUNT. This used to read
+      // "2 added, 1 rest" in effect: true, and it told the player nothing about
+      // what had just happened to their world. The arrivals are already titled
+      // "<name> child of <house>", so the only thing missing was the sentence
+      // that says what those names now MEAN — that someone else's dead are in
+      // the mud here, and the player will meet them.
       setNote(out.added === 0 && out.rests === 0
         ? 'Nothing new in that one — you already had them.'
-        : `${out.arrivals.length > 0 ? `${out.arrivals.join(', ')} walk now. ` : ''}${out.rests > 0 ? `${out.rests} closed.` : ''}`.trim());
+        : [
+          out.arrivals.length > 0
+            ? `${out.arrivals.join(', ')} walk your wastes now. They died in another player's world and the mud here has them. You will meet them.`
+            : '',
+          out.rests > 0
+            ? `${out.rests === 1 ? 'One of your own dead has' : `${out.rests} of your own dead have`} been put down out there. Their story came back with this.`
+            : '',
+        ].filter(Boolean).join(' '));
       await refresh();
     } catch (e) {
       setPreview(null);
@@ -311,6 +350,42 @@ export function FallenExchangeScreen() {
 
         {!!note && <Text style={styles.note}>{note}</Text>}
 
+        {/* ---- the roll: who is here, and who has been put down ---- */}
+        <Text style={styles.heading}>THE ROLL</Text>
+        {walking.length === 0 && rested.length === 0 ? (
+          <Text style={styles.desc}>
+            No one else&apos;s dead have walked here yet. When they do, they are named here until you put them down.
+          </Text>
+        ) : (
+          <>
+            {walking.length > 0 && (
+              <>
+                <Text style={styles.desc}>
+                  {walking.length === 1 ? 'One of them walks' : `${walking.length} of them walk`} your wastes. Each was a real
+                  character in someone else&apos;s game.
+                </Text>
+                {walking.map((h) => (
+                  <View key={`w_${h.origin.installId}_${h.ts}`} style={styles.rollRow}>
+                    <Text style={styles.rollName}>☗ {fallenTitle(h)}</Text>
+                    <Text style={styles.rollMeta}>{h.raceName} • fell at {h.locationName} • {h.kills} foes</Text>
+                    {!!h.epitaph && <Text style={styles.rollEpitaph}>{h.epitaph}</Text>}
+                  </View>
+                ))}
+              </>
+            )}
+            {rested.length > 0 && (
+              <>
+                <Text style={styles.subHeading}>PUT TO REST</Text>
+                {rested.map((r) => (
+                  <Text key={`r_${r.fallenKey}_${r.ts}`} style={styles.rollRested}>† {restRollLine(r)}</Text>
+                ))}
+                {/* ⚠ Bounded, and it says so rather than pretending to be complete. */}
+                <Text style={styles.rollNote}>The last {RESTS_SHOWN} closings. Send your dead across and this news goes with them.</Text>
+              </>
+            )}
+          </>
+        )}
+
         {/* ---- the old road, kept but demoted ---- */}
         <Pressable
           onPress={() => setAdvanced((v) => !v)}
@@ -376,4 +451,11 @@ const styles = StyleSheet.create({
   arrival: { color: '#e8dcc0', fontSize: 14, marginBottom: 3 },
   note: { color: '#c9a86a', fontSize: 12, lineHeight: 17, marginTop: 10 },
   advToggle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 22 },
+  subHeading: { color: '#8aa0a4', fontSize: 11, letterSpacing: 1.1, marginTop: 14, marginBottom: 6 },
+  rollRow: { borderLeftWidth: 2, borderLeftColor: T.rim, paddingLeft: 8, marginBottom: 10 },
+  rollName: { color: '#e8dcc0', fontSize: 14, marginBottom: 2 },
+  rollMeta: { color: '#a89a80', fontSize: 11, marginBottom: 2 },
+  rollEpitaph: { color: '#8a8069', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
+  rollRested: { color: '#a89a80', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  rollNote: { color: '#7a705c', fontSize: 11, lineHeight: 16, marginTop: 6 },
 });

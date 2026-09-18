@@ -120,6 +120,29 @@ export function stackCompatible(a: InventoryItem, b: InventoryItem): boolean {
   if (a.instanceStats || b.instanceStats || a.uniqueStats || b.uniqueStats) return false;
   if (a.golemCore || b.golemCore || a.formingName || b.formingName) return false;
   if ((a.addedResists?.length ?? 0) > 0 || (b.addedResists?.length ?? 0) > 0) return false;
+  // ⚠⚠⚠ OTA-1843 — TWO DEAD PEOPLE'S SWORDS ARE NOT ONE SWORD.
+  // Gear reclaimed from a Hollowed carries a provenance sentence naming whose
+  // hand it was in. Two Legendary blades of the same name off two different
+  // corpses would otherwise merge into one row and one of the two names would
+  // simply be gone — the player told they held Francis's blade while half the
+  // stack was someone else's.
+  //
+  // ⚠⚠ THE FIRST CUT OF THIS RULE WAS WRONG AND THE SURFACE CAUGHT IT. It read
+  // "descriptions differ → never merge", with a comment claiming that could
+  // only split a stack that was already lying. It could not: OTA-958's torch
+  // proves it. A starting Aetheric Torch carries its catalog description and
+  // one taken off a tile does not, so the same object in two rows stopped
+  // stacking and `take` looked like it granted twice. The claim was the kind
+  // that sounds airtight and is simply untrue about a real inventory.
+  //
+  // ⚠ SO THE MARKER IS THE TEST, NOT THE PROSE. A reclaimed piece is tagged
+  // `fallen`, a tag nothing before this OTA ever wrote, and it is per-instance
+  // for the same reason a coated or rolled piece is — it is a specific dead
+  // person's object, and the same corpse can only be reclaimed once anyway.
+  // Nothing that stacked yesterday changes. It lives HERE because OTA-1737 made
+  // this function the one authority on "are these the same kind of thing".
+  if ((a.tags ?? []).some((t) => t.toLowerCase() === 'fallen')) return false;
+  if ((b.tags ?? []).some((t) => t.toLowerCase() === 'fallen')) return false;
   // behaviour-bearing flags must AGREE (both set or both clear)
   for (const f of STACK_FLAGS) if (!!a[f] !== !!b[f]) return false;
   // value-bearing classification must agree

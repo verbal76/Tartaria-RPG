@@ -25227,16 +25227,19 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         const fr = get().worldMemory.activeRevenant;
         if (fr) {
           const closing = rev998.revenantDefeatLines(fr, get().player?.name ?? 'a wanderer');
-          get().appendLog('world', closing.world);
-          get().appendLog('reward', closing.reward);
+          // ⚠⚠ OTA-1843 — defeat IS the rest here, so this is the closure.
+          for (const ln of rev998.revenantRestLog(fr, get().player?.name ?? 'a wanderer')) get().appendLog(ln.channel, ln.text);
           // OTA-994 — the GUARANTEED reclaim (owner's call): a one-time boss must
           // not lose the signature piece to a dice roll that can never rerun.
           {
             const wp = rev998.revenantReclaimWeapon(fr);
+            const provenance = rev998.fallenProvenanceLine(fr); // ⚠ OTA-1843 — whose it was
+            const provHouse = rev998.revenantHouse(fr); // null for your own dead
+            const fromWhom = provHouse ? ` It was ${fr.name} child of ${provHouse}'s, carried to the end.` : '';
             if (wp) {
-              const back = rev998.reconstructFallenPiece(wp, `reclaim_${Date.now()}`);
+              const back = rev998.reconstructFallenPiece(wp, `reclaim_${Date.now()}`, provenance);
               set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, back) } } : s2));
-              get().appendLog('reward', `✦ ${back.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+              get().appendLog('reward', `✦ ${back.name} comes free of the mud — carried to the end, and yours now to carry on.${fromWhom}`);
             } else {
               const pinnedNames = (fr.gearNames && fr.gearNames.length > 0)
                 ? fr.gearNames
@@ -25244,10 +25247,13 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
               const wname = pinnedNames[0];
               if (wname) {
                 const lk = resolveLootItem(wname, 'Legendary');
+                // ⚠ Same provenance on the pre-snapshot road — whose blade you hold must not depend on the record's age.
                 set((s2) => (s2.player ? { player: { ...s2.player, inventory: mergeOrPushItem(s2.player.inventory, {
-                  id: `reclaim_${Date.now()}`, name: lk.name, kind: lk.kind, rarity: lk.rarity, quantity: 1, tags: [...lk.tags, 'loot'],
+                  id: `reclaim_${Date.now()}`, name: lk.name, kind: lk.kind, rarity: lk.rarity, quantity: 1,
+                  tags: [...lk.tags, 'loot', ...(provHouse ? ['fallen'] : [])],
+                  ...(provHouse ? { description: provenance } : {}),
                 }) } } : s2));
-                get().appendLog('reward', `✦ ${lk.name} comes free of the mud — carried to the end, and yours now to carry on.`);
+                get().appendLog('reward', `✦ ${lk.name} comes free of the mud — carried to the end, and yours now to carry on.${fromWhom}`);
               }
             }
           }
@@ -27690,11 +27696,8 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
               },
               worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
             } : s2));
-            const beats = rev.revenantIntroBeats(fr, fr.name === rvPlayer.name);
-            get().appendLog('world', beats.emergence);
-            get().appendLog('arbiter', beats.identification);
-            get().appendLog('world', beats.identity);
-            get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+            // ⚠ OTA-1843 — order and channels live in fallenRevenants, not here.
+            for (const ln of rev.revenantArrivalLog(fr, foe.name, fr.name === rvPlayer.name)) get().appendLog(ln.channel, ln.text);
             get().appendLog('debug', `spawn: revenant ${fr.name}@${fr.ts} pool=${rvPool.length}`);
           } else if (rvPool.length > 0 && Math.random() < 0.05) {
             // OTA-981 — the HINT route (owner: "hint missions that can be picked
@@ -31043,11 +31046,8 @@ function applyHookEffect(
         },
         worldMemory: { ...s2.worldMemory, activeRevenant: { ...fr } },
       } : s2));
-      const beats = rev.revenantIntroBeats(fr, fr.name === rp.name);
-      get().appendLog('world', beats.emergence);
-      get().appendLog('arbiter', beats.identification);
-      get().appendLog('world', beats.identity);
-      get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
+      // ⚠ OTA-1843 — the hook route is the same encounter by another door.
+      for (const ln of rev.revenantArrivalLog(fr, foe.name, fr.name === rp.name)) get().appendLog(ln.channel, ln.text);
       get().appendLog('debug', `hook: fallen_whisper answered ${fr.name}@${fr.ts} pool=${pool.length}`);
       return { inlineSummary: `${fr.name} answers the name`, fatal: false };
     }
