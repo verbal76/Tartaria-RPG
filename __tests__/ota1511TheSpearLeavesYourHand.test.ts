@@ -233,7 +233,12 @@ describe('OTA-1511 — the wiring (source claims)', () => {
     // so the THROW SPEAR card (ExplorationScreen) reads the same predicate the
     // button lights by. Same rule, one owner.
     expect(INPUT).toContain("import { spareThrowingSpear } from '../engine/bandolierEligibility';");
-    expect(INPUT).toContain('useGameStore.getState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)');
+    // ⚠ OTA-1836 — the ACCESSOR moved, the claim did not. This button is a direct
+    // human press that mutates gameplay, so it reaches the store through
+    // `humanGetState()` (which stamps the activity clock) instead of a bare
+    // `useGameStore.getState()`. What this line is for — the throw goes through
+    // the dedicated hurl — is unchanged.
+    expect(INPUT).toContain('humanGetState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)');
     expect(INPUT).toContain('spareThrowingSpear(reachPlayer?.inventory ?? [], reachPlayer?.equipped)');
     const ELIG = readFileSync(join(__dirname, '..', 'app', 'engine', 'bandolierEligibility.ts'), 'utf8');
     expect(ELIG).toContain("((i.id !== equipped?.mainId && i.id !== equipped?.offId) || i.quantity > 1)) ?? null;");

@@ -166,7 +166,13 @@ describe('OTA-1657 — using from the pouch IS using from the pack', () => {
     // direct store action the combat bar already used; ota1658 reproduces the
     // failure before proving the fix.
     const src = readSrc('app/components/InputBox.tsx');
-    expect(src).toContain("useGameStore.getState().useHealBatch(it.name, 'self', 1)");
+    // ⚠ OTA-1836 — the ACCESSOR moved, the claim did not. `useHealBatch` was
+    // already on HUMAN_GAMEPLAY_MUTATIONS and this door reached it bare, so a
+    // player healing from the pouch registered as idle. It now goes through
+    // `humanGetState()`. The pin still proves the pouch heals through
+    // `useHealBatch`, and the guard below still forbids the `useInventoryItem`
+    // regression this suite exists for.
+    expect(src).toContain("humanGetState().useHealBatch(it.name, 'self', 1)");
     expect(src).not.toContain('useInventoryItem(it.name)');
   });
 
