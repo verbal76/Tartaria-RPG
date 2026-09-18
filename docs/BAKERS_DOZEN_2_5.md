@@ -104,7 +104,7 @@ Source references are **as of `61f104e0`**; line numbers drift, symbol names do 
 | **#10** | **AUTHORITATIVE WORDING NOT RECOVERED** | UNKNOWN | **NOT RECOVERED** | — | UNKNOWN | Future Codex archaeology | |
 | **#11** | Take / Take-All synchronous sweep / render / persistence burst | APP LOGIC | **STRUCTURAL RISK ONLY — MEASURED, NOT MATERIAL** | LOW as measured — storage writes do not scale with the sweep | Source-derived current **+ measured on 2.5.0** | **NO OPTIMISATION JUSTIFIED** | `app/screens/ExplorationScreen.tsx` — `for (const n of nouns) takeDirect(n)`, one synchronous call per noun. The loop is real; the harm it was expected to cause is not. See **#11 — WHAT THE MEASUREMENT FOUND** |
 | **#12** | **AUTHORITATIVE WORDING NOT RECOVERED** | UNKNOWN | **NOT RECOVERED** | — | UNKNOWN | Future Codex archaeology | |
-| **#13** | Player activity accounting / false-idle admission | APP LOGIC | **CLOSED BY CURRENT SOURCE** (OTA-1834) | MEDIUM if regressed | Source-derived current + regression | No work unless a regression is reproduced | Repair: **OTA-1834**. Authority `app/state/humanActivity.ts`; regression `__tests__/ota1834TheSixtyFirstDoorCannotHide.test.tsx` |
+| **#13** | Player activity accounting / false-idle admission | APP LOGIC | **CLOSED BY CURRENT SOURCE — CLASS-WIDE** (OTA-1834 → OTA-1836) | MEDIUM if regressed | Source-derived current + regression over BOTH surfaces | No work unless a regression is reproduced | Repairs: **OTA-1834** (six screen bypasses, census made total over screens) then **OTA-1836** (thirty-three more, and the census widened to components). Authority `app/state/humanActivity.ts`; regression `__tests__/ota1836NoDoorBelowAScreen.test.tsx`. See **#13 — CLASS-WIDE CLOSURE (OTA-1836)** |
 
 ---
 
@@ -168,6 +168,56 @@ the list without increasing precision.
 
 ---
 
+## #13 — CLASS-WIDE CLOSURE (OTA-1836)
+
+OTA-1834 made the census total over the **ten screens** and parked twelve names as
+DEFERRED. The owner ruled them mechanically rather than one at a time — a control
+belongs on the authority when a human press invokes it directly AND it mutates
+gameplay state; reads, presentation, navigation, passive engine work and
+already-stamped presses do not. Ten of the twelve qualified.
+
+**The eleventh could not be seen at all.** `raiseTopic` writes
+`worldMemory.talkedTopics` and is reached from `app/components/TalkSheet.tsx`.
+The screen only opens the modal (`talkToNpc` — presentation, excluded). A
+screen-only census cannot see a gameplay mutation that lives one component
+deeper, by construction.
+
+**So the walk was widened to components, and that changed the size of the
+problem.** `raiseTopic` was not a straggler: the entire `app/components` surface
+had never been censused. Fifty-three names were reachable bare and classified
+nowhere.
+
+| bucket | count |
+| --- | --- |
+| INCLUDED — newly wired | 26 |
+| INCLUDED — already listed, bare component door repaired | 7 |
+| EXCLUDED — presentation / navigation / staging, each with a reason | 20 |
+| genuinely ambiguous | 0 |
+
+**The seven were the worst of it.** `acceptHunt`, `acceptMystery`,
+`acceptStoryline`, `acceptFactionQuest`, `setTravelCourse`, `setWhisperCourse`
+and `useHealBatch` were ruled human gameplay long ago and sat on the authority
+the whole time — and their component doors never stamped. Those are OTA-1816
+violations that a screen-only census was structurally unable to report.
+
+**Two classifications that had to be read rather than named.**
+`craftRecipe` delegates to `submitPlayerAction` — but through `get()` INSIDE the
+store, and the stamp only ever happens at the surface, so the delegation is not
+cover and the bypass is real. `dismissStoryIntro` is named for a dismissal and
+ARMS THE TUTORIAL HAND-OFF, so it is included; `parleyIntoTalk` ("no roll, no
+outcome, no cost") and `dismissDeath` (session teardown, the slot already written
+by `handlePlayerDeath`) are not.
+
+**The census is now class-wide and reads its own surface list from disk.** A
+hand-maintained component list would have rebuilt the identical blind spot one
+level up — the next component would be invisible until somebody remembered it,
+which is the "sixty-first door" failure this whole line of work exists to
+abolish. Three negative controls hold it: a screen mutation returned to a bare
+path, a component mutation returned to a bare path, and a name delisted *while*
+its bare path remains. All three fail by name and by surface.
+
+---
+
 ## #11 — WHAT THE MEASUREMENT FOUND
 
 **STRUCTURAL RISK ONLY — MEASURED, NOT MATERIAL — NO OPTIMISATION JUSTIFIED.**
@@ -208,7 +258,7 @@ was read, and the number survived them.
 
 ## CURRENT 2.5.0 WORK ORDER
 
-1. ~~**#13** — repair activity-accounting bypasses.~~ **DONE — OTA-1834.**
+1. ~~**#13** — repair activity-accounting bypasses.~~ **DONE — OTA-1834, then OTA-1836 closed the CLASS: the census now walks components as well as screens, and 33 further qualifying mutations were repaired.**
 2. ~~**#11** — instrument and measure the Take / Take-All burst.~~ **DONE — MEASURED. Structural risk only; no optimisation justified.**
 3. **#3** — rebenchmark process memory / Jetsam on current 2.5.0 hardware.
 4. **#7** — rebenchmark Qwen prefill on llama.rn 0.4.8.
