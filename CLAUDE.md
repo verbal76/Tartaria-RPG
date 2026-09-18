@@ -144,6 +144,18 @@ same place: a write to `pendingDogOnboarding`.
   than inferring health from CPU time after the fact. **Report size is NOT
   a concern** — the owner funnels this output onward for review, so verbose
   is wanted, not merely tolerated.
+- **⚠⚠ TASK STATE MUST BE UNAMBIGUOUS — OWNER RULE, 2026-09-18.** An interim
+  update must never read like a finished one. Every interim report opens with
+  `STATUS: IN PROGRESS` and avoids *done / complete / finished / closed /
+  shipped / all requested work completed* unless the whole prompt really is
+  satisfied. The last line of the final response is exactly
+  `PROMPT COMPLETE` — once, only there, and only when implementation,
+  validation, CI, publication and BOTH receipts have landed and no stop
+  condition is open. Stopped early → `PROMPT STOPPED — <condition>`. Waiting
+  on an external gate → `PROMPT WAITING — <what is pending>`. Never
+  `PROMPT COMPLETE` while tests, CI, a publish or a receipt is still running,
+  while owner-device verification is required, or while a scoped item or a
+  required decision is still open.
 
 ## Playtest-log triage
 
