@@ -101,14 +101,32 @@ export function cachedInstallId(): string {
  *  child of Sasmooch'"* — this is the Sasmooch half. It rides out with every
  *  corpse this install exports and is how other players' rolls name your dead.
  *  Your own screens never show it; a house only means something abroad. */
+/* ⚠⚠ OTA-1840 — `null` MEANS UNHYDRATED HERE TOO, and `''` is a real answer.
+ * `cachedHouseName()` used to install `''` and `loadHouseName()` early-returns
+ * on any non-null HOUSE, so one synchronous look before the disk had answered
+ * left this install nameless for the session — and its dead rode out to other
+ * players' rolls stamped `an unnamed house` while the name sat on disk. Same
+ * mistake OTA-1839 closed for the ledger; same shape of repair. */
+let HOUSE_HYDRATION: Promise<string> | null = null;
+
 export async function loadHouseName(): Promise<string> {
   if (HOUSE !== null) return HOUSE;
-  try { HOUSE = (await AsyncStorage.getItem(HOUSE_KEY)) ?? ''; } catch { HOUSE = ''; }
-  return HOUSE;
+  if (HOUSE_HYDRATION) return HOUSE_HYDRATION;
+  const run = (async (): Promise<string> => {
+    let next: string;
+    try { next = (await AsyncStorage.getItem(HOUSE_KEY)) ?? ''; } catch { next = ''; }
+    // a rename may have landed while we were reading; it wins.
+    if (HOUSE === null) HOUSE = next;
+    return HOUSE;
+  })();
+  HOUSE_HYDRATION = run;
+  try { return await run; } finally { if (HOUSE_HYDRATION === run) HOUSE_HYDRATION = null; }
 }
+/** ⚠ Empty until the disk answers, and it does NOT install that emptiness. */
 export function cachedHouseName(): string {
-  if (HOUSE === null) { HOUSE = ''; void loadHouseName(); }
-  return HOUSE;
+  if (HOUSE !== null) return HOUSE;
+  void loadHouseName();
+  return '';
 }
 export async function setHouseName(name: string): Promise<void> {
   const clean = name.replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 32);
@@ -117,30 +135,75 @@ export async function setHouseName(name: string): Promise<void> {
 }
 
 // ---- pairing ---------------------------------------------------------------
+/* ⚠⚠⚠ OTA-1840 — THE PAIRING LIST IS A TRUST RECORD, AND IT USED TO FORGET THE
+ * HALF THAT DOES THE TRUSTING. Two separate faults lived here, and they
+ * compounded into a phone that ACCEPTED A FORGERY after a restart:
+ *
+ *   1. `loadPaired()` rebuilt each row from a field whitelist that listed
+ *      player/installId/addedTs and NOT `key`. `persistPaired()` writes the
+ *      whole row with JSON.stringify, so the key reached the disk perfectly and
+ *      was then thrown away on the way back. After a cold start every sealed
+ *      pairing silently degraded to a keyless one.
+ *   2. With every key gone, `authenticate()` holds no keys at all — and a phone
+ *      holding no keys is by design a phone from before seals existed, so it
+ *      admits an unsealed payload. The restart did not merely lose a
+ *      verification; it converted a REFUSAL into an ACCEPTANCE.
+ *
+ * `cachedPaired()` carried the third: it installed `[]` as the answer and
+ * `loadPaired()` early-returns on a truthy PAIRED, so one synchronous look
+ * before the disk answered left this install permanently unpaired for the
+ * session — every arriving corpse turned away as a stranger, and the next
+ * write persisted the empty list over the real one. Same `unhydrated is not
+ * empty` mistake OTA-1839 closed for the ledger; same shape of repair. */
 let PAIRED: PairedHouse[] | null = null;
+let PAIRED_HYDRATION: Promise<PairedHouse[]> | null = null;
+
+/** Handed to a synchronous reader before the disk has answered. Frozen, and
+ *  deliberately NOT installed — it says "not yet", never "nobody". */
+const UNHYDRATED_PAIRED: PairedHouse[] = [];
+Object.freeze(UNHYDRATED_PAIRED);
+
+/** ⚠ Rebuilds one stored row. `key` is CARRIED, not regenerated: the trim and
+ *  64-char bound are exactly what `parseHouseCode` already applied when the key
+ *  came in, so this is idempotent for anything that entered through the front
+ *  door and cannot turn a real key into a different one. A row with no usable
+ *  key stays keyless — an old card from before seals existed is still paired,
+ *  and no key is invented for it. */
+function revivePairedRow(d: unknown): PairedHouse[] {
+  if (typeof d !== 'object' || d === null) return [];
+  const r = d as Record<string, unknown>;
+  const player = typeof r.player === 'string' ? r.player.slice(0, 32) : '';
+  const installId = typeof r.installId === 'string' ? r.installId.slice(0, 40) : '';
+  if (!player || !installId) return [];
+  const row: PairedHouse = { player, installId, addedTs: typeof r.addedTs === 'number' ? r.addedTs : 0 };
+  const key = typeof r.key === 'string' ? r.key.trim().slice(0, 64) : '';
+  if (key) row.key = key;
+  return [row];
+}
 
 export async function loadPaired(): Promise<PairedHouse[]> {
   if (PAIRED) return PAIRED;
-  try {
-    const raw = await AsyncStorage.getItem(PAIRED_KEY);
-    const doc: unknown = raw ? JSON.parse(raw) : [];
-    PAIRED = Array.isArray(doc)
-      ? doc.flatMap((d) => {
-        if (typeof d !== 'object' || d === null) return [];
-        const r = d as Record<string, unknown>;
-        const player = typeof r.player === 'string' ? r.player.slice(0, 32) : '';
-        const installId = typeof r.installId === 'string' ? r.installId.slice(0, 40) : '';
-        if (!player || !installId) return [];
-        return [{ player, installId, addedTs: typeof r.addedTs === 'number' ? r.addedTs : 0 }];
-      })
-      : [];
-  } catch { PAIRED = []; }
-  return PAIRED;
+  if (PAIRED_HYDRATION) return PAIRED_HYDRATION;
+  const run = (async (): Promise<PairedHouse[]> => {
+    let next: PairedHouse[];
+    try {
+      const raw = await AsyncStorage.getItem(PAIRED_KEY);
+      const doc: unknown = raw ? JSON.parse(raw) : [];
+      next = Array.isArray(doc) ? doc.flatMap(revivePairedRow) : [];
+    } catch { next = []; }
+    // a pairing or a revoke may have landed while we were reading; it wins.
+    if (PAIRED === null) PAIRED = next;
+    return PAIRED;
+  })();
+  PAIRED_HYDRATION = run;
+  try { return await run; } finally { if (PAIRED_HYDRATION === run) PAIRED_HYDRATION = null; }
 }
 
+/** ⚠ Empty until the disk answers, and it does NOT install that emptiness. */
 export function cachedPaired(): PairedHouse[] {
-  if (PAIRED === null) { PAIRED = []; void loadPaired(); }
-  return PAIRED;
+  if (PAIRED) return PAIRED;
+  void loadPaired();
+  return UNHYDRATED_PAIRED;
 }
 
 async function persistPaired(list: PairedHouse[]): Promise<void> {
@@ -148,7 +211,7 @@ async function persistPaired(list: PairedHouse[]): Promise<void> {
   try { await AsyncStorage.setItem(PAIRED_KEY, JSON.stringify(list)); } catch { /* memory-only this run */ }
 }
 
-export function _setPairedForTests(l: PairedHouse[] | null): void { PAIRED = l; }
+export function _setPairedForTests(l: PairedHouse[] | null): void { PAIRED = l; PAIRED_HYDRATION = null; }
 
 /** ⚠⚠ THE REQUEST. This is what the player sends — their own house card. There
  *  is nothing to "receive" it yet, so it travels the way everything else does:
@@ -262,6 +325,7 @@ export function _setLedgerForTests(l: Ledger | null): void { LEDGER_CACHE = l; L
 export function _setIdentityForTests(installId: string | null, house: string | null): void {
   INSTALL_ID = installId;
   HOUSE = house;
+  HOUSE_HYDRATION = null;
 }
 
 /** ⚠⚠⚠ OTA-1838 — WHAT A REFUSED DISK SOUNDS LIKE, BECAUSE IT USED TO SOUND

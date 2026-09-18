@@ -30834,7 +30834,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dead `primeLedgerCache()` — zero callers — is deleted rather than wired up.
 // No schema change, no migration, OTA-1838's failure semantics untouched.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1838-the-ledger-says-what-the-disk-says';
-export const OTA_BUILD_ID = '2026-09-18-1839-nothing-is-not-the-same-as-not-yet';
+// OTA-1840 — the house keeps its key. Three faults on the pairing authority, one
+// root: a cache that holds `null | T` is one state short, and a row rebuilt from
+// a field whitelist keeps only the fields somebody remembered to list.
+// (A) `loadPaired()` rebuilt {player, installId, addedTs} and never copied `key`,
+// while `persistPaired()` writes the whole row — so a sealed pairing's key
+// reached the disk intact and was discarded on the way back. After a cold start
+// this install held NO keys, and a phone holding no keys is by design a phone
+// from before seals existed: it admits an unsealed payload. The restart did not
+// merely lose a verification, it turned a REFUSAL INTO AN ACCEPTANCE — measured,
+// a forged payload that was refused before the restart was accepted after it.
+// (B) `cachedPaired()` installed `[]` and `loadPaired()` early-returns on a
+// truthy PAIRED, so one synchronous look before the disk answered left the
+// install unpaired for the session: arriving corpses turned away as strangers
+// (measured: added 0 of 1), and the next write persisted the empty list over the
+// real one (measured: House A erased). (C) `cachedHouseName()` did the same with
+// `''`, and this install's dead rode out to other players' rolls stamped `an
+// unnamed house` while the name sat on disk. All three take OTA-1839's state
+// model: `null` means unhydrated, a sync reader gets a non-installing fallback,
+// hydration is serialised behind one in-flight promise and installs only if the
+// cache is still `null`, so a late read cannot clobber a mutation. No key is
+// invented for a legacy keyless row, no key is regenerated or renormalised, and
+// no trust rule moved. No schema change, no migration.
+export const OTA_BUILD_ID = '2026-09-18-1840-the-house-keeps-its-key';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';
