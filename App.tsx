@@ -343,6 +343,18 @@ export default function App() {
     setAliveBeatContext(
       () => { try { return useGameStore.getState().currentScreen; } catch { return undefined; } },
       () => (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE,
+      // ⚠⚠⚠ OTA-1847 — WAS A GAME IN PROGRESS, FROM THE STORE'S OWN AUTHORITY.
+      // `activeSlotId != null && player != null` is the pair gameStore already
+      // trusts; a screen name is a proxy and this is not. Read at beat time, so
+      // the crumb carries the answer AS IT WAS, never one reconstructed later by
+      // a process that no longer holds the state. `undefined` on any failure —
+      // unknown is a fact, and bootSlice downgrades only on positive evidence.
+      () => {
+        try {
+          const s = useGameStore.getState();
+          return s.activeSlotId != null && s.player != null;
+        } catch { return undefined; }
+      },
     );
     startAliveBeat();
     return () => { stopAliveBeat(); };

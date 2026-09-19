@@ -55,7 +55,10 @@ import {
   type FreezeVerdict,
   type PressureSnapshot,
 } from './runtimePressure';
-import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded, peekLiveBreadcrumb } from '../engine/saveSystem';
+// ⚠ OTA-1847 — `clearLiveBreadcrumb` and `noteForegrounded` are deliberately NOT
+// imported here any more: the orderly-exit latch belongs to app root, not to an
+// instrument that starts at the end of `bootQwen`. See the AppState handler.
+import { stampBreadcrumbPhase, peekLiveBreadcrumb } from '../engine/saveSystem';
 // ⚠ OTA-1813 — observational only; see app/diagnostics/touchPath.ts.
 import { flushTouchPath, resetTouchCorrelation, setTouchPathContext, touchPathContext } from './touchPath';
 import { nativeMlSnapshot, nativeQueuePressure } from '../ai/nativeMlLock';
@@ -412,11 +415,15 @@ export function startRuntimePressureWatch(
       // was making the measurement slightly worse.
       if (nextStr === 'active') {
         rpLastFrameAt = t; rpLastJsAt = t;
-        // ⚠⚠ OTA-1413 — THE CLEAN-EXIT LATCH RELEASES HERE, and it must release
-        // BEFORE any foreground work can stamp a phase. From this instant a
-        // surviving crumb means a real death again — including the third B9
-        // freeze, which died 1ms into this very transition.
-        noteForegrounded();
+        // ⚠⚠⚠ OTA-1847 — THE LATCH IS NOT THIS INSTRUMENT'S BUSINESS ANY MORE.
+        // `noteForegrounded()` was called here. The RULE it enforces is
+        // OTA-1413's and is unchanged — the latch must release before any
+        // foreground work can stamp a phase — but this watcher is started at the
+        // END of `bootQwen` (aiLifecycleSlice), and since OTA-1493 `bootQwen`
+        // waits for the FIRST PLAYER ACTION. An instrument that does not exist
+        // yet cannot own a lifecycle fact the app needs from its first frame.
+        // App root owns it now (diagnostics/aliveBeat, wired in App.tsx), which
+        // leaves this file with the responsibility its name claims.
         rpStartFrameClock();
       } else {
         rpStopFrameClock();
@@ -457,10 +464,17 @@ export function startRuntimePressureWatch(
         // rarer than predicted: the owner's golem ledger carried one within a
         // day, because the Qwen teardown stamps `ctx-release` / `ctx-release-done`
         // immediately AFTER this line every single time the app backgrounds.
-        // `clearLiveBreadcrumb` now latches the clean exit as a fact, so those
-        // stamps are labelled `afterOrderlyExit` and boot can tell an OS reclaim
-        // from a death. See saveSystem.stampBreadcrumbPhase.
-        if (nextStr === 'background') void clearLiveBreadcrumb();
+        // `clearLiveBreadcrumb` latches the clean exit as a fact, so those stamps
+        // are labelled `afterOrderlyExit`. See saveSystem.stampBreadcrumbPhase.
+        //
+        // ⚠⚠⚠ OTA-1847 — AND THE CALL MOVED OUT OF HERE, POSITION INTACT. Every
+        // word above still describes the behaviour; what changed is the owner.
+        // This watcher starts at the end of `bootQwen`, which waits for the first
+        // player action, so on the title screen nothing had latched anything —
+        // which is precisely how a backgrounded title-screen process came back as
+        // a native death. The identical last-statement clear now runs from
+        // diagnostics/aliveBeat, which App.tsx starts at the root on every boot
+        // and every platform. Nothing about WHEN it runs changed.
       }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) */ }

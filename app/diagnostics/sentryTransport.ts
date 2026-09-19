@@ -266,18 +266,43 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
   const bc = rec.breadcrumb;
   return {
     message: rec.message,
-    level: rec.isFatal === false ? 'error' : 'fatal',
+    /* ⚠⚠⚠ OTA-1847 — THREE RUNGS, BECAUSE THE RECORD ALREADY KNEW THREE THINGS.
+     *
+     * This was `rec.isFatal === false ? 'error' : 'fatal'`, and that ternary is
+     * why a title-screen disappearance paged like a crash. The classifier had
+     * ALREADY decided the event was not fatal; the transport had nowhere to put
+     * that, so "not a crash" arrived one notch under a JS fatal.
+     *
+     *   background-idle    → info     nothing known to be lost
+     *   background-active  → warning  a game was up; impact possible, not proven
+     *   everything else    → the OTA-1380 mapping, byte for byte
+     *
+     * ⚠ The fall-through is the point: a legacy record, a foreground native
+     * death and anything that cannot answer all take the old path unchanged. */
+    level: rec.impact === 'background-idle' ? 'info'
+      : rec.impact === 'background-active' ? 'warning'
+        : rec.isFatal === false ? 'error' : 'fatal',
     timestamp: rec.ts / 1000,
     // ⚠ Grouped by KIND and STAGE, not by message. A native death's message is
     // reconstructed from a breadcrumb and varies with whatever the player was
     // doing; grouping on it would file one issue per session.
-    fingerprint: [rec.kind, rec.stage],
+    // ⚠⚠⚠ OTA-1847 — AND A BACKGROUND DISAPPEARANCE GETS ITS OWN GROUP. Keying
+    // on `stage` alone put a player sitting on the title screen and a player
+    // whose app died mid-fight in ONE Sentry issue whenever both were last
+    // stamped at the same phase — which is how "6 events · 2 users" could not be
+    // read as six of anything. The impact class replaces the stage for exactly
+    // these two, so the foreground group keeps its own identity and its own
+    // stage resolution.
+    fingerprint: rec.impact ? [rec.kind, rec.impact] : [rec.kind, rec.stage],
     tags: {
       line: productLine(),
       kind: rec.kind,
       stage: rec.stage,
       build: rec.build,
       version: rec.version,
+      // ⚠ Absent on every record that cannot answer, so the tag never asserts a
+      // class for a crumb that had no evidence for one.
+      ...(rec.impact ? { impact: rec.impact } : {}),
     },
     extra: {
       id: rec.id,

@@ -33,6 +33,21 @@ const save = src('app', 'engine', 'saveSystem.ts');
 // count, and cannot slip past this one.
 const store = storeSource();
 const watch = src('app', 'diagnostics', 'runtimePressureWatch.ts');
+// ⚠⚠⚠ OTA-1847 — AND HERE IS WHERE THE HANDLER MOVED AGAIN, for a reason that is
+// about correctness rather than tidiness. `startRuntimePressureWatch()` is called
+// at the END of `bootQwen`, and since OTA-1493 `bootQwen` waits for the FIRST
+// PLAYER ACTION. So the file this suite used to name owned the orderly-exit latch
+// only AFTER the player had done something: on the title screen, on the
+// character-creation screen, and through every boot that was backgrounded before
+// the first tap, NOBODY owned it. Every one of those lives produced a survivor
+// crumb with no orderly exit and was promoted to a `native-death`.
+//
+// The fix is ownership, not a new mechanism: the same listener, the same clear,
+// the same LAST-statement position, registered instead from the app root
+// (App.tsx → startAliveBeat) where it exists from the first frame. So the pins
+// below follow the handler to its new home AND assert it did not stay behind —
+// two owners racing the same latch would be worse than the bug.
+const beatSrc = src('app', 'diagnostics', 'aliveBeat.ts');
 
 function appFiles(dir: string, out: string[] = []): string[] {
   for (const e of readdirSync(dir)) {
@@ -47,7 +62,9 @@ describe('OTA-1377 — the orderly exit is marked', () => {
   it('⚠⚠ the crumb is cleared when the app reaches background', () => {
     // This is the whole fix. Before it, `clearLiveBreadcrumb` had exactly ONE
     // caller — hydrate(), at boot — so nothing on the way OUT ever cleared it.
-    expect(watch).toContain("if (nextStr === 'background') void clearLiveBreadcrumb();");
+    // ⚠ OTA-1847 — same claim, new owner, and the old owner must have let go.
+    expect(beatSrc).toContain("if (next === 'background') void clearLiveBreadcrumb();");
+    expect(watch).not.toContain('clearLiveBreadcrumb(');
   });
 
   it('⚠⚠ …as the LAST statement of the handler, so OTA-1357 keeps its window', () => {
@@ -56,10 +73,13 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // Clearing at the top would trade a false positive for a blind spot over
     // exactly that window. Anything that dies earlier never reaches the clear,
     // so the crumb survives and still names the transition it died in.
-    const start = watch.indexOf("rpAppStateSub = AppState.addEventListener");
-    const handler = watch.slice(
-      start, watch.indexOf('}) as { remove: () => void } | null;', start));
-    const stamp = handler.indexOf('stampBreadcrumbPhase(');
+    // ⚠ OTA-1847 — the stamp is now `beat()`, which is `stampAliveBeat` and so
+    // `stampBreadcrumbPhase` one call deeper. The claim is unchanged: SOMETHING
+    // records the transition before the latch is set, and the latch is last.
+    const start = beatSrc.indexOf("sub = AppState.addEventListener");
+    const handler = beatSrc.slice(
+      start, beatSrc.indexOf('}) as unknown as { remove: () => void } | null;', start));
+    const stamp = handler.lastIndexOf('beat();');
     const clear = handler.indexOf('clearLiveBreadcrumb()');
     expect(stamp).toBeGreaterThanOrEqual(0);
     expect(clear).toBeGreaterThan(stamp);
@@ -71,9 +91,13 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // iOS reports `inactive` for a notification banner, a Control Center pull,
     // a peek at the app switcher. None is an exit, and clearing on one would
     // drop the crumb for a freeze that happened while the banner was up.
-    for (const body of [store, watch]) {
+    for (const body of [store, watch, beatSrc]) {
       expect(body).not.toContain("nextStr === 'inactive') void clearLiveBreadcrumb");
       expect(body).not.toContain("nextStr !== 'active') void clearLiveBreadcrumb");
+      // ⚠ OTA-1847 — the new owner names its parameter `next`, so the same
+      // mistake would spell differently there. Both spellings are barred.
+      expect(body).not.toContain("next === 'inactive') void clearLiveBreadcrumb");
+      expect(body).not.toContain("next !== 'active') void clearLiveBreadcrumb");
     }
   });
 
@@ -111,7 +135,11 @@ describe('OTA-1377 — the orderly exit is marked', () => {
       .filter((f) => !f.endsWith(join('engine', 'saveSystem.ts')))
       .filter((f) => /clearLiveBreadcrumb\(\)/.test(codeOf(f)));
     expect(callers.map((f) => f.split('app/')[1]).sort()).toEqual([
-      'diagnostics/runtimePressureWatch.ts',   // background — mark the orderly exit
+      // ⚠ OTA-1847 — still three callers, still each named. The background
+      // marker moved from the pressure watch (started at the end of `bootQwen`,
+      // i.e. after the first player action) to the alive beat, which App.tsx
+      // starts at the root on every platform. Same count, earlier ownership.
+      'diagnostics/aliveBeat.ts',              // background — mark the orderly exit
       'state/slices/bootSlice.ts',             // boot — consume the survivor
       'updates/checkAndApplyOTA.ts',           // OTA reload — mark the deliberate exit
     ]);

@@ -30897,7 +30897,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // found NOTHING TO REMOVE. All four controls trace to live consumers, OTA-1666
 // had already pruned this drawer, and the erase still stamps both report-dedupe
 // marks. One cosmetic change by owner ruling: ADVANCED → DIAGNOSTIC TOOLS.
-export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';
+// ── OTA-1847 — THE PROCESS SAYS WHERE IT WAS ────────────────────────────────
+// A Sentry classification audit that found TWO defects, neither of them Qwen.
+//
+// (D1) LIFECYCLE OWNERSHIP. `clearLiveBreadcrumb()` — the orderly-exit latch, the
+// one thing that tells a clean background transition from a death — was owned by
+// `startRuntimePressureWatch`, which is started at the END of `bootQwen`. Since
+// OTA-1493 `bootQwen` waits for the FIRST PLAYER ACTION. So on the title screen,
+// on character creation, and through every life backgrounded before the first
+// tap, NOBODY owned the latch: the crumb survived, hydrate() promoted it, and a
+// perfectly ordinary "player put the phone down and Android took the process"
+// was filed as a native death. Ownership moves to the alive beat, which App.tsx
+// starts at the app root on every platform from the first frame. The latch is
+// still the LAST statement of the background branch — OTA-1377's position and
+// OTA-1413's reasoning are unchanged; only the OWNER changed.
+//
+// (D2) SEVERITY AND GROUPING. The classifier was already right (`isFatal: false`);
+// the severity was invented downstream by a two-rung ternary in the transport,
+// and the fingerprint grouped on `stage`, which for a background disappearance
+// is whatever happened to be written last — `boot:qwen:deferred` on a title
+// screen. That is why the signature CORRELATES with Qwen without Qwen being
+// causal. The boot slice now classifies on `crumb.appState`, which the beat
+// already persists synchronously, plus ONE optional bounded boolean (`inGame`),
+// and emits a bounded `impact`: background-idle → info, background-active →
+// warning, grouped by [kind, impact]. Foreground deaths, legacy crumbs and clean
+// exits are untouched.
+//
+// ⚠ AND THE LIMIT IS STATED, NOT PAPERED OVER: a previous process that
+// disappeared while backgrounded cannot be retrospectively identified as OS
+// reclaim, force-stop, reboot, update, developer kill, or another unclean
+// disappearance from the available Tartaria evidence. The repair stops claiming
+// to know which one it was; it does not start claiming to know.
+export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

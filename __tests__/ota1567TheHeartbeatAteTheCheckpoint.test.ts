@@ -171,7 +171,16 @@ describe('OTA-1567 — an idle reclaim is recorded, but is not a crash', () => {
     // an idle title reclaim was being recorded as a death 1s into the process
     // because only ExplorationScreen beat. Both are idle; neither is fatal.
     expect(BOOT).toContain("(crumb.phase === 'rendered' && crumb.what === '(no action yet)') || onTitle;");
-    expect(BOOT).toContain('isFatal: !idle,');
+    // ⚠ OTA-1847 — the idle rule is untouched and still decides `isFatal`; a
+    // last-seen-BACKGROUNDED process simply joins it, because neither is a
+    // crash. The `idle` term is intact, which is what this test is about.
+    // ⚠ Stated as a SHAPE, not a quotation. `check:quotedpins` counts this
+    // literal as prose — it carries none of the punctuation that marks a string
+    // as code to that gate — and the gate's rule is to state the claim another
+    // way rather than pile another pin on the ratchet. A whitespace-tolerant
+    // match is also the better pin: a reformat cannot break it, and dropping
+    // either term still does.
+    expect(BOOT).toMatch(/isFatal:\s*!idle\s*&&\s*!wasBg\s*,/);
   });
 
   it('⚠⚠⚠ IT IS STILL RECORDED — the blind spot is the trade nobody takes', () => {
@@ -179,7 +188,8 @@ describe('OTA-1567 — an idle reclaim is recorded, but is not a crash', () => {
     // positive is worth doing, buying it with a blind spot is not. There is one
     // recordCrash call and the idle path goes through it.
     expect(BOOT.match(/recordCrash\(/g)?.length).toBe(1);
-    expect(BOOT).toContain('Process reclaimed while idle at a rendered screen');
+    // ⚠ OTA-1847 — same record, wording no longer names who took the process.
+    expect(BOOT).toContain('Previous process disappeared while idle at a rendered screen');
   });
 
   it('⚠⚠ the record is dated at aliveAt, not at whichever stamp survived', () => {

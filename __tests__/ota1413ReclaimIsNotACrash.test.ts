@@ -176,11 +176,21 @@ describe('OTA-1413 — the latch is fed from the exit and released at the foregr
   });
 
   it('⚠⚠ the release happens on `active`, BEFORE any foreground work can stamp', () => {
-    const i = WATCH.indexOf("if (nextStr === 'active') {");
-    const body = WATCH.slice(i, WATCH.indexOf('} else {', i));
+    // ⚠⚠⚠ RETARGETED BY OTA-1847 — THE RULE IS UNCHANGED, THE OWNER MOVED.
+    // This pin used to read `runtimePressureWatch`, which is started at the end
+    // of `bootQwen`; since OTA-1493 that waits for the FIRST PLAYER ACTION, so
+    // on the title screen nothing owned the latch at all — which is how a
+    // backgrounded title-screen process came back as a native death. App root
+    // owns it now. Both halves of OTA-1413's claim still hold, in one file, and
+    // the clear is still the LAST statement of the background branch.
+    const BEAT = read('app', 'diagnostics', 'aliveBeat.ts');
+    const i = BEAT.indexOf("if (next === 'active') {");
+    const body = BEAT.slice(i, BEAT.indexOf('} else if', i));
     expect(body).toContain('noteForegrounded();');
     // …and it is fed only from the orderly-exit path, never from a bare timer.
-    expect(WATCH).toContain("if (nextStr === 'background') void clearLiveBreadcrumb();");
+    expect(BEAT).toContain("if (next === 'background') void clearLiveBreadcrumb();");
+    // ⚠ and the instrument that used to own it no longer does — one writer only.
+    expect(WATCH).not.toContain('noteForegrounded();');
   });
 
   it('⚠ OTA-1377\'s prediction is left standing, with its answer beside it', () => {
@@ -193,8 +203,10 @@ describe('OTA-1413 — the latch is fed from the exit and released at the foregr
 
 describe('OTA-1413 — BOTH readers were saying it, so both were fixed', () => {
   it('⚠⚠ the ledger no longer promotes a reclaimed crumb to a fatal crash', () => {
-    expect(BOOT).toContain('const reclaimed = !!crumb?.afterOrderlyExit;');
-    expect(BOOT).toContain('if (!reclaimed) {');
+    // ⚠ OTA-1847 renamed the flag: it proves the transition COMPLETED, never
+    // who took the process afterwards, and `reclaimed` asserted the latter.
+    expect(BOOT).toContain('const exitedCleanly = !!crumb?.afterOrderlyExit;');
+    expect(BOOT).toContain('if (!exitedCleanly) {');
     expect(BOOT).toContain("kind: 'native-death',");
   });
 
@@ -209,7 +221,8 @@ describe('OTA-1413 — BOTH readers were saying it, so both were fixed', () => {
   it('⚠ the crumb is still SET and still logged — suppressed, not deleted', () => {
     // OTA-1377 refused to trade a false positive for a blind spot. So does this.
     expect(BOOT).toContain('setLastBootBreadcrumb(crumb);');
-    expect(BOOT).toContain('last boot exited cleanly, then the OS reclaimed it');
+    // ⚠ OTA-1847 — same line, minus the causal claim it could not support.
+    expect(BOOT).toContain('last boot exited cleanly, then went away');
     expect(PRESSURE).toContain('Kept because the phase is still evidence if a real freeze lands here.');
   });
 

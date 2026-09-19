@@ -218,11 +218,15 @@ export const createBootSlice = (
       // suppressing the record entirely would trade a false positive for a blind
       // spot, which is the trade OTA-1377 explicitly refused. What changes is
       // that it is not promoted to a fatal crash.
-      const reclaimed = !!crumb?.afterOrderlyExit;
+      // ⚠ OTA-1847 — RENAMED FROM `reclaimed`. The flag proves the app reached
+      // the end of its background transition; it proves nothing about who took
+      // the process afterwards. The old name asserted a cause this branch has
+      // never been able to establish.
+      const exitedCleanly = !!crumb?.afterOrderlyExit;
       if (crumb) {
         setLastBootBreadcrumb(crumb);
-        get().appendLog('debug', reclaimed
-          ? `freeze forensics: last boot exited cleanly, then the OS reclaimed it — last phase ${crumb.phase ?? '?'} (${new Date(crumb.phaseAt ?? crumb.at).toISOString()})`
+        get().appendLog('debug', exitedCleanly
+          ? `freeze forensics: last boot exited cleanly, then went away — last phase ${crumb.phase ?? '?'} (${new Date(crumb.phaseAt ?? crumb.at).toISOString()})`
           // ⚠ OTA-1504 — dated at the LAST SIGN OF LIFE (phaseAt), not the
           // action's start; the record below explains why that distinction
           // cost a night of forensics.
@@ -240,7 +244,7 @@ export const createBootSlice = (
         // record. Deduped on id (`ts_kind`), so a second hydrate in the same
         // session cannot invent a second crash from one crumb.
         // ⚠ OTA-1413 — only a crumb that did NOT come after an orderly exit.
-        if (!reclaimed) {
+        if (!exitedCleanly) {
           // ⚠⚠ OTA-1504 — DATE THE DEATH AT THE LAST SIGN OF LIFE, NOT AT THE
           // ACTION'S START. The owner's 2026-08-25 15:08 record wore
           // `ctx-release (+2,639,101ms)`: the crumb's action was 44 MINUTES old
@@ -285,22 +289,66 @@ export const createBootSlice = (
           // launcher-screen process Android was always entitled to reap.
           const onTitle = crumb.screen === 'title' || crumb.screen === 'character_creation';
           const idle = (crumb.phase === 'rendered' && crumb.what === '(no action yet)') || onTitle;
+          /* ⚠⚠⚠ OTA-1847 — WHAT THE PREVIOUS PROCESS WAS LAST SEEN DOING, from
+           * evidence rather than from a screen name.
+           *
+           * `appState` has been written by the alive beat on every transition
+           * since LAG-3 — including one final stamp naming the state the app
+           * left in — and it survives to this boot. Until now the classifier
+           * never read it: it went into a prose sentence, where nothing can
+           * group, sort or alert on it, which is the same way OTA-1567 found
+           * `actionAgeMs` being spent.
+           *
+           * ⚠⚠ A DOWNGRADE REQUIRES POSITIVE EVIDENCE ON BOTH HALVES. `wasBg`
+           * must be an explicit `'background'`, and the no-game answer must be
+           * an explicit `inGame === false`. A crumb that cannot answer — every
+           * one written before this OTA, and any beat that ran before the store
+           * could be read — leaves both `undefined`, falls through every branch
+           * below and keeps exactly the behaviour it has always had. That is the
+           * legacy path, and it is deliberately unchanged: absent is UNKNOWN,
+           * never "no game".
+           *
+           * ⚠ AND NONE OF THIS CLAIMS A CAUSE. It says where the app was, not
+           * what took it. An OS reclaim, a force-stop, a reboot, an app
+           * replacement and a developer kill are one indistinguishable class
+           * from here, and the wording below says so. */
+          const wasBg = crumb.appState === 'background';
+          const bgIdle = wasBg && crumb.inGame === false;
+          const bgActive = wasBg && crumb.inGame === true;
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           (require('../../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
             kind: 'native-death',
             ts: lastAlive,
             stage: crumb.phase ?? 'mid-action',
-            message: idle
-              ? (onTitle
-                ? `Process reclaimed while idle on the ${crumb.screen === 'title' ? 'title' : 'character-creation'} screen`
-                  + ` — no game was in progress (${Math.round(Math.max(0, lastAlive - (crumb.bootAt ?? lastAlive)) / 1000)}s after boot`
-                  + `${crumb.appState ? `, app ${crumb.appState}` : ''}${crumb.aliveStage ? `, stage ${crumb.aliveStage}` : ''})`
-                : `Process reclaimed while idle at a rendered screen — nothing was in flight (${Math.round((lastAlive - (crumb.phaseAt ?? lastAlive)) / 1000)}s since the last checkpoint)`)
-              : `Process died with no orderly exit while: ${crumb.what}`
-                + (staleMs > 120_000
-                  ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
-                  : ''),
-            isFatal: !idle,
+            // ⚠⚠⚠ OTA-1847 — THE WORDING NO LONGER CLAIMS WHO TOOK THE PROCESS.
+            // "Process reclaimed" was emitted on the branch where there is NO
+            // orderly-exit evidence — precisely the branch that knows least. The
+            // detector can prove the process disappeared and where it was; it
+            // cannot tell an OS reclaim from a force-stop, a reboot, an app
+            // replacement or a developer kill. So it says what it saw.
+            message: bgIdle
+              ? `Previous process disappeared while backgrounded on the ${crumb.screen === 'character_creation' ? 'character-creation' : 'title'} screen`
+                + ` — no game was in progress (${Math.round(Math.max(0, lastAlive - (crumb.bootAt ?? lastAlive)) / 1000)}s after boot`
+                + `${crumb.aliveStage ? `, stage ${crumb.aliveStage}` : ''})`
+              : bgActive
+                ? `Previous process disappeared while backgrounded during play — last: ${crumb.what}`
+                  + `${crumb.room ? ` @ ${crumb.room}` : ''}`
+                : idle
+                  ? (onTitle
+                    ? `Previous process disappeared while idle on the ${crumb.screen === 'title' ? 'title' : 'character-creation'} screen`
+                      + ` — no game was in progress (${Math.round(Math.max(0, lastAlive - (crumb.bootAt ?? lastAlive)) / 1000)}s after boot`
+                      + `${crumb.appState ? `, app ${crumb.appState}` : ''}${crumb.aliveStage ? `, stage ${crumb.aliveStage}` : ''})`
+                    : `Previous process disappeared while idle at a rendered screen — nothing was in flight (${Math.round((lastAlive - (crumb.phaseAt ?? lastAlive)) / 1000)}s since the last checkpoint)`)
+                  : `Process died with no orderly exit while: ${crumb.what}`
+                    + (staleMs > 120_000
+                      ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
+                      : ''),
+            // ⚠ A backgrounded disappearance is not a fatal crash either way;
+            // `bgActive` keeps its own signal through `impact`, not through this.
+            isFatal: !idle && !wasBg,
+            ...(bgIdle ? { impact: 'background-idle' as const }
+              : bgActive ? { impact: 'background-active' as const }
+                : {}),
             breadcrumb: crumb,
             // ⚠⚠⚠ OTA-1587 — HOW OLD THE DEAD PROCESS WAS, AND WHAT IT WAS
             // HANDED. `lastAlive - crumb.bootAt` is the number the ledger has

@@ -1013,6 +1013,23 @@ export interface LiveBreadcrumb {
    *  not previously say. */
   appState?: string;
   aliveStage?: string;
+  /** ⚠⚠⚠ OTA-1847 — WAS A GAME ACTUALLY IN PROGRESS WHEN THIS WAS WRITTEN?
+   *
+   *  The boot classifier used to answer that from the SCREEN NAME alone, which
+   *  is a proxy and not an authority: `currentScreen === 'title'` is reachable
+   *  from several paths in slotSlice/gameStore, so "no game was in progress"
+   *  was being asserted as fact from something that only implies it.
+   *
+   *  This is the store's own authority — `activeSlotId != null && player != null`,
+   *  the same pair gameStore already trusts — sampled by the alive beat AT THE
+   *  MOMENT THE CRUMB IS WRITTEN, never reconstructed later from a process that
+   *  no longer has that state.
+   *
+   *  ⚠ OPTIONAL AND ABSENT-SAFE. Every crumb written before this OTA lacks it,
+   *  and an absent value means UNKNOWN — never "no game". See bootSlice: a
+   *  downgrade requires POSITIVE evidence on both halves, so legacy state keeps
+   *  the conservative behaviour it has always had. No migration. */
+  inGame?: boolean;
   room?: string;
   /** ⚠ OTA-1356 — the last checkpoint this activity reached (see
    *  stampBreadcrumbPhase). Absent on crumbs written before the phase system. */
@@ -1266,16 +1283,29 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
  *
  *  ⚠ It refreshes those three fields and NOTHING else — the phase, the action
  *  label and every ledger field keep whatever the last real checkpoint set. */
-export function stampAliveBeat(ctx: { screen?: string; appState?: string; stage?: string }): void {
+export function stampAliveBeat(
+  ctx: { screen?: string; appState?: string; stage?: string; inGame?: boolean },
+): void {
   try {
-    const base = _lastLiveCrumb;
-    if (base) {
-      const next: LiveBreadcrumb = { ...base };
-      if (ctx.screen) next.screen = ctx.screen;
-      if (ctx.appState) next.appState = ctx.appState;
-      if (ctx.stage) next.aliveStage = ctx.stage;
-      _lastLiveCrumb = next;
-    }
+    // ⚠⚠⚠ OTA-1847 — THE CONTEXT IS APPLIED EVEN ON THE FIRST BEAT OF A LIFE.
+    // This used to be `const base = _lastLiveCrumb; if (base) {…}`, so a beat
+    // that ran before any other writer — which is EVERY process's first beat,
+    // and every beat after a clear — dropped `screen`, `appState` and the stage
+    // on the floor. `stampBreadcrumbPhase` below then synthesised exactly this
+    // same `{ at, what: '(no action yet)' }` base one line later and wrote it,
+    // so the crumb existed either way; it simply existed without the three
+    // fields that say WHERE the app was. That mattered little when those fields
+    // were prose. It matters now that `appState` is classification evidence.
+    const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
+    const next: LiveBreadcrumb = { ...base };
+    if (ctx.screen) next.screen = ctx.screen;
+    if (ctx.appState) next.appState = ctx.appState;
+    if (ctx.stage) next.aliveStage = ctx.stage;
+    // ⚠ `undefined` is left ABSENT rather than written as `false`: an unknown
+    // active-game answer must stay unknown, because bootSlice downgrades only on
+    // positive evidence and a synthesised `false` would manufacture some.
+    if (ctx.inGame !== undefined) next.inGame = ctx.inGame;
+    _lastLiveCrumb = next;
     stampBreadcrumbPhase(HEARTBEAT_PHASE);
   } catch { /* never let instrumentation break the game */ }
 }

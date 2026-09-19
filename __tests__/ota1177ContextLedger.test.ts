@@ -397,11 +397,30 @@ describe('OTA-1177 — structure', () => {
     const install = src.indexOf('setContextLedgerSink(');
     expect(h).toBeGreaterThan(0);
     expect(install).toBeGreaterThan(h);
-    // ⚠ LAG-3 — 4000 → 5000. The claim is unchanged (the sink is armed inside
-    // hydrate, near its top, before anything can load a context); the number is a
-    // proxy for that and moved because the forensics block above it gained the
-    // parallel-read note. hydrate() is 547 lines, so this window is still its head.
-    expect(install - h).toBeLessThan(5000);
+    // ⚠⚠⚠ OTA-1847 — THE BYTE WINDOW IS RETIRED, AND THE CLAIM IT STOOD FOR IS
+    // ASSERTED DIRECTLY INSTEAD. This was `install - h < 5000`, raised once
+    // already (LAG-3, 4000 → 5000) by an unrelated OTA that added prose above
+    // it, and it went red again here for the same reason: OTA-1847 added a
+    // classification block to the survivor-promotion code earlier in hydrate.
+    // A guard that a neighbour can break by writing MORE CODE NEARBY reports
+    // drift that is not there, and teaches you to raise the number instead of
+    // reading the claim — so raising it a third time is the wrong move.
+    //
+    // What the number was a proxy for is this: the sink must be live before
+    // anything can load a context, and nothing may interleave between arming it
+    // and arming the two beside it. That is a statement about ORDER and
+    // INTERRUPTIBILITY, and both are measurable exactly.
+    const tel = src.indexOf('setQwenTelemetrySink(');
+    const dis = src.indexOf('setQwenDiscardSink(');
+    expect(tel).toBeGreaterThan(h);
+    expect(dis).toBeGreaterThan(tel);
+    expect(install).toBeGreaterThan(dis);
+    // ⚠ THE TEETH: no `await` anywhere between the FIRST sink and the LAST. The
+    // three arm as one uninterrupted run, so no awaited work — and therefore no
+    // context load — can slip in between them. Move this sink to the end of
+    // hydrate, past the awaits, and this fails; add an await between the sinks
+    // and this fails. Reformatting the code above it cannot.
+    expect(src.slice(tel, install)).not.toMatch(/\bawait\b/);
   });
 
   test('OTA-1177 changes no behaviour — the instrument is additive only', () => {

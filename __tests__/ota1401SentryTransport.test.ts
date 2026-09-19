@@ -188,7 +188,28 @@ describe('OTA-1401 — what a report actually contains', () => {
     // A native death's message is reconstructed from a breadcrumb and varies
     // with whatever the player was doing. Grouping on it files one issue per
     // session, which is the same as filing none.
-    expect(transport).toContain('fingerprint: [rec.kind, rec.stage]');
+    // ⚠⚠⚠ OTA-1847 — AND NOW BY KIND AND *IMPACT*, WHERE AN IMPACT EXISTS. The
+    // stage was doing a job it could not do for one class of record. Every
+    // background disappearance carries whatever stage happened to be last
+    // written — `boot:qwen:deferred` on a title screen, `parsed:attack` in a
+    // fight — so one indistinguishable event was filing under a dozen different
+    // issues, and `qwen:deferred` in particular READ as a Qwen fault when it is
+    // only what the stage field says while Qwen is WAITING for the first action.
+    //
+    // `impact` is the bounded classification the boot slice already computed
+    // (`background-idle` / `background-active`, two values and no more), so it
+    // groups the class together instead of splintering it by coincidence.
+    // Records without one keep the stage, so nothing else regroups.
+    //
+    // The claim this test has always made is unchanged, and it is now asserted
+    // directly rather than implied by a literal: the fingerprint is built from
+    // enumerated fields and never from the reconstructed message.
+    expect(transport).toContain('fingerprint: rec.impact ? [rec.kind, rec.impact] : [rec.kind, rec.stage]');
+    const fpAt = transport.indexOf('fingerprint:');
+    const line = transport.slice(fpAt, transport.indexOf('\n', fpAt));
+    for (const messageish of ['rec.message', 'rec.stack', 'lastAction', 'lastRoom']) {
+      expect(line).not.toContain(messageish);
+    }
   });
 
   it('⚠⚠ the breadcrumb is carried, because for a native death it IS the report', () => {

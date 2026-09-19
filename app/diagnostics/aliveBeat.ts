@@ -1,5 +1,5 @@
 import { AppState } from 'react-native';
-import { stampAliveBeat } from '../engine/saveSystem';
+import { clearLiveBreadcrumb, noteForegrounded, stampAliveBeat } from '../engine/saveSystem';
 
 /* ⚠⚠⚠ LAG-3 — THE ALIVE BEAT BELONGS TO THE APP, NOT TO ONE SCREEN.
  *
@@ -39,16 +39,20 @@ let sub: { remove: () => void } | null = null;
  *  crumb carries the screen even on surfaces that render nothing else. */
 let screenOf: (() => string | undefined) | null = null;
 let stageOf: (() => string | undefined) | null = null;
+let gameOf: (() => boolean | undefined) | null = null;
 let beats = 0;
 
-/** Tell the beat how to name the current screen and boot stage. Both are
- *  read at beat time, never held, so a stale closure cannot mislabel a death. */
+/** Tell the beat how to name the current screen, boot stage and whether a game
+ *  is in progress. All are read at beat time, never held, so a stale closure
+ *  cannot mislabel a death. */
 export function setAliveBeatContext(
   screen: (() => string | undefined) | null,
   stage?: (() => string | undefined) | null,
+  inGame?: (() => boolean | undefined) | null,
 ): void {
   screenOf = screen;
   stageOf = stage ?? null;
+  gameOf = inGame ?? null;
 }
 
 function beat(): void {
@@ -57,6 +61,8 @@ function beat(): void {
       screen: screenOf?.(),
       appState: AppState.currentState ?? 'active',
       stage: stageOf?.(),
+      // ⚠ OTA-1847 — absent when nobody told us, and absent is UNKNOWN.
+      inGame: gameOf?.(),
     });
     beats += 1;
   } catch { /* an instrument may never break the app it observes */ }
@@ -71,15 +77,39 @@ export function startAliveBeat(): void {
   try {
     sub = AppState.addEventListener('change', (next) => {
       // ⚠ The beat stops at the door and resumes at the door. A backgrounded
-      // process that Android reclaims is dated at its last active beat, which
+      // process that the OS later takes is dated at its last active beat, which
       // is exactly the fact OTA-1413 wants: it was alive, then it went away.
       if (next === 'active') {
+        // ⚠⚠⚠ OTA-1847 — THE CLEAN-EXIT LATCH RELEASES HERE, and it must release
+        // BEFORE any foreground work can stamp a phase. That rule is OTA-1413's
+        // and is unchanged; what changed is WHO enforces it. It used to live in
+        // `startRuntimePressureWatch`, which is started at the end of `bootQwen`
+        // (aiLifecycleSlice) — and since OTA-1493 `bootQwen` waits for the FIRST
+        // PLAYER ACTION. So on the title screen, before anyone had touched
+        // anything, nothing owned the latch at all. This listener is registered
+        // from the app root (App.tsx), unconditionally, on every platform, and
+        // before any other AppState listener in the tree, so the ownership now
+        // exists from the first frame of every life.
+        noteForegrounded();
         beat();
         if (timer === null) timer = setInterval(beat, ALIVE_BEAT_MS);
       } else if (timer !== null) {
         clearInterval(timer);
         timer = null;
         beat(); // one last stamp naming the state it left in
+        // ⚠⚠⚠ AND THE ORDERLY EXIT IS MARKED LAST, ON PURPOSE. OTA-1377 chose
+        // that position and OTA-1413 kept it: *"Anything that dies earlier in
+        // this handler never reaches this line, so the crumb survives and still
+        // names the transition it died in; reaching here is itself the proof the
+        // transition completed."* Moving it earlier to make the write land more
+        // often would buy a blind spot over the one event this instrument exists
+        // to catch, so it is NOT moved — the beat above stamps first, and this
+        // runs only if we got all the way here.
+        //
+        // ⚠⚠ `background` ONLY, never `inactive`: iOS reports `inactive` for a
+        // notification banner, a Control Center pull or an app-switcher peek,
+        // none of which is an exit.
+        if (next === 'background') void clearLiveBreadcrumb();
       }
     }) as unknown as { remove: () => void } | null;
   } catch { /* older RN shapes return void — the interval still runs */ }
@@ -101,4 +131,5 @@ export function _resetAliveBeatForTest(): void {
   beats = 0;
   screenOf = null;
   stageOf = null;
+  gameOf = null;
 }

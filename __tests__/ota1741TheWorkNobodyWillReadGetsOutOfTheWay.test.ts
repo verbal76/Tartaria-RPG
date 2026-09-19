@@ -478,7 +478,15 @@ describe('OTA-1741 — the app says "still here" from wherever it is', () => {
     expect(src).toContain("const onTitle = crumb.screen === 'title' || crumb.screen === 'character_creation';");
     expect(src).toContain('|| onTitle;');
     expect(src).toContain("${crumb.screen === 'title' ? 'title' : 'character-creation'} screen");
-    expect(src).toContain('isFatal: !idle,');
+    // ⚠ OTA-1847 — still not fatal, and a last-seen-BACKGROUNDED process is now
+    // held to the same answer. The title-screen classification this test owns is
+    // unchanged; it simply is no longer the only way to reach "not a crash".
+    // ⚠ A shape, not a quotation — `check:quotedpins` reads this literal as
+    // prose (it carries none of the punctuation that marks code to that gate),
+    // and its rule is to state the claim another way rather than add to the
+    // ratchet. A whitespace-tolerant match survives a reformat and still fails
+    // if either term is dropped, which is what this test is actually about.
+    expect(src).toMatch(/isFatal:\s*!idle\s*&&\s*!wasBg\s*,/);
   });
 
   it('⚠⚠ the OTA teardown names which component came back and which did not', () => {

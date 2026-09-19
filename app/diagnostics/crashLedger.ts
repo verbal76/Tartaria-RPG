@@ -61,6 +61,24 @@ export interface CrashRecord {
   message: string;
   stack?: string;
   isFatal?: boolean;
+  /** ⚠⚠⚠ OTA-1847 — WHAT THE EVIDENCE SUPPORTS ABOUT PLAYER IMPACT, as a value
+   *  rather than as prose. `isFatal` was the only dial, and the transport
+   *  collapsed it to two Sentry levels: a record that already said "not fatal"
+   *  still shipped one notch under a JS fatal, and every native death — a
+   *  title-screen disappearance and a foreground crash alike — shared the
+   *  fingerprint `[kind, stage]`.
+   *
+   *    `background-idle`   last seen BACKGROUNDED with NO game in progress.
+   *                        Both halves proven by persisted state.
+   *    `background-active` last seen BACKGROUNDED WITH a game in progress.
+   *                        Impact is possible, never proven.
+   *    absent              everything else, including every legacy record and
+   *                        every crumb that cannot answer — behaviour unchanged.
+   *
+   *  ⚠ Deliberately NOT a causal claim. It says where the app WAS, not what took
+   *  it. Nothing in Tartaria can tell an OS reclaim from a force-stop, a reboot,
+   *  an app replacement or a developer kill after the fact. */
+  impact?: 'background-idle' | 'background-active';
   sinceBoot?: number;
   build: string;
   version: string;
@@ -205,6 +223,7 @@ export function recordCrash(
       message: clip(rec.message, 500),
       stack: rec.stack ? clip(rec.stack, 2000) : undefined,
       isFatal: rec.isFatal,
+      impact: rec.impact, // OTA-1847 — absent stays absent; see the field's note
       sinceBoot: rec.sinceBoot,
       build: OTA_BUILD_ID,
       version: DISPLAY_VERSION,
