@@ -26,6 +26,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, Image, Pressable, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+// ⚠ OTA-1853 — diagnostics only; both calls are throw-free no-ops off device.
+import { markArtworkMount, markArtworkUnmount } from '../diagnostics/subsystemMemoryMarks';
 
 /** How long the art holds before it leaves on its own. */
 const HOLD_MS = 2400;
@@ -72,6 +74,14 @@ export function ArtFlash({
 
   useEffect(() => {
     if (!source || !artKey) return;
+    // ⚠⚠ OTA-1853 — THE BIGGEST SINGLE DECODED IMAGE IN THE APP, ANNOUNCED.
+    // Baker #3's ratchet holds +675 MB in 4.4M default-zone malloc blocks and
+    // the forensic pass could not say whether a full-screen art flash gives its
+    // decode back. This rides the effect that ALREADY re-runs exactly on
+    // (artKey, source) — no new hook, no new render, no change to what is
+    // loaded or when. It reports the mount; it does not claim the unmount frees
+    // anything, which is precisely the question left open.
+    markArtworkMount(artKey);
     clearTimer();
     opacity.setValue(0);
     scale.setValue(0.94);
@@ -83,7 +93,9 @@ export function ArtFlash({
       Animated.timing(opacity, { toValue: 0, duration: FADE_OUT_MS, useNativeDriver: true })
         .start(() => dismiss.current());
     }, HOLD_MS);
-    return clearTimer;
+    // ⚠ Same teardown the timer already had — the mark rides it, and clearTimer
+    // still runs on every path out (unmount, re-trigger, tap-to-dismiss).
+    return () => { clearTimer(); markArtworkUnmount(artKey); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artKey, source]);
 

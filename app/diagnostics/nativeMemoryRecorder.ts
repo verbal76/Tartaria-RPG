@@ -112,7 +112,92 @@ export const MEM_KIND = {
    * `code` is this warning's ordinal in the session.
    */
   JS_MEMORY_WARNING: 81,
+
+  /* ══════════════════════════════════════════════════════════════════════
+   * ⚠⚠⚠ THE THREE BLIND SUBSYSTEMS (OTA-1853).
+   *
+   * The 2026-09-19 iPhone SE capture put all seven ratchet steps inside a
+   * 49-second window containing THIRTEEN room transitions and SEVEN
+   * `roster=new` events. The table above had a kind for Qwen, for MiniLM, for
+   * voice, for touches, for persistence — and none at all for rooms, artwork
+   * or rosters. The instrument was blind to precisely the candidates the
+   * window was full of, which is why forensics returned "holder not proven".
+   *
+   * ⚠ NATIVE NEEDS NO REBUILD FOR THESE. `annotate(kind:code:)` takes an
+   * opaque UInt16 and never interprets it; the name table lives here. New
+   * kinds ship by OTA. Native owns 60000+; this block stays far below it.
+   *
+   * ⚠ `code` REMAINS A BOUNDED DISCRIMINATOR, never an identity. Room and
+   * asset ids go through `memCodeForId`, a pure 16-bit FNV-1a with no map and
+   * no growth — it is a CHECKSUM for cross-referencing against the game log's
+   * own `scene: loc=… hub=…` line, not a name. Collisions are possible by
+   * construction (65,536 buckets) and are harmless: the log carries the name,
+   * the code only has to agree with itself within one life.
+   * ══════════════════════════════════════════════════════════════════════ */
+
+  // ── Room / navigation. `code` is memCodeForId(roomId) except where noted.
+  ROOM_ENTER: 90,
+  ROOM_EXIT: 91,
+  ROUTE_MOUNT: 92,
+  ROUTE_UNMOUNT: 93,
+  ROOM_INSTANCE_CREATE: 94,
+  ROOM_INSTANCE_DISPOSE: 95,
+  /** `code` is the count itself — retained room/scene instances right now. */
+  ROOM_RETAINED_COUNT: 96,
+
+  // ── Artwork. `code` is memCodeForId(assetId) except ARTWORK_MOUNTED_COUNT.
+  ARTWORK_MOUNT: 100,
+  ARTWORK_UNMOUNT: 101,
+  ARTWORK_LOAD: 102,
+  ARTWORK_CACHE_HIT: 103,
+  ARTWORK_CACHE_MISS: 104,
+  ARTWORK_REPLACE: 105,
+  /** `code` is the count of significant assets mounted right now. */
+  ARTWORK_MOUNTED_COUNT: 106,
+
+  // ── Roster / scene. `code` is a COUNT, not an id — the thing under test is
+  // how many were made, not which ones.
+  ROSTER_CREATE: 110,
+  ROSTER_DISPOSE: 111,
+  ENTITY_CREATE_BATCH: 112,
+  ENTITY_DISPOSE_BATCH: 113,
+  SCENE_CREATE: 114,
+  SCENE_DISPOSE: 115,
+  /** `code` is the currently retained entity count. */
+  ENTITY_RETAINED_COUNT: 116,
+
+  // ── Audio. `code` is the active player count after the transition, so a
+  // create/dispose pair that never balances is visible as a rising number
+  // without needing to diff two separate events.
+  AUDIO_PLAYER_CREATE: 120,
+  AUDIO_PLAY_START: 121,
+  AUDIO_PLAY_END: 122,
+  AUDIO_PLAYER_DISPOSE: 123,
+  SPEECH_QUEUE_ADD: 124,
+  SPEECH_QUEUE_DRAIN: 125,
 } as const;
+
+/**
+ * ⚠ A CHECKSUM, NOT A NAME. 16-bit FNV-1a over a diagnostic id, used as the
+ * `code` of a room or asset annotation. Pure, allocation-free, no lookup table
+ * and no runtime growth — the bounded-telemetry rule forbids a map that learns
+ * new keys for the lifetime of a session.
+ *
+ * ⚠ COLLISIONS ARE EXPECTED AND HARMLESS. 65,536 buckets over a catalogue of
+ * rooms and assets will collide; the code exists to be cross-referenced against
+ * the game log's own named `scene:` / artwork lines within ONE life, never to
+ * identify anything on its own. Two rooms sharing a bucket is a reading
+ * ambiguity the log resolves, not a lost datum.
+ */
+export function memCodeForId(id: string): number {
+  let h = 0x811c9dc5;
+  const str = String(id ?? '');
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i) & 0xff;
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return (h ^ (h >>> 16)) & 0xffff;
+}
 
 export type MemKind = (typeof MEM_KIND)[keyof typeof MEM_KIND];
 
@@ -140,6 +225,44 @@ export function memKindName(kind: number): string {
 
 const PHASE_NAMES = ['unknown', 'active', 'inactive', 'background', 'terminating'];
 const THERMAL_NAMES = ['nominal', 'fair', 'serious', 'critical'];
+
+/* ⚠⚠⚠ OTA-1853 — NATIVE REMAINDER. WHAT THIS OTA PROVABLY CANNOT REACH.
+ *
+ * Everything above is JavaScript and ships over the air. These three are in the
+ * Swift binary (Build 208) and need a native build. They are written down here,
+ * with what was checked, so the next capture's limits are known BEFORE it is
+ * taken rather than discovered while reading it.
+ *
+ *  1. PHASE READS `unknown` ON EVERY SAMPLE. The JS side was traced end to end
+ *     and every link holds: PHASE_NAMES matches the native constants in order,
+ *     the drain serialises `"phase": tmInt(s.phase)`, the observers demonstrably
+ *     fire (six native memory warnings were counted in the same capture), and
+ *     `phaseName` renders what it is handed. So this is NOT a JS decode bug and
+ *     no amount of OTA can fix it — the field arrives as 0. It is a native
+ *     defect in how `s.phase` is populated at sample time.
+ *     ⚠ CONSEQUENCE FOR THE RATCHET: a step cannot currently be told apart from
+ *     a step that happened while the app was in the background. The steps in
+ *     the SE capture are known foreground only because the JS log placed the
+ *     player in rooms throughout — that is inference from another source, not
+ *     evidence from this field.
+ *
+ *  2. NO SUBSYSTEM IDENTITY ON AN ALLOCATION. `malloc_zone_statistics` gives
+ *     size and block COUNT for the default zone (98.3% of the SE footprint,
+ *     4.42–4.45M live blocks) and nothing about who asked for them. Attributing
+ *     a step to a subsystem therefore rests on events recorded NEAR it in time —
+ *     which is what the joined table prints, and why it prints co-location
+ *     rather than a holder. Real attribution needs a native malloc zone per
+ *     subsystem, or `malloc_logger`/VM-region sampling. Neither is OTA-able.
+ *
+ *  3. task_vm_info IS READ FOR phys_footprint ONLY. The same struct carries
+ *     `internal`, `compressed`, `external` and the region counts that would
+ *     separate "the process is holding decoded images" from "the process is
+ *     holding compressed pages it can give back". Widening that read is a
+ *     native change and is explicitly out of scope for this pass.
+ *
+ * ⚠ NONE OF THE THREE BLOCKS THIS OTA. The leading candidates — rooms, artwork,
+ * rosters, audio — are all discriminated by the event vocabulary now shipping;
+ * the native work buys precision on top, not the first answer. */
 
 // ───────────────────────────────────────────────────────────────────────────
 // Derived-semantics thresholds
@@ -524,11 +647,209 @@ export async function readMemoryFlight(): Promise<MemoryFlightReport> {
   }
 }
 
-/** ⚠ How many sample rows the text report prints. The ring holds 512; printing
- *  all of them would bury the reader and bloat the bug report, and the evidence
- *  is the tail. Bounded by construction either way. */
-export const REPORT_SAMPLE_ROWS = 48;
-export const REPORT_EVENT_ROWS = 32;
+/**
+ * ⚠⚠⚠ THE WHOLE RING, AND THE READING THAT COST US A CAPTURE.
+ *
+ * These were 48 and 32, on the reasoning that "the evidence is the tail". The
+ * 2026-09-19 iPhone SE capture proved that reasoning wrong in the only way that
+ * matters: the recorder took 504 samples with `evicted 0` — every one survived
+ * on the device — and the composer printed the last 48. The seven ratchet steps
+ * that carried the process from a 951MB baseline to a 1903MB peak ALL happened
+ * before the printed window opened, so the bundle could say how much was
+ * retained and never when, or after what. The forensic pass returned OUTCOME C
+ * — holder not proven — for want of data the device had already captured and
+ * this line had already thrown away.
+ *
+ * ⚠ THE RING IS THE BOUND, NOT THIS NUMBER. `TM_SAMPLE_CAPACITY = 512` and
+ * `TM_EVENT_CAPACITY = 64` are fixed, preallocated native arrays; emitting all
+ * of them is bounded by construction exactly as emitting 48 was. This is a
+ * bigger report, not an unbounded one — size is measured in the suite.
+ *
+ * ⚠ MEASURED, NOT ASSUMED — the price of the bigger block, in characters of
+ * composed text, from the real composer over a 504-sample series:
+ *
+ *     48 rows (the old cutoff)          4,789
+ *    504 rows, no events               46,474
+ *    504 rows + 64 events + the join   49,729   (610 lines, ~91 chars/row)
+ *
+ * The block rides `buildBasicDeviceSummary`, which is appended BESIDE the log
+ * body rather than inside it, so `trimLogForReport`'s 200,000-character
+ * full-log cap does not touch it. The transport chunks everything into
+ * 7,500-raw-character parts (`INLINE_CHUNK_CHARS`), and a 405,000-character
+ * send is already proven on hardware — so ~50 KB is roughly seven more parts
+ * on a path that has carried eight times this much. No cap is approached.
+ *
+ * The full window outranks shorter text. A reader can skim rows they do not
+ * need; nobody can recover rows that were never emitted.
+ */
+export const REPORT_SAMPLE_ROWS = 512;
+export const REPORT_EVENT_ROWS = 64;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⚠⚠⚠ REPORT-TIME RATCHET DETECTION (OTA-1853) — AND WHY THE THRESHOLDS ARE
+ * MEASUREMENTS RATHER THAN ROUND NUMBERS.
+ *
+ * The native recorder already reports "ratchet 7 step(s) +972MB" as an
+ * aggregate; what it cannot do is say WHEN. This finds the steps in the emitted
+ * series so each one can be joined to the events around it. It runs at report
+ * composition over data already captured — it changes no runtime behaviour, no
+ * cadence, and nothing native.
+ *
+ * ⚠ RAW FOOTPRINT IS FAR TOO NOISY TO THRESHOLD DIRECTLY. Measured on the
+ * 2026-09-19 iPhone SE series, within one stable floor:
+ *     window A (+48.6…+59.6s, 48 samples): raw peak-to-peak 61 MB
+ *     window B (+100.2…+120.3s, 48 samples): raw peak-to-peak 29 MB
+ * A 40–50 MB rule applied to raw samples would fire on that jitter alone.
+ *
+ * ⚠ SO THE FLOOR IS A TRAILING MINIMUM, AND THAT IS WHAT MADE IT TRACTABLE.
+ * Over the same two windows, the largest RISE in a trailing-min floor was:
+ *     W=5  →  21 MB          W=8  →  11 MB          W=10 →  10–11 MB
+ * against zero real ratchet steps in either window. W=10 costs ten samples of
+ * latency and buys a false-rise ceiling of 11 MB.
+ *
+ * Hence, every constant below traceable to that measurement:
+ *   FLOOR_WINDOW    10   trailing-min width; false-rise ceiling 11 MB
+ *   JITTER_MB       12   one above the worst observed false rise
+ *   RISE_MB         48   4× the jitter ceiling, and well under the 139 MB mean
+ *                        real step (the reported +972 MB over 7 steps)
+ *   STABLE_SAMPLES   8   observed transient spikes recover within 1–2 samples,
+ *                        so eight rejects them with margin
+ *
+ * ⚠ THESE ARE DIAGNOSTIC HYPOTHESES FROM ONE DEVICE'S SERIES, not universal
+ * constants, and nothing may cite them as thresholds for anything else.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+export const RATCHET_FLOOR_WINDOW = 10;
+export const RATCHET_JITTER_MB = 12;
+export const RATCHET_RISE_MB = 48;
+export const RATCHET_STABLE_SAMPLES = 8;
+
+export interface RatchetStep {
+  step: number;
+  beforeFloorMb: number;
+  peakMb: number;
+  newFloorMb: number;
+  retainedDeltaMb: number;
+  recoveryPct: number;
+  firstRisingIndex: number;
+  peakIndex: number;
+  settledIndex: number;
+  firstRisingSeq: number;
+  settledSeq: number;
+  tStartMs: number;
+  tSettledMs: number;
+  jsStale: boolean;
+}
+
+/**
+ * Find sustained retained-memory steps in an emitted sample series.
+ *
+ * ⚠ PURE AND DETERMINISTIC. No clock, no native call, no allocation beyond the
+ * result — the suite drives it with synthetic series and gets the same answer
+ * every time. A transient spike that recovers is NOT a step, and that rejection
+ * is tested directly rather than assumed.
+ */
+export function detectRatchetSteps(samples: readonly NativeSample[]): RatchetStep[] {
+  const n = samples?.length ?? 0;
+  if (n < RATCHET_FLOOR_WINDOW + RATCHET_STABLE_SAMPLES + 1) return [];
+  const mb = (bytes: number): number => Math.round((Number(bytes) || 0) / MB);
+  const fp: number[] = [];
+  for (let i = 0; i < n; i++) fp.push(mb(samples[i]!.footprint));
+
+  const floorAt = (i: number): number => {
+    let lo = fp[i]!;
+    for (let k = Math.max(0, i - RATCHET_FLOOR_WINDOW + 1); k <= i; k++) {
+      if (fp[k]! < lo) lo = fp[k]!;
+    }
+    return lo;
+  };
+
+  const steps: RatchetStep[] = [];
+  let baseFloor = floorAt(RATCHET_FLOOR_WINDOW - 1);
+  let i = RATCHET_FLOOR_WINDOW;
+  while (i < n) {
+    if (fp[i]! - baseFloor < RATCHET_RISE_MB) {
+      const f = floorAt(i);
+      if (f < baseFloor) baseFloor = f;
+      i += 1;
+      continue;
+    }
+    // A candidate rise. Walk to the peak, then require the floor to HOLD.
+    const firstRising = i;
+    let peak = fp[i]!, peakIdx = i;
+    let j = i;
+    while (j < n && j < firstRising + RATCHET_STABLE_SAMPLES * 4) {
+      if (fp[j]! > peak) { peak = fp[j]!; peakIdx = j; }
+      j += 1;
+    }
+    /* ⚠ THE SETTLE FLOOR IS MEASURED FROM THE RISE, NOT BACKWARDS THROUGH IT.
+     * `floorAt` looks back RATCHET_FLOOR_WINDOW (10) samples, and the settle
+     * point is only RATCHET_STABLE_SAMPLES (8) past the rise, so floorAt(settleAt)
+     * still straddles two PRE-rise samples and returns the OLD floor. That
+     * rejected the first genuine candidate and re-found the same step nine
+     * samples later: measured on the D6 series the step was dated at index 49
+     * when it began at 40. At the device's cadence that is ~2.25 s of
+     * misattribution — and the event join in `eventsForStep` reads exactly that
+     * window, so a late start date attributes the step to whatever happened
+     * after the cause. The floor that proves retention is the minimum of the
+     * samples from the rise onward, and nothing before it. */
+    const settleAt = firstRising + RATCHET_STABLE_SAMPLES;
+    /* Not enough series left to prove the rise was RETAINED rather than a spike
+     * caught at the edge of the ring. Leave it open rather than claim it. */
+    if (settleAt > n - 1) break;
+    let held = fp[firstRising]!;
+    for (let k = firstRising; k <= settleAt; k++) { if (fp[k]! < held) held = fp[k]!; }
+    if (held - baseFloor >= RATCHET_RISE_MB - RATCHET_JITTER_MB) {
+      let stale = false;
+      for (let k = firstRising; k <= settleAt; k++) {
+        if (((Number(samples[k]!.flags) || 0) & 2) !== 0) stale = true;
+      }
+      const gross = peak - baseFloor;
+      steps.push({
+        step: steps.length + 1,
+        beforeFloorMb: baseFloor,
+        peakMb: peak,
+        newFloorMb: held,
+        retainedDeltaMb: held - baseFloor,
+        recoveryPct: gross > 0 ? Math.round(((peak - held) / gross) * 100) : 0,
+        firstRisingIndex: firstRising,
+        peakIndex: peakIdx,
+        settledIndex: settleAt,
+        firstRisingSeq: Number(samples[firstRising]!.seq) || 0,
+        settledSeq: Number(samples[settleAt]!.seq) || 0,
+        tStartMs: Number(samples[firstRising]!.t) || 0,
+        tSettledMs: Number(samples[settleAt]!.t) || 0,
+        jsStale: stale,
+      });
+      baseFloor = held;
+      i = settleAt + 1;
+    } else {
+      // Transient — it went up and came back. Not a new floor.
+      i = settleAt + 1;
+      const f = floorAt(Math.min(n - 1, i));
+      if (f < baseFloor) baseFloor = f;
+    }
+  }
+  return steps;
+}
+
+/**
+ * ⚠ THE JOIN, AND IT USES THE KEY THAT ALREADY EXISTS. Every NativeEvent
+ * carries `sampleSeq` — the sample current when it was recorded — so an event
+ * is attributed to a step by sequence comparison alone. No second correlation
+ * mechanism, no timestamp matching, no duplicated sequence state.
+ */
+export function eventsForStep(
+  step: RatchetStep,
+  events: readonly NativeEvent[],
+  lead = 4,
+): NativeEvent[] {
+  const out: NativeEvent[] = [];
+  for (const e of events ?? []) {
+    const s = Number(e.sampleSeq) || 0;
+    if (s >= step.firstRisingSeq - lead && s <= step.settledSeq) out.push(e);
+  }
+  return out;
+}
 
 // ───────────────────────────────────────────────────────────────────────────
 // The primed cache
@@ -658,6 +979,56 @@ export function memoryFlightSummary(report: MemoryFlightReport): string {
     const mk = report.metricKit;
     if (mk && typeof mk === 'object') {
       out.push(`  MetricKit: ${metricKitLine(mk)}`);
+    }
+
+    /* ⚠⚠⚠ OTA-1853 — THE SECTION BAKER #3 NEEDED AND DID NOT HAVE.
+     *
+     * The forensic pass had the samples and the events in the same report and
+     * still returned OUTCOME C, because reading a step out of 504 raw rows and
+     * then hand-matching events to it is not something anyone does on a phone
+     * at 20:02 local. This does that join once, at compose time, and prints it
+     * FIRST — before the raw rows — so the first thing the next capture shows
+     * is every retained step with the subsystem events that were live inside it.
+     *
+     * ⚠ IT PRINTS EVIDENCE, NOT A VERDICT. The events listed under a step were
+     * RECORDED INSIDE IT. That is co-location in time and nothing more. The
+     * words "holder", "cause" and "leak" do not appear here by design: the
+     * ruling is the owner's, from this table plus the raw rows below it. */
+    try {
+      const steps = detectRatchetSteps(report.samples);
+      out.push(`  Retained steps: ${steps.length === 0 ? 'none detected'
+        : `${steps.length} (floor window ${RATCHET_FLOOR_WINDOW}, rise ≥${RATCHET_RISE_MB}MB held ${RATCHET_STABLE_SAMPLES} samples)`}`);
+      for (const st of steps) {
+        out.push(
+          `    STEP ${st.step}: ${fmtT(st.tStartMs)} → ${fmtT(st.tSettledMs)}`
+          + ` · floor ${st.beforeFloorMb} → ${st.newFloorMb}MB (+${st.retainedDeltaMb} retained)`
+          + ` · peak ${st.peakMb}MB · recovered ${st.recoveryPct}%`
+          + (st.jsStale ? '  ⚠ JS STALE inside this step' : '')
+        );
+        const inside = eventsForStep(st, report.events);
+        if (inside.length === 0) {
+          out.push('      (no annotated events inside this step — the subsystem that'
+            + ' allocated it does not report, or was not instrumented)');
+          continue;
+        }
+        // ⚠ Counted by kind, not listed one by one: thirteen room transitions
+        // inside one step must read as "13 ROOM_ENTER", not thirteen lines that
+        // push the next step off the screen.
+        const tally = new Map<number, number>();
+        for (const e of inside) tally.set(e.kind, (tally.get(e.kind) ?? 0) + 1);
+        const parts: string[] = [];
+        for (const [kind, n] of tally) parts.push(`${memKindName(kind)}×${n}`);
+        out.push(`      inside: ${parts.join(' · ')}`);
+        // The first few in full, with their codes — a code identifies WHICH
+        // room, artwork or track, and without it the tally names only a family.
+        for (const e of inside.slice(0, 6)) {
+          out.push(`      ${fmtT(e.t)} ${memKindName(e.kind)}${e.code ? `/${e.code}` : ''}`
+            + ` — ${toMb(e.footprint)}MB`);
+        }
+        if (inside.length > 6) out.push(`      … ${inside.length - 6} more inside this step`);
+      }
+    } catch {
+      out.push('  (step join failed — the raw rows below are unaffected)');
     }
 
     const events = report.events.slice(-REPORT_EVENT_ROWS);

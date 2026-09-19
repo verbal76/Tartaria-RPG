@@ -30957,7 +30957,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ ONE CONTROL IS RULED EXEMPT AND NAMED: the inventory's gift-mode banner,
 // whose planes are a module constant. OTA-1828 tried the repair and reverted
 // it; completing it is OTA-1806's class. */
-export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';
+/* ⚠⚠⚠ OTA-1853 — THE RING LEARNS WHO. DIAGNOSTICS ONLY; NOTHING IS REPAIRED.
+ *
+ * Baker #3's owner-device capture (iPhone SE, 2026-09-19) measured a real
+ * memory ratchet — baseline 951 MB, peak 1903 MB, seven retained steps, +675 MB
+ * that never came back, 98.3% of it in the default malloc zone across 4.42–4.45
+ * million live blocks — and the forensic pass ruled OUTCOME C, HOLDER NOT
+ * PROVEN. Two reasons, both addressed here and neither of them a memory fix:
+ *
+ *   1. THE COMPOSER THREW THE EVIDENCE AWAY. The recorder took 504 samples into
+ *      a 512-slot ring with `evicted 0` — every one survived on the device —
+ *      and the report printed the last 48. All seven steps happened before that
+ *      window opened. REPORT_SAMPLE_ROWS 48 → 512, REPORT_EVENT_ROWS 32 → 64.
+ *   2. THE VOCABULARY WAS BLIND TO THE SUSPECTS. The 49-second window carrying
+ *      every step held THIRTEEN room transitions and seven `roster=new` events,
+ *      and MEM_KIND had names only for Qwen, MiniLM, voice, touches and
+ *      persistence. Kinds 90–125 give rooms, routes, scenes, rosters, artwork
+ *      and audio players a word, and subsystemMemoryMarks.ts speaks it.
+ *
+ * The report now does the join itself: retained steps are detected at compose
+ * time and printed with the annotated events recorded inside each one. That is
+ * CO-LOCATION IN TIME AND NOTHING MORE — the section names no holder and no
+ * cause, by design and by test.
+ *
+ * ⚠ THE GAME IS UNCHANGED. Nine non-comment lines reach production files: three
+ * imports and six diagnostic calls. Nothing frees, disposes, caches, loads,
+ * navigates or reschedules anything. gameStore.ts is not touched — it stands at
+ * exactly its 36815-line ceiling, so the room boundary is observed from outside
+ * the store rather than spending a permanent allowance on a temporary probe. */
+export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';

@@ -23,6 +23,8 @@
 
 import { Audio } from 'expo-av';
 import { getAudioSettings, loadAudioSettings, onAudioSettingsChange } from './audioSettings';
+// ⚠ OTA-1853 — diagnostics only; both calls are throw-free no-ops off device.
+import { markAudioPlayerCreate, markAudioPlayerDispose } from '../diagnostics/subsystemMemoryMarks';
 
 type Context = 'boss' | 'combat' | 'shop' | 'menu' | 'explore';
 
@@ -131,6 +133,13 @@ async function loadTrack(entry: TrackEntry): Promise<void> {
         volume: 0,
       });
       sounds[entry.id] = sound;
+      // ⚠⚠ OTA-1853 — A DECODED TRACK IS A REAL RETAINED ALLOCATION, AND IT WAS
+      // INVISIBLE. Baker #3's ratchet holds +675 MB with Qwen idle; audio was
+      // one of the candidates the forensic pass could neither implicate nor
+      // clear, because nothing in the ring said when a player was created. This
+      // is one annotation on the line that already succeeded — it does not load,
+      // unload, cache or schedule anything.
+      markAudioPlayerCreate(entry.id);
     } catch {
       // ignore
     } finally {
@@ -400,6 +409,7 @@ export async function disposeAudio(): Promise<void> {
       const status = await sound.getStatusAsync();
       if (status.isLoaded) await sound.unloadAsync();
       delete sounds[id];
+      markAudioPlayerDispose(id); // OTA-1853 — the other end of the pair.
     }
   } catch {
     // ignore

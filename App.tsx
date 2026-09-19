@@ -72,6 +72,8 @@ import { setAliveBeatContext, startAliveBeat, stopAliveBeat } from './app/diagno
 import { stopRuntimePressureWatch } from './app/diagnostics/runtimePressureWatch';
 // ⚠⚠⚠ OTA-1813 — the previous boot's touch path. Hydrated in the boot effect.
 import { loadPriorTouchPath } from './app/diagnostics/touchPath';
+// ⚠⚠ OTA-1853 — the memory ring's new vocabulary for rooms, routes and rosters.
+import { startSubsystemMemoryMarks, stopSubsystemMemoryMarks } from './app/diagnostics/subsystemMemoryMarks';
 import { stopQwenWatchdog } from './app/ai/qwenWatchdog';
 // ⚠⚠⚠ BOOT-HANG-1741 — the screen a boot that never finished is allowed to have.
 import { BootTroubleScreen } from './app/components/BootTroubleScreen';
@@ -556,6 +558,19 @@ export default function App() {
     //   stall. Deliberately NOT a heavier probe: an instrument that changes the
     //   boot it is measuring invalidates its own result.
     try { useGameStore.getState().startBootPressureWatch(); } catch { /* never block boot */ }
+    // ⚠⚠ OTA-1853 — THE RING LEARNS WHO, NOT JUST WHEN. Baker #3's owner-device
+    // capture measured seven retained memory steps and could not attribute one
+    // of them: the event vocabulary had no word for a room, a route, a scene or
+    // a roster, and the 49-second window that carried every step held thirteen
+    // room transitions. This subscribes to the store and annotates those
+    // boundaries into the native ring. It allocates nothing per frame, holds no
+    // collection, and frees nothing — see app/diagnostics/subsystemMemoryMarks.ts.
+    //
+    // ⚠ ARMED HERE for the same reason OTA-1735 armed the pressure watch here:
+    //   the boundaries crossed during hydrate and the first scene are inside
+    //   the window under investigation, and an instrument switched on after
+    //   them records a session that has already started.
+    startSubsystemMemoryMarks();
     void primeSeenHints(); // OTA-1738 — store-side surfaces (the bounty primer) read the hint flags synchronously
     setStage('hydrate:start');
     // ⚠⚠⚠ BOOT-HANG-1741 — A BOOT THAT NEVER FINISHES MUST STILL SAY SO.
@@ -965,6 +980,7 @@ export default function App() {
       // teardown rules as the audio and TTS controllers beside it.
       stopRuntimePressureWatch();
       stopQwenWatchdog();
+      stopSubsystemMemoryMarks(); // OTA-1853 — same owner, same teardown rule.
       void disposeAudio();
     };
   }, [hydrate, bootCognitive, bootQwen]);

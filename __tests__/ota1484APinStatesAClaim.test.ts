@@ -173,6 +173,18 @@ describe('placedAt — fixtures can no longer invent impossible coordinates', ()
     //   name. ota1728's two are arguments to that same predicate, which takes a
     //   location ID and never a player. Re-baselined per the instruction above
     //   ("say which one at the site and re-baseline"), and said at both sites.
-    expect(bare).toBeLessThanOrEqual(52); // the baseline — shrink-only
+    // ⚠ OTA-1853 — 52 → 54. Two new sites, both in the class this test's own
+    //   note already names: "minimal argument objects for pure predicates …
+    //   not player state; coords would be dead weight". Both are in
+    //   ota1853TheRoomBoundarySpeaks, feeding `onStoreChange` — a pure observer
+    //   that reads the location id as an OPAQUE STRING and hashes it to a
+    //   16-bit code. It never resolves a cell, a coordinate or a map frame, so
+    //   placedAt would import world geometry into a test about string identity.
+    //   The second site is `currentLocationId: 7` and is deliberately MALFORMED
+    //   — a number where an id belongs, proving the instrument coerces and
+    //   carries on rather than throwing into its host; placedAt cannot express
+    //   that by construction. Re-baselined per the instruction above ("say
+    //   which one at the site and re-baseline"), and said at both sites.
+    expect(bare).toBeLessThanOrEqual(54); // the baseline — shrink-only
   });
 });

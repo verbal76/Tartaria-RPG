@@ -104,7 +104,14 @@ describe('OTA-1432 — it plays on the COMMIT, not on the tap', () => {
     // to and fires against the NEXT emblem, closing it a beat after it opened.
     expect(FLASH).toContain('onPress={() => { clearTimer(); onDone(); }}');
     expect(FLASH).toContain('onRequestClose={() => { clearTimer(); onDone(); }}');
-    expect(FLASH).toContain('return clearTimer;');
+    // ⚠ OTA-1853 — the effect's teardown was `return clearTimer;` and is now a
+    // closure, because a diagnostic mark rides out on the same edge. THE CLAIM
+    // IS UNCHANGED and is what this line still asserts: whatever the teardown
+    // is, it clears the timer FIRST. The behaviour behind the claim — onDone
+    // never firing after an unmount or a re-trigger — is now also proven by
+    // rendering the real component and advancing a fake clock, in
+    // ota1853TheFlashAnnouncesItself (J5, J6), which a source pin cannot do.
+    expect(FLASH).toMatch(/return \(\) => \{ clearTimer\(\);/);
   });
 
   it('⚠ it holds for a couple of seconds, not "a few"', () => {
