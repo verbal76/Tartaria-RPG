@@ -108,10 +108,34 @@ export function findMission(family: WalkFamily, id: string): MissionLike | null 
   return (d as unknown as MissionLike) ?? null;
 }
 
+/* ⚠⚠⚠ DEBT #54 — A WAIT MEASURED IN MILLISECONDS IS A DECISION MADE BY THE CPU.
+ *
+ * This used to be `while (!pred() && Date.now() - t0 < deadlineMs)`. Its RETURN
+ * VALUE is load-bearing — `const moved = await settle(...)` at the road fork
+ * picks a different branch when it comes back false — so on a machine that
+ * hiccuped, the walker took another road and reported another walk. That is the
+ * last input a replay token cannot carry: not the seed, not the world, the
+ * clock.
+ *
+ * ⚠ MEASURED. With the seed anchored and the homework interval disarmed, the
+ * SAME prefix command run twice still gave `hunt_mud_titan` 1,060 taps and then
+ * 785 — and 785 is exactly what the full run walked. So the replay was not
+ * wrong, it was a coin toss, and the coin was how fast this box happened to be.
+ *
+ * The fix is to count POLLS instead of milliseconds. Each poll still yields to
+ * the event loop, so the engine's own promises and timers get exactly as many
+ * turns to finish as they did before; what changes is that a slow machine now
+ * waits longer in real time rather than giving up earlier. The poll budget is
+ * the old deadline at the old poll interval, so no wait got shorter.
+ *
+ * ⚠ This is the harness, not the game. No probability, no product timer and no
+ * engine behaviour is touched — only how long the test agrees to keep looking. */
+const SETTLE_POLL_MS = 12;
 async function settle(pred: () => boolean, deadlineMs = 4000): Promise<boolean> {
-  const t0 = Date.now();
-  while (!pred() && Date.now() - t0 < deadlineMs) {
-    await new Promise((r) => setTimeout(r, 12));
+  const polls = Math.max(1, Math.ceil(deadlineMs / SETTLE_POLL_MS));
+  for (let i = 0; i < polls; i++) {
+    if (pred()) return true;
+    await new Promise((r) => setTimeout(r, SETTLE_POLL_MS));
   }
   return pred();
 }
@@ -1264,11 +1288,83 @@ export async function playWhisperChain(chain: ChainDef): Promise<WalkReport> {
   return r;
 }
 
+/* ⚠⚠⚠ DEBT #54 — A WALK THAT CANNOT BE REPLAYED IS NOT REPRODUCIBLE.
+ *
+ * The harness has had a fixed seed since OTA-1831, and a fixed seed is NOT the
+ * same thing as a replayable one. Measured on this tree at c94e3ebc, the same
+ * scenario under the same hardcoded seed walked two different paths:
+ *
+ *   in the full run     Nessa camps 4 tiles away (3 south, 1 EAST) · 60 taps
+ *   PLAYER_WALKER_ONLY  Nessa camps 4 tiles away (3 south, 1 WEST) · 34 taps
+ *
+ * Both walks are legitimate. They differ because `beforeAll` builds ONE world
+ * and every scenario inherits what the scenarios before it left, while the
+ * per-test reseed restarts only the DICE. So the isolated run is not the walk
+ * that broke — it is a different walk of the same mission, and debugging it
+ * tells you about a world the failing run never had.
+ *
+ * ⚠ THE FIX IS THE PREFIX, NOT ISOLATION. Isolating every scenario onto a fresh
+ * world would make replay trivial and would DELETE what this suite is for:
+ * walking the catalogue the way a player actually accumulates it. The exact
+ * state a scenario saw is reproduced by replaying the same ordered prefix under
+ * the same seed — `PLAYER_WALKER_UPTO=<family:id>` — which is what the block
+ * below prints, and which changes nothing about how the full run behaves. */
+export function walkerBaseSeed(): number {
+  const g = globalThis as { __TARTARIA_TEST_SEED__?: number };
+  return typeof g.__TARTARIA_TEST_SEED__ === 'number' ? g.__TARTARIA_TEST_SEED__ : 0x74617274;
+}
+
+export function walkerDefaultSeed(): number {
+  const g = globalThis as { __TARTARIA_DEFAULT_TEST_SEED__?: number };
+  return typeof g.__TARTARIA_DEFAULT_TEST_SEED__ === 'number' ? g.__TARTARIA_DEFAULT_TEST_SEED__ : 0x74617274;
+}
+
+/** How this process selected its scenarios — which decides what a replay must say. */
+export function walkerRunMode(): 'full' | 'prefix' | 'isolated' {
+  if (process.env.PLAYER_WALKER_UPTO) return 'prefix';
+  if (process.env.PLAYER_WALKER_ONLY) return 'isolated';
+  return 'full';
+}
+
+export function walkerSeedToken(seed = walkerBaseSeed()): string {
+  return `0x${(seed >>> 0).toString(16).padStart(8, '0')}`;
+}
+
+/**
+ * The lines a broken walk prints so the next reader reproduces it with ONE
+ * command. Seed, scenario, whether the walk was sequence-dependent, and the
+ * command itself — a replay instruction missing any of those is a guess.
+ */
+export function replayBlock(family: string, id: string): string[] {
+  const seed = walkerSeedToken();
+  const scenario = `${family}:${id}`;
+  const mode = walkerRunMode();
+  const isDefault = walkerBaseSeed() === walkerDefaultSeed();
+  const cmd = `TARTARIA_TEST_SEED=${seed} PLAYER_WALKER_UPTO=${scenario} npx jest __tests__/playerWalkerSim.test.ts --runInBand`;
+  const seq = mode === 'isolated'
+    ? 'isolated — started from a world no other scenario had touched'
+    : 'sequence-dependent — inherited the world every earlier scenario left';
+  return [
+    '    ── replay ──',
+    `      seed:     ${seed}${isDefault ? ' (harness default)' : ' (override via TARTARIA_TEST_SEED)'}`,
+    `      scenario: ${scenario}`,
+    `      mode:     ${mode} · ${seq}`,
+    `      replay:   ${cmd}`,
+    ...(mode === 'isolated'
+      ? []
+      : ['      ⚠ PLAYER_WALKER_ONLY reproduces the MISSION, not this WALK — it starts',
+         '        from a fresh world and legitimately takes a different path.']),
+  ];
+}
+
 export function formatReport(r: WalkReport): string {
   const head = `${r.outcome === 'complete' ? 'OK  ' : 'BRK '} ${r.family}:${r.id} — ${r.title} (${r.stages.length} stages played, ${r.taps} taps)`;
   const stages = r.stages.map((s) =>
     `    stage ${s.stage} @${s.ground} via=${s.via}${s.typed ? ` typed="${s.typed}"` : ''}${s.arrivalLine ? `\n      arrival: ${s.arrivalLine}` : ''}${s.closeCard ? `\n      card: ${s.closeCard}` : ''}`);
   const breaks = r.breaks.map((b) => `    ✗ ${b.split('\n').join('\n      ')}`);
+  // ⚠ ON A BREAK ONLY. A green walk needs no replay instructions, and printing
+  // them on all 89 would bury the one report a reader is actually looking for.
+  const replay = r.breaks.length > 0 ? replayBlock(r.family, r.id) : [];
   const feed = r.feed ? ['    ── feed ──', ...r.feed.map((l) => `    | ${l.split('\n').join('\n    |   ')}`)] : [];
-  return [head, ...stages, ...breaks, `    allowances: ${r.allowances.join('; ')}`, ...feed].join('\n');
+  return [head, ...stages, ...breaks, `    allowances: ${r.allowances.join('; ')}`, ...replay, ...feed].join('\n');
 }

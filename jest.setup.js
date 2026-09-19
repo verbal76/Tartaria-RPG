@@ -21,7 +21,54 @@
 // that need a specific value still override Math.random locally (jest.spyOn /
 // direct assignment); that wins within their scope and restores to this seeded
 // baseline afterward. Product code is untouched.
-const __SEED = 0x74617274; // "tart" — stable across runs and all three OTA lines
+// ⚠⚠⚠ DEBT #54 — THE SEED IS NOW ADDRESSABLE, AND THAT IS THE WHOLE REPAIR.
+//
+// The constant below has always been the harness's dice. What it never was is
+// SELECTABLE: no override, no parameter, nothing to print in a failure and
+// nothing to type to replay one. A simulator whose failures cannot be replayed
+// is not reproducible no matter how fixed its seed is, which is the defect this
+// closes — see __tests__/walkerReplaySeed.test.ts for the proof. (No OTA: this
+// change is harness-only and ships nothing to a device.)
+//
+// ⚠ THE DEFAULT IS UNCHANGED AND THAT IS LOAD-BEARING. With no override the
+// seed is still 0x74617274, so every existing suite draws the exact sequence it
+// drew before this change and no baseline moves. The override exists for
+// replaying a captured failure and for asking an invariant across many seeds;
+// it is read once, here, and it never reaches product code.
+//
+// ⚠ PRODUCT RANDOMNESS IS UNTOUCHED. This file is `setupFiles` — it exists only
+// inside jest. Nothing here ships, no probability is altered, and the game's own
+// Math.random on a device is the platform's.
+const __DEFAULT_SEED = 0x74617274; // "tart" — stable across runs and all three OTA lines
+/** Accept `0x…` or decimal; anything unparseable falls back to the default. */
+function __tartariaParseSeed(raw) {
+  if (typeof raw !== 'string') return __DEFAULT_SEED;
+  const t = raw.trim();
+  if (t === '') return __DEFAULT_SEED;
+  const n = /^0x/i.test(t) ? Number.parseInt(t.slice(2), 16) : Number.parseInt(t, 10);
+  return Number.isFinite(n) ? n >>> 0 : __DEFAULT_SEED;
+}
+const __SEED = __tartariaParseSeed(process.env.TARTARIA_TEST_SEED);
+// Published so a harness can PRINT the seed it actually ran on. A failure that
+// does not name its seed cannot be replayed, which was half of debt #54.
+globalThis.__TARTARIA_TEST_SEED__ = __SEED;
+globalThis.__TARTARIA_DEFAULT_TEST_SEED__ = __DEFAULT_SEED;
+// The parser itself, so its contract is TESTED rather than described. A seed
+// reader that silently turns junk into 0 would make every "replayed with the
+// seed from the failure" claim a lie.
+globalThis.__TARTARIA_PARSE_TEST_SEED__ = __tartariaParseSeed;
+/**
+ * ⚠ TEST-ONLY, AND THE REASON IT EXISTS IS §9's MULTI-SEED INVARIANTS.
+ * `__TARTARIA_RESEED_RANDOM__` restores THE run's seed, which is what every test
+ * needs by default. Asking whether an invariant holds across MANY seeds needs a
+ * way to say which one, and a test that reaches for its own `Math.random =` to
+ * do that loses the reproducible baseline for everything after it. This sets the
+ * cursor and nothing else; the reseed hook still returns the run to its own seed
+ * before the next test.
+ */
+globalThis.__TARTARIA_SET_RANDOM_SEED_FOR_TEST__ = function setRandomSeedForTest(seed) {
+  __s = (typeof seed === 'number' ? seed >>> 0 : __tartariaParseSeed(String(seed))) >>> 0;
+};
 let __s = __SEED >>> 0;
 Math.random = function seededRandom() {
   __s |= 0;
