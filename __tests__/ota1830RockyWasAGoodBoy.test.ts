@@ -290,9 +290,11 @@ describe('OTA-1830 §5 — the rule is WIRED, not merely written', () => {
   });
 
   test('5.2a ⚠⚠⚠ OTA-1833 — THE GEM IS ACTUALLY GRANTED, through the one real path', () => {
-    // addResurrectionGems is the ONLY way a gem enters the stash. A keepsake
-    // that only logged a line would read as generous and change nothing.
-    expect(store).toContain('addResurrectionGems(keep.gem)');
+    // ⚠ OTA-1850 — the one real path is now `gemsAfterGrant` against the
+    // character's own balance, because gems belong to the character who earned
+    // them. The claim is the same one it always was: a keepsake that only
+    // logged a line would read as generous and change nothing.
+    expect(store).toContain('gemsAfterGrant(get().player, keep.gem)');
     expect(store).toContain('resurrectionGems: t');
   });
 
@@ -314,21 +316,35 @@ describe('OTA-1830 §5 — the rule is WIRED, not merely written', () => {
      *  LOOT path  — the risk is a FULL PACK. grantItem can refuse, so the
      *               record must sit inside the accepted branch or arriving with
      *               no room spends the keepsake and hands over nothing.
-     *  GEM path   — the risk is a FAILED STASH WRITE. Gems cannot be refused
-     *               for room, but `addResurrectionGems` is async and can lose
-     *               its write, so the record must sit INSIDE the `.then` and
-     *               not beside the call. Recorded-but-not-banked costs the
+     *  GEM path   — the risk WAS a FAILED STASH WRITE. Gems cannot be refused
+     *               for room, but `addResurrectionGems` was async and could
+     *               lose its write, so the record had to sit INSIDE the `.then`
+     *               and not beside the call. Recorded-but-not-banked cost the
      *               player their one gem permanently, and silently.
-     */
+     *
+     * ⚠⚠⚠ OTA-1850 CLOSED THE GEM HAZARD BY SHAPE, so this half of the test
+     * gets STRICTER rather than looser. The gem is character-bound now: it is
+     * a field on the same record that carries `worldMemory`, so the balance and
+     * the paid-mark are assigned in ONE `set` and written by ONE `persist()`.
+     * There is no async gap to sit on the right side of — and therefore no
+     * ordering to get wrong. Asking for a `.then` here would now be asking for
+     * the weaker arrangement back. Instead the test asks for the thing that
+     * makes the hazard impossible: the gem count and the paid record must be in
+     * the SAME state update, with nothing closing it between them. */
     const records = [...store.matchAll(/recordKeepsakePaid\(st\.worldMemory\.onceLootPaid/g)].map((m) => m.index!);
     expect(records).toHaveLength(2);
 
-    // the GEM record is downstream of the gem call, on the resolved side of it
-    const gemCall = store.indexOf('addResurrectionGems(keep.gem)');
+    // the GEM record shares one `set` with the gem it guards
+    const gemCall = store.indexOf('gemsAfterGrant(get().player, keep.gem)');
     expect(gemCall).toBeGreaterThan(-1);
     const gemRecord = records.find((i) => i > gemCall && i < gemCall + 400);
     expect(gemRecord).toBeDefined();
-    expect(store.slice(gemCall, gemRecord!)).toContain('.then(');
+    const between = store.slice(gemCall, gemRecord!);
+    // the balance lands in the same object literal as the record …
+    expect(between).toContain('resurrectionGems: t');
+    // … and that update is never resolved asynchronously, which is the point
+    expect(between).not.toContain('.then(');
+    expect(between).not.toContain('await ');
 
     // the LOOT record still sits inside the accepted-grant branch
     const at = records[records.length - 1]!;

@@ -42,8 +42,8 @@ import { OTA_BUILD_ID } from '../../buildInfo';
 import { clearSlotCrash, markSlotLoadDone, markSlotLoadStart } from '../../diagnostics/saveLoadHealth';
 import { pick } from '../../engine/rng';
 import {
-  addResurrectionGems,
   characterSeedOf,
+  claimLegacyGems,
   clearFallenSeed,
   deleteSlot,
   getActiveSlotId,
@@ -53,6 +53,7 @@ import {
   readFullLog,
   saveSlot,
   setActiveSlot,
+  spendGemAndRevive,
 } from '../../engine/saveSystem';
 import { seamBanner, lastEntryTime } from '../../engine/logSeam'; // OTA-1494
 import { findMicroMicroAnywhere } from '../../engine/worldLadder';
@@ -186,6 +187,11 @@ export const createSlotSlice = (
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       void require('../../voice/TTSManager').stopAndClear();
     } catch { /* TTS not loaded yet — fine */ }
+    // ⚠ OTA-1850 — BEFORE THE READ, not after: this character absorbs its share
+    // of the legacy install-wide gem pool (and, on a fresh install, the one free
+    // seed gem) so the save we are about to load already carries the right
+    // balance. Idempotent and one-time; a character that has claimed is stamped.
+    try { await claimLegacyGems(slotId); } catch { /* best-effort — retried next load */ }
     let saved;
     try {
       saved = await loadSlot(slotId);
@@ -352,6 +358,10 @@ export const createSlotSlice = (
         awaitingTutorialName: false,
         tutorialExploreChosen: false,
         activeSlotId: slotId,
+        // ⚠ OTA-1850 — the live mirror takes THIS character's own gem balance.
+        // Loading a different character changes the number on screen, because
+        // the number belongs to the character, not to the install.
+        resurrectionGems: Math.max(0, Math.floor(repairedPlayer.resurrectionGems ?? 0)),
         // arb25 — never resume "inside a building" (building state is transient).
         activeBuildingId: null,
         activeBuildingRoomId: null,
@@ -701,23 +711,16 @@ export const createSlotSlice = (
   },
 
   async resurrectSlot(slotId) {
-    if (get().resurrectionGems <= 0) return false;
+    // ⚠⚠⚠ OTA-1850 — THE GEM IS THIS CHARACTER'S, so the store's mirror (which
+    // tracks whoever is loaded, and on the title screen is nobody) is NOT the
+    // authority any more. `spendGemAndRevive` reads the balance from the dead
+    // character's own record inside the serialized write that spends it; there
+    // is no pre-check here to be raced or to disagree with the disk.
+    // OTA-1850 — a dead character claims their legacy share FIRST: on an
+    // upgrading install that share may be the very gem that pays for this.
+    try { await claimLegacyGems(slotId); } catch { /* best-effort */ }
     const saved = await loadSlot(slotId);
     if (!saved || !saved.player || saved.player.dead !== true) return false;
-
-    // OTA-428 — backfill the saved player FIRST and revive to the BACKFILLED
-    // hpMax, not the raw saved one. A cross-version or interrupted-death save
-    // can carry a stale/missing hpMax (older saves, or gear-HP not yet baked
-    // into the stored number); backfillPlayer is the canonical normalization
-    // the regular load path runs, so the revived character wakes at the max the
-    // rest of the engine agrees on rather than whatever sat in the dead save.
-    const backfilled = deps.backfillPlayer(saved.player);
-    const revived: PlayerCharacter = {
-      ...backfilled,
-      dead: false,
-      hp: backfilled.hpMax,
-      stamina: backfilled.staminaMax ?? backfilled.stamina,
-    };
 
     // OTA-428 — drop the load-crash breadcrumb BEFORE touching the live scene.
     // Resurrection rehydrates a (possibly stale cross-version) save and runs
@@ -726,12 +729,42 @@ export const createSlotSlice = (
     // Retry/Delete instead of an instant re-crash. Cleared on clean completion.
     await markSlotLoadStart(slotId);
     try {
-      // OTA-428 — persist the revived character, THEN consume the gem. Ordered
-      // so a failed/half-written save never costs the player their gem while
-      // still leaving them dead: no save lands, no gem spent. (Pre-OTA the gem
-      // was decremented first, so a save failure burned the gem AND the run.)
-      await saveSlot(slotId, { ...saved, player: revived });
-      const remainingGems = await addResurrectionGems(-1);
+      // ⚠⚠⚠ OTA-1850 — THE SPEND AND THE REVIVAL ARE ONE WRITE TO ONE KEY.
+      //
+      // OTA-428 ordered the save before the gem decrement so a failed save
+      // could not burn a gem; that was the best available answer while the
+      // balance lived in a SEPARATE storage key from the character, because
+      // AsyncStorage has no cross-key transaction and SOME order had to lose.
+      // Making gems character-bound removed the second key: the decrement and
+      // the revival now sit in the same object, written once. A crash cannot
+      // land one without the other, so neither "alive and never charged" nor
+      // "charged and still dead" is a state the storage can hold.
+      //
+      // Retry safety is the death's own `deathId`: a second call for a death
+      // already paid for is answered from the record, not charged again.
+      const spend = await spendGemAndRevive(slotId, (dead) => {
+        // OTA-428 — backfill the saved player FIRST and revive to the BACKFILLED
+        // hpMax, not the raw saved one. A cross-version or interrupted-death save
+        // can carry a stale/missing hpMax (older saves, or gear-HP not yet baked
+        // into the stored number); backfillPlayer is the canonical normalization
+        // the regular load path runs, so the revived character wakes at the max the
+        // rest of the engine agrees on rather than whatever sat in the dead save.
+        const backfilled = deps.backfillPlayer(dead);
+        return {
+          ...backfilled,
+          dead: false,
+          hp: backfilled.hpMax,
+          stamina: backfilled.staminaMax ?? backfilled.stamina,
+        };
+      });
+      if (!spend.ok || !spend.player) {
+        // No gem, or the record moved under us. Nothing was written, nothing
+        // was charged, and the character is still exactly as they were.
+        await markSlotLoadDone();
+        return false;
+      }
+      const revived: PlayerCharacter = spend.player;
+      const remainingGems = spend.gems;
       // ⚠ OTA-1320 — the Gem also clears this character's entry on the fallen-seed
       // register (see clearFallenSeed). Without this, a Gem-revived character who
       // later genuinely vanished could never be restored from a backup: the
@@ -863,6 +896,11 @@ export const createSlotSlice = (
       pendingHookContinue: null,
       pendingGolemNaming: false,
       activeSlotId: slotId,
+      // ⚠ OTA-1850 — an imported character brings their OWN gems with them,
+      // because the balance travels inside the character record. That is the
+      // ruling working as intended: the gems belong to whoever earned them, and
+      // a round trip through export/import must neither mint nor destroy any.
+      resurrectionGems: Math.max(0, Math.floor(player.resurrectionGems ?? 0)),
       slotLoadError: null,
       // Imported mid-game saves have already seen the intro — never re-arm the
       // tutorial for them.

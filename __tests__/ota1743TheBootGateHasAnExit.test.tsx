@@ -241,14 +241,30 @@ describe('OTA-1743 — LAG-3’s parallelism survives the repair', () => {
     expect((b as { value: string[] }).value).toEqual(['slot-a', 'slot-b']);
   });
 
-  it('⚠⚠⚠ the seed still runs BEFORE the stash read — a race there costs a Resurrection Gem', () => {
-    expect(SLICE.indexOf('const seedResult = await ensureFirstInstallSeed();'))
-      .toBeLessThan(SLICE.indexOf('const stash = await loadGlobalStash();'));
-    expect(SLICE.indexOf('settled(loadActiveSlotId())'))
-      .toBeLessThan(SLICE.indexOf('const seedResult = await ensureFirstInstallSeed();'));
+  it('⚠⚠⚠ the seed still runs BEFORE anything reads the stash — a race there costs a Resurrection Gem', () => {
+    /* ⚠⚠ OTA-1850 RE-AIMED THIS PIN AT THE SAME INVARIANT. The seed WRITES the
+     * global stash, so nothing that reads it may run first or concurrently.
+     * What changed is only the reader: boot no longer pulls a gem TOTAL back
+     * out (gems are character-bound — there is no install-wide figure to show),
+     * and the stash reader that remains is the one-time legacy handover. The
+     * ordering requirement is identical and is asserted against that.
+     *
+     * ⚠ AND THE COMPARISONS NOW REQUIRE PRESENCE FIRST. `indexOf` returns -1
+     * for a string that is gone, and -1 is less than everything — so the old
+     * form would have passed vacuously if either anchor were deleted, which is
+     * precisely the failure this test exists to catch. */
+    const at = (needle: string) => {
+      const i = SLICE.indexOf(needle);
+      expect({ needle, found: i >= 0 }).toEqual({ needle, found: true });
+      return i;
+    };
+    expect(at('await ensureFirstInstallSeed();'))
+      .toBeLessThan(at('runLegacyGemHandover(activeId)'));
+    expect(at('settled(loadActiveSlotId())'))
+      .toBeLessThan(at('await ensureFirstInstallSeed();'));
     // and the legacy migration still precedes anything that enumerates slots
-    expect(SLICE.indexOf('await migrateLegacySlotIfPresent();'))
-      .toBeLessThan(SLICE.indexOf('settled(listSlots())'));
+    expect(at('await migrateLegacySlotIfPresent();'))
+      .toBeLessThan(at('settled(listSlots())'));
   });
 
   it('⚠ hydration still produces the authoritative title-screen state', async () => {

@@ -201,9 +201,16 @@ describe('OTA-1835 — §11 the restart boundary is no worse', () => {
     // Entry can be accepted from the title screen with no character loaded, so
     // the riders still owed a meeting have to outlive the slot too. Still not
     // lock bookkeeping; still the same claim.
+    // ⚠ OTA-1850 — and `legacyGemMigration` joins it, on the SAME reasoning a
+    // third time. It records a ONE-TIME, INSTALL-WIDE event: the handover of the
+    // old shared gem pool to the characters who now own their gems. It has to
+    // outlive every slot — that is its whole job, since it says which slots were
+    // paid and how much — so the stash is exactly where it belongs. Still not
+    // lock bookkeeping; still the same claim, one name longer.
     expect(Object.keys(s).sort()).toEqual([
       'devGemGrantedSlots', 'dogsFallen', 'endingBadges', 'fallen', 'fallenSeeds',
-      'installSeeded', 'ledgerVisits', 'resurrectionGems', 'testGiftGrantedSlots',
+      'installSeeded', 'ledgerVisits', 'legacyGemMigration', 'resurrectionGems',
+      'testGiftGrantedSlots',
     ]);
     if (raw) expect(() => JSON.parse(raw)).not.toThrow();
   });

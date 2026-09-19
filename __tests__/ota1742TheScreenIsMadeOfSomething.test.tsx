@@ -612,16 +612,35 @@ describe('OTA-1742 — gameplay and gestures survived the restyle', () => {
     expect(allText(tree)).toContain('No Tartarians yet');
   });
 
-  it('⚠⚠ Resurrection Gems read as a held resource, and only when the player holds any', async () => {
-    const none = await mountTitle([slot()], 0);
-    expect(allText(none)).not.toContain('RESURRECTION GEM');
-    const one = await mountTitle([slot()], 1);
-    expect(allText(one)).toContain('RESURRECTION GEM');
-    expect(allText(one)).not.toContain('RESURRECTION GEMS');
-    const many = await mountTitle([slot()], 3);
-    expect(allText(many)).toContain('RESURRECTION GEMS');
+  it('⚠⚠ Resurrection Gems read as a held resource on the RECORD that holds them', async () => {
+    /* ⚠⚠⚠ OTA-1850 MOVED WHERE THIS IS MEASURED, BY OWNER RULING, AND THE CLAIM
+     * SURVIVES INTACT. Gems used to be install-wide and read as a chit beside
+     * the roster. They are character-bound now — earned by a Tartarian and
+     * spendable only by them — so there is no install total left for a chit to
+     * show, and the count reads on that character's own dossier, beside HP, in
+     * the record's existing meta voice.
+     *
+     * The count therefore comes from the SLOT rather than the store, and is
+     * read where the dossier shows it: once the record is opened. Everything
+     * this test has always asserted still holds — silent at zero, singular at
+     * one, plural above, and no invented economy words on the screen. */
+    const openedText = async (gems: number) => {
+      const tree = await mountTitle([slot({ resurrectionGems: gems })]);
+      await renderer.act(async () => {
+        (pressablesSaying(tree, 'Corvin')[0]!.props.onPress as () => void)();
+      });
+      await flush();
+      return allText(tree);
+    };
+    expect(await openedText(0)).not.toContain('RESURRECTION GEM');
+    const one = await openedText(1);
+    expect(one).toContain('RESURRECTION GEM');
+    expect(one).not.toContain('RESURRECTION GEMS');
+    expect(await openedText(3)).toContain('RESURRECTION GEMS');
     // No invented economy: the count and the existing name, nothing more.
     expect(TITLE).not.toMatch(/gems? (earn|spend|shop|market)/i);
+    // ⚠ and the install-wide chit is genuinely gone, not merely unrendered
+    expect(TITLE).not.toContain('TResourceChit');
   });
 
   it('⚠⚠ every peripheral control the owner asked for is still on the screen', async () => {

@@ -56,7 +56,7 @@
 import type { PlayerCharacter, Enemy, CombatRange, StatusEffect } from '../engine/types';
 import { applyDogPronouns, trainDogStat, dogHpGainClause, itemIsDogArmor } from '../engine/dogCompanion';
 import { profileOf, scaledSwingCap } from '../engine/pressure';
-import { addResurrectionGems, recordFallen, recordFallenSeed, characterSeedOf } from '../engine/saveSystem';
+import { newDeathId, recordFallen, recordFallenSeed, characterSeedOf } from '../engine/saveSystem';
 import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
@@ -3139,15 +3139,14 @@ export function handlePlayerDeath(
   // rules (gem comes from boss kills / pity timer / rare drops).
   // arb89 — DEV_REVIVE_NAMES hoisted to module scope (shared with the
   // proactive on-load grant in loadSlotIntoGame).
-  if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
-    void addResurrectionGems(1).then((total) => {
-      set(() => ({ resurrectionGems: total }));
-      get().appendLog(
-        'reward',
-        `✦ A Resurrection Gem pulses in ${player.name}'s pack — the buried world owes you one. (${total} held)`,
-      );
-    });
-  }
+  // ⚠⚠ OTA-1850 — THE GRANT RIDES INSIDE THE DEATH WRITE, it is no longer an
+  // async call beside it. The gem is the CHARACTER'S now, so a fire-and-forget
+  // write straight to the save file would load it, add the gem and write back while
+  // the death `set` + `persist()` below wrote the same record from live state —
+  // whichever landed second would erase the other. Folding it into the same
+  // `set` makes death and grant one object and one write. The amount is
+  // unchanged: one gem, dev names only.
+  const devGemOnDeath = DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase());
 
   // ⚠ OTA-1701 — the killer, read before the field is cleared, so the Arbiter
   // can say on the way back that it was a Guardian (progressionHints.afterRevive).
@@ -3165,16 +3164,26 @@ export function handlePlayerDeath(
   // was downed in this fight (hp <= 0 from retaliation), mark them
   // 'dead' and queue puppyVendorOwed. Sleeping/idle dogs with hp > 0
   // survive the player's death (they wander off the abandoned save).
+  let devGemHeld = 0;
   set((s) => {
     if (!s.player) return { pendingRolls: null, pendingHookContinue: null };
     const dog = s.player.dog;
     const dogDiedInFight = !!dog && dog.hp <= 0;
     const wm = s.worldMemory;
+    const gemsHeld = Math.max(0, Math.floor(s.player.resurrectionGems ?? 0));
+    devGemHeld = devGemOnDeath ? gemsHeld + 1 : gemsHeld;
     return {
       player: {
         ...s.player,
         dead: true,
         hp: 0,
+        // ⚠⚠ OTA-1850 — THIS DEATH GETS ITS OWN IDENTITY, minted here and only
+        // here. It is what lets a resurrection be retried for free after a
+        // crash while a LATER death still costs a gem. The earlier proposal to
+        // derive it from `slotId|characterSeed|floor(hoursElapsed)` was dropped
+        // because two genuine deaths inside one game hour share that string.
+        deathId: newDeathId(),
+        resurrectionGems: devGemHeld,
         golem: null,
         dog: dogDiedInFight && dog ? { ...dog, status: 'dead' as const } : dog,
       },
@@ -3185,9 +3194,20 @@ export function handlePlayerDeath(
       },
       pendingRolls: null,
   pendingHookContinue: null,
+      // OTA-1850 — the live mirror follows the character's own balance.
+      resurrectionGems: devGemHeld,
     };
   });
   void get().persist();
+  // OTA-067 / OTA-1850 — the dev grant is announced only once the write that
+  // carries it has been handed to `persist()`, so the line can never report a
+  // gem the save did not receive.
+  if (devGemOnDeath) {
+    get().appendLog(
+      'reward',
+      `✦ A Resurrection Gem pulses in ${player.name}'s pack — the buried world owes you one. (${devGemHeld} held)`,
+    );
+  }
   if (get().player?.dog?.status === 'dead') {
     const dogName = get().player?.dog?.name ?? 'Your dog';
     get().appendLog(

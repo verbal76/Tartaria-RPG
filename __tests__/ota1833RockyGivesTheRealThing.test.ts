@@ -84,8 +84,15 @@ describe('OTA-1833 §1 — the word that was wrong is gone from the world', () =
 describe('OTA-1833 §2 — the gem comes from the one authority that holds gems', () => {
   const store = codeOnly(['app', 'state', 'gameStore.ts']);
 
-  test('2.1 ⚠⚠⚠ THE STASH IS THE PATH — addResurrectionGems, not grantItem', () => {
-    expect(store).toContain('addResurrectionGems(keep.gem)');
+  test('2.1 ⚠⚠⚠ THE GEM AUTHORITY IS THE PATH — gemsAfterGrant, not grantItem', () => {
+    /* ⚠ OTA-1850 MOVED THE AUTHORITY, NOT THE CLAIM. Gems are character-bound
+     * now, so the one place a gem is minted is `gemsAfterGrant` against the
+     * live character's own balance — the install-wide stash mutator is no
+     * longer a gameplay path at all. What this test has always guarded is that
+     * the keepsake pays through the REAL gem authority rather than being faked
+     * as an inventory row, and that is unchanged. */
+    expect(store).toContain('gemsAfterGrant(get().player, keep.gem)');
+    expect(store).not.toContain('addResurrectionGems(keep.gem)');
   });
 
   test('2.2 ⚠⚠ THE HELD COUNT REACHES THE UI, so the player can see what they hold', () => {

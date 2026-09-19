@@ -72,7 +72,7 @@ import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; 
 const ROSTER_MIN_HEIGHT = 148;
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
-import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+import { T, TType, TButton, TDivider, TRule, TCorners, TFactionPlate, TGear, TSettle, TStrata, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { factionCrest, crestArt } from '../engine/factionCrests';
 import { placeCrestField, type CardBox, type FieldComposition } from '../ui/crestField';
 
@@ -292,7 +292,6 @@ export function TitleScreen() {
   // the crashing load.
   const crashedSlotIds = useGameStore((s) => s.crashedSlotIds);
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
-  const resurrectionGems = useGameStore((s) => s.resurrectionGems);
   const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
   const dismissJustUpdated = useGameStore((s) => s.dismissJustUpdated);
   const pendingOTAUpdate = useGameStore((s) => s.pendingOTAUpdate);
@@ -400,7 +399,11 @@ export function TitleScreen() {
     // this is closed; this is the defensive guard if a tap slips through.
     if (!bootGateOpen) return;
     if (slot.dead) {
-      if (resurrectionGems > 0) {
+      // ⚠⚠ OTA-1850 — THIS CHARACTER'S OWN GEMS DECIDE, not an install-wide
+      // total. That is the farming rule made visible: gems banked on a
+      // disposable character cannot raise a favourite, so the question asked
+      // here is only ever about the record being tapped.
+      if ((slot.resurrectionGems ?? 0) > 0) {
         setPendingAction({ kind: 'resurrect', slot });
       } else {
         setPendingAction({ kind: 'fallen', slot });
@@ -914,6 +917,17 @@ export function TitleScreen() {
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>
+        {/* ⚠⚠ OTA-1850 — THE GEM COUNT, ON THE RECORD THAT OWNS IT. Owner
+            ruling: gems belong to the character who earned them, so the number
+            belongs on their dossier and not in a global resource strip. It
+            takes the dossier's existing meta voice — same style, same column,
+            no new visual system — and stays silent at zero, exactly as the
+            dog, golem and objective lines do. */}
+        {(item.resurrectionGems ?? 0) > 0 && (
+          <Text style={styles.slotMeta}>
+            ◈ {item.resurrectionGems} RESURRECTION GEM{item.resurrectionGems === 1 ? '' : 'S'}
+          </Text>
+        )}
         {/* v2.4.1 (OTA 036) — RESUME OBJECTIVE row. Surfaces the
             character's main-quest progress on the title screen so
             the player can see where they left off without loading
@@ -1087,20 +1101,14 @@ export function TitleScreen() {
         </View>
         <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
       </View>
-      {/* ⚠⚠ VIS-1 — Resurrection Gems are an in-world resource, not an
-          application status string. Stamped chit: recessed well, rim, the survey
-          diamond as the resource's own mark, count large and name quiet. It sits
-          with the roster because that is where it is spent (resurrecting a
-          fallen Tartarian), and it is deliberately small — a held resource, not
-          a headline. */}
-      {resurrectionGems > 0 && (
-        <View style={styles.gemsRow}>
-          <TResourceChit
-            count={resurrectionGems}
-            label={`RESURRECTION GEM${resurrectionGems === 1 ? '' : 'S'}`}
-          />
-        </View>
-      )}
+      {/* ⚠⚠⚠ OTA-1850 — THE GEM CHIT IS GONE FROM HERE, AND NOTHING REPLACES IT.
+          VIS-1 put a stamped chit beside the roster because Resurrection Gems
+          were an install-wide resource and this was where they were spent. The
+          owner's character-bound ruling removed the thing it counted: there is
+          no install total any more, only each Tartarian's own holding. A chit
+          here could only show somebody else's gems, or nobody's.
+          The count moved onto the character's DOSSIER, in the record's own
+          voice, where every other fact about them already lives. */}
 
       {/* v2.4.1 (OTA 043) — completion badges. Shows the player's
           collection of (faction, ending) combos earned across all
@@ -1544,9 +1552,11 @@ export function TitleScreen() {
           pendingAction?.kind === 'delete'
             ? `${pendingAction.slot.playerName} will be lost to the buried world. This cannot be undone.`
           : pendingAction?.kind === 'resurrect'
-            ? `${pendingAction.slot.playerName} has fallen. Spend 1 Resurrection Gem (you hold ${resurrectionGems}) to bring them back?`
+            // OTA-1850 — the gems are the fallen character's own, so the
+            // sentence says whose they are rather than "you hold".
+            ? `${pendingAction.slot.playerName} has fallen. Spend 1 of their ${pendingAction.slot.resurrectionGems ?? 0} Resurrection Gem${(pendingAction.slot.resurrectionGems ?? 0) === 1 ? '' : 's'} to bring them back?`
           : pendingAction?.kind === 'fallen'
-            ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
+            ? `${pendingAction.slot.playerName} has fallen and held no Resurrection Gems of their own. The buried world keeps them for now.`
           : pendingAction?.kind === 'restoreFailed'
             ? pendingAction.reason
           : undefined
@@ -1691,7 +1701,6 @@ const styles = StyleSheet.create({
   titleBlock: { marginBottom: 6, flexShrink: 1 },
   subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 2 },
   subtitleRule: { flex: 1 },
-  gemsRow: { alignItems: 'center', marginBottom: 10 },
   rosterHeader: { marginBottom: 8 },
   metaRow: { alignItems: 'center', marginTop: 6 },
 
@@ -1984,8 +1993,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 2,
   },
-  // ⚠ VIS-1 — `gems` DELETED: the count is a stamped chit (TResourceChit) now,
-  // not a sentence. arb132's build-line marker keeps its words and its colours
+  // ⚠ VIS-1 · OTA-1850 — `gems` DELETED, and its replacement chit is gone too:
+  // the count is character-bound, so it reads on the dossier as the record's
+  // own meta line rather than anywhere on this screen's own furniture. arb132's build-line marker keeps its words and its colours
   // and loses its prominence — it reads at the foot of the screen, in the meta
   // row, not under the crest.
   buildMarker: { fontSize: 10, fontWeight: '800', textAlign: 'center', letterSpacing: 3, marginBottom: 3 },

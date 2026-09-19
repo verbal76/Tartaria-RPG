@@ -425,15 +425,21 @@ describe('OTA-1744 — nothing about playing changed', () => {
   });
 
   it('⚠⚠ roster ordering, character information and the gems are untouched', async () => {
-    const tree = await mountTitle(roster(3), 2);
+    /* ⚠ OTA-1850 — the gems moved ONTO the record by owner ruling (they belong
+     * to the character who earned them, so there is no install-wide total), and
+     * the record is exactly where this test already looked for HP. The ordering
+     * claim and the "the record still carries what it carried" claim are
+     * unchanged; the gem count simply joins HP inside the opened dossier. */
+    const slots = roster(3).map((s) => ({ ...s, resurrectionGems: 2 }));
+    const tree = await mountTitle(slots);
     const text = allText(tree);
     expect(text.indexOf('Tartarian 1')).toBeLessThan(text.indexOf('Tartarian 2'));
     expect(text.indexOf('Tartarian 2')).toBeLessThan(text.indexOf('Tartarian 3'));
-    expect(text).toContain('RESURRECTION GEMS');
     // The record still carries what it carried.
     await renderer.act(async () => { (pressablesSaying(tree, 'Tartarian 1')[0]!.props.onPress as () => void)(); });
     await flush();
     expect(allText(tree)).toContain('HP 22/30');
+    expect(allText(tree)).toContain('RESURRECTION GEMS');
   });
 
   it('⚠ Settings is still one tap from the title, and the build line still reads', async () => {

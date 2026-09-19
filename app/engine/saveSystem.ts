@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { FallenGearPiece, SaveState } from './types';
+import type { FallenGearPiece, PlayerCharacter, SaveState } from './types';
 // ⚠ OTA-1844 — TYPE ONLY, and that is load-bearing: `fallenLedger` imports
 // `FallenHero` from here, so a value import either way would close a cycle. A
 // type import is erased at build, so the shape is shared and nothing is.
@@ -49,6 +49,12 @@ export interface SlotSummary {
   hpMax: number;
   /** Mirrors player.dead — set true when the character has fallen and needs a Resurrection Gem. */
   dead?: boolean;
+  /** ⚠ OTA-1850 — mirrors `player.resurrectionGems`, so the roster can show a
+   *  character's OWN gem count on their record WITHOUT loading every save.
+   *  Character-bound by ruling: this is why the count belongs on the dossier
+   *  and not in a global resource strip — there is no install-wide figure left
+   *  to put there. Absent on summaries written before this OTA. */
+  resurrectionGems?: number;
   savedAt: number;
   createdAt: number;
   // v2.4.1 (OTA 036) — main-quest snapshot for the TitleScreen
@@ -86,6 +92,21 @@ export interface GlobalStash {
   // free starter gem on every hydrate. Set to true the moment we
   // grant the install gem; never cleared afterwards.
   installSeeded?: boolean;
+  /** ⚠⚠⚠ OTA-1850 — THE ONE-TIME LEGACY HANDOVER. The install-wide
+   *  `resurrectionGems` above is NO LONGER AUTHORITATIVE: gems belong to the
+   *  character who earned them. Historical provenance does not exist (the
+   *  balance was a bare counter; no earn path ever recorded a slot), so the
+   *  legacy total is divided across the surviving characters in proportion to
+   *  their DURABLE IN-WORLD GAME HOURS — a best-effort heuristic, stated as
+   *  one, and NOT wall-clock playtime.
+   *
+   *  ⚠⚠ THIS FIELD IS THE CRASH-SAFE HANDOVER ITSELF, not a flag. The stash and
+   *  the character saves are separate keys, so the handover is unavoidably more
+   *  than one write; computing the whole split, recording it WITH its inputs,
+   *  and zeroing the pool in the FIRST write means a crash afterwards loses
+   *  nothing — the next boot replays the SAME persisted rows instead of
+   *  recomputing against hours that have since moved. */
+  legacyGemMigration?: LegacyGemPlan;
   // arb89 — dev-name proactive gem grant. Slot keys ("<slotId>:<name>")
   // that have already received their one free Resurrection Gem for being
   // a dev character (Verbal / Sasmooch). Idempotent so a load doesn't
@@ -372,6 +393,7 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       resurrectionGems: parsed.resurrectionGems ?? 0,
       endingBadges: parsed.endingBadges ?? [],
       installSeeded: parsed.installSeeded ?? false,
+      legacyGemMigration: reviveLegacyGemPlan(parsed.legacyGemMigration),
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
       fallen: parsed.fallen ?? [],
@@ -451,6 +473,378 @@ export async function mutateGlobalStash<T>(
   return run;
 }
 
+/* ═══ OTA-1850 — CHARACTER-BOUND RESURRECTION GEMS ══════════════════════════
+ *
+ * ⚠⚠⚠ THE OWNER RULING THAT MADE THREE CRASH BUGS INTO ONE SMALL ONE.
+ * Gems belong to the character who earned them, not to the install. That is a
+ * product decision about farming — a player must not bank gems on disposable
+ * characters and spend them on a favourite — but it has a large durability
+ * consequence, and it is worth writing down because it is the reason this file
+ * grew a second door instead of a gem transaction system.
+ *
+ * The three reproduced hazards were ALL the same shape: the gem balance lived
+ * in `tartaria.global.v2` while the resurrection effect lived in the character
+ * save, AsyncStorage has no cross-key transaction, and so every repair had to
+ * reconcile a split write after a crash. Move the balance INTO the character
+ * record and that split stops existing: the spend and the revival are one write
+ * to one key. There is nothing left to reconcile, so there is no boot
+ * reconciliation machinery here — building it would have been building a cure
+ * for a disease the ruling had already cured.
+ *
+ * What IS still needed is serialization, because two calls can still race on
+ * ONE record. `mutateSlot` is that, and it is deliberately the same shape as
+ * OTA-1835's `mutateGlobalStash`: one queue, load → mutate → save, so the
+ * second caller reads what the first one wrote instead of overwriting it. */
+
+/** Sentinel: the mutator changed nothing, so nothing is written. */
+export const SLOT_UNCHANGED = Symbol('slot-unchanged');
+
+/* One chain PER SLOT. Per-slot rather than global because two different
+ * characters have no shared state to corrupt and should not queue behind each
+ * other, while two writers of the SAME character must. */
+const slotChains = new Map<string, Promise<unknown>>();
+
+/**
+ * ⚠⚠ THE ONE DOOR FOR WHOLE-CHARACTER MUTATIONS. Every read-modify-write of a
+ * save that must not lose a concurrent sibling goes through here.
+ */
+export async function mutateSlot<T>(
+  slotId: string,
+  mutator: (save: SaveState) => T | typeof SLOT_UNCHANGED,
+): Promise<T | typeof SLOT_UNCHANGED | null> {
+  const prev = slotChains.get(slotId) ?? Promise.resolve();
+  const run = prev.then(async () => {
+    const save = await loadSlot(slotId);
+    if (!save) return null;
+    const result = mutator(save);
+    if (result !== SLOT_UNCHANGED) await saveSlot(slotId, save);
+    return result;
+  });
+  // The queue advances on failure too, so one rejected mutation cannot strand
+  // the ones behind it; `run` still rejects to its own caller.
+  slotChains.set(slotId, run.catch(() => undefined));
+  return run;
+}
+
+/** ⚠ OTA-1850 — a death's own identity. Minted ONCE, when the character dies,
+ *  and persisted with them, so a resurrection retry keeps it and a LATER death
+ *  gets a new one. Never derived from a display name or a floored clock: the
+ *  previously proposed `slotId|characterSeed|floor(hoursElapsed)` collided for
+ *  two genuine deaths inside the same game hour. */
+export function newDeathId(): string {
+  return `d_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/**
+ * ⚠⚠⚠ EARNING A GEM IS NOT A STORAGE OPERATION ANY MORE — IT IS A FIELD ON THE
+ * CHARACTER, and this is the whole arithmetic of it.
+ *
+ * Every earner (dev grant at creation, dev grant on death, rare drop, boss
+ * keepsake) used to be `void addResurrectionGems(n).then(...)`: a write to the
+ * GLOBAL STASH, fired without awaiting, beside a live character the store was
+ * about to persist to a DIFFERENT key. That is the shape of all three hazards
+ * this OTA closes — two durable stores and no ordering between them. Hazard C
+ * was exactly this at the boss keepsake, where the gem landed in the stash and
+ * the "already paid" mark landed in `worldMemory`, so a crash between them paid
+ * the keepsake twice.
+ *
+ * With the balance ON the character, the earners stop needing a storage door at
+ * all: they credit the live record inside the same `set` that carries the rest
+ * of the moment, and the store's ordinary `persist()` writes gem and paid-mark
+ * together, to one key, in one write. There is no window left to crash in — and
+ * no per-character reward ledger is needed either, because `onceLootPaid` is
+ * now atomic with the gem it guards.
+ *
+ * This helper is the one place the addition is written, so a caller cannot
+ * quietly disagree about flooring or the missing-field default.
+ */
+export function gemsAfterGrant(p: { resurrectionGems?: number } | null | undefined, n: number): number {
+  return Math.max(0, Math.floor(p?.resurrectionGems ?? 0) + Math.floor(n || 0));
+}
+
+export interface GemSpendResult {
+  ok: boolean;
+  gems: number;
+  alreadySpent: boolean;
+  /** ⚠ The character AS DURABLY WRITTEN. The caller puts THIS into the live
+   *  store rather than its own copy, so what the player sees and what the disk
+   *  holds cannot disagree — the whole point of doing the spend and the revival
+   *  in one write is lost if the screen then renders a different object. */
+  player?: PlayerCharacter;
+}
+
+/**
+ * ⚠⚠⚠ SPEND THIS CHARACTER'S OWN GEM AND REVIVE THEM, IN ONE SERIALIZED WRITE.
+ *
+ * The availability decision, the decrement and the resurrection effect all
+ * happen inside a single `mutateSlot` pass, so:
+ *   · two calls for the SAME death → one spend, one revival (the second sees
+ *     `resurrectedFromDeathId` already set and is answered, not charged);
+ *   · a crash cannot leave alive+unspent or dead+spent, because there is only
+ *     ONE write and it either lands whole or not at all;
+ *   · another character's balance is not visible here at all, so no amount of
+ *     farming on a disposable character can pay for this one.
+ *
+ * `revive` receives the dead player and returns the revived one; the caller
+ * owns what "revived" means (hp/stamina/backfill), this owns the money.
+ */
+export async function spendGemAndRevive(
+  slotId: string,
+  revive: (dead: PlayerCharacter) => PlayerCharacter,
+): Promise<GemSpendResult> {
+  const out = await mutateSlot(slotId, (save) => {
+    const p = save.player;
+    if (!p) return { ok: false, gems: 0, alreadySpent: false } as GemSpendResult;
+    const held = Math.max(0, Math.floor(p.resurrectionGems ?? 0));
+    // Already brought back from THIS death: idempotent, nothing to charge. The
+    // durable record is already the right answer, so it is handed straight back
+    // (it is rewritten unchanged, which costs a write and changes no bytes).
+    if (p.deathId && p.resurrectedFromDeathId === p.deathId && p.dead !== true) {
+      return { ok: true, gems: held, alreadySpent: true, player: p } as GemSpendResult;
+    }
+    if (p.dead !== true) return { ok: false, gems: held, alreadySpent: false } as GemSpendResult;
+    if (held < 1) return { ok: false, gems: held, alreadySpent: false } as GemSpendResult;
+    const revived: PlayerCharacter = {
+      ...revive(p),
+      resurrectionGems: held - 1,
+      resurrectedFromDeathId: p.deathId,
+    };
+    save.player = revived;
+    return { ok: true, gems: held - 1, alreadySpent: false, player: revived } as GemSpendResult;
+  });
+  if (out === null || out === SLOT_UNCHANGED) return { ok: false, gems: 0, alreadySpent: false };
+  return out as GemSpendResult;
+}
+
+/* ═══ OTA-1850 — THE ONE-TIME LEGACY HANDOVER ═══════════════════════════════
+ *
+ * ⚠⚠⚠ THE WEIGHT IS DURABLE IN-WORLD GAME HOURS, NOT WALL-CLOCK PLAYTIME, and
+ * the distinction is written here because it is the honest limit of what this
+ * allocation means. `PlayerCharacter.hoursElapsed` advances with in-world
+ * actions (a movement is +0.25); it does not measure how long the app was
+ * open. A character who explored scores high, one who idled in a settlement
+ * scores low no matter how long the player sat there.
+ *
+ * ⚠⚠ AND IT IS A HEURISTIC, NOT PROVENANCE. Two earlier rules were tried and
+ * both were rejected ON EVIDENCE rather than taste:
+ *   · proportional-by-DEATHS — `FallenHero` carries NO character identity
+ *     (no seed, no slotId) and `stash.fallen` is capped at 25, so counts are
+ *     unattributable AND truncated. `fallenSeeds` has identity but is a SET,
+ *     so it cannot count at all.
+ *   · all-to-the-active-character — kept, but only as the fallback below.
+ * Nothing here claims to know who earned the legacy gems. It divides them by
+ * the best durable signal that survives, and says so.
+ *
+ * ⚠⚠⚠ THE PLAN IS COMPUTED ONCE AND THEN OBEYED. Once the record exists, the
+ * split is never recomputed: a later boot, more play, a different active
+ * character or a reordered index all read the SAME persisted rows. That is
+ * what makes the migration idempotent under crash, restart and retry. The
+ * input snapshot is persisted beside the result so the arithmetic can be
+ * audited later instead of being taken on trust. */
+
+/** One participating surviving save, and what it was given. */
+export interface LegacyGemRow {
+  slotId: string;
+  /** Sanitized durable in-world game hours used as this slot's weight. */
+  gameHours: number;
+  /** Legacy gems allocated to this slot by the one-time plan. */
+  gems: number;
+}
+
+export interface LegacyGemPlan {
+  /** The original install-wide balance, before it was zeroed. */
+  total: number;
+  /** Sum of the sanitized weights across participating slots. */
+  totalHours: number;
+  /** TRUE when no usable hours existed and the active character took it all. */
+  fallback: boolean;
+  rows: LegacyGemRow[];
+  /** slotIds that have already absorbed their row. */
+  claimed: string[];
+}
+
+function reviveLegacyGemPlan(raw: unknown): LegacyGemPlan | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const r = raw as Partial<LegacyGemPlan>;
+  if (!Array.isArray(r.rows) || !Number.isFinite(r.total)) return undefined;
+  return {
+    total: Math.max(0, Math.floor(r.total as number)),
+    totalHours: Number.isFinite(r.totalHours) ? (r.totalHours as number) : 0,
+    fallback: r.fallback === true,
+    rows: r.rows
+      .filter((x): x is LegacyGemRow => !!x && typeof x.slotId === 'string')
+      .map((x) => ({
+        slotId: x.slotId,
+        gameHours: sanitizeGameHours(x.gameHours),
+        gems: Math.max(0, Math.floor(Number(x.gems) || 0)),
+      })),
+    claimed: Array.isArray(r.claimed) ? r.claimed.filter((x): x is string => typeof x === 'string') : [],
+  };
+}
+
+/** Missing, NaN, Infinity and negative all mean "no usable weight". */
+export function sanitizeGameHours(h: unknown): number {
+  const n = typeof h === 'number' ? h : Number.NaN;
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return n;
+}
+
+/**
+ * ⚠⚠ LARGEST-REMAINDER ALLOCATION — PURE, DETERMINISTIC, CONSERVING.
+ * Floor every exact share, then hand the leftovers to the largest fractional
+ * remainders, breaking ties on lexical slotId so the same inputs always give
+ * the same answer. `sum(rows.gems) === total` by construction.
+ */
+export function planLegacyGemAllocation(
+  total: number,
+  slots: { slotId: string; gameHours: number }[],
+  activeSlotId: string | null,
+): LegacyGemPlan {
+  const G = Math.max(0, Math.floor(total || 0));
+  const parts = slots
+    .map((s) => ({ slotId: s.slotId, gameHours: sanitizeGameHours(s.gameHours) }))
+    .sort((a, b) => (a.slotId < b.slotId ? -1 : a.slotId > b.slotId ? 1 : 0));
+  const totalHours = parts.reduce((n, s) => n + s.gameHours, 0);
+
+  // FALLBACK — nothing usable to weigh by. The whole balance goes to the
+  // active character, and the record says that is what happened.
+  if (G <= 0 || parts.length === 0 || totalHours <= 0) {
+    const target = parts.find((s) => s.slotId === activeSlotId)?.slotId ?? parts[0]?.slotId;
+    return {
+      total: G,
+      totalHours: 0,
+      fallback: true,
+      rows: parts.map((s) => ({ slotId: s.slotId, gameHours: s.gameHours, gems: s.slotId === target ? G : 0 })),
+      claimed: [],
+    };
+  }
+
+  const exact = parts.map((s) => ({ ...s, share: (G * s.gameHours) / totalHours }));
+  const rows: LegacyGemRow[] = exact.map((s) => ({
+    slotId: s.slotId, gameHours: s.gameHours, gems: Math.floor(s.share),
+  }));
+  let left = G - rows.reduce((n, r) => n + r.gems, 0);
+  const byRemainder = exact
+    .map((s, i) => ({ i, rem: s.share - Math.floor(s.share), slotId: s.slotId }))
+    .sort((a, b) => (b.rem - a.rem) || (a.slotId < b.slotId ? -1 : a.slotId > b.slotId ? 1 : 0));
+  for (let k = 0; left > 0 && k < byRemainder.length; k++, left--) rows[byRemainder[k]!.i]!.gems += 1;
+
+  return { total: G, totalHours, fallback: false, rows, claimed: [] };
+}
+
+/**
+ * Build the plan once (reading every surviving save for its weight), persist
+ * it, and zero the legacy pool in the SAME serialized stash write — after
+ * which the install-wide balance is neither authoritative nor spendable.
+ */
+export async function ensureLegacyGemPlan(activeSlotId: string | null): Promise<LegacyGemPlan | null> {
+  const stash0 = await loadGlobalStash();
+  if (stash0.legacyGemMigration) return stash0.legacyGemMigration;
+  const G = Math.max(0, Math.floor(stash0.resurrectionGems ?? 0));
+  if (G <= 0) return null;
+
+  // Weights come from the durable saves, not from live state.
+  const summaries = await listSlots();
+  // ⚠⚠ NO CHARACTERS YET — WRITE NOTHING AND LEAVE THE POOL ALONE. This is the
+  // fresh-install case: `ensureFirstInstallSeed` banks the one free gem at boot,
+  // before any character exists. Computing a plan here would produce a plan with
+  // no rows and zero the pool, which is exactly how the free gem would be lost.
+  // Holding the pool instead means the FIRST character created claims it — which
+  // is the owner's rule for the install seed, served by the same one mechanism
+  // that serves the legacy handover, rather than a second one beside it.
+  if (summaries.length === 0) return null;
+  const weighed: { slotId: string; gameHours: number }[] = [];
+  for (const sum of summaries) {
+    const save = await loadSlot(sum.slotId);
+    weighed.push({ slotId: sum.slotId, gameHours: sanitizeGameHours(save?.player?.hoursElapsed) });
+  }
+  const plan = planLegacyGemAllocation(G, weighed, activeSlotId);
+
+  const out = await mutateGlobalStash((stash) => {
+    if (stash.legacyGemMigration) return stash.legacyGemMigration; // someone won the race
+    stash.legacyGemMigration = plan;
+    stash.resurrectionGems = 0;
+    return plan;
+  });
+  return out === STASH_UNCHANGED ? plan : (out as LegacyGemPlan);
+}
+
+/**
+ * ⚠⚠ THE WHOLE HANDOVER, ONCE, AT BOOT — so the ROSTER TELLS THE TRUTH.
+ *
+ * Claiming lazily (only when a character is loaded) would credit correctly but
+ * leave every other record showing a stale count on the title screen, and a
+ * dead legacy character would be offered "you hold no Resurrection Gems" while
+ * a row with their share sat unclaimed in the plan. Running the whole plan at
+ * boot means each record's own summary is right before the player can read it.
+ *
+ * ⚠ THE EARLY EXITS ARE THE POINT for the overwhelmingly common case: one stash
+ * read and nothing else on an install with no legacy pool and no pending plan.
+ * The per-slot claims only happen on the single boot that actually hands over.
+ */
+export async function runLegacyGemHandover(activeSlotId: string | null): Promise<number> {
+  const stash = await loadGlobalStash();
+  const pending = stash.legacyGemMigration;
+  if (!pending && Math.max(0, Math.floor(stash.resurrectionGems ?? 0)) <= 0) return 0;
+  if (pending && pending.rows.every((r) => r.gems <= 0 || pending.claimed.includes(r.slotId))) return 0;
+  const plan = await ensureLegacyGemPlan(activeSlotId);
+  if (!plan) return 0;
+  let handed = 0;
+  for (const row of plan.rows) {
+    if (row.gems <= 0) continue;
+    handed += await claimLegacyGems(row.slotId);
+  }
+  return handed;
+}
+
+/**
+ * Absorb THIS character's persisted row. Idempotent twice over: the character
+ * is stamped `legacyGemsClaimed`, and the plan records the slotId as claimed.
+ */
+export async function claimLegacyGems(slotId: string): Promise<number> {
+  const plan = await ensureLegacyGemPlan(slotId);
+  if (!plan) return 0;
+  const row = plan.rows.find((r) => r.slotId === slotId);
+  if (!row || row.gems <= 0) return 0;
+  if (plan.claimed.includes(slotId)) return 0;
+
+  const credited = await mutateSlot(slotId, (save) => {
+    const p = save.player;
+    if (!p) return 0;
+    if (p.legacyGemsClaimed) return 0;
+    save.player = {
+      ...p,
+      resurrectionGems: Math.max(0, Math.floor(p.resurrectionGems ?? 0)) + row.gems,
+      legacyGemsClaimed: true,
+    };
+    return row.gems;
+  });
+  // ⚠ ORDERING IS DELIBERATE, and it is the safe way round. The character's own
+  // `legacyGemsClaimed` stamp is the AUTHORITATIVE guard; this stash mark is
+  // bookkeeping that lets a later boot skip the reload. A crash between the two
+  // therefore cannot double-credit — the next attempt reloads the character,
+  // sees the stamp and credits 0. `null` means the save was not there to stamp,
+  // so nothing is marked and the row stays open for a slot that may still load.
+  if (credited !== null) {
+    await mutateGlobalStash((stash) => {
+      const m = stash.legacyGemMigration;
+      if (!m || m.claimed.includes(slotId)) return STASH_UNCHANGED;
+      m.claimed = [...m.claimed, slotId];
+      return true;
+    });
+  }
+  return (credited === null || credited === SLOT_UNCHANGED) ? 0 : (credited as number);
+}
+
+/**
+ * ⚠⚠ OTA-1850 — NO GAMEPLAY PATH CALLS THIS ANY MORE, and none should. Gems are
+ * character-bound: earning one credits the live character's own record (see
+ * `gemsAfterGrant`), and spending one goes through `spendGemAndRevive`. What is
+ * left here is the LEGACY POOL mutator — the thing `ensureFirstInstallSeed`
+ * writes into and `ensureLegacyGemPlan` hands out and zeroes. It is kept
+ * exported because OTA-1835's serialization suite drives the stash door through
+ * it; adding gems here grants nobody anything a character can spend.
+ */
 export async function addResurrectionGems(n: number): Promise<number> {
   const total = await mutateGlobalStash((stash) => {
     stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
@@ -748,6 +1142,8 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       hp: state.player.hp,
       hpMax: state.player.hpMax,
       dead: state.player.dead === true,
+      // OTA-1850 — the character's own gem balance, carried for the dossier.
+      resurrectionGems: Math.max(0, Math.floor(state.player.resurrectionGems ?? 0)),
       savedAt: toSave.savedAt,
       createdAt: (await readCreatedAt(slotId)) ?? toSave.savedAt,
       factionId: state.player.factionId,

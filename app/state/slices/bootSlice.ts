@@ -70,10 +70,10 @@ import {
   ensureFirstInstallSeed,
   listSlots,
   loadActiveSlotId,
-  loadGlobalStash,
   migrateLegacySlotIfPresent,
   newSlotId,
   readSurvivingBreadcrumb,
+  runLegacyGemHandover,
   setActiveSlot,
   stampBreadcrumbPhase,
   type SlotSummary,
@@ -584,11 +584,11 @@ export const createBootSlice = (
      * keys; none is read to decide any of the others.
      *
      * ⚠⚠ WHAT IS DELIBERATELY NOT: `ensureFirstInstallSeed` WRITES the global
-     * stash and `loadGlobalStash` READS it — OTA 454's note says so in as many
-     * words ("the seed lands in the global stash before loadGlobalStash reads
-     * it so the resulting count includes the gem"). Running those two together
-     * would be a read/write race on one key for one Resurrection Gem, so they
-     * stay strictly ordered, after the group. `migrateLegacySlotIfPresent`
+     * stash, so it stays out of the group and runs strictly after it.
+     * (OTA-1850 — boot no longer READS the stash back for a gem count. Gems are
+     * character-bound now: nothing install-wide is displayed, and the seeded gem
+     * is handed to the first character through `claimLegacyGems` on load rather
+     * than shown as a boot-time total.) `migrateLegacySlotIfPresent`
      * likewise still runs BEFORE all of this: it can create the very slot
      * `listSlots` is about to enumerate.
      *
@@ -634,11 +634,22 @@ export const createBootSlice = (
       try { get().appendLog('debug', `boot: parallel read group failed — ${String(e)}`); } catch { /* never block boot */ }
     }
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
-    // fires once per install. The seed lands in the global stash
-    // before loadGlobalStash reads it so the resulting count
-    // includes the gem.
-    const seedResult = await ensureFirstInstallSeed();
-    const stash = await loadGlobalStash();
+    // fires once per install.
+    // ⚠ OTA-1850 — the seed still lands in the global pool here, because at
+    // boot there is no character to give it to. It is not spendable there: the
+    // FIRST character created or loaded absorbs it through `claimLegacyGems`,
+    // which is the owner's rule (one free gem per install, to the first
+    // character) served by the same mechanism as the legacy handover.
+    await ensureFirstInstallSeed();
+    // ⚠⚠ OTA-1850 — HAND THE LEGACY POOL OVER BEFORE THE ROSTER IS SHOWN. The
+    // split is computed once from durable in-world game hours and then obeyed
+    // forever; doing it here rather than lazily on load is what lets each
+    // record's own gem count be right on the title screen, and what stops a
+    // dead legacy character being told they hold none while their share sits
+    // unclaimed. Cheap and silent when there is nothing to hand over.
+    try {
+      if (await runLegacyGemHandover(activeId)) slots = await listSlots();
+    } catch { /* best-effort — the load paths claim again, and the plan is idempotent */ }
     // OTA-189 — STT diagnostic wiring dropped along with the rest of
     // the STT surface (mic button, toggle, handler). No consumer is
     // left for the diag callback, so the lazy require + setSTTDiag
@@ -1059,7 +1070,13 @@ export const createBootSlice = (
     set({
       slots,
       activeSlotId: activeId,
-      resurrectionGems: stash.resurrectionGems,
+      // ⚠⚠ OTA-1850 — ZERO, AND THAT IS THE POINT. Boot lands on the title
+      // screen with no character loaded, and gems are character-bound, so
+      // there is no install-wide figure to show. The mirror fills in when a
+      // character is loaded; the roster shows each record's own count from its
+      // slot summary. Reading `stash.resurrectionGems` here would put the
+      // un-handed-out legacy pool on screen as though it were spendable.
+      resurrectionGems: 0,
       currentScreen: 'title',
       hydrated: true,
       crashedSlotIds,

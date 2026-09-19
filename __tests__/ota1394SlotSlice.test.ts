@@ -157,10 +157,23 @@ describe('OTA-1394 — the guards that protect a character survived the move', (
     expect(slice).toContain('try { await setActiveSlot(null); } catch { /* ignore */ }');
   });
 
-  it('⚠ resurrection still spends the gem before it revives', () => {
-    // Order matters: revive-then-charge is a free resurrection if the write fails
-    // in between.
-    expect(slice).toContain('addResurrectionGems');
+  it('⚠ resurrection spends the gem and revives in ONE write, so no order can leak', () => {
+    /* ⚠⚠⚠ OTA-1850 STRENGTHENED THIS CLAIM RATHER THAN MOVING IT.
+     *
+     * It used to read "still spends the gem before it revives", and the worry
+     * was real: with the balance in the global stash and the character in a
+     * slot key, the charge and the revival were two writes to two keys, so SOME
+     * order had to be chosen and the losing order handed out a free
+     * resurrection (or burned a gem and left the player dead).
+     *
+     * Character-bound gems delete the choice. The balance lives ON the
+     * character, so `spendGemAndRevive` decrements and revives inside a single
+     * serialized read-modify-write of one record — there is no "before" left to
+     * get wrong. So the test no longer asks for an ordering; it asks that the
+     * ordering CANNOT EXIST: the one-write door is used, and no separate
+     * balance call sits beside it. */
+    expect(slice).toContain('spendGemAndRevive');
+    expect(slice).not.toContain('addResurrectionGems');
     expect(slice).toContain('clearFallenSeed');
   });
 

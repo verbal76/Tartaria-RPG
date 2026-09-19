@@ -30942,7 +30942,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `☗ FALLEN` fits by about 3pt. The label keeps the kit's numberOfLines={1},
 // so the worst case on a device whose ☗ fallback glyph runs wide is an ellipsis
 // on one line, never a wrap. Owner hardware check is the confirmation.
-export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
+export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';

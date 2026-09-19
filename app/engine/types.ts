@@ -1256,6 +1256,36 @@ export interface PlayerCharacter {
    *  = the motive was dealt by backfill and the load path owes the player
    *  one "why did you come down?" ask. */
   storyMotiveChosen?: boolean;
+  /* ⚠⚠⚠ OTA-1850 — RESURRECTION GEMS BELONG TO THE CHARACTER WHO EARNED THEM.
+   * Owner ruling: they are NOT an install-wide currency. A player must not be
+   * able to farm gems on disposable characters and spend them on a favourite.
+   * The balance therefore lives HERE, in the character's own durable record —
+   * which is also why the three crash hazards this OTA closes stop being
+   * cross-key problems: the gem spend and the resurrection effect are now ONE
+   * write to ONE record, so there is no split to reconcile.
+   * Absent on every save written before this OTA; see the legacy migration. */
+  resurrectionGems?: number;
+  /** ⚠⚠ OTA-1850 — THE DEATH'S OWN IDENTITY, minted once when the character
+   *  dies and persisted with them. It is what makes a resurrection retry free
+   *  and a LATER death a different operation.
+   *  ⚠ It is NOT derived from the name or a floored clock. The previously
+   *  proposed `slotId|characterSeed|floor(hoursElapsed)` was DISPROVEN: two
+   *  genuine deaths inside the same game hour produce the same string, which
+   *  would have made the second resurrection free. */
+  deathId?: string;
+  /** ⚠ OTA-1850 — the `deathId` this character was already resurrected from.
+   *  Equal to `deathId` means the resurrection completed; a spend recorded for
+   *  a deathId that this does not match is an interrupted one to finish. */
+  resurrectedFromDeathId?: string;
+  /** ⚠ OTA-1850 — set once when this character absorbs ITS SHARE of the legacy
+   *  install-wide balance. The legacy total is split across the surviving
+   *  characters in proportion to their DURABLE IN-WORLD GAME HOURS
+   *  (`hoursElapsed`) — a best-effort heuristic, explicitly NOT provenance and
+   *  explicitly NOT wall-clock playtime. The split is computed once, persisted
+   *  whole, and thereafter replayed from the record rather than recomputed.
+   *  This stamp is the idempotency key: a stamped character is never credited
+   *  twice, however often the game boots. */
+  legacyGemsClaimed?: boolean;
   /** OTA-1021 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];

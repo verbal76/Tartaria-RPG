@@ -292,7 +292,7 @@ describe('OTA-1741 — a native queue wait is legible without forensic reconstru
 // ═════════════════════════════════════════════════════════════════════════════
 
 describe('OTA-1741 — independent hydration reads run together, dependent ones do not', () => {
-  it('⚠⚠⚠ the seed still runs BEFORE the stash read — a race there would cost a Resurrection Gem', () => {
+  it('⚠⚠⚠ the seed still runs BEFORE anything reads the stash — a race there would cost a Resurrection Gem', () => {
     // ⚠⚠ OTA-1743 RE-AIMED THIS PIN, AND ONLY THE SHAPE MOVED. The group was
     // written with `Promise.allSettled`, which turned out to be the OTA-1741
     // boot hang: RN's Promise fallback and older Hermes builds do not provide
@@ -300,16 +300,32 @@ describe('OTA-1741 — independent hydration reads run together, dependent ones 
     // reached its `hydrated: true`. The grouping is now `Promise.all` over a
     // local `settled()` — same concurrency, same isolation, no new builtin.
     // The ORDERING claim this test exists for is unchanged and still true.
+    //
+    // ⚠⚠ OTA-1850 RE-AIMED IT AGAIN, AT THE SAME INVARIANT. The seed WRITES the
+    // stash, so no reader may precede or race it. Only the reader changed: boot
+    // no longer pulls a gem TOTAL back out, because gems are character-bound and
+    // there is no install-wide figure to display. The remaining stash reader is
+    // the one-time legacy handover, and the ordering is asserted against that.
+    //
+    // ⚠ PRESENCE IS CHECKED BEFORE ORDER. `indexOf` gives -1 for a vanished
+    // anchor and -1 sorts before everything, so the previous form would have
+    // gone green if an anchor were simply deleted — the exact regression this
+    // test is here to refuse.
     const src = read('app', 'state', 'slices', 'bootSlice.ts');
+    const at = (needle: string) => {
+      const i = src.indexOf(needle);
+      expect({ needle, found: i >= 0 }).toEqual({ needle, found: true });
+      return i;
+    };
     expect(src).toContain('settled(loadActiveSlotId())');
-    expect(src.indexOf('const seedResult = await ensureFirstInstallSeed();'))
-      .toBeLessThan(src.indexOf('const stash = await loadGlobalStash();'));
+    expect(at('await ensureFirstInstallSeed();'))
+      .toBeLessThan(at('runLegacyGemHandover(activeId)'));
     // and both come AFTER the parallel group, not inside it
-    expect(src.indexOf('settled(loadActiveSlotId())'))
-      .toBeLessThan(src.indexOf('const seedResult = await ensureFirstInstallSeed();'));
+    expect(at('settled(loadActiveSlotId())'))
+      .toBeLessThan(at('await ensureFirstInstallSeed();'));
     // the legacy migration still precedes everything that enumerates slots
-    expect(src.indexOf('await migrateLegacySlotIfPresent();'))
-      .toBeLessThan(src.indexOf('settled(listSlots())'));
+    expect(at('await migrateLegacySlotIfPresent();'))
+      .toBeLessThan(at('settled(listSlots())'));
   });
 
   it('⚠⚠ isolation, not `all`: one failing read must not take the slot list down with it', () => {

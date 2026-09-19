@@ -153,7 +153,7 @@ import {
   migrateLegacySlotIfPresent,
   getActiveSlotId,
   loadGlobalStash,
-  addResurrectionGems,
+  gemsAfterGrant,
   recordFallen,
   recordFallenSeed,
   clearFallenSeed,
@@ -12222,10 +12222,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         // front (Verbal/Sasmooch) + a crash-test supply kit (both dev names). This is the single
         // point a brand-new character is named; an existing save never re-enters it.
         if (DEV_REVIVE_NAMES.includes(devStartName)) {
-          void addResurrectionGems(1).then((total) => {
-            set({ resurrectionGems: total });
-            get().appendLog('reward', `✦ A Resurrection Gem is set aside for ${cleanName} — the buried world keeps its own. (${total} held)`);
-          });
+          const devGems = gemsAfterGrant(get().player, 1); // OTA-1850 — the gem is THIS character's: credited in the live record, persisted with it
+          set((s) => ({ player: s.player ? { ...s.player, resurrectionGems: devGems } : s.player, resurrectionGems: devGems }));
+          get().appendLog('reward', `✦ A Resurrection Gem is set aside for ${cleanName} — the buried world keeps its own. (${devGems} held)`);
         }
         if (DEV_REVIVE_NAMES.includes(devStartName)) {
           const devKit: Array<{ name: string; qty: number }> = [
@@ -25641,8 +25640,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       }));
     }
     if (gemDropped) {
-      void addResurrectionGems(1).then((total) => {
-        set({ resurrectionGems: total });
+      const total = gemsAfterGrant(get().player, 1); // OTA-1850 — this character's own gem, credited in the live record
+      set((s) => ({ player: s.player ? { ...s.player, resurrectionGems: total } : s.player, resurrectionGems: total }));
+      {
         const line = enemy.boss
           // ⚠ OTA-1339 — LEAD WITH "SPOILS". Owner, after killing his first Core Guardian: *"I
           // thought I had died… did I die and suddenly get some weird health bonus… the pop-up
@@ -25657,11 +25657,11 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
-        // OTA-1035 — the gem lands a tick LATE (the count is read off disk), long
-        // after the synchronous window shut. Push it onto the card by name; the
-        // merge-by-title path adds it to the one already showing.
+        // OTA-1035 / OTA-1850 — the gem no longer lands a tick late (it is not read
+        // back off disk any more), but the notice is still pushed by name so the
+        // merge-by-title path folds it into a card already showing.
         if (enemy.boss) get().raiseBossVictoryNotice(enemy.name, [], [line]);
-      });
+      }
     }
     // OTA-1035 — shut the window and show what the fight was worth. Cleared FIRST
     // so an exception below can never leave a stale capture collecting the rest
@@ -28194,7 +28194,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         }
         const keep = resolveKeepsake(enc, get().worldMemory.onceLootPaid); // OTA-1830 · gem OTA-1833
         if (keep.line) get().appendLog('arbiter', keep.line);
-        if (keep.gem) { void addResurrectionGems(keep.gem).then((t) => { set((st) => ({ resurrectionGems: t, worldMemory: { ...st.worldMemory, onceLootPaid: recordKeepsakePaid(st.worldMemory.onceLootPaid, enc.archetypeId) } })); get().appendLog('reward', `✦ A Resurrection Gem passes into your keeping. (${t} held)`); }); } // OTA-1833 — marked paid only AFTER the stash banks it
+        if (keep.gem) { const t = gemsAfterGrant(get().player, keep.gem); set((st) => ({ player: st.player ? { ...st.player, resurrectionGems: t } : st.player, resurrectionGems: t, worldMemory: { ...st.worldMemory, onceLootPaid: recordKeepsakePaid(st.worldMemory.onceLootPaid, enc.archetypeId) } })); get().appendLog('reward', `✦ A Resurrection Gem passes into your keeping. (${t} held)`); } // ⚠ OTA-1833 · OTA-1850 — hazard C closed by shape: the gem and its paid-mark are now ONE field-set on ONE record, so no crash can bank the gem and lose the mark
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
         // OTA-695 — data-driven provocable encounter. When the encounter's
         // archetype carries a `provoke` block (the Aetherkin mourner's dare,
