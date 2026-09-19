@@ -1,0 +1,382 @@
+Bug Report — Slizzy · (2026-09-19-1851-one-press-language) · I skipped the outpost salvaging this time, and I went to the real world and froz
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-19T20:46:12.757Z
+Character: Slizzy
+Slot ID: slot_mu8uvlv1_kj4a0z
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 48/48
+
+--- DESCRIPTION ---
+I skipped the outpost salvaging this time, and I went to the real world and froze pretty quick
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 2
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-19T20:46:12.745Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-19-1851-one-press-language)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-19T20:45:46.372Z
+  Last init success: 2026-09-19T20:45:51.449Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu8ux6b5xc · started 2026-09-19T20:45:45.905Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 2 recorded (newest last)
+  • 2026-09-19T20:02:55.215Z (43m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room outpost_quarters · screen exploration
+      last checkpoint: rendered · 31ms into the action · alive 787ms after it
+      launch: died 27074407ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r1/l0/p1/dn0
+  • 2026-09-19T20:45:42.388Z (1m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: tap "take / salvage"
+     Where: monarch_waystation on exploration screen
+     Last seen alive: 2026-09-19T20:45:42.388Z (1 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:inactive→background (+26178ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 32 jobs · worst wait 3.5s (cognition) · 1 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/8 · ctx 0 · app=active · native voice running q1 · warns 0
+Native memory flight recorder (Build 190)
+  Present but not yet read this session — no snapshot has been primed.
+  ⚠ NOT a reading of zero.
+Touch path
+  prior boot:
+  2026-09-19T20:45:16.210Z #39 admit quick:take / salvage (callback) p=none exploration
+  2026-09-19T20:45:16.210Z #39 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-19T20:45:16.210Z #39 done quick:take / salvage (callback) p=none exploration
+  2026-09-19T20:45:17.111Z #40 root p=G exploration
+  2026-09-19T20:45:17.112Z #41 modal p=G exploration
+  2026-09-19T20:45:17.112Z #41 in gather:all:scrap p=G exploration
+  2026-09-19T20:45:17.277Z #41 enter gather:all:scrap p=G exploration
+  2026-09-19T20:45:17.277Z #41 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-19T20:45:17.277Z #41 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-19T20:45:17.284Z #41 done gather:all:scrap (bulk) p=G exploration
+  2026-09-19T20:45:17.722Z #42 root p=G exploration
+  2026-09-19T20:45:17.722Z #43 modal p=G exploration
+  2026-09-19T20:45:17.723Z #43 in gather:all:gear p=G exploration
+  2026-09-19T20:45:17.877Z #43 enter gather:all:gear p=G exploration
+  2026-09-19T20:45:17.877Z #43 admit gather:all:gear (bulk) p=G exploration
+  2026-09-19T20:45:17.877Z #43 dispatch gather:all:gear (bulk) p=G exploration
+  2026-09-19T20:45:17.879Z #43 done gather:all:gear (bulk) p=G exploration
+  2026-09-19T20:45:18.444Z #44 root p=G exploration
+  2026-09-19T20:45:18.444Z #45 modal p=G exploration
+  2026-09-19T20:45:18.444Z #45 in gather:all:items p=G exploration
+  2026-09-19T20:45:18.627Z #45 enter gather:all:items p=G exploration
+  2026-09-19T20:45:18.628Z #45 admit gather:all:items (bulk) p=G exploration
+  2026-09-19T20:45:18.628Z #45 dispatch gather:all:items (bulk) p=G exploration
+  2026-09-19T20:45:18.629Z #45 done gather:all:items (bulk) p=G exploration
+  this boot:
+  2026-09-19T20:45:55.229Z #1 root p=none exploration
+  2026-09-19T20:45:56.528Z #2 root p=none exploration
+  2026-09-19T20:45:57.595Z #3 root p=none exploration
+  2026-09-19T20:45:58.698Z #4 root p=none exploration
+  2026-09-19T20:45:58.698Z #5 modal p=none exploration
+  2026-09-19T20:45:59.759Z #6 root p=none exploration
+  2026-09-19T20:45:59.760Z #7 modal p=none exploration
+  2026-09-19T20:46:12.678Z #8 root p=none exploration
+  2026-09-19T20:46:12.678Z #9 modal p=none exploration
+  2026-09-19T20:46:12.678Z #9 in report:send p=none exploration
+  2026-09-19T20:46:12.745Z #9 enter report:send p=none exploration
+  2026-09-19T20:46:12.745Z #9 admit report:send (described) p=none exploration
+  2026-09-19T20:46:12.745Z #9 dispatch report:send (described) p=none exploration
+  2026-09-19T20:46:12.745Z #9 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Welcome back, Slizzy. The buried country"
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Slizzy)
+  HP: 48/48  Stamina: 4/16  TC: 165  Corruption: 0
+  Pack: 23 distinct rows / 30 total
+
+Weapons (5)
+  Cudgel (1d8 bludgeoning, dur 12/12, equipped:off, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, unequip:off, use
+  Cudgel (1d8 bludgeoning, dur 14/14, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 35/35, equipped:main, [weapon,starter,barehanded,melee])
+    actions: equip:off, unequip:main, use(off)
+  Pocket Knife (1d4 slashing, dur 8/8, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusty Shortbow (1d6 piercing, dur 36/36, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (3)
+  Architect's Observer Visor (dur 23/23, AC +1 · Resists: cold · WIS +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Mud-Warden's Vest (dur 31/31, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 15/15, equipped:head, AC +2 · INV +2, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (3)
+  Speckled Egg (Uncommon, [food,foraged,protein,climb_top])
+    actions: use(eat), drop
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Rope (dur 300/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, drop
+
+Materials (6)
+  Aether Crystal ([aether,crystal])
+    actions: drop
+  Aether Dust ×2 ([aether,dust,distillable])
+    actions: drop
+  Mud Fragment ([mud])
+    actions: drop
+  Scrap Metal ([metal])
+    actions: drop
+  Stick ([wood,improvised,kindling])
+    actions: drop
+  Worn Tartarian Coin ×5 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore,improvised])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — full log, 163 entries)
+
+[2026-09-19T20:45:55.469Z] [debug] voice⏱ gap 1584ms (wait 0ms + synth 1495ms, live) "Welcome back, Slizzy."
+[2026-09-19T20:45:54.055Z] [debug] send-log: crash on record (2026-09-19T20:45:42.388Z) — game log pushed automatically, delivered to Sentry, #mu8uxck69a57 cleared from disk
+[2026-09-19T20:45:53.987Z] [debug] boot: life bmu8ux6b5xc started 2026-09-19T20:45:45.905Z · not an OTA apply (no handoff on disk)
+[2026-09-19T20:45:53.987Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-19T20:45:53.987Z] [debug] ═══ SESSION 2026-09-19T20:45:53.987Z · build 2026-09-19-1851-one-press-language · previous entry moments earlier ═══
+[2026-09-19T20:45:53.885Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-19T20:45:53.884Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Slizzy. The buried country is no place to walk alone."
+[2026-09-19T20:45:53.884Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-19T20:45:53.884Z] [debug] OTA session start: 2026-09-19-1851-one-press-language.
+[2026-09-19T20:45:51.317Z] [debug] voice⏱ gap 1235ms (wait 102ms + synth 1131ms, live) "Choose your character."
+[2026-09-19T20:45:50.044Z] [debug] voice: bundled ready
+[2026-09-19T20:45:46.497Z] [debug] voice: bundled loading
+[2026-09-19T20:45:46.497Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-19T20:45:46.360Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T20:45:46.360Z] [debug] ota: Already up to date
+[2026-09-19T20:45:46.209Z] [debug] native-sdk verdict: answered false
+[2026-09-19T20:45:46.209Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-19T20:45:45.945Z] [debug] ota: Checking…
+[2026-09-19T20:45:45.945Z] [debug] ota: boot check — enabled=true channel=preview rt=2.5.0 updateId=01a0baa3-53ec-7c29-8db6-3834b3b74c59
+[2026-09-19T20:45:42.388Z] [debug] appstate: inactive → background (was inactive for 808ms)
+[2026-09-19T20:45:41.580Z] [debug] appstate: active → inactive (was active for 39000ms)
+[2026-09-19T20:45:37.417Z] [debug] homework: scene_intro "The Monarch's Waystation" ∅ 11231ms
+[2026-09-19T20:45:37.417Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 11161ms — intro-fill:∅
+[2026-09-19T20:45:37.392Z] [debug] qwen⏱ narration:scene_intro_fill ok 11161ms read 10344ms/write 802ms in 694t→out 33t thr1 14.9ms/t HIT-CAP (163ch)
+[2026-09-19T20:45:26.188Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-19T20:45:22.954Z] [debug] qwen⏱ investigate_lore ok 8036ms wait 6739ms read 421ms/write 867ms in 130t→out 38t thr2 3.2ms/t (162ch)
+[2026-09-19T20:45:21.657Z] [debug] qwen⏱ investigate_lore ok 7950ms wait 5077ms read 1957ms/write 902ms in 129t→out 40t thr2 15.2ms/t (189ch)
+[2026-09-19T20:45:18.782Z] [cognitive] neutral  (3925ms)
+[2026-09-19T20:45:18.764Z] [cognitive] SWIM  (5121ms)
+[2026-09-19T20:45:18.629Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-19T20:45:18.629Z] [world] You get a hand under the Scrap Metal and take it.
+[2026-09-19T20:45:17.879Z] [reward] ✦ Architect's Observer Visor (Common).
+[2026-09-19T20:45:17.879Z] [world] You lift the Architect's Observer Visor clear.
+[2026-09-19T20:45:17.878Z] [reward] ✦ Rusty Shortbow (Common).
+[2026-09-19T20:45:17.878Z] [world] You pick up the Rusty Shortbow.
+[2026-09-19T20:45:17.878Z] [reward] ✦ Cudgel (Common).
+[2026-09-19T20:45:17.878Z] [world] You take the Cudgel from where it lay.
+[2026-09-19T20:45:17.284Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-09-19T20:45:17.284Z] [reward]     • Aether Crystal (Common)
+[2026-09-19T20:45:17.284Z] [reward]     • Stick (Common)
+[2026-09-19T20:45:17.284Z] [reward]     • Mud Fragment (Common)
+[2026-09-19T20:45:17.284Z] [reward]     • Aether Dust x2 (Common)
+[2026-09-19T20:45:17.284Z] [reward] ✦ Salvage haul:
+[2026-09-19T20:45:17.284Z] [world] You strip the tilting obsidian pillar carefully. Something usable comes free in your hand.
+[2026-09-19T20:45:17.284Z] [world] Wedged into the shattered endless stair landing, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-19T20:45:17.284Z] [world] You break the shattered buried reclaimer cache apart. Among the pieces, something worth keeping.
+[2026-09-19T20:45:17.283Z] [world] You strip the sack carefully. Something usable comes free in your hand.
+[2026-09-19T20:45:17.283Z] [world] You break the rubble apart. Among the pieces, something worth keeping.
+[2026-09-19T20:45:17.283Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-19T20:45:17.282Z] [reward] ✦ Found Entry 3 — the Pillars — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-19T20:45:16.210Z] [debug] ui: tap "take / salvage"
+[2026-09-19T20:45:15.953Z] [debug] voice⏱ gap 5262ms (wait 1374ms + synth 2457ms, live) "Nine Cores, nine Guardians, nine Lost Ca…"
+[2026-09-19T20:45:15.161Z] [reward] ✦ Legacy of Power — the surge overflows: +2 STR and +2 WIS for 3 rounds.
+[2026-09-19T20:45:14.856Z] [world] You give the Cudgel your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-19T20:45:14.856Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cudgel resolved=Cudgel range=- enemies=0 hooks=0
+[2026-09-19T20:45:14.856Z] [player] investigate Cudgel
+[2026-09-19T20:45:14.377Z] [debug] ui: tap "✦ ability"
+[2026-09-19T20:45:13.714Z] [debug] persist sizes(KB): total=44 player=6 wm=21[rooms=7 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=15 scene=3
+[2026-09-19T20:45:13.641Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-19T20:45:13.640Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=0
+[2026-09-19T20:45:13.639Z] [player] investigate still pond
+[2026-09-19T20:45:11.977Z] [debug] ui: tap "investigate"
+[2026-09-19T20:45:10.653Z] [arbiter] "Nine Cores, nine Guardians, nine Lost Capitals. That's the road. Tap MAIN QUEST to start."
+[2026-09-19T20:45:10.652Z] [world] [The Monarch's Waystation] north: open ground · east: Dynasty Border Post (4 tiles, 10 hours) · south: The Reaver's Crest (1 tile, 3 hours) · west: Raider's Ridge (2 tiles, 5 hours)
+[2026-09-19T20:45:10.651Z] [system] Weather effect — Eerie Calm: +1 WIS
+Hazard: Aetherstone Seal. Hardened Aether-mud, stronger than stone. No standard tool will pierce it.
+You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+[2026-09-19T20:45:10.651Z] [world] Not even wind. The kind of stillness that means something is watching.
+[2026-09-19T20:45:10.646Z] [debug] spawn: gear=[Cudgel, Architect's Observer Visor, Rusty Shortbow] window=3 roster=new
+[2026-09-19T20:45:10.644Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-19T20:45:10.644Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n
+[2026-09-19T20:45:10.644Z] [world] You step out through the gate. Open ground, open sky — the outpost falls away behind you. The road starts here.
+[2026-09-19T20:45:10.346Z] [debug] voice⏱ gap 3203ms (wait 0ms + synth 1221ms, live) "The north door is locked."
+[2026-09-19T20:45:09.349Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call. Out there every step costs 1 stamina and a little time; REST brings it back."
+[2026-09-19T20:45:09.348Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-09-19T20:45:09.347Z] [player] investigate door
+[2026-09-19T20:45:08.079Z] [debug] ui: tap "investigate"
+[2026-09-19T20:45:07.143Z] [system] ⏳ Time passed: 15 min
+[2026-09-19T20:45:07.142Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-09-19T20:45:07.142Z] [world] You make your way back down the arch. Boots back on the ground.
+[2026-09-19T20:45:07.141Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-19T20:45:07.140Z] [player] climb down
+[2026-09-19T20:45:07.113Z] [debug] ui: tap "climb down"
+[2026-09-19T20:45:05.857Z] [system] ⏳ Time passed: 30 min
+[2026-09-19T20:45:05.854Z] [reward] ✦ Speckled Egg (Uncommon) — tucked into a crack at the top of the arch.
+[2026-09-19T20:45:05.854Z] [reward] ✦ A small pouch, tucked where only a climber would look — 15 TC. High places keep things for whoever bothers to reach them.
+[2026-09-19T20:45:05.853Z] [world] You reach the top of the arch (tier 3/3). The view changes; the room reads differently from here.
+[2026-09-19T20:45:05.853Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 3/3 cleared.
+[2026-09-19T20:45:05.852Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-19T20:45:05.852Z] [player] climb arch
+[2026-09-19T20:45:05.843Z] [debug] ui: tap "climb up (2/3)"
+[2026-09-19T20:45:04.904Z] [system] ⏳ Time passed: 30 min
+[2026-09-19T20:45:04.903Z] [world] You reach the last stretch of the arch (tier 2/3). Higher still to go.
+[2026-09-19T20:45:04.903Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 2/3 cleared.
+[2026-09-19T20:45:04.902Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-19T20:45:04.902Z] [player] climb arch
+[2026-09-19T20:45:04.893Z] [debug] ui: tap "climb up (1/3)"
+[2026-09-19T20:45:04.255Z] [debug] voice⏱ gap 2273ms (wait 565ms + synth 1676ms, live) "Now the rope earns its keep."
+[2026-09-19T20:45:04.124Z] [system] ⏳ Time passed: 30 min
+[2026-09-19T20:45:04.124Z] [world] You reach the first hold of the arch (tier 1/3). Higher still to go.
+[2026-09-19T20:45:04.123Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 1/3 cleared.
+[2026-09-19T20:45:04.122Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=0
+[2026-09-19T20:45:04.122Z] [player] climb arch
+[2026-09-19T20:45:02.811Z] [debug] ui: tap "climb"
+[2026-09-19T20:45:02.562Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-19T20:45:01.981Z] [arbiter] "Now the rope earns its keep. Tap CLIMB — top out, then climb back down."
+[2026-09-19T20:45:01.981Z] [reward] ✦ Plate Fragment x2 (Common). [salvaged]
+[2026-09-19T20:45:01.981Z] [world] You pop the rusted plate off its strap and it comes apart along old hammer-marks.
+[2026-09-19T20:45:01.981Z] [player] salvage broken chest plate
+[2026-09-19T20:44:57.877Z] [debug] ui: tap "take / salvage"
+[2026-09-19T20:44:57.527Z] [debug] voice⏱ gap 2985ms (wait 552ms + synth 2001ms, live) "That broken plate is worth more in piece…"
+[2026-09-19T20:44:54.542Z] [arbiter] "That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."
+[2026-09-19T20:44:54.541Z] [arbiter] "Good. That rope earns its keep."
+[2026-09-19T20:44:54.541Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-09-19T20:44:54.541Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-09-19T20:44:54.541Z] [player] take rope
+[2026-09-19T20:44:52.906Z] [debug] voice⏱ gap 4581ms (wait 0ms + synth 0ms, cached) "Now the rope, on the shelf."
+[2026-09-19T20:44:49.236Z] [debug] kbbar: mounted bottom=260 raw=260 from=live winH=667 beat=5
+[2026-09-19T20:44:49.189Z] [debug] kbbar: mounted bottom=260 raw=260 from=cached winH=667 beat=5
+[2026-09-19T20:44:48.885Z] [debug] voice⏱ gap 4004ms (wait 135ms + synth 2824ms, live) "That vest is better than bare cloth, and…"
+[2026-09-19T20:44:48.294Z] [arbiter] "Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."
+[2026-09-19T20:44:48.294Z] [debug] stats: STR13 DEX5 INT11 WIS7 CHA2 STE0 | gear: INT+2,WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-19T20:44:48.294Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-09-19T20:44:48.294Z] [world] You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.
+[2026-09-19T20:44:48.293Z] [debug] ui: tap "★ Take & wear Reclaimer's Salvage Cap — your head slot is bare"
+[2026-09-19T20:44:47.125Z] [arbiter] "Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it's on your head."
+[2026-09-19T20:44:47.064Z] [debug] stats: STR13 DEX5 INT9 WIS7 CHA2 STE0 | gear: WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel chest=Mud-Warden's Vest
+[2026-09-19T20:44:47.064Z] [reward] ✦ Mud-Warden's Vest (Common).
+[2026-09-19T20:44:47.064Z] [world] You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.
+[2026-09-19T20:44:47.064Z] [player] take Mud-Warden's Vest
+[2026-09-19T20:44:45.776Z] [debug] ui: tap "take / salvage"
+[2026-09-19T20:44:45.194Z] [arbiter] The Arbiter raps the slate. "Not that — tap the ★ vest inside TAKE / SALVAGE — one tap puts it on."
+[2026-09-19T20:44:45.193Z] [debug] ui: tap "use aetheric torch"
+[2026-09-19T20:44:44.881Z] [arbiter] "That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."
+[2026-09-19T20:44:44.881Z] [arbiter] "Good. Keep it close."
+[2026-09-19T20:44:44.881Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-09-19T20:44:44.880Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your off hand without thinking.
+[2026-09-19T20:44:44.880Z] [player] take cudgel
+[2026-09-19T20:44:43.838Z] [debug] voice⏱ gap 1841ms (wait 0ms + synth 0ms, cached) "A cudgel, by your boots."
+[2026-09-19T20:44:42.576Z] [debug] ui: tap "take / salvage"
+[2026-09-19T20:44:42.064Z] [debug] voice⏱ gap 1152ms (wait 0ms + synth 1108ms, live) "Well met, Slizzy."
+[2026-09-19T20:44:41.996Z] [arbiter] "A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You'll want a weapon."
+[2026-09-19T20:44:41.996Z] [world] You look around. You're in The Atrium (The Monarch's Waystation). You see: Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows, sign, brick, gate, arch, lantern, tilted capacitor coil rack, stripped sentinel diagnostic console, table. Hazard active: Aether Mist. Exits: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-19T20:44:41.996Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-19T20:44:41.995Z] [player] look
+[2026-09-19T20:44:41.994Z] [debug] ui: tap "look around you"
+[2026-09-19T20:44:40.912Z] [arbiter] "First, get your bearings. Tap LOOK AROUND YOU — I'll read the room for you: what's here, your way out, and whatever you're still chasing. Use it any time you're lost."
+[2026-09-19T20:44:40.912Z] [arbiter] "Well met, Slizzy. To business."
+[2026-09-19T20:44:40.911Z] [player] Slizzy
+[2026-09-19T20:44:40.911Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-19T20:44:35.713Z] [debug] kbbar: mounted bottom=260 raw=260 from=live winH=667 beat=0
+[2026-09-19T20:44:34.971Z] [debug] voice⏱ gap 1086ms (wait 0ms + synth 1064ms, live) "Your name, traveler."
+[2026-09-19T20:44:33.886Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu8uvlv1_kj4a0z left intact
+[2026-09-19T20:44:33.845Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-09-19T20:44:32.853Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu8uvlv1_kj4a0z left intact
+[2026-09-19T20:44:32.773Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-19T20:44:32.772Z] [world] Reclaimers move past you on small errands — checking ropes, counting beads, pretending not to study the new arrival. An eerie calm presses on the world — +1 WIS. What you do here is yours to choose.
+[2026-09-19T20:44:32.772Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+[2026-09-19T20:44:32.772Z] [world] Of the Tartarian Giants, sworn to the Mud Monarchs: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.
+[2026-09-19T20:44:32.770Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows] window=0 roster=new
+[2026-09-19T20:44:32.764Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-19T20:44:32.764Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=y passing=n
+[2026-09-19T20:44:32.762Z] [debug] APK session start: 2026-09-19-1851-one-press-language.
+
+=== END REPORT ===
