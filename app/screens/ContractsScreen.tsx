@@ -467,16 +467,18 @@ export function ContractsScreen() {
     tracked: boolean,
   ) => (
     <Pressable
-      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed, tControlDepth(pressed)]}
       onPress={() => setContractActive(kind, id, !tracked)}
       accessibilityRole="button"
       accessibilityState={{ selected: tracked }}
     >
+{({ pressed }) => (<>
       <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
         {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
       </Text>
-      {CTL_PLANES}
-    </Pressable>
+      {ctlPlanes(pressed)}
+    </>)}
+</Pressable>
   );
 
   if (!player) {
@@ -1351,16 +1353,18 @@ export function ContractsScreen() {
                         leaves the tower on the slate and any laid course intact. */}
                     {!done && (
                       <Pressable
-                        style={({ pressed }) => [kit.ctl, styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed, tControlDepth(pressed)]}
                         onPress={() => setGreatClimbActive(c.id, !climbActive)}
                         accessibilityRole="button"
                         accessibilityState={{ selected: climbActive }}
                       >
+{({ pressed }) => (<>
                         <Text style={[styles.trackBtnText, climbActive ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
                           {climbActive ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
                         </Text>
-                        {CTL_PLANES}
-                      </Pressable>
+                        {ctlPlanes(pressed)}
+                      </>)}
+</Pressable>
                     )}
                   </View>
                 );
@@ -1994,17 +1998,19 @@ export function ContractsScreen() {
                         contract: stays on the slate but stops auto-advancing until
                         re-activated. Activating it pauses every other contract. */}
                     <Pressable
-                      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      style={({ pressed }) => [kit.ctl, styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed, tControlDepth(pressed)]}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
                       accessibilityRole="button"
                       accessibilityState={{ selected: tracked }}
                     >
+{({ pressed }) => (<>
                       <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
                         {/* OTA-963 — name the party the toggle stands down / recalls. */}
                         {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
                     {!readyToTurnIn && stageDef && !open && (

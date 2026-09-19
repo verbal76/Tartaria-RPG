@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from 'react-native';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 // ⚠ OTA-1771 — the modal sweep. Cloned from ClimbModal's shape, so it carried
 // ClimbModal's hand-copied scrim and card too; both are the kit's now.
@@ -83,14 +83,16 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
                   {leads.map((lead, i) => (
                     <Pressable
                       key={`lead-${lead.id}-${i}`}
-                      style={({ pressed }) => [kit.ctl, styles.row, pressed && styles.rowPressed]}
+                      style={({ pressed }) => [kit.ctl, styles.row, pressed && styles.rowPressed, tControlDepth(pressed)]}
                       onPress={() => onSubmit(lead.id)}
                       accessibilityRole="button"
                     >
+{({ pressed }) => (<>
                       <Text style={styles.rowName} numberOfLines={1}>{lead.noun}</Text>
                       <Text style={styles.rowTag}>AIM ›</Text>
-                      {CTL_PLANES}
-                    </Pressable>
+                      {ctlPlanes(pressed)}
+                    </>)}
+</Pressable>
                   ))}
                 </ScrollView>
               )}

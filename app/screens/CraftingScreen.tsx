@@ -790,6 +790,7 @@ export function CraftingScreen() {
                   style={({ pressed }) => [kit.ctl, 
                     styles.aetherCard,
                     pressed && styles.aetherCardPressed,
+                    tControlDepth(pressed),
                   ]}
                   onPress={() => {
                     // OTA-629 — the SUMMON card opens the golem confirm popup.
@@ -807,6 +808,11 @@ export function CraftingScreen() {
                     setDisciplineConfirm(buildDisciplineConfirm(d, player));
                   }}
                 >
+{/* ⚠ OTA-1851 — a golem-variant row nests INSIDE this card with a render prop
+    of the same name, so the inner `pressed` shadows this one. That is correct:
+    each key reports its OWN finger, and the row's planes must not answer the
+    card's press. */}
+{({ pressed }) => (<>
                   <Text style={styles.aetherCardTitle}>{d.title}</Text>
                   <Text style={styles.aetherCardBody}>{d.body}</Text>
                   {/* OTA-401 — light each fuel name green when it's in the
@@ -843,9 +849,11 @@ export function CraftingScreen() {
                             style={({ pressed }) => [kit.ctl, 
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
+                              tControlDepth(pressed),
                             ]}
                             onPress={() => setGolemConfirm(c)}
                           >
+{({ pressed }) => (<>
                             <Text style={styles.golemVariantName}>{g.name}</Text>
                             <Text style={styles.golemVariantStats}>{c.stats}</Text>
                             <Text style={styles.golemVariantBlurb}>{g.blurb}</Text>
@@ -854,8 +862,9 @@ export function CraftingScreen() {
                               <Text style={c.afford ? styles.fuelHave : undefined}>{c.fuel}</Text>
                             </Text>
                             <Text style={styles.golemVariantPhrase}>tap to summon →</Text>
-                            {CTL_PLANES}
-                          </Pressable>
+                            {ctlPlanes(pressed)}
+                          </>)}
+</Pressable>
                         );
                       })}
                       <Text style={styles.golemVariantsRequires}>
@@ -872,7 +881,8 @@ export function CraftingScreen() {
                     </Text>
                     {d.examples.map((ex) => `"${ex}"`).join(' · ')}
                   </Text>
-                  {CTL_PLANES}
+                  {ctlPlanes(pressed)}
+                </>)}
                 </Pressable>
               );
             })}
@@ -906,9 +916,11 @@ export function CraftingScreen() {
                     styles.aetherCard,
                     !known && styles.techCardLocked,
                     known && pressed && styles.aetherCardPressed,
+                    tControlDepth(known && pressed),
                   ]}
                   onPress={() => { if (known) setDisciplineConfirm(buildTechniqueConfirm(t, player)); }}
                 >
+{({ pressed }) => (<>
                   <Text style={styles.aetherCardTitle}>
                     {t.name} <Text style={styles.techTier}>· {t.tier}</Text>
                     {known ? <Text style={styles.techRank}>  {proficiencyLabel(rank)}</Text> : null}
@@ -927,8 +939,9 @@ export function CraftingScreen() {
                       ? `"channel ${t.name.toLowerCase()}"`
                       : 'a faction whose rapport you have earned sells this procedure.'}
                   </Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(known && pressed)}
+                </>)}
+</Pressable>
               );
             })}
             <Text style={styles.techFootnote}>

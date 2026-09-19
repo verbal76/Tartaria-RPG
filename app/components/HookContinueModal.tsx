@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import type { HookContinueStage } from '../engine/types';
-import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ OTA-1765 — the second adopter, and it is NOT a pure substitution. Stated
  * rather than discovered later:
@@ -238,13 +238,15 @@ export function HookContinueModal({
                     </Pressable>
                     {vendorName && onTrade ? (
                       <Pressable
-                        style={({ pressed }) => [kit.ctl, styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.btn, styles.btnTrade, pressed && styles.btnPressed, tControlDepth(pressed)]}
                         onPress={onTrade}
                         accessibilityRole="button"
                       >
+{({ pressed }) => (<>
                         <Text style={styles.btnTextTrade}>TRADE NOW</Text>
-                        {CTL_PLANES}
-                      </Pressable>
+                        {ctlPlanes(pressed)}
+                      </>)}
+</Pressable>
                     ) : null}
                     <Pressable
                       style={({ pressed }) => [styles.btn, kit.ctl, pressed && kit.controlPressed]}

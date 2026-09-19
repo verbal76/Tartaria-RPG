@@ -11,7 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from 'react-native';
-import { tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tFilledGold, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -189,13 +189,15 @@ export function ApproachModal({
                     {enemies.map((e) => (
                       <Pressable
                         key={`enemy-${e}`}
-                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipEnemy, pressed && styles.btnPressed, tControlDepth(pressed)]}
                         onPress={() => tapToApproach(e)}
                         accessibilityRole="button"
                       >
+{({ pressed }) => (<>
                         <Text style={styles.chipTextEnemy} numberOfLines={1}>{e}</Text>
-                        {CTL_PLANES}
-                      </Pressable>
+                        {ctlPlanes(pressed)}
+                      </>)}
+</Pressable>
                     ))}
                   </ScrollView>
                 </>
@@ -212,24 +214,28 @@ export function ApproachModal({
                     {vendorName && (
                       <Pressable
                         key={`vendor-${vendorName}`}
-                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed, tControlDepth(pressed)]}
                         onPress={() => tapToApproach(vendorName)}
                         accessibilityRole="button"
                       >
+{({ pressed }) => (<>
                         <Text style={styles.chipTextScene} numberOfLines={1}>{vendorName}</Text>
-                        {CTL_PLANES}
-                      </Pressable>
+                        {ctlPlanes(pressed)}
+                      </>)}
+</Pressable>
                     )}
                     {scene.map((h) => (
                       <Pressable
                         key={`scene-${h}`}
-                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        style={({ pressed }) => [kit.ctl, styles.chip, styles.chipScene, pressed && styles.btnPressed, tControlDepth(pressed)]}
                         onPress={() => tapToApproach(h)}
                         accessibilityRole="button"
                       >
+{({ pressed }) => (<>
                         <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
-                        {CTL_PLANES}
-                      </Pressable>
+                        {ctlPlanes(pressed)}
+                      </>)}
+</Pressable>
                     ))}
                   </ScrollView>
                 </>
@@ -240,13 +246,15 @@ export function ApproachModal({
                 {commonHints.map((h) => (
                   <Pressable
                     key={`common-${h}`}
-                    style={({ pressed }) => [kit.ctl, styles.chip, pressed && styles.btnPressed]}
+                    style={({ pressed }) => [kit.ctl, styles.chip, pressed && styles.btnPressed, tControlDepth(pressed)]}
                     onPress={() => tapToApproach(h)}
                     accessibilityRole="button"
                   >
+{({ pressed }) => (<>
                     <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
-                    {CTL_PLANES}
-                  </Pressable>
+                    {ctlPlanes(pressed)}
+                  </>)}
+</Pressable>
                 ))}
               </View>
 

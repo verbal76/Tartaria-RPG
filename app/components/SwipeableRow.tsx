@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { baseColorOf, useDisplaySettings } from '../ui/displaySettings';
+import { T, tartariaKitStyles as kit, tControlDepth } from '../ui/tartariaKit';
 
 interface Props {
   onDelete: () => void;
@@ -63,16 +64,39 @@ export function SwipeableRow({ onDelete, children, deleteLabel = 'Delete' }: Pro
   return (
     <View style={styles.wrap}>
       <View style={styles.deleteLayer}>
-        <TouchableOpacity
+        <Pressable
           accessibilityRole="button"
           onPress={() => {
             close();
             onDelete();
           }}
-          style={styles.deleteBtn}
+          /* ⚠⚠⚠ OTA-1851 — DELETE IS A BUTTON, AND IT NOW PRESSES LIKE ONE.
+           *
+           * Until now this was a bare `TouchableOpacity` over `deleteBtn`, which
+           * was nothing but `flex: 1` plus centring: NO border, NO rim, NO face
+           * of its own. It was the red well itself with a word on it, and the
+           * only thing a press did was fade the whole thing. Every other control
+           * in Tartaria rests raised and TRAVELS 3dp on press (`kit.controlPressed`).
+           * The one destructive control the player reaches most often was the one
+           * that did not.
+           *
+           * ⚠ THE REPAIR IS THE SHARED PRIMITIVE, NOT A BESPOKE ANIMATION.
+           * `kit.ctl` supplies the material (rim, radius, raised pair) exactly as
+           * it does for the other 167 controls; `kit.btnFaceDestructive` supplies
+           * the face the kit already uses for TButton's destructive variant; and
+           * `tControlDepth(pressed)` — the one depth authority — supplies both the
+           * rim inversion and the travel. Nothing here is local to this file.
+           *
+           * ⚠ THE RED IDENTITY IS UNTOUCHED. `deleteLayer` keeps `T.rustRim` as
+           * the well behind, `deleteBtn` takes `T.rustRim` for its side rims, and
+           * the label keeps its own colour and its word. The button's resting top
+           * edge is the GENERIC lit rim, not an accent, so OTA-1828's "an accent
+           * control keeps its family on press" rule does not apply and no rust
+           * pressed-tone override is needed — the standard pair is correct here. */
+          style={({ pressed }) => [kit.ctl, kit.btnFaceDestructive, styles.deleteBtn, tControlDepth(pressed)]}
         >
           <Text style={styles.deleteText}>{deleteLabel}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <Animated.View
         style={[styles.surface, { backgroundColor: baseColorOf(display) }, { transform: [{ translateX }] }]}
@@ -97,7 +121,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#5a2a26',
     borderRadius: 4,
   },
-  deleteBtn: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  /* ⚠ OTA-1851 — GEOMETRY AND THE SIDE RIMS ONLY. The face comes from
+   * `kit.btnFaceDestructive`, the rim pair and the travel from
+   * `tControlDepth(pressed)`; this entry must not name either, or the key
+   * would be independently styled again. The 3dp margin is what gives the
+   * travel somewhere to go: pressed, the button drops into the red well and
+   * 3dp more of it shows above — the depth cue is the WELL, which is why the
+   * well is the destructive colour and the key is not. */
+  deleteBtn: {
+    flex: 1,
+    margin: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: T.rustRim,
+  },
   deleteText: { color: '#e6d8b3', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   /* ⚠⚠⚠ OTA-1827 — THIS IS THE BLACK RECTANGLE, AND IT WAS A HARDCODED COLOUR.
    *

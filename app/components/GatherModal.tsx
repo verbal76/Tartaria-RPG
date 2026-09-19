@@ -76,7 +76,7 @@ import { findCatalogItem } from '../engine/crafting';
 import { utilityArt, UTILITY_ART_SIZE } from '../engine/utilityGlyphArt';
 import { rarityHexColor } from './InventoryCategorize';
 
-import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+import { tControlDepth, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 /** ⚠⚠ OTA-1317 — the row's rarity edge, or nothing.
  *
@@ -169,13 +169,21 @@ const LANE_HEADING: Record<GatherLane, string> = {
  * box the control already owns, so adopting them moves nothing by a pixel, and
  * any SEMANTIC colour the call site already carries layers on top and still
  * wins. Construction is what the object IS; state is what it is IN. */
-const CTL_PLANES = (
+/* ⚠ OTA-1851 — THE PLANES FOLLOW THE FINGER. This was the frozen `CTL_PLANES`
+ * literal; a control given travel while these stayed at resting height moves
+ * 3dp and never loses any, which OTA-1806's census names B-PARTIAL and which is
+ * most of what a press looks like. Same three planes, same geometry, same
+ * `pointerEvents="none"` — the pressed pair rides lower and the contact band is
+ * not drawn at all, because a key pushed home is not standing on anything. */
+const ctlPlanes = (pressed: boolean) => (
   <>
-    <View style={kit.controlPlaneTop} pointerEvents="none" />
-    <View style={kit.controlPlaneBottom} pointerEvents="none" />
-    <View style={kit.controlPlaneContact} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneTopPressed : kit.controlPlaneTop} pointerEvents="none" />
+    <View style={pressed ? kit.controlPlaneBottomPressed : kit.controlPlaneBottom} pointerEvents="none" />
+    {pressed ? null : <View style={kit.controlPlaneContact} pointerEvents="none" />}
   </>
 );
+/** The resting planes, for a surface that has no press to report. */
+const CTL_PLANES = ctlPlanes(false);
 const ROW_PLANES = (
   <>
     <View style={kit.chassisPlaneTop} pointerEvents="none" />
@@ -548,6 +556,7 @@ export function GatherModal({
               // teaches the opposite. All three dim under a lock.
               lockKey !== null && styles.sweepLocked,
               pressed && styles.rowPressed,
+              tControlDepth(pressed),
             ]}
             /* ⚠ OTA-1813 — T1/T2 on the BULK control. The lock branch is a real
                handler refusal (it buzzes and returns without sweeping), so it is
@@ -568,6 +577,7 @@ export function GatherModal({
             accessibilityState={{ disabled: lockKey !== null }}
             accessibilityLabel={buttonLabel(nouns.length)}
           >
+{({ pressed }) => (<>
             <Text style={[
               // ⚠ SCRAP'S BUTTON FACE IS SMALLER THAN THE TAKE ONES, ON PURPOSE.
               // Take is reversible — drop it. Salvage is a one-way door. Yellow
@@ -580,8 +590,9 @@ export function GatherModal({
             ]}>
               {buttonLabel(nouns.length)}
             </Text>
-            {CTL_PLANES}
-          </Pressable>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
       </React.Fragment>
     );
   };
@@ -666,14 +677,16 @@ export function GatherModal({
                   onSalvageAll,
                 )}
                 <Pressable
-                  style={({ pressed }) => [kit.ctl, styles.ignore, pressed && styles.rowPressed]}
+                  style={({ pressed }) => [kit.ctl, styles.ignore, pressed && styles.rowPressed, tControlDepth(pressed)]}
                   onPress={onCancel}
                   accessibilityRole="button"
                   accessibilityLabel="Ignore the rest and leave"
                 >
+{({ pressed }) => (<>
                   <Text style={styles.ignoreText}>IGNORE THE REST</Text>
-                  {CTL_PLANES}
-                </Pressable>
+                  {ctlPlanes(pressed)}
+                </>)}
+</Pressable>
               </View>
             </View>
           </TouchableWithoutFeedback>

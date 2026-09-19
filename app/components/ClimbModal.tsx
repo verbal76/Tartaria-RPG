@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 // ⚠ OTA-1771 — the modal sweep. The scrim and the card are the kit's now; this
@@ -143,6 +143,7 @@ export function ClimbModal({
                           styles.row,
                           isCleared && styles.rowCleared,
                           pressed && !isCleared && styles.rowPressed,
+                          tControlDepth(pressed && !isCleared),
                         ]}
                         /* ⚠⚠ OTA-1813 — T1. A CLEARED CHIP IS `disabled`, so RN
                            never calls onPressIn OR onPress on it and nothing is
@@ -163,6 +164,7 @@ export function ClimbModal({
                         accessibilityRole="button"
                         accessibilityState={{ disabled: isCleared }}
                       >
+{({ pressed }) => (<>
                         <Text
                           style={[styles.rowName, isCleared && styles.rowNameCleared]}
                           numberOfLines={1}
@@ -172,7 +174,8 @@ export function ClimbModal({
                         <Text style={[styles.rowHeight, isCleared && styles.rowHeightCleared]}>
                           {isCleared ? '✓ TOP' : (h === 1 ? '1 tier' : `${h} tiers`)}
                         </Text>
-                        {CTL_PLANES}
+                        {ctlPlanes(pressed && !isCleared)}
+                      </>)}
                       </Pressable>
                     );
                   })}

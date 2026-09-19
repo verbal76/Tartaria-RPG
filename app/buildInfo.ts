@@ -30942,7 +30942,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `☗ FALLEN` fits by about 3pt. The label keeps the kit's numberOfLines={1},
 // so the worst case on a device whose ☗ fallback glyph runs wide is an ellipsis
 // on one line, never a wrap. Owner hardware check is the confirmation.
-export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';
+/* ⚠⚠⚠ OTA-1851 — ONE PRESS LANGUAGE.
+// 408 interactive controls were inventoried; 168 wear `kit.ctl`, the one
+// control material. 147 of those already pressed in the one depth language.
+// TWENTY-TWO DID NOT — twenty-one stragglers of the earlier material sweep,
+// wearing the rim of a physical key and answering a press with `opacity: 0.7`,
+// plus the title screen's swipe-reveal DELETE, which wore no material at all.
+// All twenty-two now end their style array with `tControlDepth(pressed)`.
+// Nothing was redesigned: every existing colour beat, label, callback,
+// accessibility label and layout is byte-for-byte what it was. The permanent
+// guard is the INVARIANT, not the list — wearing the material obliges you to
+// press in the language, and `ota1851OnePressLanguage` asks it of the whole
+// tree, so the next straggler fails on the day it is written.
+// ⚠ ONE CONTROL IS RULED EXEMPT AND NAMED: the inventory's gift-mode banner,
+// whose planes are a module constant. OTA-1828 tried the repair and reverted
+// it; completing it is OTA-1806's class. */
+export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';

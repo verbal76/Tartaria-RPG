@@ -13,7 +13,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tControlDepth, tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 import type { InteractableChip } from './InteractableChip';
@@ -275,6 +275,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                             styles.chipFullScene,
                             grayed && styles.chipFullConsumed,
                             pressed && !c.consumed && styles.btnPressed,
+                            tControlDepth(pressed && !c.consumed),
                           ]}
                           disabled={c.consumed}
                           /* ⚠ OTA-1813 — T1. A consumed chip is `disabled`, so
@@ -285,6 +286,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                           accessibilityRole="button"
                           accessibilityState={{ disabled: c.consumed }}
                         >
+{({ pressed }) => (<>
                           <Text
                             style={[
                               styles.chipFullText,
@@ -306,7 +308,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                               {c.consumed ? '✓ done' : '→ investigate'}
                             </Text>
                           )}
-                          {CTL_PLANES}
+                          {ctlPlanes(pressed && !c.consumed)}
+                        </>)}
                         </Pressable>
                       );
                     })}

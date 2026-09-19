@@ -84,9 +84,17 @@ const CODE = BODY.split('\n')
   })
   .join('\n');
 
-/** The one style-array expression every activate/deactivate control passes. */
+/** The one style-array expression every activate/deactivate control passes.
+ *
+ * ⚠ OTA-1851 APPENDED `tControlDepth(pressed)`, AND THIS PATTERN GREW WITH IT —
+ * which is the opposite of softening. The seam these three controls share is now
+ * FOUR elements wide instead of three, so the identity check below demands one
+ * more thing of them than it used to. All three wore `kit.ctl` — the control
+ * material — while answering a press with `{ opacity: 0.7 }` and nothing else;
+ * the fourth element is the one depth authority. If any one of the three loses
+ * it while its siblings keep it, this fails exactly as it always has. */
 const SHARED_ARRAY =
-  /\[kit\.ctl, styles\.trackBtn, \w+ \? styles\.trackBtnOn : styles\.trackBtnOff, pressed && styles\.trackBtnPressed\]/g;
+  /\[kit\.ctl, styles\.trackBtn, \w+ \? styles\.trackBtnOn : styles\.trackBtnOff, pressed && styles\.trackBtnPressed, tControlDepth\(pressed\)\]/g;
 
 /** Read one top-level `name: { ... }` declaration out of the StyleSheet block. */
 function decl(name: string): string {
@@ -128,7 +136,7 @@ describe('OTA-1821 §1 — the repair sits on the narrowest seam that reaches al
     const normalised = new Set(hits.map((h) => h.replace(/\b(tracked|climbActive)\b/, '<active?>')));
     expect(normalised.size).toBe(1);
     expect([...normalised][0]).toBe(
-      '[kit.ctl, styles.trackBtn, <active?> ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]',
+      '[kit.ctl, styles.trackBtn, <active?> ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed, tControlDepth(pressed)]',
     );
     // and the two legitimate condition spellings are exactly the two expected
     expect(new Set(hits).size).toBe(2);
