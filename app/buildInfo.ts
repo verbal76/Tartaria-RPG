@@ -30928,7 +30928,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reclaim, force-stop, reboot, update, developer kill, or another unclean
 // disappearance from the available Tartaria evidence. The repair stops claiming
 // to know which one it was; it does not start claiming to know.
-export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';
+// ⚠ OTA-1849 — LORE AND FALLEN SHARE ONE ROW. Presentation only, and the whole
+// change is a flex row plus two style keys on the exploration card's right
+// column: ◈ LORE and ☗ FALLEN were two stacked full-width keys under the
+// mini-map, and the second was spending a whole row of a 165px column on a
+// destination a player opens between fights. Paired at equal width they hand
+// that row back to the map, which is `flex: 1` and takes it without being
+// resized by hand. Same control, same labels, same handlers, same destinations,
+// same tap ledger.
+//
+// ⚠ THE NARROW-DEVICE MARGIN IS SMALL AND IS WRITTEN DOWN RATHER THAN ASSUMED:
+// at 375pt each key's text box is 66.25pt against roughly 63pt of label, so
+// `☗ FALLEN` fits by about 3pt. The label keeps the kit's numberOfLines={1},
+// so the worst case on a device whose ☗ fallback glyph runs wide is an ellipsis
+// on one line, never a wrap. Owner hardware check is the confirmation.
+export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1847-the-process-says-where-it-was';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';

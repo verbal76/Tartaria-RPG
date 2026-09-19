@@ -237,6 +237,12 @@ const CREST_LORE_LABEL = '◈ LORE';
  * its secondary destinations — no new navigation family, one more key on the
  * rail the player already uses. */
 const CREST_FALLEN_LABEL = '☗ FALLEN';
+/* ⚠ OTA-1849 — the gutter between the two paired keys, named because the
+ * one-row width proof is arithmetic over it and a magic 6 buried in a
+ * StyleSheet cannot be pinned by a test. It matches the 6pt the stacked
+ * column already put between keys (`crestNavBtn`'s marginVertical: 3, twice),
+ * so the rhythm of the corner is unchanged in both directions. */
+const CREST_NAV_ROW_GAP = 6;
 const MINIMAP_TAP_LABEL = 'map';
 
 export function ExplorationScreen() {
@@ -1620,20 +1626,49 @@ export function ExplorationScreen() {
                   setScreen('map');
                 }}
               />
-              <TButton
-                label={CREST_LORE_LABEL}
-                variant="utility"
-                compact
-                style={styles.crestNavBtn}
-                onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }}
-              />
-              <TButton
-                label={CREST_FALLEN_LABEL}
-                variant="utility"
-                compact
-                style={styles.crestNavBtn}
-                onPress={() => { logUiTap(CREST_FALLEN_LABEL); setScreen('fallen'); }}
-              />
+              {/* ⚠⚠ OTA-1849 — LORE AND FALLEN SHARE ONE ROW. They were two
+                  stacked full-width keys under the mini-map, and the second of
+                  them was spending a whole row of a 165px column on a control
+                  the player reaches once a run. Paired, they give that row back
+                  to the map, which is `flex: 1` and takes it without being
+                  resized by hand.
+
+                  ⚠ NOTHING ELSE CHANGES. Same TButton, same `utility` variant,
+                  same `compact` density, same rim, face, press depression and
+                  reduce-motion behaviour, same labels, same handlers, same tap
+                  ledger entries, same destinations. `crestNavHalf` adds the two
+                  properties that make a row a row and nothing more.
+
+                  ⚠⚠⚠ THE WIDTH IS ARITHMETIC, NOT A GUESS, and the narrowest
+                  supported device is the one it is done for — iPhone SE 3 at
+                  375pt (DEVICE_PROFILES):
+                      375 − 16 (container padding)          = 359
+                      (359 − 6 topRow gap) / 2              = 176.5  rightCol
+                      176.5 − 2 (panelFrame border)         = 174.5  inner
+                      (174.5 − CREST_NAV_ROW_GAP) / 2       =  84.25 per key
+                      84.25 − 2 (btnRim) − 16 (compact pad) =  66.25 text box
+                  `☗ FALLEN` is the longer label: eight characters at 10pt/800
+                  with 1.8 letterSpacing. The margin is real but SMALL, so the
+                  label keeps `numberOfLines={1}` from the kit — the failure
+                  mode if a device's fallback glyph for ☗ is wider than a square
+                  em is an ellipsis on one line, never a wrapped or reflowed
+                  row. Checked on hardware before this is called done. */}
+              <View style={styles.crestNavRow}>
+                <TButton
+                  label={CREST_LORE_LABEL}
+                  variant="utility"
+                  compact
+                  style={[styles.crestNavBtn, styles.crestNavHalf]}
+                  onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }}
+                />
+                <TButton
+                  label={CREST_FALLEN_LABEL}
+                  variant="utility"
+                  compact
+                  style={[styles.crestNavBtn, styles.crestNavHalf]}
+                  onPress={() => { logUiTap(CREST_FALLEN_LABEL); setScreen('fallen'); }}
+                />
+              </View>
             </>
           )}
           {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
@@ -3799,6 +3834,12 @@ const styles = StyleSheet.create({
   // ⚠ VIS-3 — the face, rim, type and press behaviour all come from the kit's
   // TButton now; this is only the slot it sits in.
   crestNavBtn: { marginVertical: 3 },
+  // ⚠ OTA-1849 — LORE and FALLEN paired. The row carries the gutter; the halves
+  // carry the equal split. `minWidth: 0` is not decoration: without it a flex
+  // child in a row refuses to shrink below its text's intrinsic width, and the
+  // pair would push past the column's right edge instead of dividing it.
+  crestNavRow: { flexDirection: 'row', gap: CREST_NAV_ROW_GAP },
+  crestNavHalf: { flex: 1, minWidth: 0 },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
   // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
   // transparent backdrop so it stays legible on top of either
