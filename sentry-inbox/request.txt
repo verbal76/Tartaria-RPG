@@ -229,3 +229,73 @@ Pull everything reachable and report:
 
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion, and nothing retrieved may be attributed to any open freeze.
+
+────────────────────────────────────────────────────────────────────────────
+REQUEST 2026-09-19 (second pull of the day) — TWO LOGS FROM AN UPDATED iPHONE
+Owner: "Also I pushed 2 more logs on an updated iPhone."
+
+The 20:12Z sync (3114b5aa) brought four bundles that turned out to be ONE app
+life on the iPhone SE — bmu8te6ngr4, iOS 26.5.2, TestFlight 208 — captured four
+times, all stamped OTA 2026-09-16-1829. That three-day staleness had a cause
+written in the log itself:
+
+    ota: boot check — enabled=true channel=preview rt=2.5.0
+    ota: Checking…
+    ⚠ ota error: [ERR_UPDATES_CHECK] The Internet connection appears to be offline.
+    ota: boot check result = errored
+
+and it was NOT a publisher fault: publisher run 1440 published
+`preview (ios) at runtimeVersion 2.5.0` cleanly for OTA-1851 — the exact channel
+and runtime that build reads. The device has since been updated. This pull is to
+read the two logs that followed.
+
+Six reads, in order:
+
+1. THE OTA STAMP ON EACH NEW BUNDLE, verbatim, with the `ota: boot check` triple
+   beside it (enabled/channel/rt/updateId, "Checking…", result). The question is
+   narrow: did the check SUCCEED this time, and which OTA_BUILD_ID is the device
+   actually running. Report the stamp as written — do NOT assume it is 1851
+   because 1851 was published, and do not infer a build from a date.
+
+2. WAS THE BOOT AN OTA APPLY. `boot: life <id> started <ts> · not an OTA apply
+   (no handoff on disk)` versus the apply shape. This matters more than usual
+   here: OTA-1674/1735 found the process kills were ON OTA-APPLY BOOTS, and the
+   20:02:55 kill in the previous pull was explicitly NOT one. An update has just
+   been applied, so this pull is the natural test of that mechanism — report what
+   the boot lines say and attribute nothing.
+
+3. THE CRASH LEDGER on each bundle, verbatim — every record, its timestamp, its
+   classification, and the native SDK's `crashed=` annotation. The previous pull
+   carried exactly one: `2026-09-19T20:02:55.215Z — PROCESS KILLED — no JS ran`,
+   annotated `crashed=no`. State plainly whether that is still the only record,
+   and distinguish a NEW kill from the SAME kill re-reported by a later capture.
+   Four captures of one event is what the last pull turned out to be, and reading
+   those as four events would have been wrong.
+
+4. DEVICE / BUILD BLOCK on each, verbatim — name, platform and version, screen,
+   Hermes, app version, APK/AAB build, boot stage, and ML runtime health (status,
+   crash count, last init attempt and success, Qwen kernel variant, Qwen CPU/SoC).
+   The kernel and SoC lines both read "(not yet loaded this install)" last pull;
+   if they are populated now they are the first owner-device samples of either,
+   and Baker #3 wants them verbatim.
+
+5. MEMORY — every MemoryFlightRecorder sample with its timestamp and phase, if
+   the recorder wrote anything at all. Report numbers and interpret nothing. Do
+   NOT compare against the historical 1.85–1.89 GB figures: those are not current
+   truth, and Baker #3 (#168) is explicitly waiting on fresh owner-device
+   measurement rather than on that lineage.
+
+6. `persist: skipped — player record missing core identity (name=∅, raceId=✓,
+   stats=✓)` — whether it still fires on a new character before naming completes,
+   and how many times. Recorded as an open question from the previous pull; it is
+   not yet a defect and must not be reported as one.
+
+Plus the usual SCRUB AND ASSEMBLY ACCOUNTING: per-bundle part counts,
+completeness on the relay's own pagination and issue-walk evidence, redactions.
+A partially assembled bundle is evidence about the relay and must be reported,
+not stitched. If fewer than two new bundles arrived, say so plainly with the
+newest timestamp seen — a short pull is the answer to the owner's question.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion, and nothing retrieved may be attributed to any open freeze — the
+20:02:55 kill included.
