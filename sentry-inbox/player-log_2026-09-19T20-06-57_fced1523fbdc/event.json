@@ -1,0 +1,337 @@
+{
+  "id": "fced1523fbdc4e32ac923af5edc3e3e8",
+  "groupID": "7742874370",
+  "eventID": "fced1523fbdc4e32ac923af5edc3e3e8",
+  "projectID": "4511945117532160",
+  "size": 18310,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-16-1829-the-top-plane-stops-going-black #mu8tj9o75sia [inline 1/19]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-16-1829-the-top-plane-stops-going-black",
+  "message": "player-log 2026-09-16-1829-the-top-plane-stops-going-black #mu8tj9o75sia [inline 1/19]",
+  "title": "player-log 2026-09-16-1829-the-top-plane-stops-going-black #mu8tj9o75sia [inline 1/19]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Boston",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-19T20:03:00Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1749155840,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 70.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 120766464,
+      "usable_memory": 3588063232,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 33.14475,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0ac0a-b08c-7be5-8d4f-e52f42748d8c"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "33fa570201fb42baa4935d23bd876036",
+      "span_id": "92d3feee6900590d",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "RnV-sbC-BMb-2cg-4oC-UIG-1hb-nNp-b24-gwr-cgK-DIw-MjY-tMD-ktM-TYt-MTg-yOS-10a-GUt-dG9-wLX-BsY-W5l-LXN-0b3-BzL-Wdv-aW5-nLW-JsY-WNr-KSD-Cty-AoZ-nVs-bCB-sb2-cgc-HVz-aGV-kIG-Zvc-iBh-bmF-seX-Npc-yDi-gJQ-gbm-8gZ-GVz-Y3J-pcH-Rpb-24g-YXN-rZW-QgZ-m9y-KQo-9PT-0gV-EFS-VEF-SSU-EgQ-lVH-IFJ-FUE-9SV-CA9-PT0-KU3-Vib-Wl0-dGV-kOi-AyM-DI2-LTA-5LT-E5V-DIw-OjA-2Oj-U3L-jQ2-M1o-KQ2-hhc-mFj-dGV-yOi-BtY-W5z-aW9-uCl-Nsb-3Qg-SUQ-6IH-Nsb-3Rf-bXU-4dG-Mxc-jRf-cWV-udG-RpC-lJh-Y2U-6IE-11Z-CBE-d2V-sbG-Vyc-wpM-b2N-hdG-lvb-jog-VGh-lIE-1vb-mFy-Y2g-ncy-BXY-Xlz-dGF-0aW-9uC-khQ-OiA-yNi-8yO-AoK-LS0-tIE-RFU-0NS-SVB-USU-9OI-C0t-LQo-oZn-Vsb-CBs-b2c-gcH-Vza-GVk-IGZ-vci-Bhb-mFs-eXN-pcy-Dig-JQg-bm8-gZG-VzY-3Jp-cHR-pb2-4gY-XNr-ZWQ-gZm-9yK-QoK",
+      "LS0-tIF-JFU-E9S-VCB-TQ1-JFR-U4g-LS0-tCi-AgU-2F2-ZWQ-gY2-hhc-mFj-dGV-ycy-B0a-Glz-IHN-jcm-Vlb-iBj-b3V-sZC-BzZ-WU6-IDY-KIC-BLb-mV3-IHd-oaW-NoI-GNo-YXJ-hY3-Rlc-iB3-YXM-gYm-Vpb-mcg-cGx-heW-VkO-iB5-ZXM-KIC-AiU-2Vu-ZCB-mdW-xsI-Gxv-ZyI-gcm-93I-G9m-ZmV-yZW-Q6I-Hll-cwo-KLS-0tI-ERF-Vkl-DRS-AvI-EJV-SUx-EIC-0tL-QpE-ZXZ-pY2-UKI-CBO-YW1-lOi-BpU-Ghv-bmU-KIC-BQb-GF0-Zm9-ybT-oga-W9z-IDI-2Lj-UuM-gog-IEh-lcm-1lc-zog-eWV-zCi-AgT-G9j-YWx-lOi-Blb-i1V-Uwo-gIF-Rpb-WV6-b25-lOi-BBb-WVy-aWN-hL0-5ld-19Z-b3J-rCi-AgU-2Ny-ZWV-uOi-B3a-W5k-b3c-gMz-c1w-5c2-Njc-gLy-BzY-3Jl-ZW4-gMz-c1w-5c2-Njc-gQC-Aye-CBk-ZW5-zaX-R5C-iAg-Q2F-wdH-VyZ-WQg-YXQ-6ID-IwM-jYt-MDk-tMT-lUM-jA6-MDY-6NT-cuM-zk0-Wgo-KSW-5zd-GFs-bAo-=",
+      "ICB-BcH-AgS-UQ6-IGN-vbS-5ob-3Rh-dHR-pY2-dhb-WVz-LnR-hcn-Rhc-nBy-aW0-KIC-BBc-HAg-dmV-yc2-lvb-jog-NC4-zMi-4xM-Qog-IEF-QSy-Bid-Wls-ZCB-2ZX-Jza-W9u-OiA-yLj-UuM-Aog-IEF-QSy-Bid-Wls-ZDo-gMj-A4C-iAg-QUF-COi-AoY-nVp-bGQ-gMj-A4K-Qog-IE9-UQT-ogK-DIw-MjY-tMD-ktM-TYt-MTg-yOS-10a-GUt-dG9-wLX-BsY-W5l-LXN-0b3-BzL-Wdv-aW5-nLW-JsY-WNr-KQo-gIE-Jvb-3Qg-c3R-hZ2-U6I-HF3-ZW4-6ZG-9uZ-QoK-TUw-gcn-Vud-Glt-ZSB-oZW-Fsd-GgK-ICB-TdG-F0d-XM6-IGF-jdG-l2Z-SAo-bm8-gY3-Jhc-2hl-cyB-kZX-RlY-3Rl-ZCk-KIC-BDc-mFz-aCB-jb3-Vud-Dog-MAo-gIE-xhc-3Qg-aW5-pdC-Bhd-HRl-bXB-0Oi-AyM-DI2-LTA-5LT-E5V-DIw-OjA-0Oj-MyL-jM0-Mlo-KIC-BMY-XN0-IGl-uaX-Qgc-3Vj-Y2V-zcz-ogM-jAy-Ni0-wOS-0xO-VQy-MDo-wND-ozM-y44-OTV-aCg-==",
+      "ICB-Dcm-Fza-GVz-LWJ-lZm-9yZ-S1k-aXN-hYm-xlI-HRo-cmV-zaG-9sZ-Dog-Mgo-gIF-F3Z-W4g-Y29-tcG-xld-Glv-biB-ndW-FyZ-Dog-Y2x-lYW-4gK-G5v-IGN-vbX-BsZ-XRp-b24-gY3-Jhc-2hl-cyk-KIC-BRd-2Vu-IGt-lcm-5lb-CB2-YXJ-pYW-50O-iAo-bm9-0IH-lld-CBs-b2F-kZW-Qgd-Ghp-cyB-pbn-N0Y-Wxs-KQo-gIF-F3Z-W4g-Q1B-VL1-NvQ-zog-KG5-vdC-B5Z-XQg-bG9-hZG-VkI-HRo-aXM-gaW-5zd-GFs-bCk-KIC-BWb-2lj-ZSA-oVF-RTK-SBn-dWF-yZD-ogY-2xl-YW4-gKG-5vI-HZv-aWN-lIG-NyY-XNo-ZXM-gb2-4gd-Ghp-cyB-idW-lsZ-CkK-U2F-2ZS-1sb-2Fk-IGh-lYW-x0a-Aog-IFN-0YX-R1c-zog-Y2x-lYW-4gK-G5v-IGx-vYW-QtY-3Jh-c2g-gZm-xhZ-3Mp-Ckx-hc3-QgS-lMg-Y3J-hc2-gKI-CBT-dGF-0dX-M6I-G5v-bmU-gcm-Vjb-3Jk-ZWQ-KVG-hpc-yBs-YXV-uY2-gK",
+      "ICB-MaW-ZlO-iBi-bXU-4dG-U2b-mdy-NCD-Cty-Bzd-GFy-dGV-kID-IwM-jYt-MDk-tMT-lUM-jA6-MDM-6MD-AuM-jY4-Wgo-gIE-Nvb-GQg-c3R-hcn-Qg4-oCU-IHR-oaX-MgY-m9v-dCB-kaW-Qgb-m90-IGZ-vbG-xvd-yBh-biB-PVE-EgY-XBw-bHk-KQ3-Jhc-2gg-bGV-kZ2-VyI-OKA-lCA-xIH-JlY-29y-ZGV-kIC-huZ-Xdl-c3Q-gbG-Fzd-CkK-ICD-igK-IgM-jAy-Ni0-wOS-0xO-VQy-MDo-wMj-o1N-S4y-MTV-aIC-g0b-SBh-Z28-pIO-KAl-CBQ-Uk9-DRV-NTI-EtJ-TEx-FRC-Dig-JQg-bm8-gSl-Mgc-mFu-CiA-gIC-AgI-GJ1-aWx-kID-QuM-zIu-MTE-gwr-cgM-jAy-Ni0-wOS-0xN-i0x-ODI-5LX-RoZ-S10-b3A-tcG-xhb-mUt-c3R-vcH-MtZ-29p-bmc-tYm-xhY-2sg-wrc-gc3-RhZ-2Ug-cmV-uZG-VyZ-WQK-ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiB-0YX-AgI-nRh-a2U-gLy-BzY-Wx2-YWd-lIg-o=",
+      "ICA-gIC-AgZ-G9p-bmc-6IH-Rhc-CAi-dGF-rZS-AvI-HNh-bHZ-hZ2-UiI-MK3-IHJ-vb2-0gb-3V0-cG9-zdF-9xd-WFy-dGV-ycy-DCt-yBz-Y3J-lZW-4gZ-Xhw-bG9-yYX-Rpb-24K-ICA-gIC-Agb-GFz-dCB-jaG-Vja-3Bv-aW5-0Oi-ByZ-W5k-ZXJ-lZC-DCt-yAz-MW1-zIG-lud-G8g-dGh-lIG-Fjd-Glv-biD-Cty-Bhb-Gl2-ZSA-3OD-dtc-yBh-ZnR-lci-Bpd-Aog-ICA-gIC-BsY-XVu-Y2g-6IG-RpZ-WQg-Mjc-wNz-Q0M-Ddt-cyB-pbn-RvI-HRo-ZSB-wcm-9jZ-XNz-IMK-3IG-5vd-CBh-biB-PVE-EtY-XBw-bHk-gYm-9vd-Aog-ICA-gIC-B0a-GUg-bmF-0aX-ZlI-FNE-SyB-zYX-cgT-k8g-Y3J-hc2-gga-W4g-dGh-hdC-Bsa-WZl-IOK-AlC-B0a-GUg-cHJ-vY2-Vzc-yBl-bmR-lZC-B3a-XRo-IG5-vIH-NpZ-25h-bDo-gdG-hlI-E9T-IHR-vb2-sga-XQg-KG9-1dC-1vZ-i1t-ZW1-vcn-kga-2ls-bCB-vci-ByZ-WNs-YWl-tKQ-o=",
+      "ICA-gIC-Aga-XRz-IG9-3bi-Btb-2Rl-bCB-sZW-RnZ-XIg-YXQ-gdG-hlI-Gxh-c3Q-gc3-Rhb-XA6-IG8-xL3-IxL-2ww-L3A-xL2-RuM-ApD-cmF-zaC-BkZ-Wxp-dmV-yeT-ogT-04g-4oC-UIH-Jlc-G9y-dHM-gZ2-8gd-G8g-U2V-udH-J5I-Hdo-ZW4-geW-91I-GNy-YXN-oLg-pSd-W50-aW1-lIH-ByZ-XNz-dXJ-lCi-Ag4-pqg-4pq-gIE-xBU-1Qg-Qk9-PVC-BES-UVE-IE1-JRC-1BQ-1RJ-T04-g4o-CUI-G5v-IG9-yZG-Vyb-Hkg-ZXh-pdC-B3Y-XMg-cmV-jb3-JkZ-WQu-CiA-gIC-AgT-GFz-dCB-0aG-luZ-yB0-aGU-gYX-BwI-GRp-ZDo-gdG-FwI-CJ0-YWt-lIC-8gc-2Fs-dmF-nZS-IKI-CAg-ICB-XaG-VyZ-Tog-b3V-0cG-9zd-F9x-dWF-ydG-Vyc-yBv-biB-leH-Bsb-3Jh-dGl-vbi-BzY-3Jl-ZW4-K",
+      "ICA-gIC-BMY-XN0-IHN-lZW-4gY-Wxp-dmU-6ID-IwM-jYt-MDk-tMT-lUM-jA6-MDI-6NT-QuN-DI4-WiA-oNC-Bta-W4g-YmV-mb3-JlI-HRo-aXM-gYm-9vd-CDi-gJQ-gdG-hlI-Gtp-bGw-gbG-FuZ-GVk-IHN-vbW-V3a-GVy-ZSB-pbi-B0a-GF0-IGd-hcC-kKI-CAg-ICB-MYX-N0I-GNo-ZWN-rcG-9pb-nQg-cmV-hY2-hlZ-Dog-cmV-uZG-VyZ-WQg-KCs-zMW-1zI-GFm-dGV-yIG-l0K-Qog-ICA-gIO-Kao-CBU-aGU-gZG-lza-yBs-b2c-ncy-B0Y-Wls-IGl-zIF-VOU-kVM-SUF-CTE-UgZ-m9y-IHR-oYX-Qgc-2Vz-c2l-vbi-Dig-JQg-YmF-0Y2-hlZ-CBs-aW5-lcw-ogI-CAg-ICA-gZG-llI-Glu-IG1-lbW-9ye-SB3-aGV-uIH-RoZ-SBK-UyB-0aH-JlY-WQg-d2V-kZ2-VzL-iBU-cnV-zdC-B0a-Glz-IGx-pbm-Ugb-3Zl-ciB-pdC-4KI-CDi-mqA-gTW-Vtb-3J5-IHd-hcm-5pb-mdz-OiA-2IH-Roa-XMg-c2V-zc2-lvb-go=",
+      "ICB-Gcm-Vle-mUg-d2F-0Y2-g6I-G5v-IHN-0YW-xsc-yBz-ZWV-uIC-hKU-yBj-bG9-ja3-Mgb-25s-eSD-igJ-Qgc-2Vl-IHR-oZS-BuY-XRp-dmU-gcX-Vld-WUg-YmV-sb3-cpC-iAg-4pq-gIE-5hd-Gl2-ZSB-xdW-V1Z-Tog-d29-yc3-Qgd-2Fp-dCA-yNS-4wc-yDC-tyA-xIG-pvY-iBr-aW5-kIH-F1Z-XVl-ZCA-+M3-Mgw-rcg-d29-yc3-QgM-jAu-NW1-zL3-Byb-21w-dC1-0b2-tlb-iDC-tyA-xIG-dlb-mVy-YXR-pb2-4gd-Ghy-b3d-uIG-F3Y-Xkg-KDI-1Lj-BzK-Qog-ICA-gIF-RoZ-SBK-UyB-0aH-JlY-WQg-d2F-zIG-hlY-Wx0-aHk-gYW-5kI-HRo-ZSB-uYX-Rpd-mUg-bW9-kZW-wgc-XVl-dWU-gd2-FzI-G5v-dC4-gQS-Bzd-GFs-bCB-0aG-UgZ-nJl-ZXp-lIH-dhd-GNo-IGF-ib3-ZlI-Glz-IHN-0cn-Vjd-HVy-YWx-seS-Bib-Glu-ZCB-0by-4K",
+      "ICD-imq-AgT-mF0-aXZ-lIH-F1Z-XVl-IGF-kbW-lzc-2lv-bjo-gNj-gga-m9i-cyD-Cty-B3b-3Jz-dCB-3YW-l0I-DI1-LjB-zIC-huY-XJy-YXR-pb2-46d-HJh-dmV-sKS-DCt-yAx-MCB-wYX-N0I-DNz-IMK-3ID-Egc-mVm-dXN-lZC-BiZ-WZv-cmU-gcH-JlZ-mls-bAo-gIE-Fwc-CBz-dGF-0ZS-B0c-mFp-bDo-gaW-5hY-3Rp-dmU-g4o-aSI-GJh-Y2t-ncm-91b-mQg-4oa-SIG-Fjd-Gl2-ZQp-Nb2-Rlb-CBj-b25-0ZX-h0c-wog-IEx-pdm-Ugb-m93-OiA-wCi-AgT-3Bl-bmV-kOi-AxI-MK3-IFJ-lbG-Vhc-2Vk-OiA-xIM-K3I-FBl-YWs-gbG-l2Z-Tog-MQo-gIE-5hc-nJh-dGl-vbi-Blb-mdp-bmU-6IH-JlY-WR5-Ck1-lbW-9ye-SB0-aW1-lbG-luZ-Qog-IOK-aoC-BoZ-WFw-ID0-gSE-VST-UVT-IEp-TIE-hFQ-VAs-IG5-vdC-Bwc-m9j-ZXN-zIG-1lb-W9y-eS4-gY3-R4I-OKJ-iCB-jb3-Vud-CDD-lyA-0Mj-VNQ-iBl-c3Q-uCg-==",
+      "ICB-IZW-FwO-iBm-aXJ-zdC-AxM-k1C-IMK-3IH-BlY-Wsg-Njh-NQi-DCt-yBs-YXN-0ID-YwT-UIg-wrc-gbm-V0I-Cs0-OE1-CIG-92Z-XIg-Mjg-gbW-Fya-3MK-ICA-gIC-ArM-C4w-cyB-3YX-Rja-C1z-dGF-ydC-Dig-JQg-aGV-hcC-AxM-k1C-IGd-jID-Btc-y8z-IMK-3IG-N0e-CAw-IMK-3IG-Fwc-D1h-Y3R-pdm-Ugw-rcg-bmF-0aX-ZlI-Glk-bGU-gcT-Agw-rcg-d2F-ybn-MgM-Aog-ICA-gIC-s1L-jBz-IGh-lYX-Atb-W92-ZSD-igJ-Qga-GVh-cCA-yME-1CI-Gdj-IDB-tcy-8xM-CDC-tyB-jdH-ggM-CDC-tyB-hcH-A9Y-WN0-aXZ-lIM-K3I-G5h-dGl-2ZS-B2b-2lj-ZSB-ydW-5ua-W5n-IHE-xIM-K3I-Hdh-cm5-zID-AKI-CAg-ICs-0NS-4xc-yBo-ZWF-wLW-1vd-mUg-4oC-UIG-hlY-XAg-Mjh-NQi-BnY-yAw-bXM-vNj-Agw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gaW-RsZ-SBx-MCD-Cty-B3Y-XJu-cyA-wCg-==",
+      "ICA-gIC-s1M-y40-cyB-hcH-Bzd-GF0-ZSB-bYW-N0a-XZl-4oa-SaW-5hY-3Rp-dmV-dIO-KAl-CBo-ZWF-wID-I4T-UIg-Z2M-gMG-1zL-zcw-IMK-3IG-N0e-CAw-IMK-3IG-Fwc-D1p-bmF-jdG-l2Z-SDC-tyB-uYX-Rpd-mUg-aWR-sZS-BxM-CDC-tyB-3YX-Juc-yAw-CiA-gIC-ArN-TQu-NnM-gYX-Bwc-3Rh-dGU-gW2-luY-WN0-aXZ-l4o-aSY-mFj-a2d-yb3-VuZ-F0g-4oC-UIG-hlY-XAg-MzJ-NQi-BnY-yAw-bXM-vNz-Igw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-JhY-2tn-cm9-1bm-Qgw-rcg-bmF-0aX-ZlI-Glk-bGU-gcT-Agw-rcg-d2F-ybn-MgM-Aog-ICA-gKz-kxL-jFz-IGF-wcH-N0Y-XRl-IFt-iYW-NrZ-3Jv-dW5-k4o-aSY-WN0-aXZ-lXS-Dig-JQg-aGV-hcC-AzM-k1C-IGd-jID-Btc-y83-NSD-Cty-Bjd-Hgg-MCD-Cty-Bhc-HA9-YWN-0aX-ZlI-MK3-IG5-hdG-l2Z-SBp-ZGx-lIH-EwI-MK3-IHd-hcm-5zI-DAK",
+      "ICA-gIC-s5M-y42-cyB-jdH-gtZ-XZl-bnQ-g4o-CUI-Ghl-YXA-gMz-JNQ-iBn-YyA-wbX-MvN-zgg-wrc-gY3-R4I-DEg-4om-IND-I1T-UIg-ZXN-0IM-K3I-GFw-cD1-hY3-Rpd-mUg-wrc-gbm-F0a-XZl-IGx-sbS-Byd-W5u-aW5-nIH-EwI-MK3-IHd-hcm-5zI-DAK-ICA-gIC-s5M-y42-cyB-3YX-Rja-C1z-dGF-ydC-Dig-JQg-aGV-hcC-AzM-k1C-IGd-jID-Btc-y83-OCD-Cty-Bjd-Hgg-MSD-iiY-g0M-jVN-QiB-lc3-Qgw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gaW-RsZ-SBx-MCD-Cty-B3Y-XJu-cyA-wCi-AgI-Csx-MTM-uN3-Mga-GVh-cC1-tb3-ZlI-OKA-lCB-oZW-FwI-DQw-TUI-gZ2-MgM-G1z-LzE-1OC-DCt-yBj-dHg-gMS-Dii-Yg0-MjV-NQi-Blc-3Qg-wrc-gYX-BwP-WFj-dGl-2ZS-DCt-yBu-YXR-pdm-Uga-W52-ZXN-0aW-dhd-GVf-bG9-yZS-Byd-W5u-aW5-nIH-EyI-MK3-IHd-hcm-5zI-DAK",
+      "ICA-gKz-ExN-i4w-cyB-nZW-4tc-2V0-dGx-lZC-Bba-W52-ZXN-0aW-dhd-GVf-bG9-yZS-Bva-10g-4oC-UIG-hlY-XAg-NDR-NQi-BnY-yAw-bXM-vMT-Y1I-MK3-IGN-0eC-AxI-OKJ-iDQ-yNU-1CI-GVz-dCD-Cty-Bhc-HA9-YWN-0aX-ZlI-MK3-IG5-hdG-l2Z-SBp-bnZ-lc3-RpZ-2F0-ZV9-sb3-JlI-HJ1-bm5-pbm-cgc-TMg-wrc-gd2-Fyb-nMg-MAo-gIC-ArM-TIz-Ljd-zIG-hlY-XAt-bW9-2ZS-Dig-JQg-aGV-hcC-A2M-E1C-IGd-jID-Btc-y8y-MTE-gwr-cgY-3R4-IDE-g4o-mIN-DI1-TUI-gZX-N0I-MK3-IGF-wcD-1hY-3Rp-dmU-gwr-cgb-mF0-aXZ-lIH-Zva-WNl-IHJ-1bm-5pb-mcg-cTU-gwr-cgd-2Fy-bnM-gMA-ogI-CAr-MTI-1Lj-lzI-G1l-bS1-3YX-Jua-W5n-IOK-AlC-BoZ-WFw-IDU-2TU-IgZ-2Mg-MG1-zLz-IxO-SDC-tyB-jdH-ggM-SDi-iYg-0Mj-VNQ-iBl-c3Q-gwr-cgY-XBw-PWF-jdG-l2Z-SDC-tyB-uYX-Rpd-mUg-dm9-pY2-Ugc-nVu-bml-uZy-BxN-CDC-tyB-3YX-Juc-yAx-Cg=-=",
+      "ICA-gKz-EyO-C4x-cyB-jdH-gtZ-XZl-bnQ-g4o-CUI-Ghl-YXA-gNT-ZNQ-iBn-YyA-wbX-MvM-jIy-IMK-3IG-N0e-CAw-IMK-3IG-Fwc-D1h-Y3R-pdm-Ugw-rcg-bmF-0aX-ZlI-HRl-YXJ-kb3-duI-HJ1-bm5-pbm-cgc-TQg-wrc-gd2-Fyb-nMg-MQo-gIC-ArM-TI4-LjF-zIG-1lb-S13-YXJ-uLX-Nld-HRs-ZWQ-gW2-ZyZ-WVk-LWN-0eF-0g4-oCU-IGh-lYX-AgN-TZN-QiB-nYy-Awb-XMv-MjI-zIM-K3I-GN0-eCA-wIM-K3I-GFw-cD1-hY3-Rpd-mUg-wrc-gbm-F0a-XZl-IHZ-vaW-NlI-HJ1-bm5-pbm-cgc-TMg-wrc-gd2-Fyb-nMg-MQo-gIC-ArM-TM1-LjR-zIG-1lb-S13-YXJ-uaW-5nI-OKA-lCB-oZW-FwI-DUy-TUI-gZ2-MgM-G1z-LzI-4Ni-DCt-yBj-dHg-gMC-DCt-yBh-cHA-9YW-N0a-XZl-IMK-3IG-5hd-Gl2-ZSB-2b2-ljZ-SBy-dW5-uaW-5nI-HEz-IMK-3IH-dhc-m5z-IDI-K",
+      "ICA-gKz-EzN-S40-cyB-tZW-0td-2Fy-bi1-zZX-R0b-GVk-IFt-mcm-VlZ-C1u-b3R-oaW-5nX-SDi-gJQ-gaG-Vhc-CA1-Mk1-CIG-djI-DBt-cy8-yOD-Ygw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gdm-9pY-2Ug-cnV-ubm-luZ-yBx-MyD-Cty-B3Y-XJu-cyA-yCi-AgI-Csx-MzU-uNH-Mgb-WVt-LXd-hcm-5pb-mcg-4oC-UIG-hlY-XAg-NDh-NQi-BnY-yAw-bXM-vMj-kxI-MK3-IGN-0eC-AwI-MK3-IGF-wcD-1hY-3Rp-dmU-gwr-cgb-mF0-aXZ-lIH-Zva-WNl-IHJ-1bm-5pb-mcg-cTM-gwr-cgd-2Fy-bnM-gMw-ogI-CAr-MTM-1Lj-RzI-G1l-bS1-3YX-JuL-XNl-dHR-sZW-QgW-2Zy-ZWV-kLW-5vd-Ghp-bmd-dIO-KAl-CBo-ZWF-wID-Q4T-UIg-Z2M-gMG-1zL-zI5-MSD-Cty-Bjd-Hgg-MCD-Cty-Bhc-HA9-YWN-0aX-ZlI-MK3-IG5-hdG-l2Z-SB2-b2l-jZS-Byd-W5u-aW5-nIH-EzI-MK3-IHd-hcm-5zI-DMK",
+      "ICA-gKz-EzN-i4x-cyB-tZW-0td-2Fy-bml-uZy-Dig-JQg-aGV-hcC-A0N-E1C-IGd-jID-Btc-y8z-MTE-gwr-cgY-3R4-IDA-gwr-cgY-XBw-PWF-jdG-l2Z-SDC-tyB-uYX-Rpd-mUg-dm9-pY2-Ugc-nVu-bml-uZy-BxM-yDC-tyB-3YX-Juc-yA0-CiA-gIC-sxM-zYu-MXM-gbW-VtL-Xdh-cm4-tc2-V0d-Gxl-ZCB-bZn-JlZ-WQt-bm9-0aG-luZ-10g-4oC-UIG-hlY-XAg-NDR-NQi-BnY-yAw-bXM-vMz-ExI-MK3-IGN-0eC-AwI-MK3-IGF-wcD-1hY-3Rp-dmU-gwr-cgb-mF0-aXZ-lIH-Zva-WNl-IHJ-1bm-5pb-mcg-cTM-gwr-cgd-2Fy-bnM-gNA-ogI-CAr-MTM-3Lj-lzI-Gdl-bi1-zZX-R0b-GVk-IFt-uYX-JyY-XRp-b24-6dH-Jhd-mVs-IHB-yZW-Vtc-HRd-IOK-AlC-BoZ-WFw-IDQ-0TU-IgZ-2Mg-MG1-zLz-M0N-CDC-tyB-jdH-ggM-CDC-tyB-hcH-A9Y-WN0-aXZ-lIM-K3I-G5h-dGl-2ZS-BuY-XJy-YXR-pb2-46d-HJh-dmV-sIH-J1b-m5p-bmc-gcT-Agw-rcg-d2F-ybn-MgN-Ao=",
+      "ICA-gKz-E1O-C44-cyB-oZW-FwL-W1v-dmU-g4o-CUI-Ghl-YXA-gNT-JNQ-iBn-YyA-xbX-MvN-DU2-IMK-3IG-N0e-CAw-IMK-3IG-Fwc-D1h-Y3R-pdm-Ugw-rcg-bmF-0aX-ZlI-Glk-bGU-gcT-Agw-rcg-d2F-ybn-MgN-Aog-ICA-rMT-Y4L-jlz-IGh-lYX-Atb-W92-ZSD-igJ-Qga-GVh-cCA-2ME-1CI-Gdj-IDF-tcy-80N-zIg-wrc-gY3-R4I-DAg-wrc-gYX-BwP-WFj-dGl-2ZS-DCt-yBu-YXR-pdm-Uga-WRs-ZSB-xMC-DCt-yB3-YXJ-ucy-A0C-iAg-ICs-xOD-MuO-XMg-aGV-hcC-1tb-3Zl-IOK-AlC-BoZ-WFw-IDY-4TU-IgZ-2Mg-MW1-zLz-Q4O-CDC-tyB-jdH-ggM-CDC-tyB-hcH-A9Y-WN0-aXZ-lIM-K3I-G5h-dGl-2ZS-BpZ-Gxl-IHE-wIM-K3I-Hdh-cm5-zID-QKI-CAg-KzE-4Ni-43c-yBt-ZW0-td2-Fyb-mlu-ZyD-igJ-Qga-GVh-cCA-2NE-1CI-Gdj-IDF-tcy-80O-Tcg-wrc-gY3-R4I-DAg-wrc-gYX-BwP-WFj-dGl-2ZS-DCt-yBu-YXR-pdm-Uga-WRs-ZSB-xMC-DCt-yB3-YXJ-ucy-A1C-g==",
+      "ICA-gKz-E4N-i43-cyB-tZW-0td-2Fy-bi1-zZX-R0b-GVk-IFt-mcm-VlZ-C1u-b3R-oaW-5nX-SDi-gJQ-gaG-Vhc-CA2-NE1-CIG-djI-DFt-cy8-0OT-cgw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gaW-RsZ-SBx-MCD-Cty-B3Y-XJu-cyA-1Ci-AgI-Csx-ODY-uOH-Mgb-WVt-LXd-hcm-5pb-mcg-4oC-UIG-hlY-XAg-NjB-NQi-BnY-yAx-bXM-vNT-AxI-MK3-IGN-0eC-AwI-MK3-IGF-wcD-1hY-3Rp-dmU-gwr-cgb-mF0-aXZ-lIG-lkb-GUg-cTA-gwr-cgd-2Fy-bnM-gNg-ogI-CAr-MTg-2Lj-hzI-G1l-bS1-3YX-JuL-XNl-dHR-sZW-QgW-2Zy-ZWV-kLW-5vd-Ghp-bmd-dIO-KAl-CBo-ZWF-wID-YwT-UIg-Z2M-gMW-1zL-zUw-MSD-Cty-Bjd-Hgg-MCD-Cty-Bhc-HA9-YWN-0aX-ZlI-MK3-IG5-hdG-l2Z-SBp-ZGx-lIH-EwI-MK3-IHd-hcm-5zI-DYK-TmF-0aX-ZlI-G1l-bW9-yeS-Bmb-Gln-aHQ-gcm-Vjb-3Jk-ZXI-gKE-J1a-Wxk-IDE-5MC-kK",
+      "ICD-imq-AgZ-m9v-dHB-yaW-50I-D0g-dGF-za1-92b-V9p-bmZ-vLn-Boe-XNf-Zm9-vdH-Bya-W50-ICh-0aG-Ugb-nVt-YmV-yIE-pld-HNh-bSB-qdW-RnZ-XMp-Lgo-gIC-AgT-k9U-IGE-gaG-Vhc-C4g-YXZ-haW-xhY-mxl-ID0-gb3-Nfc-HJv-Y19-hdm-Fpb-GFi-bGV-fbW-Vtb-3J5-KCk-sIG-FuI-E9T-IGF-kdm-lzb-3J5-IOK-AlA-ogI-CAg-Tk9-UIH-RoZ-SBl-eGF-jdC-BKZ-XRz-YW0-gdG-hyZ-XNo-b2x-kLi-BCY-W5k-cyB-iZW-xvd-yBh-cmU-gZG-lhZ-25v-c3R-pYy-Boe-XBv-dGh-lc2-VzL-Aog-ICA-gbm-90I-GVz-dGF-ibG-lza-GVk-IHV-uaX-Zlc-nNh-bCB-pUG-hvb-mUg-ZGF-uZ2-VyI-HRo-cmV-zaG-9sZ-HMu-CiA-gRm-9vd-HBy-aW5-0Oi-BiY-XNl-bGl-uZS-A5N-TFN-QiD-Cty-BwZ-WFr-IDE-5MD-NNQ-iDC-tyB-sYX-N0I-DE2-MjZ-NQi-DCt-yBo-aWd-oIH-dhd-GVy-IDE-5MD-NNQ-iAg-W1N-FVk-VSR-V0K",
+      "ICB-TaG-FwZ-Tog-UkF-UQ0-hFV-CDi-gJQ-gcm-V0Y-Wlu-ZWQ-gKz-Y3N-U1C-IHZ-zIG-Jhc-2Vs-aW5-lIM-K3I-HJl-Y29-2ZX-J5I-DI5-JSD-Cty-ByY-XRj-aGV-0ID-cgc-3Rl-cCh-zKS-ArO-Tcy-TUI-KIC-BPU-yBz-YWl-kIG-F2Y-Wls-YWJ-sZT-ogb-Wlu-IDE-5NU-1CC-iAg-4pq-gID-Egc-2Ft-cGx-lKH-MpI-HRh-a2V-uIH-doa-Wxl-IEp-TIG-hhZ-CBn-b25-lIH-F1a-WV0-IOK-AlC-BuY-XRp-dmU-ga2-Vwd-CBz-YW1-wbG-luZ-yB0-aHJ-vdW-doI-GEg-SlM-gc3-Rhb-Gwu-IFR-oYX-Qgc-nVu-IEl-TIH-RoZ-SBz-dGF-sbC-wgc-2Vl-biB-mcm-9tI-G91-dHN-pZG-UuC-iAg-U2F-tcG-xlc-jog-c2F-tcG-xlc-yA1-MDQ-gwr-cgZ-XZp-Y3R-lZC-AwI-MK3-IGV-2ZW-50c-yA0-MTM-gwr-cgd-2Fy-bml-uZ3-MgN-iDC-tyB-idX-Jzd-HMg-OCs-4ZX-h0I-MK3-IGN-hZG-VuY-2Ug-MTA-wMG-1zC-g=="
+    ],
+    "chunkChars": 7433,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-16-1829-the-top-plane-stops-going-black #mu8tj9o75sia [inline 1/19]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mu8tj9o75sia"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-16-1829-the-top-plane-stops-going-black"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "19"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-16-1829-the-top-plane-stops-going-black"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-19T20:06:58.202214Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-19T20:06:57.505000Z",
+  "fingerprints": [
+    "b676e1a9879895686c4e49396f863ec8"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1976401019,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-16T21:01:09.678037Z",
+    "dateReleased": "2026-09-16T21:06:22.644876Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "e69d0448a21ee242526d4c0b5252d70772511bda",
+      "message": "OTA-1829 \u2014 the top plane stops going black\n\nThe owner gave a repro a device can reproduce: the exploration row where\nSTORE sits beside FUSE CRUCIBLE, and the three-button STORE / TALK / GIFT\nrow \u2014 \"when you hit the store button the top of it disappears.\"\n\nHe is right, and OTA-1828 walked straight past it. That pass censused\nBORDER PAIRS and pronounced 154 ctl controls correct. Every one of those\nclaims was true and none was sufficient, because the visible top edge of a\nplaned control is not its border \u2014 it is controlPlaneTop, a 2dp absolutely\npositioned band of controlFaceLit. The defect lived one layer above where\nthe census was looking.\n\nTHE MECHANISM. Pressed, controlPlaneTopPressed painted that band with\ncontrolSidewall, a two-thirds-opaque black, over a face that is already\nnear-black. It composites to the face, so the top piece does not darken,\nit VANISHES. That is ~250 planed controls across 54 files \u2014 every screen\nin the game, not one screen.\n\nAND IT IS WHY THE CHARACTER SCREEN WAS THE AUTHORITY. The dossier wears no\nplanes at all; it inverts border colours only, so its top edge is always\ndrawn. The authority never had the defect and everything else always had\nit. No per-screen patching would have found that, because it was never\nper-screen.\n\nTHE REPAIR IS ONE SHARED STYLE. The light MOVES instead of switching off:\nthe pressed top band drops to controlLit \u2014 an existing token, 0.20 against\nthe resting 0.38 \u2014 while the pressed bottom band takes the full\ncontrolFaceLit. Every geometry cue Phase 2 bought survives: the band still\ngrows 2dp to 3dp, the sidewall still collapses, the contact band is still\nnot drawn, the control still travels 3dp. Nothing minted, no idle\nappearance moved, and the only difference is DURING a press.\n\nTwo Phase-2 pins asserted the old spelling and are AMENDED, not deleted:\neach pinned \"the pressed top band is that exact black\", which is the half\nthat was the defect. Their load-bearing claims \u2014 the light moves to the\nlower edge, the side loses height \u2014 are unchanged and one is now asserted\nmore strictly than before.\n\n22/22 gates, typecheck:ci clean, lint clean, test typecheck 180 (no\nchange), 185 suites / 2773 tests green. Negative control: restoring the\nblack band turns exactly the three repair pins red and leaves all eight\nguard-rails green; restored with md5 match.\n\nThat the pressed band READS on a real panel is the owner's eye on\nhardware; this suite reads construction, not pixels.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-16T20:54:25Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-16-1829-the-top-plane-stops-going-black",
+          "shortVersion": "tartaria@4.32.11+2026-09-16-1829-the-top-plane-stops-going-black",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-16T21:06:22.644876Z",
+          "dateCreated": "2026-09-16T21:01:09.678037Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "159209898",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-16T21:06:22.935109Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-16-1829-the-top-plane-stops-going-black",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-16-1829-the-top-plane-stops-going-black",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-16-1829-the-top-plane-stops-going-black",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-16-1829-the-top-plane-stops-going-black)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f579a2e2fdea4b2a8a6e17608e3e38d8"
+}
