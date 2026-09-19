@@ -30879,7 +30879,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1840-the-house-keeps-its-key';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1843-who-the-fallen-was';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1844-the-last-walk';
-export const OTA_BUILD_ID = '2026-09-18-1845-the-ledger-of-the-fallen';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-18-1845-the-ledger-of-the-fallen';
+// OTA-1846 — UI DEBT CLEANUP. Three items, and the audit disagreed with two of
+// the three premises. (A) MOVEMENT: the four cardinals and the contextual door
+// were five equal chips in ONE WRAPPING ROW, so the compass split across lines
+// at every supported width — measured from the shipped geometry, 3+2 at 375 and
+// 390, 4+1 at 430, which is the owner's own screenshot. The compass now owns a
+// `nowrap` row of its own with the door on a row beneath it, and the cardinal
+// floor drops 92 → 80 because four chips at 92 plus gaps need 386pt of a 359pt
+// row on the narrowest supported device. Movement callbacks, direction
+// semantics, movement cost, encounter logic, the sender-introduction countdown
+// and tile/entrance/exit authority are untouched. (B) REINFORCE: already built.
+// OTA-1736 shipped equipped-first sorting, durable instance-id identity and an
+// `EQUIPPED (slot)` line; the defect was SALIENCE, so the existing state is
+// promoted to a compact badge on the NAME LINE and nothing else moved — the
+// same authority call, hoisted one scope. (C) SETTINGS ▸ SESSION: the audit
+// found NOTHING TO REMOVE. All four controls trace to live consumers, OTA-1666
+// had already pruned this drawer, and the erase still stamps both report-dedupe
+// marks. One cosmetic change by owner ruling: ADVANCED → DIAGNOSTIC TOOLS.
+export const OTA_BUILD_ID = '2026-09-18-1846-the-compass-is-one-object';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1823-build-the-microscope-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1822-the-keys-read-as-keys';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-14-1821-the-words-say-which-is-running';

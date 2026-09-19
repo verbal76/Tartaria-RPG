@@ -764,10 +764,23 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const lookBlocked = (submit: string): boolean =>
     tutLock && !(tutInstructed === 'look' && submit === 'look');
 
+  /** ⚠⚠ OTA-1846 — WHICH BRANCH OF THE TRAVEL ROW RENDERS THE COMPASS. Exactly
+   *  the two that draw NORTH/SOUTH/EAST/WEST — the tile-with-a-structure branch
+   *  and the open-wilds branch. It is written as the negation of the three
+   *  branches ABOVE them in the same ternary chain rather than as a second
+   *  opinion about the world, so the box model can never disagree with what is
+   *  actually being drawn. Room chips, a plotted course and hub exits keep the
+   *  original wrapping row untouched.
+   *
+   *  ⚠ THE TUTORIAL TARGET STILL COVERS THE WHOLE TRAVEL REGION. A beat that
+   *  highlights "travel-row" highlights the compass AND the door beneath it;
+   *  only the box model under that one target changed. */
+  const cardinalBranch = !activeBuildingId && !(travelTargetName && !hubRoom) && !hubRoom;
+
   return (
     <View style={styles.container}>
       {!inCombat && (
-        <TutorialTarget area="travel-row" style={styles.travelRow}>
+        <TutorialTarget area="travel-row" style={cardinalBranch ? styles.travelStack : styles.travelRow}>
           {activeBuildingId ? (
             // Inside a building: the room buttons + EXIT (no MAP).
             // ⚠ OTA-1430 — the cap was 4, from when four rooms was the biggest
@@ -832,10 +845,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   inside" never dangles without a button (the arb120 case): you can
                   step in, then resume the course. */}
               {sceneBuilding ? (
-                <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
+                <TravelBtn label="🚪 ENTER" a11yLabel="Enter, step inside" onPress={() => enterBuilding(sceneBuilding)} />
               ) : null}
               {onHubTileOutside ? (
-                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+                <TravelBtn label="🚪 ENTER OUTPOST" a11yLabel="Enter outpost" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
               ) : null}
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} destination spent={noStamina} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
@@ -871,24 +884,40 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // row that can walk the player out of the tutorial unblocked. Outside
             // the outpost `tutLock` is false and this costs nothing.
             <>
-              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
-              {onHubTileOutside ? (
-                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
-              ) : null}
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />
+              <View style={styles.cardinalRow}>
+                <TravelBtn cardinal label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />
+              </View>
+              {/* ⚠ OTA-1846 — the contextual door, on its own row and wearing the
+                  same 🚪 EXIT has carried since OTA-1454. One glyph for every way
+                  through a wall, in or out, so the player reads "door" before
+                  they read the word. */}
+              <View style={styles.contextRow}>
+                <TravelBtn label="🚪 ENTER" a11yLabel="Enter, step inside" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
+                {onHubTileOutside ? (
+                  <TravelBtn label="🚪 ENTER OUTPOST" a11yLabel="Enter outpost" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+                ) : null}
+              </View>
             </>
           ) : (
             <>
+              <View style={styles.cardinalRow}>
+                <TravelBtn cardinal label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
+                <TravelBtn cardinal label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />
+              </View>
+              {/* ⚠ OTA-1846 — NO CONTEXTUAL ROW WHEN THERE IS NO DOOR. Open wild
+                  ground renders the compass and nothing beneath it, rather than
+                  an empty container holding a line of space. */}
               {onHubTileOutside ? (
-                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+                <View style={styles.contextRow}>
+                  <TravelBtn label="🚪 ENTER OUTPOST" a11yLabel="Enter outpost" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+                </View>
               ) : null}
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />            </>
+            </>
           )}
         </TutorialTarget>
       )}
@@ -2003,8 +2032,19 @@ const DIR_ARROW: Record<'north' | 'south' | 'east' | 'west', string> = {
  *  like its neighbours: the 🚪 the map already uses for the same rooms
  *  (OTA-1451), plus its own border so the row reads as "doors… and the way
  *  out." One glyph, two surfaces, same meaning. */
-function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut, a11yLabel, testID }: {
+function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut, a11yLabel, testID, cardinal }: {
   label: string; onPress: () => void; blocked?: boolean; active?: boolean;
+  /** ⚠⚠⚠ OTA-1846 — A CARDINAL CHIP IS NARROWER, AND THE NUMBER IS MEASURED.
+   *  ExplorationScreen's `container` is `padding: 8` and this row inherits no
+   *  other horizontal inset, so the narrowest device in DEVICE_PROFILES
+   *  (iPhone SE 3 / iPhone 8, 375pt) gives the row 359pt. Four
+   *  chips at the general `minWidth: 92` need 4x92 + 3x6 = 386pt, so the four
+   *  cardinals could NOT share a row on the supported minimum even with the
+   *  contextual control taken out of it. At 80 they need 4x80 + 3x6 = 338pt and
+   *  fit with room to spare, then flex up to ~85pt each on that device and
+   *  wider everywhere else. `flexBasis: 0` is what makes the four share evenly
+   *  instead of each claiming 22% and rounding the last one out. */
+  cardinal?: boolean;
   /** ⚠⚠⚠ OTA-1458 — EMPTY LEGS, SHOWN BEFORE THE TAP RATHER THAN AFTER.
    *  Owner's device log: fifteen-plus refused travel taps in one session, twice
    *  on the EXIT button, each one reading "You have no stamina left" AFTER the
@@ -2084,7 +2124,7 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
        tap still speaks and costs nothing. */
     <Pressable
       testID={testID}
-      style={({ pressed }) => [tartariaKitStyles.ctl, styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && tartariaKitStyles.ctlOn,
+      style={({ pressed }) => [tartariaKitStyles.ctl, styles.travelBtn, cardinal && styles.travelBtnCardinal, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && tartariaKitStyles.ctlOn,
         // ⚠ LAST, so the semantic rim above still colours the left and right
         // edges and the depth rides on top of it. See tControlDepth.
         tControlDepth(pressed)]}
@@ -2180,6 +2220,26 @@ const styles = StyleSheet.create({
   // read"). The row now wraps onto a second line once buttons would drop
   // under ~92pt, and the shrink floor is raised so text stays legible.
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' },
+  /* ⚠⚠⚠ OTA-1846 — THE CARDINALS ARE ONE ROW, AND THE CONTEXTUAL DOOR IS NOT IN
+   * IT. Before this, ENTER / ENTER OUTPOST were emitted as SIBLINGS of the four
+   * cardinals inside the single wrapping `travelRow`, so a fifth chip did not
+   * "push WEST" by accident — it was simply the first of five equal chips in a
+   * row that wraps, and the wrap fell wherever the device's width put it.
+   *
+   * ⚠⚠ MEASURED, PER DEVICE, from the shipped `travelBtn` geometry (flexBasis
+   * 22%, minWidth 92, gap 6) against ExplorationScreen's `container: padding 8`:
+   *   375pt (iPhone SE 3 / 8)   → 359pt of row → 3 chips per line
+   *   390pt (iPhone 14)         → 374pt        → 3 chips per line
+   *   430pt (15 Pro Max)        → 414pt        → 4 chips per line
+   * So on the owner's phone the compass broke as ENTER · NORTH · SOUTH · EAST
+   * with WEST stranded beneath, and on the small phones as three-and-two. Every
+   * supported width split the compass somewhere; only the seam moved.
+   *
+   * The compass is one object and now lays out as one: its own row, `nowrap`,
+   * with the door on a row beneath it. */
+  travelStack: { flexDirection: 'column', gap: 6, marginBottom: 6 },
+  cardinalRow: { flexDirection: 'row', gap: 6, flexWrap: 'nowrap' },
+  contextRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   // ⚠ GEOMETRY ONLY — `tartariaKitStyles.ctl` owns the face, rim, radius and
   // directional pair, so the row's boxes are the exact size they shipped at.
   travelBtn: {
@@ -2189,6 +2249,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
+  // ⚠ OTA-1846 — see the note on TravelBtn's `cardinal` prop for the arithmetic.
+  travelBtnCardinal: { flexBasis: 0, minWidth: 80 },
   // letterSpacing kept low (1) so longer room names ("GRAND HALL",
   // "LIVING ROOM") fit the equal-width slots without shrinking/ellipsizing
   // as hard. Short labels (NORTH / EXIT) still read fine with it.

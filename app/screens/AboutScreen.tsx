@@ -1260,7 +1260,32 @@ export function AboutScreen() {
               DESTRUCTIVE ERASE, neither of which is an export, so the old label
               was wrong about two of its four buttons. What lives here now is
               the honest definition: the tools a DIAGNOSIS needs and ordinary
-              play never does — collapsed by default so they cost nothing. */}
+              play never does — collapsed by default so they cost nothing.
+
+              ⚠⚠⚠ OTA-1846 — "ADVANCED" BECAME "DIAGNOSTIC TOOLS", AND THE AUDIT
+              THAT RENAMED IT FOUND NOTHING TO DELETE. The drawer was re-opened
+              on the suspicion that it was pre-Sentry baggage, and every one of
+              the four survivors traced to a live consumer instead:
+
+                COPY LOG     → flushLogWrites → readFullLog → stampLogExport,
+                               and the ONLY log path that needs neither the
+                               network nor reporting to be switched on.
+                COPY SAVE    → stampSaveExport(buildSaveSnapshot(…)), the
+                               documented partner of the button below it.
+                IMPORT SAVE  → gameStore.importSaveFromText, cross-install
+                               character transfer.
+                ERASE LOG    → clearGameLog + clearActiveSlotLog AND it stamps
+                               BOTH OTA-1665/1672 report-dedupe marks, because
+                               OTA-1666 found that erasing a log was otherwise a
+                               one-tap bypass of the duplicate-report gate.
+
+              So the classification is C — developer/diagnostic — for all four,
+              D and E for none, and OTA-1666 had already done the pruning this
+              audit went looking for. The word ADVANCED was the only thing left
+              that lied: it reads as "settings for expert players" when what is
+              behind it is a diagnosis kit. ⚠ THE LABEL IS THE WHOLE CHANGE —
+              no handler, no persisted value, no dedupe mark, no Sentry path and
+              no log/save semantics were touched by this OTA. */}
           <Pressable
             style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 14 },
               tControlDepth(pressed)]}
@@ -1269,7 +1294,7 @@ export function AboutScreen() {
             accessibilityState={{ expanded: advancedOpen }}
           >
             <Text style={styles.sessionBtnSecondaryText}>
-              {advancedOpen ? '▾ ADVANCED' : '▸ ADVANCED'}
+              {advancedOpen ? '▾ DIAGNOSTIC TOOLS' : '▸ DIAGNOSTIC TOOLS'}
             </Text>
           </Pressable>
           {advancedOpen && (

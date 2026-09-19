@@ -1176,6 +1176,23 @@ export function VendorScreen() {
                   const maxed = quote.refusal !== null;
                   const short = maxed ? [] : missingIngredientsList(quote.materials, player.inventory);
                   const cannotPay = !maxed && (player.tc < quote.tc || short.length > 0);
+                  /* ⚠⚠⚠ OTA-1846 — THE MARKER WAS ALREADY TRUE; IT WAS JUST TOO
+                   * SMALL TO FIND. The audit went looking for a missing feature
+                   * and found a working one: OTA-1736 already sorts equipped
+                   * gear first, already resolves "which copy" through
+                   * `equippedInstanceIds` / `equippedWhereLabel` — the DURABLE
+                   * INSTANCE ID, never the display name, with OTA-1550's guard
+                   * that a slot holding an id may never be re-matched by name —
+                   * and already prints `EQUIPPED (main hand)`. But it prints it
+                   * at fontSize 10 on the THIRD line of a row whose name is 14,
+                   * inside a section that is collapsed by default. Two identical
+                   * Bone Crossbows are distinguishable today only by a player who
+                   * reads the small print of both.
+                   *
+                   * ⚠ SO NOTHING ABOUT IDENTITY OR ORDER MOVED HERE. The same
+                   * call, hoisted one scope so the NAME LINE can carry a badge,
+                   * and the slot detail stays exactly where it was underneath. */
+                  const equippedWhere = equippedWhereLabel(player, item);
                   return (
                     <View key={`reinforce_${item.id}`} style={tRowStyle()}>
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(item.rarity) }]} />
@@ -1205,6 +1222,12 @@ export function VendorScreen() {
                             authorities, keyed on the instance id, never the name. */}
                         <View style={styles.offerHead}>
                           <Text style={styles.offerName} numberOfLines={2}>{instanceDisplayName(item)}</Text>
+                          {/* ⚠ Text first, badge second: §7's rule is that text
+                              clarity wins, so this is the WORD with a frame round
+                              it rather than an icon a player has to learn. */}
+                          {equippedWhere ? (
+                            <Text style={styles.offerEquippedBadge}>EQUIPPED</Text>
+                          ) : null}
                           <Text style={[styles.offerPrice, maxed ? styles.offerPriceKnown : (cannotPay && styles.offerPriceBroke)]}>
                             {maxed ? `\u2713 +${quote.level} MAX` : `${quote.tc} TC`}
                           </Text>
@@ -1212,7 +1235,7 @@ export function VendorScreen() {
                         {(() => {
                           const w = resolveDisplayWeapon(item);
                           const lvl = reinforceLevel(item);
-                          const where = equippedWhereLabel(player, item);
+                          const where = equippedWhere;
                           const held = holdLabelFor(item);
                           const traits = getItemPreviewForInstance(item).stats
                             .filter((line) => /^(AC \+|[A-Z]{3} \+|Resists:|Special:|Scales with)/.test(line));
@@ -1931,6 +1954,22 @@ const styles = StyleSheet.create({
   // arb-fix — right-hand stack: "×N in stock" over "you have N".
   offerCounts: { alignItems: 'flex-end', gap: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
+  /* ⚠ OTA-1846 — the same green `offerOwned` has carried since OTA-1736, framed
+   * so it reads as a STAMP on the name rather than one more line of detail.
+   * `flexShrink: 0` keeps it whole when a long instance name takes both lines. */
+  offerEquippedBadge: {
+    color: '#9ec96a',
+    fontSize: 9,
+    letterSpacing: 1,
+    fontWeight: '700',
+    borderWidth: 1,
+    borderColor: '#4d6b3f',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    marginRight: 8,
+    flexShrink: 0,
+  },
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },

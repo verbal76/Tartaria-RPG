@@ -264,8 +264,15 @@ describe('OTA-1666 — ⚠⚠ the screen stopped describing things that do not e
   it('⚠ the drawer is not called EXPORTS any more, because half of it is not one', () => {
     // It holds an IMPORT and a destructive ERASE. The old label was wrong about
     // two of its buttons.
+    //
+    // ⚠ RETARGETED BY OTA-1846, NOT WEAKENED. This OTA's audit found the drawer
+    // still honestly named nothing: ADVANCED says what the controls are NOT for
+    // rather than what they ARE, which is why a player could not tell whether
+    // opening it would change how the game plays. The label is now
+    // DIAGNOSTIC TOOLS, so the pin follows the control to its new name — both
+    // halves still hold, and the old EXPORTS claim is still refused.
     expect(ABOUT_CODE).not.toContain('ADVANCED EXPORTS');
-    expect(ABOUT_CODE).toContain("'▾ ADVANCED' : '▸ ADVANCED'");
+    expect(ABOUT_CODE).toContain("'▾ DIAGNOSTIC TOOLS' : '▸ DIAGNOSTIC TOOLS'");
   });
 });
 
