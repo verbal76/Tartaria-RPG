@@ -1,0 +1,328 @@
+{
+  "id": "3b4c9fd52b5f47c1a20b4d9baaebe889",
+  "groupID": "7743129785",
+  "eventID": "3b4c9fd52b5f47c1a20b4d9baaebe889",
+  "projectID": "4511945117532160",
+  "size": 4986,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-19-1850-gems-belong-to-the-character",
+  "message": "player-log-beacon 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq",
+  "title": "player-log-beacon 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq",
+  "location": null,
+  "user": {
+    "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Stoneham",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-19T23:54:03.417Z",
+      "app_identifier": "com.hotatticgames.tartarprim.golem",
+      "app_name": "Golem",
+      "app_version": "2.5.0",
+      "app_build": "474",
+      "in_foreground": true,
+      "is_split_apks": false,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 14.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": true,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1837158400,
+      "storage_size": 245292421120,
+      "free_storage": 58260566016,
+      "boot_time": "2026-08-28T17:18:44.580Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "28.700000762939453",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "golem-line",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 30,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0ba27-24f7-7cc3-a738-c1afc27e0f7f"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c7ce6e523cce4ed6970a45fa96165bba",
+      "span_id": "9d331cb04712fb3f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mu91nvxz49wq"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-19-1850-gems-belong-to-the-character"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "parts",
+      "value": "7"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character"
+    },
+    {
+      "key": "user",
+      "value": "id:9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "query": "user.id:\"9a8a8c0079ee4e8eba37ffa9f098cee1\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-19T23:54:29.118582Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-19T23:54:29.908000Z",
+  "fingerprints": [
+    "3601411ce9104204c9e4540f6e527c71"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1981558143,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-19T14:52:06.957784Z",
+    "dateReleased": "2026-09-19T15:15:09.270885Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "fd66f4335755bf3274bb6e4eab4ddc7b315aa395",
+      "message": "OTA-1850 \u2014 a Resurrection Gem belongs to the Tartarian who earned it\n\nTHE PRODUCT RULING. Gems were install-wide, which let a player farm them on\ncharacters they did not care about and spend them on the one they did. They are\nnow character-bound: earned BY someone, spendable only BY them. Deleting a\ncharacter does not release their gems, switching characters switches the\nbalance, and there is no pool, no transfer and no gifting. Reward amounts, the\none-gem cost, drop rates, boss eligibility and vendor behaviour are all\nunchanged \u2014 this moves ownership, not economy.\n\nTHE DURABILITY REPAIR, WHICH IS THE SAME CHANGE. Three reproduced crash bugs\nshared one shape: two durable stores, one commit ordering, no idempotency\nmarker. The balance lived in the global stash while the thing it paid for \u2014 the\nrevival, the \"already paid\" keepsake mark \u2014 lived in the character's own slot\nkey, and AsyncStorage has no cross-key transaction. Moving the balance onto the\ncharacter deletes the second store, so:\n\n  \u00b7 the gem spend and the revival are one write to one record. Neither\n    \"charged and still dead\" nor \"alive and never charged\" is a state the\n    storage can hold, so NO boot reconciliation machinery is added \u2014 there is\n    nothing left to reconcile.\n  \u00b7 the boss keepsake's gem and its onceLootPaid mark land in the same store\n    update and the same persist(). Hazard C closes by shape.\n  \u00b7 the dev-name death grant rides inside the death write instead of racing\n    the persist() of the very record it was crediting.\n\nWhat still needs a mechanism is concurrency on ONE record, and that is\nmutateSlot \u2014 deliberately the same shape as OTA-1835's mutateGlobalStash: one\nserialized queue per slot, load \u2192 mutate \u2192 save, sentinel for no-write.\n\nA DEATH NOW HAS ITS OWN IDENTITY. newDeathId() is minted at the death site and\npersisted with the character, so a resurrection retry after a crash is free\nwhile a LATER death costs again. The previously proposed\n`slotId|characterSeed|floor(hoursElapsed)` was dropped on evidence: two genuine\ndeaths inside one floored game hour collide, which would have made the second\nresurrection free.\n\nTHE LEGACY HANDOVER, AND WHAT IT HONESTLY IS. The old shared pool is divided\nonce across surviving characters in proportion to their DURABLE IN-WORLD GAME\nHOURS (hoursElapsed), by largest remainder, with a stable lexical slotId\ntie-break and exact conservation. This is a best-effort HEURISTIC, not\nprovenance \u2014 nothing in the old data records who earned a gem \u2014 and two\nbetter-sounding rules were rejected on evidence: Fallen death counts are\nunattributable (FallenHero carries no character identity and the list is capped\nat 25) and savedAt\u2212createdAt measures wall-clock elapsed, not play. It is game\ntime, not wall-clock playtime, and a brand-new character reads zero.\n\nThe plan is computed ONCE and then obeyed: the input snapshot is persisted\nbeside the result (original total, total hours, per-slot hours and allocation,\nand whether the weighted rule or the active-character fallback applied), so a\nrestart replays the same rows rather than recomputing against hours that have\nsince moved. More play, a different active character, or a reordered index all\nread the same answer. The handover runs at boot, before the roster is drawn, so\neach record's own count is true on screen. With no characters yet the pool is\nHELD rather than split \u2014 that is the fresh-install seed, one free gem per\ninstall, claimed by the first character created.\n\nTHE COUNT MOVED TO THE DOSSIER. The title screen's global gem chit is gone and\nnothing replaces it: there is no install-wide figure left for it to show. The\nnumber reads on the character's own record, in the dossier's existing meta\nvoice, and the resurrect/fallen decision and its confirm copy ask that\ncharacter's balance rather than a shared total.\n\nTests: new permanent suite ota1850GemsBelongToTheCharacter (50) covering the\nfarming case, one-write spend/revive, retry-vs-later-death, per-record\nconcurrency, the allocation arithmetic, the one-time handover, the install seed\nand the retired install-wide paths. Four neighbouring suites were re-pointed at\nthe new architecture with their claims strengthened, not weakened: OTA-1394 now\nrequires that no spend ordering can exist rather than that a particular order is\nchosen; OTA-1830 \u00a75.5 requires the keepsake gem and its paid-mark to share one\nsynchronous update instead of requiring a .then to sit on; OTA-1833 \u00a72.1 follows\nthe gem authority to gemsAfterGrant; OTA-1835's stash-field list grows by\nlegacyGemMigration on the same reasoning OTA-1844 and OTA-1845 used.\n\nSix negative controls, each restored byte-identical. One of them (NC-C, first\nattempt) did NOT bite and that was a fault in the control rather than the code:\ndropping the LAST leftover is a no-op because the remainder is always strictly\nsmaller than the row count. Re-run as a genuine off-by-one it turned E1 and E3\nred.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-19T14:43:28Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+          "shortVersion": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-19T15:15:09.270885Z",
+          "dateCreated": "2026-09-19T14:52:06.957784Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160041960",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-19T15:15:09.511093Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-19-1850-gems-belong-to-the-character",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-19-1850-gems-belong-to-the-character)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

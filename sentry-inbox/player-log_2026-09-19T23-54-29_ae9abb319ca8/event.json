@@ -1,0 +1,357 @@
+{
+  "id": "ae9abb319ca84401b14d63814fe894ef",
+  "groupID": "7743129773",
+  "eventID": "ae9abb319ca84401b14d63814fe894ef",
+  "projectID": "4511945117532160",
+  "size": 18028,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq [inline 1/7]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-19-1850-gems-belong-to-the-character",
+  "message": "player-log 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq [inline 1/7]",
+  "title": "player-log 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq [inline 1/7]",
+  "location": null,
+  "user": {
+    "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Stoneham",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-19T23:54:03.417Z",
+      "app_identifier": "com.hotatticgames.tartarprim.golem",
+      "app_name": "Golem",
+      "app_version": "2.5.0",
+      "app_build": "474",
+      "in_foreground": true,
+      "is_split_apks": false,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 14.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": true,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 1837158400,
+      "storage_size": 245292421120,
+      "free_storage": 58260557824,
+      "boot_time": "2026-08-28T17:18:44.580Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "28.700000762939453",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "golem-line",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 30,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0ba27-24f7-7cc3-a738-c1afc27e0f7f"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c7ce6e523cce4ed6970a45fa96165bba",
+      "span_id": "93d972f804d45a13",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "QnV-nIF-Jlc-G9y-dCD-igJ-QgV-mVy-YmF-sIM-K3I-Cgy-MDI-2LT-A5L-TE5-LTE-4NT-AtZ-2Vt-cy1-iZW-xvb-mct-dG8-tdG-hlL-WNo-YXJ-hY3-Rlc-ikg-wrc-gTG-9uZ-yBs-YWc-gb2-4ga-W5p-dGl-hbC-Bsb-2Fk-Cj0-9PS-BUQ-VJU-QVJ-JQS-BCV-Ucg-UkV-QT1-JUI-D09-PQp-TdW-Jta-XR0-ZWQ-6ID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6Mj-kuO-Dc4-Wgp-DaG-FyY-WN0-ZXI-6IF-Zlc-mJh-bAp-TbG-90I-ElE-OiB-zbG-90X-211-M2w-yNT-ltX-zNp-cXF-zNQ-pSY-WNl-OiB-UYX-J0Y-XJp-YW4-gR2-lhb-nRz-Ckx-vY2-F0a-W9u-OiB-UaG-UgT-W9u-YXJ-jaC-dzI-Fdh-eXN-0YX-Rpb-24K-SFA-6ID-QzL-zQ0-Cgo-tLS-0gR-EVT-Q1J-JUF-RJT-04g-LS0-tCk-xvb-mcg-bGF-nIG-9uI-Glu-aXR-pYW-wgb-G9h-ZAo-KLS-0tI-FJF-UE9-SVC-BTQ-1JF-RU4-gLS-0tC-iAg-U2F-2ZW-QgY-2hh-cmF-jdG-Vyc-yB0-aGl-zIH-Njc-mVl-biB-jb3-VsZ-CBz-ZWU-6ID-EK",
+      "ICB-Lbm-V3I-Hdo-aWN-oIG-NoY-XJh-Y3R-lci-B3Y-XMg-YmV-pbm-cgc-Gxh-eWV-kOi-B5Z-XMK-ICA-iU2-VuZ-CBm-dWx-sIG-xvZ-yIg-cm9-3IG-9mZ-mVy-ZWQ-6IH-llc-woK-LS0-tIE-RFV-klD-RSA-vIE-JVS-UxE-IC0-tLQ-pEZ-XZp-Y2U-KIC-BOY-W1l-OiB-QaX-hlb-CAx-MCB-Qcm-8gW-EwK-ICB-QbG-F0Z-m9y-bTo-gYW-5kc-m9p-ZCA-zNw-ogI-Ehl-cm1-lcz-oge-WVz-CiA-gTG-9jY-Wxl-OiB-lbi-1VU-wog-IFR-pbW-V6b-25l-OiB-BbW-Vya-WNh-L05-ld1-9Zb-3Jr-CiA-gU2-NyZ-WVu-OiB-3aW-5kb-3cg-NDQ-zw5-c5O-DYg-LyB-zY3-JlZ-W4g-NDQ-zw5-c5O-DYg-QCA-yLj-QzN-zV4-IGR-lbn-Npd-HkK-ICB-DYX-B0d-XJl-ZCB-hdD-ogM-jAy-Ni0-wOS-0xO-VQy-Mzo-1ND-oyO-S44-MTd-aCg-pJb-nN0-YWx-sCi-AgQ-XBw-IEl-EOi-Bjb-20u-aG9-0YX-R0a-WNn-YW1-lcy-50Y-XJ0-YXJ-wcm-ltL-mdv-bGV-tCi-AgQ-XBw-IHZ-lcn-Npb-246-IDQ-uMz-IuM-TEK",
+      "ICB-BUE-sgY-nVp-bGQ-gdm-Vyc-2lv-bjo-gMi-41L-jAK-ICB-BUE-sgY-nVp-bGQ-6ID-Q3N-Aog-IEF-BQj-ogK-GJ1-aWx-kID-Q3N-CkK-ICB-PVE-E6I-Cgy-MDI-2LT-A5L-TE5-LTE-4NT-AtZ-2Vt-cy1-iZW-xvb-mct-dG8-tdG-hlL-WNo-YXJ-hY3-Rlc-ikK-ICB-Cb2-90I-HN0-YWd-lOi-Bxd-2Vu-OmR-lZm-Vyc-mVk-Cgp-NTC-Byd-W50-aW1-lIG-hlY-Wx0-aAo-gIF-N0Y-XR1-czo-gYW-N0a-XZl-ICh-uby-Bjc-mFz-aGV-zIG-Rld-GVj-dGV-kKQ-ogI-ENy-YXN-oIG-Nvd-W50-OiA-wCi-AgT-GFz-dCB-pbm-l0I-GF0-dGV-tcH-Q6I-DIw-MjY-tMD-ktM-TlU-MjM-6NT-Q6M-TQu-MDg-1Wg-ogI-Exh-c3Q-gaW-5pd-CBz-dWN-jZX-NzO-iAy-MDI-2LT-A5L-TE5-VDI-zOj-U0O-jE1-LjE-2NV-oKI-CBD-cmF-zaG-VzL-WJl-Zm9-yZS-1ka-XNh-Ymx-lIH-Roc-mVz-aG9-sZD-ogM-go=",
+      "ICB-Rd2-VuI-GNv-bXB-sZX-Rpb-24g-Z3V-hcm-Q6I-GNs-ZWF-uIC-hub-yBj-b21-wbG-V0a-W9u-IGN-yYX-NoZ-XMp-CiA-gUX-dlb-iBr-ZXJ-uZW-wgd-mFy-aWF-udD-ogK-G5v-dCB-5ZX-Qgb-G9h-ZGV-kIH-Roa-XMg-aW5-zdG-Fsb-CkK-ICB-Rd2-VuI-ENQ-VS9-Tb0-M6I-Chu-b3Q-geW-V0I-Gxv-YWR-lZC-B0a-Glz-IGl-uc3-Rhb-Gwp-CiA-gVm-9pY-2Ug-KFR-UUy-kgZ-3Vh-cmQ-6IG-NsZ-WFu-ICh-uby-B2b-2lj-ZSB-jcm-Fza-GVz-IG9-uIH-Roa-XMg-YnV-pbG-QpC-lNh-dmU-tbG-9hZ-CBo-ZWF-sdG-gKI-CBT-dGF-0dX-M6I-GNs-ZWF-uIC-hub-yBs-b2F-kLW-NyY-XNo-IGZ-sYW-dzK-QpM-YXN-0IE-pTI-GNy-YXN-oCi-AgU-3Rh-dHV-zOi-Bub-25l-IHJ-lY2-9yZ-GVk-ClR-oaX-Mgb-GF1-bmN-oCi-AgT-Glm-ZTo-gYm-11O-TFu-YnV-0MX-Ugw-rcg-c3R-hcn-RlZ-CAy-MDI-2LT-A5L-TE5-VDI-zOj-U0O-jAz-Ljg-0NV-oK",
+      "ICB-Db2-xkI-HN0-YXJ-0IO-KAl-CB0-aGl-zIG-Jvb-3Qg-ZGl-kIG-5vd-CBm-b2x-sb3-cgY-W4g-T1R-BIG-Fwc-Gx5-CkN-yYX-NoI-Gxl-ZGd-lci-Dig-JQg-MiB-yZW-Nvc-mRl-ZCw-gMS-BmY-XRh-bCA-obm-V3Z-XN0-IGx-hc3-QpC-iAg-4oC-iID-IwM-jYt-MDk-tMT-ZUM-DQ6-NDQ-6NT-QuM-Dc4-WiA-oNT-Q3M-G0g-YWd-vKS-Dig-JQg-UFJ-PQ0-VTU-yBS-RUN-MQU-lNR-UQg-4oC-UIG-5vd-CBh-IGN-yYX-NoI-Chu-byB-KUy-ByY-W4p-CiA-gIC-AgI-GJ1-aWx-kID-QuM-zIu-MTE-gwr-cgM-jAy-Ni0-wOS-0xN-S0x-ODI-0LX-RoZ-S1o-ZWx-wZX-Ita-XMt-Y2F-sbG-VkL-W5v-dC1-xdW-90Z-WQg-wrc-gc3-RhZ-2Ug-YXB-wc3-Rhd-GU6-YWN-0aX-Zl4-oaS-YmF-ja2-dyb-3Vu-ZAo-=",
+      "ICA-gIC-AgU-HJv-Y2V-zcy-ByZ-WNs-YWl-tZW-Qgd-2hp-bGU-gaW-RsZ-SBv-biB-0aG-Ugd-Gl0-bGU-gc2-NyZ-WVu-IOK-AlC-Bub-yBn-YW1-lIH-dhc-yBp-biB-wcm-9nc-mVz-cyA-oMT-NzI-GFm-dGV-yIG-Jvb-3Qs-IGF-wcC-BiY-WNr-Z3J-vdW-5kL-CBz-dGF-nZS-Bxd-2Vu-OmR-lZm-Vyc-mVk-KQo-gIC-AgI-CBk-b2l-uZz-ogK-G5v-IGF-jdG-lvb-iB5-ZXQ-pIM-K3I-HJv-b20-gPy-DCt-yBz-Y3J-lZW-4gd-Gl0-bGU-KIC-AgI-CAg-bGF-zdC-Bja-GVj-a3B-vaW-50O-iBh-cHB-zdG-F0Z-Tph-Y3R-pdm-Xih-pJi-YWN-rZ3-Jvd-W5k-IMK-3ID-EzM-zU5-bXM-gaW-50b-yB0-aGU-gYW-N0a-W9u-IMK-3IG-Fsa-XZl-IDB-tcy-BhZ-nRl-ciB-pdA-ogI-CAg-ICB-sYX-VuY-2g6-IGR-pZW-QgM-TM0-MzR-tcy-Bpb-nRv-IHR-oZS-Bwc-m9j-ZXN-zIM-K3I-G5v-dCB-hbi-BPV-EEt-YXB-wbH-kgY-m9v-dAo-=",
+      "ICA-gIC-Agd-Ghl-IG5-hdG-l2Z-SBT-REs-gc2-F3I-E5P-IGN-yYX-NoI-Glu-IHR-oYX-Qgb-Glm-ZSD-igJ-Qgd-Ghl-IHB-yb2-Nlc-3Mg-ZW5-kZW-Qgd-2l0-aCB-uby-Bza-Wdu-YWw-6IH-RoZ-SBP-UyB-0b2-9rI-Gl0-ICh-vdX-Qtb-2Yt-bWV-tb3-J5I-Gtp-bGw-gb3-Igc-mVj-bGF-pbS-kKI-CAg-ICA-gaX-RzI-G93-biB-tb2-Rlb-CBs-ZWR-nZX-IgY-XQg-dGh-lIG-xhc-3Qg-c3R-hbX-A6I-G8w-L3I-wL2-wwL-3Aw-L2R-uMA-ogI-OKA-oiA-yMD-I2L-TA5-LTE-2VD-A0O-jQ3-OjE-wLj-IzM-1og-KDU-0Nj-dtI-GFn-byk-g4o-CUI-FBS-T0N-FU1-MgS-0lM-TEV-EIO-KAl-CBu-byB-KUy-ByY-W4K-ICA-gIC-AgY-nVp-bGQ-gNC-4zM-i4x-MSD-Cty-AyM-DI2-LTA-5LT-E1L-TE4-MjQ-tdG-hlL-Whl-bHB-lci-1pc-y1j-YWx-sZW-Qtb-m90-LXF-1b3-RlZ-CDC-tyB-zdG-FnZ-SBi-b29-0Om-lkb-GU6-YXd-haX-Rpb-mct-Zml-yc3-QtY-WN0-aW9-uCg-==",
+      "ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiA-obm-8gY-WN0-aW9-uIH-lld-CkK-ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uIG-Fib-3V0-CiA-gIC-AgI-Gxh-c3Q-gY2-hlY-2tw-b2l-udD-ogY-m9v-dDp-pZG-xlO-mF3-YWl-0aW-5nL-WZp-cnN-0LW-Fjd-Glv-biD-Cty-AxM-Dk2-bXM-gaW-50b-yB0-aGU-gYW-N0a-W9u-IMK-3IG-Fsa-XZl-IDE-wND-E5b-XMg-YWZ-0ZX-Iga-XQK-ICA-gIC-Agb-GF1-bmN-oOi-Bka-WVk-IDE-xNT-Ywb-XMg-aW5-0by-B0a-GUg-cHJ-vY2-Vzc-yDC-tyB-ub3-QgY-W4g-T1R-BLW-Fwc-Gx5-IGJ-vb3-QK",
+      "ICA-gIC-Agd-Ghl-IG5-hdG-l2Z-SBT-REs-gc2-F3I-E5P-IGN-yYX-NoI-Glu-IHR-oYX-Qgb-Glm-ZSD-igJ-Qgd-Ghl-IHB-yb2-Nlc-3Mg-ZW5-kZW-Qgd-2l0-aCB-uby-Bza-Wdu-YWw-6IH-RoZ-SBP-UyB-0b2-9rI-Gl0-ICh-vdX-Qtb-2Yt-bWV-tb3-J5I-Gtp-bGw-gb3-Igc-mVj-bGF-pbS-kKI-CAg-ICA-gaX-RzI-G93-biB-tb2-Rlb-CBs-ZWR-nZX-IgY-XQg-dGh-lIG-xhc-3Qg-c3R-hbX-A6I-G8w-L3I-wL2-wwL-3Aw-L2R-uMA-pDc-mFz-aCB-kZW-xpd-mVy-eTo-gT0-4g4-oCU-IHJ-lcG-9yd-HMg-Z28-gdG-8gU-2Vu-dHJ-5IH-doZ-W4g-eW9-1IG-NyY-XNo-Lgp-SdW-50a-W1l-IHB-yZX-Nzd-XJl-CiA-gwr-cgT-GFz-dCB-ib2-90I-GV4-aXR-lZC-Bjb-GVh-bmx-5LC-B0a-GVu-IHR-oZS-BPU-yBy-ZWN-sYW-ltZ-WQg-aXQ-g4o-CUI-G5v-dCB-hIG-NyY-XNo-Lgo-=",
+      "ICA-gIC-BBI-H40-MDB-NQi-Btb-2Rl-bCB-hcH-Aga-XMg-d2h-hdC-BBb-mRy-b2l-kIG-Ryb-3Bz-IGZ-pcn-N0I-Hdo-ZW4-gaX-Qgb-mVl-ZHM-gbW-Vtb-3J5-Lgo-gIC-AgI-Etl-cHQ-gYm-VjY-XVz-ZSB-0aG-Ugc-Ghh-c2U-gaX-Mgc-3Rp-bGw-gZX-ZpZ-GVu-Y2U-gaW-YgY-SBy-ZWF-sIG-ZyZ-WV6-ZSB-sYW-5kc-yBo-ZXJ-lLg-ogI-CAg-IEx-hc3-QgY-2hl-Y2t-wb2-lud-Dog-YXB-wc3-Rhd-GU6-YWN-0aX-Zl4-oaS-YmF-ja2-dyb-3Vu-ZCB-hdC-AyM-DI2-LTA-5LT-E5V-DE1-OjA-5Oj-E5L-jA0-MVo-gKD-UyN-SBt-aW4-gYm-Vmb-3Jl-IHR-oaX-MgY-m9v-dCk-KIC-BNZ-W1v-cnk-gd2-Fyb-mlu-Z3M-6IG-5vb-mUg-dGh-pcy-BzZ-XNz-aW9-uCi-AgR-nJl-ZXp-lIH-dhd-GNo-OiB-uby-Bzd-GFs-bHM-gc2-Vlb-iAo-SlM-gY2-xvY-2tz-IG9-ubH-kg4-oCU-IHN-lZS-B0a-GUg-bmF-0aX-ZlI-HF1-ZXV-lIG-Jlb-G93-KQo-=",
+      "ICB-OYX-Rpd-mUg-cXV-ldW-U6I-Hdv-cnN-0IH-dha-XQg-MC4-wcy-DCt-yAw-IGp-vYi-Bra-W5k-cyB-xdW-V1Z-WQg-PjN-zIM-K3I-Hdv-cnN-0ID-AuM-G1z-L3B-yb2-1wd-C10-b2t-lbg-ogI-E5h-dGl-2ZS-Bxd-WV1-ZSB-hZG-1pc-3Np-b24-6ID-I3I-Gpv-YnM-gwr-cgd-29y-c3Q-gd2-Fpd-CAw-LjB-zIM-K3I-DAg-cGF-zdC-Azc-wog-IEF-wcC-Bzd-GF0-ZSB-0cm-Fpb-Dog-KG5-vbm-Ugc-mVj-b3J-kZW-QpC-k1v-ZGV-sIG-Nvb-nRl-eHR-zCi-AgT-Gl2-ZSB-ub3-c6I-DAK-ICB-PcG-VuZ-WQ6-IDA-gwr-cgU-mVs-ZWF-zZW-Q6I-DAg-wrc-gUG-Vha-yBs-aXZ-lOi-AwC-iAg-TmF-ycm-F0a-W9u-IGV-uZ2-luZ-Tog-aWR-sZQ-pNZ-W1v-cnk-gdG-ltZ-Wxp-bmU-KIC-Dim-qAg-aGV-hcC-A9I-EhF-Uk1-FUy-BKU-yBI-RUF-QLC-Bub-3Qg-cHJ-vY2-Vzc-yBt-ZW1-vcn-kuI-GN0-eCD-iiY-ggY-291-bnQ-gw5-cgN-DI1-TUI-gZX-N0L-go=",
+      "ICB-IZW-FwO-iBm-aXJ-zdC-AxM-k1C-IMK-3IH-BlY-Wsg-MjB-NQi-DCt-yBs-YXN-0ID-IwT-UIg-wrc-gbm-V0I-Cs4-TUI-gb3-Zlc-iAy-IG1-hcm-tzC-iAg-ICA-gKz-AuM-HMg-d2F-0Y2-gtc-3Rh-cnQ-g4o-CUI-Ghl-YXA-gMT-JNQ-iBn-YyA-wbX-MvM-yDC-tyB-jdH-ggM-CDC-tyB-hcH-A9Y-WN0-aXZ-lIM-K3I-G5h-dGl-2ZS-BpZ-Gxl-IHE-wIM-K3I-Hdh-cm5-zID-AKI-CAg-ICs-xMC-4wc-yBo-ZWF-wLW-1vd-mUg-4oC-UIG-hlY-XAg-MjB-NQi-BnY-yAw-bXM-vMT-Egw-rcg-Y3R-4ID-Agw-rcg-YXB-wPW-Fjd-Gl2-ZSD-Cty-BuY-XRp-dmU-gaW-RsZ-SBx-MCD-Cty-B3Y-XJu-cyA-wCk-5hd-Gl2-ZSB-tZW-1vc-nkg-Zmx-pZ2-h0I-HJl-Y29-yZG-VyI-ChC-dWl-sZC-AxO-TAp-CiA-gTk-9UI-EFW-QUl-MQU-JMR-SBv-biB-0aG-lzI-HJ1-bnR-pbW-UgK-EFu-ZHJ-vaW-QsI-Hdl-Yiw-gRX-hwb-yBH-byw-gb3-IgY-SBK-Uy1-vbm-x5I-GJ1-aWx-kKS-4K",
+      "ICD-imq-AgV-Ghp-cyB-pcy-Bhb-iBh-YnN-lbm-NlI-G9m-IHR-oZS-Bpb-nN0-cnV-tZW-50L-CBO-T1Q-gYS-Bjb-GVh-biB-iaW-xsI-G9m-IGh-lYW-x0a-C4K-VG9-1Y2-ggc-GF0-aAo-gIH-Bya-W9y-IGJ-vb3-Q6I-Ch0-cmF-jZS-Bwc-mVz-ZW5-0LC-Bub-yBz-dGF-nZX-MpC-iAg-dGh-pcy-Bib-290-Ogo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6MT-QuM-Dcz-WiA-jMS-Byb-290-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6MT-UuN-zc4-WiA-jMi-Byb-290-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6MT-cuN-jQz-WiA-jMy-Byb-290-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6MT-cuN-jQz-WiA-jNC-Btb-2Rh-bCB-wPW-5vb-mUg-ZXh-wbG-9yY-XRp-b24-K",
+      "ICA-yMD-I2L-TA5-LTE-5VD-IzO-jU0-OjE-4Lj-I3N-Vog-IzU-gcm-9vd-CBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-5VD-IzO-jU0-OjE-4Lj-I3N-Vog-IzY-gbW-9kY-Wwg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-CiA-gMj-AyN-i0w-OS0-xOV-QyM-zo1-NDo-yMS-4xN-zVa-ICM-3IH-Jvb-3Qg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-CiA-gMj-AyN-i0w-OS0-xOV-QyM-zo1-NDo-yMS-4xN-zVa-ICM-4IG-1vZ-GFs-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6Mj-IuO-Tc3-WiA-jOS-Byb-290-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6Mj-IuO-Tc4-WiA-jMT-Agb-W9k-YWw-gcD-1ub-25l-IGV-4cG-xvc-mF0-aW9-uCi-AgM-jAy-Ni0-wOS-0xO-VQy-Mzo-1ND-oyO-S43-MTR-aIC-MxM-SBy-b29-0IH-A9b-m9u-ZSB-leH-Bsb-3Jh-dGl-vbg-o=",
+      "ICA-yMD-I2L-TA5-LTE-5VD-IzO-jU0-OjI-5Lj-cxN-Vog-IzE-yIG-1vZ-GFs-IHA-9bm-9uZ-SBl-eHB-sb3-Jhd-Glv-bgo-gID-IwM-jYt-MDk-tMT-lUM-jM6-NTQ-6Mj-kuN-zE2-WiA-jMT-Iga-W4g-cmV-wb3-J0O-nNl-bmQ-g4o-+xK-zEz-bXM-gcD-1ub-25l-IGV-4cG-xvc-mF0-aW9-uCi-AgM-jAy-Ni0-wOS-0xO-VQy-Mzo-1ND-oyO-S44-MTV-aIC-MxM-iBl-bnR-lci-ByZ-XBv-cnQ-6c2-VuZ-CBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-ICA-yMD-I2L-TA5-LTE-5VD-IzO-jU0-OjI-5Lj-gxN-Vog-IzE-yIG-Fkb-Wl0-IHJ-lcG-9yd-Dpz-ZW5-kIC-hkZ-XNj-cml-iZW-QpI-HA9-bm9-uZS-Ble-HBs-b3J-hdG-lvb-gog-IDI-wMj-YtM-Dkt-MTl-UMj-M6N-TQ6-Mjk-uOD-E1W-iAj-MTI-gZG-lzc-GF0-Y2g-gcm-Vwb-3J0-OnN-lbm-QgK-GRl-c2N-yaW-JlZ-Ckg-cD1-ub2-5lI-GV4-cGx-vcm-F0a-W9u-Cg=-=",
+      "ICA-yMD-I2L-TA5-LTE-5VD-IzO-jU0-OjI-5Lj-gxN-Vog-IzE-yIG-Rpc-3Bh-dGN-oIH-Jlc-G9y-dDp-zZW-5kI-Chj-b21-wb3-NlK-SBw-PW5-vbm-UgZ-Xhw-bG9-yYX-Rpb-24K-Ci0-tLS-BWT-0lD-RSA-tLS-0KI-CBU-VFM-gZW-5hY-mxl-ZDo-gbm-8KI-CBF-bmd-pbm-U6I-GJ1-bmR-sZW-QKI-CBS-YXR-lOi-AxL-jIw-IMK-3IF-Bpd-GNo-OiA-xLj-AwC-iAg-U3l-zdG-VtI-HZv-aWN-lIG-lkO-iAo-ZGV-mYX-Vsd-CkK-ICB-Lb2-tvc-m8g-dm9-pY2-U6I-GFt-X21-pY2-hhZ-WwK-ICB-Lb2-tvc-m8g-c3R-hdG-U6I-Glk-bGU-KCi-0tL-SBJ-TlZ-FTl-RPU-lkg-LS0-tCk-lud-mVu-dG9-yeS-AoV-mVy-YmF-sKQ-ogI-EhQ-OiA-0My-80N-CAg-U3R-hbW-luY-Tog-MC8-xMi-AgV-EM6-IDE-2NS-AgQ-29y-cnV-wdG-lvb-jog-MAo-gIF-BhY-2s6-IDM-zIG-Rpc-3Rp-bmN-0IH-Jvd-3Mg-LyA-xMT-Mgd-G90-YWw-KCl-dlY-XBv-bnM-gKD-YpC-g==",
+      "ICB-Cb2-5lI-FNo-b3J-0c3-dvc-mQg-KDF-kNi-Bzb-GFz-aGl-uZy-wgZ-HVy-IDM-0Lz-M0L-CBb-d2V-hcG-9uL-G1l-bGV-lLH-Npb-mds-ZV9-oYW-5kZ-WQs-Ymx-hZG-UsZ-2lh-bnR-zXS-kKI-CAg-IGF-jdG-lvb-nM6-IGV-xdW-lwO-m1h-aW4-sIG-Vxd-Wlw-Om9-mZi-wgd-XNl-KG9-mZi-ksI-HNj-cmF-wLC-Bkc-m9w-CiA-gQm-9uZ-SBT-cGx-pdH-Rlc-iBB-eGU-gKD-FkO-CBz-bGF-zaG-luZ-ywg-ZHV-yID-EzL-zEz-LCB-bd2-Vhc-G9u-LG1-lbG-VlL-HR3-b19-oYW-5kZ-WQs-YXh-lLG-dpY-W50-c10-pCi-AgI-CBh-Y3R-pb2-5zO-iBl-cXV-pcD-ptY-Wlu-LCB-lcX-Vpc-Dpv-ZmY-sIH-VzZ-Shv-ZmY-pLC-BzY-3Jh-cCw-gZH-Jvc-Aog-IEN-1ZG-dlb-CAo-MWQ-4IG-Jsd-WRn-ZW9-uaW-5nL-CBk-dXI-gMT-YvM-TYs-IGV-xdW-lwc-GVk-Om9-mZi-wgW-3dl-YXB-vbi-xjb-HVi-LG1-lbG-VlL-Glt-cHJ-vdm-lzZ-WQs-d2V-pZ2-h0Z-WRd-KQo-=",
+      "ICA-gIG-Fjd-Glv-bnM-6IG-Vxd-Wlw-Om1-haW-4sI-HVu-ZXF-1aX-A6b-2Zm-LCB-1c2-UKI-CBN-dWQ-tZm-lzd-CBX-cmF-wcy-AoM-WQx-MCB-ibH-VkZ-2Vv-bml-uZy-wgZ-HVy-IDM-1Lz-M1L-CBl-cXV-pcH-BlZ-Dpt-YWl-uLC-Bbd-2Vh-cG9-uLH-N0Y-XJ0-ZXI-sYm-FyZ-Whh-bmR-lZC-xtZ-Wxl-ZV0-pCi-AgI-CBh-Y3R-pb2-5zO-iBl-cXV-pcD-pvZ-mYs-IHV-uZX-F1a-XA6-bWF-pbi-wgd-XNl-KG9-mZi-kKI-CBQ-b2N-rZX-QgS-25p-ZmU-gKD-FkN-CBz-bGF-zaG-luZ-ywg-ZHV-yID-EyL-zEy-LCB-bd2-Vhc-G9u-LHN-0YX-J0Z-XIs-a25-pZm-Usd-G9v-bCx-tZW-xlZ-V0p-CiA-gIC-BhY-3Rp-b25-zOi-Blc-XVp-cDp-tYW-luL-CBl-cXV-pcD-pvZ-mYs-IHV-zZS-hvZ-mYp-LCB-zY3-Jhc-Cwg-ZHJ-vcA-ogI-FNh-bHZ-hZ2-VkI-EJv-dyA-oMW-Q2I-HBp-ZXJ-jaW-5nL-CBk-dXI-gMj-kvM-jks-IFt-3ZW-Fwb-24s-cmF-uZ2-VkL-GJv-dyx-zdG-Vhb-HRo-XSk-K",
+      "ICA-gIG-Fjd-Glv-bnM-6IG-Vxd-Wlw-Om1-haW-4sI-GVx-dWl-wOm-9mZ-iwg-dXN-lKG-9mZ-iks-IHN-jcm-FwL-CBk-cm9-wCg-pBc-m1v-ciA-oNC-kKI-CBB-cmN-oaX-RlY-3Qn-cyB-BZX-RoZ-XJp-YyB-Cb2-90c-yAo-ZHV-yID-EwL-zEw-LCB-BQy-ArM-iDC-tyB-JTl-QgK-zIs-IFt-hcm-1vc-ixm-ZWV-0LG-Jvb-3Rz-LGF-yY2-hpd-GVj-dHV-yYW-xfc-2Vu-dGl-uZW-xzX-SkK-ICA-gIG-Fjd-Glv-bnM-6IG-Vxd-Wlw-OmZ-lZX-QsI-HVz-ZSw-gc2-NyY-XAs-IGR-yb3-AKI-CBN-dWQ-tV2-FyZ-GVu-J3M-gVm-Vzd-CAo-ZHV-yID-I2L-zI2-LCB-lcX-Vpc-HBl-ZDp-jaG-Vzd-Cwg-QUM-gKz-Egw-rcg-UmV-zaX-N0c-zog-c2x-hc2-hpb-mcg-wrc-gV0-lTI-Csx-LCB-bYX-Jtb-3Is-Y2h-lc3-Qsc-Gxh-dGU-sbX-VkX-2R3-ZWx-sZX-JzX-SkK-ICA-gIG-Fjd-Glv-bnM-6IH-VuZ-XF1-aXA-6Y2-hlc-3QK",
+      "ICB-SZW-NsY-Wlt-ZXI-ncy-BTY-Wx2-YWd-lIE-Nhc-CAo-ZHV-yID-I0L-zI0-LCB-lcX-Vpc-HBl-ZDp-oZW-FkL-CBB-QyA-rMS-DCt-yBJ-TlY-gKz-EsI-Fth-cm1-vci-xoZ-WFk-LGN-sb3-RoL-Ghl-bG1-ldC-xyZ-WNs-YWl-tZX-JzX-SkK-ICA-gIG-Fjd-Glv-bnM-6IH-VuZ-XF1-aXA-6aG-VhZ-Aog-IFd-hbm-Rlc-mVy-J3M-gRm-FjZ-SBv-ZiB-TaG-Fkb-3dz-ICh-kdX-IgM-jAv-MjA-sIE-FDI-Csy-IMK-3IF-NUR-SAr-Miw-gW2-Fyb-W9y-LGh-lYW-Qsb-WFz-ayx-mYW-NlL-HVu-a25-vd2-luZ-19t-YXN-zZX-NdK-Qog-ICA-gYW-N0a-W9u-czo-gZX-F1a-XA6-aGV-hZC-wgd-XNl-LCB-zY3-Jhc-Cwg-ZHJ-vcA-oKQ-W11-bGV-0cy-AmI-FJp-bmd-zIC-gxK-Qo="
+    ],
+    "chunkChars": 7144,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-19-1850-gems-belong-to-the-character #mu91nvxz49wq [inline 1/7]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mu91nvxz49wq"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-19-1850-gems-belong-to-the-character"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "7"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character"
+    },
+    {
+      "key": "user",
+      "value": "id:9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "query": "user.id:\"9a8a8c0079ee4e8eba37ffa9f098cee1\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-19T23:54:29.693996Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-19T23:54:29.908000Z",
+  "fingerprints": [
+    "24b9220693442b24c65eab8d6b7beed3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1981558143,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-19T14:52:06.957784Z",
+    "dateReleased": "2026-09-19T15:15:09.270885Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "fd66f4335755bf3274bb6e4eab4ddc7b315aa395",
+      "message": "OTA-1850 \u2014 a Resurrection Gem belongs to the Tartarian who earned it\n\nTHE PRODUCT RULING. Gems were install-wide, which let a player farm them on\ncharacters they did not care about and spend them on the one they did. They are\nnow character-bound: earned BY someone, spendable only BY them. Deleting a\ncharacter does not release their gems, switching characters switches the\nbalance, and there is no pool, no transfer and no gifting. Reward amounts, the\none-gem cost, drop rates, boss eligibility and vendor behaviour are all\nunchanged \u2014 this moves ownership, not economy.\n\nTHE DURABILITY REPAIR, WHICH IS THE SAME CHANGE. Three reproduced crash bugs\nshared one shape: two durable stores, one commit ordering, no idempotency\nmarker. The balance lived in the global stash while the thing it paid for \u2014 the\nrevival, the \"already paid\" keepsake mark \u2014 lived in the character's own slot\nkey, and AsyncStorage has no cross-key transaction. Moving the balance onto the\ncharacter deletes the second store, so:\n\n  \u00b7 the gem spend and the revival are one write to one record. Neither\n    \"charged and still dead\" nor \"alive and never charged\" is a state the\n    storage can hold, so NO boot reconciliation machinery is added \u2014 there is\n    nothing left to reconcile.\n  \u00b7 the boss keepsake's gem and its onceLootPaid mark land in the same store\n    update and the same persist(). Hazard C closes by shape.\n  \u00b7 the dev-name death grant rides inside the death write instead of racing\n    the persist() of the very record it was crediting.\n\nWhat still needs a mechanism is concurrency on ONE record, and that is\nmutateSlot \u2014 deliberately the same shape as OTA-1835's mutateGlobalStash: one\nserialized queue per slot, load \u2192 mutate \u2192 save, sentinel for no-write.\n\nA DEATH NOW HAS ITS OWN IDENTITY. newDeathId() is minted at the death site and\npersisted with the character, so a resurrection retry after a crash is free\nwhile a LATER death costs again. The previously proposed\n`slotId|characterSeed|floor(hoursElapsed)` was dropped on evidence: two genuine\ndeaths inside one floored game hour collide, which would have made the second\nresurrection free.\n\nTHE LEGACY HANDOVER, AND WHAT IT HONESTLY IS. The old shared pool is divided\nonce across surviving characters in proportion to their DURABLE IN-WORLD GAME\nHOURS (hoursElapsed), by largest remainder, with a stable lexical slotId\ntie-break and exact conservation. This is a best-effort HEURISTIC, not\nprovenance \u2014 nothing in the old data records who earned a gem \u2014 and two\nbetter-sounding rules were rejected on evidence: Fallen death counts are\nunattributable (FallenHero carries no character identity and the list is capped\nat 25) and savedAt\u2212createdAt measures wall-clock elapsed, not play. It is game\ntime, not wall-clock playtime, and a brand-new character reads zero.\n\nThe plan is computed ONCE and then obeyed: the input snapshot is persisted\nbeside the result (original total, total hours, per-slot hours and allocation,\nand whether the weighted rule or the active-character fallback applied), so a\nrestart replays the same rows rather than recomputing against hours that have\nsince moved. More play, a different active character, or a reordered index all\nread the same answer. The handover runs at boot, before the roster is drawn, so\neach record's own count is true on screen. With no characters yet the pool is\nHELD rather than split \u2014 that is the fresh-install seed, one free gem per\ninstall, claimed by the first character created.\n\nTHE COUNT MOVED TO THE DOSSIER. The title screen's global gem chit is gone and\nnothing replaces it: there is no install-wide figure left for it to show. The\nnumber reads on the character's own record, in the dossier's existing meta\nvoice, and the resurrect/fallen decision and its confirm copy ask that\ncharacter's balance rather than a shared total.\n\nTests: new permanent suite ota1850GemsBelongToTheCharacter (50) covering the\nfarming case, one-write spend/revive, retry-vs-later-death, per-record\nconcurrency, the allocation arithmetic, the one-time handover, the install seed\nand the retired install-wide paths. Four neighbouring suites were re-pointed at\nthe new architecture with their claims strengthened, not weakened: OTA-1394 now\nrequires that no spend ordering can exist rather than that a particular order is\nchosen; OTA-1830 \u00a75.5 requires the keepsake gem and its paid-mark to share one\nsynchronous update instead of requiring a .then to sit on; OTA-1833 \u00a72.1 follows\nthe gem authority to gemsAfterGrant; OTA-1835's stash-field list grows by\nlegacyGemMigration on the same reasoning OTA-1844 and OTA-1845 used.\n\nSix negative controls, each restored byte-identical. One of them (NC-C, first\nattempt) did NOT bite and that was a fault in the control rather than the code:\ndropping the LAST leftover is a no-op because the remainder is always strictly\nsmaller than the row count. Re-run as a genuine off-by-one it turned E1 and E3\nred.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-19T14:43:28Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+          "shortVersion": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-19T15:15:09.270885Z",
+          "dateCreated": "2026-09-19T14:52:06.957784Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160041960",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-19T15:15:09.511093Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-19-1850-gems-belong-to-the-character",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-19-1850-gems-belong-to-the-character",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-19-1850-gems-belong-to-the-character)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "53229f6e25ea44f7b2a8680179976e7d"
+}

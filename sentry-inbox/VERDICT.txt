@@ -17,10 +17,6 @@
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /organizations/hot-attic-games-llc/issues/7714271874/events/?full=false
     1 page(s), 4 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7714473749/events/?full=false
-    1 page(s), 56 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7714473781/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7714508713/events/?full=false
     1 page(s), 27 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7714508736/events/?full=false
@@ -201,6 +197,10 @@
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7742930043/events/?full=false
     1 page(s), 12 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7743129773/events/?full=false
+    1 page(s), 6 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7743129785/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -214,6 +214,7 @@
     mtof277pnduk: 52/56 parts
     mu5vyoncnfyi: 33/56 parts
     mu8czg6uupeh: 24/56 parts
+    mu91nvxz49wq: 6/7 parts
   scrub cost per bundle:
     mtavnjvdw4u4: 4 redactions, 60000 chars
     mtavou0hiube: 1 redactions, 9994 chars
