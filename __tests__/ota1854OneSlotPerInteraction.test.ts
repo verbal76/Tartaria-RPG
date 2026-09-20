@@ -62,8 +62,9 @@ import {
   _resetTouchPathForTest,
 } from '../app/diagnostics/touchPath';
 import {
-  onStoreChange, stopSubsystemMemoryMarks,
+  stopSubsystemMemoryMarks,
   markArtworkMount, markArtworkUnmount,
+  markAudioPlayerCreate, markAudioPlayerDispose,
 } from '../app/diagnostics/subsystemMemoryMarks';
 
 const read = (...p: string[]): string =>
@@ -287,42 +288,39 @@ describe('§C the budget holds across real interaction shapes', () => {
 // §D — THE OTA-1853 MARKS ARE UNTOUCHED, AND THE DOOR IS NOT SHUT
 // ───────────────────────────────────────────────────────────────────────────
 
+/* ⚠⚠ THE SUBSYSTEM MARKS ARE EXERCISED THROUGH THEIR STRING-ID DOORS, NOT
+ * THROUGH `onStoreChange`, AND THAT IS DELIBERATE. A store-shaped fixture here
+ * would be a bare `currentLocationId` with no `placedAt`, which ota1484's
+ * shrink-only ratchet counts — and spending a permanent project-wide allowance
+ * to re-prove a claim ota1853TheRoomBoundarySpeaks §G already owns would be a
+ * poor trade. The artwork and audio marks take a plain string id, reach the
+ * SAME `annotateMemory` door, and answer the only question this suite needs to
+ * ask: did OTA-1853's voice survive OTA-1854's cut? */
 describe('§D nothing else lost its voice', () => {
-  const state = (loc: string) => ({
-    player: { currentLocationId: loc, hubRoomId: null },
-    screen: 'exploration',
-    currentScene: null,
-  });
-
-  it('D1 the OTA-1853 room marks still reach annotateMemory', () => {
-    onStoreChange(state('tile_a') as never);
-    onStoreChange(state('tile_b') as never);
-    const kinds = calls.map((c) => c.kind);
-    expect(kinds).toContain(MEM_KIND.ROOM_ENTER);
-    expect(kinds).toContain(MEM_KIND.ROOM_EXIT);
-    // ⚠ The observer hashes the COMPOSED place key, not the bare id — its own
-    // `placeKey(locationId, hubRoomId)`. Asserting the bare id here would pass
-    // only by accident and would pin the wrong contract.
-    expect(calls.some((c) => c.kind === MEM_KIND.ROOM_ENTER && c.code === memCodeForId('loc:tile_b')))
-      .toBe(true);
-  });
-
-  it('D2 the OTA-1853 artwork marks still reach annotateMemory', () => {
+  it('D1 the OTA-1853 artwork marks still reach annotateMemory, with their code', () => {
     markArtworkMount('race:asgardar');
     markArtworkUnmount('race:asgardar');
+    expect(calls).toEqual([
+      { kind: MEM_KIND.ARTWORK_MOUNT, code: memCodeForId('race:asgardar') },
+      { kind: MEM_KIND.ARTWORK_UNMOUNT, code: memCodeForId('race:asgardar') },
+    ]);
+  });
+
+  it('D2 the OTA-1853 audio marks still reach annotateMemory', () => {
+    markAudioPlayerCreate('ambient:wind');
+    markAudioPlayerDispose('ambient:wind');
     const kinds = calls.map((c) => c.kind);
-    expect(kinds).toContain(MEM_KIND.ARTWORK_MOUNT);
-    expect(kinds).toContain(MEM_KIND.ARTWORK_UNMOUNT);
+    expect(kinds).toContain(MEM_KIND.AUDIO_PLAYER_CREATE);
+    expect(kinds).toContain(MEM_KIND.AUDIO_PLAYER_DISPOSE);
   });
 
   it('D3 annotation is NOT globally disabled — subsystem and touch share a run', () => {
     // ⚠ The failure mode this repair could most plausibly have introduced is
     // "the door got shut", which would look like success on every count above.
     // One run, both voices.
-    onStoreChange(state('tile_a') as never);
-    onStoreChange(state('tile_b') as never);
+    markArtworkMount('faction:doubters');
     ordinaryInteraction('quick:DODGE', 'callback');
-    expect(calls.some((c) => c.kind === MEM_KIND.ROOM_ENTER)).toBe(true);
+    expect(calls.some((c) => c.kind === MEM_KIND.ARTWORK_MOUNT)).toBe(true);
     expect(calls.some((c) => c.kind === MEM_KIND.T5_DONE)).toBe(true);
   });
 });
