@@ -169,6 +169,15 @@ export class Walker {
     // up on a road flips this flag; the next tap throws the road out.
     if (walkerControl.abort) throw new WalkerAborted(`road abandoned at tap "${label}"`);
     this.taps += 1;
+    /* ⚠⚠⚠ DEBT #173 — THE ONE PLACE PERCEIVED TIME MOVES. Every action the
+     * walker takes passes through this funnel (FactionWalker and WhisperWalker
+     * both extend Walker), so hanging the clock here makes elapsed time a
+     * function of WALKER PROGRESS rather than of how fast the box happened to
+     * run. Production's timers and its elapsed-time gates are untouched — they
+     * simply read a clock that answers to the walk. No-op when the clock is not
+     * installed, so anything driving the Walker outside a walker session keeps
+     * the real one. */
+    advanceWalkerClock();
     get().appendLog('debug', `ui: tap "${label}"`);
   }
 
@@ -1431,28 +1440,37 @@ export function replayBlock(family: string, id: string): string[] {
       ? []
       : ['      ⚠ PLAYER_WALKER_ONLY reproduces the MISSION, not this WALK — it starts',
          '        from a fresh world and legitimately takes a different path.']),
-    /* ⚠⚠⚠ THE HONEST LIMIT, PRINTED RATHER THAN IMPLIED — AND IT IS A MEASURED
-     * CORRECTION OF WHAT THIS BLOCK USED TO IMPLY.
+    /* ⚠⚠⚠ THIS BLOCK USED TO PRINT A WARNING HERE, AND NO LONGER HAS TO.
      *
-     * The command above reconstructs the WORLD exactly, every time; that is
-     * proven by execution in `walkerReplaySeed` §W rather than claimed. It
-     * reproduces the WALK on most runs, and on this tree not on all of them.
-     * MEASURED, three consecutive runs of the identical prefix command on an
-     * otherwise idle box, `hunt:hunt_mud_titan` taps: 1,122 · 785 · 1,122 — and
-     * the same three on the tree BEFORE this pass touched anything, to the tap,
-     * so it is the harness's inheritance of production's clock and not an edit.
+     * The first pass claimed the replay was exact. The second pass MEASURED that
+     * it was not and printed the limit instead — three consecutive runs of the
+     * identical prefix command gave `hunt:hunt_mud_titan` 1,122 · 785 · 1,122
+     * taps, because production decides several things by elapsed real time and
+     * the walker inherited every one of those reads.
      *
-     * Production decides several things by ELAPSED REAL TIME and the walker
-     * inherits every one of them. Freezing those gates from the harness would
-     * delete the behaviour the walker exists to walk, so the complete fix is a
-     * harness-level deterministic clock and belongs to its own owner-ruled pass
-     * — named debt #173, which already holds it.
+     * Debt #173 removed the INPUT rather than the behaviour. The walker runs on
+     * a harness clock that advances by player ACTION instead of by host speed,
+     * so production's gates still fire, still hold and still expire — they stop
+     * asking how fast this box happens to be. MEASURED after the repair,
+     * through THIS COMMAND, on the prefix that used to diverge: `hunt_mud_titan`
+     * 1,227 taps three times — twice at normal speed and once with every timer
+     * delay scaled 2.5x, a run 2.2x longer — and a six-scenario prefix opened
+     * with the same two numbers. `walkerReplaySeed` §K proves the invariant by
+     * execution rather than by three green runs.
      *
-     * Handing a reader "this reproduces it" without that sentence would be the
-     * same class of defect this block exists to close: an instruction that
-     * sounds exact and is not. So the block says it, in the block. */
-    '      ⚠ run it more than once. The WORLD is reconstructed exactly; the WALK can',
-    '        still differ where production decides by elapsed real time (debt #173).',
+     * ⚠ THE CLAIM IS SCOPED TO THIS HARNESS, not to the application. What is
+     * deterministic is the WALKER's replay: seed + ordered prefix + tap
+     * progression, which is why no new replay token was added — the clock is
+     * derivable from what the command already carries. The one live read still
+     * on the real calendar is the Hidden Market's stall roster, which rotates on
+     * the local DAY: stable inside any one run, so it cannot re-phase a walk,
+     * but a replay months later meets a different set of faces. It is printed
+     * because whoever replays a market break deserves to know. */
+    '      ⚠ the WALK is on the harness clock (debt #173): perceived time advances',
+    '        1,500 ms per player action from a fixed origin, so a fast box and a',
+    '        slow one walk the same road — proven in walkerReplaySeed §K. The one',
+    '        read still on the real calendar is the Hidden Market stall roster,',
+    '        which rotates on the local DAY.',
   ];
 }
 
@@ -1490,6 +1508,109 @@ export function formatReport(r: WalkReport): string {
  * be a different world), same disarm between them.
  * ══════════════════════════════════════════════════════════════════════════ */
 
+/* ══════════════════════════════════════════════════════════════════════════
+ * ⚠⚠⚠ DEBT #173 — THE WALKER'S CLOCK ADVANCES ON TAPS, NOT ON THE BOX.
+ *
+ * MEASURED, and the measurement is the whole justification. Debt #54 proved the
+ * WORLD reconstructs exactly and recorded that the WALK still moved; this is the
+ * input it moved on. Same seed, same reconstructed world, same prefix, with every
+ * timer delay scaled 2.5x (a 2.2x longer run):
+ *
+ *     uncontrolled clock    hunt_mud_titan  1,253 -> 1,086 taps
+ *     controlled clock      hunt_mud_titan  1,253 -> 1,253 taps
+ *
+ * Timer and async ORDERING were perturbed identically in both arms, so they are
+ * excluded: what moved the walk was what `Date.now()` REPORTED.
+ *
+ * ⚠⚠ THE PROVEN MECHANISM, one instance of a distributed class. `narration.ts`
+ * holds an Arbiter-flavour budget — one aside per tile, 25 seconds apart:
+ *
+ *     if (Date.now() - lastArbiterFlavorAt < ARBITER_FLAVOR_GAP_MS) return false;
+ *
+ * and its one caller either returns early (NO seeded draw) or reaches
+ * `chance(30)` (ONE seeded draw). Measured over a two-scenario prefix: 2 grants
+ * on a normal run, 4 when the run took 2.3x longer. Every grant spends one draw
+ * from the seeded stream, so real elapsed time decides how many draws are
+ * consumed, and one extra draw RE-PHASES every roll after it — which is how a
+ * millisecond becomes a 167-tap difference and an "It's night" / "It's dawn"
+ * split. Freezing that one read is NOT sufficient, so the dependency is
+ * distributed; enumerating every site was ruled not worth buying, and this
+ * authority does not need the list because it governs every read at once.
+ *
+ * ⚠⚠⚠ IT ADVANCES. IT DOES NOT FREEZE, and the difference is the repair.
+ * A frozen clock would delete the behaviour the walker exists to walk (no gate
+ * would ever fire again) and collapse every `Date.now()`-derived identity onto
+ * one value — `gameLog`'s `${Date.now()}_${counter}`, `loot_${Date.now()}_${i}`,
+ * `hook_${Date.now()}_…` are all live during a walk. Advancing keeps the gates
+ * firing, keeps the identities moving, and makes WHEN they fire a function of
+ * walker progress instead of host speed.
+ *
+ * ⚠⚠ WHY 1,500 ms A TAP, chosen from production's own numbers and NOT tuned to
+ * reproduce any historical tap count:
+ *
+ *   · the sprint detector calls 3 actions inside 4,000 ms a SPEED RUN, so the
+ *     boundary between "playing" and "not reading" is 4,000/3 ≈ 1,333 ms;
+ *   · OTA-1411's device log measured the owner's own corridor cadence at
+ *     1.4 seconds a room.
+ *
+ * 1,500 ms sits just above the speed-run boundary with margin and next to the
+ * owner's measured cadence: the walker is modelled as a deliberate player, not
+ * a clicker. That keeps it on the ORDINARY side of production's time gates
+ * rather than pinning them to a degenerate corner. The resulting walk is a new
+ * deterministic baseline and is not expected to equal 1,122, 785, 1,060 or
+ * 1,253 — those were produced by an uncontrolled input and are not a target.
+ *
+ * ⚠ THE ORIGIN IS FIXED so the walk does not depend on the day it is run, and
+ * the whole authority lives on `globalThis`: `jest.isolateModules` hands each
+ * module registry a fresh copy of this file, and a second install reading the
+ * FIRST install's patched `Date.now` as "the real one" would never give the
+ * real clock back. One box, reference-counted, restored on the last release.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/** Perceived elapsed time for one player action. See the note above. */
+export const WALKER_TAP_MS = 1_500;
+/** Fixed, so the walk does not depend on the day it is run. 2026-01-01 09:00Z. */
+export const WALKER_CLOCK_ORIGIN_MS = Date.UTC(2026, 0, 1, 9, 0, 0);
+
+interface WalkerClockBox { realNow: () => number; now: number; depth: number }
+const CLOCK_BOX = '__TARTARIA_WALKER_CLOCK__';
+const clockBox = (): WalkerClockBox | undefined =>
+  (globalThis as Record<string, unknown>)[CLOCK_BOX] as WalkerClockBox | undefined;
+
+/** Put the walker on its own clock. Idempotent and reference-counted. */
+export function installWalkerClock(): void {
+  const box = clockBox();
+  if (box) { box.depth += 1; return; }
+  const fresh: WalkerClockBox = {
+    realNow: Date.now.bind(Date),
+    now: WALKER_CLOCK_ORIGIN_MS,
+    depth: 1,
+  };
+  (globalThis as Record<string, unknown>)[CLOCK_BOX] = fresh;
+  (Date as unknown as { now: () => number }).now = () => fresh.now;
+}
+
+/** Give the real clock back. Safe to call when it was never installed. */
+export function uninstallWalkerClock(): void {
+  const box = clockBox();
+  if (!box) return;
+  box.depth -= 1;
+  if (box.depth > 0) return;
+  (Date as unknown as { now: () => number }).now = box.realNow;
+  delete (globalThis as Record<string, unknown>)[CLOCK_BOX];
+}
+
+/** One player action's worth of perceived time. Called from `Walker.tap`. */
+export function advanceWalkerClock(ms: number = WALKER_TAP_MS): void {
+  const box = clockBox();
+  if (box) box.now += ms;
+}
+
+/** What the harness clock currently reports — for tests, never for the walk. */
+export function walkerClockNow(): number | null {
+  return clockBox()?.now ?? null;
+}
+
 /* ⚠ DEBT #54 — polls, not milliseconds; see the long note on `settle` above.
  * Kept at the suite's original 15 ms so the reconstructed world is the world
  * the catalogue walk has always started from. */
@@ -1507,6 +1628,9 @@ async function worldSettle(pred: () => boolean, deadlineMs: number): Promise<voi
  * product's homework interval so the world stops advancing on the wall clock.
  */
 export async function buildWalkerWorld(): Promise<void> {
+  /* ⚠⚠⚠ DEBT #173 — THE CLOCK GOES ON FIRST, so the world is dealt under the
+   * same authority the walk runs on and the whole session reads one clock. */
+  installWalkerClock();
   /* ⚠⚠⚠ FIRST, BEFORE A SINGLE DRAW. `beforeAll` runs before any `beforeEach`,
    * so without this line the world is dealt from wherever module import left
    * the cursor — a function of the loaded tree's BYTES, which is what makes a

@@ -51,12 +51,15 @@ jest.mock('expo-updates', () => ({}));
 //         ordered prefix up to and including that scenario, so it meets the same
 //         world the full run gave it. ONLY does NOT do this: it walks the same
 //         mission against a FRESH world and legitimately takes another path.
-//         ⚠ RUN IT MORE THAN ONCE. The WORLD it reconstructs is exact — proven
-//         by execution in walkerReplaySeed §W — and the WALK reproduces on most
-//         runs but not all, because production decides several things by elapsed
-//         real time and the walker inherits that (named debt #173). Measured
-//         here: three identical prefix commands gave mud_titan 1,122 / 785 /
-//         1,122 taps, the same two outcomes as the tree before this pass.)
+//         The WORLD it reconstructs is exact — proven by execution in
+//         walkerReplaySeed §W — and since debt #173 the WALK is too: the walker
+//         runs on a harness clock that advances 1,500 ms per PLAYER ACTION from
+//         a fixed origin, so production's elapsed-time gates still fire, still
+//         hold and still expire, but measured against walker progress instead of
+//         against how fast the box happened to be. Measured through this very
+//         command: the prefix that used to give mud_titan 1,122 / 785 / 1,122
+//         now gives 1,227 three times, once with every timer delay scaled 2.5x
+//         — a run 2.2x longer, walking the same road. walkerReplaySeed §K.)
 //     TARTARIA_TEST_SEED=0x1234abcd               (debt #54 — base seed override;
 //         absent, the harness default 0x74617274 is unchanged)
 //     PLAYER_WALKER_REPORT=/path/to/report.txt   (appends one block per mission)
@@ -68,7 +71,7 @@ jest.mock('expo-updates', () => ({}));
 // one intermittent seen so far (a mid-range approach that would not close on
 // a road fight) prints the raw log with the debug channel so it can be read.
 
-import { ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS, playMission, playFactionQuest, playWhisperChain, formatReport, buildWalkerWorld, walkerSelection, type WalkReport } from '../test-utils/playerWalker';
+import { ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS, playMission, playFactionQuest, playWhisperChain, formatReport, buildWalkerWorld, uninstallWalkerClock, walkerSelection, type WalkReport } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
@@ -135,6 +138,12 @@ const picked = ALL_MISSIONS.filter(({ family, def }) => selected(`${family}:${de
   });
 
   afterAll(() => {
+    /* ⚠⚠ DEBT #173 — THE REAL CLOCK COMES BACK FIRST, and before anything that
+     * could throw. `afterAll` runs whether the walk finished, broke or timed
+     * out, so this is the one place that covers every failure path; leaving a
+     * patched `Date.now` behind would hand the next suite in this worker a
+     * clock that never moves. */
+    uninstallWalkerClock();
     const ok = reports.filter((r) => r.outcome === 'complete').length;
     const summary = `\n=== player walker: ${ok}/${reports.length} complete without a break ===\n`;
     if (REPORT) appendFileSync(REPORT, summary);

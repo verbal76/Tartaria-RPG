@@ -48,34 +48,50 @@
  * different walk. The FIRST scenario is identical in all three every time — the
  * divergence starts at the second, which is the signature §J already records.
  *
- * ⚠ AND IT IS NOT AN EDIT. The same three runs on the tree BEFORE this pass
- * touched anything gave the same two outcomes, tap for tap, so the repair below
- * preserves the walk exactly and the bistability is inherited, not introduced.
- * What the first pass measured was true of the box it measured on; it was never
- * a property of the harness, and "three green runs" is precisely the evidence
- * that cannot tell those two apart. So the claim is narrowed to what §W can
- * PROVE BY EXECUTION — the WORLD is reconstructed exactly, every time — and the
- * replay block now PRINTS the limit on the walk instead of implying none.
+ * ⚠ AND IT WAS NOT AN EDIT. The same three runs on the tree BEFORE that pass
+ * touched anything gave the same two outcomes, tap for tap, so the bistability
+ * was inherited, not introduced. What the first pass measured was true of the
+ * box it measured on; it was never a property of the harness, and "three green
+ * runs" is precisely the evidence that cannot tell those two apart. So the
+ * claim was narrowed to what §W can PROVE BY EXECUTION — the WORLD is
+ * reconstructed exactly, every time — and the residual was named debt #173.
  *
- * ⚠⚠⚠ THE RESIDUAL, NAMED RATHER THAN HIDDEN — PRODUCTION'S WALL CLOCK.
+ * ⚠⚠⚠ THIRD PASS: #173 IS CLOSED, AND NOT WITH THREE GREEN RUNS EITHER. §K
+ * holds the acceptance evidence and, more importantly, executes the invariant
+ * behind it against the real production gate. The walk that section defends is
+ * a NEW deterministic baseline — mud_titan 1,227 on the prefix that used to
+ * give 1,122 / 785, three times including one arm with every timer delay scaled
+ * 2.5x — and it is not any of the uncontrolled results, because those were
+ * produced by an input that no longer exists.
  *
- * PRODUCTION reads the wall clock by design, and the walker inherits it. Six
+ * ⚠⚠⚠ THE RESIDUAL WAS NAMED RATHER THAN HIDDEN — AND §K NOW CLOSES IT.
+ *
+ * PRODUCTION reads the wall clock by design, and the walker inherited it. Six
  * gates decide product behaviour by elapsed real time: the vendor warm settle
  * (2.5 s), the flourish generation cooldown (45 s), the burst window (5 s), the
  * stealth-hint minimum (120 s), the tutorial nudge quiet period (6 s), and the
  * per-location hours-since-last-visit. On a quiet machine the per-tap timings
- * are reproducible enough that all six land in the same places — that is what
- * the byte-identical replays above are measuring. Under heavy concurrent load
- * they do not: a full run deliberately competed against six jest workers and
- * three typechecks diverged from the quiet baseline in 77 of 89 scenarios,
- * starting at the exact scenario where the load began.
+ * are reproducible enough that all six land in the same places; under load they
+ * are not — a full run competed against six jest workers and three typechecks
+ * diverged from the quiet baseline in 77 of 89 scenarios, starting at the exact
+ * scenario where the load began.
  *
- * ⚠ THAT IS NOT REPAIRED HERE, and the reason is the firewall. Freezing those
- * gates from the harness would delete the behaviour the walker exists to walk.
- * The complete fix is a harness-level deterministic clock — `Date.now` advanced
- * by a fixed amount per tap — which changes what EVERY time-gated product path
- * sees, so it belongs to its own pass with an owner ruling behind it, not to a
- * reproducibility repair that was asked to leave production alone.
+ * ⚠ DEBT #173 REMOVED THE INPUT, NOT THE BEHAVIOUR, which is the distinction
+ * the firewall turns on. Freezing those gates would delete what the walker
+ * exists to walk; the walker instead runs on a harness clock that advances
+ * 1,500 ms per PLAYER ACTION from a fixed origin, so every gate still fires,
+ * still holds and still expires — measured against walker progress instead of
+ * against how fast the box happened to be. Production is told nothing: it calls
+ * `Date.now()` exactly as it always did. §K proves the invariant by execution
+ * against the real Arbiter gate, and §K8 is the test that keeps the product
+ * side of the firewall standing.
+ *
+ * ⚠ THE CLAIM IS SCOPED TO THIS HARNESS. What is deterministic is the WALKER's
+ * replay — seed, ordered prefix, tap progression — not the shipped application,
+ * which runs on the real clock by design. One live calendar read remains inside
+ * the walk (the Hidden Market's roster rotates on the local DAY); it is stable
+ * within a run, it is printed in the replay block, and §K10 is the census that
+ * stops a second one appearing unnoticed.
  *
  * ⚠ WHAT WAS NOT DONE, AND WHY. Isolating every scenario onto a fresh world
  * would make replay trivial and would delete what the walker is for — walking
@@ -126,8 +142,16 @@ import {
   walkerBaseSeed, walkerDefaultSeed, walkerRunMode, walkerSeedToken, replayBlock, formatReport,
   walkOrder, walkerSelection, REPLAY_SEED_VAR, REPLAY_PREFIX_VAR, REPLAY_ISOLATE_VAR,
   ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS,
+  WALKER_TAP_MS, WALKER_CLOCK_ORIGIN_MS,
+  installWalkerClock, uninstallWalkerClock, advanceWalkerClock, walkerClockNow,
   type WalkReport,
 } from '../test-utils/playerWalker';
+
+/** ⚠ DEBT #173 — CAPTURED AT MODULE LOAD, BEFORE ANY TEST CAN PATCH IT. §K
+ *  needs to ask the REAL clock how much real time a controlled run spent; a
+ *  reference taken later could be the harness clock wearing its coat. */
+const REAL_NOW: () => number = Date.now.bind(Date);
+const sleepReal = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const ROOT = path.join(__dirname, '..');
 const read = (p: string) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -324,20 +348,33 @@ describe('debt #54 §D — a break prints one command that reproduces it', () =>
     }
   });
 
-  /* ⚠⚠⚠ THE BLOCK MUST NOT OVERSELL ITSELF. Measured on this tree, the printed
-   * command reconstructs the WORLD exactly (§W) and reproduces the WALK on most
-   * runs but not all — production decides several things by elapsed real time
-   * and the walker inherits them (debt #173). A replay instruction that reads as
-   * exact when it is not is the same defect as one that points at the wrong run,
-   * so the limit is printed where the reader is standing. */
-  test('D7 the block prints its own limit — the WORLD is exact, the WALK may not be', () => {
+  /* ⚠⚠⚠ THE BLOCK MUST NOT OVERSELL ITSELF — AND THIS TEST HAS NOW BEEN WRONG
+   * IN BOTH DIRECTIONS, which is the reason it is worth having.
+   *
+   * The FIRST pass printed nothing and implied the replay was exact; it was not.
+   * The SECOND pass measured the two-outcome walk and made the block print
+   * "run it more than once … the WALK can still differ". Debt #173 then removed
+   * the input that made that true, so continuing to print it would be the same
+   * defect wearing the other hat: a harness that understates what it proves
+   * teaches readers to distrust a replay that works.
+   *
+   * So the block now states the mechanism and its ONE remaining calendar read,
+   * and this pins BOTH halves — the claim and the residual — rather than a
+   * mood. §K is what makes the claim true; this only checks it is what the
+   * reader is told. */
+  test('D7 the block states the harness clock, and its one remaining calendar read', () => {
     const b = replayBlock('whisper', 'nessa_fungus').join('\n');
-    expect(b).toContain('run it more than once');
-    expect(b).toMatch(/WORLD is reconstructed exactly/);
-    expect(b).toMatch(/elapsed real time/);
     expect(b).toContain('#173');
+    expect(b).toMatch(/harness clock/);
+    expect(b).toMatch(/1,500 ms per player action/);
+    expect(b).toMatch(/Hidden Market stall roster/);
+    expect(b).toMatch(/rotates on the local DAY/);
     // …and it is on a BREAK report, where the reader actually meets it.
-    expect(formatReport(broken)).toContain('run it more than once');
+    expect(formatReport(broken)).toMatch(/harness clock/);
+    // ⚠ THE WITHDRAWN SENTENCE MUST BE GONE, not merely outvoted by new text.
+    // Leaving it beside the new claim would print a contradiction.
+    expect(b).not.toContain('run it more than once');
+    expect(b).not.toMatch(/WALK can\s*\n?\s*still differ/);
   });
 
   test('D6 a sequence-dependent walk SAYS so, so ONLY is not mistaken for a replay', () => {
@@ -551,9 +588,16 @@ describe('debt #54 §H — the world starts from the seed, not from the byte lay
    * it instead of reading it. These two keep the ORDERING claim, which §W cannot
    * see from outside: a reconstruction that re-seeded after drawing its grounds
    * would still be self-consistent and still be wrong. */
-  test('H1 the world builder re-seeds as the FIRST thing it does, and the suite delegates', () => {
+  /* ⚠⚠ THIRD PASS — THE BUILD NOW OPENS WITH TWO STATEMENTS, NOT ONE. Debt
+   * #173's clock goes on ahead of the re-seed, because the world is DEALT
+   * inside this function and `startNewGame` stamps `Date.now()` into the
+   * character key: installing after the deal would leave that stamp on the real
+   * clock. The re-seed's own claim is unchanged and is what H2 enforces — it
+   * precedes every call that DRAWS — and `installWalkerClock()` draws nothing,
+   * so the order below is the only one that satisfies both. */
+  test('H1 the world builder opens with the clock and the re-seed, in that order, and the suite delegates', () => {
     expect(WALKER_CODE).toMatch(
-      /export async function buildWalkerWorld\(\): Promise<void> \{\s*\(globalThis as \{[^}]*\}\)\.__TARTARIA_RESEED_RANDOM__\?\.\(\);/,
+      /export async function buildWalkerWorld\(\): Promise<void> \{\s*installWalkerClock\(\);\s*\(globalThis as \{[^}]*\}\)\.__TARTARIA_RESEED_RANDOM__\?\.\(\);/,
     );
     // …and the suite's beforeAll builds the world ONLY by calling it.
     expect(SIM_CODE).toMatch(/beforeAll\([\s\S]{0,400}?await buildWalkerWorld\(\);\s*\}\);/);
@@ -704,6 +748,15 @@ describe('debt #54 §J — the walker does not read the clock', () => {
   const WALKER_SRC = read('test-utils/playerWalker.ts');
   const SIM_SRC = read('__tests__/playerWalkerSim.test.ts');
 
+  /* ⚠⚠ DEBT #173 CHANGED WHAT THIS CAN SAY, AND THE DIFFERENCE IS EXACT.
+   * The walker now OWNS a clock (§K) — it installs one, advances it on taps and
+   * gives the real one back. What it still may not do is ASK a clock and then
+   * decide something on the answer, which is the defect this section closes. So
+   * the three negatives below stand unchanged (nothing calls `Date.now()`,
+   * `performance.now()` or `new Date()`), and J1b adds the half that the #173
+   * repair made necessary: every mention of `Date` in the file must live inside
+   * the clock authority, which is where the one legitimate `Date.now` reference
+   * — the capture of the REAL function so it can be restored — belongs. */
   test.each([
     ['test-utils/playerWalker.ts', WALKER_CODE],
     ['__tests__/playerWalkerSim.test.ts', SIM_CODE],
@@ -711,6 +764,18 @@ describe('debt #54 §J — the walker does not read the clock', () => {
     expect(code).not.toMatch(/Date\.now\(/);
     expect(code).not.toMatch(/performance\.now\(/);
     expect(code).not.toMatch(/new Date\(/);
+  });
+
+  test('J1b every mention of Date in the walker lives inside the clock authority', () => {
+    const open = WALKER_CODE.indexOf('export function installWalkerClock');
+    const close = WALKER_CODE.indexOf('export function walkerClockNow');
+    expect(open).toBeGreaterThan(-1);
+    expect(close).toBeGreaterThan(open);
+    const outside = WALKER_CODE.slice(0, open) + WALKER_CODE.slice(close);
+    // `WALKER_CLOCK_ORIGIN_MS = Date.UTC(…)` is declared just above the
+    // authority, so allow that one constant and nothing else.
+    expect(outside.replace(/Date\.UTC\([^)]*\)/g, ' ')).not.toMatch(/\bDate\b/);
+    expect(SIM_CODE).not.toMatch(/\bDate\b/);
   });
 
   /* ⚠ SECOND PASS — BOTH SETTLES NOW LIVE IN THE WALKER HELPER. The suite's own
@@ -815,6 +880,13 @@ describe('debt #54 §W — the replay RECONSTRUCTS THE WORLD, and this executes 
         await w.buildWalkerWorld();
         fingerprint = w.walkerWorldDigest();
       } finally {
+        /* ⚠⚠ DEBT #173 — THE BUILD INSTALLS THE CLOCK, SO EVERY CALLER RELEASES
+         * IT. `isolateModulesAsync` hands this block a fresh copy of the walker
+         * module, but the clock deliberately lives on `globalThis` (see the note
+         * beside `installWalkerClock`), so a reconstruction that forgot to
+         * release would leave the rest of THIS FILE on a clock that never moves
+         * — and every later test would still pass while measuring nothing. */
+        w.uninstallWalkerClock();
         console.log = log; console.warn = warn; console.error = error;
         H.__TARTARIA_RESEED_RANDOM__ = hook;
       }
@@ -858,11 +930,365 @@ describe('debt #54 §W — the replay RECONSTRUCTS THE WORLD, and this executes 
       try {
         await w.buildWalkerWorld();
         installed = gs._homeworkInstalled();
-      } finally { console.log = log; console.warn = warn; console.error = error; }
+      } finally {
+        w.uninstallWalkerClock();   // debt #173 — as in `reconstruct()` above.
+        console.log = log; console.warn = warn; console.error = error;
+      }
     });
     // hydrate() arms it; the build is what takes it back off. §I5 proves the
     // door works — this proves the build walked through it.
     expect(installed).toBe(false);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+describe('debt #173 §K — the clock the WALKER moves, and the two-outcome walk it ended', () => {
+  /* ⚠⚠⚠ THE RESIDUAL §W NAMED, CLOSED — AND WHAT IT ACTUALLY WAS.
+   *
+   * Debt #54 proved the WORLD reconstructs exactly and recorded, honestly, that
+   * the WALK still did not: the identical prefix command gave `hunt_mud_titan`
+   * 1,122 · 785 · 1,122 taps. That residual was named #173 and left standing,
+   * because the obvious repair — freeze production's wall-clock gates from the
+   * harness — deletes the behaviour the walker exists to walk.
+   *
+   * ⚠⚠ THE CHANNEL WAS MEASURED BEFORE ANYTHING WAS EDITED, and the negative
+   * arm is why it is believed. Scaling every timer delay 2.5x (a 2.2x longer
+   * run) moved the walk 167 taps; doing the same with the clock controlled
+   * moved it zero. Timer and async ORDERING were perturbed identically in both
+   * arms, so ordering is excluded: what moved the walk was what `Date.now()`
+   * REPORTED.
+   *
+   * ⚠⚠ THE MECHANISM, and it is the one K3/K4 execute. `narration.ts` rations
+   * unsolicited Arbiter asides — one per tile, 25 seconds apart — and its one
+   * caller either returns early (NO seeded draw) or reaches `chance(30)` (ONE
+   * seeded draw). Measured over a two-scenario prefix: 2 grants on a normal
+   * run, 4 when the run took 2.3x longer. Every grant spends a draw, and one
+   * extra draw RE-PHASES every roll after it. That is how a millisecond becomes
+   * a 167-tap difference. Freezing that one read was measured NOT sufficient —
+   * the dependency is distributed — which is why the repair governs the clock
+   * itself rather than a list of sites nobody can finish enumerating.
+   *
+   * ⚠⚠⚠ SO THE CLOCK ADVANCES, IT DOES NOT FREEZE, and K3c is the arm that
+   * proves the difference matters: frozen, production's gate grants ONCE and
+   * never again, which is the behaviour deleted rather than controlled.
+   *
+   * ⚠ MEASURED AFTER THE REPAIR — through the PRINTED COMMAND ITSELF, on the
+   * prefix that used to diverge, `PLAYER_WALKER_UPTO=hunt:hunt_mud_titan`:
+   *
+   *     run 1, timers x1     bog_dragon 904 · mud_titan 1,227      (45 s)
+   *     run 2, timers x1     bog_dragon 904 · mud_titan 1,227      (45 s)
+   *     run 3, timers x2.5   bog_dragon 904 · mud_titan 1,227      (99 s)
+   *     6-scenario prefix    904 · 1,227 · 949 · 1,452 · 749 · 458
+   *
+   * Against the same command on the same suite BEFORE the repair: mud_titan
+   * 1,122 · 785 · 1,122. The 2.5x arm is the decisive one — it ran 2.2x longer
+   * and walked the same road to the tap — and the six-scenario prefix opens with
+   * the same two numbers, so suite shape stopped moving the walk as well (§I
+   * records one extra trivial `it` moving scenario 2 from 785 to 1,060).
+   *
+   * ⚠ A SEPARATE THROWAWAY HARNESS carried acceptance D and E, because the suite
+   * reports taps and not state: driving `buildWalkerWorld()` + two missions
+   * directly gave the same taps at x1 and x2.5, the same in-world hour
+   * (128.05), 500 of 500 unique log identities and a timestamp span of
+   * 175,500 ms — advancing, not collapsed. Its ABSOLUTE tap counts are its own
+   * and are deliberately not quoted here: it has no per-test re-seed, so it is a
+   * different dice regime from the suite. Only the suite's numbers above
+   * describe the suite.
+   *
+   * ⚠ WHAT THIS SECTION DOES *NOT* SPEND FOUR MINUTES DOING. Those rows are the
+   * acceptance evidence, and re-walking them on every CI shard would buy a
+   * slower version of the same claim. What runs here is the INVARIANT behind
+   * them, executed against the real production gate in under a second: perceived
+   * time is a function of the tap count and of nothing else (K1, K2), the gate
+   * decides identically however long the box takes (K3), it still holds and
+   * still expires (K4), identities still move (K5), and the real clock always
+   * comes back (K6).
+   *
+   * ⚠⚠ NEGATIVE CONTROL, RUN AND NOT COMMITTED. The proven gate was temporarily
+   * given back an uncontrolled real clock — `Date.now` captured at module load,
+   * used for both the comparison and the stamp — with the rest of this harness
+   * left intact. K3, K3b, K3c and K4 went red, and for the intended reason: on
+   * real time the 25-second gap never expires inside a fast process, so the
+   * budget grants ONCE and holds for the remaining 59 actions. narration.ts was
+   * then restored byte-exact (sha256 14b13899…) and all 77 tests came back.
+   *
+   * ⚠ WORTH KNOWING WHICH HALF CAUGHT IT. K3's EQUALITY half stayed green under
+   * the control, because 360 ms of real sleeps cannot cross a 25-second gap —
+   * no affordable test can. What went red was the NON-DEGENERACY half: a gate
+   * that can only ever grant once is not the gate the game ships. So this
+   * section's protection against a silent return to real time is K3's
+   * "grants more than once", K3b's comparison and K4's boundary, not the
+   * equality assertion on its own.
+   *
+   * ⚠ AND THE CLAIM IS SCOPED. What is deterministic is the WALKER's replay —
+   * seed, ordered prefix, tap progression. This says nothing about the shipped
+   * application, which still runs on the real clock by design; K8 is the test
+   * that keeps it that way. */
+  const narration = () =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../app/ai/narration') as typeof import('../app/ai/narration');
+
+  /** A store just wide enough for the budget: it asks which tile the player is
+   *  standing on, and nothing else. */
+  const standingOn = (tile: string) =>
+    (() => ({ currentScene: { location: { id: tile }, microMicroId: 'a' } })) as unknown as
+      Parameters<typeof import('../app/ai/narration').takeArbiterFlavorBudget>[0];
+
+  const ACTIONS = 60;
+  const TILE_EVERY = 5;
+  const grantsIn = (gate: string) => [...gate].filter((c) => c === '1').length;
+
+  /** Sixty player actions, crossing into a new tile every fifth — the shape the
+   *  walker actually produces. Returns the gate's decision string, the time
+   *  PRODUCTION perceived while it happened, and the real time it really took. */
+  const sixtyActions = async (
+    opts: { clock: boolean; advance?: boolean; realMsPerAction?: number },
+  ): Promise<{ gate: string; perceivedMs: number; realMs: number }> => {
+    const n = narration();
+    if (opts.clock) installWalkerClock();
+    const realT0 = REAL_NOW();
+    try {
+      n._resetArbiterFlavorBudget();
+      const t0 = Date.now();
+      const decisions: string[] = [];
+      for (let i = 0; i < ACTIONS; i++) {
+        if (opts.clock && opts.advance !== false) advanceWalkerClock();
+        const tile = `tile_${Math.floor(i / TILE_EVERY)}`;
+        decisions.push(n.takeArbiterFlavorBudget(standingOn(tile)) ? '1' : '0');
+        if (opts.realMsPerAction) await sleepReal(opts.realMsPerAction);
+      }
+      return { gate: decisions.join(''), perceivedMs: Date.now() - t0, realMs: REAL_NOW() - realT0 };
+    } finally {
+      if (opts.clock) uninstallWalkerClock();
+    }
+  };
+
+  test('K1 ⚠⚠⚠ perceived time is the ORIGIN plus the TAP COUNT — which is why no replay token was added', () => {
+    /* ⚠ THE #54 CONTRACT, UNCHANGED. The printed command carries a seed and an
+     * ordered prefix; the walk those two produce fixes the tap count; the tap
+     * count fixes the clock. Nothing else is an input, so there is nothing else
+     * to record, hand back, or let drift out of the command (see K9). */
+    installWalkerClock();
+    try {
+      expect(Date.now()).toBe(WALKER_CLOCK_ORIGIN_MS);
+      expect(walkerClockNow()).toBe(WALKER_CLOCK_ORIGIN_MS);
+      for (let i = 0; i < 40; i++) advanceWalkerClock();
+      expect(Date.now()).toBe(WALKER_CLOCK_ORIGIN_MS + 40 * WALKER_TAP_MS);
+      expect(walkerClockNow()).toBe(Date.now());
+    } finally { uninstallWalkerClock(); }
+  });
+
+  test('K2 ⚠⚠⚠ real elapsed time does not reach production — only a player action moves the clock', async () => {
+    installWalkerClock();
+    try {
+      const before = Date.now();
+      const realT0 = REAL_NOW();
+      await sleepReal(120);
+      // ⚠ the sleep must really have happened, or this test proves nothing.
+      expect(REAL_NOW() - realT0).toBeGreaterThanOrEqual(100);
+      expect(Date.now()).toBe(before);
+      advanceWalkerClock();
+      expect(Date.now()).toBe(before + WALKER_TAP_MS);
+    } finally { uninstallWalkerClock(); }
+  });
+
+  test('K3 ⚠⚠⚠ the proven channel, executed: the real Arbiter gate decides by ACTIONS, not by host speed', async () => {
+    const quick = await sixtyActions({ clock: true });
+    const slow = await sixtyActions({ clock: true, realMsPerAction: 6 });
+    // ⚠ the two arms must genuinely differ in REAL time, or they are one arm.
+    expect(slow.realMs).toBeGreaterThan(quick.realMs + 200);
+    expect(slow.gate).toBe(quick.gate);
+    expect(quick.perceivedMs).toBe(ACTIONS * WALKER_TAP_MS);
+    expect(slow.perceivedMs).toBe(ACTIONS * WALKER_TAP_MS);
+    /* ⚠ AND THE ANSWER IS NOT A CONSTANT. "Deterministic" is trivially true of a
+     * gate that always says no; the owner's acceptance says the budget must
+     * still be capable of granting more than once. It grants, and it holds. */
+    expect(grantsIn(quick.gate)).toBeGreaterThan(1);
+    expect(grantsIn(quick.gate)).toBeLessThan(ACTIONS);
+  });
+
+  test('K3b ⚠⚠⚠ without the clock those same sixty actions are worth whatever THIS BOX took', async () => {
+    /* The removed input, stated as an experiment rather than as a story. With
+     * the clock off, production's 25-second gate is measured against how fast
+     * this process happens to run — which is exactly the coin whose toss gave
+     * 1,122 / 785. It is also what makes K3 non-vacuous. */
+    const controlled = await sixtyActions({ clock: true });
+    const uncontrolled = await sixtyActions({ clock: false });
+    expect(controlled.perceivedMs).toBe(ACTIONS * WALKER_TAP_MS);
+    expect(uncontrolled.perceivedMs).toBeLessThan(ACTIONS * WALKER_TAP_MS);
+    expect(grantsIn(uncontrolled.gate)).toBeLessThan(grantsIn(controlled.gate));
+  });
+
+  test('K3c ⚠⚠⚠ a FROZEN clock would have deleted the behaviour — the repair is the ADVANCE', async () => {
+    const frozen = await sixtyActions({ clock: true, advance: false });
+    const moving = await sixtyActions({ clock: true });
+    expect(frozen.perceivedMs).toBe(0);
+    // One aside on the first tile and silence forever after: no gate can expire
+    // when no time passes. That is the product defect a freeze would have hidden.
+    expect(grantsIn(frozen.gate)).toBe(1);
+    expect(grantsIn(moving.gate)).toBeGreaterThan(1);
+  });
+
+  test("K4 ⚠⚠⚠ production's elapsed-time gate still HOLDS and still EXPIRES — now measured in player actions", () => {
+    /* ⚠ THE OWNER'S ACCEPTANCE TEST D, EXECUTED. Determinism bought by pinning
+     * a gate permanently open or permanently shut would be a harness that walks
+     * a game nobody ships. This drives the REAL budget over the REAL constant
+     * and finds the boundary: one action short of the gap it holds; one action
+     * later it grants. */
+    const n = narration();
+    const tapsToClear = Math.ceil(n._ARBITER_FLAVOR_GAP_MS / WALKER_TAP_MS);
+    const afterTaps = (taps: number): boolean => {
+      installWalkerClock();
+      try {
+        n._resetArbiterFlavorBudget();
+        expect(n.takeArbiterFlavorBudget(standingOn('tile_a'))).toBe(true);
+        for (let i = 0; i < taps; i++) advanceWalkerClock();
+        return n.takeArbiterFlavorBudget(standingOn('tile_b'));
+      } finally { uninstallWalkerClock(); }
+    };
+    expect(afterTaps(tapsToClear - 1)).toBe(false);
+    expect(afterTaps(tapsToClear)).toBe(true);
+    /* ⚠ AND THE STEP IS NOT TUNED TO THE GATE. 1,500 ms comes from production's
+     * own numbers — the sprint detector calls 3 actions in 4,000 ms a speed run,
+     * so 1,333 ms is the boundary between playing and clicking — not from any
+     * historical tap count. The consequence is checked, not the intent: a gap
+     * this wide takes many actions to clear, so it stays a real gate. */
+    expect(tapsToClear).toBeGreaterThan(4);
+  });
+
+  test('K5 ⚠⚠ timestamp-derived identities keep MOVING, and keep being different from each other', () => {
+    /* The owner's acceptance test E. `gameLog` stamps every entry
+     * `${Date.now()}_${counter}` and the walk is full of such identities; a
+     * frozen clock would collapse the timestamp half of every one of them. */
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { makeEntry } = require('../app/engine/gameLog') as typeof import('../app/engine/gameLog');
+    installWalkerClock();
+    try {
+      const entries = Array.from({ length: 20 }, (_, i) => {
+        advanceWalkerClock();
+        return makeEntry('system', `line ${i}`);
+      });
+      expect(new Set(entries.map((e) => e.id)).size).toBe(entries.length);
+      expect(entries[entries.length - 1]!.ts - entries[0]!.ts).toBe(19 * WALKER_TAP_MS);
+    } finally { uninstallWalkerClock(); }
+  });
+
+  test('K6 ⚠⚠⚠ the real clock comes back — out of a throw, and only on the LAST release', () => {
+    /* ⚠ A HARNESS THAT LEAVES `Date.now` PATCHED hands the next suite in this
+     * worker a clock that never moves, and that suite passes while measuring
+     * nothing. `isolateModulesAsync` makes this concrete: each copy of the
+     * walker module would otherwise capture the previous copy's patched
+     * function as "the real one", so the authority is one reference-counted box
+     * on `globalThis` and the real function is only ever restored from it. */
+    const realBefore = REAL_NOW();
+    installWalkerClock();
+    installWalkerClock();
+    uninstallWalkerClock();
+    expect(Date.now()).toBe(WALKER_CLOCK_ORIGIN_MS);   // still held by the outer install
+    expect(() => {
+      try { throw new Error('road abandoned'); } finally { uninstallWalkerClock(); }
+    }).toThrow('road abandoned');
+    expect(walkerClockNow()).toBeNull();
+    expect(Math.abs(Date.now() - REAL_NOW())).toBeLessThan(5);
+    expect(Date.now()).toBeGreaterThanOrEqual(realBefore);
+    uninstallWalkerClock();                            // an extra release is harmless
+    expect(Math.abs(Date.now() - REAL_NOW())).toBeLessThan(5);
+  });
+
+  test('K6b ⚠⚠ the walker suite releases it on EVERY path, which is why the release is in afterAll', () => {
+    // `afterAll` runs whether the walk finished, broke or timed out; putting the
+    // release anywhere else would cover the green path only.
+    const after = SIM_CODE.slice(SIM_CODE.indexOf('afterAll('));
+    expect(after.indexOf('uninstallWalkerClock()')).toBeGreaterThan(-1);
+    // …and it is the FIRST thing there, ahead of anything that could throw.
+    expect(after.indexOf('uninstallWalkerClock()')).toBeLessThan(after.indexOf('reports.filter'));
+  });
+
+  test('K7 ⚠⚠ perceived time moves in exactly ONE place, and it is the counted tap', () => {
+    /* ⚠ ONE FUNNEL, ONE AMOUNT. `FactionWalker` and `WhisperWalker` both extend
+     * `Walker`, so every action in all five families passes through `tap()`. A
+     * second advance anywhere — a longer one for travel, say — would make the
+     * clock a function of which code path ran rather than of how many actions
+     * the player took, and the derivation in K1 would quietly stop holding. */
+    const calls = [...WALKER_CODE.matchAll(/advanceWalkerClock\(\)/g)];
+    expect(calls).toHaveLength(1);
+    const before = WALKER_CODE.slice(Math.max(0, calls[0]!.index! - 200), calls[0]!.index!);
+    expect(before).toContain('this.taps += 1');
+    expect(SIM_CODE).not.toContain('advanceWalkerClock');
+    // The amount is one named constant: the declaration and the default argument.
+    expect((WALKER_CODE.match(/WALKER_TAP_MS/g) ?? []).length).toBe(2);
+    // And the clock goes on inside the world build, so the world is dealt under it.
+    const build = WALKER_CODE.slice(WALKER_CODE.indexOf('export async function buildWalkerWorld'));
+    expect(build.indexOf('installWalkerClock()')).toBeGreaterThan(-1);
+    expect(build.indexOf('installWalkerClock()')).toBeLessThan(build.indexOf('get().hydrate()'));
+  });
+
+  test('K8 ⚠⚠⚠ production never learns the harness has a clock', () => {
+    /* ⚠ THE FIREWALL, ASSERTED. The whole repair is that production is told
+     * nothing: it reads `Date.now()` exactly as it always has, and the harness
+     * changes what that function returns from outside. The moment a product file
+     * imports a test clock, branches on `__DEV__` for gameplay, or special-cases
+     * the walker, the determinism stops being a harness property and starts
+     * being a shipped behaviour change. */
+    for (const f of ['app/ai/narration.ts', 'app/engine/rng.ts', 'app/engine/gameLog.ts', 'app/state/gameStore.ts', 'app/state/sprint.ts']) {
+      const src = read(f);
+      expect(src).not.toContain('WALKER_TAP_MS');
+      expect(src).not.toContain('WalkerClock');
+      expect(src).not.toContain('__TARTARIA_WALKER_CLOCK__');
+      expect(src).not.toContain('test-utils/');
+    }
+    // The proven gate is byte-for-byte the gate it was: same read, same constant.
+    const nar = codeOnly(read('app/ai/narration.ts'));
+    expect(nar).toContain('if (Date.now() - lastArbiterFlavorAt < ARBITER_FLAVOR_GAP_MS) return false;');
+    expect(nar).toContain('const ARBITER_FLAVOR_GAP_MS = 25_000;');
+    expect(nar).not.toMatch(/__DEV__|process\.env\.JEST|NODE_ENV === 'test'/);
+  });
+
+  test('K9 ⚠⚠⚠ no second replay system: the printed command carries the same two variables it did', () => {
+    /* The owner's acceptance test F. The clock is DERIVABLE from seed + prefix +
+     * tap progression (K1), so adding a token for it would create a second
+     * replay authority to drift from the first — which is the defect §E exists
+     * to prevent, rebuilt by hand. */
+    const cmd = replayBlock('whisper', 'nessa_fungus').find((l) => l.includes('npx jest'))!;
+    const envs = [...cmd.matchAll(/([A-Z_][A-Z0-9_]*)=/g)].map((m) => m[1]);
+    expect(envs).toEqual([REPLAY_SEED_VAR, REPLAY_PREFIX_VAR]);
+    // …and no environment override exists for the clock to be set from either.
+    expect(WALKER_CODE).not.toMatch(/process\.env\.[A-Z_]*(CLOCK|TAP_MS|ORIGIN)/);
+  });
+
+  test('K10 ⚠⚠ Date.now is the gameplay core\'s only LIVE clock — which is why governing it is enough', () => {
+    /* ⚠ THE ASSUMPTION UNDER THE WHOLE REPAIR, MADE FALSIFIABLE. Controlling
+     * `Date.now` controls what production perceives only while `Date.now` is
+     * what production asks. A new `new Date()` or `performance.now()` in the
+     * engine or the store would be a live read the harness does not govern, and
+     * the walk would start drifting again with nothing going red.
+     *
+     * Two live reads exist today and both are allowed by name:
+     *   · vendors.ts `marketRotationDay` — the Hidden Market roster rotates on
+     *     the LOCAL CALENDAR DAY. Constant inside any one run, so it cannot
+     *     re-phase a walk; a replay months later meets other faces, which is
+     *     why `replayBlock()` prints it.
+     *   · missionTrace.ts — a forensic timestamp on a dump record, read by
+     *     nothing.
+     * `new Date(<value>)` is not a clock read — it formats a stamp already
+     * taken — so only the no-argument form counts. */
+    const ALLOWED = new Set(['app/engine/vendors.ts', 'app/engine/missionTrace.ts']);
+    const found: string[] = [];
+    const walk = (dir: string): void => {
+      for (const e of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+        const rel = `${dir}/${e.name}`;
+        if (e.isDirectory()) walk(rel);
+        else if (e.name.endsWith('.ts') && !e.name.endsWith('.d.ts')) {
+          const code = codeOnly(read(rel));
+          if (/new Date\(\s*\)/.test(code) || /performance\s*\.\s*now\s*\(/.test(code)) found.push(rel);
+        }
+      }
+    };
+    walk('app/engine');
+    walk('app/state');
+    expect(found.filter((f) => !ALLOWED.has(f))).toEqual([]);
+    // …and the allowlist is not stale: both entries still hold a live read.
+    expect(found.sort()).toEqual([...ALLOWED].sort());
   });
 });
 
