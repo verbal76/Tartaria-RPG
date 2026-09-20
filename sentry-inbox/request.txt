@@ -299,3 +299,90 @@ newest timestamp seen — a short pull is the answer to the owner's question.
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion, and nothing retrieved may be attributed to any open freeze — the
 20:02:55 kill included.
+
+═══════════════════════════════════════════════════════════════════════════════
+pull 2026-09-20 — ON DEMAND, fired by the owner ("update the log pull to right
+now"). Two things happened in the last three hours and neither has a device
+capture yet.
+
+  • OTA-1853 went live on golem at 00:48:10Z and on HAL in the same run
+    ("OTA complete for line 'hal' — 3 target(s)", revision 1126ae79b492, stamp
+    2026-09-19-1853-the-ring-learns-who). DIAGNOSTICS ONLY — it repairs no
+    memory and changes no gameplay. What it changes is what a report can SAY.
+
+  • The 23:54:29Z Pixel 10 Pro XL report ("Long lag on initial load", stamp
+    2026-09-19-1850) located that lag precisely, and the fix has NOT shipped.
+
+Last bundle in the tree: assembled_mu91nvxz49wq. Everything below concerns what
+arrived after it.
+
+1. ANY REPORT ON STAMP 2026-09-19-1853 — does the bigger window arrive? The one
+   defect this OTA exists to correct: the recorder took 504 samples with
+   `evicted 0` and the composer printed 48, so every ratchet step happened
+   before the printed window opened. On 1853 the block must read "Samples (last
+   N of N)" with N in the hundreds, and event rows 32 → 64.
+   ⚠ A 1853 report still showing a 48-row sample block is the finding and is
+   the opposite of what shipped — flag it loudly rather than filing it.
+
+2. THE BOOT GATE, ON EVERY REPORT REGARDLESS OF STAMP. The live unshipped bug
+   and the reason for this pull. From the 23:54 Pixel capture:
+
+       23:54:03.845  process start
+       23:54:04.001  ota: Checking…
+                     ← 8.353s of total silence, no JS logging at all
+       23:54:12.354  OTA session start → world resumes, character gate opens
+       23:54:14.008  ota: Error
+       23:54:14.009  ota: boot check result = errored
+
+   `otaGateSafetyCap` is setTimeout(…, 8000) and force-opens the character-entry
+   gate; `checkTimeoutMs` is 10_000. 8 < 10, so on any boot where the network
+   cannot answer the cap ALWAYS fires first and the player waits a fixed eight
+   seconds. The cap's own comment still claims it is "longer than the OTA
+   check's own 5s budget" — that budget no longer exists.
+   For each new report extract, in order:
+     · process start → first `ota: Checking…`
+     · `Checking…` → the next line of ANY kind (the wait the player feels;
+       ~8.35s means the cap fired)
+     · `Checking…` → `boot check result = …`, and which result
+   Contrast from this device's own history: 12 of 13 prior checks resolved in
+   0.143–0.409s, one at 3.067s, and only the errored one reached 10.008s. This
+   bites on a cold radio or offline, not in general.
+
+3. THE JOINED STEP TABLE, on any 1853 report. Steps are now detected at compose
+   time and printed before the raw rows:
+       Retained steps: N (floor window 10, rise ≥48MB held 8 samples)
+         STEP 1: +Xs → +Ys · floor A → B MB (+C retained) · peak D · recovered E%
+           inside: ROOM_ENTER×13 · ROSTER_CREATE×1 · …
+   Quote verbatim if present. A step printing "(no annotated events inside this
+   step …)" is a real answer, not a gap — the subsystem that allocated it does
+   not report yet.
+   ⚠ CO-LOCATION IN TIME AND NOTHING MORE. The section names no holder and no
+   cause, by design. Do not summarise it as "X caused the rise".
+
+4. THE NEW EVENT VOCABULARY — kinds 90–125 (ROOM_ENTER/EXIT, ROUTE_MOUNT/
+   UNMOUNT, SCENE_CREATE/DISPOSE, ROSTER_CREATE/DISPOSE, ARTWORK_MOUNT/UNMOUNT,
+   AUDIO_PLAYER_CREATE/DISPOSE). Before 1853 the ring had words only for Qwen,
+   MiniLM, voice, touches and persistence, which is why the SE forensic pass
+   could not attribute a single step. Report which appear and their codes.
+   Absence on a 1853 bundle is itself evidence: either the boundary was never
+   crossed during the capture, or the observer never armed.
+
+5. PHASE, which this OTA deliberately did NOT fix. Every sample on Build 208
+   reads `phase: unknown`. The JS side was traced end to end and holds, so it is
+   a native defect no OTA can reach. A 1853 report still showing `unknown`
+   everywhere CONFIRMS the diagnosis — record it, do not raise it as new. Any
+   sample reading active/inactive/background is a surprise worth flagging.
+
+Device context: the test phones carry no SIM and update over a hotspot, so an
+offline or cold-radio boot is normal and read 2 is expected to fire often. A
+device still reporting an older stamp has simply not cold-booted since 00:48 —
+note the stamp; do not treat it as a publish failure.
+
+Usual SCRUB AND ASSEMBLY ACCOUNTING applies. (assembled_mu91nvxz49wq came in at
+6/7 parts with [7] missing; its boot window survived intact, but say so when it
+happens.) If nothing new is in Sentry, say so plainly in the VERDICT block with
+the newest timestamp seen — "nothing was there" and "I stopped looking" are
+different answers and only one is useful.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion, and nothing retrieved may be attributed to any open freeze.
