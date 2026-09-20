@@ -31054,7 +31054,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * owner's device. A slow or offline launch may still legitimately spend the
  * full 10s budget — what changed is that the emergency hatch can no longer fire
  * before that budget has had its chance. */
-export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';
+/* ⚠⚠⚠ OTA-1856 — THE BASELINE IS NOT THE FIRST SAMPLE.
+ *
+ * DIAGNOSTIC INTERPRETATION ONLY. Nothing here allocates, frees, disposes,
+ * throttles or schedules anything; no gameplay, no Qwen lifecycle, no audio
+ * lifecycle, no room/scene/roster behaviour, no native sample cadence and no
+ * ring capacity moved. The native recorder measures exactly what it measured
+ * yesterday. What changed is what TypeScript is willing to CLAIM about it.
+ *
+ * ⚠ MEASURED ON THE 2026-09-20 iPHONE SE CAPTURE (OTA-1854, first boot after an
+ * OTA apply). The report printed
+ *
+ *     Footprint: baseline 68MB · peak 1690MB · last 1266MB · high water 1877MB
+ *     Shape: RATCHET — retained +1198MB vs baseline · recovery 26% · ratchet 6 step(s) +1816MB
+ *
+ * and every one of those numbers reproduces exactly from the emitted samples,
+ * so the samples were never in question. The interpretation was:
+ *
+ *  1. BASELINE WAS THE MEDIAN OF THE FIRST EIGHT SAMPLES, and on that capture
+ *     all eight were pre-hydration or mid-boot — 29·39·50·68·29·216·790·904,
+ *     median 68MB. The first five were taken before the JS bundle had been
+ *     evaluated (81k malloc blocks against 1.98M a moment later). A median
+ *     survives ONE bad member; it cannot rescue a window where every member is
+ *     wrong.
+ *
+ *  2. THE SAMPLE STREAM WAS TREATED AS ONE OBSERVATION. It was three: the
+ *     recorder samples in bursts and restarts its own clock at each one, and
+ *     the gaps between them are time nobody watched. `last − first` across that
+ *     is not a measurement. The same crossing made the step table print
+ *     `STEP 4: +46.1s → +0.8s`, an interval running backwards because its two
+ *     ends came off two different clocks.
+ *
+ * REPLAYED THROUGH THE REPAIR, the same 477 device samples now read
+ * `process start 29MB` (kept as EVIDENCE), `analysis baseline 1207MB`,
+ * `retained +59MB`, `recovery 88%`, three epochs named, and zero backwards
+ * intervals. The `+1816MB` figure was never retention — it sums upward floor
+ * movements and never subtracts a downward one — so it is now labelled as the
+ * churn it is.
+ *
+ * ⚠ THIS DOES NOT FIX, EXPLAIN OR NARROW #174, and it says nothing about the
+ * iPhone freeze. What native resource holds the footprint that does not come
+ * back is exactly as unknown as it was. This repairs the TRUTHFULNESS AND
+ * COMPARABILITY of the instrument that has to answer that question. A forensic
+ * report that overstates by an order of magnitude spends the next
+ * investigation's time on a number that was never there. */
+export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';

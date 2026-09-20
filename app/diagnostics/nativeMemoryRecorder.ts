@@ -302,6 +302,67 @@ export const RECOVERY_GOOD_FRACTION = 0.5;
 export const RATCHET_MIN_STEPS = 3;
 export const RATCHET_STEP_MB = 40;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⚠⚠⚠ THE ANALYSIS BASELINE, AND THE COLD START THAT PROVED THE OLD ONE WRONG.
+ *
+ * The baseline used to be the median of the first EIGHT samples, chosen (see
+ * `deriveMemoryFacts`) so one mid-boot outlier could not drag it. The comment
+ * there already named the hazard — "calling the first one baseline would make
+ * every healthy session look like a catastrophic ratchet away from a number
+ * that never really existed" — and §3.7 was written to cover it.
+ *
+ * ⚠ MEASURED ON THE 2026-09-20 iPHONE SE CAPTURE (OTA-1854, the first boot
+ * after an OTA apply). The first eight footprints were
+ *
+ *     29 · 39 · 50 · 68 · 29 · 216 · 790 · 904 MB    → median 68MB
+ *
+ * and the report printed `baseline 68MB … retained +1198MB · recovery 26%`.
+ * Reconstructed against a comparable gameplay floor the residual was about
+ * +100MB. The headline overstated it by an order of magnitude.
+ *
+ * TWO THINGS WERE WRONG, AND THEY ARE INDEPENDENT:
+ *
+ *  1. MEDIAN-OF-EIGHT ASSUMES THE PROCESS SETTLES WITHIN EIGHT SAMPLES. On that
+ *     capture ALL EIGHT were pre-hydration or mid-boot — the first five were
+ *     taken before the JS bundle had been evaluated (81k malloc blocks against
+ *     1.98M a moment later). A median cannot rescue a window in which every
+ *     member is wrong; §3.7's synthetic ramp settled by its fourth sample,
+ *     which is why it passed while hardware did not.
+ *
+ *  2. THE SAMPLE STREAM IS NOT ONE CONTINUOUS OBSERVATION. The recorder samples
+ *     in bursts and its `t` restarts at each one. That capture held THREE
+ *     epochs — 5 samples, then 46, then 426 — with unobserved gaps between them
+ *     across which the footprint moved by hundreds of megabytes. Subtracting
+ *     the last sample of the third epoch from the first of the first is not a
+ *     measurement of retention; it spans time nobody watched.
+ *
+ * SO A BASELINE MUST BE (a) INSIDE THE EPOCH THAT ENDS THE STREAM, the only one
+ * contiguous with `last`, and (b) TAKEN WHILE THE PROCESS WAS NOT STILL MOVING.
+ * Neither rule names a megabyte figure, and neither was chosen because it
+ * reproduces this one capture's floor.
+ *
+ * ⚠ AND WHEN NEITHER HOLDS, THE ANSWER IS "UNAVAILABLE". A recorder that
+ * invents a baseline it cannot establish is worse than one that admits it,
+ * because the invented number is the one that gets quoted.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Samples a baseline is read from. Unchanged from the original — see §3.8. */
+export const BASELINE_WINDOW = 8;
+
+/**
+ * A baseline window is STABLE when its robust spread (p75 − p25) is within
+ * this. ⚠ DERIVED FROM A MEASUREMENT ALREADY IN THIS FILE, not invented: the
+ * OTA-1853 note below records raw peak-to-peak footprint jitter of 61MB and
+ * 29MB inside two windows that each held ONE stable floor. 64 sits just above
+ * the worse of those, so a genuinely settled window is never rejected while a
+ * process still climbing through hundreds of megabytes always is.
+ *
+ * ⚠ ROBUST, NOT max−min, and that is load-bearing. §3.8 pins that a single
+ * outlier may not move the baseline; a max−min test would be defeated by
+ * exactly the outlier the median was chosen to absorb.
+ */
+export const BASELINE_STABLE_SPREAD_MB = 64;
+
 /**
  * ⚠ `os_proc_available_memory()` IS NOT THE EXACT JETSAM THRESHOLD. It is the
  * OS's own advisory answer to "how much more may this process take", it moves
@@ -438,7 +499,24 @@ export function beginMemoryBurst(ms = 3_000): void {
 export interface MemoryFacts {
   /** Number of samples the facts were derived from. */
   n: number;
-  /** ⚠ THE SETTLED EARLY READING, not the first one. See below. */
+  /**
+   * ⚠ THE EARLIEST VALID SAMPLE IN THE WHOLE STREAM — evidence, NEVER a
+   * baseline. On a cold start this is the process before the JS bundle was
+   * evaluated, and nothing about gameplay may be measured from it.
+   */
+  processStartMb: number;
+  /** Contiguous observation epochs found in the stream. >1 means the recorder
+   *  stopped and restarted, and time passed that nobody sampled. */
+  epochs: number;
+  /** Index (into the filtered rows) where the analysis window begins. */
+  analysisFromIndex: number;
+  /**
+   * ⚠ FALSE when no settled window could be found inside the final epoch. When
+   * this is false `baselineMb`, `retainedDeltaMb` and `recoveryFraction` are
+   * not claims about anything and the report says so instead of printing them.
+   */
+  baselineKnown: boolean;
+  /** ⚠ THE SETTLED EARLY READING OF THE FINAL EPOCH, not the first sample. */
   baselineMb: number;
   peakMb: number;
   lastMb: number;
@@ -462,10 +540,61 @@ export interface MemoryFacts {
 }
 
 const EMPTY_FACTS: MemoryFacts = {
-  n: 0, baselineMb: 0, peakMb: 0, lastMb: 0, highWaterMb: 0,
+  n: 0, processStartMb: 0, epochs: 0, analysisFromIndex: -1, baselineKnown: false,
+  baselineMb: 0, peakMb: 0, lastMb: 0, highWaterMb: 0,
   retainedDeltaMb: 0, recoveryFraction: 1, ratchetSteps: 0, ratchetMb: 0,
   minAvailableMb: 0, jsStaleSamples: 0, band: 'unknown', shape: 'unknown',
 };
+
+/**
+ * ⚠⚠ THE STREAM IS A LIST OF EPOCHS, NOT ONE OBSERVATION, and this is the only
+ * place that says so. The native recorder restarts its own `t` whenever it
+ * begins sampling again, so a `t` that goes BACKWARDS is the recorder telling
+ * us it stopped watching and started over. Whatever the process did in that
+ * gap is unmeasured, and a subtraction across it is not a measurement.
+ *
+ * Returns the start index of each epoch. A stream with a monotonic clock — the
+ * ordinary case, and every synthetic trace the suite builds — yields `[0]`.
+ */
+export function sampleEpochStarts(samples: readonly { t: number }[]): number[] {
+  const rows = samples ?? [];
+  if (rows.length === 0) return [];
+  const starts = [0];
+  for (let i = 1; i < rows.length; i += 1) {
+    const prev = Number(rows[i - 1]?.t);
+    const cur = Number(rows[i]?.t);
+    if (Number.isFinite(prev) && Number.isFinite(cur) && cur < prev) starts.push(i);
+  }
+  return starts;
+}
+
+/**
+ * The median of the first window inside `mb` (searching forward from `from`)
+ * whose ROBUST spread is within `BASELINE_STABLE_SPREAD_MB`, or `null` when the
+ * series never settles. See the long note beside BASELINE_STABLE_SPREAD_MB.
+ */
+function settledBaseline(mb: readonly number[], from: number): { mb: number; at: number } | null {
+  const n = mb.length;
+  if (n - from <= 0) return null;
+  // A window shorter than BASELINE_WINDOW cannot be judged for stability, so a
+  // short epoch keeps the original median-of-what-there-is rather than being
+  // declared unavailable — that behaviour predates this repair and nothing
+  // observed argues against it.
+  if (n - from < BASELINE_WINDOW) {
+    const tail = mb.slice(from).slice().sort((a, b) => a - b);
+    const med = tail[Math.floor(tail.length / 2)];
+    return med == null ? null : { mb: med, at: from };
+  }
+  for (let start = from; start + BASELINE_WINDOW <= n; start += 1) {
+    const win = mb.slice(start, start + BASELINE_WINDOW).slice().sort((a, b) => a - b);
+    const lo = win[Math.floor(win.length * 0.25)]!;
+    const hi = win[Math.floor(win.length * 0.75)]!;
+    if (hi - lo <= BASELINE_STABLE_SPREAD_MB) {
+      return { mb: win[Math.floor(win.length / 2)]!, at: start };
+    }
+  }
+  return null;
+}
 
 /**
  * ⚠⚠ THE INTERPRETATION, AND THE THREE SHAPES IT EXISTS TO TELL APART.
@@ -489,26 +618,42 @@ export function deriveMemoryFacts(samples: readonly NativeSample[]): MemoryFacts
 
     const mb = rows.map((s) => toMb(s.footprint));
 
-    // ⚠ BASELINE IS THE MEDIAN OF THE FIRST EIGHT SETTLED SAMPLES, not the
-    // first sample. The opening samples of a process are taken mid-boot while
-    // the bundle is still evaluating and models are still loading; calling the
-    // first one "baseline" would make every healthy session look like a
-    // catastrophic ratchet away from a number that never really existed. A
-    // median over a short window also refuses to be dragged by one outlier.
-    const head = mb.slice(0, Math.min(8, mb.length)).slice().sort((a, b) => a - b);
-    const baselineMb = head[Math.floor(head.length / 2)] ?? mb[0] ?? 0;
+    /* ⚠⚠⚠ THE EARLIEST SAMPLE IS KEPT AS EVIDENCE AND IS NOT THE BASELINE.
+     * On the OTA-1854 cold start this is 29MB — a process that had not yet
+     * evaluated its JS bundle. It answers "what was the earliest process
+     * footprint", which is a real and separate question from "how much stayed
+     * elevated", and confusing the two is the defect this block repairs. */
+    const processStartMb = mb[0] ?? 0;
 
-    const peakMb = Math.max(...mb);
+    /* ⚠⚠ THE ANALYSIS WINDOW IS THE FINAL EPOCH. Only the epoch that ends the
+     * stream is contiguous with `last`; anything earlier is separated from it
+     * by time the recorder did not watch. See sampleEpochStarts. */
+    const epochStarts = sampleEpochStarts(rows);
+    const from = epochStarts[epochStarts.length - 1] ?? 0;
+    const win = mb.slice(from);
+
+    const settled = settledBaseline(mb, from);
+    const baselineKnown = settled !== null;
+    const baselineMb = settled?.mb ?? 0;
+
+    const peakMb = Math.max(...win);
     const lastMb = mb[mb.length - 1] ?? 0;
+    // ⚠ HIGH WATER STAYS WHOLE-STREAM. It is the kernel's own never-decreasing
+    // residentPeak: "the most this process ever held" is true of the process,
+    // not of a window, and narrowing it would hide a real maximum.
     const highWaterMb = Math.max(
       peakMb,
+      ...mb,
       ...rows.map((s) => toMb(s.residentPeak)).filter((v) => Number.isFinite(v))
     );
-    const retainedDeltaMb = lastMb - baselineMb;
+    // ⚠ NOT A NUMBER WHEN THERE IS NO BASELINE. Zero would read as "nothing was
+    // retained", which is a claim, and the whole point here is to stop making
+    // claims the data cannot support.
+    const retainedDeltaMb = baselineKnown ? lastMb - baselineMb : 0;
 
     // Of everything the session climbed above baseline, how much came back?
-    const climb = Math.max(0, peakMb - baselineMb);
-    const recoveryFraction = climb === 0
+    const climb = baselineKnown ? Math.max(0, peakMb - baselineMb) : 0;
+    const recoveryFraction = !baselineKnown || climb === 0
       ? 1
       : Math.max(0, Math.min(1, (peakMb - lastMb) / climb));
 
@@ -518,9 +663,21 @@ export function deriveMemoryFacts(samples: readonly NativeSample[]): MemoryFacts
     // refuses to give back once the work is over — that distinguishes "busy"
     // from "leaking". A trough that is materially higher than the previous
     // trough is one step of a ratchet.
+    /* ⚠⚠ AND IT WALKS THE ANALYSIS WINDOW, NOT THE WHOLE STREAM. A trough in
+     * one epoch and a trough in the next are separated by unobserved time, so
+     * the "rise" between them is not a rise the recorder saw.
+     *
+     * ⚠⚠⚠ WHAT THIS SUM IS, AND WHAT IT IS NOT. It adds every UPWARD trough
+     * movement and never subtracts a downward one, so it is the total distance
+     * the floor travelled UP — an upper bound on retention, not retention. A
+     * floor that climbs 400MB and gives it all back still totals +400 here,
+     * and the OTA-1854 capture printed `ratchet 6 step(s) +1816MB` for a
+     * session whose floor ended ~100MB above where it started. `retainedDelta`
+     * is the number that answers "how much stayed"; this one answers "how much
+     * churn was there". The report must never let them be read as the same. */
     let ratchetSteps = 0;
     let ratchetMb = 0;
-    const troughs = localMinima(mb);
+    const troughs = localMinima(win);
     for (let i = 1; i < troughs.length; i += 1) {
       const step = troughs[i]! - troughs[i - 1]!;
       if (step >= RATCHET_STEP_MB) {
@@ -540,14 +697,22 @@ export function deriveMemoryFacts(samples: readonly NativeSample[]): MemoryFacts
           : peakMb >= MEM_ELEVATED_MB ? 'elevated'
             : 'normal';
 
+    /* ⚠ A RATCHET IS STILL CALLABLE WITHOUT A BASELINE — it is read from rising
+     * troughs, which need no reference point. The other three shapes ALL rest
+     * on `climb`, which rests on the baseline, so without one they would say
+     * "flat" about a session nobody measured. That is the false-comfort failure
+     * this file exists to refuse, so they collapse to UNKNOWN instead. */
     const shape: MemoryFacts['shape'] =
       ratchetSteps >= RATCHET_MIN_STEPS ? 'ratchet'
-        : climb < RATCHET_STEP_MB ? 'flat'
-          : recoveryFraction >= RECOVERY_GOOD_FRACTION ? 'spike-recovered'
-            : 'spike-retained';
+        : !baselineKnown ? 'unknown'
+          : climb < RATCHET_STEP_MB ? 'flat'
+            : recoveryFraction >= RECOVERY_GOOD_FRACTION ? 'spike-recovered'
+              : 'spike-retained';
 
     return {
-      n: rows.length, baselineMb, peakMb, lastMb, highWaterMb, retainedDeltaMb,
+      n: rows.length, processStartMb, epochs: epochStarts.length,
+      analysisFromIndex: from, baselineKnown,
+      baselineMb, peakMb, lastMb, highWaterMb, retainedDeltaMb,
       recoveryFraction, ratchetSteps, ratchetMb, minAvailableMb, jsStaleSamples,
       band, shape,
     };
@@ -948,14 +1113,53 @@ export function memoryFlightSummary(report: MemoryFlightReport): string {
     if (f.n === 0) {
       out.push('  No samples recorded — the recorder was present but had taken no reading.');
     } else {
+      /* ⚠⚠ TWO DIFFERENT QUESTIONS, PRINTED APART ON PURPOSE.
+       * "What was the earliest process footprint" is answered by the first
+       * sample. "How much stayed elevated" may only be answered against a
+       * settled reading inside the epoch that ends the stream. The OTA-1854
+       * capture is what happens when one line tries to answer both: it opened
+       * at 29MB before the JS bundle existed and the report subtracted that
+       * from a gameplay figure 200 seconds and two unobserved gaps later. */
+      out.push(`  Process start: ${f.processStartMb}MB (earliest sample — EVIDENCE, not a baseline)`);
+      if (f.epochs > 1) {
+        out.push(
+          `  ⚠ ${f.epochs} observation epochs — the recorder stopped and restarted.`
+        );
+        out.push(
+          '    Time passed between them that nothing sampled, so only the LAST'
+        );
+        out.push(
+          `    epoch (from sample #${f.analysisFromIndex + 1}) is compared against the end.`
+        );
+      }
       out.push(
-        `  Footprint: baseline ${f.baselineMb}MB · peak ${f.peakMb}MB · last ${f.lastMb}MB`
+        `  Footprint: ${f.baselineKnown ? `analysis baseline ${f.baselineMb}MB · ` : ''}`
+        + `peak ${f.peakMb}MB · last ${f.lastMb}MB`
         + ` · high water ${f.highWaterMb}MB  [${f.band.toUpperCase()}]`
       );
+      if (!f.baselineKnown) {
+        /* ⚠ NO NUMBER IS BETTER THAN A WRONG ONE. Nothing in the analysis
+         * window ever held still long enough to read a baseline from, so
+         * "retained" and "recovery" have no second operand. Printing them
+         * anyway is how +1198MB got quoted. */
+        out.push('  ⚠ ANALYSIS BASELINE UNAVAILABLE — the process never settled inside the');
+        out.push('    final observation epoch, so retained memory and recovery cannot be');
+        out.push('    calculated. This is a limit of the observation, NOT a clean reading.');
+      }
       out.push(
-        `  Shape: ${f.shape.toUpperCase()} — retained ${f.retainedDeltaMb >= 0 ? '+' : ''}`
-        + `${f.retainedDeltaMb}MB vs baseline · recovery ${Math.round(f.recoveryFraction * 100)}%`
-        + (f.ratchetSteps > 0 ? ` · ratchet ${f.ratchetSteps} step(s) +${f.ratchetMb}MB` : '')
+        `  Shape: ${f.shape.toUpperCase()}`
+        + (f.baselineKnown
+          ? ` — retained ${f.retainedDeltaMb >= 0 ? '+' : ''}${f.retainedDeltaMb}MB`
+            + ` vs analysis baseline · recovery ${Math.round(f.recoveryFraction * 100)}%`
+          : '')
+        // ⚠ THE LABEL IS THE REPAIR. This sums upward floor movements and never
+        // subtracts a downward one, so it is how far the floor TRAVELLED up,
+        // not how much is still held. Printed beside "retained" under the old
+        // wording it read as a second, larger retention figure.
+        + (f.ratchetSteps > 0
+          ? ` · floor rose ${f.ratchetSteps} time(s), +${f.ratchetMb}MB travelled`
+            + ' (churn, NOT memory still held)'
+          : '')
       );
       if (f.minAvailableMb > 0) {
         out.push(
@@ -1001,7 +1205,20 @@ export function memoryFlightSummary(report: MemoryFlightReport): string {
      * words "holder", "cause" and "leak" do not appear here by design: the
      * ruling is the owner's, from this table plus the raw rows below it. */
     try {
-      const steps = detectRatchetSteps(report.samples);
+      /* ⚠⚠ THE STEP DETECTOR GETS THE ANALYSIS WINDOW, NOT THE WHOLE STREAM.
+       * The recorder's `t` restarts at every epoch, so a detector walking
+       * across a boundary compares a sample from one clock with a sample from
+       * another and prints intervals that run backwards — the OTA-1854 capture
+       * showed `STEP 4: +46.1s → +0.8s`. Confining it to one epoch makes
+       * tStartMs <= tSettledMs true by construction. */
+      // ⚠ Recomputed from `report.samples` rather than reusing
+      // `facts.analysisFromIndex`, which indexes the FILTERED rows. One dropped
+      // zero-footprint sample would slide the window by one and nothing would
+      // say so. The event join below keys on native seq, not on array position,
+      // so slicing the samples cannot disturb it.
+      const epochs = sampleEpochStarts(report.samples);
+      const from = epochs[epochs.length - 1] ?? 0;
+      const steps = detectRatchetSteps(report.samples.slice(from));
       out.push(`  Retained steps: ${steps.length === 0 ? 'none detected'
         : `${steps.length} (floor window ${RATCHET_FLOOR_WINDOW}, rise ≥${RATCHET_RISE_MB}MB held ${RATCHET_STABLE_SAMPLES} samples)`}`);
       for (const st of steps) {
