@@ -179,7 +179,10 @@ describe('OTA-1581 — the card arms itself on the tile, and nowhere else', () =
   it('⚠⚠ carrying it turns the beat into a button', () => {
     const p = playerAt('cradle_of_dusk', {
       activeStorylines: [{ id: 'story_order_red_tower', stage: 2 }],
-      inventory: [{ name: 'First Fragment', quantity: 1 }],
+      // ⚠ OTA-1858 — carried AS THE MISSION CARRIES IT. A bare row satisfied the
+      // requirement before; now the mission's own (quest-locked) object does, because
+      // an identically-named piece of loot is not the thing the stage asked for.
+      inventory: [{ name: 'First Fragment', quantity: 1, tags: ['quest', 'mission'] }],
     } as unknown as Partial<PlayerCharacter>);
     const armed = armedEncounter(p);
     expect(armed?.canPersuade).toBe(true);

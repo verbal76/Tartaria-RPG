@@ -964,7 +964,7 @@ export function grantStageItems(
     if (!g) continue;
     const qty = g.quantity ?? 1;
     const live = get().player;
-    if (!live || QS.countInPack(live.inventory, g.item) >= qty) continue;
+    if (!live || QS.countObjectiveInPack(live.inventory, g.item) >= qty) continue; // ⚠⚠⚠ OTA-1858 — the mission's OWN object, in lockstep with stageRequirementMet; splitting them bricks a pack holding a lookalike. questStage.countObjectiveInPack has the five collisions and the measurement.
     const res = grantItem(live.inventory, {
       id: freshInstanceId(g.item.toLowerCase().replace(/[^a-z0-9]+/g, '_')),
       name: g.item, kind: 'misc', quantity: qty, tags: ['quest', 'mission'],

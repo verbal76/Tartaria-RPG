@@ -111,8 +111,29 @@ export function mergeOrPushItem(
  *  every existing pack from every new grant the first time a catalog revision
  *  adds a tag — measured on ota958 the moment the full set was compared. */
 const STACK_FLAGS = ['selfCrafted', 'stolen', 'reservedForFusion', 'reservedForQuest', 'materializing'] as const;
-/** The tags sellPrice / scrap read PER ROW — the ones whose presence changes worth. */
-const STACK_TAGS = ['trophy', 'unsellable', 'fused'] as const;
+/** The tags sellPrice / scrap read PER ROW — the ones whose presence changes worth.
+ *
+ *  ⚠⚠⚠ OTA-1858 — `quest` JOINS THEM, AND IT BELONGS HERE BY THIS CONSTANT'S OWN RULE.
+ *  It is not a catalogue opinion about a NAME — the thing the comment above deliberately
+ *  keeps out of the key — it is state of THIS ROW: the mark that says this specific
+ *  object is bound to a contract. sellPrice, scrapEngine, giftEligibility, drop and
+ *  fusion all read it per row. A row carrying it cannot be sold; a row without it can.
+ *  That is precisely "presence changes worth".
+ *
+ *  ⚠⚠ MEASURED, AND IT IS WHY THIS LINE EXISTS. Five mission objectives share a name
+ *  with an ordinary loot/armour object (Fragment of the Red Tower, Cradle of Dusk
+ *  Compass, Hollow Crown, Shifting Obsidian Orb, Temporal Distortion Watch). A player
+ *  holding the looted one was handed the mission's copy — and it MERGED INTO THE LOOTED
+ *  ROW: quantity 2, tags still ['loot','relic','rare'], id still the looted one. The
+ *  protected object was swallowed by an unprotected stack, the grant printed its receipt
+ *  anyway, and the pack held two of a thing one tap could sell. Same class as OTA-1843's
+ *  two dead people's swords: one row, two different objects, one of them quietly gone.
+ *
+ *  ⚠ NOTHING THAT STACKED YESTERDAY SPLITS. Two mission copies both carry it and still
+ *  merge; two ordinary copies carry neither and still merge. Only the mixed pair — which
+ *  was never one object — is kept apart. Rows a previous build already merged stay
+ *  merged; this changes what the NEXT grant does. */
+const STACK_TAGS = ['trophy', 'unsellable', 'fused', 'quest'] as const;
 export function stackCompatible(a: InventoryItem, b: InventoryItem): boolean {
   if (a.name !== b.name || a.kind !== b.kind) return false;
   // per-instance identity — never merged, whichever side carries it

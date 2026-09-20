@@ -183,15 +183,76 @@ export function countInPack(inventory: readonly InventoryItem[] | undefined, nam
   return n;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1858 — COUNT THE MISSION'S OWN OBJECT, NOT EVERYTHING WEARING ITS NAME.
+ *
+ * `countInPack` answers "how many things called X". For a REQUIREMENT that is the
+ * wrong question, because the world also contains ordinary tradeable objects that
+ * share a name with a mission objective. Measured on this corpus, five of them:
+ *
+ *   Hollow Crown              mystery_hollow_crown#2→#3    ALSO Legendary head armour, tcBuy 300
+ *   Shifting Obsidian Orb     mystery_obsidian_orb#2→#3    ALSO Rare loot relic, 850 tc
+ *   Temporal Distortion Watch mystery_temporal_watch#2→#3  ALSO Rare loot relic, 820 tc
+ *   Fragment of the Red Tower mystery_red_tower#2→#3       ALSO Rare loot relic, 900 tc
+ *   Cradle of Dusk Compass    mystery_cradle_compass#1→#2  ALSO Legendary loot relic, 5000 tc
+ *
+ * ⚠⚠ THE FAILURE IS NOT THAT THE CHAIN CAN BE SKIPPED. It cannot: each of those arcs
+ * is a strict linked chain and the requirement stands one stage after its own grant.
+ * The failure is that the two objects are INTERCHANGEABLE to the only test the engine
+ * has, and they are not interchangeable to the player:
+ *
+ *   1. THE GRANT IS SUPPRESSED. `grantStageItems` skips on `countInPack >= qty`, so a
+ *      player already carrying the looted relic is never handed the mission's copy and
+ *      never sees the "✦ … mission item" receipt.
+ *   2. THE OBJECT THEN HOLDING THE CHAIN OPEN IS UNPROTECTED. `isQuestLockedItem` is
+ *      false for the looted row, so it can be sold, scrapped, gifted, dropped or fused
+ *      away at any vendor or bench — measured: the mission copy is unsellable and
+ *      unscrappable, the lookalike is neither.
+ *
+ * The quest lock exists precisely so a chain cannot be spent by accident. It never
+ * engaged, because the protected copy was never handed over.
+ *
+ * ⚠ SO THE TWO SIDES MOVE TOGETHER, AND THEY MUST. `grantStageItems` uses this same
+ * count for its idempotency guard. Tightening the requirement alone would hard-brick a
+ * player holding a lookalike — the grant would stay suppressed while the gate stopped
+ * accepting what they held. Tightened together, the mission simply hands over its own
+ * object as it always meant to, and the looted relic stays the player's to sell.
+ *
+ * ⚠ THIS IS NOT A RENAME. Whether the mystery's relic and the world's relic ought to be
+ * the same fiction is the owner's call, not the engine's; the engine's job is to know
+ * which one it handed over. `countInPack` is unchanged for every other reader.
+ */
+export function countObjectiveInPack(
+  inventory: readonly InventoryItem[] | undefined,
+  name: string,
+): number {
+  if (!inventory || !name) return 0;
+  // Lazy, like questItems' own catalogue require — engine and state import both ways.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isQuestLockedItem } = require('./questItems') as typeof import('./questItems');
+  const want = name.trim().toLowerCase();
+  let n = 0;
+  for (const it of inventory) {
+    // ⚠ Name first, lock second. The lock resolves canonical catalogue tags, and paying
+    // that for every row in the pack on every arrival door is the OTA-1004 hazard.
+    if ((it.name ?? '').trim().toLowerCase() !== want) continue;
+    if (!isQuestLockedItem(it)) continue;
+    n += it.quantity ?? 0;
+  }
+  return n;
+}
+
 /** Does the pack satisfy this stage's `requires`? A stage with no requirement always
- *  passes — the old behaviour, unchanged. */
+ *  passes — the old behaviour, unchanged.
+ *  ⚠ OTA-1858 — counts the mission's OWN object (quest-locked), not every row wearing
+ *  the name. See countObjectiveInPack for the five measured collisions. */
 export function stageRequirementMet(
   stage: StageBinding | undefined,
   inventory: readonly InventoryItem[] | undefined,
 ): boolean {
   const req = stage?.requires;
   if (!req) return true;
-  return countInPack(inventory, req.item) >= (req.quantity ?? 1);
+  return countObjectiveInPack(inventory, req.item) >= (req.quantity ?? 1);
 }
 
 /** The refusal a player should read when the verb was right and the pack was not.

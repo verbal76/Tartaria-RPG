@@ -64,8 +64,15 @@ import { resolvePosterLocation, huntAnchorId } from '../app/engine/contractMarke
 import huntsData from '../app/data/quests/hunts.json';
 
 const HUNTS = (huntsData as unknown as { hunts: Array<{ id: string; stages: Array<Record<string, unknown>> }> }).hunts;
+// ⚠⚠ OTA-1858 SUPERSEDED THE FIXTURE, NOT THE CLAIM. This minted a bare row with
+// `tags: []`, which no path in the game produces: `grantStageItems` stamps every
+// mission object ['quest','mission'], and since OTA-1858 a requirement is satisfied by
+// the mission's OWN object rather than by anything wearing its name (five objectives
+// share a name with ordinary loot). The claims below — counted exactly, no fuzzy
+// matching, quantity respected — are unchanged; the helper now hands over what the
+// mission actually hands over.
 const inv = (name: string, quantity = 1) =>
-  [{ id: 'x', name, kind: 'misc' as const, rarity: 'Common' as const, quantity, tags: [] }];
+  [{ id: 'x', name, kind: 'misc' as const, rarity: 'Common' as const, quantity, tags: ['quest', 'mission'] }];
 
 describe('OTA-1328 — the stage layer', () => {
   it('⚠ a stage with no bindings behaves exactly as before — silence is the default', () => {

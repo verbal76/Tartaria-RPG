@@ -125,7 +125,10 @@ function standAt(locId: string): void {
 }
 function give(name: string): void {
   const p = useGameStore.getState().player!;
-  useGameStore.setState({ player: { ...p, inventory: [...p.inventory, { id: `probe_${name}_${Math.random()}`, name, kind: 'misc', rarity: 'Common', quantity: 1, tags: [] }] } } as never);
+  // ⚠ OTA-1858 — the probe hands over a MISSION object, tagged as grantStageItems tags
+  // it. Untagged, it no longer satisfies a requirement: a stage wants its own object,
+  // not a same-named piece of loot. The reload claim below is unchanged.
+  useGameStore.setState({ player: { ...p, inventory: [...p.inventory, { id: `probe_${name}_${Math.random()}`, name, kind: 'misc', rarity: 'Common', quantity: 1, tags: ['quest', 'mission'] }] } } as never);
 }
 function seat(fam: Fam, id: string, stage = 0): void {
   const p = useGameStore.getState().player!;

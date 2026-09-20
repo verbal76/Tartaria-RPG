@@ -31127,7 +31127,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  *
  * ⚠ NOT IN THIS PACKAGE: the world-memory writes, the climax wording, and the
  * Highest Bidder stage-5 temptation. Those are Packages B, C and D. */
-export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';
+/* ⚠⚠⚠ OTA-1858 — THE MISSION KNOWS ITS OWN. Package 2 of the mechanical-integrity
+ * program: can every authored objective be obtained, kept, checked and used in the
+ * order the arc requires?
+ *
+ * MOST OF IT WAS ALREADY TRUE, and ota1858 pins it so it cannot rot: 50 arcs, 281
+ * stages, 219 grants, 213 requirements, EVERY requirement has an earlier grant in its
+ * own arc, no name is granted by two stages, no name is shared between two arcs, and
+ * no requirement asks for more than its grant hands over. Two leads carried in from
+ * the earlier audit were re-proven and REFUTED on this authority: story_order_red_tower
+ * is a strict linked chain (#0→#8), so its climax checking only Seventh Fragment is no
+ * bypass — that fragment has exactly one source, stage #7, itself chain-gated; and no
+ * mission object is among the 101 recipe ingredients, so crafting cannot eat one.
+ *
+ * ⚠⚠ WHAT WAS NOT TRUE — ONE NAME, TWO OBJECTS. Five mission objectives share a name
+ * with an ordinary tradeable object (Fragment of the Red Tower, Cradle of Dusk Compass,
+ * Hollow Crown, Shifting Obsidian Orb, Temporal Distortion Watch), and both
+ * `stageRequirementMet` and `grantStageItems` keyed on NAME ALONE. Measured: a looted
+ * relic satisfied all five requirements; holding it SUPPRESSED the mission's own grant
+ * (landed 0, no "✦ … mission item" receipt); and that relic is not quest-locked, so the
+ * object holding the chain open could be sold or scrapped at any vendor. The quest lock
+ * never engaged, because the protected copy was never handed over.
+ *
+ * ⚠ AND THE FIRST CUT OF THE FIX WAS NOT ENOUGH — measured, not assumed. With the
+ * counts tightened the mission's copy WAS granted, and then STACK-MERGED INTO THE LOOTED
+ * ROW: quantity 2, tags still ['loot','relic','rare'], and the grant printed its receipt
+ * anyway. So `quest` joins the per-row merge key, where it belongs by that constant's
+ * own rule: it is row state, read per row by sellPrice, scrap, gift, drop and fusion,
+ * and its presence changes worth.
+ *
+ * THREE SURGICAL CHANGES: questStage.countObjectiveInPack (new) behind
+ * stageRequirementMet, grantStageItems' idempotency guard, and STACK_TAGS. Nothing is
+ * renamed — whether the mystery's relic and the world's relic are one fiction is the
+ * owner's call, and ota1858 pins the five collisions in DATA so a future rename is a
+ * deliberate, visible act. */
+export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
