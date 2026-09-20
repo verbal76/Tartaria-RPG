@@ -520,3 +520,54 @@ Loot (5)
 [2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
 [2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
 [2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+
+=== END REPORT ===
