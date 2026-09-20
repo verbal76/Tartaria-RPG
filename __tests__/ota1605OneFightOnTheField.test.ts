@@ -170,25 +170,31 @@ describe('OTA-1605 — one fight on the field', () => {
   });
 
   it('⚠⚠ a NON-freezing stage still advances mid-fight — the provoke verb keeps paying during its own battle', () => {
-    // Stage 3 (attack_provoke at the ridge) has no spawn and is not the apex:
-    // the one-fight guard must not eat legitimate mid-combat stage pays.
+    /* ⚠⚠ PACKAGE A MOVED THE WITNESS, NOT THE CLAIM. This used to use the
+     * Doubter's stage 3 — an `attack_provoke` with no spawn — which was exactly
+     * the defect Package A repaired: its sentence names two raiders striking
+     * from cover and nothing was ever placed. It is a freezing stage now. The
+     * claim still needs a NON-freezing provoke beat, and hunt_salamander_
+     * voronov's junction is one: the heat and the vents are the hazard there,
+     * nothing stands up, and the one-fight guard must not eat the stage's pay
+     * because an ambient Mud Boar happens to be on the field. */
     const p = get().player!;
     store.setState({
       player: {
         ...p,
-        ...placedAt('raiders_ridge'),
+        ...placedAt('voronov'),
         hubRoomId: null, travelTarget: undefined, whisperCourse: null,
         inventory: [
-          ...p.inventory.filter((i) => !/Spiral-Mark Stone|Ridge-Sign/.test(i.name)),
-          { id: 't_stone', name: "Reaver's Spiral-Mark Stone", kind: 'misc', quantity: 1, tags: ['quest'] } as never,
+          ...p.inventory.filter((i) => !/Junction Scar-Trace|Main-Line Bearing/.test(i.name)),
+          { id: 't_trace', name: 'Junction Scar-Trace', kind: 'misc', quantity: 1, tags: ['quest'] } as never,
         ],
-        activeHunts: [{ id: 'hunt_servants_doubter', stage: 3, tracked: true } as never],
+        activeHunts: [{ id: 'hunt_salamander_voronov', stage: 3, tracked: true } as never],
       },
       activeBuildingId: null,
     });
     plantAmbient('Mud Boar');
-    get().advanceHunt('hunt_servants_doubter');
-    const rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
+    get().advanceHunt('hunt_salamander_voronov');
+    const rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_salamander_voronov');
     expect(rec?.stage).toBe(4);
   });
 

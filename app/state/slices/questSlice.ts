@@ -2937,6 +2937,44 @@ export const createQuestSlice = (
     if (!record || !def) return;
     const stageDef = def.stages[record.stage];
     if (!stageDef) return;
+    /* ⚠⚠⚠ PACKAGE A — THE ROOF GUARD advanceHunt HAS ALWAYS HAD, AND THIS
+     * HANDLER NEVER DID. `spawnStageEscort`'s own belt refuses to write bodies
+     * into a hub room or a building interior (OTA-1598), and its note says
+     * "every caller should already have refused at the door (advanceHunt's
+     * truce guard)". advanceStoryline was not one of those callers: under a
+     * roof the spawn silently returned false and execution fell straight
+     * through to the advance below — the stage closed, the item landed, and the
+     * authored fight never happened. That is the exact defect this package
+     * exists to close, one layer down.
+     *
+     * ⚠⚠ IT WAS UNREACHABLE UNTIL NOW, WHICH IS WHY IT SURVIVED. The two
+     * storyline spawns that existed before this package stand on Karok-Sa and
+     * the Sunken Enclave — wilderness anchor cells, where `sceneBuilding` is
+     * null by construction (`onAnchorTile`). Package A authors a spawn on
+     * `story_reclaimer_highest_bidder` #4, which stands on THE HIDDEN MARKET —
+     * and OTA-508 AUTO-ENTERS the market building on arrival, so `inside` is
+     * the DEFAULT state on that tile, not an edge case. Without this guard the
+     * new spawn would be dead on the normal player path while reading green in
+     * the data.
+     *
+     * ⚠ SAME SEMANTICS AS advanceHunt's, DELIBERATELY. The blades test is the
+     * one `missionTrace`'s arrival line already uses for a non-hunt family
+     * (`!!st.spawn`), so the line the player reads on the ground and the door
+     * the verb hits cannot disagree. The refusal names the affordance that is
+     * actually on screen: LEAVE OUTPOST under a hub roof, EXIT inside a
+     * building. Stepping out keeps the boots on the same canon cell (OTA-1597),
+     * so the same verb pays honestly the moment they are outside, and the
+     * record has not advanced, so nothing is lost by refusing. */
+    const storyDrawsBlades = !!stageDef.spawn;
+    if (storyDrawsBlades && (player.hubRoomId || get().activeBuildingId)) {
+      get().appendLog(
+        'arbiter',
+        player.hubRoomId
+          ? `The Arbiter puts a hand out. "Not under this roof — the outpost holds its truce. Step out the gate (LEAVE OUTPOST) and force it there."`
+          : `The Arbiter puts a hand out. "Not in here — take it outside. Step out (EXIT) and force it on open ground."`,
+      );
+      return;
+    }
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — hand over what the stage promised, say where the next one is, set the course.

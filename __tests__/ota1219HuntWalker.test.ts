@@ -311,6 +311,31 @@ describe('OTA-1219 — the hunt walker: every hunt in the catalog completes, in 
         // The apex: spawn, FREEZE (OTA-796), kill, complete.
         const hunted = `${def.targetEnemyName} (hunted)`;
         await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === hunted));
+        /* ⚠⚠⚠ PACKAGE A — THE APEX BRANCH GETS THE RETRY THE ESCORT BRANCH HAS HAD
+         * SINCE OTA-1831, and for the identical reason: the ground is live. A
+         * wandering faction patrol standing on the cell holds `advanceHunt` shut,
+         * because a stage that freezes for a kill is a deliberate no-op while ANY
+         * live hostile is up ("Silent by design — you're already fighting"); the
+         * clear-field re-arm raises the curtain when the last body drops.
+         *
+         * ⚠⚠ MEASURED, on hunt_mud_harpy_cradle: with stage 5 now standing up the
+         * brood its own sentence names, the walk's timing on the Cradle changed and
+         * the apex press landed with three True Tartarians Raiders already on the
+         * field, so the Mud Harpy was never placed. Nothing about the hunt is
+         * broken — the player fights the patrol and the apex arms — the WALKER just
+         * had no way to say "clear the ground and say it again" at this one beat.
+         *
+         * ⚠ Bounded, and the freeze is re-asserted on every attempt, so a genuine
+         * dead-end still fails here rather than being papered over. */
+        for (let attempt = 0;
+          !(store.getState().currentScene?.enemies ?? []).some((e) => e.name === hunted) && attempt < 3;
+          attempt += 1) {
+          expect({ hunt: def.id, at: s, stage: stage() }).toEqual({ hunt: def.id, at: s, stage: s });
+          clearScene();
+          await store.getState().submitPlayerAction(verb);
+          drainRolls();
+          await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === hunted));
+        }
         const enemies = store.getState().currentScene!.enemies;
         const apexIdx = enemies.findIndex((e) => e.name === hunted);
         expect({ hunt: def.id, apexSpawned: apexIdx > -1, names: enemies.map((e) => e.name) })

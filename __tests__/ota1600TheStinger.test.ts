@@ -114,9 +114,16 @@ describe('OTA-1600 — the stinger fires when bodies stand up, and only then', (
   });
 
   it('⚠⚠ a prose-only close shouts at nobody — no bodies, no popup', () => {
+    // ⚠ PACKAGE A MOVED THE EXAMPLE. Stage 3 used to be this suite's prose-only
+    // close — an `attack_provoke` with no spawn — and that WAS the defect
+    // Package A repaired: the sentence said two raiders struck from cover and
+    // nothing was ever placed. It stands bodies up now and carries a shout to
+    // match. Stage 2 is the honest prose-only beat: an `investigate` on the
+    // Plains that reads the trail and hands over the spiral-mark stone.
     get().dismissMissionStinger();
-    seedDoubter(3, 'raiders_ridge'); // attack_provoke, no spawn: the gauntlet resolves in prose
+    seedDoubter(2, 'great_tartary_plains');
     get().advanceHunt('hunt_servants_doubter');
+    expect((get().currentScene?.enemies ?? []).length).toBe(0);
     expect(get().pendingMissionStinger).toBeNull();
   });
 

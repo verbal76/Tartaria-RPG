@@ -617,7 +617,7 @@
         },
         {
           "stageType": "gauntlet",
-          "narration": "East through scrub and broken stone, reading the spiral-marks off the rocks as you go. Two more raiders strike from cover at the half-mile mark. They aren't trying to stop you, only slow you — and one of them dies holding the sign for where the meeting is set.",
+          "narration": "East through scrub and broken stone, reading the spiral-marks off the rocks as you go. Two more Tartarian Raiders strike from cover at the half-mile mark. They aren't trying to stop you, only slow you — and one of them is holding the sign for where the meeting is set. It comes off him or it does not come at all.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -626,7 +626,13 @@
           "requires": {
             "item": "Reaver's Spiral-Mark Stone"
           },
-          "locationName": "Raider's Ridge"
+          "locationName": "Raider's Ridge",
+          "spawn": {
+            "enemyName": "Tartarian Raider",
+            "count": 2,
+            "ambush": true
+          },
+          "stinger": "Two come off the rocks at once — the sign in one fist, a blade in the other."
         },
         {
           "stageType": "apex",
@@ -1078,7 +1084,7 @@
         },
         {
           "stageType": "catalyst",
-          "narration": "You pole into the drowned quarter of Drakova with the song gone flat and far. Unable to sing you down, the Siren sends the drowned it has already taken to pull you under by hand. You break them off the hull one at a time, and the last one goes down clutching a reed-mark cut from the roost itself.",
+          "narration": "You pole into the drowned quarter of Drakova with the song gone flat and far. Unable to sing you down, the Siren sends the ones it has already taken — three Drowned Aetherkin coming up under the hull to pull you down by hand. One of them is still clutching a reed-mark cut from the roost itself.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -1087,7 +1093,13 @@
           "requires": {
             "item": "Netter's Ear-Wax Seal"
           },
-          "locationName": "The Drowned Quarter"
+          "locationName": "The Drowned Quarter",
+          "spawn": {
+            "enemyName": "Drowned Aetherkin",
+            "count": 3,
+            "ambush": true
+          },
+          "stinger": "Three sets of hands find the hull at once. The Siren does not need a song for this."
         },
         {
           "stageType": "apex",
@@ -1310,7 +1322,7 @@
         },
         {
           "stageType": "catalyst",
-          "narration": "You climb to the casing with the notes open in one hand, and the Tower turns hostile — the dead scholars' faces surrounding you on every landing, all speaking your failures at once. You cut through them to the casing, and pry the seal-breaker the scholars died machining out of the wall where they left it.",
+          "narration": "You climb to the casing with the notes open in one hand, and the Tower turns hostile — three Aetheric Ghosts wearing the dead scholars' faces, closing on every landing, all speaking your failures at once. The seal-breaker they died machining is still in the wall behind them.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -1319,7 +1331,13 @@
           "requires": {
             "item": "The Scholars' Field-Notes"
           },
-          "locationName": "the Red Tower of Nimari"
+          "locationName": "the Red Tower of Nimari",
+          "spawn": {
+            "enemyName": "Aetheric Ghost",
+            "count": 3,
+            "ambush": true
+          },
+          "stinger": "Three of the dead scholars turn their faces to you at once, all saying your name wrong."
         },
         {
           "stageType": "apex",
@@ -1426,7 +1444,7 @@
         },
         {
           "stageType": "catalyst",
-          "narration": "Ferel walks you in as far as he can stand to and points out the roost. As you close, the dusk erupts — the Harpy's brood, half-grown and screaming, flung at you to blind and slow you before the mother folds her wings. You put them down and pace out the long-shadow ground while the light is still worth anything.",
+          "narration": "Ferel walks you in as far as he can stand to and points out the roost. As you close, the dusk erupts — three Mud Harpies of the brood, half-grown and screaming, flung at you to blind and slow you before the mother folds her wings. The long-shadow ground can only be paced once they are down, and the light is not waiting.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -1435,7 +1453,13 @@
           "requires": {
             "item": "Ferel's Dusk-Trick"
           },
-          "locationName": "Cradle of Dusk"
+          "locationName": "Cradle of Dusk",
+          "spawn": {
+            "enemyName": "Mud Harpy",
+            "count": 3,
+            "ambush": true
+          },
+          "stinger": "The dusk comes apart into three screaming shapes — the brood reaches you before the mother moves."
         },
         {
           "stageType": "apex",
@@ -1740,7 +1764,7 @@
         },
         {
           "stageType": "gauntlet",
-          "narration": "The reliquary approach is a gauntlet of her drones, throwing themselves into your torch to blind it and dusting every breath you take with rot. You hold your air and cut through the swarm until the roost door is the only thing left standing between you.",
+          "narration": "The reliquary approach is a gauntlet of her drones — three lesser Plague Moths throwing themselves into your torch to blind it, dusting every breath you take with rot. Hold your air. The roost door is the only thing past them.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -1749,7 +1773,13 @@
           "requires": {
             "item": "Rot-Dust Trail Reading"
           },
-          "locationName": "The Sunken Enclave"
+          "locationName": "The Sunken Enclave",
+          "spawn": {
+            "enemyName": "Plague Moth",
+            "count": 3,
+            "ambush": true
+          },
+          "stinger": "Three drones hit the torch together and the light goes rot-coloured."
         },
         {
           "stageType": "apex",
@@ -1822,7 +1852,7 @@
         },
         {
           "stageType": "gauntlet",
-          "narration": "You turn the trap — walk the canyon on your own terms — and the pack commits, pouring in expecting easy meat and finding a hunter. The Alpha throws everything it has at you at once to overwhelm what its cleverness could not fool. When it goes quiet, the pack is half what it was.",
+          "narration": "You turn the trap — walk the canyon on your own terms — and the pack commits: three Bog Hounds pouring in expecting easy meat and finding a hunter. The Alpha holds back and spends them, trying to overwhelm what its cleverness could not fool. What the canyon is worth is what is left standing in it.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -1831,7 +1861,12 @@
           "requires": {
             "item": "Box-Canyon Bone-Mark"
           },
-          "locationName": "Yuldra-Tul"
+          "locationName": "Yuldra-Tul",
+          "spawn": {
+            "enemyName": "Bog Hound",
+            "count": 3
+          },
+          "stinger": "The canyon answers with teeth — three of them, and the Alpha watching from the rim."
         },
         {
           "stageType": "apex",

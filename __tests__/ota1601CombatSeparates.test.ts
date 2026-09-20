@@ -62,6 +62,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { armSpawnStagesAtArrival } from '../app/state/stageArrival';
+import { resolveStageEscortClear } from '../app/state/slices/questSlice';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS } from '../app/engine/hunts';
 import { stageLocationId } from '../app/engine/questStage';
@@ -192,8 +193,18 @@ describe('OTA-1601 — his hunt, walked over the seam', () => {
     // course SET (travel row lit, player still on the ridge) and the tap on
     // → DESTINATION lands on the crest. Arrival on the apex ground IS the
     // summons: no "fight me", no second button.
+    // ⚠⚠ PACKAGE A — THE GAUNTLET IS EARNED NOW, AND THAT STRENGTHENS THIS CLAIM.
+    // Stage 3's own sentence names two raiders striking from cover, and it
+    // carried no spawn, so it used to close on the press. It stands them up and
+    // freezes. The road is still set BY THE CLOSE — the close has simply moved
+    // to where OTA-1601 always said it belonged for a frozen stage:
+    // resolveStageEscortClear, when the last body drops.
     seedDoubter(3, 'raiders_ridge');
-    get().advanceHunt('hunt_servants_doubter'); // stage 3 closes in prose
+    get().advanceHunt('hunt_servants_doubter');
+    const pack = get().currentScene!.enemies;
+    expect(pack.map((e) => e.name)).toEqual(['Tartarian Raider', 'Tartarian Raider']);
+    set((s) => ({ currentScene: { ...s.currentScene!, enemyHps: pack.map(() => 0) } }));
+    resolveStageEscortClear(store.getState, store.setState as never, get().player!, pack[0]!, 0);
     const rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
     expect(rec?.stage).toBe(4);
     expect(get().player?.currentLocationId).toBe('raiders_ridge');
@@ -216,18 +227,41 @@ describe('OTA-1601 — his hunt, walked over the seam', () => {
   });
 
   it('⚠⚠ a stage the freeze rule would NOT hold is not fired by the arm — the verb door stays', () => {
-    // Stage 2 (investigate, on the Plains) and stage 3 (attack_provoke, on the
-    // ridge) put no bodies up and are not the apex: standing on their grounds
-    // must not auto-advance them — arrival-fires is exactly the freeze set.
+    // Stage 2 (investigate, on the Plains) puts no bodies up and is not the
+    // apex: standing on its ground must not auto-advance it — arrival-fires is
+    // exactly the freeze set.
     seedDoubter(2, 'great_tartary_plains');
     armSpawnStagesAtArrival(get as never, set as never);
-    let rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
+    const rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
     expect(rec?.stage).toBe(2);
     expect((get().currentScene?.enemies ?? []).length).toBe(0);
-    seedDoubter(3, 'raiders_ridge');
+
+    /* ⚠⚠ PACKAGE A MOVED THE SECOND HALF OF THIS CASE. Stage 3 used to be the
+     * example of "an attack_provoke the arm leaves alone", because it had no
+     * spawn — which was the defect: its sentence names two raiders striking
+     * from cover and nothing was ever placed. It has one now, so it is inside
+     * the freeze set and the arm DOES fire it (proved in ota1857 §C). The
+     * claim itself is unchanged and still needs a witness, so it is taken by a
+     * provoke beat that genuinely stands nobody up — hunt_salamander_voronov's
+     * junction, where the heat and the vents are the hazard. */
+    const p = get().player!;
+    store.setState({
+      player: {
+        ...p,
+        ...placedAt('voronov'),
+        hubRoomId: null,
+        travelTarget: undefined,
+        whisperCourse: null,
+        activeHunts: [{ id: 'hunt_salamander_voronov', stage: 3, tracked: true } as never],
+      } as never,
+      activeBuildingId: null,
+    });
+    set((s) => (s.currentScene
+      ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+      : s));
     armSpawnStagesAtArrival(get as never, set as never);
-    rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
-    expect(rec?.stage).toBe(3); // the provoke is the player's own swing to take
+    const sal = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_salamander_voronov');
+    expect(sal?.stage).toBe(3); // the provoke is the player's own swing to take
     expect((get().currentScene?.enemies ?? []).length).toBe(0);
   });
 

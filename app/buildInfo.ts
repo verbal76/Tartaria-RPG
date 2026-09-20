@@ -31098,7 +31098,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * COMPARABILITY of the instrument that has to answer that question. A forensic
  * report that overstates by an order of magnitude spends the next
  * investigation's time on a number that was never there. */
-export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
+/* ⚠⚠⚠ OTA-1857 — PACKAGE A: THE NINE SENTENCES THAT NAME BODIES.
+ *
+ * The story-arc immersion audit censused the quest data, then traced the real
+ * runtime handlers, and threw away two thirds of what the census had flagged.
+ * A hunt `boss` stage stands up the hunt's own target through `scaleHuntBoss`;
+ * `spawnStageEscort` is wired into all three families. What survived the trace
+ * was ONE class with NINE instances: a stage whose prose names discrete bodies
+ * and instructs the player to deal with them, carrying no `spawn`. The player
+ * types the verb the arrival line gave them, reads a description of a fight,
+ * takes the item and walks on, and `currentScene.enemies` is never touched.
+ *
+ * Seven of the nine sit in the SAME template slot — `standard_7`'s `catalyst`
+ * and `bait_switch_5`'s `gauntlet` — that hunt_bog_dragon #5, hunt_iron_titan
+ * #5 and hunt_mud_siren_queen #3 fill correctly with a spawn. An unfinished
+ * content pass, not a design position, so the repair is data: nine spawns, and
+ * nine narrations given the species name the OTA-1583 gate already requires.
+ *
+ * ⚠⚠ ONE CODE CHANGE, AND IT WAS REQUIRED FOR THE DATA TO MEAN ANYTHING.
+ * `story_reclaimer_highest_bidder` #4 stands on THE HIDDEN MARKET, and OTA-508
+ * auto-enters the market building on arrival — so `activeBuildingId` is the
+ * DEFAULT state on that tile. `spawnStageEscort`'s OTA-1598 belt refuses to
+ * write bodies under a roof, and advanceStoryline had no door-refusal ahead of
+ * it, so the new spawn would have returned false and fallen straight through to
+ * the advance: stage closed, item granted, no fight. advanceStoryline now
+ * mirrors advanceHunt's truce guard, naming EXIT for a building and LEAVE
+ * OUTPOST for a hub. Owner-authorized as a narrow expansion of Package A.
+ *
+ * ⚠ NOT IN THIS PACKAGE: the world-memory writes, the climax wording, and the
+ * Highest Bidder stage-5 temptation. Those are Packages B, C and D. */
+export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';

@@ -55,6 +55,7 @@ jest.mock('expo-updates', () => ({}));
 // and the same verb pays honestly right outside.
 
 import { useGameStore } from '../app/state/gameStore';
+import { resolveStageEscortClear } from '../app/state/slices/questSlice';
 import { missionArrivalLines } from '../app/engine/missionTrace';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS } from '../app/engine/hunts';
@@ -141,14 +142,50 @@ describe('OTA-1598 — the truce holds, and the mission survives it', () => {
     expect((get().currentScene?.enemies ?? []).length).toBe(0);
   });
 
-  it('⚠⚠⚠ OUT THE GATE — same cell, roof gone: the verb pays, and the apex stands up OUTSIDE', () => {
+  /* ⚠⚠⚠ PACKAGE A SUPERSEDE — THIS CASE USED TO ASSERT THE DEFECT.
+   *
+   * It read "the verb pays" as "stage 3 closes on the press", which was true
+   * and was the bug: stage 3's own prose says *"Two more Tartarian Raiders
+   * strike from cover at the half-mile mark"*, and the stage carried no
+   * `spawn`, so the player typed `provoke it` at empty ground, read a
+   * description of an ambush, took the Ridge-Sign and walked on. The story
+   * audit traced that path through `advanceHunt` — `override = stageDef.spawn`
+   * is `undefined`, `spawnStageEscort` returns false at its first line, and
+   * `checkKind !== 'boss'` keeps the boss branch shut — and filed it as one of
+   * nine PROVEN runtime mismatches.
+   *
+   * Package A authored the two raiders the sentence names. The truce half of
+   * this suite is untouched and still the point: under the roof, nothing
+   * stands up and the door is named. What changes is what happens OUTSIDE —
+   * the beat now costs what it says it costs. */
+  it('⚠⚠⚠ OUT THE GATE — same cell, roof gone: the two raiders the sentence names stand up, and the stage holds for them', () => {
     seedDoubterAtStageThree({ indoors: false });
-    get().advanceHunt('hunt_servants_doubter'); // stage 3 attack_provoke closes
-    expect(doubterStage()).toBe(4);
+    get().advanceHunt('hunt_servants_doubter');
+    const up = get().currentScene?.enemies ?? [];
+    expect(up.map((e) => e.name)).toEqual(['Tartarian Raider', 'Tartarian Raider']);
+    expect(doubterStage()).toBe(3); // frozen for the kill — the fight owns the advance
+  });
+
+  /* ⚠ THE SIGN LANDS ON THE FIRE, NOT ON THE CLEAR, and that is the shared
+   * close block's long-standing behaviour rather than anything Package A did:
+   * `grantStageItems` runs in advanceHunt's P19 block, above the spawn. The
+   * beat still costs what it says — the RECORD does not move until the last
+   * body is down — so the player cannot take the sign and be on the next beat. */
+  it('⚠⚠⚠ and clearing them advances ONCE and leaves the apex to stand up next', () => {
+    seedDoubterAtStageThree({ indoors: false });
+    get().advanceHunt('hunt_servants_doubter');
     expect((get().player?.inventory ?? []).some((i) => i.name === "Raider's Ridge-Sign")).toBe(true);
+    const scene = get().currentScene!;
+    // Drop the pack the way the real kill path does: every body of this stage's
+    // key at 0 hp, then the clear that resolveEnemyDefeat routes through.
+    set((s) => ({ currentScene: { ...s.currentScene!, enemyHps: scene.enemies.map(() => 0) } }));
+    resolveStageEscortClear(store.getState, store.setState as never, get().player!, scene.enemies[0]!, 0);
+    expect(doubterStage()).toBe(4);
     get().advanceHunt('hunt_servants_doubter'); // stage 4 — the apex boss
-    expect((get().currentScene?.enemies ?? []).length).toBeGreaterThanOrEqual(1);
-    expect(doubterStage()).toBe(4); // frozen for the kill — the fight owns the advance
+    const apex = get().currentScene?.enemies ?? [];
+    expect(apex.length).toBe(1);
+    expect(apex[0]!.name).toContain('Tartarian Reaver'); // scaleHuntBoss marks it "(hunted)"
+    expect(doubterStage()).toBe(4); // frozen for the kill
   });
 
   // ⚠ OTA-1599 SUPERSEDE — the positive "Outside the walls" slate test is gone

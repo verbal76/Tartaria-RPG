@@ -59,6 +59,7 @@ jest.mock('expo-updates', () => ({}));
 // truce guard stays behind this as the belt for anything authored later.
 
 import { useGameStore } from '../app/state/gameStore';
+import { resolveStageEscortClear } from '../app/state/slices/questSlice';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS, findHuntById } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
@@ -198,10 +199,23 @@ describe('OTA-1599 — his hunt, replayed on the set bone', () => {
     expect(get().player?.travelTarget?.locationId).toBe('raiders_ridge');
   });
 
-  it('⚠⚠⚠ ON THE RIDGE the verb pays clean — no gate, no truce line, and the apex stands up', async () => {
+  it('⚠⚠⚠ ON THE RIDGE the verb pays clean — no gate, no truce line, the gauntlet is fought, and the apex stands up', async () => {
+    /* ⚠⚠ PACKAGE A — THE VERB STILL PAYS CLEAN; IT NOW COSTS WHAT IT SAYS.
+     * This case is about the BONE being set: the ridge is open ground, so the
+     * verb draws no truce line and no outpost gate, and that is unchanged.
+     * What changed is that stage 3 no longer closes on the press — its own
+     * sentence names two raiders striking from cover, and Package A placed
+     * them, so the beat holds until they are down. The road to the crest is
+     * still set by the CLOSE; for a frozen stage the close is the clear. */
     seedDoubter(3, 'raiders_ridge', true);
     Math.random = () => 0.99;
     await get().submitPlayerAction('attack');
+    await settle(() => (get().currentScene?.enemies ?? []).length > 0);
+    const pack = get().currentScene!.enemies;
+    expect(pack.map((e) => e.name)).toEqual(['Tartarian Raider', 'Tartarian Raider']);
+    expect(doubterStage()).toBe(3); // frozen for the kill
+    set((s) => ({ currentScene: { ...s.currentScene!, enemyHps: pack.map(() => 0) } }));
+    resolveStageEscortClear(store.getState, store.setState as never, get().player!, pack[0]!, 0);
     await settle(() => doubterStage() === 4);
     expect(doubterStage()).toBe(4);
     expect((get().player?.inventory ?? []).some((i) => i.name === "Raider's Ridge-Sign")).toBe(true);

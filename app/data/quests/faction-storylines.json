@@ -398,7 +398,7 @@
           "locationName": "Ostragar"
         },
         {
-          "narration": "Sixth and last — Kincaid's own former assistant, gone rogue and waiting for you at the Parley Ground. He expects you. He is not happy. It is the only name on the list that ends with anyone raising a hand.",
+          "narration": "Sixth and last — Kincaid's own former assistant, a Black Cloak Agent gone rogue, waiting for you at the Parley Ground. He expects you. He is not happy. It is the only name on the list that ends with anyone raising a hand.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -407,7 +407,11 @@
           "requires": {
             "item": "Intercepted Photographs"
           },
-          "locationName": "The Parley Ground"
+          "locationName": "The Parley Ground",
+          "spawn": {
+            "enemyName": "Black Cloak Agent",
+            "count": 1
+          }
         },
         {
           "narration": "You return to Kincaid and lay out what you carried back from each name. He counts the items, looks at you once, and slides a heavy purse across the table. Six people are quiet. Five of them are also alive, which he does not remark on.",
@@ -956,7 +960,7 @@
           "locationName": "The Hidden Market"
         },
         {
-          "narration": "With coin no longer able to settle it, the losers settle it the old way — the Order sappers and the Dynasty duelist turning on each other and on you across the burning floor. The broker cowers behind the box while you make a path to the door.",
+          "narration": "With coin no longer able to settle it, the losers settle it the old way — three Black Cloak Agents, Order and Dynasty pay both, turning on each other and on you across the burning floor. The broker cowers behind the box. There is no path to the door that does not go through them.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -965,7 +969,11 @@
           "requires": {
             "item": "The Strongbox"
           },
-          "locationName": "The Hidden Market"
+          "locationName": "The Hidden Market",
+          "spawn": {
+            "enemyName": "Black Cloak Agent",
+            "count": 3
+          }
         },
         {
           "narration": "You break out with the broker and the box both intact. He pays you in the quiet after, hands shaking. \"The winner gets the key tomorrow,\" he says. \"You could take it tonight.\" The strongbox sits between you, and for one breath the aim of a Guardian is yours to set.",
