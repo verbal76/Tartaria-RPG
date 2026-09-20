@@ -36,8 +36,10 @@
 // The output is a REPORT, not a pass: every mission comes back with the list of
 // breaks it hit, in the player's own terms. Those become OTAs.
 
-import { useGameStore } from '../app/state/gameStore';
+import { createHash } from 'node:crypto';
+import { useGameStore, setHomeworkTick } from '../app/state/gameStore';
 import type { GameStore } from '../app/state/gameStore';
+import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS, findHuntById, checkKindLabel } from '../app/engine/hunts';
 import { MYSTERIES, findMysteryById } from '../app/engine/mysteries';
 import { STORYLINES, findStorylineById } from '../app/engine/factionStorylines';
@@ -1319,11 +1321,83 @@ export function walkerDefaultSeed(): number {
   return typeof g.__TARTARIA_DEFAULT_TEST_SEED__ === 'number' ? g.__TARTARIA_DEFAULT_TEST_SEED__ : 0x74617274;
 }
 
+/* ⚠⚠⚠ DEBT #54, SECOND PASS — THE PRINTED COMMAND AND THE SUITE'S SELECTOR ARE
+ * ONE OBJECT NOW, BECAUSE TWO OF THEM CANNOT BE TESTED.
+ *
+ * The first pass shipped both halves of the replay and proved each half by
+ * READING ITS SOURCE: `replayBlock()` was asserted to print the string
+ * `PLAYER_WALKER_UPTO=…`, and `playerWalkerSim.test.ts` was asserted to contain
+ * the text `ORDER.indexOf(key) <= UPTO_INDEX`. Two independent claims about two
+ * independent spellings in two files, with nothing executing the relationship
+ * between them.
+ *
+ * ⚠ THAT LEFT THE EXACT HOLE THE DEBT IS ABOUT. Rename the variable the suite
+ * reads — `const UPTO = process.env.PLAYER_WALKER_PREFIX` — and every one of
+ * those assertions still passes, while the command a break prints silently
+ * selects NOTHING and runs the whole catalogue instead of the prefix. A replay
+ * token that reads as green while reproducing a different run is worse than no
+ * token at all: it is the c94e3ebc defect with a receipt stapled to it.
+ *
+ * So the names below are the single spelling. `replayBlock()` BUILDS the
+ * command out of them and `walkerSelection()` READS the environment by them,
+ * which makes the relationship executable: hand the printed command's own text
+ * back to the selector and the prefix it returns either is, or is not, the
+ * ordered prefix. `walkerReplaySeed` §E does exactly that. */
+export const REPLAY_SEED_VAR = 'TARTARIA_TEST_SEED';
+export const REPLAY_PREFIX_VAR = 'PLAYER_WALKER_UPTO';
+export const REPLAY_ISOLATE_VAR = 'PLAYER_WALKER_ONLY';
+export const WALKER_SUITE_PATH = '__tests__/playerWalkerSim.test.ts';
+
+/**
+ * Every scenario key in the order `playerWalkerSim` registers them — missions,
+ * then faction quests, then whispers.
+ *
+ * ⚠ THE ORDER IS THE PREFIX. `beforeAll` builds ONE world and each scenario
+ * inherits what the scenarios before it left, so "the world that broke" is
+ * reproduced by replaying this exact sequence up to the target and no other.
+ */
+export function walkOrder(): readonly string[] {
+  return [
+    ...ALL_MISSIONS.map(({ family, def }) => `${family}:${def.id}`),
+    ...ALL_FACTION_QUESTS.map((q) => `faction:${q.id}`),
+    ...ALL_WHISPER_CHAINS.map((c) => `whisper:${c.id}`),
+  ];
+}
+
+export interface WalkerSelection {
+  /** full = the catalogue; prefix = the ordered replay; isolated = one mission or family. */
+  mode: 'full' | 'prefix' | 'isolated';
+  /** What the environment asked for, or null in a full run. */
+  target: string | null;
+  /** ⚠ A replay that walks NOTHING reads as green. False says so out loud. */
+  targetFound: boolean;
+  /** The scenario keys this environment selects, in registration order. */
+  keys: readonly string[];
+}
+
+/**
+ * Which scenarios an environment selects. Pure, so the regression can feed it
+ * the env parsed out of a printed replay command rather than trust the source
+ * text of two files to agree.
+ */
+export function walkerSelection(env: Record<string, string | undefined> = process.env): WalkerSelection {
+  const order = walkOrder();
+  const upto = env[REPLAY_PREFIX_VAR];
+  if (upto) {
+    const i = order.indexOf(upto);
+    return { mode: 'prefix', target: upto, targetFound: i >= 0, keys: i >= 0 ? order.slice(0, i + 1) : [] };
+  }
+  const only = env[REPLAY_ISOLATE_VAR];
+  if (only) {
+    const keys = order.filter((k) => only === k || only === k.slice(0, k.indexOf(':')));
+    return { mode: 'isolated', target: only, targetFound: keys.length > 0, keys };
+  }
+  return { mode: 'full', target: null, targetFound: true, keys: order };
+}
+
 /** How this process selected its scenarios — which decides what a replay must say. */
 export function walkerRunMode(): 'full' | 'prefix' | 'isolated' {
-  if (process.env.PLAYER_WALKER_UPTO) return 'prefix';
-  if (process.env.PLAYER_WALKER_ONLY) return 'isolated';
-  return 'full';
+  return walkerSelection().mode;
 }
 
 export function walkerSeedToken(seed = walkerBaseSeed()): string {
@@ -1340,7 +1414,10 @@ export function replayBlock(family: string, id: string): string[] {
   const scenario = `${family}:${id}`;
   const mode = walkerRunMode();
   const isDefault = walkerBaseSeed() === walkerDefaultSeed();
-  const cmd = `TARTARIA_TEST_SEED=${seed} PLAYER_WALKER_UPTO=${scenario} npx jest __tests__/playerWalkerSim.test.ts --runInBand`;
+  // ⚠ BUILT FROM THE SAME NAMES `walkerSelection()` READS. See the note above
+  // REPLAY_SEED_VAR: a command assembled from its own private spelling is how a
+  // replay token becomes decorative without a single test going red.
+  const cmd = `${REPLAY_SEED_VAR}=${seed} ${REPLAY_PREFIX_VAR}=${scenario} npx jest ${WALKER_SUITE_PATH} --runInBand`;
   const seq = mode === 'isolated'
     ? 'isolated — started from a world no other scenario had touched'
     : 'sequence-dependent — inherited the world every earlier scenario left';
@@ -1354,6 +1431,28 @@ export function replayBlock(family: string, id: string): string[] {
       ? []
       : ['      ⚠ PLAYER_WALKER_ONLY reproduces the MISSION, not this WALK — it starts',
          '        from a fresh world and legitimately takes a different path.']),
+    /* ⚠⚠⚠ THE HONEST LIMIT, PRINTED RATHER THAN IMPLIED — AND IT IS A MEASURED
+     * CORRECTION OF WHAT THIS BLOCK USED TO IMPLY.
+     *
+     * The command above reconstructs the WORLD exactly, every time; that is
+     * proven by execution in `walkerReplaySeed` §W rather than claimed. It
+     * reproduces the WALK on most runs, and on this tree not on all of them.
+     * MEASURED, three consecutive runs of the identical prefix command on an
+     * otherwise idle box, `hunt:hunt_mud_titan` taps: 1,122 · 785 · 1,122 — and
+     * the same three on the tree BEFORE this pass touched anything, to the tap,
+     * so it is the harness's inheritance of production's clock and not an edit.
+     *
+     * Production decides several things by ELAPSED REAL TIME and the walker
+     * inherits every one of them. Freezing those gates from the harness would
+     * delete the behaviour the walker exists to walk, so the complete fix is a
+     * harness-level deterministic clock and belongs to its own owner-ruled pass
+     * — named debt #173, which already holds it.
+     *
+     * Handing a reader "this reproduces it" without that sentence would be the
+     * same class of defect this block exists to close: an instruction that
+     * sounds exact and is not. So the block says it, in the block. */
+    '      ⚠ run it more than once. The WORLD is reconstructed exactly; the WALK can',
+    '        still differ where production decides by elapsed real time (debt #173).',
   ];
 }
 
@@ -1367,4 +1466,131 @@ export function formatReport(r: WalkReport): string {
   const replay = r.breaks.length > 0 ? replayBlock(r.family, r.id) : [];
   const feed = r.feed ? ['    ── feed ──', ...r.feed.map((l) => `    | ${l.split('\n').join('\n    |   ')}`)] : [];
   return [head, ...stages, ...breaks, `    allowances: ${r.allowances.join('; ')}`, ...replay, ...feed].join('\n');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * ⚠⚠⚠ DEBT #54, SECOND PASS — THE WORLD THE REPLAY HAS TO RECONSTRUCT.
+ *
+ * `playerWalkerSim` built this world inline in its own `beforeAll`, which meant
+ * the three things that make the world reproducible — the re-seed FIRST, the
+ * homework interval disarmed, the settles counted in polls — could only ever be
+ * asserted by reading that `beforeAll` as text. Source text cannot answer the
+ * question the debt actually asks: *does replaying it produce the same world?*
+ *
+ * Moved here it is a function, so `walkerReplaySeed` §W can CALL it: twice, and
+ * with the RNG cursor shoved 250,000 draws sideways first, and under a second
+ * seed, and once with the re-seed suppressed — and compare the worlds that come
+ * back. The suite's `beforeAll` is now the call and nothing else, so the thing
+ * the regression executes is the thing the catalogue walk runs.
+ *
+ * ⚠ NOT ONE CALL, ARGUMENT OR ORDERING CHANGED IN THE MOVE, and that matters:
+ * this sequence IS the world 89 scenarios inherit. Same re-seed first, same
+ * hydrate, same character, same skipTutorial, same two settles at the same
+ * 15 ms poll (the walker's own `settle` polls at 12 — a different phase would
+ * be a different world), same disarm between them.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ DEBT #54 — polls, not milliseconds; see the long note on `settle` above.
+ * Kept at the suite's original 15 ms so the reconstructed world is the world
+ * the catalogue walk has always started from. */
+const WORLD_SETTLE_POLL_MS = 15;
+async function worldSettle(pred: () => boolean, deadlineMs: number): Promise<void> {
+  const polls = Math.max(1, Math.ceil(deadlineMs / WORLD_SETTLE_POLL_MS));
+  for (let i = 0; i < polls && !pred(); i++) {
+    await new Promise((r) => setTimeout(r, WORLD_SETTLE_POLL_MS));
+  }
+}
+
+/**
+ * The one world `playerWalkerSim` walks the catalogue in. Deterministic given
+ * the harness seed: re-seed BEFORE anything is drawn, build, then disarm the
+ * product's homework interval so the world stops advancing on the wall clock.
+ */
+export async function buildWalkerWorld(): Promise<void> {
+  /* ⚠⚠⚠ FIRST, BEFORE A SINGLE DRAW. `beforeAll` runs before any `beforeEach`,
+   * so without this line the world is dealt from wherever module import left
+   * the cursor — a function of the loaded tree's BYTES, which is what makes a
+   * replay token expire the moment anybody edits anything. Re-seeding after the
+   * world is built buys nothing: the grounds, the weather and the roster are
+   * already drawn. */
+  (globalThis as { __TARTARIA_RESEED_RANDOM__?: () => void }).__TARTARIA_RESEED_RANDOM__?.();
+  await get().hydrate();
+  await get().startNewGame({ name: 'Thumb', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
+  get().skipTutorial?.();
+  await worldSettle(() => !!get().currentScene, 5000);
+  /* ⚠⚠⚠ AND THE WORLD MUST NOT ADVANCE ON THE WALL CLOCK EITHER. `hydrate()`
+   * arms a 5-second interval in gameStore; across an 18-minute catalogue walk it
+   * fires ~200 times and WHERE each firing lands between two taps is decided by
+   * how fast the machine ran. This is the product's own stop path, already
+   * called this way from jest.teardown.js — no timer, probability or product
+   * code changes, and the suites that test homework drive it by hand through
+   * `_homeworkTickForTest()`. It has to sit AFTER hydrate (hydrate is what arms
+   * it) and BEFORE the first walk. */
+  setHomeworkTick(null);
+  let last = -1;
+  await worldSettle(() => {
+    const n = get().gameLog.length;
+    const stable = n === last;
+    last = n;
+    return stable;
+  }, 10000);
+}
+
+/* ⚠⚠ WHAT IS MASKED, AND WHY IT IS NOT A CONVENIENCE. Measured on this tree,
+ * exactly two things differ between two reconstructions of this world, and both
+ * are the same thing wearing different clothes — a millisecond stamped into an
+ * IDENTITY string:
+ *
+ *   · `player.mapSeed` = `name|raceId|factionId|<Date.now()>`, minted at
+ *     creation as the save system's character key (`characterKeyOf`). It is not
+ *     world state: `generateWorldMap` opens with
+ *     `void characterSeed; // positions are canon now`, so it decides nothing
+ *     the walker walks.
+ *   · starter inventory instance ids — `starter_torch_<Date.now()>_0` — whose
+ *     uniqueness comes from the stamp. The STEM and the ORDINAL still compare,
+ *     so a different item, a different count or a different order is still a
+ *     different world.
+ *
+ * So the mask is exactly "a 13-digit epoch, wherever it is written", and nothing
+ * else. ⚠ THE WORD BOUNDARY IS NOT OPTIONAL AND `\b` IS THE WRONG ONE: the
+ * stamps sit between underscores, which are word characters, so `\b` never
+ * matched them and the first draft of this fingerprint reported every pair of
+ * reconstructions as different worlds. With the digit-boundary form below, the
+ * scene, the world memory, the rolled character and all thirty-odd feed lines
+ * are byte-identical across independent reconstructions. */
+const EPOCH_MS_IN_TEXT = /(?<![0-9])1[6-9][0-9]{11}(?![0-9])/g;
+function canonicalizeWorldValue(v: unknown): unknown {
+  if (typeof v === 'string') return v.replace(EPOCH_MS_IN_TEXT, '<epoch>');
+  if (typeof v === 'number') return v > 1e12 ? '<epoch>' : v;
+  if (Array.isArray(v)) return v.map(canonicalizeWorldValue);
+  if (v && typeof v === 'object') {
+    const out: Record<string, unknown> = {};
+    // Sorted, so a store that reorders its keys is not reported as a new world.
+    for (const k of Object.keys(v as object).sort()) {
+      out[k] = canonicalizeWorldValue((v as Record<string, unknown>)[k]);
+    }
+    return out;
+  }
+  return v;
+}
+
+/**
+ * A compact fingerprint of the world a replay has to reconstruct: the scene the
+ * player stands in, the world memory behind it, the rolled character, and every
+ * line the build wrote to the feed.
+ *
+ * ⚠ A FINGERPRINT, NOT A SNAPSHOT. Nothing is pinned to a stored value — it
+ * exists only to be compared against another reconstruction made in the same
+ * process, so an edit anywhere in the game changes both sides and the claim
+ * stays true without a golden file to re-bless.
+ */
+export function walkerWorldDigest(): string {
+  const s = get();
+  const world = {
+    scene: s.currentScene,
+    worldMemory: s.worldMemory,
+    player: s.player,
+    feed: s.gameLog.map((l) => l.text),
+  };
+  return createHash('sha256').update(JSON.stringify(canonicalizeWorldValue(world))).digest('hex').slice(0, 16);
 }

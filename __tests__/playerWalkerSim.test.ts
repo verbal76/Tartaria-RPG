@@ -47,11 +47,16 @@ jest.mock('expo-updates', () => ({}));
 //     npx jest __tests__/playerWalkerSim.test.ts
 //     PLAYER_WALKER_ONLY=hunt:hunt_servants_doubter npx jest …   (one mission)
 //     PLAYER_WALKER_ONLY=faction | whisper | mystery | storyline   (one family)
-//     PLAYER_WALKER_UPTO=whisper:nessa_fungus     (debt #54 — EXACT REPLAY: the
+//     PLAYER_WALKER_UPTO=whisper:nessa_fungus     (debt #54 — THE REPLAY: the
 //         ordered prefix up to and including that scenario, so it meets the same
-//         world the full run gave it — byte for byte, verified against a full
-//         run. ONLY does NOT do this: it walks the same mission against a FRESH
-//         world and legitimately takes another path.)
+//         world the full run gave it. ONLY does NOT do this: it walks the same
+//         mission against a FRESH world and legitimately takes another path.
+//         ⚠ RUN IT MORE THAN ONCE. The WORLD it reconstructs is exact — proven
+//         by execution in walkerReplaySeed §W — and the WALK reproduces on most
+//         runs but not all, because production decides several things by elapsed
+//         real time and the walker inherits that (named debt #173). Measured
+//         here: three identical prefix commands gave mud_titan 1,122 / 785 /
+//         1,122 taps, the same two outcomes as the tree before this pass.)
 //     TARTARIA_TEST_SEED=0x1234abcd               (debt #54 — base seed override;
 //         absent, the harness default 0x74617274 is unchanged)
 //     PLAYER_WALKER_REPORT=/path/to/report.txt   (appends one block per mission)
@@ -63,15 +68,12 @@ jest.mock('expo-updates', () => ({}));
 // one intermittent seen so far (a mid-range approach that would not close on
 // a road fight) prints the raw log with the debug channel so it can be read.
 
-import { useGameStore, setHomeworkTick } from '../app/state/gameStore';
-import { getRaces, getFactions } from '../app/engine/character';
-import { ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS, playMission, playFactionQuest, playWhisperChain, formatReport, type WalkReport } from '../test-utils/playerWalker';
+import { ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS, playMission, playFactionQuest, playWhisperChain, formatReport, buildWalkerWorld, walkerSelection, type WalkReport } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
 
 const ON = process.env.PLAYER_WALKER !== '0';
-const ONLY = process.env.PLAYER_WALKER_ONLY; // "family:id" or a family name
 const REPORT = process.env.PLAYER_WALKER_REPORT;
 
 /* ⚠⚠⚠ DEBT #54 — PLAYER_WALKER_UPTO IS THE EXACT REPLAY, AND ONLY IS NOT.
@@ -85,37 +87,19 @@ const REPORT = process.env.PLAYER_WALKER_REPORT;
  *
  * UPTO replays the ordered prefix up to and including the target, so the world
  * the target sees is the world it saw. It is the command `replayBlock()` prints.
- * ⚠ The order below must stay the REGISTRATION order of the three families —
- * missions, then faction quests, then whispers — or the prefix is not the
- * prefix. A mistyped target registers its own failing `it` rather than silently
- * walking zero scenarios, because a replay that walks nothing reads as green. */
-const UPTO = process.env.PLAYER_WALKER_UPTO;
-const ORDER: readonly string[] = [
-  ...ALL_MISSIONS.map(({ family, def }) => `${family}:${def.id}`),
-  ...ALL_FACTION_QUESTS.map((q) => `faction:${q.id}`),
-  ...ALL_WHISPER_CHAINS.map((c) => `whisper:${c.id}`),
-];
-const UPTO_INDEX = UPTO ? ORDER.indexOf(UPTO) : -1;
-
-function selected(key: string): boolean {
-  if (UPTO) return UPTO_INDEX >= 0 && ORDER.indexOf(key) <= UPTO_INDEX;
-  if (!ONLY) return true;
-  const family = key.slice(0, key.indexOf(':'));
-  return ONLY === family || ONLY === key;
-}
-
-const store = useGameStore;
-
-// ⚠ DEBT #54 — polls, not milliseconds. See the long note on the same helper in
-// test-utils/playerWalker.ts: a wait that gives up on the clock lets the CPU
-// decide what the walker does next. Same poll budget, no clock.
-const SETTLE_POLL_MS = 15;
-async function settle(pred: () => boolean, deadlineMs = 5000) {
-  const polls = Math.max(1, Math.ceil(deadlineMs / SETTLE_POLL_MS));
-  for (let i = 0; i < polls && !pred(); i++) {
-    await new Promise((r) => setTimeout(r, SETTLE_POLL_MS));
-  }
-}
+ *
+ * ⚠⚠ SECOND PASS — THE SELECTION IS NO LONGER SPELLED OUT HERE, ON PURPOSE.
+ * The order, the env var names and the prefix arithmetic used to live in this
+ * file while `replayBlock()` composed its command from its own private copies
+ * of the same strings in another one. Nothing executed the relationship, so
+ * renaming the variable this file read would have left every assertion green
+ * while the printed command silently ran the whole catalogue. Both halves now
+ * come from `walkerSelection()`, which `walkerReplaySeed` §E calls with the env
+ * parsed out of a printed replay command — so "the command selects the prefix"
+ * is a test that runs rather than two greps that agree. */
+const SELECTION = walkerSelection();
+const SELECTED = new Set(SELECTION.keys);
+const selected = (key: string): boolean => SELECTED.has(key);
 
 const picked = ALL_MISSIONS.filter(({ family, def }) => selected(`${family}:${def.id}`));
 
@@ -124,71 +108,30 @@ const picked = ALL_MISSIONS.filter(({ family, def }) => selected(`${family}:${de
 
   // ⚠ A replay that silently walks NOTHING is worse than a failing replay: it
   // reads as green. If UPTO names a scenario that does not exist, say so.
-  if (UPTO) {
+  if (SELECTION.mode === 'prefix') {
     it('the PLAYER_WALKER_UPTO target resolves to a real scenario', () => {
-      expect({ target: UPTO, found: UPTO_INDEX >= 0 }).toEqual({ target: UPTO, found: true });
+      expect({ target: SELECTION.target, found: SELECTION.targetFound })
+        .toEqual({ target: SELECTION.target, found: true });
     });
   }
 
   beforeAll(async () => {
-    /* ⚠⚠⚠ DEBT #54 — THE WORLD MUST START FROM THE SEED, NOT FROM THE BYTE LAYOUT.
+    /* ⚠⚠⚠ DEBT #54 — THE WORLD IS BUILT BY A FUNCTION NOW, NOT BY THIS BLOCK.
      *
-     * OTA-1831 moved the per-test reseed into a `beforeEach` so a test's dice no
-     * longer depended on how many times the loaded modules happened to draw at
-     * import. It closed that hole for TESTS. `beforeAll` runs BEFORE any
-     * `beforeEach`, so the world built here kept drawing from wherever module
-     * import left the cursor — and that position is a function of the source-map
-     * shape of the loaded files, which OTA-1831 measured shifting by ~4,000
-     * draws on an edit that rolled nothing.
+     * The three things that make the world reproducible — the re-seed BEFORE a
+     * single draw, the homework interval disarmed after hydrate arms it, the two
+     * settles counted in polls rather than milliseconds — used to be written out
+     * here, which meant `walkerReplaySeed` could only assert them by READING THIS
+     * TEXT. Source text cannot answer the question the debt asks: does replaying
+     * it produce the same world?
      *
-     * ⚠ MEASURED, and it is why this line exists. Replaying `hunt:hunt_bog_dragon`
-     * under the identical seed gave 1,250 taps before this pass and 1,180 after
-     * three harness files were edited — the same stages, the same grounds, the
-     * same cards, a different world underneath them. Two repeats of the same
-     * command gave 1,180 and 1,180, so the walk was never flaky; it was ANCHORED
-     * TO THE TREE'S BYTES instead of to the seed, which is the thing that makes a
-     * replay token worthless the moment anybody edits anything.
-     *
-     * One line, and the world becomes a function of the seed alone. */
-    (globalThis as { __TARTARIA_RESEED_RANDOM__?: () => void }).__TARTARIA_RESEED_RANDOM__?.();
+     * `buildWalkerWorld()` is that sequence, call for call, so the regression can
+     * execute it — twice, with the RNG cursor shoved 250,000 draws sideways, under
+     * a second seed, and once with the re-seed suppressed — and compare the worlds
+     * that come back. The long notes on WHY each step is there live with the code,
+     * in test-utils/playerWalker.ts. */
     console.log = () => {}; console.warn = () => {}; console.error = () => {};
-    await store.getState().hydrate();
-    await store.getState().startNewGame({ name: 'Thumb', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
-    store.getState().skipTutorial?.();
-    await settle(() => !!store.getState().currentScene);
-    /* ⚠⚠⚠ DEBT #54 — AND THE WORLD MUST NOT ADVANCE ON THE WALL CLOCK EITHER.
-     *
-     * `hydrate()` installs the homework tick, which arms a 5-second setInterval
-     * in gameStore. Over an 18-minute catalogue walk that fires ~200 times, and
-     * WHERE each firing lands between two taps is a function of how long the
-     * machine took, not of the seed. That is a third input to the walk that no
-     * replay token can carry.
-     *
-     * ⚠ MEASURED, twice, on this tree. Replaying the prefix
-     * `PLAYER_WALKER_UPTO=hunt:hunt_servants_doubter` reproduced the full run's
-     * FIRST scenario byte for byte and then drifted: mud_titan 785 taps in the
-     * full run against 1,060 in the replay. The only structural difference
-     * between the two processes is the extra `it` above — so a single short test
-     * shifted the interval's phase enough to move ticks across tap boundaries.
-     * Suppressing just that `it` made five scenarios byte-identical again, and
-     * disarming the interval made the with-`it` and without-`it` runs identical
-     * on their own. Two repeats of any one command were always bit-stable, so
-     * this was never flakiness — it was the clock leaking into the world.
-     *
-     * ⚠ NOTHING IS WEAKENED BY THIS. Homework is background progress while the
-     * player is idle; this suite asserts mission walks, never homework. The
-     * product keeps its timer — this is the same disarm jest.teardown.js already
-     * performs through the same exported door, moved to where the walk begins,
-     * and the suites that DO test homework drive it by hand through
-     * `_homeworkTickForTest()`. No probability, no product code, is touched. */
-    setHomeworkTick(null);
-    let last = -1;
-    await settle(() => {
-      const n = store.getState().gameLog.length;
-      const stable = n === last;
-      last = n;
-      return stable;
-    }, 10000);
+    await buildWalkerWorld();
   });
 
   afterAll(() => {

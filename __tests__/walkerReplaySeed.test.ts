@@ -34,13 +34,30 @@
  *     §J  and `settle()` DECIDED on a clock deadline, so the same command gave
  *         1,060 taps and then 785 — a coin toss whose coin was the CPU
  *
- * With all four shut, three consecutive prefix replays are byte-identical and
- * the prefix replay reproduces the full run byte for byte — measured over the
+ * With all four shut, three consecutive prefix replays were byte-identical and
+ * the prefix replay reproduced the full run byte for byte — measured over the
  * first six scenarios of an 89-scenario run that walked clean, and again over
  * the twenty scenarios preceding a deliberately planted break, whose printed
  * command reproduced both the walk and the break.
  *
- * ⚠⚠⚠ THE RESIDUAL, NAMED RATHER THAN HIDDEN — HEAVY CONCURRENT LOAD.
+ * ⚠⚠⚠ SECOND PASS, AND THE FIRST THING IT HAD TO DO WAS UN-CLAIM THAT.
+ *
+ * Re-measured on current authority, on an otherwise idle box: the identical
+ * prefix command, three times, `hunt:hunt_mud_titan` taps 1,122 · 785 · 1,122.
+ * Runs one and three agree to the byte across all six scenarios; run two is a
+ * different walk. The FIRST scenario is identical in all three every time — the
+ * divergence starts at the second, which is the signature §J already records.
+ *
+ * ⚠ AND IT IS NOT AN EDIT. The same three runs on the tree BEFORE this pass
+ * touched anything gave the same two outcomes, tap for tap, so the repair below
+ * preserves the walk exactly and the bistability is inherited, not introduced.
+ * What the first pass measured was true of the box it measured on; it was never
+ * a property of the harness, and "three green runs" is precisely the evidence
+ * that cannot tell those two apart. So the claim is narrowed to what §W can
+ * PROVE BY EXECUTION — the WORLD is reconstructed exactly, every time — and the
+ * replay block now PRINTS the limit on the walk instead of implying none.
+ *
+ * ⚠⚠⚠ THE RESIDUAL, NAMED RATHER THAN HIDDEN — PRODUCTION'S WALL CLOCK.
  *
  * PRODUCTION reads the wall clock by design, and the walker inherits it. Six
  * gates decide product behaviour by elapsed real time: the vendor warm settle
@@ -107,6 +124,8 @@ import fs from 'fs';
 import path from 'path';
 import {
   walkerBaseSeed, walkerDefaultSeed, walkerRunMode, walkerSeedToken, replayBlock, formatReport,
+  walkOrder, walkerSelection, REPLAY_SEED_VAR, REPLAY_PREFIX_VAR, REPLAY_ISOLATE_VAR,
+  ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS,
   type WalkReport,
 } from '../test-utils/playerWalker';
 
@@ -305,6 +324,22 @@ describe('debt #54 §D — a break prints one command that reproduces it', () =>
     }
   });
 
+  /* ⚠⚠⚠ THE BLOCK MUST NOT OVERSELL ITSELF. Measured on this tree, the printed
+   * command reconstructs the WORLD exactly (§W) and reproduces the WALK on most
+   * runs but not all — production decides several things by elapsed real time
+   * and the walker inherits them (debt #173). A replay instruction that reads as
+   * exact when it is not is the same defect as one that points at the wrong run,
+   * so the limit is printed where the reader is standing. */
+  test('D7 the block prints its own limit — the WORLD is exact, the WALK may not be', () => {
+    const b = replayBlock('whisper', 'nessa_fungus').join('\n');
+    expect(b).toContain('run it more than once');
+    expect(b).toMatch(/WORLD is reconstructed exactly/);
+    expect(b).toMatch(/elapsed real time/);
+    expect(b).toContain('#173');
+    // …and it is on a BREAK report, where the reader actually meets it.
+    expect(formatReport(broken)).toContain('run it more than once');
+  });
+
   test('D6 a sequence-dependent walk SAYS so, so ONLY is not mistaken for a replay', () => {
     const upto = process.env.PLAYER_WALKER_UPTO;
     const only = process.env.PLAYER_WALKER_ONLY;
@@ -322,29 +357,114 @@ describe('debt #54 §D — a break prints one command that reproduces it', () =>
 });
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-describe('debt #54 §E — the prefix door is wired, and a mistyped target is loud', () => {
-  test('E1 the suite builds its order from the three families in registration order', () => {
-    const i = SIM_CODE.indexOf('const ORDER');
-    expect(i).toBeGreaterThan(-1);
-    const block = SIM_CODE.slice(i, i + 400);
-    expect(block.indexOf('ALL_MISSIONS')).toBeGreaterThan(-1);
-    expect(block.indexOf('ALL_MISSIONS')).toBeLessThan(block.indexOf('ALL_FACTION_QUESTS'));
-    expect(block.indexOf('ALL_FACTION_QUESTS')).toBeLessThan(block.indexOf('ALL_WHISPER_CHAINS'));
+describe('debt #54 §E — the printed command is EXECUTED against the real selector', () => {
+  /* ⚠⚠⚠ THE SECOND-PASS REPAIR, AND WHAT IT REPLACED.
+   *
+   * This section used to be four regexes over `playerWalkerSim.test.ts`: that it
+   * contained `const ORDER`, that the three family names appeared in the right
+   * order inside it, that the text `ORDER.indexOf(key) <= UPTO_INDEX` was
+   * present. Meanwhile `replayBlock()` composed `PLAYER_WALKER_UPTO=…` from its
+   * own private string literal in a different file. Two source-text claims about
+   * two independent spellings, and NOTHING executing the relationship between
+   * them.
+   *
+   * ⚠ MEASURED AS A NEGATIVE CONTROL, not reasoned about: rename the variable
+   * the suite reads to `process.env.PLAYER_WALKER_PREFIX` and every assertion in
+   * the old §E — and every assertion in §D — stayed GREEN, while the command a
+   * break prints selected nothing and ran the entire 89-scenario catalogue
+   * instead of the prefix. That is the c94e3ebc defect with a receipt stapled to
+   * it: a reader typing the printed command gets a DIFFERENT run and is told it
+   * is a replay.
+   *
+   * So the tests below take the printed text, parse the environment out of it
+   * WITHOUT knowing any variable's name, hand that environment to the selector
+   * the suite actually uses, and ask what it selected. */
+  const TARGET = 'whisper:nessa_fungus';
+
+  const envFromPrintedCommand = (block: string): Record<string, string | undefined> => {
+    const line = block.split('\n').find((l) => l.includes('replay:'));
+    expect(line).toBeDefined();
+    const cmd = line!.slice(line!.indexOf('replay:') + 'replay:'.length).trim();
+    const env: Record<string, string | undefined> = {};
+    for (const m of cmd.matchAll(/(?:^|\s)([A-Z][A-Z0-9_]*)=(\S+)/g)) env[m[1]!] = m[2]!;
+    return env;
+  };
+
+  test('E1 the order is the three families, in blocks, each scenario exactly once', () => {
+    const order = walkOrder();
+    expect(new Set(order).size).toBe(order.length);
+    const missions = ALL_MISSIONS.map(({ family, def }) => `${family}:${def.id}`);
+    const factions = ALL_FACTION_QUESTS.map((q) => `faction:${q.id}`);
+    const whispers = ALL_WHISPER_CHAINS.map((c) => `whisper:${c.id}`);
+    for (const k of [...missions, ...factions, ...whispers]) expect(order).toContain(k);
+    expect(order).toHaveLength(missions.length + factions.length + whispers.length);
+    // Blocks, in registration order — anything else is not the prefix the walk walked.
+    const last = (ks: string[]) => Math.max(...ks.map((k) => order.indexOf(k)));
+    const first = (ks: string[]) => Math.min(...ks.map((k) => order.indexOf(k)));
+    expect(last(missions)).toBeLessThan(first(factions));
+    expect(last(factions)).toBeLessThan(first(whispers));
   });
 
-  test('E2 UPTO selects the prefix — every scenario at or before the target', () => {
-    expect(SIM_CODE).toMatch(/ORDER\.indexOf\(key\)\s*<=\s*UPTO_INDEX/);
+  test('E2 ⚠⚠⚠ THE CONTRACT: the command a break prints selects the ordered PREFIX', () => {
+    const selection = walkerSelection(envFromPrintedCommand(replayBlock('whisper', 'nessa_fungus').join('\n')));
+    const order = walkOrder();
+    const i = order.indexOf(TARGET);
+    expect(i).toBeGreaterThan(0); // a real prefix — the target is not the first scenario
+    expect(selection.mode).toBe('prefix');
+    expect(selection.targetFound).toBe(true);
+    expect(selection.keys).toEqual(order.slice(0, i + 1));
+    expect(selection.keys[selection.keys.length - 1]).toBe(TARGET);
+    /* ⚠ AND NOT THE WHOLE CATALOGUE. This is the line a decorative rename trips:
+     * an environment the selector does not recognise falls through to `full`,
+     * which reads as "the replay ran" while walking 89 scenarios instead of 85. */
+    expect(selection.keys.length).toBeLessThan(order.length);
+  });
+
+  test('E3 the seed the command carries is the seed this run actually used', () => {
+    const env = envFromPrintedCommand(replayBlock('whisper', 'nessa_fungus').join('\n'));
+    expect(env[REPLAY_SEED_VAR]).toBeDefined();
+    expect(H.__TARTARIA_PARSE_TEST_SEED__!(env[REPLAY_SEED_VAR])).toBe(walkerBaseSeed());
   });
 
   /* ⚠ A replay that walks NOTHING reads as green, which is worse than one that
-   * fails. A target that does not resolve registers its own failing test. */
-  test('E3 a mistyped UPTO target fails loudly instead of walking zero scenarios', () => {
-    expect(SIM_CODE).toMatch(/UPTO_INDEX\s*>=\s*0/);
+   * fails. A target that does not resolve selects nothing AND says so. */
+  test('E4 a mistyped target selects nothing and reports it, rather than everything', () => {
+    const selection = walkerSelection({ [REPLAY_PREFIX_VAR]: `${TARGET}_TYPO` });
+    expect(selection.mode).toBe('prefix');
+    expect(selection.targetFound).toBe(false);
+    expect(selection.keys).toEqual([]);
+    // …and the suite turns that into a failing `it` instead of an empty green run.
+    expect(SIM_CODE).toMatch(/SELECTION\.mode === 'prefix'/);
+    expect(SIM_CODE).toMatch(/SELECTION\.targetFound/);
     expect(SIM_CODE).toMatch(/PLAYER_WALKER_UPTO target resolves to a real scenario/);
   });
 
-  test('E4 all three families route through the one selector', () => {
-    expect((SIM_CODE.match(/selected\(`/g) ?? []).length).toBe(3);
+  test('E5 ⚠⚠ the suite carries NO selection logic of its own — one implementation', () => {
+    // The durable form of the claim: not "the right text is present" but "there
+    // is no second copy to drift". A private re-implementation is exactly how
+    // the printed command and the selected scenarios came apart.
+    expect(SIM_CODE).toMatch(/walkerSelection\(\)/);
+    for (const forbidden of [
+      /process\.env\.PLAYER_WALKER_UPTO/,
+      /process\.env\.PLAYER_WALKER_ONLY/,
+      /ORDER\.indexOf/,
+      /UPTO_INDEX/,
+    ]) {
+      expect(SIM_CODE).not.toMatch(forbidden);
+    }
+  });
+
+  test('E6 the isolating door still isolates, and an unset environment walks it all', () => {
+    const order = walkOrder();
+    const whispers = order.filter((k) => k.startsWith('whisper:'));
+    const byFamily = walkerSelection({ [REPLAY_ISOLATE_VAR]: 'whisper' });
+    expect(byFamily.mode).toBe('isolated');
+    expect(byFamily.keys).toEqual(whispers);
+    const byKey = walkerSelection({ [REPLAY_ISOLATE_VAR]: TARGET });
+    expect(byKey.keys).toEqual([TARGET]);
+    const full = walkerSelection({});
+    expect(full.mode).toBe('full');
+    expect(full.keys).toEqual(order);
   });
 });
 
@@ -427,19 +547,28 @@ describe('debt #54 §H — the world starts from the seed, not from the byte lay
    * expires the moment anybody edits anything is not reproducibility.
    *
    * The two tests below are that control experiment, reduced to the mechanism. */
-  test('H1 the walker re-seeds as the FIRST thing its beforeAll does', () => {
-    expect(SIM_CODE).toMatch(
-      /beforeAll\(\s*async\s*\(\s*\)\s*=>\s*\{\s*\(globalThis as \{[^}]*\}\)\.__TARTARIA_RESEED_RANDOM__\?\.\(\);/,
+  /* ⚠⚠ SECOND PASS — THE WORLD BUILD MOVED INTO A FUNCTION so §W below can run
+   * it instead of reading it. These two keep the ORDERING claim, which §W cannot
+   * see from outside: a reconstruction that re-seeded after drawing its grounds
+   * would still be self-consistent and still be wrong. */
+  test('H1 the world builder re-seeds as the FIRST thing it does, and the suite delegates', () => {
+    expect(WALKER_CODE).toMatch(
+      /export async function buildWalkerWorld\(\): Promise<void> \{\s*\(globalThis as \{[^}]*\}\)\.__TARTARIA_RESEED_RANDOM__\?\.\(\);/,
     );
+    // …and the suite's beforeAll builds the world ONLY by calling it.
+    expect(SIM_CODE).toMatch(/beforeAll\([\s\S]{0,400}?await buildWalkerWorld\(\);\s*\}\);/);
+    for (const call of ['hydrate()', 'startNewGame(', 'skipTutorial']) {
+      expect(SIM_CODE).not.toContain(call);
+    }
   });
 
   /* Re-seeding AFTER the world is built buys nothing — the grounds, the weather,
    * the first encounters and the roster are already drawn. Order is the claim. */
   test('H2 the re-seed precedes every call that builds the world', () => {
-    const seedAt = SIM_CODE.indexOf('__TARTARIA_RESEED_RANDOM__');
+    const seedAt = WALKER_CODE.indexOf('__TARTARIA_RESEED_RANDOM__');
     expect(seedAt).toBeGreaterThan(-1);
-    for (const call of ['hydrate()', 'startNewGame(', 'skipTutorial']) {
-      expect(SIM_CODE.indexOf(call)).toBeGreaterThan(seedAt);
+    for (const call of ['get().hydrate()', 'get().startNewGame(', 'get().skipTutorial']) {
+      expect(WALKER_CODE.indexOf(call)).toBeGreaterThan(seedAt);
     }
   });
 
@@ -492,21 +621,26 @@ describe('debt #54 §I — the world does not advance on the wall clock', () => 
    * suites that actually test homework drive it by hand through
    * `_homeworkTickForTest()`, so nothing loses coverage and no product code,
    * timer or probability changes. */
-  test('I1 the walker disarms the homework interval before it walks', () => {
-    expect(SIM_CODE).toMatch(/setHomeworkTick\(null\)/);
-    expect(SIM_CODE).toMatch(/import \{[^}]*setHomeworkTick[^}]*\} from '\.\.\/app\/state\/gameStore'/);
+  /* ⚠⚠ SECOND PASS — THE DISARM MOVED WITH THE WORLD BUILD into
+   * `buildWalkerWorld()`, and §W5 now EXECUTES it: reconstruct the world, then
+   * ask the store whether the tick is installed. These two keep the ordering
+   * claim, which the execution cannot see. */
+  test('I1 the world builder disarms the homework interval before the walk starts', () => {
+    expect(WALKER_CODE).toMatch(/setHomeworkTick\(null\)/);
+    expect(WALKER_CODE).toMatch(/import \{[^}]*setHomeworkTick[^}]*\} from '\.\.\/app\/state\/gameStore'/);
   });
 
   /* Disarming it before `hydrate()` would do nothing at all — hydrate is what
    * arms it — and disarming it after the first walk would leave that walk on the
    * clock. The order is the claim. */
-  test('I2 the disarm sits after hydrate and before the first scenario', () => {
-    const hydrateAt = SIM_CODE.indexOf('hydrate()');
-    const disarmAt = SIM_CODE.indexOf('setHomeworkTick(null)');
-    const firstWalkAt = SIM_CODE.indexOf('playMission(');
+  test('I2 the disarm sits after hydrate and before the build returns', () => {
+    const build = WALKER_CODE.slice(WALKER_CODE.indexOf('export async function buildWalkerWorld'));
+    const hydrateAt = build.indexOf('get().hydrate()');
+    const disarmAt = build.indexOf('setHomeworkTick(null)');
     expect(hydrateAt).toBeGreaterThan(-1);
     expect(disarmAt).toBeGreaterThan(hydrateAt);
-    expect(firstWalkAt).toBeGreaterThan(disarmAt);
+    // …and the suite walks only after the build it awaits has returned.
+    expect(SIM_CODE.indexOf('await buildWalkerWorld()')).toBeLessThan(SIM_CODE.indexOf('playMission('));
   });
 
   test('I3 the disarm uses the product door that already exists', () => {
@@ -517,9 +651,14 @@ describe('debt #54 §I — the world does not advance on the wall clock', () => 
     expect(codeOnly(read('jest.teardown.js'))).toMatch(/setHomeworkTick\(null\)/);
   });
 
-  test('I4 the walker never re-arms it, and never installs a tick of its own', () => {
-    expect(SIM_CODE).not.toMatch(/setHomeworkTick\(\s*(?!null)/);
-    expect(WALKER_CODE).not.toMatch(/setHomeworkTick/);
+  test('I4 the harness never re-arms it, and never installs a tick of its own', () => {
+    // ⚠ The claim is about the ARGUMENT, not about the name. The disarm now
+    // lives in the walker helper, so "the helper must not mention it" would be
+    // false; "neither file may ever pass anything but null" is what was meant.
+    for (const code of [SIM_CODE, WALKER_CODE]) {
+      expect(code).not.toMatch(/setHomeworkTick\(\s*(?!null\s*\))/);
+    }
+    expect((WALKER_CODE.match(/setHomeworkTick\(/g) ?? []).length).toBe(1);
   });
 
   /* ⚠ A DISARM THAT DID NOT DISARM WOULD SATISFY EVERY CLAIM ABOVE. This one
@@ -574,12 +713,16 @@ describe('debt #54 §J — the walker does not read the clock', () => {
     expect(code).not.toMatch(/new Date\(/);
   });
 
-  test.each([
-    ['test-utils/playerWalker.ts', WALKER_CODE],
-    ['__tests__/playerWalkerSim.test.ts', SIM_CODE],
-  ])('J2 %s settles on a poll budget derived from the old deadline', (_name, code) => {
-    expect(code).toMatch(/const SETTLE_POLL_MS = \d+;/);
-    expect(code).toMatch(/Math\.max\(1, Math\.ceil\(deadlineMs \/ SETTLE_POLL_MS\)\)/);
+  /* ⚠ SECOND PASS — BOTH SETTLES NOW LIVE IN THE WALKER HELPER. The suite's own
+   * copy went with the world build into `buildWalkerWorld()`, which is why this
+   * counts two poll-budgeted helpers in one file instead of one in each, and
+   * requires the suite to have none of its own left to drift. */
+  test('J2 every settle is spent on a poll budget derived from the old deadline', () => {
+    expect(WALKER_CODE).toMatch(/const SETTLE_POLL_MS = \d+;/);
+    expect(WALKER_CODE).toMatch(/const WORLD_SETTLE_POLL_MS = \d+;/);
+    const budgets = WALKER_CODE.match(/Math\.max\(1, Math\.ceil\(deadlineMs \/ [A-Z_]*SETTLE_POLL_MS\)\)/g) ?? [];
+    expect(budgets).toHaveLength(2);
+    expect(SIM_CODE).not.toMatch(/SETTLE_POLL_MS/);
   });
 
   /* ⚠ NO WAIT MAY GET SHORTER. The budget is the caller's own deadline at the
@@ -609,6 +752,117 @@ describe('debt #54 §J — the walker does not read the clock', () => {
       return polls;
     };
     expect(await run(0)).toBe(await run(2_000_000));
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+describe('debt #54 §W — the replay RECONSTRUCTS THE WORLD, and this executes it', () => {
+  /* ⚠⚠⚠ THE CLAIM THE FIRST PASS COULD ONLY MAKE IN PROSE.
+   *
+   * §A–§J prove the four inputs are shut: the seed is addressable, the world is
+   * re-seeded before it is dealt, the homework interval is disarmed, no wait
+   * consults a clock. Every one of those was asserted by reading source text —
+   * which is exactly the shape of test that lets a replay token go decorative
+   * while the world underneath it drifts. The question the debt actually asks is
+   * *does replaying it produce the same world?*, and only running it can answer.
+   *
+   * So each test below RECONSTRUCTS the world `playerWalkerSim` walks its 89
+   * scenarios in — the real `buildWalkerWorld()`, in a fresh module registry,
+   * which is what a replay process does minus the process — and compares the
+   * worlds that come back. The fingerprint covers the scene the player stands
+   * in, the world memory behind it, the rolled character and every line the
+   * build wrote to the feed.
+   *
+   * ⚠ NOTHING IS PINNED TO A STORED VALUE. Two reconstructions made in the same
+   * process are compared against each other, so an edit anywhere in the game
+   * moves both sides and the claim survives without a golden file to re-bless —
+   * the opposite of the giant snapshot this repair was told not to introduce.
+   *
+   * ⚠ MEASURED ON THIS TREE. Exactly one field differs between two independent
+   * reconstructions: `player.mapSeed`, `name|race|faction|<Date.now()>`, which
+   * is the SAVE SYSTEM'S character key and not world state — `generateWorldMap`
+   * opens by voiding it, because positions are canon. Masking that one epoch,
+   * scene, world memory, the rolled character and all 30-odd feed lines are
+   * byte-identical. */
+  jest.setTimeout(120_000);
+
+  /** One reconstruction, in its own module registry.
+   *
+   *  · `burn` stands in for whatever the loaded tree happened to draw at import,
+   *    which is the §H defect's actual mechanism.
+   *  · `seed` swaps the RE-SEED HOOK, not the cursor — because that is what a
+   *    `TARTARIA_TEST_SEED=…` process does. jest.setup.js's hook restores that
+   *    process's `__SEED`, so setting the cursor beforehand and letting the
+   *    build re-seed over it would prove nothing except that the build re-seeds.
+   *  · `reseed: false` removes the hook entirely, so the build cannot anchor
+   *    itself and the burn is free to decide the world. */
+  const reconstruct = async (
+    opts: { burn?: number; seed?: number; reseed?: boolean } = {},
+  ): Promise<string> => {
+    let fingerprint = '';
+    const hook = H.__TARTARIA_RESEED_RANDOM__;
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const w = require('../test-utils/playerWalker') as typeof import('../test-utils/playerWalker');
+      for (let i = 0; i < (opts.burn ?? 0); i++) Math.random();
+      if (opts.reseed === false) delete H.__TARTARIA_RESEED_RANDOM__;
+      else if (opts.seed !== undefined) {
+        H.__TARTARIA_RESEED_RANDOM__ = () => H.__TARTARIA_SET_RANDOM_SEED_FOR_TEST__!(opts.seed!);
+      }
+      const [log, warn, error] = [console.log, console.warn, console.error];
+      console.log = () => {}; console.warn = () => {}; console.error = () => {};
+      try {
+        await w.buildWalkerWorld();
+        fingerprint = w.walkerWorldDigest();
+      } finally {
+        console.log = log; console.warn = warn; console.error = error;
+        H.__TARTARIA_RESEED_RANDOM__ = hook;
+      }
+    });
+    expect(fingerprint).toMatch(/^[0-9a-f]{16}$/);
+    return fingerprint;
+  };
+
+  test('W1 ⚠⚠⚠ two reconstructions of the walker world are the SAME WORLD', async () => {
+    expect(await reconstruct()).toBe(await reconstruct());
+  });
+
+  test('W2 ⚠⚠⚠ and 250,000 draws burned beforehand change nothing — the world is a function of the SEED, not of the tree', async () => {
+    // The §H defect stated as an experiment on the world itself rather than on
+    // `Math.random`: a replay token anchored to the byte layout of the loaded
+    // files expires the moment anybody edits anything.
+    expect(await reconstruct({ burn: 250_000 })).toBe(await reconstruct());
+  });
+
+  test('W3 ⚠⚠ without the re-seed that same burn DOES change the world — W1/W2 are not vacuous', async () => {
+    // The other half. Without this, W1 and W2 would both pass on a harness that
+    // had quietly stopped drawing at all, or on a fingerprint that saw nothing.
+    expect(await reconstruct({ burn: 250_000, reseed: false })).not.toBe(await reconstruct());
+  });
+
+  test('W4 ⚠⚠⚠ a different seed reconstructs a different world — the seed is not decorative', async () => {
+    // The seed is printed in every replay block and typed back by whoever reads
+    // one. If it did not govern the world, that block would be an instruction to
+    // reproduce something else.
+    expect(await reconstruct({ seed: 0x1234abcd })).not.toBe(await reconstruct());
+  });
+
+  test('W5 ⚠⚠ the reconstruction leaves the homework interval DISARMED', async () => {
+    let installed: boolean | null = null;
+    await jest.isolateModulesAsync(async () => {
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      const w = require('../test-utils/playerWalker') as typeof import('../test-utils/playerWalker');
+      const gs = require('../app/state/gameStore') as typeof import('../app/state/gameStore');
+      const [log, warn, error] = [console.log, console.warn, console.error];
+      console.log = () => {}; console.warn = () => {}; console.error = () => {};
+      try {
+        await w.buildWalkerWorld();
+        installed = gs._homeworkInstalled();
+      } finally { console.log = log; console.warn = warn; console.error = error; }
+    });
+    // hydrate() arms it; the build is what takes it back off. §I5 proves the
+    // door works — this proves the build walked through it.
+    expect(installed).toBe(false);
   });
 });
 
