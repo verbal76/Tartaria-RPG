@@ -1,0 +1,326 @@
+{
+  "id": "9999bf9b2ead410c9c1ec78c7ae24e32",
+  "groupID": "7743237089",
+  "eventID": "9999bf9b2ead410c9c1ec78c7ae24e32",
+  "projectID": "4511945117532160",
+  "size": 9996,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-19-1853-the-ring-learns-who #mu959anvpigm [inline 35/35]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-19-1853-the-ring-learns-who",
+  "message": "player-log 2026-09-19-1853-the-ring-learns-who #mu959anvpigm [inline 35/35]",
+  "title": "player-log 2026-09-19-1853-the-ring-learns-who #mu959anvpigm [inline 35/35]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Boston",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-20T01:25:57Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1538637824,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 100.0,
+      "orientation": "portrait",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 91357184,
+      "usable_memory": 3492216832,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 33.778416,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0bc48-d976-7105-908c-e3189e3a1409"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "82ed0c143ce14da585f94b979a76509f",
+      "span_id": "aa039faefe704ec8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Ymx-lLi-BFe-Gl0-czo-gbm-9yd-Ggg-dG8-gU3-Rhb-mRh-cmR-zIM-K3I-HNv-dXR-oIH-RvI-EZp-cnN-0IE-xhb-mRp-bmc-uIC-hUe-XBl-ICd-sZW-F2Z-SBv-dXR-wb3-N0J-yB0-byB-oZW-FkI-Glu-dG8-gdG-hlI-Hdp-bGR-zLi-kKW-zIw-MjY-tMD-ktM-jBU-MDE-6Mj-k6M-zAu-ODM-0Wl-0gW-2Rl-YnV-nXS-BwY-XJz-ZXI-6IG-lud-GVu-dD1-pbn-Zlc-3Rp-Z2F-0ZS-Bjb-25m-PTE-uMD-Agd-mVy-Yj1-sb2-9rI-HRh-cmd-ldD-0tI-HJl-c29-sdm-VkP-S0g-cmF-uZ2-U9L-SBl-bmV-taW-VzP-TAg-aG9-va3-M9M-Apb-MjA-yNi-0wO-S0y-MFQ-wMT-oyO-Toz-MC4-4Mz-NaX-SBb-cGx-heW-VyX-SBs-b29-rCl-syM-DI2-LTA-5LT-IwV-DAx-OjI-5Oj-MwL-jgz-MVp-dIF-tkZ-WJ1-Z10-gdW-k6I-HRh-cCA-ibG-9va-yBh-cm9-1bm-Qge-W91-Igo-=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-Mjk-uOT-g4W-l0g-W2R-lYn-VnX-SB2-b2l-jZe-KPs-SBn-YXA-gOT-gwb-XMg-KHd-haX-QgM-G1z-ICs-gc3-lud-Ggg-OTM-0bX-MsI-Gxp-dmU-pIC-JXZ-Wxs-IG1-ldC-wgS-29o-bi4-iCl-syM-DI2-LTA-5LT-IwV-DAx-OjI-5Oj-I5L-jkz-MVp-dIF-thc-mJp-dGV-yXS-BUa-GUg-QXJ-iaX-Rlc-iBy-YXB-zIH-RoZ-SBz-bGF-0ZS-4gI-k5v-dCB-0aG-F0I-OKA-lCB-0YX-Agd-Ghl-IGd-sb3-dpb-mcg-TE9-PSy-BBU-k9V-TkQ-gWU-9VI-GJ1-dHR-vbi-B0b-yBn-ZXQ-geW-91c-iBi-ZWF-yaW-5nc-y4i-Cls-yMD-I2L-TA5-LTI-wVD-AxO-jI5-OjI-5Lj-kzM-Vpd-IFt-kZW-J1Z-10g-dWk-6IH-Rhc-CAi-4oa-RIF-NUQ-U5E-QVJ-EUy-IK",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-Mjk-uMD-A5W-l0g-W2F-yYm-l0Z-XJd-ICJ-GaX-Jzd-Cwg-Z2V-0IH-lvd-XIg-YmV-hcm-luZ-3Mu-IFR-hcC-BMT-09L-IEF-ST1-VOR-CBZ-T1U-g4o-CUI-Ekn-bGw-gcm-VhZ-CB0-aGU-gcm-9vb-SBm-b3I-geW-91O-iB3-aGF-0J3-Mga-GVy-ZSw-geW-91c-iB3-YXk-gb3-V0L-CBh-bmQ-gd2-hhd-GV2-ZXI-geW-91J-3Jl-IHN-0aW-xsI-GNo-YXN-pbm-cuI-FVz-ZSB-pdC-Bhb-nkg-dGl-tZS-B5b-3Un-cmU-gbG-9zd-C4i-Cls-yMD-I2L-TA5-LTI-wVD-AxO-jI5-OjI-5Lj-AwO-Fpd-IFt-hcm-Jpd-GVy-XSA-iV2-Vsb-CBt-ZXQ-sIE-tva-G4u-IFR-vIG-J1c-2lu-ZXN-zLi-IKW-zIw-MjY-tMD-ktM-jBU-MDE-6Mj-k6M-jku-MDA-4Wl-0gW-3Bs-YXl-lcl-0gS-29o-bgo-=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-Mjk-uMD-A3W-l0g-W2R-lYn-VnX-SBx-d2V-uOi-Bsb-2Fk-aW5-nIC-h3Y-XMg-aWR-sZS-kg4-oCU-IHR-oZS-BBc-mJp-dGV-yIH-NwZ-WFr-cyB-0ZW-1wb-GF0-ZXM-gdW-50a-Wwg-aXQ-gaX-Mgc-mVh-ZHk-KWz-IwM-jYt-MDk-tMj-BUM-DE6-Mjk-6Mj-MuN-jIy-Wl0-gW2-RlY-nVn-XSB-rYm-Jhc-jog-bW9-1bn-RlZ-CBi-b3R-0b2-09M-jYw-IHJ-hdz-0yN-jAg-ZnJ-vbT-1sa-XZl-IHd-pbk-g9N-jY3-IGJ-lYX-Q9M-Apb-MjA-yNi-0wO-S0y-MFQ-wMT-oyO-Toy-Mi4-xMj-daX-SBb-ZGV-idW-ddI-HZv-aWN-l4o-+xI-Gdh-cCA-xMD-I1b-XMg-KHd-haX-QgM-G1z-ICs-gc3-lud-Ggg-MTA-wMW-1zL-CBs-aXZ-lKS-AiW-W91-ciB-uYW-1lL-CB0-cmF-2ZW-xlc-i4i-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-MjE-uMT-AyW-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0O-iBz-a2l-wcG-VkI-OKA-lCB-wbG-F5Z-XIg-cmV-jb3-JkI-G1p-c3N-pbm-cgY-29y-ZSB-pZG-Vud-Gl0-eSA-obm-FtZ-T3i-iIU-sIH-JhY-2VJ-ZD3-inJ-MsI-HN0-YXR-zPe-Kck-yk7-IHN-sb3-Qgc-2xv-dF9-tdT-k1M-XJr-dV9-uOW-5he-GQg-bGV-mdC-Bpb-nRh-Y3Q-KWz-IwM-jYt-MDk-tMj-BUM-DE6-Mjk-6Mj-EuM-DUy-Wl0-gW2-FyY-ml0-ZXJ-dIF-RoZ-SBB-cmJ-pdG-VyI-Gxv-b2t-zIH-VwL-iAi-WW9-1ci-BuY-W1l-LCB-0cm-F2Z-Wxl-ci4-gVH-lwZ-SBp-dCw-gdG-hlb-iB0-YXA-gQU-NUL-iIK",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-MTY-uMz-U5W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0O-iBz-a2l-wcG-VkI-OKA-lCB-wbG-F5Z-XIg-cmV-jb3-JkI-G1p-c3N-pbm-cgY-29y-ZSB-pZG-Vud-Gl0-eSA-obm-FtZ-T3i-iIU-sIH-JhY-2VJ-ZD3-inJ-MsI-HN0-YXR-zPe-Kck-yk7-IHN-sb3-Qgc-2xv-dF9-tdT-k1M-XJr-dV9-uOW-5he-GQg-bGV-mdC-Bpb-nRh-Y3Q-KWz-IwM-jYt-MDk-tMj-BUM-DE6-Mjk-6MT-YuM-jc0-Wl0-gW3-dvc-mxk-XSB-QYX-Roc-zog-bm9-ydG-ggd-G8g-U3R-hbm-Rhc-mRz-IMK-3IH-Nvd-XRo-IHR-vIE-Zpc-nN0-IEx-hbm-Rpb-mcu-ICh-UeX-BlI-Cds-ZWF-2ZS-Bvd-XRw-b3N-0Jy-B0b-yBo-ZWF-kIG-lud-G8g-dGh-lIH-dpb-GRz-Lik-K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-MTY-uMj-czW-l0g-W3d-vcm-xkX-SBU-aGU-gb3-V0c-G9z-dCd-zIG-xhb-nRl-cm5-zIH-N3Y-Xkg-aW4-gYS-Bkc-mFm-dCB-0aG-F0I-HNo-b3V-sZC-Bub-3Qg-cmV-hY2-ggd-Ghp-cyB-mYX-Iga-W5z-aWR-lLi-BBb-iBh-c2g-gc3-Rvc-m0g-cHJ-lc3-Nlc-yBv-biB-0aG-Ugd-29y-bGQ-g4o-CUI-C0x-IFN-UUi-4gV-2hh-dCB-5b3-UgZ-G8g-aGV-yZS-Bpc-yB5-b3V-ycy-B0b-yBj-aG9-vc2-UuC-lsy-MDI-2LT-A5L-TIw-VDA-xOj-I5O-jE2-LjI-3M1-pdI-Ft3-b3J-sZF-0gT-W9u-YXJ-jaC-BDb-3Vy-dCB-yaX-Nlc-yBv-dXQ-gb2-Ygd-Ghl-IHN-pbH-QgY-XQg-dGh-lIG-VkZ-2Ug-b2Y-gVG-hlI-E1v-bmF-yY2-gnc-yBX-YXl-zdG-F0a-W9u-LiB-Zb3-UgY-XJy-aXZ-lIG-F0I-FRo-ZSB-BdH-Jpd-W0u-IFB-vbG-lza-GVk-IG1-1ZC-1nb-GFz-cyB-0aW-xlc-yBh-bmQ-gYS-BjY-XJ2-ZWQ-gTW-9uY-XJj-aCB-zaW-dpb-CBv-dmV-yIH-RoZ-SBk-b29-yd2-F5",
+      "LiB-UaG-Ugc-2Vu-ZXN-jaG-FsI-G5v-ZHM-geW-91I-HRo-cm9-1Z2-ggd-2l0-aG9-1dC-Bzc-GVh-a2l-uZy-Dig-JQg-eW9-1ci-Bid-XNp-bmV-zcy-BoY-XMg-YWx-yZW-Fke-SBi-ZWV-uIG-xvZ-2dl-ZCB-lbH-Nld-2hl-cmU-uCl-syM-DI2-LTA-5LT-IwV-DAx-OjI-5Oj-E2L-jI3-Mlp-dIF-t3b-3Js-ZF0-gT2-Ygd-Ghl-IFR-hcn-Rhc-mlh-biB-HaW-Fud-HMs-IHN-3b3-JuI-HRv-IHR-oZS-BNd-WQg-TW9-uYX-Jja-HM6-IHl-vdS-BoY-XZl-IGN-yb3-NzZ-WQg-aW5-0by-BUY-XJ0-YXJ-pYS-4gV-Ghl-IGJ-1cm-llZ-CBj-b3V-udH-J5L-iBU-aGU-gY2-F0Y-WNs-eXN-tIH-RoY-XQg-bWF-kZS-Bpd-CB3-YXM-gY2-Fsb-GVk-IHR-oZS-BBZ-XRo-ZXJ-zdG-9uZ-SBG-bG9-vZC-wgY-W5k-IGl-0IG-VuZ-GVk-IGE-gdG-hvd-XNh-bmQ-geW-Vhc-nMg-YWd-vIO-KAl-CB5-ZXQ-gaG-VyZ-Swg-YXQ-gZ3-Jvd-W5k-IGx-ldm-VsL-CBp-dCB-uZX-Zlc-iBx-dWl-0ZS-Bzd-G9w-cGV-kLi-BUa-GUg-bXV-kIH-N0a-Ww=",
+      "bCB-tb3-Zlc-y4g-VGh-lIG-Fpc-iBz-dGl-sbC-Bod-W1z-Lgp-bMj-AyN-i0w-OS0-yMF-QwM-Toy-OTo-xNi-4yN-zBa-XSB-bZG-Vid-Wdd-IHN-wYX-duO-iBn-ZWF-yPV-tCb-25l-IFN-wbG-l0d-GVy-IEF-4ZS-wgU-2Fs-dmF-nZW-QgQ-m93-LCB-XYW-5kZ-XJl-cid-zIE-ZhY-2Ug-b2Y-gU2-hhZ-G93-c10-gd2-luZ-G93-PTA-gcm-9zd-GVy-PW5-ldw-pbM-jAy-Ni0-wOS-0yM-FQw-MTo-yOT-oxN-i4y-NjN-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-Bub-25l-IGF-jdG-l2Z-SDC-tyB-hdD-1tb-25h-cmN-oX3-dhe-XN0-YXR-pb2-4KW-zIw-MjY-tMD-ktM-jBU-MDE-6Mj-k6M-TYu-MjY-zWl-0gW-2Rl-YnV-nXS-BzY-2Vu-ZTo-gbG-9jP-W1v-bmF-yY2-hfd-2F5-c3R-hdG-lvb-iBo-dWI-9b3-V0c-G9z-dF9-nYX-RlI-GFy-cml-2YW-w9b-iBv-cGV-uaW-5nP-Xkg-cGF-zc2-luZ-z1u-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-E6M-jk6-MTY-uMj-YxW-l0g-W2R-lYn-VnX-SBB-UEs-gc2-Vzc-2lv-biB-zdG-Fyd-Dog-MjA-yNi-0wO-S0x-OS0-xOD-UzL-XRo-ZS1-yaW-5nL-Wxl-YXJ-ucy-13a-G8u-Cgo-9PT-0gR-U5E-IFJ-FUE-9SV-CA9-PT0-="
+    ],
+    "chunkChars": 3072,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-19-1853-the-ring-learns-who #mu959anvpigm [inline 35/35]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mu959anvpigm"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-19-1853-the-ring-learns-who"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "35"
+    },
+    {
+      "key": "parts",
+      "value": "35"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-19-1853-the-ring-learns-who"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-20T01:35:14.071175Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-20T01:35:07.658000Z",
+  "fingerprints": [
+    "ef6f894235d7dd8446f24482f5945185"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1981935382,
+    "commitCount": 5,
+    "data": {},
+    "dateCreated": "2026-09-19T23:54:57.960782Z",
+    "dateReleased": "2026-09-20T00:48:11.181243Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "1126ae79b4920cfb4b98f735c6269d3b180e1b03",
+      "message": "OTA-1853 \u2014 the ring learns who, not just when (diagnostics only)\n\nBaker #3's owner-device capture (iPhone SE, 2026-09-19) measured a real\nmemory ratchet \u2014 baseline 951MB, peak 1903MB, seven retained steps, +675MB\nthat never came back, 98.3% of it in the default malloc zone across\n4.42-4.45M live blocks \u2014 and the forensic pass ruled OUTCOME C, HOLDER NOT\nPROVEN. Two reasons, both addressed here, neither of them a memory fix.\n\n1. THE COMPOSER THREW THE EVIDENCE AWAY. The recorder took 504 samples into\n   a 512-slot ring with `evicted 0` and the report printed the last 48. All\n   seven steps happened before that window opened. REPORT_SAMPLE_ROWS 48->512,\n   REPORT_EVENT_ROWS 32->64. Measured cost: 4,789 -> 49,729 chars. The block\n   rides buildBasicDeviceSummary, beside the log body rather than inside it,\n   so the 200,000-char full-log cap does not touch it; the transport chunks at\n   7,500 raw chars and a 405,000-char send is already proven on hardware.\n\n2. THE VOCABULARY WAS BLIND TO THE SUSPECTS. The 49-second window carrying\n   every step held THIRTEEN room transitions and seven `roster=new` events,\n   and MEM_KIND had words only for Qwen, MiniLM, voice, touches and\n   persistence. Kinds 90-125 name rooms, routes, scenes, rosters, artwork and\n   audio players; memCodeForId is a pure 16-bit FNV-1a with no map, so the\n   instrument cannot become the holder it was installed to find.\n\nTHE REPORT NOW DOES THE JOIN. Retained steps are detected at compose time and\nprinted with the annotated events recorded inside each one, before the raw\nrows. That is CO-LOCATION IN TIME AND NOTHING MORE: the section names no\nholder and no cause, and H5 tests that those words never appear in it.\n\nDETECTOR DEFECT FOUND AND FIXED. detectRatchetSteps measured the settle floor\nwith floorAt(settleAt), whose 10-sample lookback reaches back THROUGH the rise\nwhen settle is only 8 samples past it. That rejected the first genuine\ncandidate and re-found the same step nine samples later \u2014 ~2.25s at device\ncadence, which is the whole event-join window, so a late-dated step is\nattributed to whatever happened after its cause. The settle floor is now the\nminimum from the rise onward, and a rise with no room left to settle is left\nopen rather than claimed.\n\nTHE GAME IS UNCHANGED. Nine non-comment lines reach production files: three\nimports and six diagnostic calls. Exactly one line was removed \u2014 ArtFlash's\n`return clearTimer;`, replaced by a closure that still calls it first, proven\nby rendering the real component against a fake clock. Nothing frees, disposes,\ncaches, loads, navigates or reschedules anything.\n\ngameStore.ts IS NOT TOUCHED. It stands at exactly its 36815-line ceiling, a\ndeliberate anti-growth ratchet, so the room boundary is observed from outside\nthe store rather than spending a permanent allowance on a temporary probe.\nThe observer keys transitions on the id STRING and reports the hash, so a\n16-bit collision can cost an ambiguous label but never a missing crossing.\nMeasured: 374ns per unchanged store publish (760ns before the string check),\nand 200,000 unchanged publishes emit zero events.\n\nTWO EXISTING PINS WENT STALE AND WERE REPAIRED, NOT WEAKENED.\n- ota1433ChoiceArtFlash pinned the teardown by its exact source text. The\n  claim is unchanged and still asserted (the teardown clears the timer FIRST);\n  only the spelling moved, and the behaviour is now additionally proven by\n  J5/J6 rendering the real component.\n- ota1484APinStatesAClaim's shrink-only fixture ratchet 52 -> 54, following\n  its own documented procedure: both new sites fall in the class it already\n  names (\"minimal argument objects for pure predicates\"), said at both sites\n  and at the ratchet. onStoreChange reads the location id as an opaque string\n  and never resolves a cell, so placedAt would import world geometry into a\n  test about string identity; the second site is deliberately malformed.\n\nNATIVE REMAINDER, written down before the next capture rather than after:\nphase reads `unknown` on every sample and it is NOT a JS decode bug (every JS\nlink traced and holds), so no OTA fixes it; no subsystem identity on a malloc\nblock; task_vm_info read for phys_footprint only. None of the three blocks\nthis pass.\n\nVALIDATION on the exact committed tree: full surface 1358/1358 suites,\n15,751 passed, 0 failed. 22/22 local gates. typecheck:ci and lint clean.\nTen negative controls each red then restored byte-identical, including one\nthat reintroduces the detector defect above and one that drops clearTimer.\n\nNOT CLAIMED: no holder is identified, nothing is repaired, and no capture has\nbeen taken on hardware with this build.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-19T23:43:35Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-19-1853-the-ring-learns-who",
+          "shortVersion": "tartaria@4.32.11+2026-09-19-1853-the-ring-learns-who",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-20T00:48:11.181243Z",
+          "dateCreated": "2026-09-19T23:54:57.960782Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160102571",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-20T00:48:11.401585Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-19-1853-the-ring-learns-who",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-19-1853-the-ring-learns-who",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-19-1853-the-ring-learns-who",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-19-1853-the-ring-learns-who)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a01fa9a764fb4a11a94787e000d804d1",
+  "previousEventID": "95a81581e0484c6abdb7d4b715558b82"
+}
