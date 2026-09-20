@@ -111,7 +111,20 @@ describe('OTA-1174 — the boot update check reports itself to the DEVICE log', 
     expect(APPTSX).toContain("setStage('ota:done');");
     // ⚠ A budget still EXISTS. An unbounded check would hold the splash forever on a
     // dead network, which is the failure the number was introduced to prevent.
-    const budget = /checkTimeoutMs:\s*([\d_]+)/.exec(APPTSX)?.[1]?.replace(/_/g, '');
+    //
+    // ⚠⚠ OTA-1855 MOVED THE VALUE BEHIND A NAME, AND THIS PIN FOLLOWS IT. The
+    // boot-front now passes `checkTimeoutMs: BOOT_OTA_CHECK_TIMEOUT_MS` so App.tsx can
+    // derive its emergency boot-gate cap from the SAME constant — the two were
+    // independent literals and drifted into an 8s cap guarding a 10s budget, costing a
+    // measured 8.353s stall at every launch the network could not answer. THE CLAIM
+    // HERE IS UNCHANGED: a budget exists and is bounded at both ends. Only the spelling
+    // moved, so this resolves one level of indirection instead of pinning a literal
+    // that no longer sits at the call site.
+    const ref = /checkTimeoutMs:\s*([A-Za-z_$][\w$]*|[\d_]+)\s*,/.exec(APPTSX)?.[1];
+    expect(ref).toBeDefined();
+    const budget = /^[\d_]+$/.test(ref!)
+      ? ref!.replace(/_/g, '')
+      : new RegExp(`const ${ref!} = ([\\d_]+);`).exec(APPTSX)?.[1]?.replace(/_/g, '');
     expect(budget).toBeDefined();
     const ms = Number(budget);
     // …and it is sane at both ends: long enough for a cold radio to answer, short enough

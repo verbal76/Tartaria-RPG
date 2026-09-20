@@ -31014,7 +31014,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * This changes WHAT REACHES THE NATIVE RING and nothing else: no gameplay, no
  * handler, no dispatch, no touch semantics, no OTA-1853 subsystem mark, no
  * HERMES_HEAP, and no native ring capacity. Three production lines of logic. */
-export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
+/* ⚠⚠⚠ OTA-1855 — THE CAP LOSES THE RACE IT WAS NEVER MEANT TO WIN.
+ *
+ * MEASURED ON THE OWNER'S PIXEL 10 PRO XL / ANDROID 37, on OTA
+ * 2026-09-19-1850, reported as "long lag on initial load": process start
+ * 23:54:03.845, OTA state 'Checking' at 23:54:04.001, the character gate
+ * opening 8.353s later at 23:54:12.354 — and the OTA check reporting its error
+ * only AFTERWARDS at 23:54:14.008. Two timers, in the wrong order.
+ *
+ * App.tsx's emergency boot-gate cap was a bare `8000` while the boot-front OTA
+ * check asked for `10_000`. 8 < 10, so on EVERY launch the network could not
+ * answer, the emergency hatch fired first and the player paid a fixed
+ * eight-second stall at the splash before they could pick a character. The cap
+ * exists for a boot that is never coming back — hydrate() rejecting, a step
+ * throwing before the check resolves — not as a second OTA timeout, and it was
+ * winning a race it must always lose.
+ *
+ * ⚠⚠ THE 10s BUDGET IS PRESERVED, DELIBERATELY. It is OTA-1453's product
+ * decision for cold radios, taken after two owner reports about missed updates;
+ * shortening it back to 5s would "fix" the stall by reintroducing the fault
+ * that raised it. Instead the cap is now DERIVED:
+ *
+ *     BOOT_OTA_CHECK_TIMEOUT_MS  = 10_000
+ *     OTA_GATE_SAFETY_MARGIN_MS  =  2_000
+ *     OTA_GATE_SAFETY_TIMEOUT_MS =  12_000   (sum, by construction)
+ *
+ * so the inversion is UNREPRESENTABLE — the two cannot drift apart again, which
+ * is exactly how they drifted the first time (OTA-1453 moved one, OTA-405's
+ * literal stayed put, 120 lines away in a different function). The launch
+ * ordering it restores: check 10s < gate cap 12s < boot watchdog 25s.
+ *
+ * ⚠ SCOPE. Three constants and two call sites. No native change, no new binary,
+ * no expo-updates or checkAndApplyOTA control-flow change, no hydration change,
+ * no TitleScreen change, and the 5s CLASSIFIER readiness cap (GATE B, a
+ * different timer in a different file) is untouched. Two stale comments that
+ * still described the OTA budget as ~5s are corrected.
+ *
+ * ⚠ NOT CLAIMED: no startup improvement is asserted until it is measured on the
+ * owner's device. A slow or offline launch may still legitimately spend the
+ * full 10s budget — what changed is that the emergency hatch can no longer fire
+ * before that budget has had its chance. */
+export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';

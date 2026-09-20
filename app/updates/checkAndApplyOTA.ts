@@ -151,10 +151,18 @@ export interface CheckAndApplyOptions {
    *  ERR_UPDATES_FETCH 'Failed to download new update' even
    *  though the bundle was already on disk and ready to load. */
   skipFetch?: boolean;
-  /** OTA-367 — override the check-for-update timeout (default 10s). The
-   *  boot-front gate uses a shorter budget (~5s) so an offline / slow
-   *  launch never stalls boot for long before falling through to load
-   *  the game on the current bundle. */
+  /** OTA-367 — override the check-for-update timeout (default 10s).
+   *
+   *  ⚠ OTA-1855 — THIS NOTE USED TO SAY THE BOOT-FRONT GATE SHORTENED IT TO
+   *  ~5s. It has not since OTA-1453 raised that caller to the default for cold
+   *  radios; the boot-front passes `BOOT_OTA_CHECK_TIMEOUT_MS`, which IS 10s.
+   *  An offline / slow launch is protected by this timeout itself rather than
+   *  by a shorter budget: however it resolves — found, errored or timed out —
+   *  the caller falls through and loads the game on the current bundle.
+   *
+   *  ⚠ App.tsx derives its emergency boot-gate cap FROM that same constant so
+   *  the cap always loses this race. A caller that shortens this budget below
+   *  its own stuck-boot fallback reintroduces OTA-1855's inverted ordering. */
   checkTimeoutMs?: number;
   /** OTA-369 — override the bundle-download timeout (default 240s, up
    *  from the old 60s). A device that's many OTAs behind ("a big jump")

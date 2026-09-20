@@ -276,13 +276,59 @@ function SummonRefusalGate() {
  * Hydration is ~12 storage round trips; the audit measured it at ~1s on the
  * device and the owner had gone four months without ever noticing the spinner.
  * 25s is therefore twenty-five times the worst honest boot, comfortably past
- * OTA-405's own 8s gate cap and the 5s OTA budget, and still inside the minute
- * a stuck player will actually wait.
+ * the boot OTA budget AND the gate cap derived from it below, and still inside
+ * the minute a stuck player will actually wait.
+ *
+ * ⚠ THE NUMBERS ARE NOT REPEATED HERE. OTA-1855 found this comment naming an
+ * "8s gate cap and the 5s OTA budget" when the real values were 8s and 10s —
+ * a comment that had outlived both. The ordering is what matters and the
+ * constants below express it.
  *
  * ⚠ IT SETS NO GAME STATE. When it fires, `hydrated` is still false and stays
  * false; all it does is replace a spinner that says nothing with a screen that
  * says where the boot stopped and offers the update door. */
 const BOOT_WATCHDOG_MS = 25_000;
+
+/* ⚠⚠⚠ OTA-1855 — THE BOOT OTA BUDGET, AND THE CAP THAT MUST LOSE TO IT.
+ *
+ * THE DEFECT THIS CLOSES, MEASURED ON A PHONE. Pixel 10 Pro XL / Android 37,
+ * OTA 2026-09-19-1850: process start 23:54:03.845, OTA state 'Checking' at
+ * 23:54:04.001, the character gate opening 8.353s later at 23:54:12.354 — and
+ * the OTA check reporting its error afterwards at 23:54:14.008. Two timers, in
+ * the wrong order. The emergency cap was 8s while the OTA check's own budget
+ * was 10s, so on any launch the network could not answer, the CAP ALWAYS WON
+ * and every player paid a fixed eight-second stall at the splash.
+ *
+ * ⚠⚠ THE CAP IS NOT A SECOND OTA TIMEOUT. It is a stuck-boot escape hatch for
+ * the case where hydrate() rejects, or any boot step throws before the check
+ * resolves, and the gate would otherwise stay locked forever and brick the
+ * player out of their own saves. It must therefore LOSE EVERY LEGITIMATE RACE:
+ * a normal completion, error or timeout of the OTA check has to reach
+ * `otaBootResolved` first, every time.
+ *
+ * ⚠⚠ SO THE TWO VALUES ARE ONE POLICY, NOT TWO LITERALS. They were independent
+ * magic numbers in two different functions ~120 lines apart, which is exactly
+ * how they drifted: OTA-1453 raised the check 5s → 10s for cold radios and the
+ * cap stayed where OTA-405 left it. Deriving the cap from the budget makes the
+ * inversion unrepresentable — you cannot change one without carrying the other.
+ *
+ * ⚠ THE MARGIN IS DELIBERATELY SMALL. All it has to cover is the JS between the
+ * check's own timeout firing and this file's catch/continue setting
+ * `otaBootResolved` on the same tick — microseconds of work. 2s is orders of
+ * magnitude more than that and still leaves the ordering the whole launch path
+ * depends on intact:
+ *
+ *     BOOT_OTA_CHECK_TIMEOUT_MS (10s)
+ *         < OTA_GATE_SAFETY_TIMEOUT_MS (12s)
+ *         < BOOT_WATCHDOG_MS (25s)
+ *
+ * ⚠ THE 10s BUDGET IS NOT NEGOTIATED HERE. It is OTA-1453's product decision
+ * for cold radios and `checkAndApplyOTA`'s own default; see the block at the
+ * call site. This repair changes WHICH TIMER WINS, not how long the app is
+ * willing to look for an update. */
+const BOOT_OTA_CHECK_TIMEOUT_MS = 10_000;
+const OTA_GATE_SAFETY_MARGIN_MS = 2_000;
+const OTA_GATE_SAFETY_TIMEOUT_MS = BOOT_OTA_CHECK_TIMEOUT_MS + OTA_GATE_SAFETY_MARGIN_MS;
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -531,14 +577,20 @@ export default function App() {
     // gate; it's normally set the moment the boot OTA check resolves below.
     // But if hydrate() rejects (or any boot step throws before that line),
     // the gate would stay locked forever and brick the player out of their
-    // own saves. This timer force-opens it after 8s no matter what — longer
-    // than the OTA check's own 5s budget, so the normal path always wins the
-    // race and this only fires on a genuinely stuck boot.
+    // own saves. This timer force-opens it no matter what.
+    //
+    // ⚠⚠⚠ OTA-1855 — IT IS DERIVED FROM THE OTA BUDGET, NOT WRITTEN BESIDE IT.
+    // This was a bare `8000` while the check below asked for 10s, so the cap
+    // won every offline launch and cost a measured 8.353s stall before the
+    // character gate opened. OTA_GATE_SAFETY_TIMEOUT_MS is
+    // BOOT_OTA_CHECK_TIMEOUT_MS plus a margin BY CONSTRUCTION, so the normal
+    // path — completion, error OR the check's own timeout — always resolves
+    // first and this can only fire on a genuinely stuck boot.
     const otaGateSafetyCap = setTimeout(() => {
       if (!useGameStore.getState().otaBootResolved) {
         useGameStore.setState({ otaBootResolved: true });
       }
-    }, 8000);
+    }, OTA_GATE_SAFETY_TIMEOUT_MS);
     // ⚠⚠⚠ OTA-1735 — THE INSTRUMENT IS ARMED BEFORE THE THING IT MEASURES.
     //
     // `startRuntimePressureWatch` is started at the end of `bootQwen`, and since
@@ -659,7 +711,9 @@ export default function App() {
             //
             // ⚠ The DOWNLOAD budget is untouched (240s, OTA-369). This is the "is there
             // one?" question, not the transfer.
-            checkTimeoutMs: 10_000,
+            // ⚠ OTA-1855 — the same constant the gate cap is derived from, so
+            // the cap can never again be shorter than this budget.
+            checkTimeoutMs: BOOT_OTA_CHECK_TIMEOUT_MS,
             skipTeardown: true,
             // ⚠ `silent` only suppresses UI. These now land in the device log, so a
             // report shows 'Checking…' → 'Downloading…' → what happened, or where it
