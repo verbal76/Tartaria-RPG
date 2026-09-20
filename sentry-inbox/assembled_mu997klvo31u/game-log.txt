@@ -1,0 +1,1380 @@
+Bug Report — Skippy · (2026-09-20-1854-one-slot-per-interaction) · I can’t make it freeze
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-20T03:25:45.619Z
+Character: Skippy
+Slot ID: slot_mu9925gz_zv11vm
+Race: Tartarian Giants
+Location: The Monarch's Waystation
+HP: 55/55
+
+--- DESCRIPTION ---
+I can’t make it freeze
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 2
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-20T03:25:45.540Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-20-1854-one-slot-per-interaction)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-20T03:21:43.923Z
+  Last init success: 2026-09-20T03:21:58.906Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmu991pwofy · started 2026-09-20T03:21:12.552Z
+  Followed an OTA apply 223ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 3 recorded (newest last)
+  ⚠⚠ 1 of 3 process kills landed on an OTA-apply boot
+  • 2026-09-19T20:02:55.215Z (443m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room outpost_quarters · screen exploration
+      last checkpoint: rendered · 31ms into the action · alive 787ms after it
+      launch: died 27074407ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r1/l0/p1/dn0
+  • 2026-09-19T20:45:42.388Z (400m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-20T01:42:10.103Z (104m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1853-the-ring-learns-who · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet) — begun 4m before the last sign of life; treat the action label as stale, not as the killer
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: appstate:inactive→background · 262490ms into the action · alive 0ms after it
+      launch: died 803123ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 147ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o2/r2/l0/p1/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠ Memory warnings: 15 this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 20.1s · 1 job kind queued >3s · worst 0.0ms/prompt-token
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 117 jobs · worst wait 55.8s (cognition) · 26 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 1 · Released: 1 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 180MB · last 176MB · net +164MB over 57 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/15 · ctx 0 · app=active · native idle q0 · warns 0
+    +35.1s heap-move — heap 32MB gc 0ms/71 · ctx 0 · app=active · native voice running q2 · warns 0
+    +40.1s heap-move — heap 40MB gc 0ms/94 · ctx 0 · app=active · native voice running q2 · warns 0
+    +45.1s heap-move — heap 48MB gc 0ms/139 · ctx 0 · app=active · native llm running q0 · warns 0
+    +46.3s ctx-event — heap 48MB gc 0ms/147 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+    +46.3s watch-start — heap 48MB gc 0ms/147 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +56.4s heap-move — heap 60MB gc 0ms/196 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+    +61.4s heap-move — heap 68MB gc 0ms/227 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +66.4s heap-move — heap 76MB gc 0ms/253 · ctx 1 ≈425MB est · app=active · native voice running q4 · warns 0
+    +83.2s mem-warning — heap 72MB gc 0ms/374 · ctx 1 ≈425MB est · app=active · native voice running q7 · warns 1
+    +83.2s mem-warning — heap 68MB gc 0ms/378 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 2
+    +83.2s mem-warn-settled [freed-nothing] — heap 68MB gc 0ms/378 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 2
+    +83.3s mem-warning — heap 64MB gc 0ms/383 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 3
+    +83.3s mem-warn-settled [freed-nothing] — heap 64MB gc 0ms/383 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 3
+    +83.3s mem-warning — heap 60MB gc 0ms/388 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 4
+    +83.3s mem-warn-settled [freed-nothing] — heap 60MB gc 0ms/388 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 4
+    +83.3s mem-warning — heap 56MB gc 0ms/394 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 5
+    +83.3s mem-warn-settled [freed-nothing] — heap 56MB gc 0ms/394 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 5
+    +83.4s mem-warning — heap 52MB gc 0ms/400 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 6
+    +83.4s mem-warn-settled [freed-nothing] — heap 52MB gc 0ms/400 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 6
+    +83.5s mem-warning — heap 48MB gc 0ms/405 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 7
+    +83.5s mem-warn-settled [freed-nothing] — heap 48MB gc 0ms/405 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 7
+    +83.7s mem-warning — heap 44MB gc 0ms/418 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 8
+    +83.7s mem-warn-settled [freed-nothing] — heap 44MB gc 0ms/418 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 8
+    +84.1s mem-warning — heap 40MB gc 0ms/429 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 9
+    +84.1s mem-warn-settled [freed-nothing] — heap 40MB gc 0ms/429 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 9
+    +84.1s mem-warning — heap 36MB gc 0ms/433 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 10
+    +84.1s mem-warn-settled [freed-nothing] — heap 36MB gc 0ms/433 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 10
+    +85.4s mem-warning — heap 32MB gc 0ms/465 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 11
+    +85.4s mem-warn-settled [freed-nothing] — heap 32MB gc 0ms/465 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 11
+    +85.5s mem-warning — heap 28MB gc 0ms/469 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 12
+    +85.5s mem-warn-settled [freed-nothing] — heap 28MB gc 0ms/469 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 12
+    +85.6s mem-warning — heap 24MB gc 0ms/478 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 13
+    +85.6s mem-warn-settled [freed-nothing] — heap 24MB gc 0ms/478 · ctx 1 ≈425MB est · app=active · native voice running q8 · warns 13
+    +85.7s ctx-event — heap 24MB gc 0ms/480 · ctx 0 · app=active · native teardown running q7 · warns 13
+    +85.7s mem-warn-settled [freed-ctx] — heap 24MB gc 0ms/480 · ctx 0 · app=active · native cognition running q6 · warns 13
+    +85.8s gen-settled [investigate_lore dormant] — heap 24MB gc 0ms/486 · ctx 0 · app=active · native investigate_lore running q0 · warns 13
+    +96.5s heap-move — heap 36MB gc 0ms/608 · ctx 0 · app=active · native voice running q2 · warns 13
+   +101.5s heap-move — heap 48MB gc 0ms/671 · ctx 0 · app=active · native voice running q0 · warns 13
+   +106.5s heap-move — heap 60MB gc 0ms/716 · ctx 0 · app=active · native voice running q2 · warns 13
+   +111.5s heap-move — heap 72MB gc 0ms/747 · ctx 0 · app=active · native voice running q2 · warns 13
+   +121.6s heap-move — heap 84MB gc 0ms/798 · ctx 0 · app=active · native voice running q4 · warns 13
+   +126.6s heap-move — heap 92MB gc 0ms/811 · ctx 0 · app=active · native voice running q4 · warns 13
+   +131.6s heap-move — heap 100MB gc 0ms/832 · ctx 0 · app=active · native voice running q4 · warns 13
+   +136.6s heap-move — heap 108MB gc 0ms/845 · ctx 0 · app=active · native voice running q4 · warns 13
+   +141.6s heap-move — heap 116MB gc 0ms/883 · ctx 0 · app=active · native voice running q5 · warns 13
+   +146.6s heap-move — heap 128MB gc 1ms/901 · ctx 0 · app=active · native voice running q6 · warns 13
+   +156.7s heap-move — heap 136MB gc 1ms/935 · ctx 0 · app=active · native voice running q7 · warns 13
+   +161.7s heap-move — heap 148MB gc 1ms/954 · ctx 0 · app=active · native idle q0 · warns 13
+   +166.7s heap-move — heap 156MB gc 1ms/971 · ctx 0 · app=active · native idle q0 · warns 13
+   +176.7s heap-move — heap 168MB gc 1ms/996 · ctx 0 · app=active · native idle q0 · warns 13
+   +181.7s heap-move — heap 176MB gc 1ms/1017 · ctx 0 · app=active · native idle q0 · warns 13
+   +187.7s mem-warning — heap 180MB gc 1ms/1038 · ctx 0 · app=active · native idle q0 · warns 14
+   +187.7s mem-warn-settled [freed-nothing] — heap 180MB gc 1ms/1038 · ctx 0 · app=active · native idle q0 · warns 14
+   +187.8s mem-warning — heap 176MB gc 1ms/1043 · ctx 0 · app=active · native idle q0 · warns 15
+   +187.8s mem-warn-settled [freed-nothing] — heap 176MB gc 1ms/1043 · ctx 0 · app=active · native idle q0 · warns 15
+Native memory flight recorder (Build 190)
+  ⚠ footprint = task_vm_info.phys_footprint (the number Jetsam judges).
+    NOT a heap. available = os_proc_available_memory(), an OS advisory —
+    NOT the exact Jetsam threshold. Bands below are diagnostic hypotheses,
+    not established universal iPhone danger thresholds.
+  Footprint: baseline 68MB · peak 1690MB · last 1266MB · high water 1877MB  [HIGH]
+  Shape: RATCHET — retained +1198MB vs baseline · recovery 26% · ratchet 6 step(s) +1816MB
+  OS said available: min 408MB
+  Sampler: samples 477 · evicted 0 · events 598 · warnings 15 · bursts 16+17ext · cadence 1000ms
+  ⚠⚠ PREVIOUS LIFE — the last checkpoint written by a process that did not
+     come back. This is the only trace a Jetsam kill can ever leave us.
+     WILL_TERMINATE at 1286MB (high water 1677MB, baseline 958MB) after 254s · 7 warning(s) · terminating · build 2026-09-19-1853-the-ring-learns-who
+  MetricKit: no payload delivered yet (iOS delivers ~daily) — undelivered, NOT healthy
+  Retained steps: 14 (floor window 10, rise ≥48MB held 8 samples)
+    STEP 1:     +6.0s →    +14.3s · floor 29 → 967MB (+938 retained) · peak 1102MB · recovered 13%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 2:    +27.0s →    +35.1s · floor 967 → 1016MB (+49 retained) · peak 1207MB · recovered 80%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 3:    +36.1s →    +44.0s · floor 1016 → 1078MB (+62 retained) · peak 1207MB · recovered 68%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 4:    +46.1s →     +0.8s · floor 1078 → 1159MB (+81 retained) · peak 1209MB · recovered 38%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 5:     +0.9s →     +1.7s · floor 1159 → 1207MB (+48 retained) · peak 1209MB · recovered 4%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 6:    +36.0s →    +37.7s · floor 1160 → 1290MB (+130 retained) · peak 1690MB · recovered 75%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 7:    +37.8s →    +38.6s · floor 1290 → 1664MB (+374 retained) · peak 1690MB · recovered 7%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 8:    +43.2s →    +44.0s · floor 1614 → 1662MB (+48 retained) · peak 1675MB · recovered 21%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 9:    +62.4s →    +70.4s · floor 1314 → 1360MB (+46 retained) · peak 1437MB · recovered 63%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 10:    +87.5s →    +95.4s · floor 1360 → 1412MB (+52 retained) · peak 1583MB · recovered 77%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 11:    +96.6s →   +104.6s · floor 1412 → 1456MB (+44 retained) · peak 1632MB · recovered 80%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 12:   +105.6s →   +113.4s · floor 1456 → 1508MB (+52 retained) · peak 1663MB · recovered 75%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 13:   +115.6s →   +123.4s · floor 1508 → 1558MB (+50 retained) · peak 1668MB · recovered 69%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 14:   +125.4s →   +133.4s · floor 1558 → 1605MB (+47 retained) · peak 1668MB · recovered 57%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+  Events (last 64):
+      +176.7s ROOM_EXIT/12061 — 1266MB · unknown
+      +176.7s ROOM_ENTER/4954 — 1266MB · unknown
+      +176.7s ROOM_RETAINED_COUNT/40 — 1266MB · unknown
+      +176.7s SCENE_DISPOSE/4954 — 1266MB · unknown
+      +176.7s SCENE_CREATE/4954 — 1266MB · unknown
+      +176.7s ROSTER_DISPOSE — 1266MB · unknown
+      +176.7s ROSTER_CREATE — 1266MB · unknown
+      +176.7s T5_DONE/249 — 1266MB · unknown
+      +177.5s ROOM_EXIT/4954 — 1266MB · unknown
+      +177.5s ROOM_ENTER/12061 — 1266MB · unknown
+      +177.5s SCENE_DISPOSE/12061 — 1266MB · unknown
+      +177.5s SCENE_CREATE/12061 — 1266MB · unknown
+      +177.5s ROSTER_DISPOSE — 1266MB · unknown
+      +177.5s ROSTER_CREATE — 1266MB · unknown
+      +177.5s T5_DONE/250 — 1266MB · unknown
+      +178.8s ROOM_EXIT/12061 — 1266MB · unknown
+      +178.8s ROOM_ENTER/41105 — 1266MB · unknown
+      +178.8s SCENE_DISPOSE/41105 — 1266MB · unknown
+      +178.8s SCENE_CREATE/41105 — 1266MB · unknown
+      +178.8s ROSTER_DISPOSE — 1266MB · unknown
+      +178.8s ROSTER_CREATE — 1266MB · unknown
+      +178.8s T5_DONE/251 — 1266MB · unknown
+      +180.3s ROOM_EXIT/41105 — 1266MB · unknown
+      +180.3s ROOM_ENTER/6383 — 1266MB · unknown
+      +180.3s SCENE_DISPOSE/6383 — 1266MB · unknown
+      +180.3s SCENE_CREATE/6383 — 1266MB · unknown
+      +180.3s ROSTER_DISPOSE — 1266MB · unknown
+      +180.3s ROSTER_CREATE — 1266MB · unknown
+      +180.3s T5_DONE/252 — 1266MB · unknown
+      +180.6s HERMES_HEAP/176 — 1286MB · unknown
+      +182.0s T5_DONE/253 — 1267MB · unknown
+      +183.4s T5_DONE/255 — 1267MB · unknown
+      +184.1s T5_DONE/256 — 1286MB · unknown
+      +184.9s T5_DONE/258 — 1267MB · unknown
+      +185.6s HERMES_HEAP/176 — 1267MB · unknown
+      +186.4s T5_DONE/260 — 1286MB · unknown
+      +187.0s ROOM_EXIT/6383 — 1285MB · unknown
+      +187.0s ROOM_ENTER/23832 — 1285MB · unknown
+      +187.0s SCENE_DISPOSE/23832 — 1285MB · unknown
+      +187.0s SCENE_CREATE/23832 — 1285MB · unknown
+      +187.0s ROSTER_DISPOSE — 1285MB · unknown
+      +187.0s ROSTER_CREATE — 1285MB · unknown
+      +187.1s T5_DONE/261 — 1285MB · unknown
+      +188.1s T5_DONE/262 — 1267MB · unknown
+      +188.9s T5_DONE/264 — 1268MB · unknown
+      +189.6s T5_DONE/265 — 1287MB · unknown
+      +190.4s T5_DONE/267 — 1268MB · unknown
+      +190.6s HERMES_HEAP/176 — 1288MB · unknown
+      +191.0s T5_DONE/269 — 1287MB · unknown
+      +191.8s T5_DONE/271 — 1267MB · unknown
+      +194.8s T5_DONE/272 — 1266MB · unknown
+      +195.6s SCENE_DISPOSE/23832 — 1266MB · unknown
+      +195.6s SCENE_CREATE/23832 — 1266MB · unknown
+      +195.6s SCENE_DISPOSE/23832 — 1266MB · unknown
+      +195.6s SCENE_CREATE/23832 — 1266MB · unknown
+      +195.6s SCENE_DISPOSE/23832 — 1266MB · unknown
+      +195.6s SCENE_CREATE/23832 — 1266MB · unknown
+      +195.6s SCENE_DISPOSE/23832 — 1266MB · unknown
+      +195.6s SCENE_CREATE/23832 — 1266MB · unknown
+      +195.6s SCENE_DISPOSE/23832 — 1266MB · unknown
+      +195.6s SCENE_CREATE/23832 — 1266MB · unknown
+      +195.6s T5_DONE/273 — 1266MB · unknown
+      +195.6s HERMES_HEAP/176 — 1266MB · unknown
+      +195.6s REPORT_COMPOSE_START — 1266MB · unknown
+  Samples (last 477 of 477):
+        +1.1s 29MB rss 93MB avail 2069MB malloc 15MB/78959blk · active · nominal
+        +2.0s 39MB rss 104MB avail 2059MB · active · nominal
+        +3.3s 50MB rss 115MB avail 2048MB malloc 37MB/80202blk · active · nominal
+        +4.3s 68MB rss 134MB avail 2030MB malloc 55MB/81079blk · active · nominal
+        +5.0s 29MB rss 135MB avail 2069MB · active · nominal
+        +1.0s 216MB rss 393MB avail 1882MB malloc 203MB/1977656blk · unknown · nominal
+        +2.2s 790MB rss 531MB avail 1308MB malloc 764MB/2076641blk · unknown · nominal
+        +3.2s 904MB rss 641MB avail 1194MB malloc 954MB/2088703blk · unknown · nominal
+        +4.2s 972MB rss 814MB avail 1126MB malloc 1010MB/2207408blk · unknown · nominal
+        +5.1s 967MB rss 818MB avail 1131MB · unknown · nominal
+        +6.0s 967MB rss 819MB avail 1131MB malloc 988MB/2209408blk · unknown · nominal
+        +7.2s 967MB rss 819MB avail 1131MB malloc 990MB/2207717blk · unknown · nominal
+        +8.2s 967MB rss 819MB avail 1131MB malloc 990MB/2207780blk · unknown · nominal
+        +9.2s 967MB rss 819MB avail 1131MB malloc 990MB/2207974blk · unknown · nominal
+       +10.3s 967MB rss 818MB avail 1131MB malloc 990MB/2203944blk · unknown · nominal
+       +11.3s 967MB rss 818MB avail 1131MB malloc 989MB/2203102blk · unknown · nominal
+       +12.3s 967MB rss 818MB avail 1131MB malloc 989MB/2202726blk · unknown · nominal
+       +13.3s 967MB rss 819MB avail 1131MB malloc 990MB/2203616blk · unknown · nominal
+       +14.3s 967MB rss 819MB avail 1131MB malloc 990MB/2203850blk · unknown · nominal
+       +15.3s 967MB rss 819MB avail 1131MB malloc 990MB/2204021blk · unknown · nominal
+       +16.3s 967MB rss 819MB avail 1131MB malloc 990MB/2204629blk · unknown · nominal
+       +17.1s 967MB rss 819MB avail 1131MB · unknown · nominal
+       +18.1s 967MB rss 819MB avail 1131MB malloc 990MB/2206410blk · unknown · nominal
+       +19.1s 967MB rss 819MB avail 1131MB · unknown · nominal
+       +20.0s 970MB rss 826MB avail 1128MB malloc 991MB/2214892blk · unknown · nominal
+       +21.0s 974MB rss 837MB avail 1124MB · unknown · nominal
+       +22.1s 974MB rss 837MB avail 1124MB malloc 994MB/2239544blk · unknown · nominal
+       +23.1s 979MB rss 838MB avail 1119MB malloc 995MB/2239486blk · unknown · nominal
+       +24.0s 1004MB rss 873MB avail 1094MB · unknown · nominal
+       +25.0s 1000MB rss 875MB avail 1098MB malloc 1010MB/2241786blk · unknown · nominal
+       +26.0s 1001MB rss 876MB avail 1097MB · unknown · nominal
+       +27.0s 1016MB rss 845MB avail 1082MB malloc 1014MB/2266816blk · unknown · nominal
+       +28.0s 1029MB rss 842MB avail 1069MB malloc 1017MB/2268050blk · unknown · nominal
+       +29.0s 1036MB rss 837MB avail 1062MB malloc 1015MB/2273814blk · unknown · nominal
+       +30.1s 1036MB rss 837MB avail 1062MB malloc 1015MB/2274342blk · unknown · nominal
+       +31.1s 1036MB rss 836MB avail 1062MB malloc 1015MB/2272449blk · unknown · nominal
+       +32.1s 1037MB rss 841MB avail 1061MB malloc 1014MB/2271939blk · unknown · nominal
+       +33.0s 1037MB rss 846MB avail 1061MB · unknown · nominal
+       +34.0s 1057MB rss 878MB avail 1041MB malloc 1049MB/2366926blk · unknown · nominal
+       +35.1s 1070MB rss 952MB avail 1028MB malloc 1058MB/2367914blk · unknown · nominal
+       +36.1s 1079MB rss 979MB avail 1019MB · unknown · nominal
+       +37.0s 1102MB rss 1059MB avail 996MB malloc 1083MB/2375831blk · unknown · nominal
+       +38.1s 1093MB rss 1059MB avail 1005MB malloc 1173MB/2375130blk · unknown · nominal
+       +39.0s 1078MB rss 1049MB avail 1020MB · unknown · nominal
+       +40.0s 1079MB rss 1053MB avail 1019MB malloc 1054MB/2382168blk · unknown · nominal
+       +41.0s 1084MB rss 1063MB avail 1014MB malloc 1067MB/2383679blk · unknown · nominal
+       +42.0s 1087MB rss 1069MB avail 1011MB malloc 1074MB/2386227blk · unknown · nominal
+       +43.0s 1096MB rss 1080MB avail 1002MB · unknown · nominal
+       +44.0s 1102MB rss 1087MB avail 996MB malloc 1123MB/2389435blk · unknown · nominal
+       +45.0s 1096MB rss 1092MB avail 1002MB · unknown · nominal
+       +46.1s 1159MB rss 1368MB avail 939MB malloc 1178MB/2720737blk · unknown · nominal
+        +0.1s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.2s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.3s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.4s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.5s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.6s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.7s 1207MB rss 1443MB avail 891MB malloc 1331MB/2715065blk · unknown · nominal · burst
+        +0.8s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +0.9s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.0s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.1s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.2s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.3s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.4s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.5s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.6s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.7s 1207MB rss 1443MB avail 891MB malloc 1331MB/2715340blk · unknown · nominal · burst
+        +1.8s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +1.9s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.0s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.1s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.2s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.3s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.4s 1207MB rss 1443MB avail 891MB · unknown · nominal · burst
+        +2.5s 1207MB rss 1444MB avail 891MB · unknown · nominal · burst
+        +2.6s 1209MB rss 1344MB avail 889MB · unknown · nominal · burst
+        +2.7s 1205MB rss 1387MB avail 893MB malloc 1327MB/2716376blk · unknown · nominal · burst
+        +2.8s 1202MB rss 1390MB avail 896MB · unknown · nominal · burst
+        +2.9s 1197MB rss 1392MB avail 901MB · unknown · nominal · burst
+        +3.0s 1191MB rss 1394MB avail 907MB · unknown · nominal
+        +4.0s 1164MB rss 1408MB avail 934MB malloc 1237MB/2720189blk · unknown · nominal
+        +5.1s 1169MB rss 1446MB avail 929MB malloc 1305MB/2718867blk · unknown · nominal
+        +6.0s 1170MB rss 1451MB avail 928MB · unknown · nominal
+        +7.0s 1173MB rss 1455MB avail 925MB malloc 1309MB/2722265blk · unknown · nominal
+        +8.0s 1172MB rss 1459MB avail 926MB · unknown · nominal
+        +9.0s 1179MB rss 1465MB avail 919MB malloc 1289MB/2724730blk · unknown · nominal
+       +10.1s 1178MB rss 1470MB avail 920MB malloc 1298MB/2726532blk · unknown · nominal
+       +11.0s 1179MB rss 1478MB avail 919MB · unknown · nominal
+       +12.1s 1179MB rss 1484MB avail 919MB malloc 1328MB/2729065blk · unknown · nominal
+       +13.1s 1178MB rss 1485MB avail 920MB · unknown · nominal
+       +14.0s 1183MB rss 1488MB avail 915MB malloc 1293MB/2733787blk · unknown · nominal
+       +15.0s 1183MB rss 1488MB avail 915MB malloc 1292MB/2733559blk · unknown · nominal
+       +16.1s 1185MB rss 1489MB avail 913MB malloc 1288MB/2733606blk · unknown · nominal
+       +17.0s 1191MB rss 1496MB avail 907MB · unknown · nominal
+       +18.1s 1201MB rss 1503MB avail 897MB malloc 1296MB/2741062blk · unknown · nominal
+       +19.1s 1202MB rss 1518MB avail 896MB · unknown · nominal
+       +20.1s 1198MB rss 1514MB avail 900MB malloc 1271MB/2744143blk · unknown · nominal
+       +21.0s 1166MB rss 1542MB avail 932MB · unknown · nominal
+       +22.1s 1161MB rss 1544MB avail 937MB malloc 1246MB/2695617blk · unknown · nominal
+       +23.1s 1165MB rss 1544MB avail 933MB malloc 1248MB/2694149blk · unknown · nominal
+       +24.0s 1160MB rss 1545MB avail 938MB · unknown · nominal
+       +25.0s 1165MB rss 1545MB avail 933MB malloc 1264MB/2696942blk · unknown · nominal
+       +26.0s 1160MB rss 1546MB avail 938MB malloc 1253MB/2698193blk · unknown · nominal
+       +27.0s 1160MB rss 1547MB avail 938MB · unknown · nominal
+       +28.2s 1161MB rss 1548MB avail 937MB malloc 1268MB/2704093blk · unknown · nominal
+       +29.1s 1161MB rss 1548MB avail 937MB · unknown · nominal
+       +30.0s 1161MB rss 1550MB avail 937MB malloc 1268MB/2707524blk · unknown · nominal
+       +31.0s 1162MB rss 1553MB avail 936MB malloc 1258MB/2711656blk · unknown · nominal
+       +32.2s 1174MB rss 1581MB avail 924MB malloc 1270MB/2712433blk · unknown · nominal
+       +33.2s 1182MB rss 1593MB avail 916MB malloc 1277MB/2715149blk · unknown · nominal
+       +34.2s 1194MB rss 1609MB avail 904MB · unknown · nominal
+       +35.1s 1197MB rss 1628MB avail 901MB malloc 1296MB/2717041blk · unknown · nominal
+       +36.0s 1290MB rss 1671MB avail 808MB · unknown · nominal
+       +37.0s 1675MB rss 1754MB avail 423MB malloc 1849MB/4634736blk · unknown · nominal · burst
+       +37.1s 1677MB rss 1721MB avail 421MB · unknown · nominal · burst
+       +37.2s 1676MB rss 1655MB avail 422MB · unknown · nominal · burst
+       +37.3s 1677MB rss 1592MB avail 421MB · unknown · nominal · burst
+       +37.4s 1682MB rss 1571MB avail 417MB · unknown · nominal · burst
+       +37.5s 1674MB rss 1536MB avail 424MB · unknown · nominal · burst
+       +37.6s 1676MB rss 1508MB avail 422MB · unknown · nominal · burst
+       +37.7s 1677MB rss 1449MB avail 421MB · unknown · nominal · burst
+       +37.8s 1669MB rss 1460MB avail 429MB · unknown · nominal · burst
+       +37.9s 1669MB rss 1460MB avail 429MB · unknown · nominal · burst
+       +38.0s 1664MB rss 1461MB avail 434MB malloc 1870MB/4643552blk · unknown · nominal · burst
+       +38.1s 1666MB rss 1471MB avail 432MB · unknown · nominal · burst
+       +38.2s 1666MB rss 1474MB avail 432MB · unknown · nominal · burst
+       +38.3s 1667MB rss 1476MB avail 431MB · unknown · nominal · burst
+       +38.4s 1668MB rss 1477MB avail 430MB · unknown · nominal · burst
+       +38.5s 1670MB rss 1479MB avail 428MB · unknown · nominal · burst
+       +38.6s 1671MB rss 1481MB avail 427MB · unknown · nominal · burst
+       +38.7s 1673MB rss 1485MB avail 425MB · unknown · nominal · burst
+       +38.8s 1675MB rss 1487MB avail 423MB · unknown · nominal · burst
+       +38.9s 1676MB rss 1489MB avail 422MB · unknown · nominal · burst
+       +39.0s 1678MB rss 1493MB avail 420MB malloc 1905MB/4653886blk · unknown · nominal · burst
+       +39.1s 1690MB rss 1493MB avail 408MB · unknown · nominal · burst
+       +39.2s 1670MB rss 1452MB avail 428MB · unknown · nominal · burst
+       +39.3s 1670MB rss 1452MB avail 428MB · unknown · nominal · burst
+       +39.4s 1614MB rss 1202MB avail 484MB · unknown · nominal · burst
+       +39.5s 1615MB rss 1205MB avail 483MB · unknown · nominal · burst
+       +39.6s 1614MB rss 1207MB avail 484MB · unknown · nominal · burst
+       +39.7s 1614MB rss 1207MB avail 484MB · unknown · nominal · burst
+       +39.8s 1614MB rss 1208MB avail 484MB · unknown · nominal · burst
+       +39.9s 1614MB rss 1208MB avail 484MB · unknown · nominal · burst
+       +40.0s 1614MB rss 1208MB avail 484MB malloc 1781MB/4339292blk · unknown · nominal · burst
+       +40.1s 1614MB rss 1208MB avail 484MB · unknown · nominal · burst
+       +40.2s 1614MB rss 1209MB avail 484MB · unknown · nominal · burst
+       +40.3s 1615MB rss 1210MB avail 483MB · unknown · nominal · burst
+       +40.4s 1617MB rss 1213MB avail 481MB · unknown · nominal · burst
+       +40.5s 1618MB rss 1215MB avail 480MB · unknown · nominal · burst
+       +40.6s 1619MB rss 1217MB avail 479MB · unknown · nominal · burst
+       +40.7s 1620MB rss 1220MB avail 478MB · unknown · nominal · burst
+       +40.8s 1622MB rss 1222MB avail 476MB · unknown · nominal · burst
+       +40.9s 1624MB rss 1225MB avail 474MB · unknown · nominal · burst
+       +41.0s 1625MB rss 1227MB avail 473MB malloc 1806MB/4339638blk · unknown · nominal · burst
+       +41.1s 1627MB rss 1230MB avail 471MB · unknown · nominal · burst
+       +41.2s 1628MB rss 1220MB avail 470MB · unknown · nominal · burst
+       +41.3s 1630MB rss 1223MB avail 468MB · unknown · nominal · burst
+       +41.4s 1631MB rss 1224MB avail 467MB · unknown · nominal · burst
+       +41.5s 1632MB rss 1225MB avail 466MB · unknown · nominal · burst
+       +41.6s 1635MB rss 1221MB avail 463MB · unknown · nominal · burst
+       +41.7s 1636MB rss 1223MB avail 462MB · unknown · nominal · burst
+       +41.8s 1638MB rss 1225MB avail 460MB · unknown · nominal · burst
+       +41.9s 1640MB rss 1227MB avail 458MB · unknown · nominal · burst
+       +42.0s 1642MB rss 1229MB avail 456MB malloc 1824MB/4343544blk · unknown · nominal · burst
+       +42.1s 1648MB rss 1228MB avail 450MB · unknown · nominal · burst
+       +42.2s 1650MB rss 1230MB avail 448MB · unknown · nominal · burst
+       +42.3s 1652MB rss 1232MB avail 446MB · unknown · nominal · burst
+       +42.4s 1653MB rss 1234MB avail 445MB · unknown · nominal · burst
+       +42.5s 1655MB rss 1237MB avail 443MB · unknown · nominal · burst
+       +42.6s 1652MB rss 1239MB avail 446MB · unknown · nominal · burst
+       +42.7s 1653MB rss 1212MB avail 445MB · unknown · nominal · burst
+       +42.8s 1655MB rss 1214MB avail 443MB · unknown · nominal · burst
+       +42.9s 1657MB rss 1216MB avail 441MB · unknown · nominal · burst
+       +43.0s 1659MB rss 1218MB avail 439MB malloc 1843MB/4347105blk · unknown · nominal · burst
+       +43.1s 1660MB rss 1219MB avail 438MB · unknown · nominal · burst
+       +43.2s 1662MB rss 1222MB avail 436MB · unknown · nominal · burst
+       +43.3s 1663MB rss 1195MB avail 435MB · unknown · nominal · burst
+       +43.4s 1665MB rss 1198MB avail 433MB · unknown · nominal · burst
+       +43.5s 1667MB rss 1199MB avail 431MB · unknown · nominal · burst
+       +43.6s 1668MB rss 1201MB avail 430MB · unknown · nominal · burst
+       +43.7s 1670MB rss 1204MB avail 428MB · unknown · nominal · burst
+       +43.8s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +43.9s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.0s 1670MB rss 1205MB avail 428MB malloc 1855MB/4347037blk · unknown · nominal · burst
+       +44.1s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.2s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.3s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.4s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.5s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.6s 1670MB rss 1205MB avail 428MB · unknown · nominal · burst
+       +44.7s 1675MB rss 1194MB avail 423MB · unknown · nominal · burst
+       +44.8s 1675MB rss 1194MB avail 423MB · unknown · nominal · burst
+       +44.9s 1675MB rss 1194MB avail 423MB · unknown · nominal · burst
+       +45.0s 1675MB rss 1194MB avail 423MB malloc 1855MB/4345588blk · unknown · nominal · burst
+       +45.1s 1675MB rss 1194MB avail 423MB · unknown · nominal · burst
+       +45.2s 1675MB rss 1194MB avail 423MB · unknown · nominal · burst
+       +45.3s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.4s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.5s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.6s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.7s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.8s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +45.9s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +46.0s 1670MB rss 1194MB avail 428MB malloc 1855MB/4346001blk · unknown · nominal · burst
+       +46.1s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +46.2s 1670MB rss 1194MB avail 428MB · unknown · nominal · burst
+       +46.3s 1368MB rss 1088MB avail 730MB · unknown · nominal · burst
+       +46.4s 1368MB rss 1128MB avail 730MB · unknown · nominal · burst
+       +46.5s 1358MB rss 1128MB avail 740MB · unknown · nominal · burst
+       +46.6s 1357MB rss 1136MB avail 741MB · unknown · nominal · burst
+       +46.7s 1352MB rss 1148MB avail 746MB · unknown · nominal · burst
+       +46.8s 1348MB rss 1151MB avail 750MB · unknown · nominal · burst
+       +46.9s 1345MB rss 1154MB avail 753MB · unknown · nominal · burst
+       +47.0s 1342MB rss 1154MB avail 756MB malloc 1456MB/4221595blk · unknown · nominal · burst
+       +47.1s 1335MB rss 1165MB avail 763MB · unknown · nominal · burst
+       +47.2s 1331MB rss 1167MB avail 767MB · unknown · nominal · burst
+       +47.3s 1328MB rss 1176MB avail 770MB · unknown · nominal · burst
+       +47.4s 1320MB rss 1182MB avail 778MB · unknown · nominal · burst
+       +47.5s 1315MB rss 1183MB avail 783MB · unknown · nominal · burst
+       +47.6s 1314MB rss 1188MB avail 784MB · unknown · nominal · burst
+       +47.7s 1314MB rss 1197MB avail 784MB · unknown · nominal · burst
+       +47.8s 1319MB rss 1197MB avail 779MB · unknown · nominal · burst
+       +47.9s 1325MB rss 1204MB avail 773MB · unknown · nominal · burst
+       +48.0s 1325MB rss 1205MB avail 773MB · unknown · nominal · burst
+       +48.1s 1325MB rss 1205MB avail 773MB malloc 1314MB/4222938blk · unknown · nominal · burst
+       +48.2s 1326MB rss 1207MB avail 772MB · unknown · nominal · burst
+       +48.3s 1322MB rss 1209MB avail 776MB · unknown · nominal · burst
+       +48.4s 1322MB rss 1212MB avail 776MB · unknown · nominal · burst
+       +48.5s 1321MB rss 1213MB avail 777MB · unknown · nominal · burst
+       +48.6s 1321MB rss 1214MB avail 777MB · unknown · nominal · burst
+       +48.7s 1321MB rss 1216MB avail 777MB · unknown · nominal · burst
+       +48.8s 1322MB rss 1217MB avail 776MB · unknown · nominal · burst
+       +48.9s 1322MB rss 1217MB avail 776MB · unknown · nominal · burst
+       +49.0s 1322MB rss 1218MB avail 776MB · unknown · nominal · burst
+       +49.1s 1322MB rss 1218MB avail 776MB malloc 1323MB/4227281blk · unknown · nominal · burst
+       +49.2s 1322MB rss 1218MB avail 776MB · unknown · nominal · burst
+       +49.3s 1322MB rss 1219MB avail 776MB · unknown · nominal · burst
+       +49.4s 1324MB rss 1221MB avail 774MB · unknown · nominal
+       +50.6s 1340MB rss 1249MB avail 758MB malloc 1401MB/4230063blk · unknown · nominal
+       +51.4s 1337MB rss 1252MB avail 761MB · unknown · nominal
+       +52.4s 1334MB rss 1255MB avail 764MB malloc 1347MB/4234916blk · unknown · nominal
+       +53.4s 1337MB rss 1258MB avail 761MB malloc 1357MB/4237953blk · unknown · nominal
+       +54.4s 1341MB rss 1263MB avail 757MB malloc 1364MB/4240702blk · unknown · nominal
+       +55.6s 1336MB rss 1260MB avail 762MB malloc 1359MB/4242854blk · unknown · nominal
+       +56.4s 1334MB rss 1270MB avail 764MB · unknown · nominal
+       +57.4s 1335MB rss 1274MB avail 763MB malloc 1347MB/4247897blk · unknown · nominal
+       +58.4s 1338MB rss 1285MB avail 760MB malloc 1410MB/4249501blk · unknown · nominal
+       +59.4s 1340MB rss 1288MB avail 758MB · unknown · nominal
+       +60.4s 1343MB rss 1294MB avail 755MB malloc 1417MB/4254135blk · unknown · nominal
+       +61.4s 1352MB rss 1308MB avail 746MB malloc 1416MB/4256995blk · unknown · nominal
+       +62.4s 1368MB rss 1324MB avail 730MB · unknown · nominal
+       +63.4s 1383MB rss 1346MB avail 715MB malloc 1425MB/4260764blk · unknown · nominal
+       +64.6s 1373MB rss 1346MB avail 725MB malloc 1442MB/4262391blk · unknown · nominal
+       +65.4s 1377MB rss 1351MB avail 721MB · unknown · nominal
+       +66.6s 1360MB rss 1356MB avail 738MB malloc 1400MB/4272007blk · unknown · nominal
+       +67.4s 1363MB rss 1360MB avail 735MB · unknown · nominal
+       +68.4s 1387MB rss 1365MB avail 711MB malloc 1414MB/4272692blk · unknown · nominal
+       +69.5s 1370MB rss 1367MB avail 728MB malloc 1450MB/4271073blk · unknown · nominal
+       +70.4s 1392MB rss 1370MB avail 706MB · unknown · nominal
+       +71.6s 1395MB rss 1374MB avail 703MB malloc 1426MB/4277169blk · unknown · nominal
+       +72.4s 1375MB rss 1375MB avail 723MB · unknown · nominal
+       +73.4s 1380MB rss 1396MB avail 718MB malloc 1401MB/4280704blk · unknown · nominal
+       +74.4s 1384MB rss 1400MB avail 714MB · unknown · nominal
+       +75.4s 1390MB rss 1410MB avail 708MB malloc 1414MB/4282209blk · unknown · nominal
+       +76.6s 1396MB rss 1417MB avail 702MB malloc 1422MB/4282516blk · unknown · nominal
+       +77.4s 1426MB rss 1427MB avail 672MB · unknown · nominal
+       +78.5s 1425MB rss 1428MB avail 673MB malloc 1536MB/4286777blk · unknown · nominal
+       +79.4s 1398MB rss 1421MB avail 700MB · unknown · nominal
+       +80.5s 1410MB rss 1414MB avail 688MB malloc 1518MB/4289864blk · unknown · nominal
+       +81.4s 1388MB rss 1413MB avail 710MB · unknown · nominal
+       +82.4s 1389MB rss 1417MB avail 709MB malloc 1425MB/4293833blk · unknown · nominal
+       +83.4s 1397MB rss 1426MB avail 701MB · unknown · nominal
+       +84.4s 1425MB rss 1428MB avail 673MB malloc 1412MB/4298444blk · unknown · nominal
+       +85.4s 1403MB rss 1434MB avail 695MB malloc 1420MB/4297172blk · unknown · nominal
+       +86.4s 1406MB rss 1439MB avail 692MB malloc 1424MB/4299058blk · unknown · nominal
+       +87.5s 1431MB rss 1443MB avail 667MB malloc 1477MB/4300490blk · unknown · nominal
+       +88.4s 1412MB rss 1446MB avail 686MB · unknown · nominal
+       +89.4s 1412MB rss 1447MB avail 686MB malloc 1476MB/4305018blk · unknown · nominal
+       +90.6s 1437MB rss 1450MB avail 661MB malloc 1461MB/4306314blk · unknown · nominal
+       +91.5s 1421MB rss 1452MB avail 677MB · unknown · nominal
+       +92.5s 1416MB rss 1453MB avail 682MB malloc 1461MB/4309520blk · unknown · nominal
+       +93.4s 1426MB rss 1459MB avail 672MB · unknown · nominal
+       +94.4s 1426MB rss 1465MB avail 672MB malloc 1467MB/4316304blk · unknown · nominal
+       +95.4s 1436MB rss 1475MB avail 662MB malloc 1476MB/4322504blk · unknown · nominal
+       +96.6s 1468MB rss 1488MB avail 630MB malloc 1484MB/4323042blk · unknown · nominal
+       +97.5s 1456MB rss 1485MB avail 642MB · unknown · nominal
+       +98.6s 1472MB rss 1447MB avail 626MB malloc 1495MB/4326632blk · unknown · nominal
+       +99.6s 1531MB rss 1420MB avail 567MB · unknown · nominal
+      +100.6s 1548MB rss 1423MB avail 550MB malloc 1581MB/4329734blk · unknown · nominal
+      +101.6s 1526MB rss 1423MB avail 572MB malloc 1579MB/4329528blk · unknown · nominal
+      +102.4s 1525MB rss 1423MB avail 573MB · unknown · nominal
+      +103.4s 1525MB rss 1426MB avail 573MB malloc 1500MB/4330274blk · unknown · nominal
+      +104.6s 1539MB rss 1408MB avail 559MB malloc 1492MB/4334335blk · unknown · nominal
+      +105.6s 1508MB rss 1402MB avail 590MB · unknown · nominal
+      +106.4s 1510MB rss 1404MB avail 588MB malloc 1475MB/4335972blk · unknown · nominal
+      +107.4s 1536MB rss 1408MB avail 562MB malloc 1479MB/4337924blk · unknown · nominal
+      +108.6s 1546MB rss 1418MB avail 552MB malloc 1486MB/4338864blk · unknown · nominal
+      +109.4s 1556MB rss 1427MB avail 542MB · unknown · nominal
+      +110.4s 1545MB rss 1435MB avail 553MB malloc 1555MB/4341025blk · unknown · nominal
+      +111.4s 1569MB rss 1436MB avail 529MB · unknown · nominal
+      +112.4s 1546MB rss 1437MB avail 552MB malloc 1554MB/4345616blk · unknown · nominal
+      +113.4s 1583MB rss 1419MB avail 515MB malloc 1554MB/4349568blk · unknown · nominal
+      +114.4s 1555MB rss 1421MB avail 543MB · unknown · nominal
+      +115.6s 1558MB rss 1424MB avail 540MB malloc 1526MB/4352685blk · unknown · nominal
+      +116.6s 1563MB rss 1425MB avail 535MB malloc 1525MB/4352193blk · unknown · nominal
+      +117.4s 1573MB rss 1414MB avail 525MB · unknown · nominal
+      +118.4s 1576MB rss 1417MB avail 522MB malloc 1528MB/4356757blk · unknown · nominal
+      +119.5s 1603MB rss 1421MB avail 495MB malloc 1531MB/4360918blk · unknown · nominal
+      +120.5s 1609MB rss 1424MB avail 489MB malloc 1532MB/4363671blk · unknown · nominal
+      +121.4s 1582MB rss 1425MB avail 516MB · unknown · nominal
+      +122.4s 1595MB rss 1413MB avail 503MB malloc 1532MB/4365495blk · unknown · nominal
+      +123.4s 1598MB rss 1416MB avail 500MB · unknown · nominal
+      +124.5s 1599MB rss 1417MB avail 499MB malloc 1534MB/4366699blk · unknown · nominal
+      +125.4s 1623MB rss 1420MB avail 475MB · unknown · nominal
+      +126.6s 1632MB rss 1419MB avail 466MB malloc 1538MB/4372906blk · unknown · nominal
+      +127.4s 1605MB rss 1419MB avail 493MB · unknown · nominal
+      +128.5s 1655MB rss 1403MB avail 443MB malloc 1539MB/4373947blk · unknown · nominal
+      +129.6s 1652MB rss 1406MB avail 446MB malloc 1541MB/4376071blk · unknown · nominal
+      +130.4s 1631MB rss 1407MB avail 467MB · unknown · nominal
+      +131.4s 1656MB rss 1410MB avail 442MB malloc 1543MB/4379555blk · unknown · nominal
+      +132.6s 1635MB rss 1411MB avail 463MB malloc 1543MB/4380799blk · unknown · nominal
+      +133.4s 1659MB rss 1414MB avail 439MB · unknown · nominal
+      +134.6s 1663MB rss 1418MB avail 435MB malloc 1547MB/4384911blk · unknown · nominal
+      +135.6s 1647MB rss 1419MB avail 451MB · unknown · nominal
+      +136.4s 1643MB rss 1419MB avail 455MB malloc 1549MB/4389097blk · unknown · nominal
+      +137.5s 1643MB rss 1419MB avail 455MB malloc 1549MB/4389142blk · unknown · nominal
+      +138.6s 1666MB rss 1421MB avail 432MB malloc 1550MB/4388625blk · unknown · nominal
+      +139.6s 1668MB rss 1425MB avail 430MB malloc 1551MB/4391405blk · unknown · nominal
+      +140.4s 1650MB rss 1426MB avail 448MB · unknown · nominal
+      +141.3s 1430MB rss 1474MB avail 668MB malloc 1208MB/3446051blk · unknown · nominal · burst
+      +141.4s 1271MB rss 1460MB avail 827MB · unknown · nominal · burst
+      +141.5s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +141.6s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +141.7s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +141.8s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +141.9s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +142.0s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +142.1s 1267MB rss 1457MB avail 831MB · unknown · nominal · burst
+      +142.2s 1267MB rss 1456MB avail 831MB · unknown · nominal · burst
+      +142.3s 1267MB rss 1456MB avail 831MB malloc 1108MB/2358792blk · unknown · nominal · burst
+      +142.4s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +142.5s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +142.6s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +142.7s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +142.8s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +142.9s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +143.0s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +143.1s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +143.2s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +143.3s 1266MB rss 1456MB avail 832MB malloc 1111MB/2365457blk · unknown · nominal · burst
+      +143.4s 1284MB rss 1474MB avail 814MB · unknown · nominal · burst
+      +143.5s 1284MB rss 1474MB avail 814MB · unknown · nominal · burst
+      +143.6s 1284MB rss 1456MB avail 814MB · unknown · nominal · burst
+      +143.7s 1284MB rss 1456MB avail 814MB · unknown · nominal · burst
+      +143.8s 1284MB rss 1456MB avail 814MB · unknown · nominal · burst
+      +143.9s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +144.0s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +144.1s 1290MB rss 1475MB avail 808MB · unknown · nominal · burst
+      +144.2s 1290MB rss 1475MB avail 808MB · unknown · nominal · burst
+      +144.3s 1290MB rss 1475MB avail 808MB malloc 1113MB/2367773blk · unknown · nominal · burst
+      +144.4s 1290MB rss 1456MB avail 808MB · unknown · nominal · burst
+      +144.5s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +144.6s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +144.7s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +144.8s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +144.9s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.0s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.1s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.2s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.3s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.4s 1266MB rss 1456MB avail 832MB malloc 1113MB/2368741blk · unknown · nominal · burst
+      +145.5s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.6s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.7s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.8s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +145.9s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +146.0s 1266MB rss 1456MB avail 832MB · unknown · nominal · burst
+      +146.1s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +146.2s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +146.3s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +146.4s 1271MB rss 1456MB avail 827MB malloc 1113MB/2368721blk · unknown · nominal · burst
+      +146.5s 1271MB rss 1456MB avail 827MB · unknown · nominal · burst
+      +146.6s 1290MB rss 1476MB avail 808MB · unknown · nominal · burst
+      +146.7s 1285MB rss 1476MB avail 813MB · unknown · nominal · burst
+      +146.8s 1285MB rss 1476MB avail 813MB · unknown · nominal · burst
+      +146.9s 1285MB rss 1476MB avail 813MB · unknown · nominal · burst
+      +147.0s 1285MB rss 1476MB avail 813MB · unknown · nominal · burst
+      +147.1s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.2s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.3s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.4s 1266MB rss 1476MB avail 832MB malloc 1115MB/2370358blk · unknown · nominal · burst
+      +147.5s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.6s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.7s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.8s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +147.9s 1283MB rss 1475MB avail 815MB · unknown · nominal · burst
+      +148.0s 1283MB rss 1475MB avail 815MB · unknown · nominal · burst
+      +148.1s 1283MB rss 1475MB avail 815MB · unknown · nominal · burst
+      +148.2s 1283MB rss 1475MB avail 815MB · unknown · nominal · burst
+      +148.3s 1283MB rss 1475MB avail 815MB · unknown · nominal · burst
+      +148.4s 1265MB rss 1475MB avail 833MB malloc 1117MB/2373147blk · unknown · nominal · burst
+      +148.5s 1265MB rss 1475MB avail 833MB · unknown · nominal · burst
+      +148.6s 1265MB rss 1475MB avail 833MB · unknown · nominal · burst
+      +148.7s 1265MB rss 1475MB avail 833MB · unknown · nominal · burst
+      +148.8s 1265MB rss 1475MB avail 833MB · unknown · nominal · burst
+      +148.9s 1265MB rss 1475MB avail 833MB · unknown · nominal · burst
+      +149.0s 1269MB rss 1475MB avail 829MB · unknown · nominal · burst
+      +149.1s 1284MB rss 1475MB avail 814MB · unknown · nominal · burst
+      +149.2s 1284MB rss 1475MB avail 814MB · unknown · nominal · burst
+      +149.3s 1284MB rss 1475MB avail 814MB · unknown · nominal · burst
+      +149.4s 1284MB rss 1475MB avail 814MB malloc 1118MB/2373733blk · unknown · nominal · burst
+      +149.5s 1284MB rss 1475MB avail 814MB · unknown · nominal · burst
+      +149.6s 1266MB rss 1475MB avail 832MB · unknown · nominal · burst
+      +149.7s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +149.8s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +149.9s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.0s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.1s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.2s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.3s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.4s 1266MB rss 1476MB avail 832MB malloc 1119MB/2376449blk · unknown · nominal · burst
+      +150.5s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.6s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.7s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.8s 1266MB rss 1476MB avail 832MB · unknown · nominal · burst
+      +150.9s 1271MB rss 1476MB avail 827MB · unknown · nominal · burst
+      +151.0s 1271MB rss 1476MB avail 827MB · unknown · nominal · burst
+      +151.1s 1271MB rss 1476MB avail 827MB · unknown · nominal · burst
+      +151.2s 1271MB rss 1476MB avail 827MB · unknown · nominal · burst
+      +151.3s 1271MB rss 1476MB avail 827MB · unknown · nominal · burst
+      +151.4s 1285MB rss 1476MB avail 813MB · unknown · nominal · burst
+      +151.5s 1285MB rss 1476MB avail 813MB malloc 1121MB/2378369blk · unknown · nominal
+      +152.5s 1266MB rss 1476MB avail 832MB malloc 1122MB/2382013blk · unknown · nominal
+      +153.6s 1287MB rss 1476MB avail 811MB malloc 1125MB/2385365blk · unknown · nominal
+      +154.6s 1284MB rss 1476MB avail 814MB malloc 1127MB/2388261blk · unknown · nominal
+      +155.6s 1266MB rss 1476MB avail 832MB · unknown · nominal
+      +156.6s 1284MB rss 1476MB avail 814MB malloc 1129MB/2390521blk · unknown · nominal
+      +157.6s 1265MB rss 1476MB avail 833MB malloc 1129MB/2390870blk · unknown · nominal
+      +158.6s 1265MB rss 1476MB avail 833MB malloc 1129MB/2390960blk · unknown · nominal
+      +159.6s 1285MB rss 1477MB avail 813MB malloc 1129MB/2392064blk · unknown · nominal
+      +160.6s 1272MB rss 1477MB avail 826MB · unknown · nominal
+      +161.6s 1266MB rss 1477MB avail 832MB malloc 1132MB/2397484blk · unknown · nominal
+      +162.6s 1283MB rss 1475MB avail 815MB · unknown · nominal
+      +163.6s 1265MB rss 1475MB avail 833MB malloc 1134MB/2401462blk · unknown · nominal
+      +164.5s 1265MB rss 1475MB avail 833MB · unknown · nominal
+      +165.5s 1283MB rss 1476MB avail 815MB malloc 1135MB/2404520blk · unknown · nominal
+      +166.6s 1266MB rss 1476MB avail 832MB malloc 1136MB/2404445blk · unknown · nominal
+      +167.6s 1283MB rss 1477MB avail 815MB malloc 1137MB/2405913blk · unknown · nominal
+      +168.6s 1283MB rss 1477MB avail 815MB malloc 1138MB/2407914blk · unknown · nominal
+      +169.6s 1265MB rss 1477MB avail 833MB · unknown · nominal
+      +170.6s 1265MB rss 1477MB avail 833MB malloc 1138MB/2407917blk · unknown · nominal
+      +171.6s 1283MB rss 1478MB avail 815MB malloc 1140MB/2409594blk · unknown · nominal
+      +172.6s 1266MB rss 1478MB avail 832MB · unknown · nominal
+      +173.6s 1285MB rss 1478MB avail 813MB malloc 1142MB/2412248blk · unknown · nominal
+      +174.6s 1289MB rss 1478MB avail 809MB malloc 1145MB/2415023blk · unknown · nominal
+      +175.6s 1284MB rss 1478MB avail 814MB malloc 1146MB/2417025blk · unknown · nominal
+      +176.6s 1266MB rss 1478MB avail 832MB · unknown · nominal
+      +177.6s 1285MB rss 1480MB avail 813MB malloc 1149MB/2421019blk · unknown · nominal
+      +178.6s 1266MB rss 1480MB avail 832MB · unknown · nominal
+      +179.6s 1266MB rss 1481MB avail 832MB malloc 1150MB/2422833blk · unknown · nominal
+      +180.6s 1286MB rss 1481MB avail 812MB malloc 1151MB/2424789blk · unknown · nominal
+      +181.8s 1267MB rss 1481MB avail 831MB malloc 1151MB/2424852blk · unknown · nominal
+      +182.5s 1267MB rss 1481MB avail 831MB · unknown · nominal
+      +183.8s 1272MB rss 1482MB avail 826MB malloc 1151MB/2426801blk · unknown · nominal
+      +184.7s 1267MB rss 1480MB avail 831MB · unknown · nominal
+      +185.5s 1267MB rss 1481MB avail 831MB malloc 1154MB/2431414blk · unknown · nominal
+      +186.8s 1286MB rss 1481MB avail 812MB malloc 1156MB/2433313blk · unknown · nominal
+      +187.8s 1267MB rss 1483MB avail 831MB malloc 1158MB/2436846blk · unknown · nominal
+      +188.7s 1267MB rss 1483MB avail 831MB · unknown · nominal
+      +189.5s 1288MB rss 1484MB avail 810MB malloc 1160MB/2440607blk · unknown · nominal
+      +190.5s 1289MB rss 1483MB avail 809MB · unknown · nominal
+      +191.7s 1267MB rss 1483MB avail 831MB malloc 1165MB/2448602blk · unknown · nominal
+      +192.6s 1267MB rss 1483MB avail 831MB · unknown · nominal
+      +193.8s 1266MB rss 1483MB avail 832MB malloc 1166MB/2449831blk · unknown · nominal
+      +194.7s 1266MB rss 1483MB avail 832MB · unknown · nominal
+      +195.5s 1266MB rss 1483MB avail 832MB malloc 1167MB/2451369blk · unknown · nominal
+  (snapshot taken 31s before this report)
+Touch path
+  prior boot:
+  2026-09-20T01:35:07.737Z #350 pres report:receipt (shown) p=none exploration
+  2026-09-20T01:35:08.504Z #351 root p=none exploration
+  2026-09-20T01:35:08.634Z #350 pres report:receipt (dismissed) p=none exploration
+  2026-09-20T01:35:09.638Z #352 root p=none exploration
+  2026-09-20T01:35:10.639Z #353 root p=none exploration
+  2026-09-20T01:35:10.639Z #354 modal p=none exploration
+  2026-09-20T01:35:11.665Z #355 root p=none exploration
+  2026-09-20T01:35:11.665Z #356 modal p=none exploration
+  2026-09-20T01:35:19.321Z #357 root p=none exploration
+  2026-09-20T01:35:19.322Z #358 modal p=none exploration
+  2026-09-20T01:35:19.322Z #358 in report:send p=none exploration
+  2026-09-20T01:35:19.403Z #358 enter report:send p=none exploration
+  2026-09-20T01:35:19.404Z #358 admit report:send (described) p=none exploration
+  2026-09-20T01:35:19.404Z #358 dispatch report:send (described) p=none exploration
+  2026-09-20T01:35:19.404Z #358 dispatch report:send (compose) p=none exploration
+  2026-09-20T01:35:19.467Z #358 done report:send (handed-off) p=none exploration
+  2026-09-20T01:35:19.546Z #358 admit report:send (sent) p=none exploration
+  2026-09-20T01:35:19.546Z #358 done report:send (resolved) p=none exploration
+  2026-09-20T01:35:19.546Z #358 pres report:receipt (requested) p=none exploration
+  2026-09-20T01:35:19.550Z #358 pres report:receipt (shown) p=none exploration
+  2026-09-20T01:35:20.304Z #359 root p=none exploration
+  2026-09-20T01:35:20.434Z #358 pres report:receipt (dismissed) p=none exploration
+  2026-09-20T01:37:48.809Z #360 root p=none exploration active
+  2026-09-20T01:42:07.723Z #361 root p=none exploration active
+  this boot:
+  2026-09-20T03:25:29.873Z #298 root p=S exploration
+  2026-09-20T03:25:29.874Z #299 modal p=S exploration
+  2026-09-20T03:25:29.874Z #299 in search:still pond p=S exploration
+  2026-09-20T03:25:29.955Z #299 enter search:still pond p=S exploration
+  2026-09-20T03:25:29.955Z #299 admit search:still pond (chip) p=S exploration
+  2026-09-20T03:25:29.955Z #299 dispatch search:still pond (chip) p=S exploration
+  2026-09-20T03:25:29.955Z #299 dispatch sheet:deferred (delayed-submit-armed) ⏱+400ms p=S exploration
+  2026-09-20T03:25:29.955Z #299 done search:still pond (chip) p=S exploration
+  2026-09-20T03:25:30.394Z #299 dispatch sheet:deferred (delayed-submit-fired) p=none exploration
+  2026-09-20T03:25:32.440Z #300 root p=none exploration
+  2026-09-20T03:25:33.489Z #301 root p=none exploration
+  2026-09-20T03:25:35.055Z #302 root p=none exploration
+  2026-09-20T03:25:35.985Z #303 root p=none exploration
+  2026-09-20T03:25:37.153Z #304 root p=none exploration
+  2026-09-20T03:25:37.154Z #305 modal p=none exploration
+  2026-09-20T03:25:38.421Z #306 root p=none exploration
+  2026-09-20T03:25:38.421Z #307 modal p=none exploration
+  2026-09-20T03:25:45.462Z #308 root p=none exploration
+  2026-09-20T03:25:45.462Z #309 modal p=none exploration
+  2026-09-20T03:25:45.463Z #309 in report:send p=none exploration
+  2026-09-20T03:25:45.538Z #309 enter report:send p=none exploration
+  2026-09-20T03:25:45.539Z #309 admit report:send (described) p=none exploration
+  2026-09-20T03:25:45.539Z #309 dispatch report:send (described) p=none exploration
+  2026-09-20T03:25:45.539Z #309 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Jorah the Scholar, Tomekeeper. Kind and "
+    • route=bundled-kokoro · kokoro=ready · "Tarek the Tinkerer, Mechanical Outfitter"
+    • route=bundled-kokoro · kokoro=ready · "Long-form work, Silence Across the Borde"
+    • route=bundled-kokoro · kokoro=ready · "From Maren, this. She cuts warding charm"
+    • route=bundled-kokoro · kokoro=ready · "Irma Ironhand, Heavy Armorer. A gruff, n"
+    • route=bundled-kokoro · kokoro=ready · "Bolts by the sheaf. Tolvek, south, look "
+
+--- INVENTORY ---
+Inventory (Skippy)
+  HP: 55/55  Stamina: 0/13  TC: 147  Corruption: 0
+  Pack: 76 distinct rows / 218 total
+
+Weapons (18)
+  Aetheric Pike (1d8 aetheric, dur 42/42, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Shortsword (1d6 slashing, dur 34/34, [weapon,melee,single_handed,blade,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 30/30, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Energy Blade (1d6 burn, dur 16/16, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 39/39, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 10/10, equipped:off, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, unequip:off, use
+  Cudgel (1d8 bludgeoning, dur 10/10, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 21/21, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grinder Axe (1d8 slashing, dur 21/21, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Heater Sword (1d6 slashing, dur 34/34, [weapon,melee,single_handed,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Knife (1d4 slashing, dur 35/35, [weapon,melee,single_handed,knife,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 37/37, equipped:main, [weapon,starter])
+    actions: equip:off, unequip:main, use(off)
+  Mud-fist Wraps (1d10 bludgeoning, dur 43/43, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Cutter (1d6 burn, dur 23/23, [weapon,melee,single_handed,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 11/11, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pocket Knife (1d4 slashing, dur 7/7, [weapon,starter,knife,tool])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusty Shortbow (1d6 piercing, dur 33/33, [weapon,ranged,bow,two_handed,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Salvaged Bow (1d6 piercing, dur 21/21, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (17)
+  Aether-Walker's Cape (dur 35/35, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,cloak,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Strider Boots (dur 14/14, AC +2 · Regen: +1 stamina per action · DEX +2, [armor,feet,boots,feet,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Aetheric Boots (dur 18/18, AC +2 · INT +2, [armor,feet,boots,feet,architectural_sentinels])
+    actions: equip:feet, use, scrap, drop
+  Architect's Field Jacket (dur 14/14, AC +2 · Regen: +1 HP per action · INT +2, [armor,cloak,cloak,outer,tartarian_giants])
+    actions: equip:cloak, use, scrap, drop
+  Architect's Leg Enhancers (dur 22/22, AC +1 · Resists: slashing · INT +1, [armor,legs,greaves,legs,architectural_sentinels])
+    actions: equip:legs, use, scrap, drop
+  Architect's Observer Visor (dur 9/9, AC +2 · Resists: cold · WIS +2, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 26/26, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Face of the Ancient Walker (Rare, dur 45/45, AC +3 · Resists: poison, burn · DEX +3 · CHA +2, [armor,head,mask,face,mud_dwellers])
+    actions: equip:head, use, scrap, drop
+  Mud-Warden's Vest (dur 21/21, equipped:chest, AC +2 · Resists: slashing · WIS +2, [armor])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 15/15, equipped:head, AC +2 · INT +2, [armor])
+    actions: unequip:head
+  Salvager's Worn Boots (dur 14/14, AC +2 · Resists: slashing · INT +2 · STE +2, [armor,feet,boots,feet,reclaimers])
+    actions: equip:feet, use, scrap, drop
+  Seer's Veil of the Aether (dur 36/36, AC +1 · Resists: aetheric · WIS +1, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Sentinel's Faceguard (dur 27/27, AC +1 · Resists: slashing · HP +5 · DEX +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Shaman's Warden Gloves (dur 30/30, AC +1 · WIS +1, [armor,hands,gauntlets,hands,mud_dwellers])
+    actions: equip:hands, use, scrap, drop
+  Traveler's Cloak (dur 28/28, AC +1 · STE +1 · STE +1, [armor,cloak,cloak,outer,unknowing_masses])
+    actions: equip:cloak, use, scrap, drop
+  Wanderer's Face of Shadows (dur 25/25, AC +1 · STE +1, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 32/32, AC +1 · STR +1, [armor,hands,gauntlets,hands,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (3)
+  Trail Rations ×3 ([food])
+    actions: use(eat), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Rope ([climb,rope,fiber])
+    actions: use, scrap, drop
+
+Materials (22)
+  Aether Crystal ×16 ([aether,crystal])
+    actions: drop
+  Aether Dust ×17 ([aether,dust,distillable])
+    actions: drop
+  Aether Residue ([aether])
+    actions: drop
+  Aetheric Cloth (Uncommon, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Shard ×2 (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×6 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail
+    actions: scrap, drop
+  Bent Nail ×5 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bone Sliver ([bone,junk,scrap])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy])
+    actions: save-for-fusion, drop
+  Cloth Scrap ×3 ([fiber,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap
+    actions: scrap, drop
+  ◆ Horn-Capped Dowel ([trophy])
+    actions: save-for-fusion, drop
+  Mud Fragment ×6 ([mud])
+    actions: drop
+  Scrap Metal ×17 ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Small Rock
+    actions: drop
+  Smooth Stone ×8 ([stone,junk,scrap])
+    actions: scrap, drop
+  Stick
+    actions: drop
+  Stick ×7 ([wood,improvised,kindling])
+    actions: drop
+  Worn Tartarian Coin ×64 ([currency,metal,pre-flood])
+    actions: scrap, drop
+  ◆ Yellowed Tusk Stub ([trophy])
+    actions: save-for-fusion, drop
+
+Loot (10)
+  ◆ Amber Droplet (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  ◆ Bent Shackle Pin ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Chipped Phial Neck ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Faded Ribbon Coil ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Flint Core Nodule ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Knotted Sinew Braid ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Obsidian Chip ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Salt-Cured Dowel ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Tin Valve Housing ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Warped Plank Offcut ([trophy])
+    actions: save-for-fusion, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 396 of 1258 entries; older trimmed to fit a single email paste)
+
+[2026-09-20T03:25:30.452Z] [cognitive] SWIM  (35ms)
+[2026-09-20T03:25:30.393Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:25:30.393Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:30.392Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-20T03:25:30.390Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1
+[2026-09-20T03:25:30.390Z] [player] investigate still pond
+[2026-09-20T03:25:29.171Z] [debug] ui: tap "investigate"
+[2026-09-20T03:25:27.897Z] [reward] ✦ Shaman's Warden Gloves (Common).
+[2026-09-20T03:25:27.897Z] [world] You take the Shaman's Warden Gloves from where it lay.
+[2026-09-20T03:25:27.894Z] [reward] ✦ Salvager's Worn Boots (Common).
+[2026-09-20T03:25:27.893Z] [world] The Salvager's Worn Boots goes into the pack by feel. You have done this a great many times.
+[2026-09-20T03:25:26.454Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:25:25.140Z] [reward]     • Aether Crystal (Common)
+[2026-09-20T03:25:25.140Z] [reward]     • Warped Plank Offcut (Common)
+[2026-09-20T03:25:25.140Z] [reward]     • Worn Tartarian Coin x13 (Common)
+[2026-09-20T03:25:25.140Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:25:25.139Z] [world] You work the tilting obsidian pillar over. A part of it comes loose, intact.
+[2026-09-20T03:25:25.139Z] [world] Tucked inside the stone marker: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-20T03:25:25.138Z] [world] You break the shattered buried reclaimer cache apart. Among the pieces, something worth keeping.
+[2026-09-20T03:25:25.138Z] [world] You salvage the cracked supply crate. The take is small but real.
+[2026-09-20T03:25:24.269Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:25:24.058Z] [cognitive] SEARCH · USE_ITEM · DISENGAGE · TALK  (58ms)
+[2026-09-20T03:25:23.999Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:25:23.999Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:23.998Z] [world] The Shaman's Warden Gloves sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-20T03:25:23.997Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shaman warden gloves resolved=Shaman's Warden Gloves range=- enemies=0 hooks=1
+[2026-09-20T03:25:23.996Z] [player] investigate Shaman's Warden Gloves
+[2026-09-20T03:25:22.805Z] [debug] ui: tap "investigate"
+[2026-09-20T03:25:22.079Z] [cognitive] neutral  (38ms)
+[2026-09-20T03:25:22.019Z] [system] ⏳ Time passed: 15 min
+[2026-09-20T03:25:22.019Z] [world] The thread you were following waits where you left it.
+[2026-09-20T03:25:22.018Z] [world] You push east. The silt is heavy underfoot, the horizon unchanged.
+[2026-09-20T03:25:22.017Z] [debug] spawn: gear=[Shaman's Warden Gloves, Salvager's Worn Boots] window=10 roster=new
+[2026-09-20T03:25:22.007Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-09-20T03:25:22.007Z] [player] go east
+[2026-09-20T03:25:21.972Z] [debug] ui: tap "EAST"
+[2026-09-20T03:25:21.401Z] [debug] persist sizes(KB): total=141 player=21 wm=32[rooms=14 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=2
+[2026-09-20T03:25:21.372Z] [cognitive] SWIM  (57ms)
+[2026-09-20T03:25:21.314Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-20T03:25:21.313Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=1
+[2026-09-20T03:25:21.312Z] [player] investigate waterskin
+[2026-09-20T03:25:20.105Z] [debug] ui: tap "investigate"
+[2026-09-20T03:25:19.061Z] [reward]     • Aether Dust x3 (Common)
+[2026-09-20T03:25:19.061Z] [reward]     • Smooth Stone x3 (Common)
+[2026-09-20T03:25:19.057Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:25:19.057Z] [world] You strip the tilting obsidian pillar carefully. Something usable comes free in your hand.
+[2026-09-20T03:25:19.057Z] [world] You salvage the marker. The take is small but real.
+[2026-09-20T03:25:18.366Z] [reward] ✦ Mud Knife (Common).
+[2026-09-20T03:25:18.366Z] [world] You pocket the Mud Knife and check the horizon, in that order.
+[2026-09-20T03:25:18.363Z] [reward] ✦ Mud Grinder Axe (Common).
+[2026-09-20T03:25:18.362Z] [world] You take the Mud Grinder Axe the way you take everything out here — quickly, and without ceremony.
+[2026-09-20T03:25:18.359Z] [reward] ✦ Architect's Field Jacket (Common).
+[2026-09-20T03:25:18.359Z] [world] Old habit: see it, take it, keep walking. The Architect's Field Jacket is yours.
+[2026-09-20T03:25:17.829Z] [cognitive] SWIM  (40ms)
+[2026-09-20T03:25:17.764Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-20T03:25:17.763Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1
+[2026-09-20T03:25:17.762Z] [player] investigate still pond
+[2026-09-20T03:25:17.170Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:25:16.571Z] [cognitive] neutral  (49ms)
+[2026-09-20T03:25:16.521Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-20T03:25:16.521Z] [world] You take the measure of the Architect's Field Jacket. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-20T03:25:16.520Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect field jacket resolved=Architect's Field Jacket range=- enemies=0 hooks=1
+[2026-09-20T03:25:16.517Z] [player] investigate Architect's Field Jacket
+[2026-09-20T03:25:16.475Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-09-20T03:25:15.304Z] [debug] ui: tap "investigate"
+[2026-09-20T03:25:14.523Z] [cognitive] neutral  (36ms)
+[2026-09-20T03:25:14.464Z] [system] ⏳ Time passed: 15 min
+[2026-09-20T03:25:14.464Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-20T03:25:14.463Z] [world] A wagon, abandoned and broken-axled, leans into the mud ahead.
+[2026-09-20T03:25:14.463Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-09-20T03:25:14.461Z] [debug] spawn: gear=[Mud Knife, Architect's Field Jacket, Mud Grinder Axe] window=10 roster=new
+[2026-09-20T03:25:14.454Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:25:14.453Z] [player] go east
+[2026-09-20T03:25:14.420Z] [debug] ui: tap "EAST"
+[2026-09-20T03:25:13.775Z] [cognitive] REST  (54ms)
+[2026-09-20T03:25:13.700Z] [system] ⏳ Time passed: 8h
+[2026-09-20T03:25:13.698Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-20T03:25:13.698Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 3, night)
+[2026-09-20T03:25:13.697Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:25:13.696Z] [player] rest
+[2026-09-20T03:25:13.687Z] [debug] ui: tap "rest"
+[2026-09-20T03:25:10.725Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-20T03:25:10.725Z] [world] You do not think about it. The Scrap Metal is simply in your hand now.
+[2026-09-20T03:25:09.895Z] [reward] ✦ Architect's Observer Visor (Common).
+[2026-09-20T03:25:09.894Z] [world] You crouch, take the Architect's Observer Visor, and are moving again before you have straightened up.
+[2026-09-20T03:25:09.892Z] [reward] ✦ Rusty Shortbow (Common).
+[2026-09-20T03:25:09.892Z] [world] The Rusty Shortbow goes in your pack. Its outline stays in the silt a while.
+[2026-09-20T03:25:09.890Z] [reward] ✦ Cudgel (Common).
+[2026-09-20T03:25:09.890Z] [world] You take the Cudgel. The hollow it came out of starts closing.
+[2026-09-20T03:25:09.306Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-09-20T03:25:09.305Z] [reward]     • Worn Tartarian Coin x11 (Common)
+[2026-09-20T03:25:09.305Z] [reward]     • Stick (Common)
+[2026-09-20T03:25:09.305Z] [reward]     • Aether Crystal (Common)
+[2026-09-20T03:25:09.305Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-20T03:25:09.304Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:25:09.304Z] [world] You work the tilting obsidian pillar over. A part of it comes loose, intact.
+[2026-09-20T03:25:09.303Z] [world] You break the shattered endless stair landing apart. Among the pieces, something worth keeping.
+[2026-09-20T03:25:09.303Z] [world] You work the shattered buried reclaimer cache over. A part of it comes loose, intact.
+[2026-09-20T03:25:09.303Z] [world] You break the sack apart. Among the pieces, something worth keeping.
+[2026-09-20T03:25:09.302Z] [world] You break the rubble apart. Among the pieces, something worth keeping.
+[2026-09-20T03:25:09.302Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-20T03:25:08.536Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:25:08.377Z] [debug] persist sizes(KB): total=140 player=19 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=88 scene=3
+[2026-09-20T03:25:08.338Z] [cognitive] SWIM  (76ms)
+[2026-09-20T03:25:08.261Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-20T03:25:08.261Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:25:08.261Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:08.260Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-20T03:25:08.258Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=0
+[2026-09-20T03:25:08.258Z] [player] investigate still pond
+[2026-09-20T03:25:06.987Z] [debug] ui: tap "investigate"
+[2026-09-20T03:25:06.023Z] [cognitive] RETREAT · DISENGAGE · HIDE  (70ms)
+[2026-09-20T03:25:05.953Z] [system] ⏳ Time passed: 1h
+[2026-09-20T03:25:05.952Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:25:05.952Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:05.952Z] [arbiter] "Nine Cores, nine Guardians, nine Lost Capitals. That's the road. Tap MAIN QUEST to start."
+[2026-09-20T03:25:05.951Z] [arbiter] "This place has changed since I last passed through," the Arbiter says. "Or perhaps it has not, and I have."
+[2026-09-20T03:25:05.951Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:05.951Z] [world] Rare workings for sale: Heart of the Aetherstorm (500 TC), Helm of the Great Architect (200 TC), Hoarfrost Ward Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-20T03:25:05.943Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Grit Maalen, wandering trader. A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with one eye and the merchandise with the other."
+[2026-09-20T03:25:05.943Z] [world] You hear a kettle whistling before you see them. Grit Maalen, wandering trader, has made camp here.
+[2026-09-20T03:25:05.943Z] [world] [The Monarch's Waystation] north: open ground · east: Dynasty Border Post (4 tiles, 10 hours) · south: The Reaver's Crest (1 tile, 3 hours) · west: Raider's Ridge (2 tiles, 5 hours)
+[2026-09-20T03:25:05.940Z] [system] Weather effect — Ash Storm: -1 STR
+You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+[2026-09-20T03:25:05.940Z] [world] A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.
+[2026-09-20T03:25:05.935Z] [debug] spawn: gear=[Cudgel, Architect's Observer Visor, Rusty Shortbow] window=10 roster=new
+[2026-09-20T03:25:05.930Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:25:05.930Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n
+[2026-09-20T03:25:05.929Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-09-20T03:25:05.928Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:25:05.927Z] [player] leave outpost
+[2026-09-20T03:25:05.886Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-20T03:25:05.353Z] [cognitive] REST  (47ms)
+[2026-09-20T03:25:05.285Z] [system] ⏳ Time passed: 8h
+[2026-09-20T03:25:05.285Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:25:05.284Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:25:05.284Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:25:05.283Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:25:05.283Z] [world] You rest for 8 hours. +8 stamina, −1 corruption recovered. (Day 2, afternoon)
+[2026-09-20T03:25:05.281Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:25:05.281Z] [player] rest
+[2026-09-20T03:25:05.270Z] [debug] ui: tap "rest"
+[2026-09-20T03:25:04.671Z] [world] Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.
+[2026-09-20T03:25:04.670Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-20T03:25:03.764Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-20T03:25:03.764Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:25:03.763Z] [world] You break the rusted engine chamber scaffolding apart. Among the pieces, something worth keeping.
+[2026-09-20T03:25:03.036Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:25:02.749Z] [cognitive] neutral  (28ms)
+[2026-09-20T03:25:02.696Z] [reward] ✦ Small Rock.
+[2026-09-20T03:25:02.696Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-20T03:25:02.695Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:25:02.694Z] [player] investigate the floor
+[2026-09-20T03:25:00.853Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:59.265Z] [cognitive] TRAVEL  (39ms)
+[2026-09-20T03:24:59.210Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:59.210Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:59.209Z] [world] Halem the Trader places you as you come in. "Skippy. What are you after?"
+[2026-09-20T03:24:59.209Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:59.209Z] [world] You catch yourself walking the same line through the wreckage.
+[2026-09-20T03:24:59.208Z] [world] Monarch Court — The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+[2026-09-20T03:24:59.204Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:59.204Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n
+[2026-09-20T03:24:59.204Z] [world] You head on to the Atrium.
+[2026-09-20T03:24:59.203Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:59.202Z] [player] go north
+[2026-09-20T03:24:59.169Z] [debug] ui: tap "↑ ✓ ATRIUM"
+[2026-09-20T03:24:57.756Z] [cognitive] TRAVEL  (28ms)
+[2026-09-20T03:24:57.712Z] [world] Paths: north to Atrium · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:57.711Z] [world] Time has passed. This ground has no opinion on it.
+[2026-09-20T03:24:57.711Z] [world] Monarch Court — First Landing. A wide platform of cracked Tartarian stone with its mud-glass facing stripped off long ago and never replaced — the Monarchs finish what guests can see. The stair behind you climbs north to the Atrium; ahead it keeps dropping south into the dark.
+[2026-09-20T03:24:57.709Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:57.709Z] [debug] scene: loc=monarch_waystation hub=buried_landing_one arrival=n opening=n passing=n
+[2026-09-20T03:24:57.709Z] [world] You head on to the First Landing.
+[2026-09-20T03:24:57.708Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-20T03:24:57.707Z] [player] go north
+[2026-09-20T03:24:57.669Z] [debug] ui: tap "↑ ✓ FIRST LANDING"
+[2026-09-20T03:24:56.440Z] [cognitive] TRAVEL  (32ms)
+[2026-09-20T03:24:56.393Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:56.393Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:56.393Z] [world] You think back to the tarpaulin from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-20T03:24:56.393Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:56.392Z] [world] This ground has stopped being a place and started being a route.
+[2026-09-20T03:24:56.392Z] [world] Monarch Court — Second Landing. Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it.
+[2026-09-20T03:24:56.389Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:56.388Z] [debug] scene: loc=monarch_waystation hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-20T03:24:56.388Z] [world] You head on to the Second Landing.
+[2026-09-20T03:24:56.387Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:56.387Z] [player] go north
+[2026-09-20T03:24:56.352Z] [debug] ui: tap "↑ ✓ SECOND LANDING"
+[2026-09-20T03:24:55.672Z] [cognitive] neutral  (31ms)
+[2026-09-20T03:24:55.625Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:55.624Z] [world] Days have gone by out there. In here it may as well be the same afternoon.
+[2026-09-20T03:24:55.624Z] [world] Monarch Court — The Shallow Digs. The deepest ground beneath the Court that anyone has bothered to map, and the family does not put it in writing. Tarpaulins, rope ladders, braziers somebody keeps lit. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. The way out is north, the way you came.
+[2026-09-20T03:24:55.622Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:55.621Z] [debug] scene: loc=monarch_waystation hub=buried_shallow_digs arrival=n opening=n passing=n
+[2026-09-20T03:24:55.621Z] [world] You head on to the Shallow Digs.
+[2026-09-20T03:24:55.620Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:55.620Z] [player] go south
+[2026-09-20T03:24:55.586Z] [debug] ui: tap "↓ ✓ SHALLOW DIGS"
+[2026-09-20T03:24:54.407Z] [cognitive] TRAVEL  (29ms)
+[2026-09-20T03:24:54.362Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:54.362Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:54.361Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:54.361Z] [world] It has been a while. Not long enough for the ground to forget you.
+[2026-09-20T03:24:54.360Z] [world] Monarch Court — Second Landing. Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it.
+[2026-09-20T03:24:54.358Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:54.358Z] [debug] scene: loc=monarch_waystation hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-20T03:24:54.358Z] [world] You head on to the Second Landing.
+[2026-09-20T03:24:54.357Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:54.352Z] [player] go north
+[2026-09-20T03:24:54.319Z] [debug] ui: tap "↑ ✓ SECOND LANDING"
+[2026-09-20T03:24:53.430Z] [debug] persist sizes(KB): total=133 player=18 wm=26[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2
+[2026-09-20T03:24:53.343Z] [reward] ✦ Climbing Rope (Common).
+[2026-09-20T03:24:53.342Z] [world] Where the Climbing Rope was, the ground is a shade darker.
+[2026-09-20T03:24:52.552Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:24:52.141Z] [cognitive] CLIMB  (59ms)
+[2026-09-20T03:24:52.080Z] [world] The rope reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-20T03:24:52.078Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rope resolved=rope range=- enemies=0 hooks=0
+[2026-09-20T03:24:52.077Z] [player] investigate rope
+[2026-09-20T03:24:50.902Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:49.843Z] [cognitive] neutral  (33ms)
+[2026-09-20T03:24:49.794Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:49.793Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:49.793Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:49.793Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:49.792Z] [world] Everything is where it was. That is either comfort or warning.
+[2026-09-20T03:24:49.792Z] [world] Monarch Court — The Shallow Digs. The deepest ground beneath the Court that anyone has bothered to map, and the family does not put it in writing. Tarpaulins, rope ladders, braziers somebody keeps lit. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. The way out is north, the way you came.
+[2026-09-20T03:24:49.789Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:49.789Z] [debug] scene: loc=monarch_waystation hub=buried_shallow_digs arrival=n opening=n passing=n
+[2026-09-20T03:24:49.788Z] [world] You head on to the Shallow Digs.
+[2026-09-20T03:24:49.787Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:49.787Z] [player] go south
+[2026-09-20T03:24:49.752Z] [debug] ui: tap "↓ ✓ SHALLOW DIGS"
+[2026-09-20T03:24:47.325Z] [cognitive] TRAVEL  (33ms)
+[2026-09-20T03:24:47.276Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:47.275Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:47.275Z] [world] It has not aged a day, which in Tartaria means nothing at all.
+[2026-09-20T03:24:47.274Z] [world] Monarch Court — Second Landing. Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it.
+[2026-09-20T03:24:47.272Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:47.272Z] [debug] scene: loc=monarch_waystation hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-20T03:24:47.272Z] [world] You head on to the Second Landing.
+[2026-09-20T03:24:47.271Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:47.270Z] [player] go north
+[2026-09-20T03:24:47.236Z] [debug] ui: tap "↑ ✓ SECOND LANDING"
+[2026-09-20T03:24:45.996Z] [cognitive] neutral  (66ms)
+[2026-09-20T03:24:45.928Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:45.928Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:45.927Z] [world] The cut reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-09-20T03:24:45.926Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cut resolved=cut range=- enemies=0 hooks=0
+[2026-09-20T03:24:45.925Z] [player] investigate cut
+[2026-09-20T03:24:44.385Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:44.007Z] [cognitive] neutral  (59ms)
+[2026-09-20T03:24:43.945Z] [world] The flame is long out, but the residue tells you what it burned and roughly when — probably the night the world ended here.
+[2026-09-20T03:24:43.944Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=brazier resolved=brazier range=- enemies=0 hooks=0
+[2026-09-20T03:24:43.943Z] [player] investigate brazier
+[2026-09-20T03:24:42.769Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:41.699Z] [reward] ✦ Compact Energy Blade (Common).
+[2026-09-20T03:24:41.699Z] [world] The Compact Energy Blade leaves a shape behind it in the mud, filling slowly.
+[2026-09-20T03:24:40.997Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-09-20T03:24:40.997Z] [reward]     • Horn-Capped Dowel (Common)
+[2026-09-20T03:24:40.997Z] [reward]     • Aether Dust (Common)
+[2026-09-20T03:24:40.997Z] [reward]     • Scrap Metal x3 (Common)
+[2026-09-20T03:24:40.996Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-20T03:24:40.996Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:24:40.996Z] [world] You salvage the tarpaulin. The take is small but real.
+[2026-09-20T03:24:40.995Z] [world] You lever something loose from the shattered engine chamber scaffolding — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-20T03:24:40.995Z] [world] You break the salt-crusted forgotten order reliquary apart. Among the pieces, something worth keeping.
+[2026-09-20T03:24:40.995Z] [world] You salvage the rusted sentinel diagnostic console. The take is small but real.
+[2026-09-20T03:24:40.994Z] [world] You salvage the broken aether-tether grapple point. The take is small but real.
+[2026-09-20T03:24:40.236Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:24:39.918Z] [cognitive] neutral  (42ms)
+[2026-09-20T03:24:39.852Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:39.851Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-09-20T03:24:39.850Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:39.849Z] [player] investigate the floor
+[2026-09-20T03:24:38.702Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:38.045Z] [cognitive] neutral  (47ms)
+[2026-09-20T03:24:37.977Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:37.977Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:37.976Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:37.975Z] [world] Monarch Court — The Shallow Digs. The deepest ground beneath the Court that anyone has bothered to map, and the family does not put it in writing. Tarpaulins, rope ladders, braziers somebody keeps lit. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. The way out is north, the way you came.
+[2026-09-20T03:24:37.974Z] [debug] spawn: gear=[Compact Energy Blade] window=10 roster=new
+[2026-09-20T03:24:37.971Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:37.971Z] [debug] scene: loc=monarch_waystation hub=buried_shallow_digs arrival=n opening=n passing=n
+[2026-09-20T03:24:37.971Z] [world] You head on to the Shallow Digs.
+[2026-09-20T03:24:37.970Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:37.969Z] [player] go south
+[2026-09-20T03:24:37.935Z] [debug] ui: tap "↓ SHALLOW DIGS"
+[2026-09-20T03:24:35.191Z] [debug] persist sizes(KB): total=133 player=18 wm=26[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=1
+[2026-09-20T03:24:35.165Z] [cognitive] TAKE_COVER  (30ms)
+[2026-09-20T03:24:35.114Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:35.114Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:35.114Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:35.113Z] [world] The wall reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-20T03:24:35.112Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wall resolved=wall range=- enemies=0 hooks=0
+[2026-09-20T03:24:35.112Z] [player] investigate wall
+[2026-09-20T03:24:33.885Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:33.325Z] [cognitive] neutral  (35ms)
+[2026-09-20T03:24:33.274Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:33.274Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-20T03:24:33.274Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T03:24:33.273Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:33.272Z] [world] The place has been waiting exactly where you left it.
+[2026-09-20T03:24:33.272Z] [world] Monarch Court — Second Landing. Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it.
+[2026-09-20T03:24:33.269Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:33.269Z] [debug] scene: loc=monarch_waystation hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-20T03:24:33.269Z] [world] You head on to the Second Landing.
+[2026-09-20T03:24:33.268Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-09-20T03:24:33.267Z] [player] go east
+[2026-09-20T03:24:33.235Z] [debug] ui: tap "→ ✓ SECOND LANDING"
+[2026-09-20T03:24:32.146Z] [reward]     • Brittle Antler Fork (Common)
+[2026-09-20T03:24:32.146Z] [reward]     • Tin Valve Housing (Common)
+[2026-09-20T03:24:32.146Z] [reward]     • Chipped Phial Neck (Common)
+[2026-09-20T03:24:32.145Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:24:32.145Z] [world] Wedged into the weathered forgotten order reliquary, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-20T03:24:32.145Z] [world] Tucked inside the tilting engine chamber scaffolding: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-20T03:24:32.144Z] [world] Wedged into the tilted library archive console, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-20T03:24:32.144Z] [world] The pump gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-20T03:24:32.144Z] [world] Tucked inside the panel: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-20T03:24:32.143Z] [world] Wedged into the conduit, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-20T03:24:32.142Z] [reward] ✦ Found Fourth Tablet — the toy — The Tunneler. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:32.134Z] [reward] ✦ Found Verse Three — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:32.124Z] [reward] ✦ Found Second Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:31.553Z] [reward] ✦ Seer's Veil of the Aether (Common).
+[2026-09-20T03:24:31.552Z] [world] One good tug and the Seer's Veil of the Aether is out.
+[2026-09-20T03:24:31.552Z] [reward] ✦ Traveler's Cloak (Common).
+[2026-09-20T03:24:31.552Z] [world] You brace a foot and the Traveler's Cloak gives.
+[2026-09-20T03:24:31.450Z] [cognitive] SEARCH · HIDE  (67ms)
+[2026-09-20T03:24:31.382Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:31.382Z] [world] You take the measure of the Traveler's Cloak. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-20T03:24:31.381Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=traveler cloak resolved=Traveler's Cloak range=- enemies=0 hooks=1
+[2026-09-20T03:24:31.381Z] [player] investigate Traveler's Cloak
+[2026-09-20T03:24:30.802Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:24:30.200Z] [cognitive] neutral  (43ms)
+[2026-09-20T03:24:30.132Z] [reward] ✦ Cloth Scrap.
+[2026-09-20T03:24:30.132Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-09-20T03:24:30.130Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=1
+[2026-09-20T03:24:30.130Z] [player] investigate the floor
+[2026-09-20T03:24:28.552Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:27.891Z] [cognitive] TRAVEL  (45ms)
+[2026-09-20T03:24:27.827Z] [world] You think back to the crate from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-20T03:24:27.827Z] [world] Paths: east to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:27.826Z] [world] Monarch Court — The Pump Room. Old Aetheric pumps churn the silt-water out from under the Court. They have run for centuries and no Monarch ever ordered it — a household that would notice the day they stopped and cannot say who keeps them running. The only corridor runs back east to the junction.
+[2026-09-20T03:24:27.825Z] [debug] spawn: gear=[Seer's Veil of the Aether, Traveler's Cloak] window=10 roster=new
+[2026-09-20T03:24:27.822Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:27.822Z] [debug] scene: loc=monarch_waystation hub=buried_pumps arrival=n opening=n passing=n
+[2026-09-20T03:24:27.822Z] [world] You head on to the Pump Room.
+[2026-09-20T03:24:27.820Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:27.820Z] [player] go west
+[2026-09-20T03:24:27.785Z] [debug] ui: tap "← PUMP ROOM"
+[2026-09-20T03:24:26.707Z] [cognitive] TRAVEL  (36ms)
+[2026-09-20T03:24:26.656Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-20T03:24:26.655Z] [world] Same silt, same lean, same everything.
+[2026-09-20T03:24:26.655Z] [world] Monarch Court — Second Landing. Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it.
+[2026-09-20T03:24:26.652Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-20T03:24:26.652Z] [debug] scene: loc=monarch_waystation hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-20T03:24:26.651Z] [world] You head on to the Second Landing.
+[2026-09-20T03:24:26.650Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-20T03:24:26.650Z] [player] go west
+[2026-09-20T03:24:26.618Z] [debug] ui: tap "← ✓ SECOND LANDING"
+[2026-09-20T03:24:25.435Z] [cognitive] CURIOSITY · SEARCH  (52ms)
+[2026-09-20T03:24:25.382Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:25.381Z] [world] You tilt the rim. A residue of something long-evaporated coats the inside — sour, organic, old.
+[2026-09-20T03:24:25.380Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=container resolved=container range=- enemies=0 hooks=0
+[2026-09-20T03:24:25.379Z] [player] investigate container
+[2026-09-20T03:24:24.152Z] [debug] ui: tap "investigate"
+[2026-09-20T03:24:22.874Z] [reward] ✦ Echoing Steps Boots (Common).
+[2026-09-20T03:24:22.874Z] [world] The Echoing Steps Boots resists, then does not.
+[2026-09-20T03:24:22.242Z] [debug] persist sizes(KB): total=131 player=16 wm=25[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2
+[2026-09-20T03:24:22.163Z] [reward]     • Bent Nail x2 (Common)
+[2026-09-20T03:24:22.163Z] [reward]     • Scrap Metal x3 (Common)
+[2026-09-20T03:24:22.163Z] [reward]     • Aether Crystal (Common)
+[2026-09-20T03:24:22.162Z] [reward]     • Worn Tartarian Coin x6 (Common)
+[2026-09-20T03:24:22.162Z] [reward] ✦ Salvage haul:
+[2026-09-20T03:24:22.162Z] [world] You crack the tilting royal vault pedestal open. A page slides out — paper somehow dry, ink somehow still legible.
+[2026-09-20T03:24:22.161Z] [world] You break the shelf down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-09-20T03:24:22.161Z] [world] You salvage the shattered maintenance tunnel ladder. The take is small but real.
+[2026-09-20T03:24:22.161Z] [world] You salvage the mud-glazed sentinel diagnostic console. The take is small but real.
+[2026-09-20T03:24:22.160Z] [world] Wedged into the lantern, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-09-20T03:24:22.160Z] [world] You break the crate apart. Among the pieces, something worth keeping.
+[2026-09-20T03:24:22.160Z] [world] You strip the cracked vault relic pedestal carefully. Something usable comes free in your hand.
+[2026-09-20T03:24:22.158Z] [reward] ✦ Found Entry 2 — the Plains — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:22.157Z] [reward] ✦ Found Entry 7 — last page — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:22.147Z] [reward] ✦ Found Mother's Note — to her son — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-09-20T03:24:21.400Z] [debug] ui: tap "take / salvage"
+[2026-09-20T03:24:21.305Z] [cognitive] neutral  (58ms)
+[2026-09-20T03:24:21.245Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T03:24:21.245Z] [world] The Echoing Steps Boots resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-20T03:24:21.244Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=echoing steps boots resolved=Echoing Steps Boots range=- enemies=0 hooks=0
+[2026-09-20T03:24:21.244Z] [player] investigate Echoing Steps Boots
+[2026-09-20T03:24:20.330Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-20T03:24:20.330Z] [debug] ⚠⚠ MEMORY WARNING #15 from the OS (0.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-20T03:24:20.300Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-20T03:24:20.300Z] [debug] ⚠⚠ MEMORY WARNING #14 from the OS (102.1s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-20T03:24:20.045Z] [cognitive] neutral  (43ms)
+
+=== END REPORT ===

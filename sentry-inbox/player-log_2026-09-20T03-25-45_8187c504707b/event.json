@@ -1,0 +1,330 @@
+{
+  "id": "8187c504707b4a989d8816fe1523d91d",
+  "groupID": "7743358653",
+  "eventID": "8187c504707b4a989d8816fe1523d91d",
+  "projectID": "4511945117532160",
+  "size": 13240,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-20-1854-one-slot-per-interaction #mu997klvo31u [inline 15/15]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-20-1854-one-slot-per-interaction",
+  "message": "player-log 2026-09-20-1854-one-slot-per-interaction #mu997klvo31u [inline 15/15]",
+  "title": "player-log 2026-09-20-1854-one-slot-per-interaction #mu997klvo31u [inline 15/15]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Boston",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-20T03:21:07Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1355563008,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 90.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 100581376,
+      "usable_memory": 3762520064,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 30.487583,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0bcc1-55c5-7907-a080-4bd7ef0e5e87"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "eb5a11c8de6e4cdca418dff9ff75fdc8",
+      "span_id": "af410e759bff37d6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjY-uNj-U1W-l0g-W3d-vcm-xkX-SBN-b25-hcm-NoI-ENv-dXJ-0IO-KAl-CBT-ZWN-vbm-QgT-GFu-ZGl-uZy-4gV-2hl-cmU-gdG-hlI-Ghv-dXN-laG-9sZ-Cdz-IHd-yaX-Qgc-3Rv-cHM-uIF-B1b-XBz-IHd-lc3-QsI-HRo-ZSB-kaX-N1c-2Vk-IGN-lbG-xhc-nMg-ZWF-zdC-wgd-Ghl-IGN-1dH-Mgc-291-dGg-sIH-RoZ-SBz-dGF-pci-BiY-WNr-IG5-vcn-RoL-iBB-IHN-lbm-VzY-2hh-bCd-zIG-5vd-Glj-ZSB-pcy-BuY-Wls-ZWQ-gdG-8gd-Ghl-IHd-hbG-wgZ-GVj-bGF-yaW-5nI-HRo-ZSB-zb3-V0a-CBj-b3J-yaW-Rvc-iBu-byB-jb2-5jZ-XJu-IG9-mIH-RoZ-SBm-YW1-pbH-ksI-GRh-dGV-kIH-RoZ-SB5-ZWF-yIH-R3b-yBy-ZXR-haW-5lc-nMg-d2V-udC-Bkb-3du-IGl-0Lg-pbM-jAy-Ni0-wOS-0yM-FQw-Mzo-yND-oyN-i42-NTJ-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-Bub-25l-IGF-jdG-l2Z-SDC-tyB-hdD-1tb-25h-cmN-oX3-dhe-XN0-YXR-pb2-4K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjY-uNj-UyW-l0g-W2R-lYn-VnX-SBz-Y2V-uZT-ogb-G9j-PW1-vbm-FyY-2hf-d2F-5c3-Rhd-Glv-biB-odW-I9Y-nVy-aWV-kX2-xhb-mRp-bmd-fdH-dvI-GFy-cml-2YW-w9b-iBv-cGV-uaW-5nP-W4g-cGF-zc2-luZ-z1u-Cls-yMD-I2L-TA5-LTI-wVD-AzO-jI0-OjI-2Lj-Y1M-Vpd-IFt-3b3-JsZ-F0g-WW9-1IG-hlY-WQg-b24-gdG-8gd-Ghl-IFN-lY2-9uZ-CBM-YW5-kaW-5nL-gpb-MjA-yNi-0wO-S0y-MFQ-wMz-oyN-Doy-Ni4-2NT-BaX-SBb-ZGV-idW-ddI-HBh-cnN-lcj-oga-W50-ZW5-0PX-RyY-XZl-bCB-jb2-5mP-TEu-MDA-gdm-VyY-j1n-byB-0YX-JnZ-XQ9-d2V-zdC-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPS-0gZ-W5l-bWl-lcz-0wI-Ghv-b2t-zPT-AKW-zIw-MjY-tMD-ktM-jBU-MDM-6Mj-Q6M-jYu-NjU-wWl-0gW-3Bs-YXl-lcl-0gZ-28g-d2V-zdA-o=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjY-uNj-E4W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CLi-hpA-g4p-yTI-FNF-Q09-ORC-BMQ-U5E-SU5-HIg-pbM-jAy-Ni0-wOS-0yM-FQw-Mzo-yND-oyN-S40-MzV-aXS-BbY-29n-bml-0aX-ZlX-SBD-VVJ-JT1-NJV-Fkg-wrc-gU0-VBU-kNI-ICA-oNT-Jtc-ykK-WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjU-uMz-gyW-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iBh-bWJ-pZW-50I-Ghl-bGQ-gKG-Fjd-Glv-biB-zZX-R0b-Glu-ZyD-igJ-QgY-XJt-ZWQ-gZm-9yI-HRo-ZSB-uZX-h0I-HF1-aWV-0IH-RpY-2sp-Cls-yMD-I2L-TA5-LTI-wVD-AzO-jI0-OjI-1Lj-M4M-Vpd-IFt-3b3-JsZ-F0g-WW9-1IH-Rpb-HQg-dGh-lIH-Jpb-S4g-QSB-yZX-NpZ-HVl-IG9-mIH-Nvb-WV0-aGl-uZy-Bsb-25n-LWV-2YX-Bvc-mF0-ZWQ-gY2-9hd-HMg-dGh-lIG-luc-2lk-ZSD-igJ-Qgc-291-ciw-gb3-JnY-W5p-Yyw-gb2-xkL-go=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjU-uMz-gwW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9Y-29u-dGF-pbm-VyI-HJl-c29-sdm-VkP-WNv-bnR-haW-5lc-iBy-YW5-nZT-0tI-GVu-ZW1-pZX-M9M-CBo-b29-rcz-0wC-lsy-MDI-2LT-A5L-TIw-VDA-zOj-I0O-jI1-LjM-3OV-pdI-Ftw-bGF-5ZX-JdI-Glu-dmV-zdG-lnY-XRl-IGN-vbn-Rha-W5l-cgp-bMj-AyN-i0w-OS0-yMF-QwM-zoy-NDo-yNC-4xN-TJa-XSB-bZG-Vid-Wdd-IHV-pOi-B0Y-XAg-Iml-udm-Vzd-Gln-YXR-lIg-pbM-jAy-Ni0-wOS-0yM-FQw-Mzo-yND-oyM-i44-NzR-aXS-Bbc-mV3-YXJ-kXS-Din-KYg-RWN-ob2-luZ-yBT-dGV-wcy-BCb-290-cyA-oQ2-9tb-W9u-KS4-K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uOD-c0W-l0g-W3d-vcm-xkX-SBU-aGU-gRW-Nob-2lu-ZyB-TdG-Vwc-yBC-b29-0cy-ByZ-XNp-c3R-zLC-B0a-GVu-IGR-vZX-Mgb-m90-Lgp-bMj-AyN-i0w-OS0-yMF-QwM-zoy-NDo-yMi-4yN-DJa-XSB-bZG-Vid-Wdd-IHB-lcn-Npc-3Qg-c2l-6ZX-MoS-0Ip-OiB-0b3-Rhb-D0x-MzE-gcG-xhe-WVy-PTE-2IH-dtP-TI1-W3J-vb2-1zP-Tgg-ZXZ-lbn-RzP-TAg-bWV-tb3-M9M-CBu-cGN-zPT-EgZ-GVm-ZWF-0ZW-Q9M-CB0-YWd-zPT-AgZ-Glz-Y29-2ZX-JlZ-D0w-XSB-sb2-c9O-Dcg-c2N-lbm-U9M-gpb-MjA-yNi-0wO-S0y-MFQ-wMz-oyN-Doy-Mi4-xNj-NaX-SBb-cmV-3YX-JkX-SAg-ICA-g4o-CiI-EJl-bnQ-gTm-Fpb-CB4-MiA-oQ2-9tb-W9u-KQp-bMj-AyN-i0w-OS0-yMF-QwM-zoy-NDo-yMi-4xN-jNa-XSB-bcm-V3Y-XJk-XSA-gIC-Ag4-oCi-IFN-jcm-FwI-E1l-dGF-sIH-gzI-ChD-b21-tb2-4pC-g==",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-YzW-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBB-ZXR-oZX-IgQ-3J5-c3R-hbC-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0yM-FQw-Mzo-yND-oyM-i4x-NjJ-aXS-Bbc-mV3-YXJ-kXS-AgI-CAg-4oC-iIF-dvc-m4g-VGF-ydG-Fya-WFu-IEN-vaW-4ge-DYg-KEN-vbW-1vb-ikK-WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-YyW-l0g-W3J-ld2-FyZ-F0g-4py-mIF-Nhb-HZh-Z2U-gaG-F1b-DoK-WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-YyW-l0g-W3d-vcm-xkX-SBZ-b3U-gY3-JhY-2sg-dGh-lIH-Rpb-HRp-bmc-gcm-95Y-Wwg-dmF-1bH-Qgc-GVk-ZXN-0YW-wgb-3Bl-bi4-gQS-BwY-Wdl-IHN-saW-Rlc-yBv-dXQ-g4o-CUI-HBh-cGV-yIH-Nvb-WVo-b3c-gZH-J5L-CBp-bms-gc2-9tZ-Whv-dyB-zdG-lsb-CBs-ZWd-pYm-xlL-go=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-YxW-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-JlY-Wsg-dGh-lIH-NoZ-Wxm-IGR-vd2-4uI-EFt-b25-nIH-RoZ-SBw-aWV-jZX-MsI-GEg-ZnJ-hZ2-1lb-nQg-b2Y-gc2-9tZ-W9u-ZSd-zIH-dya-XRp-bmc-g4o-CUI-Ghl-bGQ-gYW-dha-W5z-dCB-0aG-Ugd-29y-bGQ-gYn-kgc-3R1-YmJ-vcm-5uZ-XNz-IGF-sb2-5lL-gpb-MjA-yNi-0wO-S0y-MFQ-wMz-oyN-Doy-Mi4-xNj-FaX-SBb-d29-ybG-RdI-Flv-dSB-zYW-x2Y-Wdl-IHR-oZS-Bza-GF0-dGV-yZW-Qgb-WFp-bnR-lbm-FuY-2Ug-dHV-ubm-VsI-Gxh-ZGR-lci-4gV-Ghl-IHR-ha2-Uga-XMg-c21-hbG-wgY-nV0-IHJ-lYW-wuC-lsy-MDI-2LT-A5L-TIw-VDA-zOj-I0O-jIy-LjE-2MV-pdI-Ft3-b3J-sZF-0gW-W91-IHN-hbH-ZhZ-2Ug-dGh-lIG-11Z-C1n-bGF-6ZW-Qgc-2Vu-dGl-uZW-wgZ-Glh-Z25-vc3-RpY-yBj-b25-zb2-xlL-iBU-aGU-gdG-FrZ-SBp-cyB-zbW-Fsb-CBi-dXQ-gcm-Vhb-C4K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-YwW-l0g-W3d-vcm-xkX-SBX-ZWR-nZW-Qga-W50-byB-0aG-Ugb-GFu-dGV-ybi-wga-GFs-Zi1-oaW-RkZ-W4g-Ynk-gdG-hlI-GR1-c3Q-6IG-Egc-2Vh-bGV-kIG-xld-HRl-ci4-gWW-91I-HBv-Y2t-ldC-Bpd-CBj-YXJ-lZn-Vsb-Hku-Cls-yMD-I2L-TA5-LTI-wVD-AzO-jI0-OjI-yLj-E2M-Fpd-IFt-3b3-JsZ-F0g-WW9-1IG-JyZ-WFr-IHR-oZS-Bjc-mF0-ZSB-hcG-Fyd-C4g-QW1-vbm-cgd-Ghl-IHB-pZW-Nlc-ywg-c29-tZX-Roa-W5n-IHd-vcn-RoI-Gtl-ZXB-pbm-cuC-lsy-MDI-2LT-A5L-TIw-VDA-zOj-I0O-jIy-LjE-2MF-pdI-Ft3-b3J-sZF-0gW-W91-IHN-0cm-lwI-HRo-ZSB-jcm-Fja-2Vk-IHZ-hdW-x0I-HJl-bGl-jIH-BlZ-GVz-dGF-sIG-Nhc-mVm-dWx-seS-4gU-29t-ZXR-oaW-5nI-HVz-YWJ-sZS-Bjb-21l-cyB-mcm-VlI-Glu-IHl-vdX-Iga-GFu-ZC4-K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjI-uMT-U4W-l0g-W3J-ld2-FyZ-F0g-4py-mIE-Zvd-W5k-IEV-udH-J5I-DIg-4oC-UIH-RoZ-SBQ-bGF-pbn-Mg4-oCU-IFR-oZS-BHc-mVl-ZHk-gUm-Vjb-GFp-bWV-yLi-Aob-3Bl-biB-Db2-50c-mFj-dHM-g4o-aSI-ENv-bGx-lY3-RpY-mxl-cyB-0by-ByZ-WFk-KQp-bMj-AyN-i0w-OS0-yMF-QwM-zoy-NDo-yMi-4xN-Tda-XSB-bcm-V3Y-XJk-XSD-inK-YgR-m91-bmQ-gRW-50c-nkg-NyD-igJ-Qgb-GFz-dCB-wYW-dlI-OKA-lCB-UaG-UgR-3Jl-ZWR-5IF-JlY-2xh-aW1-lci-4gK-G9w-ZW4-gQ2-9ud-HJh-Y3R-zIO-KGk-iBD-b2x-sZW-N0a-WJs-ZXM-gdG-8gc-mVh-ZCk-KWz-IwM-jYt-MDk-tMj-BUM-DM6-MjQ-6Mj-IuM-TQ3-Wl0-gW3-Jld-2Fy-ZF0-g4p-ymI-EZv-dW5-kIE-1vd-Ghl-cid-zIE-5vd-GUg-4oC-UIH-RvI-Ghl-ciB-zb2-4g4-oCU-IFR-oZS-BGY-W1p-bHk-gaW-4gd-Ghl-IE1-1ZC-4gK-G9w-ZW4-gQ2-9ud-HJh-Y3R-zIO-KGk-iBD-b2x-sZW-N0a-WJs-ZXM-gdG-8gc-mVh-ZCk-K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjE-uND-AwW-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJ0-YWt-lIC-8gc-2Fs-dmF-nZS-IKW-zIw-MjY-tMD-ktM-jBU-MDM-6Mj-Q6M-jEu-MzA-1Wl-0gW-2Nv-Z25-pdG-l2Z-V0g-bmV-1dH-Jhb-CAg-KDU-4bX-MpC-lsy-MDI-2LT-A5L-TIw-VDA-zOj-I0O-jIx-LjI-0NV-pdI-Ftk-ZWJ-1Z1-0gY-XJi-aXR-lcj-ogY-W1i-aWV-udC-BoZ-Wxk-ICh-hY3-Rpb-24g-c2V-0dG-xpb-mcg-4oC-UIG-Fyb-WVk-IGZ-vci-B0a-GUg-bmV-4dC-Bxd-Wll-dCB-0aW-NrK-Qpb-MjA-yNi-0wO-S0y-MFQ-wMz-oyN-Doy-MS4-yND-VaX-SBb-d29-ybG-RdI-FRo-ZSB-FY2-hva-W5n-IFN-0ZX-BzI-EJv-b3R-zIH-Jlc-2lz-dHM-geW-91c-iBy-ZWF-kaW-5nL-iBO-b3Q-gaG-9zd-Gls-ZSD-igJ-Qga-nVz-dCB-jbG-9zZ-WQu-IFN-vbW-Ugd-Ghp-bmd-zIG-luI-HRo-ZSB-idX-JpZ-WQg-d29-ybG-QgZ-G9u-J3Q-gb3-Blb-iBm-b3I-gdG-hlI-GN1-cml-vdX-MuC-g==",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjE-uMj-Q0W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9Z-WNo-b2l-uZy-Bzd-GVw-cyB-ib2-90c-yBy-ZXN-vbH-ZlZ-D1F-Y2h-vaW-5nI-FN0-ZXB-zIE-Jvb-3Rz-IHJ-hbm-dlP-S0g-ZW5-lbW-llc-z0w-IGh-vb2-tzP-TAK-WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjE-uMj-Q0W-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gRW-Nob-2lu-ZyB-TdG-Vwc-yBC-b29-0cw-o=",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjA-uMz-MwW-l0g-W2R-lYn-VnX-SBt-ZW1-vcn-k6I-E5P-VEh-JTk-cgV-E8g-UkV-MRU-FTR-SDi-gJQ-gbm-8gb-W9k-ZWw-gd2-FzI-Gxv-YWR-lZC-Aoc-Xdl-bj0-naW-RsZ-Scp-LCB-zby-B0a-Glz-IGZ-yZW-VkI-DAg-Ynl-0ZX-MuI-FRo-ZSB-wcm-Vzc-3Vy-ZSB-pcy-Bjb-21p-bmc-gZn-Jvb-SBz-b21-ldG-hpb-mcg-ZWx-zZS-4KW-zIw-MjY-tMD-ktM-jBU-MDM-6Mj-Q6M-jAu-MzM-wWl-0gW-2Rl-YnV-nXS-Dim-qDi-mqA-gTU-VNT-1JZ-IFd-BUk-5JT-kcg-IzE-1IG-Zyb-20g-dGh-lIE-9TI-Cgw-LjB-zIH-Npb-mNl-IHR-oZS-BsY-XN0-IG9-uZS-kg4-oCU-IGF-wcD-1hY-3Rp-dmU-gwr-cgc-Xdl-bj0-naW-RsZ-Scg-wrc-gdm-9pY-2U9-J3J-lYW-R5J-yDC-tyB-yZW-xvY-WRz-PTA-gwr-cgc-2F2-ZT0-xMz-BLQ-i4g-VGh-lIH-N5c-3Rl-bSB-pcy-Bhc-2tp-bmc-gZm-9yI-G1l-bW9-yeS-BiY-WNr-OyB-hIG-ZyZ-WV6-ZSB-vci-BhI-Gtp-bGw-gY2-FuI-GZv-bGx-vdy-4K",
+      "WzI-wMj-YtM-Dkt-MjB-UMD-M6M-jQ6-MjA-uMz-AwW-l0g-W2R-lYn-VnX-SBt-ZW1-vcn-k6I-E5P-VEh-JTk-cgV-E8g-UkV-MRU-FTR-SDi-gJQ-gbm-8gb-W9k-ZWw-gd2-FzI-Gxv-YWR-lZC-Aoc-Xdl-bj0-naW-RsZ-Scp-LCB-zby-B0a-Glz-IGZ-yZW-VkI-DAg-Ynl-0ZX-MuI-FRo-ZSB-wcm-Vzc-3Vy-ZSB-pcy-Bjb-21p-bmc-gZn-Jvb-SBz-b21-ldG-hpb-mcg-ZWx-zZS-4KW-zIw-MjY-tMD-ktM-jBU-MDM-6Mj-Q6M-jAu-MzA-wWl-0gW-2Rl-YnV-nXS-Dim-qDi-mqA-gTU-VNT-1JZ-IFd-BUk-5JT-kcg-IzE-0IG-Zyb-20g-dGh-lIE-9TI-Cgx-MDI-uMX-Mgc-2lu-Y2U-gdG-hlI-Gxh-c3Q-gb2-5lK-SDi-gJQ-gYX-BwP-WFj-dGl-2ZS-DCt-yBx-d2V-uPS-dpZ-Gxl-JyD-Cty-B2b-2lj-ZT0-ncm-VhZ-Hkn-IMK-3IH-Jlb-G9h-ZHM-9MC-DCt-yBz-YXZ-lPT-EzM-EtC-LiB-UaG-Ugc-3lz-dGV-tIG-lzI-GFz-a2l-uZy-Bmb-3Ig-bWV-tb3-J5I-GJh-Y2s-7IG-EgZ-nJl-ZXp-lIG-9yI-GEg-a2l-sbC-BjY-W4g-Zm9-sbG-93L-g==",
+      "Cls-yMD-I2L-TA5-LTI-wVD-AzO-jI0-OjI-wLj-A0N-Vpd-IFt-jb2-dua-XRp-dmV-dIG-5ld-XRy-YWw-gIC-g0M-21z-KQo-KPT-09I-EVO-RCB-SRV-BPU-lQg-PT0-9"
+    ],
+    "chunkChars": 4824,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-20-1854-one-slot-per-interaction #mu997klvo31u [inline 15/15]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mu997klvo31u"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-20-1854-one-slot-per-interaction"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "15"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-20-1854-one-slot-per-interaction"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-20T03:25:49.148384Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-20T03:25:45.660000Z",
+  "fingerprints": [
+    "fc57ce9cbae26bc2f56c1bf4248560e4"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1982062143,
+    "commitCount": 5,
+    "data": {},
+    "dateCreated": "2026-09-20T02:49:07.390123Z",
+    "dateReleased": "2026-09-20T02:59:47.208317Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "df1472b39a60123c9996b58c01293345fdf20288",
+      "message": "OTA-1854 fixup \u2014 the new suite stops spending ota1484's fixture ratchet\n\nCI run 2234 shard 4/4 was RED on ota1484APinStatesAClaim: \"bare\ncurrentLocationId fixtures may only shrink\", expected <= 54, received 55. The\n55th was mine \u2014 \u00a7D's `state()` helper fed `onStoreChange` a store shape with a\nbare `currentLocationId` and no `placedAt`.\n\nMY LOCAL VALIDATION MISSED IT, AND THE REASON MATTERS. I chose the suites to\nrun by the IMPORT GRAPH of the changed modules. ota1484's ratchet does not\nimport anything \u2014 it walks the whole __tests__ directory and reads bytes. Any\nNEW test file is in its scope no matter what it imports, so an import-graph\nselection can never see it. The fast surface is now run in full below.\n\nTHE FIX SPENDS NO RATCHET. \u00a7D's job is \"did OTA-1853's voice survive OTA-1854's\ncut\", and the artwork and audio marks answer it through the SAME\nannotateMemory door while taking a plain string id \u2014 no store shape, no bare\nfixture, no permanent project-wide allowance spent. Rooms keep their coverage\nwhere it belongs, in ota1853TheRoomBoundarySpeaks \u00a7G, which owns that claim.\nD1 now also pins the code (memCodeForId of the asset key), which the previous\nversion did not.\n\nRe-baselining 54 -> 55 was the alternative and was rejected: the ratchet is a\nshrink-only anti-growth guard, and buying a slot to re-prove a claim another\nsuite already holds is a poor trade.\n\nNo production file changed in this commit.\n\nValidation on this tree: FULL FAST SURFACE 1349/1349 suites, 15,376 passed,\n3 skipped, 0 failed. 22/22 local gates, typecheck source + test ratchet, full\nlint. No Heavy CI.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-20T02:42:45Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-20-1854-one-slot-per-interaction",
+          "shortVersion": "tartaria@4.32.11+2026-09-20-1854-one-slot-per-interaction",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-20T02:59:47.208317Z",
+          "dateCreated": "2026-09-20T02:49:07.390123Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160114946",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-20T02:59:47.586384Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-20-1854-one-slot-per-interaction",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-20-1854-one-slot-per-interaction",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-20-1854-one-slot-per-interaction",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-20-1854-one-slot-per-interaction)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "83fb0a0834d94791a943680c7d8d7e59",
+  "previousEventID": "784ac0fdc69a4d4b8dfe634f825b65a9"
+}
