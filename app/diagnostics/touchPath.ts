@@ -49,7 +49,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // borrowing it here cannot disturb tapClock's own slot or its `⏱+Nms` suffix.
 import { touchLateMs } from './tapClock';
 // ⚠ BUILD 190 — correlation only. A safe no-op wherever the native recorder is
-// absent, and it cannot throw; see the BUILD190_STAGE_KIND note below `noteStage`.
+// absent, and it cannot throw; see the NATIVE_STAGE_KIND note below `noteStage`
+// for WHICH stage reaches the native ring, and why OTA-1854 cut it to one.
 import { MEM_KIND, annotateMemory } from './nativeMemoryRecorder';
 
 /** Bump when the entry shape changes; a reader that does not know the version
@@ -365,37 +366,59 @@ export function noteStage(
 }
 
 /**
- * ⚠⚠⚠ BUILD 190 — THE FOUR CORNERS, AND THE FOUR THAT ARE DELIBERATELY ABSENT.
+ * ⚠⚠⚠ OTA-1854 — ONE NATIVE SLOT PER INTERACTION. THE OTHER THREE CORNERS KEEP
+ * EVERY BYTE OF THEIR DETAIL, IN THE JS TRACE, WHERE A HUMAN READS THEM ANYWAY.
  *
- * The native memory recorder correlates against T0 / T2 / T4 / T5 ONLY. This
- * chain has eight stages, and annotating all of them would put an event in a
- * 64-slot ring for every finger movement, evicting the rare annotations — a
- * context init, a memory warning — that the ring exists to hold. It would also
- * bury the signal: four events per tap is a trace a human can read, eight is a
- * log.
+ * BUILD 190 annotated four corners — root / enter / dispatch / done — on the
+ * reasoning that four events per tap is a trace a human can read. THE FIRST
+ * HARDWARE CAPTURE SAID OTHERWISE. OTA-1853's report printed `events 1685`
+ * against a 64-slot native ring: a ~26× overrun in which eight of nine dated
+ * retained footprint steps each printed "(no annotated events inside this
+ * step)". The join is not broken. It is STARVED, and the touch trace is what
+ * eats it.
  *
- * These four are the load-bearing corners of one interaction:
- *     root      the touch arrived at all
- *     enter     JS ran the control's code
- *     dispatch  the admitted operation went out
- *     done      the authoritative sync part returned
- * A footprint step between any adjacent pair localises the cost to ONE span,
- * which is the entire point of correlating.
+ * ⚠⚠ AND THE FOUR CORNERS WERE NEVER FOUR. `root` is emitted from the app
+ * root's capture on EVERY finger-down, including the browsing taps on the
+ * transcript that reach no control at all; `dispatch` is emitted TWICE by the
+ * deferred submit (armed, then fired). An ordinary interaction cost four to six
+ * slots, and a scroll cost one for nothing.
  *
- * `modal`, `in`, `admit` and `reject` are NOT annotated, and that is a choice
- * rather than an oversight: each refines a corner already covered, and none can
- * carry a memory cost the corners either side of it do not already bracket.
+ * ⚠⚠⚠ WHY `done` IS THE CORNER THAT STAYS NATIVE:
+ *   · it proves the operation BEGAN. Nothing returns that was never
+ *     dispatched, and the JS trace names the dispatch it returned from;
+ *   · it is written by the AUTHORITATIVE handler, on the line after the
+ *     dispatch it completes, carrying that same control and operation kind;
+ *   · it is the ONLY corner that proves synchronous completion. `root`,
+ *     `enter` and `dispatch` all stand in front of the work;
+ *   · its timestamp is the one a footprint cares about. At `dispatch` nothing
+ *     has been allocated yet; at `done` the synchronous allocation has
+ *     happened, and what the following samples hold is what was RETAINED —
+ *     which is the only question the ratchet detector asks;
+ *   · `code` is unchanged. It is still the interaction id, so the native event
+ *     still joins to the whole eight-stage story of that one tap in the
+ *     touch-path block of the same report.
  *
- * ⚠ A TABLE RATHER THAN A SWITCH, so a stage added to this chain in future is
- * silently NOT annotated. That is the safe default: a new stage that deserves
- * correlation has to be added here deliberately.
+ * ⚠ THE JS CHAIN IS UNTOUCHED. All eight stages are still appended, with their
+ * control, reason, presentation token, screen, AppState, delay and orphan flag.
+ * This table decides what reaches the NATIVE ring and nothing else.
+ *
+ * ⚠ A TABLE RATHER THAN A SWITCH, as before, so a stage added to this chain in
+ * future is silently NOT annotated. That is the safe default: a new stage that
+ * deserves a native slot has to be added here deliberately.
  */
-const BUILD190_STAGE_KIND: Partial<Record<TouchStage, number>> = {
-  root: MEM_KIND.T0_ROOT_TOUCH,
-  enter: MEM_KIND.T2_HANDLER_ENTER,
-  dispatch: MEM_KIND.T4_DISPATCH,
+const NATIVE_STAGE_KIND: Partial<Record<TouchStage, number>> = {
   done: MEM_KIND.T5_DONE,
 };
+
+/** ⚠⚠ ONE SLOT PER INTERACTION — AND `done` IS NOT ONCE PER INTERACTION. A
+ *  report send writes `done` TWICE for one id: the composer's hand-off, then
+ *  the resolution from AboutScreen seconds later, with any number of other taps
+ *  in between. So the guard is a small ring of ids already spent rather than a
+ *  single slot. Bounded, fixed cost, and generous next to `TOUCH_PENDING_MAX`
+ *  fingers — an id evicted from here can at worst spend a second slot, which is
+ *  the old behaviour, never a wrong one. */
+export const NATIVE_ANNOTATED_MAX = 8;
+let nativeAnnotated: number[] = [];
 
 function append(partial: { i: number; st: TouchStage; c?: string; r?: string; d?: number; o?: true }): void {
   // ⚠ FIRST, AND IN ITS OWN TRY. It must never be able to stop a stage being
@@ -404,10 +427,14 @@ function append(partial: { i: number; st: TouchStage; c?: string; r?: string; d?
   // work on this thread, which matters because this thread is usually the JS
   // thread mid-gesture.
   try {
-    const kind = BUILD190_STAGE_KIND[partial.st];
+    const kind = NATIVE_STAGE_KIND[partial.st];
     // `code` carries the interaction id, so a memory event can be tied back to
     // the exact tap in the touch-path block of the same report.
-    if (kind !== undefined) annotateMemory(kind, partial.i & 0xffff);
+    if (kind !== undefined && !nativeAnnotated.includes(partial.i)) {
+      nativeAnnotated.push(partial.i);
+      if (nativeAnnotated.length > NATIVE_ANNOTATED_MAX) nativeAnnotated.shift();
+      annotateMemory(kind, partial.i & 0xffff);
+    }
   } catch { /* an instrument never breaks another instrument */ }
   try {
     const e: TouchPathEntry = {
@@ -521,6 +548,7 @@ export function touchPathLines(entries: readonly TouchPathEntry[]): string[] {
 export function _resetTouchPathForTest(): void {
   ring = [];
   pending = [];
+  nativeAnnotated = [];
   heldPressIn = null;
   lastEntered = null;
   priorBoot = null;

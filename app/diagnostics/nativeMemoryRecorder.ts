@@ -47,12 +47,18 @@ import { requireOptionalNativeModule } from 'expo-modules-core';
  * table stays well below that and never collides.
  */
 export const MEM_KIND = {
-  // ── Correlation. ⚠ FOUR STAGES ONLY, DELIBERATELY.
-  // touchPath already records the full eight-stage chain; annotating all of it
-  // here would put an event in the ring for every finger movement and evict the
-  // rare ones that matter. These four are the load-bearing corners: the touch
-  // arrived, JS ran the handler, the operation went out, the operation returned.
-  // A footprint step between any adjacent pair localises the cost to one span.
+  // ── Correlation. ⚠⚠ ONE STAGE IS EMITTED TODAY — T5_DONE. OTA-1854.
+  // Build 190 emitted four corners, reasoning that four events per tap was a
+  // trace a human could read. Hardware disagreed: OTA-1853's first capture
+  // printed `events 1685` against a 64-slot ring, and eight of nine dated
+  // retained footprint steps carried no annotation at all. `done` is the corner
+  // that stayed, because it is the only one that proves the work COMPLETED and
+  // the only one whose timestamp sits where retention becomes measurable. See
+  // NATIVE_STAGE_KIND in diagnostics/touchPath.ts, which is the authority.
+  //
+  // ⚠ ALL FOUR NUMBERS STAY IN THIS TABLE, and that is not an oversight. The
+  // decode vocabulary must still read a capture taken from a Build 190 device;
+  // deleting a kind would turn its events into `kind:10` in an old report.
   T0_ROOT_TOUCH: 10,
   T2_HANDLER_ENTER: 12,
   T4_DISPATCH: 14,

@@ -900,20 +900,28 @@ describe('§8 the instrument is wired where it claims to be', () => {
     expect(src).toMatch(/primeTicks % 12 === 0/);
   });
 
-  it('8.4 correlates the four touch corners and no others', () => {
-    // ⚠ Eight stages annotated would evict the rare events the 64-slot ring
-    // exists to hold. A table rather than a switch, so a NEW stage is silently
-    // not annotated — the safe default.
+  it('8.4 correlates ONE touch corner and no others', () => {
+    // ⚠⚠ AMENDED BY OTA-1854, AND THE AMENDMENT IS THE FINDING. This pin used
+    // to state "the four corners", on Build 190's reasoning that four events
+    // per tap is a trace a human can read. The first hardware capture measured
+    // 1685 events against a 64-slot ring, and eight of nine dated retained
+    // footprint steps carried no annotation at all. Four corners is not a
+    // budget this ring has. `done` — the only corner that proves the work
+    // COMPLETED, and the one whose timestamp sits where retention becomes
+    // measurable — keeps the slot; the other three keep the JS trace, which is
+    // where their detail always was.
+    //
+    // ⚠ Still a table rather than a switch, so a NEW stage is silently not
+    // annotated — the safe default.
     const src = app('diagnostics/touchPath.ts');
     const table = src.slice(
-      src.indexOf('const BUILD190_STAGE_KIND'),
+      src.indexOf('const NATIVE_STAGE_KIND'),
       src.indexOf('function append('),
     );
-    expect(table).toContain('root: MEM_KIND.T0_ROOT_TOUCH');
-    expect(table).toContain('enter: MEM_KIND.T2_HANDLER_ENTER');
-    expect(table).toContain('dispatch: MEM_KIND.T4_DISPATCH');
     expect(table).toContain('done: MEM_KIND.T5_DONE');
-    for (const notCorrelated of ['modal:', 'in:', 'admit:', 'reject:']) {
+    for (const notCorrelated of [
+      'root:', 'modal:', 'in:', 'enter:', 'admit:', 'reject:', 'dispatch:',
+    ]) {
       expect(table).not.toContain(notCorrelated);
     }
   });

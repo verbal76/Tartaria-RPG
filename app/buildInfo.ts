@@ -30985,7 +30985,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * navigates or reschedules anything. gameStore.ts is not touched — it stands at
  * exactly its 36815-line ceiling, so the room boundary is observed from outside
  * the store rather than spending a permanent allowance on a temporary probe. */
-export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';
+/* ⚠⚠⚠ OTA-1854 — ONE SLOT PER INTERACTION. THE MICROSCOPE STOPS FOGGING ITSELF.
+ *
+ * OTA-1853's instrument reached Apple hardware and WORKED: the first capture
+ * printed `Samples (last 512 of 512)` and nine dated RETAINED footprint steps in
+ * the new vocabulary, with rooms, scenes and rosters firing on step 9. It also
+ * printed `events 1685` against a native memory-event ring that holds 64 — a
+ * ~26× overrun — so eight of those nine steps came back "(no annotated events
+ * inside this step)". The join was never broken. It was STARVED.
+ *
+ * Codex's bounded audit at 1126ae79 named the eater: every OTA-1853 mark is
+ * transition-gated and emits nothing on an unchanged publication, while the
+ * Build 190 touch trace puts FOUR corners of every tap into the ring — and the
+ * four were never four. `root` fires from the app root's capture on EVERY
+ * finger-down, including the browsing taps OTA-1818 measured in healthy play,
+ * and the deferred submit writes `dispatch` twice. An ordinary interaction cost
+ * four to six of the sixty-four slots; a scroll cost one to say nothing.
+ *
+ * ⚠⚠ `done` KEEPS THE SLOT, and it is the only corner that could. It is the one
+ * that proves the work COMPLETED rather than merely started, it is written by
+ * the authoritative handler on the line after the dispatch it completes, and
+ * its timestamp sits where retention becomes measurable — at `dispatch` nothing
+ * has been allocated yet. `code` is unchanged, still the interaction id, so the
+ * surviving event still joins to that tap's whole eight-stage story.
+ *
+ * ⚠ THE JS TOUCH TRACE IS UNTOUCHED — all eight stages, every control name,
+ * operation kind, presentation token, screen, AppState, delay and orphan flag.
+ * This changes WHAT REACHES THE NATIVE RING and nothing else: no gameplay, no
+ * handler, no dispatch, no touch semantics, no OTA-1853 subsystem mark, no
+ * HERMES_HEAP, and no native ring capacity. Three production lines of logic. */
+export const OTA_BUILD_ID = '2026-09-20-1854-one-slot-per-interaction';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1853-the-ring-learns-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1851-one-press-language';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1850-gems-belong-to-the-character';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-19-1849-lore-and-fallen-share-the-row';
