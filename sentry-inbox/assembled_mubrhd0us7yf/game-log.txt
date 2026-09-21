@@ -1,0 +1,717 @@
+Bug Report — Permannu · (2026-09-21-1862-the-beat-keeps-its-way-out) · Froze after gaurdiannfight
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-21T21:32:47.789Z
+Character: Permannu
+Slot ID: slot_mu9z9l9q_ip9bpv
+Race: Tartarian Giants
+Location: Iskan-Veil
+HP: 5/56
+
+--- DESCRIPTION ---
+Froze after gaurdiannfight
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-21T21:32:47.737Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-21-1862-the-beat-keeps-its-way-out)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-21T21:32:01.797Z
+  Last init success: 2026-09-21T21:32:06.394Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmubrgcssg5 · started 2026-09-21T21:32:00.844Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 4 recorded (newest last)
+  ⚠⚠ 2 of 4 process kills landed on an OTA-apply boot
+  • 2026-09-19T20:02:55.215Z (2970m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room outpost_quarters · screen exploration
+      last checkpoint: rendered · 31ms into the action · alive 787ms after it
+      launch: died 27074407ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r1/l0/p1/dn0
+  • 2026-09-19T20:45:42.388Z (2927m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-20T01:42:10.103Z (2631m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1853-the-ring-learns-who · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet) — begun 4m before the last sign of life; treat the action label as stale, not as the killer
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: appstate:inactive→background · 262490ms into the action · alive 0ms after it
+      launch: died 803123ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 147ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o2/r2/l0/p1/dn0
+  • 2026-09-21T21:31:59.422Z (1m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "roll"
+      doing: tap "roll" · room iskan_veil · screen exploration
+      last checkpoint: appstate:inactive→background · 28194ms into the action · alive 0ms after it
+      launch: died 196203ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o3/r3/l0/p1/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: tap "roll"
+     Where: iskan_veil on exploration screen
+     Last seen alive: 2026-09-21T21:31:59.422Z (1 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:inactive→background (+28194ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 3.2s (cognition) · 1 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/8 · ctx 0 · app=active · native voice running q1 · warns 0
+Native memory flight recorder (Build 190)
+  Present but not yet read this session — no snapshot has been primed.
+  ⚠ NOT a reading of zero.
+Touch path
+  prior boot:
+  2026-09-21T21:31:22.947Z #60 root p=none exploration
+  2026-09-21T21:31:22.947Z #60 content controls p=none exploration
+  2026-09-21T21:31:26.031Z #61 root p=none exploration
+  2026-09-21T21:31:26.031Z #61 content controls p=none exploration
+  2026-09-21T21:31:26.032Z #61 in quick:dodge p=none exploration
+  2026-09-21T21:31:26.144Z #61 enter quick:dodge p=none exploration
+  2026-09-21T21:31:26.145Z #61 admit quick:dodge (callback) p=none exploration
+  2026-09-21T21:31:26.145Z #61 dispatch quick:dodge (callback) p=none exploration
+  2026-09-21T21:31:26.191Z #61 done quick:dodge (callback) p=none exploration
+  2026-09-21T21:31:26.847Z #62 root p=none exploration
+  2026-09-21T21:31:26.848Z #62 content controls p=none exploration
+  2026-09-21T21:31:26.848Z #62 in quick:golem greatsword ⚔ p=none exploration
+  2026-09-21T21:31:26.961Z #62 enter quick:golem greatsword ⚔ p=none exploration
+  2026-09-21T21:31:26.962Z #62 admit quick:golem greatsword ⚔ (callback) p=none exploration
+  2026-09-21T21:31:26.962Z #62 dispatch quick:golem greatsword ⚔ (callback) p=none exploration
+  2026-09-21T21:31:27.038Z #62 done quick:golem greatsword ⚔ (callback) p=none exploration
+  2026-09-21T21:31:28.230Z #63 root p=none exploration
+  2026-09-21T21:31:28.230Z #63 content controls p=none exploration
+  2026-09-21T21:31:29.646Z #64 root p=none exploration
+  2026-09-21T21:31:29.647Z #64 content controls p=none exploration
+  2026-09-21T21:31:31.080Z #65 root p=none exploration
+  2026-09-21T21:31:31.081Z #65 content controls p=none exploration
+  2026-09-21T21:31:32.173Z #0 pres chapter:cores (mount:native) p=none exploration
+  2026-09-21T21:31:34.061Z #66 root p=none exploration
+  this boot:
+  2026-09-21T21:32:25.165Z #1 root p=none exploration
+  2026-09-21T21:32:26.562Z #2 root p=none exploration
+  2026-09-21T21:32:28.247Z #3 root p=none exploration
+  2026-09-21T21:32:30.281Z #4 root p=none exploration
+  2026-09-21T21:32:31.997Z #5 root p=none exploration
+  2026-09-21T21:32:31.999Z #6 modal p=none exploration
+  2026-09-21T21:32:33.536Z #7 root p=none exploration
+  2026-09-21T21:32:33.536Z #8 modal p=none exploration
+  2026-09-21T21:32:47.598Z #9 root p=none exploration
+  2026-09-21T21:32:47.598Z #10 modal p=none exploration
+  2026-09-21T21:32:47.599Z #10 in report:send p=none exploration
+  2026-09-21T21:32:47.737Z #10 enter report:send p=none exploration
+  2026-09-21T21:32:47.737Z #10 admit report:send (described) p=none exploration
+  2026-09-21T21:32:47.737Z #10 dispatch report:send (described) p=none exploration
+  2026-09-21T21:32:47.737Z #10 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Permannu)
+  HP: 5/56  Stamina: 10/16  TC: 112  Corruption: 7
+  Pack: 68 distinct rows / 170 total
+
+Weapons (18)
+  Aetheric Pike (1d8 aetheric, dur 28/28, [weapon,melee,two_handed,spear,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Shortsword (1d6 slashing, dur 25/25, [weapon,melee,single_handed,blade,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Sling (1d4 bludgeoning, dur 27/27, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Splitter Axe (1d8 slashing, dur 26/26, [weapon,melee,two_handed,axe,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Energy Blade (1d6 burn, dur 29/29, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Greatsword (2d6 slashing, dur 18/26, equipped:main, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:off, unequip:main, use(off), repair
+  Cudgel (1d8 bludgeoning, dur 13/13, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 23/25, equipped:off, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, unequip:off, use, repair
+  Mud Grinder Axe (1d8 slashing, dur 16/16, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 31/31, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Harpoon (1d8 piercing, dur 32/32, [weapon,melee,two_handed,spear,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shortsword (1d6 slashing, dur 23/23, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 28/28, [weapon,starter,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 42/42, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 33/33, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pocket Knife (1d4 slashing, dur 14/15, [weapon,starter,knife,tool,melee])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Salvaged Bow (1d6 piercing, dur 17/17, [weapon,ranged,bow,stealth])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Veilkeeper Blades (Legendary, dur 55/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (12)
+  Aether-Walker's Cape (dur 22/24, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, repair, drop
+  Aetheric Strider Boots (dur 32/32, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Aetheric Boots (dur 30/30, AC +1 · INT +1, [armor,feet,boots,architectural_sentinels])
+    actions: equip:feet, use, scrap, drop
+  Echoing Steps Boots (dur 27/29, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet, repair
+  Echoing Steps Boots (dur 12/12, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 25/28, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest, repair
+  Reclaimer's Salvage Cap (dur 31/32, AC +1 · INV +1, [armor,head,cloth,helmet,reclaimers])
+    actions: equip:head, use, scrap, repair, drop
+  Seer's Veil of the Aether (dur 10/10, equipped:head, AC +2 · Resists: aetheric · WIS +2, [armor,head,mask,face,aetherborn])
+    actions: unequip:head
+  Sentinel's Gauntlets (dur 14/17, AC +2 · HP +5 · STR +2, [armor,hands,gauntlets,architectural_sentinels])
+    actions: equip:hands, use, scrap, repair, drop
+  Traveler's Cloak (dur 29/29, AC +1 · STE +1 · STE +1, [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Wanderer's Face of Shadows (dur 30/30, AC +1 · STE +1, [armor,head,mask,face,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (1)
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (3)
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Rope (dur 300/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, drop
+
+Materials (31)
+  Aether Crystal ×6 ([aether,crystal])
+    actions: drop
+  Aether Dust ×14 ([aether,dust,distillable])
+    actions: drop
+  Aetheric Shard ×4 (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×5 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×4 ([metal,junk,scrap])
+    actions: scrap, drop
+  Blank Runecaster Casing (Common) ×2 ([runecaster,casing,blank,loot])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Charred Twig Bundle ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  Cloth Scrap ×10 ([fiber,junk,scrap])
+    actions: scrap, drop
+  Cloth Scrap ×2 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Copper-Threaded Veil ×2 (Uncommon, [trophy,metal,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Cracked Carapace Curl ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Dried Tendon Coil ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Faded Ribbon Coil ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Fragmented Aether (Rare, [aether,crystal,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Gargoyle Wing (Rare, [organic,wing,stone,aether,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Imp Horn ×2 ([organic,horn,mud,loot])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×13 ([mud])
+    actions: drop
+  ◆ Salvager's Tether Loop (Uncommon, [trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  Scrap Metal ×10 ([metal])
+    actions: drop
+  Smooth Stone ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×2 ([organic,fiber,loot])
+    actions: drop
+  ◆ Splintered Haft End ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  Stick ×4 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Tattered Gauze Roll ([trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Tin Valve Housing ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Verdigris Bell Fragment ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Wasp Venom ([organic,alchemy,poison,venom,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Weathered Granite Knob ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Worn Tartarian Coin ×37 ([currency,metal,pre-flood])
+    actions: scrap, drop
+  Worn Tartarian Coin ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Quest Items (2)
+  Folded Note ([note,quest,lore,improvised])
+    actions: drop
+  Iskan-Veil Core (Legendary, [quest,aetheric_core,main_quest,cloth])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 389 of 1441 entries; older trimmed to fit a single email paste)
+
+[2026-09-21T21:32:12.046Z] [debug] send-log: crash on record (2026-09-21T21:31:59.422Z) — game log pushed automatically, delivered to Sentry, #mubrglc8j903 cleared from disk
+[2026-09-21T21:32:11.868Z] [debug] boot: life bmubrgcssg5 started 2026-09-21T21:32:00.844Z · not an OTA apply (no handoff on disk)
+[2026-09-21T21:32:11.868Z] [debug] missions: none active · at=iskan_veil
+[2026-09-21T21:32:11.868Z] [debug] ═══ SESSION 2026-09-21T21:32:11.867Z · build 2026-09-21-1862-the-beat-keeps-its-way-out · previous entry moments earlier ═══
+[2026-09-21T21:32:11.764Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Permannu. The buried country is no place to walk alone."
+[2026-09-21T21:32:11.764Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-21T21:32:11.763Z] [debug] OTA session start: 2026-09-21-1862-the-beat-keeps-its-way-out.
+[2026-09-21T21:32:06.270Z] [debug] voice⏱ gap 1095ms (wait 113ms + synth 980ms, live) "Choose your character."
+[2026-09-21T21:32:05.131Z] [debug] voice: bundled ready
+[2026-09-21T21:32:01.926Z] [debug] voice: bundled loading
+[2026-09-21T21:32:01.926Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-21T21:32:01.769Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T21:32:01.768Z] [debug] ota: Already up to date
+[2026-09-21T21:32:01.059Z] [debug] native-sdk verdict: answered false
+[2026-09-21T21:32:01.059Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-21T21:32:00.879Z] [debug] ota: Checking…
+[2026-09-21T21:32:00.879Z] [debug] ota: boot check — enabled=true channel=preview rt=2.5.0 updateId=01a0c468-0c0a-7a5c-9573-c56abf935102
+[2026-09-21T21:31:58.215Z] [debug] appstate: active → inactive (was active for 163929ms)
+[2026-09-21T21:31:42.866Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 4046ms
+[2026-09-21T21:31:42.866Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 3966ms — intro-fill:∅
+[2026-09-21T21:31:42.842Z] [debug] qwen⏱ narration:scene_intro_fill ok 3966ms read 3226ms/write 723ms in 730t→out 33t thr1 4.4ms/t HIT-CAP (175ch)
+[2026-09-21T21:31:38.822Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-21T21:31:32.210Z] [debug] persist sizes(KB): total=154 player=25 wm=33[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=94 scene=2
+[2026-09-21T21:31:32.130Z] [reward] ✦ Boss spoils: a Resurrection Gem, prised from the wreckage where Veilkeeper Inarra fell. Yours — the buried world is one boss lighter. (1 held)
+[2026-09-21T21:31:32.129Z] [arbiter] The Iskan-Veil Core acknowledges your blood and lets itself be lifted. Family right, family due. 8 Cores still to recover.
+[2026-09-21T21:31:32.129Z] [reward] ✦ Veilkeeper Blades taken from Veilkeeper Inarra. ✦ Grey Leather of Iskan-Veil taken from Veilkeeper Inarra.
+[2026-09-21T21:31:32.128Z] [arbiter] Inarra slides down the wall, grey leather darkening at the ribs. "...the Veil... will open one more time... for what you have earned..." The Core slips out of the false housing — the real seat was behind her all along — and lands in your palm.
+[2026-09-21T21:31:32.118Z] [reward] +60 TC pried from the dust.
+[2026-09-21T21:31:32.118Z] [reward] ✦ Boss spoils: Gargoyle Wing, Fragmented Aether.
+[2026-09-21T21:31:32.116Z] [reward] Veilkeeper Inarra defeated.
+[2026-09-21T21:31:32.114Z] [combat] Final strike with the crude golem greatsword for 19. Veilkeeper Inarra is still. The Aetherstone hums on, indifferent.
+[2026-09-21T21:31:32.113Z] [combat] You — d20 → 3 + STR 14 perfect opening (2× dice) = 17 vs Veilkeeper Inarra AC 17 — ✓ HIT
+[2026-09-21T21:31:32.113Z] [combat] Veilkeeper Inarra — d20 → 8 + ATK 6 = 14 vs your AC 18 — ✗ MISS
+[2026-09-21T21:31:32.111Z] [world] Veilkeeper Inarra moves first. The pressure is immediate.
+[2026-09-21T21:31:32.048Z] [debug] dice⏱ damage: shown +58ms, tapped +553ms, settled +820ms = 1431ms
+[2026-09-21T21:31:31.228Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:30.615Z] [debug] dice⏱ attack: shown +59ms, tapped +536ms, settled +821ms = 1416ms
+[2026-09-21T21:31:29.794Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:29.198Z] [debug] dice⏱ initiative: shown +24ms, tapped +1318ms, settled +820ms = 2162ms
+[2026-09-21T21:31:28.378Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:27.037Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:27.037Z] [world] You commit forward with the crude golem greatsword. Veilkeeper Inarra watches your hands.
+[2026-09-21T21:31:27.034Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-21T21:31:27.033Z] [debug] attack: target=Veilkeeper Inarra range=close reach.bands=[close] reach.label=Crude Golem Greatsword bareHand=false
+[2026-09-21T21:31:27.031Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem greatsword resolved=Crude Golem Greatsword range=close enemies=1 hooks=0
+[2026-09-21T21:31:27.031Z] [player] attack with the crude golem greatsword
+[2026-09-21T21:31:26.961Z] [debug] ui: tap "golem greatsword ⚔"
+[2026-09-21T21:31:26.189Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:26.189Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The Veilkeeper Inarra is patient. Be patienter."
+[2026-09-21T21:31:26.189Z] [debug] arbiter: template (reason=combat)
+[2026-09-21T21:31:26.181Z] [combat] Dodge — d20 → 9 + DEX 10 = 19 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-21T21:31:26.181Z] [combat] Veilkeeper Inarra — d20 → 11 + ATK 6 = 17 vs your AC 18 — ✗ EVADED
+[2026-09-21T21:31:26.176Z] [world] You commit to the dodge. Slip Veilkeeper Inarra's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-21T21:31:26.170Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-21T21:31:26.169Z] [player] dodge
+[2026-09-21T21:31:26.144Z] [debug] ui: tap "dodge"
+[2026-09-21T21:31:24.067Z] [combat] Veilkeeper Inarra deals 14 bludgeoning damage. You have 5 HP remaining.
+[2026-09-21T21:31:24.033Z] [combat] Veilkeeper Inarra — d20 → 18 + ATK 6 = 24 vs your AC 18 — ✓ HIT
+[2026-09-21T21:31:24.032Z] [combat] Your strike with the crude golem greatsword lands for 8. Veilkeeper Inarra staggers — 13 HP remaining. It answers.
+[2026-09-21T21:31:24.030Z] [combat] You — d20 → 6 + STR 14 = 20 vs Veilkeeper Inarra AC 17 — ✓ HIT
+[2026-09-21T21:31:24.030Z] [world] You seize the initiative. Veilkeeper Inarra has no time to react.
+[2026-09-21T21:31:23.965Z] [debug] dice⏱ damage: shown +56ms, tapped +723ms, settled +820ms = 1599ms
+[2026-09-21T21:31:23.145Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:22.365Z] [debug] dice⏱ attack: shown +57ms, tapped +472ms, settled +820ms = 1349ms
+[2026-09-21T21:31:21.545Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:21.015Z] [debug] dice⏱ initiative: shown +24ms, tapped +804ms, settled +820ms = 1648ms
+[2026-09-21T21:31:20.195Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:19.368Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:19.368Z] [world] You commit forward with the crude golem greatsword. Veilkeeper Inarra watches your hands.
+[2026-09-21T21:31:19.364Z] [debug] attack: target=Veilkeeper Inarra range=close reach.bands=[close] reach.label=Crude Golem Greatsword bareHand=false
+[2026-09-21T21:31:19.362Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem greatsword resolved=Crude Golem Greatsword range=close enemies=1 hooks=0
+[2026-09-21T21:31:19.362Z] [player] attack with the crude golem greatsword
+[2026-09-21T21:31:19.308Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-09-21T21:31:19.294Z] [debug] ui: tap "golem greatsword ⚔"
+[2026-09-21T21:31:16.067Z] [combat] Veilkeeper Inarra deals 7 bludgeoning damage. You have 19 HP remaining.
+[2026-09-21T21:31:16.031Z] [combat] Veilkeeper Inarra — d20 → 13 + ATK 6 = 19 vs your AC 18 — ✓ HIT
+[2026-09-21T21:31:16.030Z] [combat] Veilkeeper Inarra takes 14 with the crude golem greatsword. It reels: 21 left. Then it fights back.
+[2026-09-21T21:31:16.028Z] [combat] You — d20 → 14 + STR 14 perfect opening (2× dice) = 28 vs Veilkeeper Inarra AC 17 — ✓ HIT
+[2026-09-21T21:31:16.028Z] [world] You seize the initiative. Veilkeeper Inarra has no time to react.
+[2026-09-21T21:31:15.965Z] [debug] dice⏱ damage: shown +56ms, tapped +589ms, settled +820ms = 1465ms
+[2026-09-21T21:31:15.145Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:14.498Z] [debug] dice⏱ attack: shown +57ms, tapped +855ms, settled +820ms = 1732ms
+[2026-09-21T21:31:13.678Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:12.765Z] [debug] dice⏱ initiative: shown +25ms, tapped +853ms, settled +820ms = 1698ms
+[2026-09-21T21:31:11.945Z] [debug] ui: tap "roll"
+[2026-09-21T21:31:11.068Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:11.068Z] [world] You commit forward with the crude golem greatsword. Veilkeeper Inarra watches your hands.
+[2026-09-21T21:31:11.066Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-21T21:31:11.064Z] [debug] attack: target=Veilkeeper Inarra range=close reach.bands=[close] reach.label=Crude Golem Greatsword bareHand=false
+[2026-09-21T21:31:11.062Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem greatsword resolved=Crude Golem Greatsword range=close enemies=1 hooks=0
+[2026-09-21T21:31:11.062Z] [player] attack with the crude golem greatsword
+[2026-09-21T21:31:10.994Z] [debug] ui: tap "golem greatsword ⚔"
+[2026-09-21T21:31:10.137Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:10.129Z] [combat] Dodge — d20 → 4 + DEX 10 = 14 vs ATK 14. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-21T21:31:10.129Z] [combat] Veilkeeper Inarra — d20 → 8 + ATK 6 = 14 vs your AC 18 — ✗ EVADED
+[2026-09-21T21:31:10.123Z] [world] You commit to the dodge. Slip Veilkeeper Inarra's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-21T21:31:10.121Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-21T21:31:10.120Z] [player] dodge
+[2026-09-21T21:31:10.095Z] [debug] ui: tap "dodge"
+[2026-09-21T21:31:08.647Z] [system] Action cancelled.
+[2026-09-21T21:31:06.402Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:31:06.402Z] [world] Your crude golem greatsword comes around in an arc; Veilkeeper Inarra squares up to meet it.
+[2026-09-21T21:31:06.399Z] [debug] attack: status mods tired -1
+[2026-09-21T21:31:06.398Z] [debug] attack: target=Veilkeeper Inarra range=close reach.bands=[close] reach.label=Crude Golem Greatsword bareHand=false
+[2026-09-21T21:31:06.396Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem greatsword resolved=Crude Golem Greatsword range=close enemies=1 hooks=0
+[2026-09-21T21:31:06.396Z] [player] attack with the crude golem greatsword
+[2026-09-21T21:31:06.328Z] [debug] ui: tap "golem greatsword ⚔"
+[2026-09-21T21:31:04.657Z] [world] You use 1× Trail Rations. +6 HP (26/56), +3 stamina.
+[2026-09-21T21:31:03.494Z] [debug] ui: tap "✚ heals (2)"
+[2026-09-21T21:31:00.674Z] [debug] persist sizes(KB): total=151 player=23 wm=33[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=93 scene=3
+[2026-09-21T21:31:00.574Z] [world] You use 1× Trail Rations. +6 HP (20/56), +3 stamina.
+[2026-09-21T21:30:59.628Z] [debug] ui: tap "✚ heals (2)"
+[2026-09-21T21:30:57.324Z] [world] You use 1× Trail Rations. +6 HP (14/56), +3 stamina.
+[2026-09-21T21:30:55.695Z] [debug] ui: tap "✚ heals (2)"
+[2026-09-21T21:30:52.385Z] [combat] Veilkeeper Inarra deals 13 bludgeoning damage. You have 8 HP remaining.
+[2026-09-21T21:30:52.351Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-09-21T21:30:52.350Z] [combat] Veilkeeper Inarra — d20 → 15 + ATK 6 = 21 vs your AC 18 — ✓ HIT
+[2026-09-21T21:30:52.349Z] [combat] Veilkeeper Inarra takes 7 with the crude golem greatsword. It reels: 35 left. Then it fights back.
+[2026-09-21T21:30:52.347Z] [combat] You — d20 → 14 + STR 14 tired -1 = 27 vs Veilkeeper Inarra AC 17 — ✓ HIT
+[2026-09-21T21:30:52.347Z] [world] You seize the initiative. Veilkeeper Inarra has no time to react.
+[2026-09-21T21:30:52.282Z] [debug] dice⏱ damage: shown +57ms, tapped +522ms, settled +820ms = 1399ms
+[2026-09-21T21:30:51.462Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:50.882Z] [debug] dice⏱ attack: shown +58ms, tapped +470ms, settled +821ms = 1349ms
+[2026-09-21T21:30:50.061Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:49.532Z] [debug] dice⏱ initiative: shown +25ms, tapped +786ms, settled +821ms = 1632ms
+[2026-09-21T21:30:48.711Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:47.902Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:30:47.901Z] [world] You commit forward with the crude golem greatsword. Veilkeeper Inarra watches your hands.
+[2026-09-21T21:30:47.899Z] [debug] attack: status mods tired -1
+[2026-09-21T21:30:47.897Z] [debug] attack: target=Veilkeeper Inarra range=close reach.bands=[close] reach.label=Crude Golem Greatsword bareHand=false
+[2026-09-21T21:30:47.896Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem greatsword resolved=Crude Golem Greatsword range=close enemies=1 hooks=0
+[2026-09-21T21:30:47.895Z] [player] attack with the crude golem greatsword
+[2026-09-21T21:30:47.828Z] [debug] ui: tap "golem greatsword ⚔"
+[2026-09-21T21:30:46.727Z] [combat] Veilkeeper Inarra — d20 → 7 + ATK 6 = 13 vs your AC 18 — ✗ MISS
+[2026-09-21T21:30:46.726Z] [world] You close the gap with Veilkeeper Inarra. (range: close / arm's reach)
+[2026-09-21T21:30:46.726Z] [debug] move: field advance target=Veilkeeper Inarra d 1.50->0.50 band mid->close
+[2026-09-21T21:30:46.724Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0
+[2026-09-21T21:30:46.722Z] [debug] parser: intent=advance conf=1.00 verb=approach target=veilkeeper inarra resolved=Veilkeeper Inarra range=mid enemies=1 hooks=0
+[2026-09-21T21:30:46.722Z] [player] approach Veilkeeper Inarra
+[2026-09-21T21:30:46.661Z] [debug] ui: tap "approach"
+[2026-09-21T21:30:44.034Z] [arbiter] The Arbiter watches the Veilkeeper Inarra. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-21T21:30:44.034Z] [combat] The gale binder wand cuts air. Veilkeeper Inarra answers immediately.
+[2026-09-21T21:30:44.033Z] [combat] You — d20 → 4 + INT 4 exhausted -2 = 6 vs Veilkeeper Inarra AC 17 — ✗ MISS
+[2026-09-21T21:30:44.032Z] [combat] Veilkeeper Inarra — d20 → 7 + ATK 6 = 13 vs your AC 18 — ✗ MISS
+[2026-09-21T21:30:44.031Z] [world] Veilkeeper Inarra moves first. The pressure is immediate.
+[2026-09-21T21:30:43.965Z] [debug] dice⏱ attack: shown +56ms, tapped +523ms, settled +820ms = 1399ms
+[2026-09-21T21:30:43.145Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:42.565Z] [debug] dice⏱ initiative: shown +32ms, tapped +1141ms, settled +820ms = 1993ms
+[2026-09-21T21:30:41.745Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:40.573Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:30:40.573Z] [world] You raise the gale binder wand toward Veilkeeper Inarra. The room narrows around the both of you.
+[2026-09-21T21:30:40.571Z] [debug] attack: status mods exhausted -2
+[2026-09-21T21:30:40.569Z] [debug] attack: target=Veilkeeper Inarra range=mid reach.bands=[far,mid,close] reach.label=Gale Binder Wand bareHand=false
+[2026-09-21T21:30:40.568Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand gale binder wand resolved=Gale Binder Wand range=mid enemies=1 hooks=0
+[2026-09-21T21:30:40.567Z] [player] attack with the off-hand gale binder wand
+[2026-09-21T21:30:40.516Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-09-21T21:30:40.502Z] [debug] ui: tap "binder wand ✦"
+[2026-09-21T21:30:38.886Z] [combat] Half a beat too slow. Veilkeeper Inarra steps inside your reach.
+[2026-09-21T21:30:38.885Z] [combat] You — d20 → 10 + INT 4 exhausted -2 perfect opening (2× dice) = 12 vs Veilkeeper Inarra AC 17 — ✗ MISS
+[2026-09-21T21:30:38.884Z] [combat] Veilkeeper Inarra — d20 → 7 + ATK 6 = 13 vs your AC 18 — ✗ MISS
+[2026-09-21T21:30:38.883Z] [world] Veilkeeper Inarra moves first. The pressure is immediate.
+[2026-09-21T21:30:38.815Z] [debug] dice⏱ attack: shown +59ms, tapped +670ms, settled +820ms = 1549ms
+[2026-09-21T21:30:37.995Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:37.265Z] [debug] dice⏱ initiative: shown +25ms, tapped +1034ms, settled +820ms = 1879ms
+[2026-09-21T21:30:36.445Z] [debug] ui: tap "roll"
+[2026-09-21T21:30:35.387Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:30:35.387Z] [world] You commit forward with the gale binder wand. Veilkeeper Inarra watches your hands.
+[2026-09-21T21:30:35.385Z] [debug] attack: status mods exhausted -2 · perfect opening (2× dice)
+[2026-09-21T21:30:35.383Z] [debug] attack: target=Veilkeeper Inarra range=mid reach.bands=[far,mid,close] reach.label=Gale Binder Wand bareHand=false
+[2026-09-21T21:30:35.381Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand gale binder wand resolved=Gale Binder Wand range=mid enemies=1 hooks=0
+[2026-09-21T21:30:35.381Z] [player] attack with the off-hand gale binder wand
+[2026-09-21T21:30:35.311Z] [debug] ui: tap "binder wand ✦"
+[2026-09-21T21:30:34.608Z] [system] ⏳ Time passed: 6 min
+[2026-09-21T21:30:34.598Z] [combat] Dodge — d20 → 20 + DEX 10 = 30 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-21T21:30:34.598Z] [combat] Veilkeeper Inarra — d20 → 11 + ATK 6 = 17 vs your AC 18 — ✗ EVADED
+[2026-09-21T21:30:34.593Z] [world] You commit to the dodge. Slip Veilkeeper Inarra's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-21T21:30:34.589Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-21T21:30:34.589Z] [player] dodge
+[2026-09-21T21:30:34.561Z] [debug] ui: tap "dodge"
+[2026-09-21T21:30:31.246Z] [debug] persist sizes(KB): total=150 player=23 wm=33[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=91 scene=3
+[2026-09-21T21:30:13.052Z] [debug] stats: STR14 DEX10 INT4 WIS7 CHA10 STE0 | gear: WIS+4,STR+3,DEX+2,INT+1 | worn: main=Crude Golem Greatsword off=Gale Binder Wand head=Seer's Veil of the Aether chest=Mud-Warden's Vest hands=Sentinel's Gauntlets feet=Echoing Steps Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-21T21:29:51.395Z] [debug] ui: tap "inventory"
+[2026-09-21T21:29:43.915Z] [arbiter] A door that was not in the Iskan-Veil housing yesterday opens, and a woman in grey leather steps through. The door closes behind her and is gone. "I have watched you walk every false door in this Capital and pick the wrong one twice," says Veilkeeper Inarra, almost amused. "You found this seat anyway. The Order respects that. The Order will still kill you for it."
+[2026-09-21T21:29:43.915Z] [combat] Veilkeeper Inarra closes — Veil-Step Cuts ready, 1d8+3+1d6 damage on a hit. (range: mid) ★ CORE GUARDIAN
+[2026-09-21T21:29:43.908Z] [world] You lay a hand on the cold Core seat and call its Guardian up.
+[2026-09-21T21:29:37.435Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 9035ms
+[2026-09-21T21:29:37.435Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 9015ms — intro-fill:∅
+[2026-09-21T21:29:37.426Z] [debug] qwen⏱ narration:scene_intro_fill ok 9015ms read/write unusable (native mis-reported 13176ms/835ms — llama.rn split bug, not this call) in 721t→out 33t thr1 HIT-CAP (131ch)
+[2026-09-21T21:29:28.401Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-21T21:29:27.508Z] [debug] voice⏱ gap 4100ms (wait 17ms + synth 4075ms, live) "Your journey through the archives has be…"
+[2026-09-21T21:29:23.441Z] [debug] qwen⏱ ✂ DISCARDED ambient after 5022ms — ambient:preempted
+[2026-09-21T21:29:23.441Z] [debug] arbiter: ambient cut short 5075ms — yielded to the player
+[2026-09-21T21:29:23.433Z] [debug] qwen⏱ ambient preempted 5022ms read 4468ms/write 519ms in 366t→out 22t thr1 12.2ms/t (115ch)
+[2026-09-21T21:29:15.872Z] [reward]     • Mud Fragment x3 (Common)
+[2026-09-21T21:29:15.871Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-09-21T21:29:15.871Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-21T21:29:15.871Z] [reward]     • Aether Crystal x2 (Common)
+[2026-09-21T21:29:15.871Z] [reward]     • Tattered Gauze Roll (Common)
+[2026-09-21T21:29:15.870Z] [reward] ✦ Salvage haul:
+[2026-09-21T21:29:15.870Z] [world] You break the veil step apart. Among the pieces, something worth keeping.
+[2026-09-21T21:29:15.869Z] [world] You break the trick lever apart. Among the pieces, something worth keeping.
+[2026-09-21T21:29:15.869Z] [world] You work the tome over. A part of it comes loose, intact.
+[2026-09-21T21:29:15.869Z] [world] You break the loose tile apart. Among the pieces, something worth keeping.
+[2026-09-21T21:29:15.868Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-21T21:29:15.868Z] [world] The core housing gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-21T21:29:15.188Z] [reward] ✦ Mud Shortsword (Common).
+[2026-09-21T21:29:15.188Z] [world] You pick up the Mud Shortsword.
+[2026-09-21T21:29:15.184Z] [reward] ✦ Mud Grip Wand (Common).
+[2026-09-21T21:29:15.184Z] [world] You take the Mud Grip Wand from where it lay.
+[2026-09-21T21:29:14.255Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-21T21:29:14.077Z] [debug] ui: tap "take / salvage"
+[2026-09-21T21:29:12.949Z] [cognitive] SEARCH  (73ms)
+[2026-09-21T21:29:12.875Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-21T21:29:12.875Z] [world] The veil step reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-21T21:29:12.873Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=veil step resolved=veil step range=- enemies=0 hooks=0
+[2026-09-21T21:29:12.872Z] [player] investigate veil step
+[2026-09-21T21:29:12.838Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-21T21:29:11.377Z] [debug] ui: tap "investigate"
+[2026-09-21T21:29:09.835Z] [debug] send-log: crash on record (2026-09-20T01:42:10.103Z) — game log pushed automatically, delivered to Sentry, #mubrcorotx3a cleared from disk
+[2026-09-21T21:29:09.684Z] [debug] boot: life bmubrc4b7ox started 2026-09-21T21:28:43.219Z · FOLLOWED AN OTA APPLY 187ms ago via mid-session · prev ctx o3/r3/l0/p1/dn0 (previous life released its contexts first)
+[2026-09-21T21:29:09.684Z] [debug] missions: none active · at=iskan_veil
+[2026-09-21T21:29:09.684Z] [debug] ═══ SESSION 2026-09-21T21:29:09.683Z · build 2026-09-21-1862-the-beat-keeps-its-way-out · updated from 2026-09-20-1855-the-cap-loses-the-race · previous entry moments earlier ═══
+[2026-09-21T21:29:09.545Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-21T21:29:09.545Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Permannu. We've still got ground to cover, you and I."
+[2026-09-21T21:29:09.545Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-21T21:29:09.545Z] [debug] OTA session start: 2026-09-21-1862-the-beat-keeps-its-way-out.
+[2026-09-21T21:29:09.545Z] [debug] OTA applied: 2026-09-20-1855-the-cap-loses-the-race → 2026-09-21-1862-the-beat-keeps-its-way-out.
+[2026-09-21T21:28:48.283Z] [debug] voice⏱ gap 1077ms (wait 95ms + synth 980ms, live) "Choose your character."
+[2026-09-21T21:28:47.197Z] [debug] voice: bundled ready
+[2026-09-21T21:28:43.831Z] [debug] voice: bundled loading
+[2026-09-21T21:28:43.831Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-21T21:28:43.683Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T21:28:43.682Z] [debug] ota: Already up to date
+[2026-09-21T21:28:43.340Z] [debug] native-sdk verdict: answered false
+[2026-09-21T21:28:43.260Z] [debug] ota: Checking…
+[2026-09-21T21:28:43.260Z] [debug] ota: boot check — enabled=true channel=preview rt=2.5.0 updateId=01a0c468-0c0a-7a5c-9573-c56abf935102
+[2026-09-21T21:28:42.768Z] [debug] ctx: RELEASED — live=0 (opened=3 released=3)
+[2026-09-21T21:26:07.387Z] [debug] ctx: OPENED — live=1 (opened=3 released=2) ≈425MB est
+[2026-09-21T21:26:06.009Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-21T21:26:06.007Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-09-21T21:25:57.994Z] [debug] appstate: background → active (was background for 83654949ms)
+[2026-09-21T21:25:57.993Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-09-21T21:25:57.305Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-09-20T22:11:43.045Z] [debug] appstate: inactive → background (was inactive for 48ms)
+[2026-09-20T22:11:42.997Z] [debug] appstate: active → inactive (was active for 298910ms)
+[2026-09-20T22:08:24.434Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 683ms
+[2026-09-20T22:08:24.434Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 665ms — intro-fill:near-dup
+[2026-09-20T22:08:24.426Z] [debug] qwen⏱ narration:scene_intro_fill ok 665ms read 0ms/write 647ms in 716t→out 34t thr1 HIT-CAP (131ch)
+[2026-09-20T22:08:23.752Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-20T22:07:39.416Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 683ms
+[2026-09-20T22:07:39.416Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 666ms — intro-fill:∅
+[2026-09-20T22:07:39.409Z] [debug] qwen⏱ narration:scene_intro_fill ok 666ms read 0ms/write 647ms in 716t→out 34t thr1 HIT-CAP (136ch)
+[2026-09-20T22:07:38.735Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-20T22:07:05.999Z] [debug] homework: scene_intro "Iskan-Veil" ∅ 12409ms
+[2026-09-20T22:07:05.999Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 12396ms — intro-fill:∅
+[2026-09-20T22:07:05.993Z] [debug] qwen⏱ narration:scene_intro_fill ok 12396ms wait 3265ms read/write unusable (native mis-reported 12193ms/734ms — llama.rn split bug, not this call) in 716t→out 33t thr1 HIT-CAP (134ch)
+[2026-09-20T22:06:56.856Z] [debug] voice⏱ gap 3795ms (wait 14ms + synth 3775ms, live) "You have traversed the winding paths of …"
+[2026-09-20T22:06:53.591Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-20T22:06:53.089Z] [debug] qwen⏱ ✂ DISCARDED ambient after 4479ms — ambient:preempted
+[2026-09-20T22:06:53.089Z] [debug] arbiter: ambient cut short 4498ms — yielded to the player
+[2026-09-20T22:06:53.080Z] [debug] qwen⏱ ambient preempted 4479ms read 4073ms/write 360ms in 363t→out 19t thr1 11.2ms/t (93ch)
+[2026-09-20T22:06:44.082Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-09-20T22:06:42.516Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-20T22:06:42.515Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-09-20T22:06:34.495Z] [debug] appstate: background → active (was background for 22799698ms)
+[2026-09-20T22:06:20.144Z] [debug] persist sizes(KB): total=143 player=17 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=92 scene=3
+[2026-09-20T15:49:30.303Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-09-20T15:46:34.797Z] [debug] appstate: inactive → background (was inactive for 7ms)
+[2026-09-20T15:46:34.791Z] [debug] appstate: active → inactive (was active for 301309ms)
+[2026-09-20T15:43:51.238Z] [debug] persist sizes(KB): total=144 player=17 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=93 scene=3
+[2026-09-20T15:41:35.482Z] [debug] voice⏱ gap 1074ms (wait 0ms + synth 1064ms, live) "Choose your character."
+[2026-09-20T15:41:33.481Z] [debug] appstate: background → active (was background for 732ms)
+[2026-09-20T15:41:32.750Z] [debug] appstate: inactive → background (was inactive for 666ms)
+[2026-09-20T15:41:32.083Z] [debug] appstate: active → inactive (was active for 350757ms)
+[2026-09-20T15:41:28.750Z] [debug] send-log: #mu9zhpkvie4m — DELIVERED (inline, no attachments): beacon out, 26/26 parts accepted (188900 chars) — flush said yes, transport took every part
+[2026-09-20T15:41:24.801Z] [debug] send-log: #mu9zhmk2tdn3 — DELIVERED (inline, no attachments): beacon out, 15/15 parts accepted (106819 chars) — flush said yes, transport took every part
+[2026-09-20T15:41:12.007Z] [reward] +11 TC pried from the dust.
+[2026-09-20T15:41:12.005Z] [reward] Mud Wasp defeated. You recover Wasp Venom.
+[2026-09-20T15:41:12.003Z] [combat] Your blow lands clean — 12 damage. Mud Wasp crumples in the dust. The Aetherstone settles.
+[2026-09-20T15:41:12.002Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-20T15:41:12.001Z] [combat] You — d20 → 7 + STR 14 = 21 vs Mud Wasp AC 8 — ✓ HIT
+[2026-09-20T15:41:11.999Z] [combat] Mud Wasp — d20 → 7 + ATK 4 = 11 vs your AC 17 — ✗ MISS
+[2026-09-20T15:41:11.996Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-09-20T15:41:11.985Z] [debug] dice⏱ damage: shown +67ms, tapped +395ms, settled +820ms = 1282ms
+[2026-09-20T15:41:11.165Z] [debug] ui: tap "roll"
+[2026-09-20T15:41:10.702Z] [debug] dice⏱ attack: shown +69ms, tapped +443ms, settled +821ms = 1333ms
+[2026-09-20T15:41:09.881Z] [debug] ui: tap "roll"
+[2026-09-20T15:41:09.368Z] [debug] dice⏱ initiative: shown +55ms, tapped +787ms, settled +820ms = 1662ms
+[2026-09-20T15:41:08.548Z] [debug] ui: tap "roll"
+[2026-09-20T15:41:07.708Z] [system] ⏳ Time passed: 6 min
+[2026-09-20T15:41:07.708Z] [world] Mud Wasp fixes on you. You commit to the strike.
+[2026-09-20T15:41:07.699Z] [debug] attack: target=Mud Wasp range=close reach.bands=[close] reach.label=Bare hands bareHand=true
+[2026-09-20T15:41:07.699Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-20T15:41:07.698Z] [player] punch
+[2026-09-20T15:41:07.681Z] [debug] ui: tap "punch"
+[2026-09-20T15:41:07.135Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-20T15:41:07.134Z] [debug] ⚠⚠ MEMORY WARNING #8 from the OS (0.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=144KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-20T15:41:07.093Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-20T15:41:07.092Z] [debug] ⚠⚠ MEMORY WARNING #7 from the OS (247.6s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=144KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-20T15:41:06.819Z] [combat] Mud Wasp deals 2 poison damage. You have 21 HP remaining.
+[2026-09-20T15:41:06.772Z] [arbiter] The Arbiter watches the mud wasp. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-20T15:41:06.772Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-20T15:41:06.768Z] [combat] Mud Wasp — d20 → 13 + ATK 4 = 17 vs your AC 17 — ✓ HIT
+[2026-09-20T15:41:06.767Z] [world] You close the gap with Mud Wasp. (range: close / arm's reach)
+[2026-09-20T15:41:06.767Z] [debug] move: field advance target=Mud Wasp d 1.50->0.50 band mid->close
+[2026-09-20T15:41:06.765Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0
+[2026-09-20T15:41:06.763Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wasp resolved=Mud Wasp range=mid enemies=1 hooks=0
+[2026-09-20T15:41:06.762Z] [player] approach Mud Wasp
+[2026-09-20T15:41:06.714Z] [debug] ui: tap "approach"
+[2026-09-20T15:41:04.034Z] [debug] persist sizes(KB): total=144 player=17 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=93 scene=3
+[2026-09-20T15:41:03.948Z] [debug] ui: tap "glyph key"
+[2026-09-20T15:41:03.036Z] [arbiter] The Arbiter holds up a hand. "Bare hands works at close / arm's reach range only — you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+[2026-09-20T15:41:03.036Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[close] reach.label=Bare hands bareHand=true
+[2026-09-20T15:41:03.035Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-20T15:41:03.035Z] [player] punch
+[2026-09-20T15:41:03.014Z] [debug] ui: tap "punch"
+[2026-09-20T15:41:02.005Z] [combat] The gale binder wand cuts air. Mud Wasp answers immediately.
+[2026-09-20T15:41:02.004Z] [combat] You — d20 → 2 + INT 5 tired -1 = 6 vs Mud Wasp AC 8 — ✗ MISS
+[2026-09-20T15:41:02.004Z] [combat] Mud Wasp — d20 → 7 + ATK 4 = 11 vs your AC 17 — ✗ MISS
+[2026-09-20T15:41:02.003Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-09-20T15:41:01.935Z] [debug] dice⏱ attack: shown +71ms, tapped +441ms, settled +820ms = 1332ms
+[2026-09-20T15:41:01.114Z] [debug] ui: tap "roll"
+[2026-09-20T15:41:00.601Z] [debug] dice⏱ initiative: shown +31ms, tapped +727ms, settled +820ms = 1578ms
+[2026-09-20T15:40:59.781Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:59.024Z] [system] ⏳ Time passed: 6 min
+[2026-09-20T15:40:59.024Z] [world] You commit forward with the gale binder wand. Mud Wasp watches your hands.
+[2026-09-20T15:40:59.022Z] [debug] attack: status mods tired -1
+[2026-09-20T15:40:59.020Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[far,mid,close] reach.label=Gale Binder Wand bareHand=false
+[2026-09-20T15:40:59.019Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand gale binder wand resolved=Gale Binder Wand range=mid enemies=1 hooks=0
+[2026-09-20T15:40:59.018Z] [player] attack with the off-hand gale binder wand
+[2026-09-20T15:40:58.964Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-09-20T15:40:58.947Z] [debug] ui: tap "binder wand ✦"
+[2026-09-20T15:40:57.447Z] [arbiter] The Arbiter looks around. "Every map of Iskan-Veil is wrong by design. The city considers this a courtesy."
+[2026-09-20T15:40:57.446Z] [combat] Mud Wasp — d20 → 5 + ATK 4 = 9 vs your AC 17 — ✗ MISS
+[2026-09-20T15:40:57.441Z] [world] Your foot scrapes stone. Something stirs in the dark.
+[2026-09-20T15:40:57.441Z] [debug] stats: STR14 DEX10 INT5 WIS5 CHA10 STE0 | gear: INT+2,WIS+2,STR+3,DEX+2 | worn: main=Crude Golem Greatsword off=Gale Binder Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Sentinel's Gauntlets feet=Echoing Steps Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-20T15:40:57.436Z] [debug] skillcheck: stealth d20=8 STE 0 = 8 vs DC 12 — Hard → FAIL
+[2026-09-20T15:40:57.434Z] [debug] dice⏱ skill_check: shown +62ms, tapped +580ms, settled +820ms = 1462ms
+[2026-09-20T15:40:56.614Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:55.974Z] [system] ⏳ Time passed: 15 min
+[2026-09-20T15:40:55.967Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-20T15:40:55.966Z] [player] sneak
+[2026-09-20T15:40:55.947Z] [debug] ui: tap "stealth"
+[2026-09-20T15:40:53.941Z] [combat] Mud Wasp deals 3 poison damage [edge of reach — halved]. You have 23 HP remaining.
+[2026-09-20T15:40:53.869Z] [arbiter] The Arbiter looks around. "The corridor you came in by is not behind you. This is normal here. Keep walking."
+[2026-09-20T15:40:53.865Z] [combat] Mud Wasp — d20 → 17 + ATK 4 = 21 vs your AC 17 — ✓ HIT
+[2026-09-20T15:40:53.862Z] [world] Your foot scrapes stone. Something stirs in the dark.
+[2026-09-20T15:40:53.862Z] [debug] train: stealth near-miss → progress 1/100
+[2026-09-20T15:40:53.860Z] [arbiter] The Arbiter keeps his voice low. "Slipping away once they're onto you is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."
+[2026-09-20T15:40:53.858Z] [debug] stats: STR14 DEX10 INT5 WIS5 CHA10 STE0 | gear: INT+2,WIS+2,STR+3,DEX+2 | worn: main=Crude Golem Greatsword off=Gale Binder Wand head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Sentinel's Gauntlets feet=Echoing Steps Boots cloak=Aether-Walker's Cape amulet=Aetheric Locket
+[2026-09-20T15:40:53.854Z] [debug] skillcheck: stealth d20=11 STE 0 = 11 vs DC 12 — Hard → FAIL
+[2026-09-20T15:40:53.851Z] [debug] dice⏱ skill_check: shown +50ms, tapped +567ms, settled +820ms = 1437ms
+[2026-09-20T15:40:53.031Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:52.417Z] [system] ⏳ Time passed: 15 min
+[2026-09-20T15:40:52.410Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-20T15:40:52.410Z] [player] sneak
+[2026-09-20T15:40:52.396Z] [debug] ui: tap "stealth"
+[2026-09-20T15:40:49.338Z] [combat] Clean hit with the gale binder wand for 5. Mud Wasp has 5 left and does not back away.
+[2026-09-20T15:40:49.338Z] [combat] Mud Wasp is driven back — 1 round.
+[2026-09-20T15:40:49.336Z] [combat] You — d20 → 9 + INT 5 tired -1 = 13 vs Mud Wasp AC 8 — ✓ HIT
+[2026-09-20T15:40:49.336Z] [combat] Mud Wasp — d20 → 10 + ATK 4 = 14 vs your AC 17 — ✗ MISS
+[2026-09-20T15:40:49.335Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-09-20T15:40:49.267Z] [debug] dice⏱ damage: shown +65ms, tapped +464ms, settled +820ms = 1349ms
+[2026-09-20T15:40:48.447Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:47.917Z] [debug] dice⏱ attack: shown +64ms, tapped +465ms, settled +820ms = 1349ms
+[2026-09-20T15:40:47.097Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:46.567Z] [debug] dice⏱ initiative: shown +30ms, tapped +627ms, settled +820ms = 1477ms
+[2026-09-20T15:40:45.747Z] [debug] ui: tap "roll"
+[2026-09-20T15:40:45.160Z] [debug] persist sizes(KB): total=144 player=17 wm=31[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=93 scene=3
+[2026-09-20T15:40:45.091Z] [system] ⏳ Time passed: 6 min
+[2026-09-20T15:40:45.091Z] [world] You bring the gale binder wand to bear on Mud Wasp.
+[2026-09-20T15:40:45.088Z] [debug] attack: status mods tired -1
+[2026-09-20T15:40:45.087Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[far,mid,close] reach.label=Gale Binder Wand bareHand=false
+[2026-09-20T15:40:45.085Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand gale binder wand resolved=Gale Binder Wand range=mid enemies=1 hooks=0
+[2026-09-20T15:40:45.085Z] [player] attack with the off-hand gale binder wand
+[2026-09-20T15:40:45.013Z] [debug] ui: tap "binder wand ✦"
+[2026-09-20T15:40:43.015Z] [cognitive] SEARCH  (99ms)
+[2026-09-20T15:40:42.914Z] [debug] enemy: Mud Wasp hp=10 ac=8 atk=Poison Sting dmg=1D6 rarity=Common ap=3
+[2026-09-20T15:40:42.914Z] [combat] Mud Wasp — Poison Sting ready, 1D6 damage on a hit.
+[2026-09-20T15:40:42.914Z] [world] Something shifted while you were turned away — a Mud Wasp breaks cover, fast and low. (range: close)
+[2026-09-20T15:40:42.911Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=veil step resolved=veil step range=- enemies=0 hooks=0
+[2026-09-20T15:40:42.910Z] [player] investigate veil step
+[2026-09-20T15:40:42.063Z] [debug] ui: tap "take / salvage"
+[2026-09-20T15:40:41.729Z] [cognitive] neutral  (77ms)
+[2026-09-20T15:40:41.652Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-20T15:40:41.651Z] [world] Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere.
+[2026-09-20T15:40:41.650Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=loose tile resolved=loose tile range=- enemies=0 hooks=0
+[2026-09-20T15:40:41.650Z] [player] investigate loose tile
+[2026-09-20T15:40:39.896Z] [debug] ui: tap "investigate"
+
+=== END REPORT ===
