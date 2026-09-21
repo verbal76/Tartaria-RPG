@@ -7282,9 +7282,8 @@ export interface GameStore {
    *  reason `landControl` is the only way to grant a control (OTA-1572): the
    *  one-persuade-ever rule and the fight hand-off cannot be forgotten at a call
    *  site that does not exist. No-op when no encounter is armed on this tile. */
-  answerMissionEncounter: (
-    choice: import('../engine/missionEncounter').EncounterChoice,
-  ) => void;
+  /** ⚠⚠⚠ OTA-1860 — `key` is the card the player actually pressed. See the body. */
+  answerMissionEncounter: (choice: import('../engine/missionEncounter').EncounterChoice, key?: string) => void;
   /** ⚠ OTA-1581 — owner's rule 10: *"if the mission is active then it opens
    *  automatically. if you had to flee and you come back, there should be a
    *  summon button."* Re-arms a fled (or abandoned-mid-fight) encounter, and
@@ -26897,11 +26896,12 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   // ⚠⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARD ANSWERS HERE, and this is the
   // only place an encounter's state is ever written. See missionEncounter.ts for
   // the owner's ruleset; this function is the half that touches the world.
-  answerMissionEncounter(choice) {
+  answerMissionEncounter(choice, key) {
     const player = get().player;
     if (!player) return;
     const armed = armedEncounter(player);
     if (!armed) return;
+    if (key && key !== armed.key) return; // ⚠⚠⚠ OTA-1860 — THE ANSWER BELONGS TO THE CARD THAT ASKED. This re-derives `armed` from live state, so without this line a second PROCEED lands on whatever arc is first-hit NOW. Measured on varakush: two tracked hunts both armed at stage 0, two taps → hunt_iron_titan 0→1 AND hunt_apparition_red_tower 0→1, one modal, two missions. missionEncounterArm.armedEncounter has the collision census.
     const prev: EncounterState = player.missionEncounters?.[armed.key] ?? freshEncounter(armed.key);
 
     // ⚠ THE ROLL IS TAKEN HERE AND NOWHERE ELSE. `resolvePersuade` invents no

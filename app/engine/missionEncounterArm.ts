@@ -129,6 +129,27 @@ function build(
  * ⚠ A PAUSED CONTRACT IS SILENT. `tracked === false` is the player saying "not
  * this one right now"; a card that opens itself anyway would be the loudest
  * possible way to ignore that.
+ *
+ * ⚠⚠⚠ OTA-1860 — FIRST HIT WINS, AND THE GROUNDS ARE CROWDED. Package 4 counted
+ * it: of the 24 cells that host an authored `npcName` stage, EIGHTEEN host stages
+ * from more than one arc — varakush carries eight, reclaimer_stake seven,
+ * monarch_waystation six. So this function returning the first hit is not a rare
+ * tie-break, it is the normal case for a player running several contracts.
+ *
+ * That is fine for DISPLAY: one card at a time is the design. It was not fine for
+ * the ANSWER. `answerMissionEncounter` re-derives this on every call, and the card
+ * is a Modal that stays mounted — so paying the first arc swapped the card to the
+ * second arc's beat in the same frame, in the same place, and a second press paid
+ * THAT. Measured on varakush with two tracked hunts both armed at stage 0: two
+ * presses of PROCEED moved hunt_iron_titan 0 -> 1 AND hunt_apparition_red_tower
+ * 0 -> 1, and the same-tick pair did it with no re-render at all. The player
+ * pressed the Envoy's button twice and opened the Order archivist's beat.
+ *
+ * The repair is the shape this repository already uses for "prove you still own
+ * this": the card hands its `key` back and the store refuses a key that is no
+ * longer the armed one — the same sentence as the OTA-1703 body stamp on a stage's
+ * own escort. The key was ALREADY stage-stamped (`family:missionId:stageIndex`);
+ * nothing here needed inventing, only carrying.
  */
 export function armedEncounter(player: PlayerCharacter | null | undefined): ArmedEncounter | null {
   if (!player?.currentLocationId) return null;

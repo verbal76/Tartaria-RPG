@@ -182,11 +182,17 @@ export function MissionEncounterCard() {
           {choices.map((c) => {
             const primary = c === 'proceed' || c === 'take';
             const danger = c === 'fight' || c === 'take_and_kill';
+            // ⚠⚠⚠ OTA-1860 — THE CARD HANDS BACK THE KEY IT WAS RENDERED WITH.
+            // `answerMissionEncounter` re-derives the armed encounter from live state,
+            // and this modal stays mounted across a close: pay one arc and it becomes
+            // the NEXT arc's card in the same frame, in the same place, with no visual
+            // break. Without the key a second press pays a mission whose conversation
+            // the player never saw.
             return (
               <Pressable
                 key={c}
                 style={({ pressed }) => [kit.ctl, styles.btn, primary && styles.btnPrimary, danger && styles.btnDanger, pressed && kit.controlPressed]}
-                onPress={() => answer(c)}
+                onPress={() => answer(c, armed.key)}
                 accessibilityRole="button"
                 accessibilityLabel={c === 'proceed'
                   ? proceedLabel(armed.needs, armed.gives, armed.verb)

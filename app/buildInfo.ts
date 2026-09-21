@@ -31198,7 +31198,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * and the only floor under a stage whose ground never happens to produce a fight —
  * trading a wrong-state close for an unreachable one is the softlock P19's heal exists
  * to avoid. ota1859 asserts it stays legal on purpose. */
-export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
+/* ⚠⚠⚠ OTA-1860 — THE ANSWER BELONGS TO THE CARD THAT ASKED (PACKAGE 4 of the
+ * mechanical-integrity program). Package 1 asked whether authored opposition
+ * materializes; Package 2 whether the authored objective can be obtained and used;
+ * Package 3 whether every stage advances through the correct path exactly once.
+ * Package 4 asks whether the authored NPC promise becomes the CORRECT interactive
+ * object — and whether that object can pay only the stage it belongs to.
+ *
+ * MOST OF IT WAS ALREADY TRUE. All 114 authored `npcName` stages resolve to a person
+ * (zero unresolved, 61 unique names); the card key is stage-stamped
+ * `family:missionId:stageIndex`, so two stages naming the same post are two separate
+ * conversations; the card is DERIVED from the live record rather than held, so it
+ * cannot go stale; and no authored card can offer FIGHT or PERSUADE, because
+ * `stageHasFight` is `!!spawn` and zero npcName stages carry one — the live surface is
+ * PROCEED (gated on Package 2's protected-object check) and FLEE.
+ *
+ * WHAT WAS NOT TRUE — THE ANSWER WAS NOT BOUND TO THE CARD. Of the 24 cells hosting an
+ * authored npcName stage, EIGHTEEN host stages from more than one arc: varakush carries
+ * eight, reclaimer_stake seven, monarch_waystation six. `armedEncounter` returns the
+ * FIRST hit, which is right for display — one card at a time. But
+ * `answerMissionEncounter` re-derived it on every call, and the card is a Modal that
+ * stays mounted. Measured on varakush with two tracked hunts both armed at stage 0:
+ *
+ *   press 1 -> hunt_iron_titan 0 -> 1, and the card BECAME hunt_apparition_red_tower
+ *   press 2 -> hunt_apparition_red_tower 0 -> 1
+ *
+ * …and two synchronous calls did it with no re-render at all. The player pressed Envoy
+ * Tamsin's button twice and opened the Order archivist's beat — a different mission,
+ * same place on screen, a conversation they never saw.
+ *
+ * THE REPAIR IS THE SENTENCE THIS REPOSITORY ALREADY USES FOR "prove you still own
+ * this": the card hands back the key it was RENDERED with, and the store refuses a key
+ * that is no longer the armed one — the same shape as the OTA-1703 body stamp on a
+ * stage's own escort. The key was already stage-stamped; nothing needed inventing, only
+ * carrying. The guard is opt-in on the argument, so no other caller is broken, and the
+ * shadowed arc is not stranded: the card yields to it and its own key pays it. */
+export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
