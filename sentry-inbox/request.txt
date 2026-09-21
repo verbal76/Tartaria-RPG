@@ -386,3 +386,104 @@ different answers and only one is useful.
 
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion, and nothing retrieved may be attributed to any open freeze.
+
+═══════════════════════════════════════════════════════════════════════════════
+pull 2026-09-21T21:4xZ — FOUR NEW LOGS, TWO FREEZES AND TWO CONTROLS.
+Owner-initiated, on his word "if you didn't get the newest ones, pull them again".
+
+Authority at request time: a568f776 (Package 8 close, test-only).
+Last sync: 40f845f9 at 2026-09-21T07:24:39Z. Newest raw events in the tree are
+player-log_2026-09-20T15-41-28_*. Hourly runs 409-414 (16:13, 17:09, 18:14,
+19:09, 20:11, 21:10Z) all reported SUCCESS and committed nothing — correctly,
+because every one of them fired BEFORE the sends. This is not a relay fault.
+
+THE FOUR BUNDLES, established from the Sentry alert mail rather than guessed.
+All four carry OTA_BUILD_ID 2026-09-21-1862-the-beat-keeps-its-way-out and
+release tartaria@4.32.11+2026-09-21-1862-the-beat-keeps-its-way-out, i.e. the
+CURRENT stamp, and all four were sent inside a three-minute window:
+
+  LOG A  #mubrcorotx3a   inline 17/19   issue 7746981048   alert 21:30:04Z
+  LOG B  #mubrk96k2ad4   inline  7/8    issue 7746985981   (+ beacon 7746986031)
+  LOG C  #mubrhgkwai4g   inline 22/23   issue 7746987022
+  LOG D  #mubrkcddy8dv   inline  5/25   issue 7746990168
+
+LOG A's tags give the device: iPhone14,6 · iOS 26.5.2 build 23F84 · hermes ·
+environment hal · user 9943F21D-01AB-4722-800D-77CA32B14782 · app.device
+7af67691e564d22a5e0e77c03501ed4816fe57e5. B/C/D arrived in a digest that carries
+no tag block, so their device fields are UNKNOWN until the payloads land.
+
+⚠ TWO OF THE FOUR ARE FREEZES AND TWO ARE CONTROLS, ON THE OWNER'S WORD. WHICH
+IS WHICH IS NOT KNOWN AND MUST NOT BE INFERRED FROM PART COUNT. 19/8/23/25 is a
+proxy for log length and nothing else; a session that froze early is short and
+one that froze late is long. The assignment has to come out of the bodies.
+
+⚠⚠ DO NOT CARRY IN A THEORY. Not the native-memory ratchet (#174), not memory
+pressure, not JS starvation, not a native deadlock, not a touch/input fault, and
+NOT the assumption that both freezes share a cause. Memory pressure is evidence,
+not causality. OTA-1856 semantics hold: the first sample is not the baseline, and
+a large peak followed by recovery is not a monotonic ratchet.
+
+Reads, in order:
+
+1. COUNT AND STAMP FIRST. How many of the four assembled, each one's
+   OTA_BUILD_ID verbatim, and per-bundle part completeness on the relay's own
+   pagination and issue-walk evidence. A short pull is the answer, not a
+   failure — say so plainly with the newest timestamp seen. A partially
+   assembled bundle is evidence about the relay and must be reported, not
+   quietly stitched.
+
+2. WHICH SESSIONS FROZE, decided by the logs or not at all. If the bodies cannot
+   establish it, say so explicitly rather than guessing.
+
+3. THE ALIVE BEAT, which is the decisive discriminator and is already shipped.
+   ALIVE_BEAT_MS is 3000 and the beat runs from the app root whenever AppState
+   is active, carrying screen / appState / stage / inGame. For each candidate
+   freeze window, quote the beat train across it:
+     · a gap much greater than 3s with appState still `active` = NO JS PROGRESS
+     · beats continuing across the frozen window = JS ALIVE, and the boundary
+       is above the JS thread
+   NO INPUT and NO JS PROGRESS are different findings. Do not merge them.
+
+4. THE TAP CLOCK. Every ledgered control stamps onPressIn; touchLateMs measures
+   the OS touch stamp to JS receipt and rides `⏱+Nms`, with ` late Nms` past
+   250ms over the session floor. A large `⏱+` means the finger landed and JS got
+   it late. NO `⏱` line at all during the freeze means the touch never reached
+   JS. Quote what is there, including absence.
+
+5. THE TOUCH PATH BLOCK (OTA-1813) — T0/M0 root observations, T1 press-ins, T2
+   handler entries, T3 admit/reject, T4 dispatches, T5 completions, with
+   interaction ids and ordering, plus the prior-boot tail above this boot's ring.
+   Separates "observed at the root but never admitted" from "never observed".
+
+6. PRESENTATION EDGES (OTA-1819) — every `pres` entry: mount/unmount for
+   chapter:<phase>, fork:<id>, hint:combat_readout, as written, INCLUDING any
+   mount with no matching unmount. That shape is the Class H signature (#114-116).
+   Report it; claim no causation.
+
+7. CRASH LEDGER + LAUNCH FACTS, verbatim — every record, timestamp,
+   classification and the native SDK's `crashed=` annotation. This is the only
+   block where a native death appears at all, because a killed process runs no
+   JS. Distinguish a NEW kill from the SAME kill re-reported by a later capture.
+   Also the boot line: `boot: life <id> started <ts> · not an OTA apply` versus
+   the apply shape.
+
+8. MEMORY, reported as numbers and not as a story. Every MemoryFlightRecorder
+   sample with timestamp and phase; the memory-timeline block with its floor →
+   floor, retained MB, peak and RECOVERED % (that last figure is what separates
+   a peak-and-return from a ratchet); the joined step table if present, quoted
+   verbatim, remembering it names co-location in time and NO holder and NO cause.
+   Runtime-pressure counts: memory warnings, render stalls, the AppState trail.
+
+9. RENDER AND ROLL CLOCKS where they fired — `render⏱ Nms after engine-done ·
+   feed N`, and `dice⏱ <step>: shown +A, tapped +B, settled +C (hold late D)`.
+   A late hold is a busy JS thread, not a slow player.
+
+10. THE LAST THING EACH SESSION DID — last action, room, screen, and whether any
+    touch or engine evidence continues AFTER it. The absence of a crash is not
+    evidence the process stayed healthy.
+
+Plus the usual scrub accounting and redaction counts.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion, and nothing retrieved may be attributed to any open freeze — #174
+included, which stays pending and unevidenced until these bodies are read.
