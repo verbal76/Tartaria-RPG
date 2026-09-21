@@ -1762,6 +1762,31 @@ const kit = StyleSheet.create({
   momentCard: {
     width: '100%',
     maxWidth: 440,
+    /* ⚠⚠⚠ OTA-1862 — THE CEILING FAMILY A HAS HAD SINCE OTA-1614, AND FAMILY B
+     * NEVER GOT. `modalCard` above caps at 85% so a dialog can never grow past
+     * the screen and take its own controls with it. This card — the BEAT shell —
+     * was written without one, and the asymmetry stayed invisible because three
+     * of its six adopters solve containment a different way: DogOnboarding,
+     * GolemNaming and WandererEncounter put the whole card INSIDE a ScrollView
+     * that is a flex child of the scrim, so the card scrolls and the beat stays
+     * reachable. The other three — CombatPrimer, MissionComplete, MissionStinger
+     * — hang the card straight off `momentScrim`, where nothing bounded it at
+     * all: the card's height was a pure function of its content, and the scrim's
+     * `justifyContent: 'center'` pushed the overflow off BOTH ends at once.
+     *
+     * ⚠⚠ MEASURED AGAINST THE SMALLEST SUPPORTED TARGET. `DEVICE_PROFILES`' floor
+     * is iPhone SE 3 at 667pt; `momentScrim`'s 24pt gutter leaves 619pt of usable
+     * interior, less again under the status bar. A stinger carrying a long shout
+     * and a handful of `granted` receipts — both authored, both variable — runs
+     * past that with no scroll path to either end and its CTA below the fold.
+     *
+     * ⚠ AND IT IS INERT FOR THE THREE THAT WRAP. A percentage resolves against a
+     * parent with a DEFINITE size; a ScrollView's content container is sized by
+     * its content along the scroll axis, so there is nothing for 85% to resolve
+     * against and the constraint is dropped. Those three keep the geometry they
+     * ship with — this puts a floor under the unbounded and moves nothing that
+     * was already bounded. */
+    maxHeight: '85%',
     backgroundColor: '#17150f',
     borderWidth: 1,
     borderRadius: 6,

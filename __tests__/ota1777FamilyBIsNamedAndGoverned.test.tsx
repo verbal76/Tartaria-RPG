@@ -90,8 +90,23 @@ describe('⚠⚠⚠ the kit carries two modal shells, deliberately', () => {
      * six hand-copies drew, and that stays exactly true of every value that
      * occupies a pixel. Asserted in two halves so the lift can never smuggle in
      * a layout property — the dialog shell's twin claim is in OTA-1765. */
+    /* ⚠⚠⚠ AMENDED AGAIN BY OTA-1862, AND THIS ONE IS A REAL PIXEL. `maxHeight:
+     * '85%'` was added to the beat shell because the six hand-copies' geometry
+     * turned out to be WRONG rather than merely copied: none of them declared a
+     * ceiling, and the three that hang the card straight off `momentScrim`
+     * (CombatPrimer, MissionComplete, MissionStinger) were therefore unbounded —
+     * on a 667pt iPhone SE a long beat ran off BOTH ends of a centred scrim and
+     * took its own way out with it. So this test no longer says "the shell is
+     * what the six drew" without qualification; it says the shell is what the
+     * six drew PLUS the one ceiling Family A has had since OTA-1614 and Family B
+     * never got. Held as a separate expectation rather than folded into the list
+     * above, so the amendment cannot be mistaken for a re-tune of the original
+     * seven values — those are still asserted exactly. */
     const LIFT = ['shadowColor', 'shadowOpacity', 'shadowRadius', 'shadowOffset', 'elevation'];
-    expect(Object.fromEntries(Object.entries(flat).filter(([k]) => !LIFT.includes(k)))).toEqual({
+    const CEILING = ['maxHeight'];
+    expect(Object.fromEntries(
+      Object.entries(flat).filter(([k]) => !LIFT.includes(k) && !CEILING.includes(k)),
+    )).toEqual({
       width: '100%',
       maxWidth: 440,
       backgroundColor: '#17150f',
@@ -100,6 +115,7 @@ describe('⚠⚠⚠ the kit carries two modal shells, deliberately', () => {
       borderRadius: 6,
       padding: 20,
     });
+    expect(flat.maxHeight).toBe('85%');
     expect(Object.keys(flat).filter((k) => LIFT.includes(k)).sort()).toEqual([...LIFT].sort());
     expect(flat.shadowColor).toBe(T.boardShadow);
   });

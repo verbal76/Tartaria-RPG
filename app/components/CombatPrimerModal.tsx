@@ -199,7 +199,10 @@ const styles = StyleSheet.create({
   kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 16, marginTop: 8, lineHeight: 22 },
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },
-  bodyWrap: { maxHeight: 360 },
+  /* ⚠⚠ OTA-1862 — the body yields to the card's 85% ceiling (see
+   * tartariaKit.momentCard); `flexGrow: 0` keeps it content-sized when there is
+   * room, so nothing moves on a phone that already had the height. */
+  bodyWrap: { maxHeight: 360, flexShrink: 1, flexGrow: 0 },
   bodyPad: { paddingBottom: 2 },
   row: { color: '#cfc6b2', fontSize: 13, lineHeight: 20, marginBottom: 12 },
   term: { color: '#e0c179', fontSize: 13, letterSpacing: 1 },

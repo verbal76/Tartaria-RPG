@@ -31279,7 +31279,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * world did not want. With nothing canonized the order — and every cell — is identical.
  * And it costs the whisper nothing: the "?" marker and the arrival that resolves it both
  * read the EVENT'S own gx/gy, and the course walks to the raw cell. */
-export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
+/* ⚠⚠⚠ OTA-1862 — THE BEAT KEEPS ITS WAY OUT. A physical iPhone SE report from
+ * the owner, and his ruling on how to read it: *"Treat this as a CONFIRMED UI
+ * DEFECT, not a speculative audit."* Not every popup is resolution-aware, and
+ * some run off the screen. His constraint on the repair was equally exact:
+ * *"SAME UI / SAME CONTENT / SAME INTERACTION / RESPONSIVE BOUNDS."*
+ *
+ * THE CLASS, AND WHY IT HID FOR SO LONG. The kit carries two modal shells
+ * (OTA-1777): `modalCard` is the DIALOG and has capped its height at 85% since
+ * OTA-1614; `momentCard` is the BEAT and declared no ceiling at all. That
+ * asymmetry was survivable only by accident of construction — three of Family
+ * B's six adopters (DogOnboarding, GolemNaming, WandererEncounter) put the
+ * whole card INSIDE a ScrollView that is a flex child of the scrim, so the card
+ * may be any height and stays reachable. The other three — CombatPrimer,
+ * MissionComplete, MissionStinger — hang the card straight off `momentScrim`,
+ * whose `justifyContent: 'center'` pushes overflow off BOTH ends at once. So a
+ * beat too tall for the phone lost its title off the top AND its only button
+ * off the bottom, with no scroll path to either.
+ *
+ * MEASURED FROM THE AUTHORED CORPUS, NOT FROM A GUESS. A mission stinger is the
+ * worst real shape because both variable parts come from the quest data: `line`
+ * is `stageDef.stinger ?? stageDef.narration`, and `granted` is the pack
+ * receipt for a RANGE of stages. Across 50 arcs / 281 stages the ceilings are a
+ * 403-character line ("The Mud Titan of the Endless Stair") and 8 grant-bearing
+ * stages in one arc ("The Red Tower's Mouth"). On the narrowest supported phone
+ * that card wants 780pt inside a 667pt window — 113pt of overflow, centred, so
+ * ~56pt left the screen at each end and the CTA went with the bottom. The
+ * arithmetic also produced a finding nobody had: 0.85 × (932 − 48) = 751pt, so
+ * that beat overflows EVERY supported device. The SE only meets it soonest.
+ *
+ * THE REPAIR IS GEOMETRY, AND ONLY GEOMETRY. `momentCard` gains the ceiling
+ * Family A already had; MissionStinger's private card — kept private by
+ * OTA-1777's governed exception — copies the one value rather than taking the
+ * shell, so safety is bought without reversing an owner ruling. The stinger's
+ * prose, receipts and next-line move into a ScrollView with its title pinned
+ * above and its CTA pinned below (OTA-1614's shape), and all three direct-child
+ * bodies gain `flexShrink: 1, flexGrow: 0` — the pair BrandedModal's
+ * `scrollArea` has carried since OTA-1799, and the half of the repair without
+ * which the ceiling would simply clip. Nothing was deleted, shortened, hidden
+ * or conditionally omitted to make a card fit; a beat that already fitted is
+ * laid out by exactly the tree it always was. The three wrapped beats are
+ * untouched — a percentage resolves against a parent with a DEFINITE size, and
+ * a ScrollView's content container has none along its scroll axis, so the new
+ * ceiling is inert for them by construction.
+ *
+ * ⚠ NOT CLAIMED: physical-device confirmation. SE regression is covered in
+ * automation; the phone is the owner's to look at. */
+export const OTA_BUILD_ID = '2026-09-21-1862-the-beat-keeps-its-way-out';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';

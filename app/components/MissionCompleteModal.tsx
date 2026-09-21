@@ -132,7 +132,13 @@ const styles = StyleSheet.create({
   kicker: { color: '#9ec96a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 17, marginTop: 8, lineHeight: 23 },
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },
-  bodyWrap: { maxHeight: 380 },
+  /* ⚠⚠ OTA-1862 — AND THE BODY YIELDS, the same two words BrandedModal's
+   * `scrollArea` carries (OTA-1799): `flexShrink` lets this region give way to
+   * the card's new 85% ceiling instead of pushing the GOOD button through it,
+   * and `flexGrow: 0` keeps it sized by its content when there is room — so a
+   * short take looks exactly as it always has. The 380 cap stays: it is this
+   * card's own reading window, not the screen's. */
+  bodyWrap: { maxHeight: 380, flexShrink: 1, flexGrow: 0 },
   bodyPad: { paddingBottom: 2 },
   reward: { color: '#e0c179', fontSize: 13, lineHeight: 20, marginBottom: 6 },
   flavor: { color: '#cfc6b2', fontSize: 13, lineHeight: 21, marginBottom: 12 },

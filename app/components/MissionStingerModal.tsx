@@ -29,7 +29,7 @@
 // FIGHT (the `cta` prop), and the optional `next` line says where the story
 // goes. Same component, same palette: one curtain for the missions.
 import React from 'react';
-import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ PHASE 3 — migrated off the deprecated control dialect. The control keeps
@@ -61,11 +61,28 @@ export function MissionStingerModal({
             {(stinger?.title ?? '').toUpperCase()}
           </Text>
           <View style={styles.rule} />
-          <Text style={styles.line}>{stinger?.line ?? ''}</Text>
-          {stinger?.granted?.length
-            ? stinger.granted.map((g) => <Text key={g} style={styles.granted}>✦ {g} — in your pack.</Text>)
-            : null}
-          {stinger?.next ? <Text style={styles.next}>{stinger.next}</Text> : null}
+          {/* ⚠⚠⚠ OTA-1862 — THE SHOUT SCROLLS SO THE CTA CANNOT LEAVE. This card
+              hangs straight off `momentScrim`, and until this pass gave it a
+              ceiling of its own (see `styles.card`) nothing bounded it at all
+              — not the card, not a body, and not the kit, whose new Family B
+              ceiling this beat's governed exception keeps it away from. Its
+              height was a pure function of content that is AUTHORED and VARIABLE:
+              `line` is the beat's prose and `granted` is a list whose length comes
+              from the stage's own receipts. A long shout with a handful of grants
+              ran past the smallest supported viewport, centred, so both ends left
+              the screen at once and the one way out went with the bottom.
+              The shape is OTA-1614's, the one Family A has used since: the title
+              and its rule pinned above, the CTA pinned below, and the middle — the
+              part whose height comes from the beat — scrolls. A ScrollView sized by
+              its content is invisible when there is room, so a short stinger reads
+              exactly as it always has. */}
+          <ScrollView style={styles.bodyWrap} contentContainerStyle={styles.bodyPad}>
+            <Text style={styles.line}>{stinger?.line ?? ''}</Text>
+            {stinger?.granted?.length
+              ? stinger.granted.map((g) => <Text key={g} style={styles.granted}>✦ {g} — in your pack.</Text>)
+              : null}
+            {stinger?.next ? <Text style={styles.next}>{stinger.next}</Text> : null}
+          </ScrollView>
           <Pressable
             style={({ pressed }) => [kit.ctl, styles.btn, tControlDepth(pressed)]}
             onPress={onClose}
@@ -89,10 +106,28 @@ const styles = StyleSheet.create({
   // the kit owns. The owner asked for momentScrim across ALL SIX beats, and
   // consistent outer geometry is not the same instruction as taking the card —
   // this modal stays experiential in its card treatment.
+  /* ⚠⚠⚠ OTA-1862 — AND THE CEILING HAD TO BE WRITTEN HERE, BECAUSE THE RULING
+   * KEPT THIS CARD PRIVATE. The kit's `momentCard` gained `maxHeight: '85%'` in
+   * this same pass, and every other direct child of `momentScrim` inherits it
+   * from there — but OTA-1777's governed exception says this beat *"remains
+   * EXPERIENTIAL"* and keeps its own card, so the kit's ceiling does not reach
+   * it. Taking `tMomentCard` to get the ceiling would buy safety by overturning
+   * an owner ruling, which is the wrong trade; the ceiling is the SAFE OUTER
+   * GEOMETRY that OTA-1778 already settled belongs to every beat, and the rim,
+   * the ground and the air stay this card's own. So the one value is copied and
+   * the exception survives intact. ⚠ It is also the value that makes the body's
+   * `flexShrink` mean anything: with no cap on the card there is nothing for the
+   * region to yield to, and a scroller that never shrinks never scrolls. */
   card: {
-    width: '100%', maxWidth: 440, backgroundColor: '#17150f',
+    width: '100%', maxWidth: 440, maxHeight: '85%', backgroundColor: '#17150f',
     borderWidth: 1, borderColor: '#c9a86a', borderRadius: 6, padding: 20,
   },
+  /* ⚠⚠ OTA-1862 — the beat's own region: it yields to the card's 85% ceiling
+   * (`flexShrink`) and stays content-sized when there is room (`flexGrow: 0`),
+   * the same two words BrandedModal's `scrollArea` carries. No cap of its own —
+   * the card's ceiling is the only limit this beat needs. */
+  bodyWrap: { flexShrink: 1, flexGrow: 0 },
+  bodyPad: { paddingBottom: 2 },
   kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 2 },
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },
   // The shout is the whole card — set large, with air, like a title card.
