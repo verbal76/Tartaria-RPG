@@ -78,6 +78,7 @@ import { rarityHexColor } from './InventoryCategorize';
 
 import { tControlDepth, tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
+import { notePresentationDismissed } from '../state/presentationHandoff';
 /** ⚠⚠ OTA-1317 — the row's rarity edge, or nothing.
  *
  *  A row here is an ambient NOUN, not an inventory item — "cart", "rubble", a
@@ -598,7 +599,20 @@ export function GatherModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel} statusBarTranslucent>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+      statusBarTranslucent
+      /* ⚠⚠⚠ OTA-1863 — THE SHEET SAYS WHEN IT IS GONE. OTA-1497 deferred any
+         submit leaving a closing sheet by SHEET_SETTLE_MS, because presenting a
+         popup into this window's dismissal wedges iOS. 400ms was a guess at the
+         animation; this is the animation reporting itself. The timer survives
+         as a bounded fallback (and as Android's normal release — RN 0.81.5 fires
+         onDismiss on iOS only). */
+      onDismiss={() => notePresentationDismissed('sheet')}
+    >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <View
           /* ⚠⚠⚠ OTA-1813 — MODAL_TOUCH. Native <Modal> hosts this card outside

@@ -758,6 +758,7 @@ import {
 import { missionTraceArrivalLines, missionArrivalLines } from '../engine/missionTrace';
 // OTA-1796 — leaves the initial state reads; imported so they exist before create() runs.
 import { FRESH_ENEMY_ARRAYS, chainRouting } from './storeLeaves';
+import { armPresentationHandoff } from './presentationHandoff';
 export { FRESH_ENEMY_ARRAYS, chainRouting };
 import { armedEncounter } from '../engine/missionEncounterArm';
 import {
@@ -29643,8 +29644,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   // persisted), and the feed carries the transition's narration.
   dismissChapterCard() {
     set({ chapterCard: null });
-    // OTA-1065 — the card was the thing standing in front of the question.
-    raiseDueFork(get, set);
+    armPresentationHandoff('chapter', () => raiseDueFork(get, set));  // ⚠⚠⚠ OTA-1863 — the line above only STARTS this modal's iOS dismissal, so OTA-1065's question waits on it; see presentationHandoff.ts
   },
 
   dismissSummonRefusal() {
@@ -29692,7 +29692,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // on the same screen. Re-check anyway — a fork gated at the same phase as
     // this one is authorable, and silently dropping it would be the exact
     // failure this system is built to make impossible.
-    raiseDueFork(get, set);
+    armPresentationHandoff('fork', () => raiseDueFork(get, set));  // ⚠⚠⚠ OTA-1863 — same wound: `pendingFork: null` above began THIS modal's dismissal, so the re-check waits on it
   },
 
   // OTA-1022 — the one-time veteran motive picker commits here. The pick

@@ -17,6 +17,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// OTA-1863 — a fork that raises a fork waits for this window to go first.
+import { notePresentationDismissed } from '../state/presentationHandoff';
 // ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
 import { useHumanAction } from '../state/humanActivity';
 
@@ -61,12 +63,28 @@ export function StoryForkOverlay() {
     Animated.timing(drift, { toValue: 1, duration: CARD_IN_MS, useNativeDriver: true }).start();
   }, [fork, drift]);
 
-  if (!fork) return null;
+  // ⚠⚠⚠ OTA-1863 — THE <Modal> STAYS MOUNTED SO IT CAN REPORT ITS OWN DISMISSAL.
+  // `if (!fork) return null` unmounted it, and react-native 0.81.5's Modal drops
+  // its `modalDismissed` subscription in componentWillUnmount — so onDismiss
+  // could never fire and the handoff would always fall back to a deadline. The fork is driven by `visible` now (exactly as GatherModal/SearchModal already
+  // are) and the last fork is held so the content still renders THROUGH the
+  // dismissal animation instead of blanking a frame early.
+  const held = useRef(fork);
+  if (fork) held.current = fork;
+  const shown = fork ?? held.current;
 
   return (
     // onRequestClose is required by RN for the Android back button; it is a
     // no-op here on purpose — back must not answer the question for you.
-    <Modal visible transparent animationType="fade" onRequestClose={() => {}}>
+    <Modal
+      visible={!!fork}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}}
+      /* ⚠⚠⚠ OTA-1863 — answering a fork can make another fork due. That second
+         question used to present while THIS window was still dismissing. */
+      onDismiss={() => notePresentationDismissed('fork')}
+    >
       <View style={styles.backdrop}>
         <Animated.View
           style={[
@@ -78,12 +96,12 @@ export function StoryForkOverlay() {
           ]}
         >
           <ScrollView contentContainerStyle={styles.pad} showsVerticalScrollIndicator={false}>
-            <Text style={styles.kicker}>{fork.kicker}</Text>
-            <Text style={styles.title} accessibilityRole="header">{fork.title}</Text>
+            <Text style={styles.kicker}>{shown?.kicker}</Text>
+            <Text style={styles.title} accessibilityRole="header">{shown?.title}</Text>
             <View style={styles.rule} />
-            <Text style={styles.body}>{fork.body}</Text>
-            <Text style={styles.question}>{fork.question}</Text>
-            {fork.options.map((o) => (
+            <Text style={styles.body}>{shown?.body}</Text>
+            <Text style={styles.question}>{shown?.question}</Text>
+            {(shown?.options ?? []).map((o) => (
               <Pressable
                 key={o.id}
                 style={({ pressed }) => [kit.ctl, styles.option, pressed && styles.optionPressed, tControlDepth(pressed)]}

@@ -34,20 +34,49 @@ import { between, blockAt } from '../test-utils/srcBlock';
 const SRC = readFileSync(
   join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
 
-describe('OTA-1497 — the deferral exists and is real', () => {
-  it('⚠⚠⚠ the helper defers the submit by SHEET_SETTLE_MS', () => {
+/* ⚠⚠⚠ 2026-09-21, OTA-1863 — THIS CONTRACT GOT STRONGER, NOT WEAKER.
+ *
+ * OTA-1497 was right about WHEN and could only approximate it. `setTimeout(...,
+ * SHEET_SETTLE_MS)` proves that 400ms elapsed; it never proved the sheet's
+ * native window was gone, and React state going null is not dismissal either.
+ * The 2026-09-21 guardian freeze then reproduced the same wedge on a path this
+ * helper never covered — `dismissChapterCard()` raising the story fork in the
+ * tick it tore the chapter card down.
+ *
+ * So the authority moved to the platform: the sheets call
+ * `notePresentationDismissed('sheet')` from their <Modal onDismiss>, and that
+ * releases the submit. SHEET_SETTLE_MS is UNCHANGED at 400 and DEMOTED to a
+ * bounded fallback — which is also Android's normal release, because
+ * react-native 0.81.5 fires onDismiss under `Platform.OS === 'ios'` only
+ * (Libraries/Modal/Modal.js). The old assertions are replaced by the stronger
+ * claim they were standing in for; the freeze-path coverage below is untouched.
+ */
+describe('OTA-1497 / OTA-1863 — the deferral exists, and native dismissal owns it', () => {
+  it('⚠⚠⚠ the helper waits on the sheet\'s own dismissal, not on a timer', () => {
     const body = blockAt(SRC, 'const submitAfterSheetSettles = (text: string, after?: () => void): void => {', { mode: 'opener' });
-    expect(body).toMatch(/setTimeout\(\(\) => \{ submit\(text\); after\?\.\(\); \}, SHEET_SETTLE_MS\)/);
+    expect(body).toContain("armPresentationHandoff('sheet', (release) => {");
+    expect(body).toContain('submit(text); after?.();');
+    // the wall-clock authority OTA-1497 had to settle for is gone
+    expect(body).not.toMatch(/setTimeout\(\(\) => \{ submit\(text\); after\?\.\(\); \}, SHEET_SETTLE_MS\)/);
   });
 
-  it('⚠⚠ the settle window clears an iOS modal dismissal with margin', () => {
+  it('⚠⚠ every implicated sheet reports its native dismissal', () => {
+    for (const f of ['GatherModal', 'SearchModal']) {
+      const src = readFileSync(join(__dirname, '..', 'app', 'components', `${f}.tsx`), 'utf8');
+      expect(src).toMatch(/onDismiss=\{\(\) => notePresentationDismissed\('sheet'\)\}/);
+    }
+  });
+
+  it('⚠⚠ the settle window survives as a BOUNDED FALLBACK — and was not raised', () => {
     const m = /const SHEET_SETTLE_MS = (\d+);/.exec(SRC);
     expect(m).not.toBeNull();
     const ms = Number(m![1]);
-    // The RN <Modal> fade runs ~300ms on iOS. Below that the wedge returns;
-    // far above it the tap starts reading as lag.
-    expect(ms).toBeGreaterThanOrEqual(350);
-    expect(ms).toBeLessThanOrEqual(700);
+    // ⚠ THE ANTI-CHEAT. "Make the timer longer" was the tempting non-repair, and
+    // it is now also the wrong shape: this number no longer authorizes anything
+    // on iOS. It is still the deadline that keeps Android — and a missing
+    // callback — from deadlocking, so it stays in the band OTA-1497 chose.
+    expect(ms).toBe(400);
+    expect(SRC).toContain('{ fallbackMs: SHEET_SETTLE_MS }');
   });
 });
 

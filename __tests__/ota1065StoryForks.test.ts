@@ -55,6 +55,23 @@ import {
 import { STORY_MOTIVE_IDS } from '../app/engine/story';
 import { gateAllows, type TalkContext } from '../app/engine/dialogue';
 import { useGameStore } from '../app/state/gameStore';
+// ⚠⚠ OTA-1863 — THE CARD'S OWN WINDOW NOW RELEASES THE QUESTION. `dismissChapterCard()`
+// used to raise the due fork in the same synchronous call, which on iOS presented the
+// fork's <Modal> into the card's ~300ms dismissal and wedged the window (JS alive,
+// screen dead, force-close). The fork is still DERIVED and still asked exactly once —
+// what changed is that it waits for <Modal onDismiss>. These tests supply that signal
+// where the device supplies it, so they exercise the real sequence rather than a
+// shape production no longer has. Nothing here is weakened: every assertion below is
+// the one it always made, and OTA-1863's own suite additionally proves the fork is NOT
+// raised before the signal arrives.
+import { notePresentationDismissed } from '../app/state/presentationHandoff';
+
+/** Dismiss the chapter card the way a device does: React teardown, then the
+ *  native window reporting that it is actually gone. */
+const dismissChapterCardFully = (): void => {
+  useGameStore.getState().dismissChapterCard();
+  notePresentationDismissed('chapter');
+};
 import type { PlayerCharacter } from '../app/engine/types';
 
 /** The smallest thing dueFork actually reads. */
@@ -250,19 +267,19 @@ describe('OTA-1065 — in the real store', () => {
 
   it('the fork is DERIVED — clearing it and re-raising asks the same question', () => {
     setup();
-    useGameStore.getState().dismissChapterCard();   // raises the due fork
+    dismissChapterCardFully();   // raises the due fork
     const first = useGameStore.getState().pendingFork;
     expect(first?.id).toBe('debt_collector');
     // Simulate the app being killed in front of the card: the view is gone and
     // nothing was written. It comes straight back.
     useGameStore.setState({ pendingFork: null });
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     expect(useGameStore.getState().pendingFork?.id).toBe('debt_collector');
   });
 
   it('answering records the choice, narrates it, and closes the question for good', () => {
     setup();
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     const tcBefore = useGameStore.getState().player!.tc;
     useGameStore.getState().answerFork('turn_them');
     const p = useGameStore.getState().player!;
@@ -272,7 +289,7 @@ describe('OTA-1065 — in the real store', () => {
     const feed = useGameStore.getState().gameLog.map((e) => e.text).join('\n');
     expect(feed).toContain('I know your face now');
     // ...and it never comes back.
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     expect(useGameStore.getState().pendingFork).toBeNull();
   });
 
@@ -280,14 +297,14 @@ describe('OTA-1065 — in the real store', () => {
     setup();
     const p = useGameStore.getState().player!;
     useGameStore.setState({ player: { ...p, tc: 10 } as PlayerCharacter });
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     useGameStore.getState().answerFork('pay_partial');   // -140
     expect(useGameStore.getState().player!.tc).toBe(0);
   });
 
   it('a keepsake is quest-locked, so a decision cannot be pawned', () => {
     setup({ storyMotive: 'missing' } as Partial<PlayerCharacter>);
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     expect(useGameStore.getState().pendingFork?.id).toBe('missing_letters');
     useGameStore.getState().answerFork('carry_them');
     const item = useGameStore.getState().player!.inventory.find((i) => i.name === 'The Fifth Letter');
@@ -299,7 +316,7 @@ describe('OTA-1065 — in the real store', () => {
 
   it('a garbage option id does nothing at all', () => {
     setup();
-    useGameStore.getState().dismissChapterCard();
+    dismissChapterCardFully();
     useGameStore.getState().answerFork('not_a_real_option');
     expect(useGameStore.getState().pendingFork?.id).toBe('debt_collector');
     expect(useGameStore.getState().player!.storyChoices).toBeUndefined();

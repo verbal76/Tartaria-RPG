@@ -5,6 +5,8 @@ import * as Clipboard from 'expo-clipboard';
 // OTA-1558 — `hasActiveDog`: a dead or abandoned dog leaves its record behind, so
 // a raw `player.dog` answers "yes" forever. Every rescue gate asks this instead.
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap, hasActiveDog } from '../state/gameStore';
+// OTA-1863 — the sheet's own native dismissal releases the deferred submit.
+import { armPresentationHandoff } from '../state/presentationHandoff';
 import { playerGridCell } from '../state/playerGrid';
 // ⚠⚠ OTA-1807 — the Gather sheet's controls mutate the game WITHOUT submitting an
 // action, so the activity authority never heard about them. They say so here.
@@ -303,34 +305,55 @@ export function ExplorationScreen() {
     // one and the work that handler scheduled never ran. `armed` without a
     // matching `fired` separates them, and nothing else in the trace can.
     //
-    // ⚠⚠ THE SUBMIT STATEMENT BELOW IS UNCHANGED, BYTE FOR BYTE. OTA-1497's
-    // suite reads it literally, and the deferral it pins is load-bearing — it
-    // is the fix for a different iOS wedge. `after` is composed BEFORE the
-    // timeout is scheduled, so the closure that line captures is the wrapped
-    // one, and the caller's own callback still runs exactly where it always
-    // did: immediately after the submit, inside the same timer tick.
+    // ⚠⚠⚠ OTA-1863 — THE WAIT IS NO LONGER A GUESS AT THE ANIMATION; IT IS THE
+    // ANIMATION REPORTING ITSELF. OTA-1497 was right about WHEN and could only
+    // approximate it: `setTimeout(..., SHEET_SETTLE_MS)` proves that 400ms
+    // elapsed, never that the sheet's native window is gone. The sheets now
+    // call `notePresentationDismissed('sheet')` from their <Modal onDismiss>,
+    // and that releases this submit. SHEET_SETTLE_MS is unchanged and DEMOTED:
+    // it is the bounded fallback deadline, not the authority. It was never the
+    // wrong number — it was the wrong kind of fact, and raising it would not
+    // have been a repair.
+    //
+    // ⚠⚠ ANDROID HAS NO SUCH CALLBACK. react-native 0.81.5 fires `onDismiss`
+    // only under `Platform.OS === 'ios'` (Libraries/Modal/Modal.js), so on
+    // Android the deadline IS the normal release and behaviour is exactly what
+    // it was before this OTA. The wedge being closed is an iOS window fault.
+    //
+    // ⚠ THE SUBMIT STATEMENT IS UNCHANGED, BYTE FOR BYTE, and `after` is still
+    // composed BEFORE the handoff is armed, so the caller's own callback runs
+    // exactly where it always did: immediately after the submit, in the same
+    // tick as the release.
     //
     // ⚠ IT BORROWS THE HANDLER'S ID AND NEVER MINTS ONE. Calling
     // `noteHandlerEnter` here would find the root touch already claimed by T1
     // and report a fabricated orphan. A null means no handler owns this call,
     // and then nothing is recorded — a missing stage beats an invented one.
+    //
+    // ⚠ THE DIAGNOSTIC PAIR SURVIVES, RENAMED TO WHAT IT NOW MEANS.
+    // OTA-1813's `delayed-submit-armed` / `delayed-submit-fired` become
+    // `dismiss-wait-armed` / `dismiss-complete-release` | `fallback-release`,
+    // so a trace still separates "the tap never reached a handler" from "the
+    // handler's work never ran" AND now also says which clock released it.
     const tp = currentTouchId();
     if (tp !== null) {
       noteStage(tp, 'dispatch', {
         control: 'sheet:deferred',
-        reason: 'delayed-submit-armed',
+        reason: 'dismiss-wait-armed',
         delayMs: SHEET_SETTLE_MS,
       });
       const caller = after;
-      after = (): void => {
+      after = (): void => { caller?.(); };
+    }
+    armPresentationHandoff('sheet', (release) => {
+      if (tp !== null) {
         noteStage(tp, 'dispatch', {
           control: 'sheet:deferred',
-          reason: 'delayed-submit-fired',
+          reason: release === 'dismiss-complete' ? 'dismiss-complete-release' : 'fallback-release',
         });
-        caller?.();
-      };
-    }
-    setTimeout(() => { submit(text); after?.(); }, SHEET_SETTLE_MS);
+      }
+      submit(text); after?.();
+    }, { fallbackMs: SHEET_SETTLE_MS });
   };
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);

@@ -401,21 +401,34 @@ describe('OTA-1813 §8 — the deferred submit says both halves', () => {
     { mode: 'opener' },
   );
 
-  it('the helper records armed before scheduling and fired when it runs', () => {
-    expect(HELPER).toContain("reason: 'delayed-submit-armed'");
-    expect(HELPER).toContain("reason: 'delayed-submit-fired'");
-    // armed carries the delay, so a reader knows how long a missing `fired` is
-    // missing BY without consulting the source.
+  /* ⚠⚠⚠ OTA-1863 RENAMED THIS PAIR TO WHAT IT NOW MEANS, AND STRENGTHENED IT.
+   * The job is unchanged and is the reason the pair exists: `armed` without a
+   * release still separates "the tap never reached a handler" from "the handler's
+   * work never ran". What is new is that the release says WHICH CLOCK freed it —
+   * the sheet's own native <Modal onDismiss> (the authority) or the bounded
+   * deadline (the fallback, and Android's normal path, since react-native 0.81.5
+   * fires onDismiss under Platform.OS === 'ios' only). A trace that used to say
+   * only "fired" now also says whether iOS answered. */
+  it('the helper records armed before waiting and says which clock released it', () => {
+    expect(HELPER).toContain("reason: 'dismiss-wait-armed'");
+    expect(HELPER).toContain("'dismiss-complete-release' : 'fallback-release'");
+    // armed carries the fallback deadline, so a reader knows how long a missing
+    // release is missing BY without consulting the source.
     expect(HELPER).toContain('delayMs: SHEET_SETTLE_MS');
   });
 
-  /* ⚠⚠⚠ OTA-1497'S DEFERRAL IS UNTOUCHED, BYTE FOR BYTE. That statement is the
-   * fix for a different iOS wedge and its exact spelling is pinned by that
-   * OTA's own suite. This instrument composes `after` BEFORE the timeout is
-   * scheduled rather than editing the statement — pinned here too, so a future
-   * edit cannot quietly move the instrument into the pinned line. */
-  it('the pinned deferral statement is unchanged', () => {
-    expect(HELPER).toContain('setTimeout(() => { submit(text); after?.(); }, SHEET_SETTLE_MS);');
+  /* ⚠⚠⚠ OTA-1497'S DEFERRAL BECAME OTA-1863'S HANDOFF, AND THE SUBMIT STATEMENT
+   * ITSELF IS STILL UNTOUCHED. What moved is only WHO RELEASES IT: a wall-clock
+   * setTimeout proved that 400ms elapsed, never that the sheet's native window
+   * was gone. `after` is still composed BEFORE the wait is armed rather than by
+   * editing the submit line — pinned here, so a future edit cannot quietly move
+   * the instrument into it. */
+  it('the submit statement is unchanged and is released by the handoff, not a timer', () => {
+    expect(HELPER).toContain('submit(text); after?.();');
+    expect(HELPER).toContain("armPresentationHandoff('sheet', (release) => {");
+    expect(HELPER).toContain('{ fallbackMs: SHEET_SETTLE_MS }');
+    // the bare timer that used to authorize it is gone
+    expect(HELPER).not.toContain('setTimeout(() => { submit(text); after?.(); }, SHEET_SETTLE_MS);');
   });
 
   /* ⚠⚠ AND IT BORROWS THE HANDLER'S ID. Calling noteHandlerEnter here would find

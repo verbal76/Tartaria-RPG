@@ -6,6 +6,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// OTA-1863 — this card's native window reports when it is actually gone.
+import { notePresentationDismissed } from '../state/presentationHandoff';
 
 const CARD_IN_MS = 1200;
 
@@ -24,10 +26,30 @@ export function ChapterCardOverlay() {
     }).start();
   }, [card, drift]);
 
-  if (!card) return null;
+  // ⚠⚠⚠ OTA-1863 — THE <Modal> STAYS MOUNTED SO IT CAN REPORT ITS OWN DISMISSAL.
+  // `if (!card) return null` unmounted it, and react-native 0.81.5's Modal drops
+  // its `modalDismissed` subscription in componentWillUnmount — so onDismiss
+  // could never fire and the handoff would always fall back to a deadline. The
+  // card is driven by `visible` now (exactly as GatherModal/SearchModal already
+  // are) and the last card is held so the content still renders THROUGH the
+  // dismissal animation instead of blanking a frame early.
+  const held = useRef(card);
+  if (card) held.current = card;
+  const shown = card ?? held.current;
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={dismiss}>
+    <Modal
+      visible={!!card}
+      transparent
+      animationType="fade"
+      onRequestClose={dismiss}
+      /* ⚠⚠⚠ OTA-1863 — THE ONLY AUTHORITY. iOS calls this once the native window
+         is gone (react-native 0.81.5 Modal.js fires it under Platform.OS ===
+         'ios' only). Whatever was waiting on this card — the due story fork —
+         is released here instead of in the same tick the card was told to go.
+         Android never calls it; there the handoff's bounded deadline releases. */
+      onDismiss={() => notePresentationDismissed('chapter')}
+    >
       <Pressable style={styles.backdrop} onPress={dismiss} accessibilityRole="button" accessibilityLabel="Continue">
         <Animated.View
           style={[
@@ -45,14 +67,14 @@ export function ChapterCardOverlay() {
                 the exact moment a lethal fight ends; without an explicit verdict the player
                 has to GUESS whether they won, died, or hit a glitch — the owner guessed
                 "died" and nearly put the phone down. Gold, loud, and first. */}
-            {card.banner ? <Text style={styles.victoryBanner}>{card.banner}</Text> : null}
-            <Text style={styles.kicker}>{card.kicker}</Text>
-            <Text style={styles.title} accessibilityRole="header">{card.title}</Text>
+            {shown?.banner ? <Text style={styles.victoryBanner}>{shown.banner}</Text> : null}
+            <Text style={styles.kicker}>{shown?.kicker}</Text>
+            <Text style={styles.title} accessibilityRole="header">{shown?.title}</Text>
             <View style={styles.rule} />
-            <Text style={styles.body}>{card.body}</Text>
+            <Text style={styles.body}>{shown?.body}</Text>
             <View style={styles.motiveBlock}>
-              <Text style={styles.motiveTag}>{card.motiveTitle.toUpperCase()}</Text>
-              <Text style={styles.motiveLine}>{card.motiveLine}</Text>
+              <Text style={styles.motiveTag}>{shown?.motiveTitle?.toUpperCase()}</Text>
+              <Text style={styles.motiveLine}>{shown?.motiveLine}</Text>
             </View>
           </ScrollView>
         </Animated.View>

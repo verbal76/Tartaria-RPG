@@ -15,6 +15,7 @@ import {
 
 import { tControlDepth, tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
+import { notePresentationDismissed } from '../state/presentationHandoff';
 
 import type { InteractableChip } from './InteractableChip';
 
@@ -200,6 +201,13 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
       animationType="fade"
       onRequestClose={onCancel}
       statusBarTranslucent
+      /* ⚠⚠⚠ OTA-1863 — THE SHEET SAYS WHEN IT IS GONE. OTA-1497 deferred any
+         submit leaving a closing sheet by SHEET_SETTLE_MS, because presenting a
+         popup into this window's dismissal wedges iOS. 400ms was a guess at the
+         animation; this is the animation reporting itself. The timer survives
+         as a bounded fallback (and as Android's normal release — RN 0.81.5 fires
+         onDismiss on iOS only). */
+      onDismiss={() => notePresentationDismissed('sheet')}
     >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <KeyboardAvoidingView
