@@ -31233,7 +31233,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * stage's own escort. The key was already stage-stamped; nothing needed inventing, only
  * carrying. The guard is opt-in on the argument, so no other caller is broken, and the
  * shadowed arc is not stranded: the card yields to it and its own key pays it. */
-export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
+/* ⚠⚠⚠ OTA-1861 — THE GROUND STAYS UNDER THE BOOTS (PACKAGE 5 of the mechanical-
+ * integrity program). Package 1 asked whether authored opposition materializes;
+ * Package 2 whether the authored objective can be obtained and used; Package 3 whether
+ * every stage advances through the correct path exactly once; Package 4 whether the
+ * authored NPC becomes the correct interactive object. Package 5 asks whether authored
+ * geography and RUNTIME geography agree: when a stage expects the player to travel to,
+ * arrive at, stand on, leave or re-enter a place, does the runtime recognise the
+ * correct transition, at the correct time, for the correct stage?
+ *
+ * MOST OF IT WAS ALREADY TRUE. All 281 stages name their own place and all 281 names
+ * resolve (nothing falls back to the arc anchor); the 54 distinct grounds are all real
+ * canon locations and no two share a cell; and every runtime door asks ONE question —
+ * the canon GRID CELL (OTA-1597/1637), never the sticky `currentLocationId` label.
+ * Measured: travel lands on the cell; the wrong ground pays nothing; the right NAMED
+ * PLACE two tiles off its cell pays nothing; a roof shuts the arm (three independent
+ * guards deep) and stepping out opens it; leaving and returning keeps the beat
+ * reachable; mud_seas — where FOUR tracked arcs are armed at once — stands up exactly
+ * ONE pack, stamped `hunt:<arc>:<stage>`, and the flee ledger names that same arc; and
+ * an arrival re-delivered after the record advanced arms nothing.
+ *
+ * WHAT WAS NOT TRUE — THE TABLE EVERY ONE OF THOSE READERS RESOLVES AGAINST COULD MOVE.
+ * `worldMap.canonicalPositions` is that table. It was built over `allKnownLocations()`
+ * — the install-fixed world PLUS everything the save has canonized since — in one
+ * id-sorted pass where `findFreeTile` hands a tile to whoever the sort reaches first.
+ * Setting a whisper course canonizes its objective tile as `mention_<slug>` carrying an
+ * EXPLICIT cell, and `mention_` sorts ahead of 28 of the 54 authored mission grounds.
+ * Measured on the pre-repair tree, standing on mud_seas' cell with hunt_bog_dragon at
+ * stage 5, paid up:
+ *
+ *   before   49,14 · standingAtLocation true · the arm stands up Mud Harpy x3
+ *   canonize mention_a_salt_cart at 49,14 (exactly what a whisper course does)
+ *   after    49,14 -> 48,13 · THE PLAYER HAS NOT MOVED · standingAtLocation false
+ *            · the arm stands up nothing · 49,14 now answers "A Salt Cart"
+ *            · ATTACK: "Close. The Bog Dragon of Old Drakova wants the ground
+ *              2 tiles west of here — step onto it and go again."
+ *
+ * The world moved out from under the boots — permanently, because canonLocations is
+ * saved and re-pushed on load, and silently, because every reader agreed with the new
+ * table. Nothing read as broken; it read as a player standing in the wrong place.
+ *
+ * THE REPAIR IS THE TIER THAT COMPARATOR ALREADY HAD, EXTENDED BY ONE. Hidden statics
+ * were already placed last among statics for exactly this reason; dynamically canonized
+ * places now sort after every static, so a mention can only take a tile the install-fixed
+ * world did not want. With nothing canonized the order — and every cell — is identical.
+ * And it costs the whisper nothing: the "?" marker and the arrival that resolves it both
+ * read the EVENT'S own gx/gy, and the course walks to the raw cell. */
+export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';

@@ -378,12 +378,57 @@ export function overlandAreaLabel(
 }
 
 /** The install-canon position table for every static location, collision-resolved
- *  once in a fixed (id-sorted, hidden-last) order so it's identical every load. */
+ *  once in a fixed (id-sorted, hidden-last) order so it's identical every load.
+ *
+ * ⚠⚠⚠ OTA-1861 — THE INSTALL-FIXED WORLD IS PLACED FIRST; A CANONIZED MENTION
+ * TAKES WHAT IS LEFT. This table is the one answer to "where is X?" that every
+ * position reader in the game resolves against — `standingAtLocation`, the arrival
+ * doors' canon-cell test (OTA-1597), `travelTo`'s grid snap, the autoroute, the
+ * atlas pin. `travelTo` calls a location's cell "the location's permanent grid
+ * position", and the comment above calls it install-canon. It was neither, because
+ * the ORDER this loop runs in is `allKnownLocations()` — statics PLUS everything
+ * the save has canonized since — and `findFreeTile` gives the tile to whoever the
+ * sort reaches first.
+ *
+ * Setting a whisper course canonizes its objective tile as `mention_<slug>` with an
+ * EXPLICIT cell (gameStore.setWhisperCourse → canonizeLocation → setCanonExtraLocations,
+ * which drops this cache). `mention_` sorts between `master_strand` and
+ * `monarch_waystation`, so it was placed BEFORE 28 of the 54 authored mission grounds
+ * — and when its tile was one of theirs, THE GROUND MOVED. Measured on the pre-repair
+ * tree, standing on mud_seas' cell with hunt_bog_dragon at stage 5:
+ *
+ *   before   cell 49,14 · standingAtLocation true · the arm stands up Mud Harpy x3
+ *   canonize mention_a_salt_cart at 49,14 (exactly what a whisper course does)
+ *   after    cell 49,14 -> 48,13 · the player has NOT moved · standingAtLocation false
+ *            · the arm stands up nothing · 49,14 now answers "A Salt Cart"
+ *            · ATTACK: "Close. The Bog Dragon of Old Drakova wants the ground
+ *              2 tiles west of here — step onto it and go again."
+ *
+ * The world moved out from under the boots, permanently (canonLocations is saved and
+ * re-pushed on load), and every reader agreed with the new table, so nothing anywhere
+ * read as wrong — it read as a player standing in the wrong place.
+ *
+ * ⚠ THE REPAIR IS THE TIER THIS COMPARATOR ALREADY HAS, EXTENDED BY ONE. Hidden
+ * statics were already placed last among statics for exactly this reason; dynamically
+ * canonized places now sort after every static, so a mention can only ever take a tile
+ * the install-fixed world did not want. Nothing else changes: with no extras canonized
+ * the order — and therefore every cell — is byte-identical to before.
+ *
+ * ⚠ AND IT COSTS THE WHISPER NOTHING. The "?" marker (questionMarkers.questionMarkerPlaces)
+ * and the arrival that resolves it (gameStore.resolveGridEventAt) both read the EVENT'S
+ * OWN gx/gy, never this table, and `continueWhisperCourse` walks to the raw cell. Only
+ * the mention's routable pin can now be bumped a tile — which is already what happens
+ * whenever a mention collides with a location sorting ahead of it. */
 export function canonicalPositions(): Record<string, { x: number; y: number }> {
   if (_canonCache) return _canonCache;
   const positions: Record<string, { x: number; y: number }> = {};
   const taken = new Set<string>();
+  const staticIds = new Set(ALL_LOCATIONS.map((l) => l.id));
   const ordered = [...allKnownLocations()].sort((a, b) => {
+    // ⚠⚠⚠ OTA-1861 — statics first, in their install-fixed order; see the header.
+    const ad = staticIds.has(a.id) ? 0 : 1;
+    const bd = staticIds.has(b.id) ? 0 : 1;
+    if (ad !== bd) return ad - bd;
     const ah = HIDDEN_LOCATIONS[a.id] ? 1 : 0;
     const bh = HIDDEN_LOCATIONS[b.id] ? 1 : 0;
     if (ah !== bh) return ah - bh;
