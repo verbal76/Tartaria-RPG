@@ -31161,7 +31161,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * renamed — whether the mystery's relic and the world's relic are one fiction is the
  * owner's call, and ota1858 pins the five collisions in DATA so a future rename is a
  * deliberate, visible act. */
-export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';
+/* ⚠⚠⚠ OTA-1859 — THE BEAT THAT IS PAID BY LEAVING (PACKAGE 3 of the mechanical-
+ * integrity program). Package 1 asked whether authored opposition materializes.
+ * Package 2 asked whether authored objectives can be obtained and used. Package 3
+ * asks whether every authored stage can ADVANCE, BLOCK and COMPLETE through the
+ * correct mechanical path — exactly once, at the right time, from the right state.
+ *
+ * MOST OF IT WAS ALREADY TRUE, and ota1859 pins it. Across 50 arcs / 281 stages:
+ * every stage has at least one supported closing door (ZERO orphans); all 14 null
+ * stages are TRAILING epilogues the auto-consume loops walk past, so nothing can be
+ * parked on a verbless beat; the nine consecutive same-verb-AND-same-tile pairs are
+ * paid one at a time (measured: one `investigate` on mystery_red_tower moves #2 to #3
+ * and stops); the final transition fires exactly once and three more paying inputs on
+ * a finished arc change nothing; and a body stamped for stage N cannot close stage
+ * N+1 — resolveStageEscortClear compares the OTA-1703 stageKey against the record's
+ * CURRENT stage, which is stage-instance identity, not "advance whatever is current".
+ *
+ * WHAT WAS NOT TRUE — ONE checkKind, LOOKED FOR IN THE WRONG FAMILY. `escape` is the
+ * only authored checkKind whose action does not exist outside a fight. Five stages
+ * carry it, ALL storylines, all mid-arc, each one "you have the thing, now carry it
+ * clear". Two runtime readers carved `escape` out of their combat gate and BOTH wrote
+ * `family === 'hunt'` — and hunts author zero escape stages. Measured on the
+ * pre-repair tree at The Sunken Enclave, holding The Founder's Case:
+ *
+ *   · IN COMBAT — the authored action — the stage did NOT advance (3 -> 3), and the
+ *     Arbiter said "That is the right move for The Drowned Library — but not with
+ *     something on you. Put this down first." to a player who was fleeing.
+ *   · OUT OF COMBAT — fleeing nothing — the stage DID advance (3 -> 4).
+ *
+ * Exactly inverted. THREE SURGICAL CHANGES: questStage.stageClosesOnEscape (new, one
+ * authority); stageArrival.closeEscapeBeatOnFlee, called from inside the branch that
+ * clears the field, so the beat pays where the prose is true; and the two readers now
+ * ask the stage instead of the family. The hunt matcher's dead carve-out is gone.
+ *
+ * ⚠ THE OUT-OF-COMBAT PATH STAYS, DELIBERATELY. It is live behaviour a save may sit on
+ * and the only floor under a stage whose ground never happens to produce a fight —
+ * trading a wrong-state close for an unreachable one is the softlock P19's heal exists
+ * to avoid. ota1859 asserts it stays legal on purpose. */
+export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1858-the-mission-knows-its-own';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1857-the-sentences-that-name-bodies';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1856-the-baseline-is-not-the-first-sample';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-20-1855-the-cap-loses-the-race';

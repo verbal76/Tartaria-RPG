@@ -381,6 +381,42 @@ export function rearmAfterRoll(get: Get, set: Set, grantStageItems: GrantStageIt
   checkStandingGround(get, set, grantStageItems);
 }
 
+/**
+ * ⚠⚠⚠ OTA-1859 — THE ESCAPE BEAT CLOSES WHERE THE ESCAPE HAPPENS. Called from the
+ * successful-flee branch, right after `noteMissionFlee`, with the field already
+ * cleared. `questStage.stageClosesOnEscape` carries the whole finding and the five
+ * authored stages; the short version is that `escape` is the one checkKind whose
+ * action does not exist outside a fight, and the verb choke — the only door those
+ * five had — is gated on NOT being in one.
+ *
+ * ⚠ CALLED FROM INSIDE THE BRANCH THAT CLEARS THE FIELD, which is the whole point of
+ * the placement. Fleeing cannot fail today (OTA-1459 charges the stamina after the
+ * escape, never as a gate on it), so this is not about a failed roll — it is about
+ * paying the beat only where the prose is true: there WAS a fight, and the player is
+ * out of it carrying the thing. A wall-flee that ends in a fatal fall breaks out above
+ * this branch and pays nothing; the verb typed on an empty tile never reaches here.
+ *
+ * ⚠ SAME GATES AS EVERY OTHER DOOR, AND THE SAME ONE WRITER. `standingStages` is the
+ * canon-cell test (OTA-1597); the pack is checked with the Package 2 count; and the
+ * advance itself is the family's own `advance*`, so the narration, the grant, the
+ * direction, the route and the close card all come from machinery this file does not
+ * duplicate. One beat per flee — two arcs closing on one escape is not a thing the
+ * prose ever promises.
+ */
+export function closeEscapeBeatOnFlee(get: Get, set: Set): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+  for (const s of standingStages(get)) {
+    if (!QS.stageClosesOnEscape(s.stage as never)) continue;
+    if (!QS.stageRequirementMet(s.stage as never, get().player?.inventory ?? [])) continue;
+    if (s.family === 'hunt') get().advanceHunt(s.recId);
+    else if (s.family === 'mystery') get().advanceMystery(s.recId);
+    else get().advanceStoryline(s.recId);
+    return;
+  }
+  void set;
+}
+
 /** ⚠⚠ OTA-1597 — THE ONE DOOR for every way of standing on the tile: heal the
  *  record's debts, then arm the fight. Called from the per-action catch-all
  *  (typed cardinals, chips, any verb while standing there), from

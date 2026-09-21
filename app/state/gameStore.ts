@@ -235,7 +235,7 @@ import {
 // OTA: single-owner state moves WITH its owner, shared state moves DOWN.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from './sprint';
 import { playerGridCell } from './playerGrid';
-import { armSpawnStagesAtArrival, checkStandingGround, healStageDebtsAtArrival, noteMissionGroundsUnderfoot, noteMissionFlee, fieldHasLiveHostiles, rearmAfterRoll } from './stageArrival';
+import { armSpawnStagesAtArrival, checkStandingGround, closeEscapeBeatOnFlee, healStageDebtsAtArrival, noteMissionGroundsUnderfoot, noteMissionFlee, fieldHasLiveHostiles, rearmAfterRoll } from './stageArrival';
 import { recordDeed, lastDeed as lastDeedAt } from '../engine/deeds';
 import * as PH from '../engine/progressionHints'; // OTA-1701
 // ⚠⚠ OTA-1461 — the pools for the lines a player hears ten times an hour. Each is
@@ -1093,14 +1093,13 @@ function advanceStagesOnIntent(
       const next = def.stages[rec.stage];
       if (!next) return false;
       if (QSV.payingIntent('hunt', next) !== intent) return false;
-      // ⚠⚠ OTA-1217 — EVERY ROW BUT ESCAPE IS AN OUT-OF-COMBAT DELIBERATE ACTION
-      // (escape alone stays in-combat: fleeing IS combat). Without the guard, the
-      // frozen apex stage (OTA-796) re-matched on EVERY swing of the boss fight
-      // itself — each attack re-ran advanceHunt, which re-spawned the boss at
-      // FULL HP, reset the range, and re-logged the apex narration. The fight
-      // literally could not be won. ⚠ OTA-1588 kept this guard byte for byte and
+      // ⚠⚠ OTA-1217 — A STAGE VERB IS AN OUT-OF-COMBAT DELIBERATE ACTION. Without
+      // the guard the frozen apex stage (OTA-796) re-matched on EVERY swing of the
+      // boss fight itself — each attack re-ran advanceHunt, which re-spawned the
+      // boss at FULL HP, reset the range and re-logged the apex narration. The
+      // fight literally could not be won. OTA-1588 kept it byte for byte and
       // replaced only the verb table above it.
-      return next.checkKind === 'escape' ? true : !inCombat;
+      return !inCombat; // ⚠⚠⚠ OTA-1859 — this row read `checkKind === 'escape' ? true : !inCombat` and hunts author zero escape stages; all five are storylines, which this matcher gated shut. The beat is paid by LEAVING now (stageArrival.closeEscapeBeatOnFlee), in every family alike.
     });
   if (huntMatch && huntMatch.def) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -22802,6 +22801,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
               const fledPl = get().player;
               if (fledPl) set({ missionFleeHoldCell: playerGridCell(fledPl) });
               noteMissionFlee(get, set, currentScene); // ⚠ OTA-1688 — the flee is written down, bodies' state and all
+              closeEscapeBeatOnFlee(get, set); // ⚠⚠⚠ OTA-1859 — and an `escape` stage is PAID here, on the success. questStage.stageClosesOnEscape has the five stages and the measurement.
             }
             // ⚠⚠⚠ OTA-1459 — RUNNING COSTS SOMETHING NOW. See FLEE_STAMINA_COST.
             //

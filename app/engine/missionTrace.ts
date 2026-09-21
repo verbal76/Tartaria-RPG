@@ -51,7 +51,8 @@ import { playerGridCell } from '../state/playerGrid';
 // ⚠ OTA-1637 — "here" is the CELL, the same test the arrival doors run.
 import { standingAtLocation, offGroundText } from './standingAt';
 import {
-  stageLocationId, stageRequirementMet, stageVerbAsk, stageObjectiveAsk, payingIntent, type MissionFamily,
+  stageLocationId, stageRequirementMet, stageVerbAsk, stageObjectiveAsk, payingIntent,
+  stageClosesOnEscape, type MissionFamily,
 } from './questStage';
 
 type Rec = { id: string; stage: number; tracked?: boolean };
@@ -309,7 +310,15 @@ export function stalledInCombat(
       if (!def || !next || next.checkKind === null) continue;
       // A hunt's apex IS the fight; fleeing IS combat — neither is a stall.
       if (family === 'hunt' && next.checkKind === 'boss') continue;
-      if (family === 'hunt' && next.checkKind === 'escape') continue;
+      // ⚠⚠⚠ OTA-1859 — THIS ONE WAS NEVER HUNT-ONLY, AND SAYING SO COST A REAL LINE.
+      // Fleeing IS combat in every family — but this read `family === 'hunt'`, and hunts
+      // author ZERO escape stages while storylines author all five. Measured mid-fight on
+      // The Sunken Enclave, carrying The Founder's Case: "That is the right move for The
+      // Drowned Library — but not with something on you. Put this down first." — said to
+      // a player doing exactly what the stage asks. The boss and attack_provoke lines
+      // around it ARE family-specific (a mystery's boss is paid by investigate, a
+      // storyline's by diplomacy, and neither of those is a fight); this one is not.
+      if (stageClosesOnEscape(next)) continue;
       // OTA-1686 — so is a provoke, and so is any stage that stands bodies up.
       if (family === 'hunt' && next.checkKind === 'attack_provoke') continue;
       if (next.spawn) continue;

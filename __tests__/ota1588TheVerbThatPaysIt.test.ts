@@ -241,8 +241,22 @@ describe('OTA-1588 — one implementation, enforced', () => {
     // The rows that went away carried it. Losing it would re-spawn the hunt apex
     // at full HP on every swing — a fight that literally cannot be won, which is
     // a far worse bug than the one being fixed.
+    //
+    // ⚠⚠ SUPERSEDED BY OTA-1859 — THE CLAIM IS KEPT, THE WITNESS IS CORRECTED. This
+    // quoted `return next.checkKind === 'escape' ? true : !inCombat;`, and that
+    // `escape` half was a hunt-local carve-out for a checkKind hunts never author:
+    // all five escape stages are storylines, and OTA-1859 measured the storyline
+    // matcher holding them shut in combat while the Arbiter told the fleeing player
+    // to stand and fight. The beat is paid by LEAVING now — see
+    // stageArrival.closeEscapeBeatOnFlee — so the special case is gone and the
+    // OTA-1217 guard itself is what remains, which is all this test ever protected.
     const STORE = src('app', 'state', 'gameStore.ts');
-    expect(STORE).toContain("return next.checkKind === 'escape' ? true : !inCombat;");
+    expect(STORE).toContain('return !inCombat;');
+    // …and the reason it matters, as behaviour rather than as a quotation: a hunt's
+    // apex is paid by ATTACK, so without the guard every swing of the boss fight
+    // re-runs advanceHunt and re-spawns the boss at full HP.
+    const apex = HUNTS.find((h) => h.id === 'hunt_bog_dragon')!;
+    expect(payingIntent('hunt', apex.stages[apex.stages.length - 1] as never)).toBe('attack');
   });
 
   it('⚠⚠ the Contracts card prints the hint for all three families now', () => {

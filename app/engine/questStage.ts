@@ -322,6 +322,52 @@ export function payingIntent(
   return kind;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1859 — THE BEAT THAT IS PAID BY LEAVING. Package 3 asked whether every
+ * authored stage can close through the correct mechanical path, and found exactly one
+ * checkKind whose action does not exist outside a fight: `escape`. Five stages author
+ * it — all storylines, all mid-arc, each one "you have the thing, now carry it clear":
+ *
+ *   story_tartarian_ascension#1        The Buried Cities         Korash's Trial-Token
+ *   story_tartarian_ascension#5        Tartarian Outskirts       Night-Watch Tally
+ *   story_dynasty_blood_aetherborn#2   the Sinking Cathedral     The Drowned Party's Seal
+ *   story_builders_scripture_in_stone#3 Grand Spire of Etheria   The True Glyph
+ *   story_order_drowned_library#3      The Sunken Enclave        The Founder's Case
+ *
+ * ⚠⚠ THE RUNTIME KNEW ABOUT ESCAPE BEATS AND LOOKED FOR THEM IN THE WRONG FAMILY.
+ * Two readers carved `escape` out of their combat gate and both wrote `family === 'hunt'`
+ * — advanceStagesOnIntent's hunt matcher (`next.checkKind === 'escape' ? true : !inCombat`)
+ * and missionTrace.stalledInCombat. Hunts author ZERO escape stages. The one family that
+ * authors all five was gated `!inCombat` with no carve-out at all, so, measured on the
+ * pre-repair tree at The Sunken Enclave holding The Founder's Case:
+ *
+ *   · IN COMBAT — the authored action — the stage did NOT advance (3 -> 3), and the
+ *     Arbiter said "That is the right move for The Drowned Library — but not with
+ *     something on you. Put this down first." to a player who was fleeing.
+ *   · OUT OF COMBAT — fleeing nothing — the stage DID advance (3 -> 4).
+ *
+ * Exactly inverted. The beat is now closed where it actually happens: the escape itself
+ * (stageArrival.closeEscapeBeatOnFlee), for every family, on the stage's own ground,
+ * with the pack checked.
+ *
+ * ⚠ THE PLACEMENT IS INSIDE THE BRANCH THAT CLEARS THE FIELD, not at the verb. Fleeing
+ * cannot FAIL today — OTA-1459 charges the stamina after the escape and never as a gate
+ * on it — so "attempt vs success" buys nothing on the ordinary path; what the placement
+ * does buy is that the beat only pays when there WAS a fight and the player is out of it.
+ * A wall-flee that ends in a fatal fall breaks out above that branch and pays nothing,
+ * and a verb typed on an empty tile never reaches it at all.
+ *
+ * ⚠ THE VERB CHOKE KEEPS ITS OUT-OF-COMBAT PATH, DELIBERATELY. That path is live
+ * behaviour a save may be sitting on, and it is the only floor under a stage whose
+ * ground never happens to produce a fight. Removing it would trade a wrong-state close
+ * for an unreachable one, and a softlock is worse than the bug it replaces (P19's rule).
+ * What changes there is only that the hunt matcher stops special-casing escape, so all
+ * three families read the same sentence and a failed flee cannot pay any of them.
+ */
+export function stageClosesOnEscape(stage: { checkKind?: string | null } | null | undefined): boolean {
+  return (stage?.checkKind ?? null) === 'escape';
+}
+
 /** The Contracts card's "→ Advance by …" phrasing. ⚠ Keyed on the raw kind where
  *  the raw kind is honest, and resolved through the family only for `boss` —
  *  folding `attack_provoke` into "defeat in combat" would lose a distinction the
