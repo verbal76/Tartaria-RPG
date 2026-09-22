@@ -79,7 +79,7 @@ import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoverie
 import { giftBlockReason } from '../engine/giftEligibility';
 // OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
-  hasTopicsFor, topicsFor, topicReply, answersAvailable, alreadySaidLine, nothingToSayLine,
+  hasTopicsFor, topicsFor, topicReply, topicSpent, alreadySaidLine, nothingToSayLine,
   lockedTopicCount, teaserDeflectionLine,
   topicGrantWouldDefer,
   type Topic as TalkTopic,
@@ -8431,10 +8431,10 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     if (!target || !hasTopicsFor(target.id)) return false;
     const ctx = talkContextFor(get, { id: target.id, name: target.name, faction: target.faction ?? null });
     const talked = get().worldMemory.talkedTopics ?? {};
-    // ⚠ OTA-1784 — `answersAvailable`: on `lines.length` a laned trader's glow never dims.
-    return topicsFor(target.id, ctx).some(
-      (t) => (talked[`${target.id}:${t.id}`] ?? 0) < answersAvailable(t, target.id),
-    );
+    // ⚠ OTA-1784 — on `lines.length` a laned trader's glow never dims.
+    // ⚠ OTA-1866 — and it asks `topicSpent` now, the same single reader the
+    // topic list asks, so the light, the list and the engine cannot drift.
+    return topicsFor(target.id, ctx).some((t) => !topicSpent(t, target.id, talked));
   },
   // OTA-1090 — the teaser answers IN VOICE, never in labels. Rotates through
   // the rung's deflection pool per tap; the count row itself never changes,
@@ -8491,8 +8491,8 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // Repetition is acknowledged rather than replayed. An NPC who answers the
     // same question twice as though it were the first time is the exact
     // "checklist, not a relationship" failure Phase 1 was written against.
-    // ⚠ OTA-1784 — `answersAvailable`: a class set's lines are parallel VOICES now.
-    if (asked >= answersAvailable(topic, t.npcId)) {
+    // ⚠ OTA-1784/1866 — `topicSpent` is also what the topic list renders from.
+    if (topicSpent(topic, t.npcId, get().worldMemory.talkedTopics)) {
       const dup = alreadySaidLine(t.npcName);
       get().appendLog('world', dup);
       recordTalkTurn(set, t.npcId, topic.label, dup);

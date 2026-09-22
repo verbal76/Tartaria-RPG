@@ -50,7 +50,7 @@ import { useGameStore } from '../state/gameStore';
 // and this sheet is its only door. A screen-only census could never see this
 // file, which is why it went unaccounted; see humanActivity.ts.
 import { useHumanAction } from '../state/humanActivity';
-import { lockedTeaserLabel } from '../engine/dialogue';
+import { lockedTeaserLabel, topicSpent, type Topic } from '../engine/dialogue';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 
@@ -102,10 +102,18 @@ export function TalkSheet() {
   const [collapsed, setCollapsed] = useState(false);
   const transcriptRef = useRef<ScrollView | null>(null);
 
+  /* ⚠⚠⚠ OTA-1866 — THE LIST ASKS THE ENGINE, and it used to answer for itself.
+     This closure took a `lineCount` from each call site and every call site
+     passed `topic.lines.length` — which stopped being the number of answers a
+     person has at OTA-1784, when a class set's lines became parallel voices.
+     A laned trader's topic therefore reported spent at 6 while the engine spent
+     it at 1, and since the engine returns before the counter write on the
+     already-said path the counter froze at 1 and the row never dimmed. Ilva
+     Sidelong took 79 presses for three questions. `topicSpent` is the engine's
+     own reader; there is no count to pass and so none to get wrong. */
   const spent = useMemo(() => {
     const npcId = ctx?.npcId;
-    return (topicId: string, lineCount: number) =>
-      !!npcId && (talked?.[`${npcId}:${topicId}`] ?? 0) >= lineCount;
+    return (topic: Topic) => !!npcId && topicSpent(topic, npcId, talked);
   }, [ctx?.npcId, talked]);
 
   // Unasked first, asked sunk — but never hidden. A list that silently shrinks
@@ -115,14 +123,14 @@ export function TalkSheet() {
   const ordered = useMemo(() => {
     if (!ctx) return [];
     return [...ctx.topics].sort((a, b) => {
-      const aAsked = spent(a.id, a.lines.length);
-      const bAsked = spent(b.id, b.lines.length);
+      const aAsked = spent(a);
+      const bAsked = spent(b);
       return aAsked === bAsked ? 0 : aAsked ? 1 : -1;
     });
   }, [ctx, spent]);
 
   const remaining = useMemo(
-    () => ordered.filter((t) => !spent(t.id, t.lines.length)).length,
+    () => ordered.filter((t) => !spent(t)).length,
     [ordered, spent],
   );
 
@@ -256,7 +264,7 @@ export function TalkSheet() {
 
             <ScrollView style={styles.topics} contentContainerStyle={styles.topicsInner}>
               {ordered.map((t) => {
-                const asked = spent(t.id, t.lines.length);
+                const asked = spent(t);
                 return (
                   <Pressable
                     key={t.id}

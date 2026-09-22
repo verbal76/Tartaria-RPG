@@ -31339,7 +31339,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * ⚠ NOT CLAIMED: that Freeze 2 is fixed, that OTA-1863 is proven effective, or
  * that all freezes are now observable. This makes the instrument deep enough to
  * hold an interaction of the age and event volume that was measured. */
-export const OTA_BUILD_ID = '2026-09-22-1865-the-report-keeps-the-evidence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-22-1865-the-report-keeps-the-evidence';
+/* ⚠⚠⚠ OTA-1866 — A QUESTION IS ASKED ONCE, AND THE LIST HAS TO AGREE.
+ * The owner's contract for a vendor conversation: ask once, the answer lands
+ * once, the conversation remembers, and the question is not offered again for
+ * that character. Measured violation on hardware 2026-09-22 — 79 presses in
+ * 25s against Ilva Sidelong, three options, "I have told you that one." every
+ * time. Ilva is `roadside:ilva_sidelong` → `class:roadside`.
+ * CLASS ERROR, not an Ilva one: OTA-1784 made a class set's lines parallel
+ * VOICES (one answer per person) and moved the store's guard and the TALK glow
+ * onto `answersAvailable`. TalkSheet was left comparing against
+ * `topic.lines.length` — `1 >= 6` for the roadside class, and permanently
+ * false because `raiseTopic` returns before the counter write on the
+ * already-said path, freezing the count at 1. The engine was right throughout;
+ * the list was asking the wrong question.
+ * Repaired by giving the fact ONE reader, `topicSpent`, which takes the topic
+ * and the person so no caller can supply the wrong count. Dialogue text,
+ * answers, gates, grants, inventory, prices, standing and navigation untouched.
+ * ⚠ NOT CLAIMED: anything about non-vendor NPC conversation beyond the sets
+ * this same machinery governs. */
+export const OTA_BUILD_ID = '2026-09-22-1866-a-question-is-asked-once';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';

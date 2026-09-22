@@ -405,9 +405,13 @@ describe('F — nothing but the instrument moved', () => {
     ].sort());
   });
 
-  it('the build stamp names this OTA — as a value, not as a quoted line', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { OTA_BUILD_ID } = require('../app/buildInfo') as typeof import('../app/buildInfo');
-    expect(OTA_BUILD_ID).toBe('2026-09-22-1865-the-report-keeps-the-evidence');
-  });
+  /* ⚠ OTA-1866 — THE STAMP PIN THAT WAS HERE IS GONE, AND ITS REMOVAL IS THE
+     CORRECTION OF A MISTAKE MADE IN THIS SUITE'S OWN FIRST DRAFT. It asserted
+     `OTA_BUILD_ID === '2026-09-22-1865-...'`, which is true of exactly one
+     commit and false of every commit after it — so it went red on the next
+     OTA for no defect at all, which is the definition of a pin that reports
+     noise. The repository already has an authority for this: `check:otastamp`
+     ties the live stamp to the highest-numbered suite in `__tests__`, and it
+     is a gate rather than a test, so it cannot rot. What THIS suite is for is
+     retention depth, and §A asserts that against the measured floor. */
 });

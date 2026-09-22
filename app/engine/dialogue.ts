@@ -305,6 +305,40 @@ export function answersAvailable(topic: Topic, npcId?: string): number {
   return npcId && usesClassSet(npcId) ? 1 : topic.lines.length;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1866 — "HAS THIS ALREADY BEEN ASKED" IS ONE FACT, SO IT GETS ONE
+ * READER. The owner's contract for a vendor conversation is ask-once: the
+ * answer lands once, the conversation remembers it, and the question is not
+ * offered again for that character.
+ *
+ * ⚠⚠ IT EXISTS BECAUSE TWO READERS DRIFTED APART AND NOTHING COULD SEE IT.
+ * OTA-1784 turned a class set's `lines` into PARALLEL VOICES — one answer per
+ * person, not a repeat sequence — and `answersAvailable` above was written to
+ * say so. `raiseTopic`'s already-said guard and `hasUnspokenTalk`'s glow were
+ * moved onto it. THE TOPIC LIST WAS NOT, and went on comparing the counter
+ * against `topic.lines.length`.
+ *
+ * For `class:roadside`, six lanes per topic, that reads `1 >= 6` — false. And
+ * permanently false, because `raiseTopic` returns on the already-said path
+ * BEFORE the counter write, so the count freezes at 1 and can never climb to
+ * 6. The question stayed undimmed and pressable for the rest of that
+ * character's life. Measured on hardware 2026-09-22: 79 presses in 25s against
+ * Ilva Sidelong, every one answered "I have told you that one." The engine was
+ * right the whole time; the list was asking the wrong question.
+ *
+ * ⚠ SO THIS IS NOT A THIRD COPY — IT IS THE ONLY COPY. It takes the topic and
+ * the person rather than a caller-supplied count, so a reader cannot pass the
+ * wrong number any more. The divergence is made unrepresentable rather than
+ * corrected in two places and hoped about.
+ */
+export function topicSpent(
+  topic: Topic,
+  npcId: string,
+  talked: Record<string, number> | undefined,
+): boolean {
+  return (talked?.[`${npcId}:${topic.id}`] ?? 0) >= answersAvailable(topic, npcId);
+}
+
 export function topicReply(topic: Topic, timesAsked: number, npcId?: string): string {
   if (topic.lines.length === 0) return '';
   if (npcId && usesClassSet(npcId)) return topic.lines[voiceLaneFor(npcId, topic.lines.length)]!;
