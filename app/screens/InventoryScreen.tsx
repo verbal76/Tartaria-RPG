@@ -14,6 +14,7 @@ import {
   CATEGORY_ORDER,
   groupInventoryByCategory,
   categoryRuns, // OTA-1731 — one answer to "how does this section divide" (weapons by reach, armour + jewellery by body part)
+  salePinRank, // OTA-1871 — one answer to "what leads Materials", shared with the vendor's sell list
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip, RING_SLOTS, RING_ID_KEYS } from '../engine/equipment';
@@ -113,6 +114,13 @@ function sortInventoryItems(
     const aw = worn.has(a.id);
     const bw = worn.has(b.id);
     if (aw !== bw) return aw ? -1 : 1;
+    // OTA-1871 — second pre-key, same shape and the same reason: a sale-pinned
+    // material leads its own section on every axis and in both directions. It
+    // sits BELOW the worn pre-key only for tidiness; the two can never both
+    // fire, because worn gear is never a Materials item.
+    const ap = salePinRank(a);
+    const bp = salePinRank(b);
+    if (ap !== bp) return ap - bp;
     switch (sortKey) {
       case 'rarity': {
         const ar = RARITY_RANK[a.rarity ?? 'Common'] ?? 0;

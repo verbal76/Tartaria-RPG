@@ -49,6 +49,7 @@ import {
   CATEGORY_LABEL,
   CATEGORY_COLORS,
   categorizeItem,
+  salePinRank, // OTA-1871 — one answer to "what leads Materials", shared with the inventory list
   type InventoryCategory,
 } from '../components/InventoryCategorize';
 
@@ -249,6 +250,15 @@ export function VendorScreen() {
     }))
     .filter((x) => x.price > 0)
     .sort((a, b) => {
+      // OTA-1871 — pre-key, ahead of every sell axis and independent of it: a
+      // sale-pinned material leads. These rows are filtered into CATEGORY_ORDER
+      // sections BELOW this sort, and partitioning preserves each section's
+      // internal order, so "first overall" renders as "first in MATERIALS" and
+      // nothing is dragged out of its own section. Two unpinned rows fall
+      // through untouched to whichever axis the player picked.
+      const ap = salePinRank(a.item);
+      const bp = salePinRank(b.item);
+      if (ap !== bp) return ap - bp;
       if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
       if (sellSort === 'rarity') {
         const ra = RARITY_ORDER[a.item.rarity ?? 'Common'] ?? 99;

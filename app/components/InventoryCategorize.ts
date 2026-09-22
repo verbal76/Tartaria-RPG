@@ -241,6 +241,54 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   return 'loot';
 }
 
+/** ⚠⚠⚠ OTA-1871 — THE SALE PIN. A material the player mostly accumulates to
+ *  SELL leads the Materials section on every sort, on both screens that draw it.
+ *
+ *  Owner: "have it first even when the sort shouldn't list it first, have
+ *  everything else in materials under it follow the selected sort function
+ *  though." So this is a PRE-KEY, not a sort key: it separates the pinned row
+ *  from everything else and then gets out of the way — two unpinned items are
+ *  ordered entirely by whatever the player chose, and the pin is
+ *  direction-independent, exactly like the worn-gear pre-key OTA-1094 put at the
+ *  head of sortInventoryItems.
+ *
+ *  WHY THE COIN IS THE ONE ON THE LIST. The Worn Tartarian Coin cannot be swept
+ *  by SELL ALL LOOT and should not be: it is an ingredient in five recipes
+ *  (Force Wave Wand, Rusted Band of Knowledge, Tartarian Oath-Band, Ring of
+ *  Forgotten Lore, Scribe's Signet), so `isRecipeIngredientName` blocks it in
+ *  isForgeableLootReagent and its `currency` tag blocks it again in
+ *  FORGE_LOOT_BLOCK_TAGS. Both guards are correct and neither is touched here.
+ *  It drops from 17 wasteland encounter tables in stacks of up to 22, so it
+ *  piles up faster than any other material and is the thing the player most
+ *  often goes to a vendor to unload by hand. The bulk sweep can't have it, so
+ *  the manual sale is made one tap deep instead.
+ *
+ *  GATED ON THE SECTION IT PINS. The rank only fires for an item whose HOME
+ *  category is Materials. A coin the player has tapped "Save for quest" on
+ *  categorizes as 'quest' (see the reservedForQuest branch above), and must NOT
+ *  then be dragged to the head of Quest Items — the pin is about where a thing
+ *  is sold, not about the thing. */
+export const SALE_PINNED_MATERIAL_NAMES: readonly string[] = [
+  'Worn Tartarian Coin',
+];
+const SALE_PINNED_SET: ReadonlySet<string> = new Set(
+  SALE_PINNED_MATERIAL_NAMES.map((n) => n.toLowerCase()),
+);
+
+/** True when this item leads the Materials section regardless of the sort. */
+export function isSalePinnedMaterial(item: InventoryItem): boolean {
+  if (!SALE_PINNED_SET.has(item.name.trim().toLowerCase())) return false;
+  return categorizeItem(item) === 'material';
+}
+
+/** 0 for a pinned material, 1 for everything else. Comparator pre-key: subtract
+ *  two of these and a non-zero result decides the pair; zero means "not my
+ *  business — let the player's chosen sort answer". Never multiplied by the
+ *  asc/desc direction, so DESC does not flip the pin to the bottom. */
+export function salePinRank(item: InventoryItem): number {
+  return isSalePinnedMaterial(item) ? 0 : 1;
+}
+
 // arb109 — every category an item should be LISTED under. Usually one. But a
 // crafting MATERIAL that is also a deliberate thrown WEAPON (the `throwable` tag —
 // exactly what validSlotsForItem routes to a hand, e.g. Disease Sample / Sentinel
