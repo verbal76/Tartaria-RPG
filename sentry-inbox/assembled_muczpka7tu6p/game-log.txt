@@ -1,0 +1,971 @@
+Bug Report — Johnny Blaze · (2026-09-22-1867-the-second-disclosure-is-its-own-question) · Building followed me?
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-22T18:10:53.550Z
+Character: Johnny Blaze
+Slot ID: slot_mtrjgazg_fumkzk
+Race: Reclaimers
+Location: The Cistern Intake
+HP: 36/36
+
+--- DESCRIPTION ---
+Building followed me?
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-22T18:10:53.489Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 476
+  AAB: (build 476)
+  OTA: (2026-09-22-1867-the-second-disclosure-is-its-own-question)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-22T18:01:09.352Z
+  Last init success: 2026-09-22T18:01:10.905Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmuczci1w9b · started 2026-09-22T18:00:44.132Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 4 fatal (newest last)
+  ⚠⚠ 3 of 4 process kills landed on an OTA-apply boot
+  • 2026-09-07T03:23:14.327Z (22488m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (21569m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (19662m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-13T23:38:11.705Z (12633m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage boot:idle:awaiting-first-action
+      Process reclaimed while idle on the title screen — no game was in progress (9s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: boot:idle:awaiting-first-action · 807ms into the action · alive 8005ms after it
+      launch: died 8893ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-14T00:23:34.481Z (12587m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (23s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 2949ms into the action · alive 0ms after it
+      launch: died 22707ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-16T21:08:23.255Z (8463m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage native:cognition:done
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room iskan_veil · screen exploration
+      last checkpoint: native:cognition:done [q0] · 7526ms into the action · alive 2504ms after it
+      launch: died 43179ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 137ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-18T16:41:13.847Z (5850m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1840-the-house-keeps-its-key · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4958ms into the action · alive 0ms after it
+      launch: died 5002ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T20:16:45.657Z (5634m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room samarran · screen lore
+      last checkpoint: appstate:active→background · 70239ms into the action · alive 0ms after it
+      launch: died 94479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 416ms earlier via boot-front
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T21:11:04.127Z (5580m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4984ms into the action · alive 0ms after it
+      launch: died 5069ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-19T13:06:45.292Z (4624m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-19-1847-the-process-says-where-it-was · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded during play — last: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: boot:idle:awaiting-first-action · 795ms into the action · alive 12383ms after it
+      launch: died 13276ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: appstate:active→background at 2026-09-22T17:53:16.344Z (18 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 2.9s · 0 job kinds queued >3s · worst 373.7ms/prompt-token · 4 generations thrown away (294.4s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  Native queue admission: 50 jobs · worst wait 2.9s (investigate_lore) · 0 past 3s · running narration:scene_intro_fill for 1.6s
+  App state trail: background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 28MB · last 28MB · net +16MB over 16 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+    +26.6s ctx-event — heap 24MB gc 0ms/48 · ctx 1 ≈425MB est · app=active · native llm running q1 · warns 0
+    +26.7s watch-start — heap 24MB gc 0ms/49 · ctx 1 ≈425MB est · app=active · native cognition running q0 · warns 0
+    +30.3s gen-settled [investigate_lore ok] — heap 24MB gc 0ms/61 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +60.3s gen-settled [ambient ok] — heap 24MB gc 0ms/123 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+    +81.4s appstate [active→background] — heap 28MB gc 0ms/131 · ctx 1 ≈425MB est · app=background · native narration:scene_intro_fill running q0 · warns 0
+   +347.5s appstate [background→active] — heap 20MB gc 1ms/138 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +349.6s gen-settled [narration:scene_intro_fi] — heap 20MB gc 1ms/142 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +417.3s gen-settled [ambient_fill ok] — heap 20MB gc 1ms/246 · ctx 1 ≈425MB est · app=active · native ambient_fill running q0 · warns 0
+   +450.9s gen-settled [investigate_lore ok] — heap 24MB gc 1ms/294 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +473.5s gen-settled [narration:scene_intro_fi] — heap 24MB gc 1ms/343 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q3 · warns 0
+   +476.0s gen-settled [investigate_lore ok] — heap 24MB gc 1ms/353 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +477.4s gen-settled [investigate_lore ok] — heap 24MB gc 1ms/361 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +552.1s gen-settled [ambient_fill preempted] — heap 24MB gc 1ms/521 · ctx 1 ≈425MB est · app=active · native ambient_fill running q0 · warns 0
+   +604.0s gen-settled [narration:scene_intro ok] — heap 28MB gc 2ms/603 · ctx 1 ≈425MB est · app=active · native narration:scene_intro running q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot: (trace present, no stages)
+  this boot:
+  2026-09-22T18:08:40.954Z #121 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:42.063Z #122 root p=none exploration
+  2026-09-22T18:08:42.064Z #122 content controls p=none exploration
+  2026-09-22T18:08:42.065Z #122 in quick:approach ⏱+20ms p=none exploration
+  2026-09-22T18:08:42.198Z #122 enter quick:approach p=none exploration
+  2026-09-22T18:08:42.206Z #122 admit quick:approach (callback) p=none exploration
+  2026-09-22T18:08:42.206Z #122 dispatch quick:approach (callback) p=none exploration
+  2026-09-22T18:08:42.240Z #122 done quick:approach (callback) p=none exploration
+  2026-09-22T18:08:46.231Z #123 root p=none exploration
+  2026-09-22T18:08:46.237Z #123 content controls p=none exploration
+  2026-09-22T18:08:46.238Z #123 in quick:approach ⏱+26ms p=none exploration
+  2026-09-22T18:08:46.365Z #123 enter quick:approach p=none exploration
+  2026-09-22T18:08:46.370Z #123 admit quick:approach (callback) p=none exploration
+  2026-09-22T18:08:46.370Z #123 dispatch quick:approach (callback) p=none exploration
+  2026-09-22T18:08:46.410Z #123 done quick:approach (callback) p=none exploration
+  2026-09-22T18:08:49.195Z #124 root p=none exploration
+  2026-09-22T18:08:49.199Z #124 content controls p=none exploration
+  2026-09-22T18:08:49.200Z #124 in quick:dodge ⏱+20ms p=none exploration
+  2026-09-22T18:08:49.350Z #124 enter quick:dodge p=none exploration
+  2026-09-22T18:08:49.356Z #124 admit quick:dodge (callback) p=none exploration
+  2026-09-22T18:08:49.356Z #124 dispatch quick:dodge (callback) p=none exploration
+  2026-09-22T18:08:49.384Z #124 done quick:dodge (callback) p=none exploration
+  2026-09-22T18:08:49.916Z #125 root p=none exploration
+  2026-09-22T18:08:49.920Z #125 content controls p=none exploration
+  2026-09-22T18:08:49.921Z #125 in quick:⚗ aetheric shield- ⏱+20ms p=none exploration
+  2026-09-22T18:08:50.053Z #125 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:08:50.056Z #125 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:50.056Z #125 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:50.119Z #125 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:50.849Z #126 root p=none exploration
+  2026-09-22T18:08:50.853Z #126 content controls p=none exploration
+  2026-09-22T18:08:52.818Z #127 root p=none exploration
+  2026-09-22T18:08:52.826Z #127 content controls p=none exploration
+  2026-09-22T18:08:54.201Z #128 root p=none exploration
+  2026-09-22T18:08:54.206Z #128 content controls p=none exploration
+  2026-09-22T18:08:55.484Z #129 root p=none exploration
+  2026-09-22T18:08:55.493Z #129 content controls p=none exploration
+  2026-09-22T18:08:57.435Z #130 root p=none exploration
+  2026-09-22T18:08:57.438Z #130 content controls p=none exploration
+  2026-09-22T18:08:57.439Z #130 in quick:⚗ aetheric shield- ⏱+27ms p=none exploration
+  2026-09-22T18:08:57.621Z #130 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:08:57.625Z #130 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:57.626Z #130 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:57.673Z #130 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:08:58.254Z #131 root p=none exploration
+  2026-09-22T18:08:58.261Z #131 content controls p=none exploration
+  2026-09-22T18:08:59.602Z #132 root p=none exploration
+  2026-09-22T18:08:59.604Z #132 content controls p=none exploration
+  2026-09-22T18:09:00.940Z #133 root p=none exploration
+  2026-09-22T18:09:00.956Z #133 content controls p=none exploration
+  2026-09-22T18:09:02.289Z #134 root p=none exploration
+  2026-09-22T18:09:02.295Z #134 content controls p=none exploration
+  2026-09-22T18:09:05.620Z #135 root p=none exploration
+  2026-09-22T18:09:05.625Z #135 content controls p=none exploration
+  2026-09-22T18:09:05.626Z #135 in quick:stealth ⏱+24ms p=none exploration
+  2026-09-22T18:09:05.705Z #135 enter quick:stealth p=none exploration
+  2026-09-22T18:09:05.708Z #135 admit quick:stealth (callback) p=none exploration
+  2026-09-22T18:09:05.708Z #135 dispatch quick:stealth (callback) p=none exploration
+  2026-09-22T18:09:05.727Z #135 done quick:stealth (callback) p=none exploration
+  2026-09-22T18:09:06.320Z #136 root p=none exploration
+  2026-09-22T18:09:06.321Z #136 content controls p=none exploration
+  2026-09-22T18:09:08.287Z #137 root p=none exploration
+  2026-09-22T18:09:08.288Z #137 content controls p=none exploration
+  2026-09-22T18:09:08.290Z #137 in quick:⚗ aetheric shield- ⏱+17ms p=none exploration
+  2026-09-22T18:09:08.437Z #137 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:09:08.440Z #137 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:08.440Z #137 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:08.490Z #137 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:09.038Z #138 root p=none exploration
+  2026-09-22T18:09:09.039Z #138 content controls p=none exploration
+  2026-09-22T18:09:10.573Z #139 root p=none exploration
+  2026-09-22T18:09:10.578Z #139 content controls p=none exploration
+  2026-09-22T18:09:11.923Z #140 root p=none exploration
+  2026-09-22T18:09:11.929Z #140 content controls p=none exploration
+  2026-09-22T18:09:13.340Z #141 root p=none exploration
+  2026-09-22T18:09:13.343Z #141 content controls p=none exploration
+  2026-09-22T18:09:15.557Z #142 root p=none exploration
+  2026-09-22T18:09:15.568Z #142 content controls p=none exploration
+  2026-09-22T18:09:15.568Z #142 in quick:dodge ⏱+31ms p=none exploration
+  2026-09-22T18:09:15.657Z #142 enter quick:dodge p=none exploration
+  2026-09-22T18:09:15.658Z #142 admit quick:dodge (callback) p=none exploration
+  2026-09-22T18:09:15.658Z #142 dispatch quick:dodge (callback) p=none exploration
+  2026-09-22T18:09:15.687Z #142 done quick:dodge (callback) p=none exploration
+  2026-09-22T18:09:16.359Z #143 root p=none exploration
+  2026-09-22T18:09:16.362Z #143 content controls p=none exploration
+  2026-09-22T18:09:16.363Z #143 in quick:⚗ aetheric shield- ⏱+17ms p=none exploration
+  2026-09-22T18:09:16.458Z #143 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:09:16.461Z #143 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:16.461Z #143 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:16.512Z #143 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:17.106Z #144 root p=none exploration
+  2026-09-22T18:09:17.108Z #144 content controls p=none exploration
+  2026-09-22T18:09:18.824Z #145 root p=none exploration
+  2026-09-22T18:09:18.830Z #145 content controls p=none exploration
+  2026-09-22T18:09:20.192Z #146 root p=none exploration
+  2026-09-22T18:09:20.197Z #146 content controls p=none exploration
+  2026-09-22T18:09:21.859Z #147 root p=none exploration
+  2026-09-22T18:09:21.861Z #147 content controls p=none exploration
+  2026-09-22T18:09:24.192Z #148 root p=none exploration
+  2026-09-22T18:09:24.201Z #148 content controls p=none exploration
+  2026-09-22T18:09:24.202Z #148 in quick:✚ heals (3) ⏱+29ms p=none exploration
+  2026-09-22T18:09:24.312Z #148 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:24.315Z #148 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:24.315Z #148 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:24.316Z #148 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:25.375Z #149 root p=none exploration
+  2026-09-22T18:09:25.380Z #149 content controls p=none exploration
+  2026-09-22T18:09:26.475Z #150 root p=none exploration
+  2026-09-22T18:09:26.477Z #150 content controls p=none exploration
+  2026-09-22T18:09:26.477Z #150 in quick:✚ heals (3) ⏱+25ms p=none exploration
+  2026-09-22T18:09:26.628Z #150 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:26.632Z #150 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:26.632Z #150 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:26.632Z #150 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:27.030Z #151 root p=none exploration
+  2026-09-22T18:09:27.035Z #151 content controls p=none exploration
+  2026-09-22T18:09:27.708Z #152 root p=none exploration
+  2026-09-22T18:09:27.709Z #152 content controls p=none exploration
+  2026-09-22T18:09:27.710Z #152 in quick:✚ heals (3) ⏱+19ms p=none exploration
+  2026-09-22T18:09:27.877Z #152 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:27.880Z #152 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:27.880Z #152 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:27.880Z #152 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:28.343Z #153 root p=none exploration
+  2026-09-22T18:09:28.351Z #153 content controls p=none exploration
+  2026-09-22T18:09:30.042Z #154 root p=none exploration
+  2026-09-22T18:09:30.050Z #154 content controls p=none exploration
+  2026-09-22T18:09:30.050Z #154 in quick:✚ heals (3) ⏱+26ms p=none exploration
+  2026-09-22T18:09:30.179Z #154 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:30.182Z #154 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:30.182Z #154 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:30.183Z #154 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:30.659Z #155 root p=none exploration
+  2026-09-22T18:09:30.661Z #155 content controls p=none exploration
+  2026-09-22T18:09:31.461Z #156 root p=none exploration
+  2026-09-22T18:09:31.467Z #156 content controls p=none exploration
+  2026-09-22T18:09:31.468Z #156 in quick:✚ heals (3) ⏱+31ms p=none exploration
+  2026-09-22T18:09:31.562Z #156 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:31.567Z #156 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:31.567Z #156 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:31.567Z #156 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:32.010Z #157 root p=none exploration
+  2026-09-22T18:09:32.015Z #157 content controls p=none exploration
+  2026-09-22T18:09:32.678Z #158 root p=none exploration
+  2026-09-22T18:09:32.682Z #158 content controls p=none exploration
+  2026-09-22T18:09:32.683Z #158 in quick:✚ heals (3) ⏱+20ms p=none exploration
+  2026-09-22T18:09:32.812Z #158 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:32.815Z #158 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:32.815Z #158 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:32.816Z #158 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:33.327Z #159 root p=none exploration
+  2026-09-22T18:09:33.332Z #159 content controls p=none exploration
+  2026-09-22T18:09:34.085Z #160 root p=none exploration
+  2026-09-22T18:09:34.096Z #160 content controls p=none exploration
+  2026-09-22T18:09:34.097Z #160 in quick:✚ heals (3) ⏱+42ms p=none exploration
+  2026-09-22T18:09:34.196Z #160 enter quick:✚ heals (3) p=none exploration
+  2026-09-22T18:09:34.199Z #160 admit quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:34.199Z #160 dispatch quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:34.200Z #160 done quick:✚ heals (3) (callback) p=none exploration
+  2026-09-22T18:09:34.811Z #161 root p=none exploration
+  2026-09-22T18:09:34.814Z #161 content controls p=none exploration
+  2026-09-22T18:09:39.560Z #162 root p=none exploration
+  2026-09-22T18:09:39.571Z #162 content controls p=none exploration
+  2026-09-22T18:09:39.572Z #162 in quick:⚗ aetheric shield- ⏱+32ms p=none exploration
+  2026-09-22T18:09:39.688Z #162 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:09:39.691Z #162 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:39.691Z #162 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:39.751Z #162 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:40.387Z #163 root p=none exploration
+  2026-09-22T18:09:40.388Z #163 content controls p=none exploration
+  2026-09-22T18:09:41.838Z #164 root p=none exploration
+  2026-09-22T18:09:41.844Z #164 content controls p=none exploration
+  2026-09-22T18:09:43.142Z #165 root p=none exploration
+  2026-09-22T18:09:43.148Z #165 content controls p=none exploration
+  2026-09-22T18:09:44.626Z #166 root p=none exploration
+  2026-09-22T18:09:44.635Z #166 content controls p=none exploration
+  2026-09-22T18:09:56.048Z #167 root p=none exploration
+  2026-09-22T18:09:56.049Z #167 content controls p=none exploration
+  2026-09-22T18:09:56.050Z #167 in travel:🚪 ENTER ⏱+10ms p=none exploration
+  2026-09-22T18:09:56.167Z #167 enter travel:🚪 ENTER p=none exploration
+  2026-09-22T18:09:56.172Z #167 admit travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T18:09:56.172Z #167 dispatch travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T18:09:56.183Z #167 done travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T18:09:58.503Z #168 root p=none exploration
+  2026-09-22T18:09:58.512Z #168 content controls p=none exploration
+  2026-09-22T18:09:58.512Z #168 in quick:approach ⏱+23ms p=none exploration
+  2026-09-22T18:09:58.618Z #168 enter quick:approach p=none exploration
+  2026-09-22T18:09:58.620Z #168 admit quick:approach (callback) p=none exploration
+  2026-09-22T18:09:58.620Z #168 dispatch quick:approach (callback) p=none exploration
+  2026-09-22T18:09:58.674Z #168 done quick:approach (callback) p=none exploration
+  2026-09-22T18:09:59.455Z #169 root p=none exploration
+  2026-09-22T18:09:59.466Z #169 content controls p=none exploration
+  2026-09-22T18:09:59.466Z #169 in quick:⚗ aetheric shield- ⏱+35ms p=none exploration
+  2026-09-22T18:09:59.603Z #169 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:09:59.605Z #169 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:59.605Z #169 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:09:59.647Z #169 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:00.302Z #170 root p=none exploration
+  2026-09-22T18:10:00.304Z #170 content controls p=none exploration
+  2026-09-22T18:10:01.752Z #171 root p=none exploration
+  2026-09-22T18:10:01.756Z #171 content controls p=none exploration
+  2026-09-22T18:10:03.186Z #172 root p=none exploration
+  2026-09-22T18:10:03.193Z #172 content controls p=none exploration
+  2026-09-22T18:10:04.586Z #173 root p=none exploration
+  2026-09-22T18:10:04.591Z #173 content controls p=none exploration
+  2026-09-22T18:10:06.504Z #174 root p=none exploration
+  2026-09-22T18:10:06.507Z #174 content controls p=none exploration
+  2026-09-22T18:10:06.508Z #174 in quick:⚗ aetheric shield- ⏱+14ms p=none exploration
+  2026-09-22T18:10:06.655Z #174 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:10:06.659Z #174 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:06.659Z #174 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:06.708Z #174 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:07.423Z #175 root p=none exploration
+  2026-09-22T18:10:07.427Z #175 content controls p=none exploration
+  2026-09-22T18:10:08.989Z #176 root p=none exploration
+  2026-09-22T18:10:08.994Z #176 content controls p=none exploration
+  2026-09-22T18:10:10.372Z #177 root p=none exploration
+  2026-09-22T18:10:10.374Z #177 content controls p=none exploration
+  2026-09-22T18:10:11.740Z #178 root p=none exploration
+  2026-09-22T18:10:11.743Z #178 content controls p=none exploration
+  2026-09-22T18:10:14.708Z #179 root p=none exploration
+  2026-09-22T18:10:14.717Z #179 content controls p=none exploration
+  2026-09-22T18:10:14.718Z #179 in quick:dodge ⏱+33ms p=none exploration
+  2026-09-22T18:10:14.863Z #179 enter quick:dodge p=none exploration
+  2026-09-22T18:10:14.867Z #179 admit quick:dodge (callback) p=none exploration
+  2026-09-22T18:10:14.867Z #179 dispatch quick:dodge (callback) p=none exploration
+  2026-09-22T18:10:14.900Z #179 done quick:dodge (callback) p=none exploration
+  2026-09-22T18:10:15.527Z #180 root p=none exploration
+  2026-09-22T18:10:15.533Z #180 content controls p=none exploration
+  2026-09-22T18:10:15.533Z #180 in quick:⚗ aetheric shield- ⏱+19ms p=none exploration
+  2026-09-22T18:10:15.643Z #180 enter quick:⚗ aetheric shield- p=none exploration
+  2026-09-22T18:10:15.645Z #180 admit quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:15.645Z #180 dispatch quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:15.693Z #180 done quick:⚗ aetheric shield- (callback) p=none exploration
+  2026-09-22T18:10:16.325Z #181 root p=none exploration
+  2026-09-22T18:10:16.326Z #181 content controls p=none exploration
+  2026-09-22T18:10:17.660Z #182 root p=none exploration
+  2026-09-22T18:10:17.670Z #182 content controls p=none exploration
+  2026-09-22T18:10:19.377Z #183 root p=none exploration
+  2026-09-22T18:10:19.382Z #183 content controls p=none exploration
+  2026-09-22T18:10:22.045Z #184 root p=none exploration
+  2026-09-22T18:10:22.050Z #184 content controls p=none exploration
+  2026-09-22T18:10:40.217Z #185 root p=none exploration
+  2026-09-22T18:10:42.052Z #186 root p=none exploration
+  2026-09-22T18:10:42.819Z #187 root p=none exploration
+  2026-09-22T18:10:44.220Z #188 root p=none exploration
+  2026-09-22T18:10:44.223Z #189 modal p=none exploration
+  2026-09-22T18:10:46.236Z #190 root p=none exploration
+  2026-09-22T18:10:46.239Z #191 modal p=none exploration
+  2026-09-22T18:10:53.356Z #192 root p=none exploration
+  2026-09-22T18:10:53.358Z #193 modal p=none exploration
+  2026-09-22T18:10:53.358Z #193 in report:send ⏱+19ms p=none exploration
+  2026-09-22T18:10:53.487Z #193 enter report:send p=none exploration
+  2026-09-22T18:10:53.488Z #193 admit report:send (described) p=none exploration
+  2026-09-22T18:10:53.488Z #193 dispatch report:send (described) p=none exploration
+  2026-09-22T18:10:53.488Z #193 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Johnny Blaze)
+  HP: 36/36  Stamina: 14/14  TC: 191  Corruption: 0
+  Pack: 62 distinct rows / 228 total
+
+Weapons (13)
+  Aether-Shard Spear (Uncommon, 2d6 piercing, dur 10/10, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, +1d4 acid coat, dur 10/20, equipped:main, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:off, unequip:main, use(off), repair
+  Aetheric Touch Wand (1d6 aetheric, dur 36/42, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Atalan's Trident (Legendary, dur 55/55, 1d10+2 piercing, unique, [core_guardian_set,aether_born,piercing,reach,slow_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Cudgel (1d8 bludgeoning, +1d4 acid coat, dur 16/21, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Flame of Aether Wand (1d6 burn, dur 14/14, [weapon,runecaster,rune_power,aetheric,fire])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 22/22, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Ghost-Charged Skewer (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Mud-fist Wraps (1d10 bludgeoning, +1d4 acid coat, dur 22/27, [weapon,barehanded,melee])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Pyric Wand (1d6 burn, dur 33/33, [weapon,runecaster])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 11/11, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Stormcalled Warstaff (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (10)
+  Drowned Mantle (Legendary, dur 70/70, AC+3, resist:aetheric, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Echoing Steps Boots (dur 21/23, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet, repair
+  Memory Weaver's Hood (dur 18/18, AC +2 · INT +2, [armor,head,cloth,helmet,unknowing_masses])
+    actions: equip:head, use, scrap, drop
+  Mud-Warden's Vest (dur 19/19, equipped:chest, AC +2 · Resists: slashing · WIS +2, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 10/10, equipped:head, AC +2 · INV +2, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head
+  Rough-Hewn Chestplate (dur 10/10, AC +2 · STR +2, [armor,chest,plate,mud_golems])
+    actions: equip:chest, use, scrap, drop
+  Salvager's Trench Coat (dur 12/17, AC +2 · Resists: cold · INT +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Salvager's Worn Gloves (dur 29/29, AC +1 · INT +1, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Tatter-Sewn Girdle (Rare, dur 35/35, equipped:legs, AC+3, unique, [fused,unique])
+    actions: unequip:legs
+  Wanderer's Worn Gauntlets (dur 12/16, AC +2 · STR +2, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, repair, drop
+
+Dog Armor (1)
+  Riveted Leather Vest (Uncommon, dur 24/24, AC +2 (dog), [dog_armor,vest,leather,cloth])
+    actions: scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (7)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])
+    actions: use(eat), drop
+  First Aid Kit ×2 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  First Aid Kit ×4 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Trail Rations ×4 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+  Wild Carrot ×2 ([food,foraged,vegetable])
+    actions: use(eat), drop
+
+Coatings (3)
+  Acid Flask ×3 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×3 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (5)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Mud Scanner ([exploration,relic,common,mud_dweller])
+    actions: equip:off, use(off), scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 255/300, [exploration,tool,common,race_starter,reclaimer])
+    actions: use, scrap, repair, drop
+
+Materials (20)
+  Aether Crystal ×15 ([aether,crystal])
+    actions: drop
+  Aether Mud ×7 ([mud,aether])
+    actions: drop
+  ◆ Aetheric Moss ×3 (Uncommon, [organic,moss,aether,alchemy,loot])
+    actions: scrap, save-for-fusion, drop
+  Aetheric Shard ×2 (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×9 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×18 ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ×2 ([thrown,stone,improvised,heavy])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  Drake Scale (Rare, [organic,scale,loot])
+    actions: scrap, drop
+  ◆ Flint Core Nodule (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Iron Core (Legendary, [construct,metal,boss,legendary,loot])
+    actions: scrap, drop
+  ◆ Iron-Pinned Plank Shard (Uncommon, [trophy,crystal,metal,wood])
+    actions: scrap, save-for-fusion, drop
+  ◆ Mortar-Bound Cobble ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×7 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Siren Crystal (Legendary, [aether,crystal,boss,legendary,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Slug Slime ([organic,slime,alchemy,loot])
+    actions: scrap, save-for-fusion, drop
+  Small Rock ×2 ([thrown,stone,improvised])
+    actions: drop
+  Smooth Stone ×9 ([stone,junk,scrap])
+    actions: scrap, drop
+  Worn Tartarian Coin ×91 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Quest Items (2)
+  Folded Note ([note,quest,lore,improvised,loot])
+    actions: drop
+  Samarran Core (Legendary, [quest,aetheric_core,main_quest,improvised])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 374 of 3888 entries; older trimmed to fit a single email paste)
+
+[2026-09-22T18:10:51.878Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-22T18:10:48.247Z] [debug] arbiter: qwen ✓ 12492ms (intent=scene_intro)
+[2026-09-22T18:10:48.247Z] [arbiter] You found the hollow the Reclaimer described. The information was good.
+[2026-09-22T18:10:48.239Z] [debug] native queue: 49 jobs · worst wait 2.9s (investigate_lore) · running narration:scene_intro 12.4s
+[2026-09-22T18:10:48.239Z] [debug] qwen⏱ stats — investigate_lore n4 avg3.5s max4.2s read1.1s/write1.2s ⚠1unusable in130t→out27t ms/tok 2.8-12.6 wait1.1s | narration:scene_intro_fill n2 avg142.7s max274.5s read273.1s/write1.3s ⚠1unusable in745t→out17t ms/tok 373.7-373.7 cap1 ⏸1 ✂2/285.3s | ambient_fill n2 avg4.5s max4.7s read3.9s/write1.1s in375t→out18t ms/tok 9.4-11.2 cap1 ⏸1 ✂2/9.1s | ambient n1 avg5.1s max5.1s read4.0s/write1.0s in364t→out31t ms/tok 11.1-11.1 cap1 | narration:scene_intro n1 avg12.4s max12.4s ⚠1unusable in843t→out14t || WASTED 4 calls / 294.4s
+[2026-09-22T18:10:48.235Z] [debug] qwen⏱ narration:scene_intro ok 12370ms read/write unusable (native mis-reported 51432ms/515ms — llama.rn split bug, not this call) in 843t→out 14t thr2 (71ch)
+[2026-09-22T18:10:35.756Z] [reward] ✦ Resurrection. Johnny Blaze returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-22T18:10:35.753Z] [world] Rare workings for sale: Cutpurse's Band (200 TC), Elder Golem Greatsword (500 TC), Elder Golem Pike (500 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-22T18:10:35.746Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Ilva Sidelong, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move."
+[2026-09-22T18:10:35.746Z] [world] You hear a kettle whistling before you see them. Ilva Sidelong, fence, has made camp here.
+[2026-09-22T18:10:35.745Z] [system] Weather effect — Whisper Fog: -1 WIS
+A faint glow lives inside the mud here, like a banked coal.
+Hazard: Aether Mist. A glowing low mist that pulses with each heartbeat — yours, or something else's.
+You are at The Cistern Intake. The pump-works and cistern intake east of Samarran's colonnade — the city's old waterworks, dark, dripping, and exactly the kind of throat something foul dens in.
+[2026-09-22T18:10:35.745Z] [world] A low-hanging mist that murmurs in old Tartarian. Step too far in and you forget which century you came from.
+[2026-09-22T18:10:35.742Z] [world] A patchwork hovel stands off the path here — weathered and quiet, a way in still clear. (You’re on a route — type ENTER to step inside, or keep traveling.)
+[2026-09-22T18:10:35.729Z] [debug] missions: none active · at=cistern_intake travelTo=nimari
+[2026-09-22T18:10:35.728Z] [debug] scene: loc=cistern_intake hub=- arrival=n opening=n passing=y
+[2026-09-22T18:10:23.196Z] [system] You join the Fallen of Tartaria — 25 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-22T18:10:23.094Z] [system] Johnny Blaze has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-22T18:10:23.094Z] [combat] Johnny Blaze's breath leaves. The dust settles back into its old patterns.
+[2026-09-22T18:10:23.093Z] [combat] Mud-Wracked Aetherkin deals 24 aetheric damage [armor −9%] +1 electrical [Echoing Steps Boots took it]. You fall.
+[2026-09-22T18:10:23.048Z] [combat] Mud-Wracked Aetherkin — d20 → 20 + ATK 4 = 24 vs your AC 19 — ✓ CRITICAL HIT
+[2026-09-22T18:10:23.046Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.
+[2026-09-22T18:10:22.998Z] [debug] dice⏱ coating: shown +60ms, tapped +1733ms, settled +819ms = 2612ms
+[2026-09-22T18:10:22.179Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-22T18:10:20.384Z] [debug] dice⏱ damage: shown +50ms, tapped +893ms, settled +840ms = 1783ms
+[2026-09-22T18:10:19.544Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-22T18:10:18.599Z] [debug] dice⏱ attack: shown +58ms, tapped +439ms, settled +822ms = 1319ms
+[2026-09-22T18:10:17.777Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:10:17.279Z] [debug] dice⏱ initiative: shown +30ms, tapped +739ms, settled +820ms = 1589ms
+[2026-09-22T18:10:16.459Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-22T18:10:15.692Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:10:15.692Z] [world] Your acid-etched aetheric shield-hammer comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.
+[2026-09-22T18:10:15.689Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-22T18:10:15.687Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:10:15.686Z] [combat] Mud-Wracked Aetherkin smokes — acid eats 4. (83/103 HP, 1 turn left)
+[2026-09-22T18:10:15.684Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Mud-Wracked Aetherkin range=close enemies=1 hooks=0
+[2026-09-22T18:10:15.684Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:10:15.642Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+19ms
+[2026-09-22T18:10:15.050Z] [debug] persist sizes(KB): total=162 player=25 wm=44[rooms=11 events=2 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=90 scene=3
+[2026-09-22T18:10:14.896Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:10:14.894Z] [combat] Dodge — d20 → 13 + DEX 13 = 26 vs ATK 21. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T18:10:14.894Z] [combat] Mud-Wracked Aetherkin — d20 → 17 + ATK 4 = 21 vs your AC 19 — ✗ EVADED
+[2026-09-22T18:10:14.887Z] [combat] Mud-Wracked Aetherkin smokes — acid eats 4. (87/103 HP, 2 turns left)
+[2026-09-22T18:10:14.887Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T18:10:14.884Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-22T18:10:14.883Z] [player] dodge
+[2026-09-22T18:10:14.877Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:10:14.861Z] [debug] ui: tap "dodge" ⏱+33ms
+[2026-09-22T18:10:12.737Z] [combat] Acid-Etched Aetheric Shield-Hammer — 4 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 2 total).
+[2026-09-22T18:10:12.737Z] [combat] Clean hit with the acid-etched aetheric shield-hammer for 7. Mud-Wracked Aetherkin has 91 left and does not back away.
+[2026-09-22T18:10:12.736Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:10:12.735Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, ×0.5 for 7)
+[2026-09-22T18:10:12.734Z] [combat] You — d20 → 16 + STR 10 = 26 vs Mud-Wracked Aetherkin AC 12 — ✓ HIT
+[2026-09-22T18:10:12.734Z] [combat] Mud-Wracked Aetherkin — d20 → 4 + ATK 4 = 8 vs your AC 19 — ✗ MISS
+[2026-09-22T18:10:12.732Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.
+[2026-09-22T18:10:12.681Z] [debug] dice⏱ coating: shown +48ms, tapped +483ms, settled +824ms = 1355ms
+[2026-09-22T18:10:11.857Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-22T18:10:11.324Z] [debug] dice⏱ damage: shown +50ms, tapped +474ms, settled +818ms = 1342ms
+[2026-09-22T18:10:10.506Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:10:09.980Z] [debug] dice⏱ attack: shown +46ms, tapped +666ms, settled +838ms = 1550ms
+[2026-09-22T18:10:09.142Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-22T18:10:08.423Z] [debug] dice⏱ initiative: shown +39ms, tapped +843ms, settled +835ms = 1717ms
+[2026-09-22T18:10:07.588Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-22T18:10:06.708Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:10:06.707Z] [world] You commit forward with the acid-etched aetheric shield-hammer. Mud-Wracked Aetherkin watches your hands.
+[2026-09-22T18:10:06.702Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:10:06.700Z] [combat] Mud-Wracked Aetherkin smokes — acid eats 1. (98/103 HP, 2 turns left)
+[2026-09-22T18:10:06.698Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Mud-Wracked Aetherkin range=close enemies=1 hooks=0
+[2026-09-22T18:10:06.698Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:10:06.667Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:10:06.654Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+14ms
+[2026-09-22T18:10:05.626Z] [combat] Mud-Wracked Aetherkin deals 17 aetheric damage [armor −9%] +4 electrical [Salvager's Trench Coat took it]. You have 19 HP remaining.
+[2026-09-22T18:10:05.583Z] [combat] Acid-Etched Aetheric Shield-Hammer — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-22T18:10:05.583Z] [combat] Your strike with the acid-etched aetheric shield-hammer lands for 4. Mud-Wracked Aetherkin staggers — 99 HP remaining. It answers.
+[2026-09-22T18:10:05.582Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:10:05.582Z] [arbiter] The Arbiter watches the bludgeoning skid off. "Swap to the Pyric Wand — burn will bite where bludgeoning won't."
+[2026-09-22T18:10:05.581Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, ×0.5 for 4)
+[2026-09-22T18:10:05.580Z] [combat] You — d20 → 14 + STR 10 = 24 vs Mud-Wracked Aetherkin AC 13 — ✓ HIT
+[2026-09-22T18:10:05.579Z] [combat] Mud-Wracked Aetherkin — d20 → 18 + ATK 4 = 22 vs your AC 19 — ✓ HIT
+[2026-09-22T18:10:05.579Z] [debug] ac-shift 21→19: race/base 10 + gear 12 + title 0 → trimmed 19 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:10:05.577Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.
+[2026-09-22T18:10:05.527Z] [debug] dice⏱ coating: shown +50ms, tapped +500ms, settled +822ms = 1372ms
+[2026-09-22T18:10:04.705Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-22T18:10:04.154Z] [debug] dice⏱ damage: shown +69ms, tapped +509ms, settled +833ms = 1411ms
+[2026-09-22T18:10:03.321Z] [debug] ui: tap "roll" ⏱+28ms
+[2026-09-22T18:10:02.742Z] [debug] dice⏱ attack: shown +53ms, tapped +612ms, settled +824ms = 1489ms
+[2026-09-22T18:10:01.918Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:10:01.253Z] [debug] dice⏱ initiative: shown +27ms, tapped +762ms, settled +817ms = 1606ms
+[2026-09-22T18:10:00.435Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-22T18:09:59.647Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:09:59.647Z] [world] Your acid-etched aetheric shield-hammer comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.
+[2026-09-22T18:09:59.644Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:09:59.642Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Mud-Wracked Aetherkin range=close enemies=1 hooks=0
+[2026-09-22T18:09:59.640Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:09:59.602Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+35ms
+[2026-09-22T18:09:58.673Z] [arbiter] "Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."
+[2026-09-22T18:09:58.673Z] [debug] arbiter: template (reason=combat)
+[2026-09-22T18:09:58.672Z] [combat] Mud-Wracked Aetherkin stops — and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).
+[2026-09-22T18:09:58.669Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)
+[2026-09-22T18:09:58.669Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close
+[2026-09-22T18:09:58.668Z] [debug] move: advance from range=mid enemies=1 weather=Silent Blizzard cost=1 partial=0
+[2026-09-22T18:09:58.666Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=0
+[2026-09-22T18:09:58.665Z] [player] approach Mud-Wracked Aetherkin
+[2026-09-22T18:09:58.629Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:09:58.618Z] [debug] ui: tap "approach" ⏱+23ms
+[2026-09-22T18:09:56.344Z] [debug] qwen⏱ ✂ DISCARDED ambient_fill after 4419ms — ambient:fill-∅
+[2026-09-22T18:09:56.344Z] [debug] arbiter: ambient-fill ∅ 4496ms
+[2026-09-22T18:09:56.316Z] [debug] qwen⏱ ambient_fill preempted 4419ms read 4202ms/write 159ms in 375t→out 5t thr1 11.2ms/t (21ch)
+[2026-09-22T18:09:56.183Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs — it will defend itself, and nothing more.
+[2026-09-22T18:09:56.183Z] [world] In life it was a bell-ringer, shoulders rounded from a rope pulled ten thousand times — you find yourself wanting to know their name, and knowing you never will. The Aetherstone set hard around them right here, in this room. You are the first living thing through the door since.
+[2026-09-22T18:09:56.183Z] [arbiter] The traders were right. Aetherkin. Some kneel to them; some burn them where they stand.
+[2026-09-22T18:09:56.182Z] [world] Something stirs in the dark of the place — a shape peeling itself up off the floor where the mud had set it.
+[2026-09-22T18:09:56.177Z] [world] A low room with a dead stove and a threadbare rug. A board creaks loose underfoot near the wall.
+[2026-09-22T18:09:56.176Z] [world] You step inside the patchwork hovel, into the den.
+[2026-09-22T18:09:56.167Z] [debug] ui: tap "🚪 ENTER" ⏱+10ms
+[2026-09-22T18:09:45.683Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Riveted Leather Vest now, if you wanted."
+[2026-09-22T18:09:45.670Z] [reward] +12 TC pried from the dust.
+[2026-09-22T18:09:45.668Z] [reward] Bog Creeper defeated. You recover Aetheric Moss ×3.
+[2026-09-22T18:09:45.667Z] [combat] Final strike with the acid-etched aetheric shield-hammer for 14. Bog Creeper is still. The Aetherstone hums on, indifferent.
+[2026-09-22T18:09:45.667Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:09:45.665Z] [combat] You — d20 → 16 + STR 10 poisoned -2 tired -1 = 23 vs Bog Creeper AC 6 — ✓ HIT
+[2026-09-22T18:09:45.665Z] [world] You seize the initiative. Bog Creeper has no time to react.
+[2026-09-22T18:09:45.615Z] [debug] dice⏱ coating: shown +59ms, tapped +573ms, settled +840ms = 1472ms
+[2026-09-22T18:09:44.776Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-22T18:09:44.142Z] [debug] dice⏱ damage: shown +45ms, tapped +465ms, settled +835ms = 1345ms
+[2026-09-22T18:09:43.307Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:09:42.795Z] [debug] dice⏱ attack: shown +53ms, tapped +547ms, settled +836ms = 1436ms
+[2026-09-22T18:09:41.958Z] [debug] ui: tap "roll" ⏱+32ms
+[2026-09-22T18:09:41.357Z] [debug] dice⏱ initiative: shown +36ms, tapped +744ms, settled +835ms = 1615ms
+[2026-09-22T18:09:40.522Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-22T18:09:39.743Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:09:39.743Z] [world] You raise the acid-etched aetheric shield-hammer toward Bog Creeper. The room narrows around the both of you.
+[2026-09-22T18:09:39.738Z] [debug] attack: status mods poisoned -2 · tired -1
+[2026-09-22T18:09:39.737Z] [debug] attack: target=Bog Creeper range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:09:39.735Z] [combat] Bog Creeper smokes — acid eats 1. (13/63 HP, 2 turns left)
+[2026-09-22T18:09:39.733Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=close enemies=1 hooks=2
+[2026-09-22T18:09:39.733Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:09:39.702Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:09:39.702Z] [system] poison (from Bog Creeper) fades.
+[2026-09-22T18:09:39.701Z] [system] bleeding fades.
+[2026-09-22T18:09:39.687Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+32ms
+[2026-09-22T18:09:34.992Z] [world] You use 1× Trail Rations.
+[2026-09-22T18:09:34.195Z] [debug] ui: tap "✚ heals (3)" ⏱+42ms
+[2026-09-22T18:09:33.469Z] [world] You use 1× Trail Rations. +2 HP (36/36).
+[2026-09-22T18:09:32.811Z] [debug] ui: tap "✚ heals (3)" ⏱+20ms
+[2026-09-22T18:09:32.282Z] [debug] persist sizes(KB): total=166 player=25 wm=49[rooms=15 events=2 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=89 scene=3
+[2026-09-22T18:09:32.139Z] [world] You use 1× Trail Rations. +6 HP (34/36), +1 stamina.
+[2026-09-22T18:09:31.562Z] [debug] ui: tap "✚ heals (3)" ⏱+31ms
+[2026-09-22T18:09:30.808Z] [world] You use 1× Trail Rations. +6 HP (28/36), +3 stamina.
+[2026-09-22T18:09:30.179Z] [debug] ui: tap "✚ heals (3)" ⏱+26ms
+[2026-09-22T18:09:28.505Z] [world] You use 1× Trail Rations. +6 HP (22/36), +3 stamina.
+[2026-09-22T18:09:27.876Z] [debug] ui: tap "✚ heals (3)" ⏱+19ms
+[2026-09-22T18:09:27.152Z] [world] You use 1× Trail Rations. +6 HP (16/36), +3 stamina.
+[2026-09-22T18:09:26.628Z] [debug] ui: tap "✚ heals (3)" ⏱+25ms
+[2026-09-22T18:09:25.450Z] [world] You use 1× Trail Rations. +6 HP (10/36), +3 stamina.
+[2026-09-22T18:09:24.311Z] [debug] ui: tap "✚ heals (3)" ⏱+29ms
+[2026-09-22T18:09:22.935Z] [combat] Bog Creeper regenerates 1 HP (14/63).
+[2026-09-22T18:09:22.879Z] [combat] Bog Creeper — d20 → 5 + ATK 4 = 9 vs your AC 21 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-22T18:09:22.879Z] [debug] ac-shift 19→21: race/base 10 + gear 12 + title 0 → trimmed 19 + status 2 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:09:22.878Z] [combat] Bog Creeper is left exposed — easier to hit.
+[2026-09-22T18:09:22.878Z] [combat] Acid-Etched Aetheric Shield-Hammer — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 3 total).
+[2026-09-22T18:09:22.878Z] [combat] Bog Creeper takes 18 with the acid-etched aetheric shield-hammer. It reels: 13 left. Then it fights back.
+[2026-09-22T18:09:22.877Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:09:22.876Z] [combat] Bludgeoning flares — +1 on hit.
+[2026-09-22T18:09:22.874Z] [combat] You — d20 → 3 + STR 10 poisoned -2 tired -1 perfect opening (2× dice) = 10 vs Bog Creeper AC 6 — ✓ HIT
+[2026-09-22T18:09:22.874Z] [world] You seize the initiative. Bog Creeper has no time to react.
+[2026-09-22T18:09:22.826Z] [debug] dice⏱ coating: shown +42ms, tapped +775ms, settled +834ms = 1651ms
+[2026-09-22T18:09:21.992Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-22T18:09:21.175Z] [debug] dice⏱ damage: shown +53ms, tapped +498ms, settled +826ms = 1377ms
+[2026-09-22T18:09:20.349Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-22T18:09:19.795Z] [debug] dice⏱ attack: shown +53ms, tapped +829ms, settled +836ms = 1718ms
+[2026-09-22T18:09:18.959Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-22T18:09:18.075Z] [debug] dice⏱ initiative: shown +32ms, tapped +700ms, settled +834ms = 1566ms
+[2026-09-22T18:09:17.241Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-22T18:09:16.510Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:09:16.510Z] [world] You bring the acid-etched aetheric shield-hammer to bear on Bog Creeper.
+[2026-09-22T18:09:16.508Z] [debug] attack: status mods poisoned -2 · tired -1 · perfect opening (2× dice)
+[2026-09-22T18:09:16.505Z] [debug] attack: target=Bog Creeper range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:09:16.504Z] [combat] Bog Creeper smokes — acid eats 2. (31/63 HP, 1 turn left)
+[2026-09-22T18:09:16.502Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=close enemies=1 hooks=2
+[2026-09-22T18:09:16.502Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:09:16.458Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+17ms
+[2026-09-22T18:09:15.749Z] [combat] Bog Creeper regenerates 1 HP (33/63).
+[2026-09-22T18:09:15.686Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:09:15.683Z] [combat] Dodge — d20 → 14 + DEX 13 = 27 vs ATK 12. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T18:09:15.683Z] [combat] Bog Creeper — d20 → 8 + ATK 4 = 12 vs your AC 19 — ✗ EVADED
+[2026-09-22T18:09:15.681Z] [debug] ac-shift 21→19: race/base 10 + gear 12 + title 0 → trimmed 19 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:09:15.675Z] [combat] Bog Creeper smokes — acid eats 2. (32/63 HP, 2 turns left)
+[2026-09-22T18:09:15.675Z] [world] You commit to the dodge. Slip Bog Creeper's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T18:09:15.672Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-22T18:09:15.672Z] [player] dodge
+[2026-09-22T18:09:15.664Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:09:15.657Z] [debug] ui: tap "dodge" ⏱+31ms
+[2026-09-22T18:09:14.435Z] [combat] Bog Creeper regenerates 1 HP (34/63).
+[2026-09-22T18:09:14.434Z] [combat] Bog Creeper's strike leaves you bleeding.
+[2026-09-22T18:09:14.434Z] [combat] Bog Creeper deals 20 bludgeoning damage +2 poison [Tatter-Sewn Girdle took it, poison-resistant, halved]. You have 4 HP remaining.
+[2026-09-22T18:09:14.381Z] [combat] Bog Creeper — d20 → 20 + ATK 4 = 24 vs your AC 21 (needs nat 16+ — AC capped) — ✓ CRITICAL HIT
+[2026-09-22T18:09:14.381Z] [debug] ac-shift 19→21: race/base 10 + gear 12 + title 0 → trimmed 19 + status 2 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:09:14.380Z] [combat] Bog Creeper is left exposed — easier to hit.
+[2026-09-22T18:09:14.380Z] [combat] Acid-Etched Aetheric Shield-Hammer — 2 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 3 total).
+[2026-09-22T18:09:14.379Z] [combat] Your strike with the acid-etched aetheric shield-hammer lands for 8. Bog Creeper staggers — 33 HP remaining. It answers.
+[2026-09-22T18:09:14.379Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:09:14.378Z] [combat] Bludgeoning flares — +3 on hit.
+[2026-09-22T18:09:14.376Z] [combat] You — d20 → 3 + STR 10 stealthed +5 poisoned -2 = 16 vs Bog Creeper AC 6 — ✓ HIT
+[2026-09-22T18:09:14.376Z] [world] You seize the initiative. Bog Creeper has no time to react.
+[2026-09-22T18:09:14.328Z] [debug] dice⏱ coating: shown +57ms, tapped +536ms, settled +836ms = 1429ms
+[2026-09-22T18:09:13.492Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-22T18:09:12.897Z] [debug] dice⏱ damage: shown +52ms, tapped +473ms, settled +840ms = 1365ms
+[2026-09-22T18:09:12.057Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-22T18:09:11.530Z] [debug] dice⏱ attack: shown +52ms, tapped +661ms, settled +839ms = 1552ms
+[2026-09-22T18:09:10.690Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-22T18:09:09.975Z] [debug] dice⏱ initiative: shown +30ms, tapped +636ms, settled +821ms = 1487ms
+[2026-09-22T18:09:09.154Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-22T18:09:08.597Z] [debug] persist sizes(KB): total=165 player=25 wm=49[rooms=15 events=2 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=88 scene=3
+[2026-09-22T18:09:08.490Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:09:08.489Z] [world] You bring the acid-etched aetheric shield-hammer to bear on Bog Creeper.
+[2026-09-22T18:09:08.486Z] [debug] attack: status mods stealthed +5 · poisoned -2
+[2026-09-22T18:09:08.484Z] [debug] attack: target=Bog Creeper range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:09:08.483Z] [combat] Bog Creeper smokes — acid eats 3. (41/63 HP, 1 turn left)
+[2026-09-22T18:09:08.481Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=close enemies=1 hooks=2
+[2026-09-22T18:09:08.481Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:09:08.446Z] [system] unseen — next strike +5 fades.
+[2026-09-22T18:09:08.437Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+17ms
+[2026-09-22T18:09:07.389Z] [combat] Bog Creeper regenerates 1 HP (44/63).
+[2026-09-22T18:09:07.388Z] [combat] Bog Creeper's strike leaves you bleeding.
+[2026-09-22T18:09:07.388Z] [combat] Bog Creeper deals 12 bludgeoning damage +3 poison [Mud-Warden's Vest took it]. You have 24 HP remaining.
+[2026-09-22T18:09:07.292Z] [combat] Bog Creeper — d20 → 15 + ATK 4 = 19 vs your AC 19 — ✓ HIT
+[2026-09-22T18:09:07.288Z] [combat] Bog Creeper smokes — acid eats 3. (43/63 HP, 2 turns left)
+[2026-09-22T18:09:07.288Z] [debug] stealth: reset WIN init 17 vs 6 (dust, +5 1r)
+[2026-09-22T18:09:07.287Z] [world] You fling a fistful of grit into Bog Creeper's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)
+[2026-09-22T18:09:07.283Z] [world] Dusk is with you — the silt eats sound after dark. (stealth +1, night)
+[2026-09-22T18:09:07.282Z] [debug] train: stealth (stealth check) → progress 15/100
+[2026-09-22T18:09:07.282Z] [debug] stats: STR10 DEX13 INT6 WIS7 CHA8 STE3 | gear: INT+4,WIS+3,STR+4,DEX+2 | worn: main=Aetheric Shield-Hammer head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat amulet=Aetheric Locket
+[2026-09-22T18:09:07.278Z] [debug] skillcheck: stealth d20=11 STE 3 = 14 vs DC 12 — Hard → (resolved below)
+[2026-09-22T18:09:07.274Z] [debug] dice⏱ skill_check: shown +43ms, tapped +672ms, settled +834ms = 1549ms
+[2026-09-22T18:09:06.439Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-22T18:09:05.726Z] [system] ⏳ Time passed: 15 min
+[2026-09-22T18:09:05.720Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-22T18:09:05.720Z] [player] sneak
+[2026-09-22T18:09:05.719Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:09:05.704Z] [debug] ui: tap "stealth" ⏱+24ms
+[2026-09-22T18:09:03.391Z] [combat] Bog Creeper regenerates 1 HP (56/63).
+[2026-09-22T18:09:03.335Z] [combat] Bog Creeper is left exposed — easier to hit.
+[2026-09-22T18:09:03.335Z] [combat] Acid-Etched Aetheric Shield-Hammer — 3 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 2 total).
+[2026-09-22T18:09:03.335Z] [combat] Clean hit with the acid-etched aetheric shield-hammer for 10. Bog Creeper has 46 left and does not back away.
+[2026-09-22T18:09:03.334Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:09:03.333Z] [combat] Bludgeoning flares — +2 on hit.
+[2026-09-22T18:09:03.332Z] [combat] You — d20 → 18 + STR 10 = 28 vs Bog Creeper AC 8 — ✓ HIT
+[2026-09-22T18:09:03.331Z] [combat] Bog Creeper — d20 → 5 + ATK 4 = 9 vs your AC 19 — ✗ MISS
+[2026-09-22T18:09:03.331Z] [debug] ac-shift 21→19: race/base 10 + gear 12 + title 0 → trimmed 19 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:09:03.330Z] [world] Bog Creeper moves first. The pressure is immediate.
+[2026-09-22T18:09:03.271Z] [debug] dice⏱ coating: shown +50ms, tapped +499ms, settled +832ms = 1381ms
+[2026-09-22T18:09:02.439Z] [debug] ui: tap "roll" ⏱+31ms
+[2026-09-22T18:09:01.888Z] [debug] dice⏱ damage: shown +75ms, tapped +434ms, settled +819ms = 1328ms
+[2026-09-22T18:09:01.069Z] [debug] ui: tap "roll" ⏱+44ms
+[2026-09-22T18:09:00.558Z] [debug] dice⏱ attack: shown +52ms, tapped +458ms, settled +821ms = 1331ms
+[2026-09-22T18:08:59.737Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:08:59.223Z] [debug] dice⏱ initiative: shown +28ms, tapped +688ms, settled +835ms = 1551ms
+[2026-09-22T18:08:58.387Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T18:08:57.672Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:08:57.672Z] [world] You commit forward with the acid-etched aetheric shield-hammer. Bog Creeper watches your hands.
+[2026-09-22T18:08:57.669Z] [debug] attack: target=Bog Creeper range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:08:57.667Z] [combat] Bog Creeper smokes — acid eats 1. (55/63 HP, 2 turns left)
+[2026-09-22T18:08:57.666Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=close enemies=1 hooks=2
+[2026-09-22T18:08:57.666Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:08:57.633Z] [system] Aetheric Shield-Hammer guard (+2 AC) fades.
+[2026-09-22T18:08:57.620Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+27ms
+[2026-09-22T18:08:56.559Z] [combat] Bog Creeper regenerates 1 HP (56/63).
+[2026-09-22T18:08:56.510Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-09-22T18:08:56.510Z] [combat] Bog Creeper — d20 → 10 + ATK 4 = 14 vs your AC 21 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-22T18:08:56.510Z] [debug] ac-shift 19→21: race/base 10 + gear 12 + title 0 → trimmed 19 + status 2 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Tatter-Sewn Girdle feet=Echoing Steps Boots cloak=Salvager's Trench Coat
+[2026-09-22T18:08:56.509Z] [combat] Acid-Etched Aetheric Shield-Hammer — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-22T18:08:56.508Z] [combat] The blow with the acid-etched aetheric shield-hammer finds purchase — 8 damage, 55 HP standing. Bog Creeper commits to the counter.
+[2026-09-22T18:08:56.508Z] [combat] The Aetheric Shield-Hammer holds a guard — +2 AC for 1 round.
+[2026-09-22T18:08:56.506Z] [combat] You — d20 → 6 + STR 10 perfect opening (2× dice) = 16 vs Bog Creeper AC 9 — ✓ HIT
+[2026-09-22T18:08:56.505Z] [world] You seize the initiative. Bog Creeper has no time to react.
+[2026-09-22T18:08:56.457Z] [debug] dice⏱ coating: shown +44ms, tapped +439ms, settled +837ms = 1320ms
+[2026-09-22T18:08:55.621Z] [debug] ui: tap "roll" ⏱+28ms
+[2026-09-22T18:08:55.135Z] [debug] dice⏱ damage: shown +49ms, tapped +497ms, settled +816ms = 1362ms
+[2026-09-22T18:08:54.319Z] [debug] ui: tap "roll" ⏱+30ms
+[2026-09-22T18:08:53.771Z] [debug] dice⏱ attack: shown +50ms, tapped +1081ms, settled +820ms = 1951ms
+[2026-09-22T18:08:52.951Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-22T18:08:51.818Z] [debug] dice⏱ initiative: shown +44ms, tapped +840ms, settled +818ms = 1702ms
+[2026-09-22T18:08:51.000Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-22T18:08:50.118Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:08:50.117Z] [world] Your acid-etched aetheric shield-hammer comes around in an arc; Bog Creeper squares up to meet it.
+[2026-09-22T18:08:50.115Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-22T18:08:50.113Z] [debug] attack: target=Bog Creeper range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:08:50.100Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=close enemies=1 hooks=2
+[2026-09-22T18:08:50.099Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:08:50.051Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+20ms
+[2026-09-22T18:08:49.382Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T18:08:49.380Z] [combat] Dodge — d20 → 8 + DEX 13 = 21 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T18:08:49.380Z] [combat] Bog Creeper — d20 → 13 + ATK 4 = 17 vs your AC 19 — ✗ EVADED
+[2026-09-22T18:08:49.373Z] [world] You commit to the dodge. Slip Bog Creeper's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T18:08:49.369Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-22T18:08:49.369Z] [player] dodge
+[2026-09-22T18:08:49.349Z] [debug] ui: tap "dodge" ⏱+20ms
+[2026-09-22T18:08:46.410Z] [combat] Bog Creeper — d20 → 2 + ATK 4 = 6 vs your AC 19 — ✗ MISS
+[2026-09-22T18:08:46.407Z] [world] You close the gap with Bog Creeper. (range: close / arm's reach)
+[2026-09-22T18:08:46.407Z] [debug] move: field advance target=Bog Creeper d 1.50->0.50 band mid->close
+[2026-09-22T18:08:46.404Z] [debug] move: advance from range=mid enemies=1 weather=Silent Blizzard cost=1 partial=0
+[2026-09-22T18:08:46.402Z] [debug] parser: intent=advance conf=1.00 verb=approach target=bog creeper resolved=Bog Creeper range=mid enemies=1 hooks=2
+[2026-09-22T18:08:46.402Z] [player] approach Bog Creeper
+[2026-09-22T18:08:46.364Z] [debug] ui: tap "approach" ⏱+26ms
+[2026-09-22T18:08:42.239Z] [combat] Bog Creeper — d20 → 11 + ATK 4 = 15 vs your AC 19 — ✗ MISS
+[2026-09-22T18:08:42.237Z] [world] You close the gap with Bog Creeper. (range: mid-range)
+[2026-09-22T18:08:42.237Z] [debug] move: field advance target=Bog Creeper d 2.50->1.50 band far->mid
+[2026-09-22T18:08:42.236Z] [debug] move: advance from range=far enemies=1 weather=Silent Blizzard cost=1 partial=0
+[2026-09-22T18:08:42.233Z] [debug] parser: intent=advance conf=1.00 verb=approach target=bog creeper resolved=Bog Creeper range=far enemies=1 hooks=2
+[2026-09-22T18:08:42.233Z] [player] approach Bog Creeper
+[2026-09-22T18:08:42.197Z] [debug] ui: tap "approach" ⏱+20ms
+[2026-09-22T18:08:41.592Z] [debug] qwen⏱ investigate_lore ok 4238ms wait 2892ms read 360ms/write 972ms in 130t→out 28t thr2 2.8ms/t (122ch)
+[2026-09-22T18:08:41.124Z] [debug] persist sizes(KB): total=163 player=25 wm=49[rooms=15 events=2 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=87 scene=3
+[2026-09-22T18:08:40.953Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T18:08:40.953Z] [debug] arbiter: template (reason=combat)
+[2026-09-22T18:08:40.953Z] [arbiter] The Arbiter holds up a hand. "Aetheric Shield-Hammer works at close / arm's reach range only — you're at far. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+[2026-09-22T18:08:40.953Z] [debug] attack: target=Bog Creeper range=far reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:08:40.949Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=far enemies=1 hooks=2
+[2026-09-22T18:08:40.948Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:08:40.897Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+10ms
+[2026-09-22T18:08:40.237Z] [debug] qwen⏱ investigate_lore ok 4140ms wait 1669ms read/write unusable (native mis-reported 12394ms/936ms — llama.rn split bug, not this call) in 129t→out 28t thr2 (114ch)
+[2026-09-22T18:08:38.900Z] [arbiter] The Arbiter holds up a hand. "Aetheric Shield-Hammer works at close / arm's reach range only — you're at far. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+[2026-09-22T18:08:38.900Z] [debug] attack: target=Bog Creeper range=far reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false
+[2026-09-22T18:08:38.894Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Shield-Hammer range=far enemies=1 hooks=2
+[2026-09-22T18:08:38.893Z] [player] attack with the aetheric shield-hammer
+[2026-09-22T18:08:38.845Z] [debug] ui: tap "⚗ aetheric shield-hammer ⚒" ⏱+11ms
+[2026-09-22T18:08:37.767Z] [cognitive] REST  (272ms)
+[2026-09-22T18:08:37.738Z] [debug] homework: scene_intro "The Cistern Intake" ∅ 10932ms
+[2026-09-22T18:08:37.736Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10840ms — intro-fill:∅
+[2026-09-22T18:08:37.698Z] [debug] qwen⏱ narration:scene_intro_fill preempted 10840ms read 0ms/write 0ms in 758t→out 0t thr1 (0ch)
+[2026-09-22T18:08:37.493Z] [system] ⏳ Time passed: 8h
+[2026-09-22T18:08:37.492Z] [debug] enemy: Bog Creeper hp=63 ac=9 atk=Vine Lash dmg=2D6 rarity=Uncommon ap=4
+[2026-09-22T18:08:37.492Z] [world] A Bog Creeper is already inside the reach of your fire. The rest is over.
+[2026-09-22T18:08:37.492Z] [arbiter] The Arbiter goes still. "Whatever found you had all night to leave. It stayed."
+[2026-09-22T18:08:37.488Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-22T18:08:37.488Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 11, evening)
+[2026-09-22T18:08:37.487Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-22T18:08:37.487Z] [player] rest
+[2026-09-22T18:08:37.478Z] [debug] ui: tap "rest" ⏱+25ms
+[2026-09-22T18:08:37.325Z] [cognitive] neutral  (38ms)
+[2026-09-22T18:08:37.251Z] [world] You look the access rung over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-22T18:08:37.250Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=access rung resolved=access rung range=- enemies=0 hooks=2
+[2026-09-22T18:08:37.250Z] [player] investigate access rung
+[2026-09-22T18:08:36.066Z] [cognitive] SWIM  (36ms)
+[2026-09-22T18:08:35.994Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-22T18:08:35.992Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=2
+[2026-09-22T18:08:35.992Z] [player] investigate shallow pool
+[2026-09-22T18:08:34.839Z] [cognitive] CLIMB  (60ms)
+[2026-09-22T18:08:34.744Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T18:08:34.743Z] [reward] You scrape at the silt with the worn tartarian coin. ✦ Recovered Small Rock (Common).
+[2026-09-22T18:08:34.739Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-09-22T18:08:34.738Z] [player] investigate the ground
+[2026-09-22T18:08:31.510Z] [debug] ui: tap "investigate" ⏱+18ms
+[2026-09-22T18:08:30.208Z] [reward]     • Aether Crystal (Common)
+[2026-09-22T18:08:30.207Z] [reward]     • Smooth Stone x2 (Common)
+[2026-09-22T18:08:30.207Z] [reward]     • Worn Tartarian Coin x9 (Common)
+[2026-09-22T18:08:30.207Z] [reward] ✦ Salvage haul:
+[2026-09-22T18:08:30.207Z] [world] You break the rusted obsidian pillar apart. Among the pieces, something worth keeping.
+[2026-09-22T18:08:30.207Z] [world] You break the cistern mouth apart. Among the pieces, something worth keeping.
+[2026-09-22T18:08:30.206Z] [world] You salvage the bone. The take is small but real.
+[2026-09-22T18:08:29.404Z] [reward] ✦ Salvager's Worn Gloves (Common).
+[2026-09-22T18:08:29.403Z] [world] You lift the Salvager's Worn Gloves clear.
+[2026-09-22T18:08:29.402Z] [reward] ✦ Force Wave Wand (Common).
+[2026-09-22T18:08:29.401Z] [world] You pick up the Force Wave Wand.
+[2026-09-22T18:08:28.309Z] [debug] ui: tap "take / salvage" ⏱+16ms
+[2026-09-22T18:08:26.809Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-22T18:08:24.739Z] [world] A faint smell of burning Aetherstone drifts from somewhere north.
+[2026-09-22T18:08:24.738Z] [world] You push east. The silt is heavy underfoot, the horizon unchanged.
+[2026-09-22T18:08:24.736Z] [debug] spawn: gear=[Force Wave Wand, Salvager's Worn Gloves] window=10 roster=new
+[2026-09-22T18:08:24.708Z] [debug] ui: tap "→ NIMARI" ⏱+23ms
+[2026-09-22T18:08:18.331Z] [arbiter] "This is what they sell information for," the Arbiter says.
+
+=== END REPORT ===

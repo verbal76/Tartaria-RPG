@@ -1,0 +1,358 @@
+{
+  "id": "c7da71ecbac44887ba56558827b9199c",
+  "groupID": "7749031861",
+  "eventID": "c7da71ecbac44887ba56558827b9199c",
+  "projectID": "4511945117532160",
+  "size": 13944,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-22-1867-the-second-disclosure-is-its-own-question #muczpka7tu6p [inline 11/11]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-22-1867-the-second-disclosure-is-its-own-question",
+  "message": "player-log 2026-09-22-1867-the-second-disclosure-is-its-own-question #muczpka7tu6p [inline 11/11]",
+  "title": "player-log 2026-09-22-1867-the-second-disclosure-is-its-own-question #muczpka7tu6p [inline 11/11]",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Revere",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-22T18:00:43.812Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 56.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 2295599104,
+      "storage_size": 245292421120,
+      "free_storage": 59154980864,
+      "boot_time": "2026-08-28T17:18:42.329Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "37.20000076293945",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 37,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0ca10-2cd4-738e-a2a2-4fd3f894085c"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a44a5d8ed9a849218453cc34b343b7c7",
+      "span_id": "86d350a6ea957441",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzg-uOT-AwW-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIG-hvb-GRz-IHV-wIG-Ega-GFu-ZC4-gIk-Fld-Ghl-cml-jIF-Noa-WVs-ZC1-IYW-1tZ-XIg-d29-ya3-MgY-XQg-Y2x-vc2-UgL-yBh-cm0-ncy-ByZ-WFj-aCB-yYW-5nZ-SBv-bmx-5IO-KAl-CB5-b3U-ncm-UgY-XQg-ZmF-yLi-BBR-FZB-TkN-FIH-RvI-GNs-b3N-lIG-luI-Ch0-aGV-5J2-xsI-GFu-c3d-lci-B0a-GUg-YXB-wcm-9hY-2gp-LCB-vci-Bhd-HRh-Y2s-gd2-l0a-CBz-b21-ldG-hpb-mcg-dGh-hdC-ByZ-WFj-aGV-zLi-IKW-zIw-MjY-tMD-ktM-jJU-MTg-6MD-g6M-zgu-OTA-wWl-0gW-2Rl-YnV-nXS-Bhd-HRh-Y2s-6IH-Rhc-mdl-dD1-Cb2-cgQ-3Jl-ZXB-lci-ByY-W5n-ZT1-mYX-Igc-mVh-Y2g-uYm-FuZ-HM9-W2N-sb3-NlX-SBy-ZWF-jaC-5sY-WJl-bD1-BZX-RoZ-XJp-YyB-TaG-llb-GQt-SGF-tbW-VyI-GJh-cmV-IYW-5kP-WZh-bHN-lCg-==",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzg-uOD-k0W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-1hZ-XRo-ZXJ-pYy-Bza-Gll-bGQ-gaG-Ftb-WVy-IHJ-lc2-9sd-mVk-PUF-ldG-hlc-mlj-IFN-oaW-VsZ-C1I-YW1-tZX-Igc-mFu-Z2U-9Zm-FyI-GVu-ZW1-pZX-M9M-SBo-b29-rcz-0yC-lsy-MDI-2LT-A5L-TIy-VDE-4Oj-A4O-jM4-Ljg-5M1-pdI-Ftw-bGF-5ZX-JdI-GF0-dGF-jay-B3a-XRo-IHR-oZS-BhZ-XRo-ZXJ-pYy-Bza-Gll-bGQ-taG-Ftb-WVy-Cls-yMD-I2L-TA5-LTI-yVD-E4O-jA4-OjM-4Lj-g0N-Vpd-IFt-kZW-J1Z-10g-dWk-6IH-Rhc-CAi-4pq-XIG-Fld-Ghl-cml-jIH-Noa-WVs-ZC1-oYW-1tZ-XIg-4pq-SIi-Dij-7Er-MTF-tcw-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozN-y43-Njd-aXS-BbY-29n-bml-0aX-ZlX-SBS-RVN-UIC-AoM-jcy-bXM-pCg-==",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uNz-M4W-l0g-W2R-lYn-VnX-SBo-b21-ld2-9ya-zog-c2N-lbm-Vfa-W50-cm8-gIl-RoZ-SBD-aXN-0ZX-JuI-Elu-dGF-rZS-Ig4-oiF-IDE-wOT-Myb-XMK-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uNz-M2W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-OKc-giB-ESV-NDQ-VJE-RUQ-gbm-Fyc-mF0-aW9-uOn-NjZ-W5l-X2l-udH-JvX-2Zp-bGw-gYW-Z0Z-XIg-MTA-4ND-Btc-yDi-gJQ-gaW-50c-m8t-Zml-sbD-rii-IUK-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uNj-k4W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-G5h-cnJ-hdG-lvb-jpz-Y2V-uZV-9pb-nRy-b19-maW-xsI-HBy-ZWV-tcH-RlZ-CAx-MDg-0MG-1zI-HJl-YWQ-gMG-1zL-3dy-aXR-lID-Btc-yBp-biA-3NT-h04-oaS-b3V-0ID-B0I-HRo-cjE-gKD-Bja-CkK-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uND-kzW-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iA4-aAo-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uND-kyW-l0g-W2R-lYn-VnX-SBl-bmV-teT-ogQ-m9n-IEN-yZW-VwZ-XIg-aHA-9Nj-MgY-WM9-OSB-hdG-s9V-mlu-ZSB-MYX-NoI-GRt-Zz0-yRD-Ygc-mFy-aXR-5PV-VuY-29t-bW9-uIG-FwP-TQK-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uND-kyW-l0g-W3d-vcm-xkX-SBB-IEJ-vZy-BDc-mVl-cGV-yIG-lzI-GFs-cmV-hZH-kga-W5z-aWR-lIH-RoZ-SBy-ZWF-jaC-BvZ-iB5-b3V-yIG-Zpc-mUu-IFR-oZS-ByZ-XN0-IGl-zIG-92Z-XIu-Cls-yMD-I2L-TA5-LTI-yVD-E4O-jA4-OjM-3Lj-Q5M-lpd-IFt-hcm-Jpd-GVy-XSB-UaG-UgQ-XJi-aXR-lci-Bnb-2Vz-IHN-0aW-xsL-iAi-V2h-hdG-V2Z-XIg-Zm9-1bm-Qge-W91-IGh-hZC-Bhb-Gwg-bml-naH-Qgd-G8g-bGV-hdm-UuI-El0-IHN-0YX-llZ-C4i-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uND-g4W-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iBh-bWJ-pZW-50I-Ghl-bGQ-gKG-Fjd-Glv-biB-zZX-R0b-Glu-ZyD-igJ-QgY-XJt-ZWQ-gZm-9yI-HRo-ZSB-uZX-h0I-HF1-aWV-0IH-RpY-2sp-Cls-yMD-I2L-TA5-LTI-yVD-E4O-jA4-OjM-3Lj-Q4O-Fpd-IFt-3b3-JsZ-F0g-WW9-1IH-Jlc-3Qg-Zm9-yID-gga-G91-cnM-uIC-s4I-HN0-YW1-pbm-Egc-mVj-b3Z-lcm-VkL-iAo-RGF-5ID-ExL-CBl-dmV-uaW-5nK-Qpb-MjA-yNi-0wO-S0y-MlQ-xOD-owO-Doz-Ny4-0OD-daX-SBb-ZGV-idW-ddI-HBh-cnN-lcj-oga-W50-ZW5-0PX-Jlc-3Qg-Y29-uZj-0xL-jAw-IHZ-lcm-I9c-mVz-dCB-0YX-JnZ-XQ9-LSB-yZX-Nvb-HZl-ZD0-tIH-Jhb-mdl-PS0-gZW-5lb-Wll-cz0-wIG-hvb-2tz-PTI-KWz-IwM-jYt-MDk-tMj-JUM-Tg6-MDg-6Mz-cuN-Dg3-Wl0-gW3-BsY-Xll-cl0-gcm-Vzd-Ao=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uND-c4W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJy-ZXN-0Ii-Dij-7Er-MjV-tcw-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozN-y4z-MjV-aXS-BbY-29n-bml-0aX-ZlX-SBu-ZXV-0cm-FsI-CAo-Mzh-tcy-kKW-zIw-MjY-tMD-ktM-jJU-MTg-6MD-g6M-zcu-MjU-xWl-0gW-3dv-cmx-kXS-BZb-3Ug-bG9-vay-B0a-GUg-YWN-jZX-NzI-HJ1-bmc-gb3-Zlc-i4g-Tm9-0aG-luZ-yBh-Ym9-1dC-Bpd-CBz-aW5-ncy-wgb-m90-aGl-uZy-BhY-m91-dCB-pdC-B3Y-XJu-cyD-igJ-QgV-GFy-dGF-yaW-Ega-XMg-ZnV-sbC-BvZ-iB0-aGl-uZ3-Mgd-2Fp-dGl-uZy-B0b-yBi-ZSB-yZW-1lb-WJl-cmV-kLg-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mzc-uMj-UwW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9Y-WNj-ZXN-zIH-J1b-mcg-cmV-zb2-x2Z-WQ9-YWN-jZX-NzI-HJ1-bmc-gcm-FuZ-2U9-LSB-lbm-Vta-WVz-PTA-gaG-9va-3M9-Mgp-bMj-AyN-i0w-OS0-yMl-QxO-Dow-ODo-zNy-4yN-TBa-XSB-bcG-xhe-WVy-XSB-pbn-Zlc-3Rp-Z2F-0ZS-BhY-2Nl-c3M-gcn-VuZ-wpb-MjA-yNi-0wO-S0y-MlQ-xOD-owO-Doz-Ni4-wNj-ZaX-SBb-Y29-nbm-l0a-XZl-XSB-TV0-lNI-CAo-MzZ-tcy-kK",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MzU-uOT-k0W-l0g-W3d-vcm-xkX-SBZ-b3U-gbG-9va-yB0-aGU-gc2-hhb-Gxv-dyB-wb2-9sI-G92-ZXI-uIE-5vd-Ghp-bmc-gYW-Jvd-XQg-aXQ-gc2-luZ-3Ms-IG5-vdG-hpb-mcg-YWJ-vdX-Qga-XQg-d2F-ybn-Mg4-oCU-IFR-hcn-Rhc-mlh-IGl-zIG-Z1b-Gwg-b2Y-gdG-hpb-mdz-IHd-haX-Rpb-mcg-dG8-gYm-Ugc-mVt-ZW1-iZX-JlZ-C4K-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MzU-uOT-kyW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9c-2hh-bGx-vdy-Bwb-29s-IHJ-lc2-9sd-mVk-PXN-oYW-xsb-3cg-cG9-vbC-ByY-W5n-ZT0-tIG-VuZ-W1p-ZXM-9MC-Bob-29r-cz0-yCl-syM-DI2-LTA-5LT-IyV-DE4-OjA-4Oj-M1L-jk5-Mlp-dIF-twb-GF5-ZXJ-dIG-lud-mVz-dGl-nYX-RlI-HNo-YWx-sb3-cgc-G9v-bAo-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MzQ-uOD-M5W-l0g-W2N-vZ2-5pd-Gl2-ZV0-gQ0-xJT-UIg-ICg-2MG-1zK-Qpb-MjA-yNi-0wO-S0y-MlQ-xOD-owO-Doz-NC4-3ND-RaX-SBb-c3l-zdG-VtX-SDi-j7M-gVG-ltZ-SBw-YXN-zZW-Q6I-DI0-IG1-pbg-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozN-C43-NDN-aXS-Bbc-mV3-YXJ-kXS-BZb-3Ug-c2N-yYX-BlI-GF0-IHR-oZS-Bza-Wx0-IHd-pdG-ggd-Ghl-IHd-vcm-4gd-GFy-dGF-yaW-FuI-GNv-aW4-uIO-Kcp-iBS-ZWN-vdm-VyZ-WQg-U21-hbG-wgU-m9j-ayA-oQ2-9tb-W9u-KS4-KWz-IwM-jYt-MDk-tMj-JUM-Tg6-MDg-6Mz-QuN-zM5-Wl0-gW2-RlY-nVn-XSB-wYX-JzZ-XI6-IGl-udG-Vud-D1p-bnZ-lc3-RpZ-2F0-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1p-bnZ-lc3-RpZ-2F0-ZSB-0YX-JnZ-XQ9-Z3J-vdW-5kI-HJl-c29-sdm-VkP-S0g-cmF-uZ2-U9L-SBl-bmV-taW-VzP-TAg-aG9-va3-M9M-go=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MzQ-uNz-M4W-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gdG-hlI-Gdy-b3V-uZA-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozM-S41-MTB-aXS-BbZ-GVi-dWd-dIH-VpO-iB0-YXA-gIm-lud-mVz-dGl-nYX-RlI-iDi-j7E-rMT-htc-wpb-MjA-yNi-0wO-S0y-MlQ-xOD-owO-Doz-MC4-yMD-haX-SBb-cmV-3YX-JkX-SAg-ICA-g4o-CiI-EFl-dGh-lci-BDc-nlz-dGF-sIC-hDb-21t-b24-pCl-syM-DI2-LTA-5LT-IyV-DE4-OjA-4Oj-MwL-jIw-N1p-dIF-tyZ-Xdh-cmR-dIC-AgI-CDi-gKI-gU2-1vb-3Ro-IFN-0b2-5lI-Hgy-ICh-Db2-1tb-24p-Cls-yMD-I2L-TA5-LTI-yVD-E4O-jA4-OjM-wLj-IwN-1pd-IFt-yZX-dhc-mRd-ICA-gIC-Dig-KIg-V29-ybi-BUY-XJ0-YXJ-pYW-4gQ-29p-biB-4OS-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozM-C4y-MDd-aXS-Bbc-mV3-YXJ-kXS-Din-KYg-U2F-sdm-FnZ-SBo-YXV-sOg-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MzA-uMj-A3W-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-JlY-Wsg-dGh-lIH-J1c-3Rl-ZCB-vYn-NpZ-Glh-biB-waW-xsY-XIg-YXB-hcn-QuI-EFt-b25-nIH-RoZ-SBw-aWV-jZX-MsI-HNv-bWV-0aG-luZ-yB3-b3J-0aC-BrZ-WVw-aW5-nLg-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-ozM-C4y-MDd-aXS-Bbd-29y-bGR-dIF-lvd-SBi-cmV-hay-B0a-GUg-Y2l-zdG-Vyb-iBt-b3V-0aC-Bhc-GFy-dC4-gQW-1vb-mcg-dGh-lIH-BpZ-WNl-cyw-gc2-9tZ-XRo-aW5-nIH-dvc-nRo-IGt-lZX-Bpb-mcu-Cls-yMD-I2L-TA5-LTI-yVD-E4O-jA4-OjM-wLj-IwN-lpd-IFt-3b3-JsZ-F0g-WW9-1IH-Nhb-HZh-Z2U-gdG-hlI-GJv-bmU-uIF-RoZ-SB0-YWt-lIG-lzI-HNt-YWx-sIG-J1d-CBy-ZWF-sLg-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-oyO-S40-MDR-aXS-Bbc-mV3-YXJ-kXS-Din-KYg-U2F-sdm-FnZ-XIn-cyB-Xb3-JuI-Eds-b3Z-lcy-AoQ-29t-bW9-uKS-4K",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mjk-uND-AzW-l0g-W3d-vcm-xkX-SBZ-b3U-gbG-lmd-CB0-aGU-gU2-Fsd-mFn-ZXI-ncy-BXb-3Ju-IEd-sb3-Zlc-yBj-bGV-hci-4KW-zIw-MjY-tMD-ktM-jJU-MTg-6MD-g6M-jku-NDA-yWl-0gW-3Jl-d2F-yZF-0g4-pym-IEZ-vcm-NlI-Fdh-dmU-gV2-FuZ-CAo-Q29-tbW-9uK-S4K-WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-Mjk-uND-AxW-l0g-W3d-vcm-xkX-SBZ-b3U-gcG-lja-yB1-cCB-0aG-UgR-m9y-Y2U-gV2-F2Z-SBX-YW5-kLg-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-oyO-C4z-MDl-aXS-BbZ-GVi-dWd-dIH-VpO-iB0-YXA-gIn-Rha-2Ug-LyB-zYW-x2Y-Wdl-IiD-ij7-ErM-TZt-cwp-bMj-AyN-i0w-OS0-yMl-QxO-Dow-ODo-yNi-44M-Dla-XSB-bZG-Vid-Wdd-IGh-vbW-V3b-3Jr-OiB-pbn-Ryb-y1m-aWx-sIG-Fyb-WVk-IGF-mdG-VyI-DYw-MDB-tcy-BpZ-Gxl-ICh-zdH-Jpa-2Ug-Mi8-zKQ-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MjQ-uNz-M5W-l0g-W3d-vcm-xkX-SBB-IGZ-haW-50I-HNt-ZWx-sIG-9mI-GJ1-cm5-pbm-cgQ-WV0-aGV-yc3-Rvb-mUg-ZHJ-pZn-RzI-GZy-b20-gc2-9tZ-Xdo-ZXJ-lIG-5vc-nRo-Lgp-bMj-AyN-i0w-OS0-yMl-QxO-Dow-ODo-yNC-43M-zha-XSB-bd2-9yb-GRd-IFl-vdS-Bwd-XNo-IGV-hc3-QuI-FRo-ZSB-zaW-x0I-Glz-IGh-lYX-Z5I-HVu-ZGV-yZm-9vd-Cwg-dGh-lIG-hvc-ml6-b24-gdW-5ja-GFu-Z2V-kLg-pbM-jAy-Ni0-wOS-0yM-lQx-ODo-wOD-oyN-C43-MzZ-aXS-BbZ-GVi-dWd-dIH-NwY-Xdu-OiB-nZW-FyP-VtG-b3J-jZS-BXY-XZl-IFd-hbm-QsI-FNh-bHZ-hZ2-VyJ-3Mg-V29-ybi-BHb-G92-ZXN-dIH-dpb-mRv-dz0-xMC-Byb-3N0-ZXI-9bm-V3C-lsy-MDI-2LT-A5L-TIy-VDE-4Oj-A4O-jI0-Ljc-wOF-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Ai4-oaS-IE5-JTU-FSS-SIg-4o+-xKz-Izb-XMK",
+      "WzI-wMj-YtM-Dkt-MjJ-UMT-g6M-Dg6-MTg-uMz-MxW-l0g-W2F-yYm-l0Z-XJd-ICJ-UaG-lzI-Glz-IHd-oYX-Qgd-Ghl-eSB-zZW-xsI-Glu-Zm9-ybW-F0a-W9u-IGZ-vci-wiI-HRo-ZSB-Bcm-Jpd-GVy-IHN-heX-MuC-go9-PT0-gRU-5EI-FJF-UE9-SVC-A9P-T0="
+    ],
+    "chunkChars": 4778,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-22-1867-the-second-disclosure-is-its-own-question #muczpka7tu6p [inline 11/11]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "muczpka7tu6p"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-22-1867-the-second-disclosure-is-its-own-question"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "11"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-22-1867-the-second-disclosure-is-its-own-question"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-22T18:11:27.977537Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-22T18:10:53.612000Z",
+  "fingerprints": [
+    "1121110e2607c6132dfa4bc2434c1c2e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1986400504,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-22T16:55:19.792634Z",
+    "dateReleased": "2026-09-22T17:02:47.893019Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ad46a171b503d1cf2ed41d2dd4a7aaab3db08272",
+      "message": "OTA-1867 \u2014 the second disclosure is its own question\n\nSix authored vendor topics held TWO disclosures behind ONE label:\nirma_berrin, irma_nimari, halem_stayed, elara_ring, felra_stopped,\nnalren_why. Ask-once and a second answer cannot both be true \u2014 the second\npress is refused before the counter write \u2014 so after OTA-1866 those six\nsecond paragraphs were content no player could reach.\n\nOwner ruling: every visible vendor conversation question is ask-once, and\ndeeper conversation is a DISTINCT follow-up question, not the same question\nasked twice.\n\nTHE GATE. `TopicGate.requiresTopic` names a topic on the SAME person's set\nthat must already have been asked \u2014 the first gate dimension that asks about\nthe CONVERSATION rather than the world. It resolves through\n`conversationMemory(npcId, talked)`, a closure rather than the ledger, so the\ngate layer can ask exactly one thing and the answer still comes from\n`topicSpent`. Additive with every existing clause, and fail-closed: a context\ncarrying no conversation memory reads as \"nothing has been asked\", so a\nmissing ledger never OPENS a door.\n\nTHE OLD AUTHORITY IS DELETED, NOT DORMANT. `answersAvailable` was a branch \u2014\none answer for a laned person, `lines.length` for an authored one \u2014 and that\nbranch is what two readers drifted across for a year. It is now the constant\nANSWERS_PER_QUESTION, and no authored topic holds a second line. A class\nset's six lines remain PARALLEL VOICES inside one ask-once topic; that is\n`voiceLaneFor`'s business and was never a count of answers.\n\nTHE SAME CONVERSATION. `raiseTopic` re-derives the open list from `topicsFor`\nafter the counter write, against the faction the sheet opened with, so a\nfollow-up unlocked by an answer is askable without closing and reopening. It\nonly ever ADDS: a question the player can see must not vanish under their\nthumb.\n\nLEGACY IS A MIGRATION FIELD, NOT A RULE. A pre-split save can hold\n`<npc>:<parent> = 2`, meaning that player already heard disclosure 2.\n`Topic.legacyHeardWith` says so on those six rows, naming the exact old\nparent and the exact old count, read in one place. It is NOT \"a follow-up\ninherits its parent's count\" \u2014 that would be wrong for every ordinary\nfollow-up authored after today.\n\nCorpus 347 -> 353 topics, 41 sets unchanged; multi-line rows 12 -> 6, all six\nremaining being class:roadside voice lanes. All 12 authored paragraphs\nsurvive: six first paragraphs byte-identical, four second paragraphs edited\nonly where they claimed the player had asked the same question twice (41\ncharacters of 1,939).\n\n`talkContextFor` moved to app/state/talkContext.ts, body otherwise unchanged.\nIt was never store work \u2014 it takes a player and a world memory and returns a\nplain context \u2014 and gameStore.ts was at its ceiling. Ceiling 36815 -> 36812.\n\nNew suite ota1867TheSecondDisclosureIsItsOwnQuestion 31/31; five negative\ncontrols each detected their own class with production restored byte-for-byte\nafterwards. ota1866 24/24 and ota1784 20/20 green on the converted corpus.\n22/22 check gates, typecheck source clean, test ratchet at baseline 196, lint\nclean.\n\nNOT CLAIMED: nothing here changes non-vendor conversation, gameplay,\npresentation, crafting, grants, prices or navigation.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-22T16:47:41Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-22-1867-the-second-disclosure-is-its-own-question",
+          "shortVersion": "tartaria@4.32.11+2026-09-22-1867-the-second-disclosure-is-its-own-question",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-22T17:02:47.893019Z",
+          "dateCreated": "2026-09-22T16:55:19.792634Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160835068",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-22T17:02:48.189350Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-22-1867-the-second-disclosure-is-its-own-question",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-22-1867-the-second-disclosure-is-its-own-question",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-22-1867-the-second-disclosure-is-its-own-question",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-22-1867-the-second-disclosure-is-its-own-question)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d3501a4ddd504c99ac9dc1dcf5643df4",
+  "previousEventID": "c144cd0f29274e82a469d2bde61c357b"
+}
