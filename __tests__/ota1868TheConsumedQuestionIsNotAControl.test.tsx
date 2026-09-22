@@ -801,9 +801,77 @@ describe('H — a UI interaction repair, and only that', () => {
     }
   });
 
-  it('36 — the only production file #193 changed is the tray', () => {
-    const changed = execSync('git diff --name-only HEAD -- app/', { cwd: ROOT })
-      .toString().trim().split('\n').filter(Boolean);
-    expect(changed.filter((f) => f !== 'app/buildInfo.ts')).toEqual(['app/components/TalkSheet.tsx']);
+  /* ⚠⚠⚠ THIS TEST REPLACES ONE THAT COULD NOT SURVIVE ITS OWN COMMIT.
+   * It read `git diff --name-only HEAD -- app/` and expected the tray — which
+   * described the DIRTY WORKTREE the author happened to be sitting in, not the
+   * repository. On any clean checkout of the commit it describes, that diff is
+   * empty by definition, so it passed locally before the commit and failed in
+   * CI after it (run 2257, shard 3/4). A regression suite must assert
+   * properties of the CHECKED-OUT CODE; reconstructing the author's editing
+   * session is not a property of anything that ships.
+   *
+   * ⚠⚠ What it should have been asking is the claim #193 actually depends on.
+   * §G-33 proves the boundary is centralised BETWEEN files — one renderer of
+   * `pendingTalk.topics`, one caller of `raiseTopic`, ParleySheet a door rather
+   * than a second tray. Nothing proved the boundary is airtight INSIDE that one
+   * file: a second row, a duplicate, a future "ask again" affordance sitting
+   * beside the guarded one would pass every other test in this suite and hand
+   * the player back the dead key. So this asks the rendered conversation
+   * directly, with two questions spent and the rest live: which controls will
+   * take a touch, and what do they name. */
+  it('36 — one control per question, and only a question with something left to give takes a touch', () => {
+    seatPerson(ODAR.id, ODAR.name);
+    openTalk(ODAR.name);
+    pressRow('t_front');
+    pressRow('t_known');
+
+    const pending = useGameStore.getState().pendingTalk!;
+    const spentLabels = pending.topics.filter((t) => topicSpent(t, ODAR.id, talkedNow())).map((t) => t.label);
+    const liveLabels = pending.topics.filter((t) => !topicSpent(t, ODAR.id, talkedNow())).map((t) => t.label);
+    expect(spentLabels.length).toBe(2);
+    expect(liveLabels.length).toBeGreaterThan(0);
+
+    let tree: TestTree | null = null;
+    renderer.act(() => { tree = renderer.create(<TalkSheet />); });
+    const t = tree as unknown as TestTree;
+
+    // Every node the sheet renders that presents itself as a button. React
+    // Native nests a few per logical control, so keep only the outermost of
+    // each — that one is the control.
+    const buttons = t.root.findAll((n: TI) => n.props.accessibilityRole === 'button'
+      && typeof n.props.accessibilityLabel === 'string');
+    const controls = buttons.filter((n: TI) => !buttons.some((o: TI) => o !== n
+      && o.findAll((x: TI) => x === n).length > 0));
+
+    const takesTouch = (n: TI): boolean => {
+      const hosts = n.findAll((h: TI) => typeof h.props.onStartShouldSetResponder === 'function');
+      return hosts.length
+        ? (hosts[hosts.length - 1]!.props.onStartShouldSetResponder as () => boolean)() === true
+        : false;
+    };
+    /* ⚠ READ THE TREE WHILE IT IS MOUNTED. `props` and the responder handlers
+     * are live fibre reads, so anything lazy here throws "unable to find node
+     * on an unmounted component" below. Flatten first, assert afterwards. */
+    const offered = controls.map((n: TI) => ({
+      label: n.props.accessibilityLabel as string,
+      live: takesTouch(n),
+    }));
+    renderer.act(() => { t.unmount(); });
+
+    const named = (label: string): string[] => offered
+      .filter((c) => c.label === label || c.label === `${label}, already asked`)
+      .map((c) => (c.live ? 'LIVE' : 'inert'));
+
+    // ⚠ A consumed question is offered exactly ONE control, and that control
+    // is inert. Not "the one we know about is inert" — every control in the
+    // whole rendered conversation that names it.
+    for (const label of spentLabels) expect(named(label)).toEqual(['inert']);
+    // ⚠ And an unasked question is offered exactly ONE control, which is live.
+    // A duplicate row would read ['LIVE', 'LIVE'] and fail here.
+    for (const label of liveLabels) expect(named(label)).toEqual(['LIVE']);
+    // No question is rendered twice and none is missing: one control each.
+    expect(offered.filter((c) => [...spentLabels, ...liveLabels].some((l) =>
+      c.label === l || c.label === `${l}, already asked`)).length)
+      .toBe(pending.topics.length);
   });
 });
