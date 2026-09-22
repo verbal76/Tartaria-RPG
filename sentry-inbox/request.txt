@@ -487,3 +487,62 @@ Plus the usual scrub accounting and redaction counts.
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion, and nothing retrieved may be attributed to any open freeze — #174
 included, which stays pending and unevidenced until these bodies are read.
+
+pull 2026-09-22T04:35Z — the first POST-FIX session, and the relay has not looked
+since run 422 closed at 04:14:45Z with "Nothing new to commit."
+
+The owner played and pushed after that read. Nothing in the tree is newer than
+player-log_2026-09-21T21-35-06_007ca773f3df, which is stamped
+2026-09-21-1862-the-beat-keeps-its-way-out and is the already-analysed Crafting
+Freeze 2 corpus. It MUST NOT be reused as post-fix evidence. Two OTAs shipped
+after it: 74839fad (2026-09-21-1863-the-window-says-when-it-is-gone) and
+a5b1ba60 (2026-09-22-1864-the-bench-leaves-a-trail).
+
+THE IDENTITY GATE COMES FIRST. For every bundle fetched, the release/dist stamp,
+device, OS, app build, environment and process/life ids, stated plainly. A
+bundle that is not stamped 1863 or 1864 answers nothing here and is not to be
+dressed as an answer. Deduplicate: several bundles can carry one physical life,
+and a duplicate upload is not a second traversal.
+
+Seven reads, in order:
+
+1. OTA-1863's REPAIRED PRESENTATION PATHS, each traversal separately: the
+   surface, the close request, whatever native-dismiss or handoff evidence
+   exists, the continuation, and the next presentation or game state.
+   ChapterCard, StoryFork, gather and search sheets. Opening and closing an
+   unrelated Modal is not a traversal of the thing that carried risk.
+
+2. INPUT AFTER EACH HANDOFF, which is the whole question. root → control →
+   press-in → handler enter → dispatch → done, or a later travel, combat,
+   navigation or interaction. A process that merely stayed alive is weaker
+   evidence than a press that landed.
+
+3. THE OLD SIGNATURE, searched for rather than assumed absent: bare root touches
+   with no control continuation, root storms, control-in without handler entry,
+   enter without dispatch, dispatch without done, a presentation opened without
+   its close, a close without continuation, JS alive while input stops, an
+   inactive/background transition after apparent input death, force-close or
+   process replacement.
+
+4. PRESENTATION EDGE BALANCE across the whole session — every open against its
+   close, and any unusually long handoff, quoted with its timings.
+
+5. OTA-1864's CRAFTING LADDER, only if a 1864-stamped bundle exists. Every
+   CraftingScreen touch and every CrucibleGuardModal answer, reconstructed as
+   ROOT → IN → ENTER → DISPATCH → DONE plus react-mount / react-unmount, naming
+   the control (SAVE ALL, SAVE TICKED, CANCEL, SPEND IT ALL, backdrop). Where a
+   stage is missing, say exactly which one and stop there. Do not fill a gap.
+
+6. THE ALIVE BEAT across any candidate freeze window, with the tap clock beside
+   it. NO INPUT and NO JS PROGRESS are different findings and are not to be
+   merged.
+
+7. THE LAST THING EACH SESSION DID — last action, room, screen, and whether any
+   touch or engine evidence continues after it. The absence of a crash is not
+   evidence the process stayed healthy.
+
+Plus the usual scrub accounting and redaction counts.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion. A clean session is not proof the freeze class is extinct, and nothing
+retrieved may be attributed to any open freeze — #174 included.
