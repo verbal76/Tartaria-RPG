@@ -546,3 +546,60 @@ Plus the usual scrub accounting and redaction counts.
 Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
 promotion. A clean session is not proof the freeze class is extinct, and nothing
 retrieved may be attributed to any open freeze — #174 included.
+
+────────────────────────────────────────────────────────────────────────────
+pull 2026-09-22T16:44Z — owner pushed a log on the OTA-1866 build. Fetch it.
+
+TARGET: bundle mucw88o001jj, 11 inline parts, dist
+2026-09-22-1866-a-question-is-asked-once, line hal, Pixel 10 Pro XL, Android 17.
+Sentry issue 7748839290 (TARTARIA-CH). Assemble all 11 parts before reading;
+a partial assembly is not a read and must be reported as one.
+
+WHY THIS ONE MATTERS NOW: 1866 is the ask-once repair itself, live for a few
+hours. This is the first player evidence from it, and OTA-1867 (the six
+two-disclosure topics becoming Q1 → Q2 follow-up questions) is built on the same
+machinery and is staged to ship. Read it as a check on 1866, not as a search for
+something to fix.
+
+Six reads, in order:
+
+1. EVERY VENDOR CONVERSATION IN THE BUNDLE. Per person: the ledger id, the
+   questions offered, which were pressed, how many times each, and what came
+   back — an authored answer or the "I have told you that one" refusal. Name the
+   person by their real name AND their ledger id; `roadside:<slug>` and
+   `irma_ironhand` are different identity classes and the distinction is the
+   whole of the 1866 defect.
+
+2. THE 1866 CONTRACT ON HARDWARE. Was any question OFFERED AGAIN after it had
+   been answered — that is, did any label appear undimmed in the tray after its
+   answer landed? Count offers, not presses. A press on a dimmed row is the
+   player testing; an undimmed row after an answer is the defect returning.
+   If there are zero, say zero. Do not soften a clean result into a caveat.
+
+3. THE REFUSAL RATE. How many "I have told you that one" lines, against how many
+   authored answers, per person. 1866's own reproduction was 79 refusals to 3
+   answers against Ilva Sidelong. Anything resembling that shape is a
+   regression and is to be named immediately and loudly.
+
+4. THE SIX. Any appearance of irma_berrin, irma_nimari, halem_stayed,
+   elara_ring, felra_stopped or nalren_why. For each: pressed how many times,
+   answered how many times, and whether the SECOND authored paragraph was ever
+   delivered. Under 1866 it cannot be — the second press is refused before the
+   counter write — so a player reaching for it and being refused is exactly the
+   content-unreachable condition OTA-1867 exists to end. Quote the refusal and
+   its timestamp if it happened. If nobody reached for it, say so plainly;
+   absence of the attempt is not evidence the split is unnecessary.
+
+5. ANY TALK-PATH ERROR OR STALL: an empty topic tray on a person who should
+   have questions, a conversation that opened and closed with nothing said, a
+   tray that did not change after an answer, or any exception on the talk path.
+
+6. THE LAST THING THE SESSION DID — last action, room, screen, and whether any
+   touch or engine evidence continues after it.
+
+Plus the usual scrub accounting and redaction counts, and an explicit VERDICT
+line for the 1866 ask-once contract: HELD, VIOLATED, or NOT EXERCISED.
+
+Retrieval only. Nothing here authorizes a repair, a native build, an OTA or a
+promotion. A clean read is not a reason to widen OTA-1867's scope, and a dirty
+one is not a reason to ship it faster.
