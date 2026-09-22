@@ -95,9 +95,23 @@
       "minRegard": "familiar"
      },
      "lines": [
-      "Irma's hand goes to it before she decides anything. \"Berrin,\" she says. \"My husband. He was a Reclaimer — gallery work, the sealed ones, the deep surveys.\" The hammer stays down. \"He is the reason half my straps outlast the plate. He used to say the strap is the promise and the plate is just the words.\" She picks the hammer back up, and that is the end of it, today.",
-      "\"You asked about Berrin before.\" She does not look up, but she is not working either. \"He laughed at his own jokes before he finished them. He was afraid of exactly one thing, and it was not the galleries.\" A long pause. \"It was that I would stop being angry at him for going down. He needn't have worried.\""
+      "Irma's hand goes to it before she decides anything. \"Berrin,\" she says. \"My husband. He was a Reclaimer — gallery work, the sealed ones, the deep surveys.\" The hammer stays down. \"He is the reason half my straps outlast the plate. He used to say the strap is the promise and the plate is just the words.\" She picks the hammer back up, and that is the end of it, today."
      ]
+    },
+    {
+     "id": "irma_berrin_more",
+     "label": "Ask what Berrin was like",
+     "gate": {
+      "minRegard": "familiar",
+      "requiresTopic": "irma_berrin"
+     },
+     "lines": [
+      "\"You asked about Berrin before.\" She does not look up, but she is not working either. \"He laughed at his own jokes before he finished them. He was afraid of exactly one thing, and it was not the galleries.\" A long pause. \"It was that I would stop being angry at him for going down. He needn't have worried.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "irma_berrin",
+      "atCount": 2
+     }
     },
     {
      "id": "irma_nimari",
@@ -106,9 +120,23 @@
       "minRegard": "trusted"
      },
      "lines": [
-      "\"The Nimari flood was not the flood.\" Irma says it the way you correct a record. \"Eleven years back. A perched basin over the gallery district let go — two streets and the survey camp, gone in an afternoon. Everyone above ground got out.\" She sets the hammer down. \"Berrin's crew was on the sealed side when the water found the old shafts. The Guild closed the galleries and called them memorials, which is a word that means they stopped digging.\"",
-      "\"You want to know the part I do not say.\" It is not a question. \"The seals held everywhere the water did not go, and failed exactly where it did. Berrin marked that pattern in his last survey and the Guild filed it.\" Her jaw is set. \"Filed. My husband read the water coming in a ledger nobody opened. So no, I do not sell to Guild surveyors at my prices. They get other prices.\""
+      "\"The Nimari flood was not the flood.\" Irma says it the way you correct a record. \"Eleven years back. A perched basin over the gallery district let go — two streets and the survey camp, gone in an afternoon. Everyone above ground got out.\" She sets the hammer down. \"Berrin's crew was on the sealed side when the water found the old shafts. The Guild closed the galleries and called them memorials, which is a word that means they stopped digging.\""
      ]
+    },
+    {
+     "id": "irma_nimari_filed",
+     "label": "Ask what the Guild did with his survey",
+     "gate": {
+      "minRegard": "trusted",
+      "requiresTopic": "irma_nimari"
+     },
+     "lines": [
+      "\"You want to know the part I do not say.\" It is not a question. \"The seals held everywhere the water did not go, and failed exactly where it did. Berrin marked that pattern in his last survey and the Guild filed it.\" Her jaw is set. \"Filed. My husband read the water coming in a ledger nobody opened. So no, I do not sell to Guild surveyors at my prices. They get other prices.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "irma_nimari",
+      "atCount": 2
+     }
     },
     {
      "id": "irma_galleries",
@@ -266,9 +294,23 @@
       "minRegard": "trusted"
      },
      "lines": [
-      "\"I did leave. Once. Half a year, my seventeenth — I went with a wagon crew to see the coast everyone talked about.\" Halem straightens tins that are straight. \"The coast is a line where the mud meets more mud, wetter. And the whole way back I kept thinking: every road in Tartaria crosses every other road SOMEWHERE, and my father was already standing on it.\" He shrugs. \"You do not leave the middle of the map. You just stop noticing you are standing on it.\"",
-      "\"I will tell you the other half, since you asked twice.\" He glances toward the back room. \"Sera hates the road. Proper hate — her family lost people to it. So the choice was the world or the woman who prices it, and I have never regretted the arithmetic. Do not tell her I called it arithmetic.\""
+      "\"I did leave. Once. Half a year, my seventeenth — I went with a wagon crew to see the coast everyone talked about.\" Halem straightens tins that are straight. \"The coast is a line where the mud meets more mud, wetter. And the whole way back I kept thinking: every road in Tartaria crosses every other road SOMEWHERE, and my father was already standing on it.\" He shrugs. \"You do not leave the middle of the map. You just stop noticing you are standing on it.\""
      ]
+    },
+    {
+     "id": "halem_stayed_sera",
+     "label": "Ask if the road was the only reason",
+     "gate": {
+      "minRegard": "trusted",
+      "requiresTopic": "halem_stayed"
+     },
+     "lines": [
+      "\"I will tell you the other half, since you ask.\" He glances toward the back room. \"Sera hates the road. Proper hate — her family lost people to it. So the choice was the world or the woman who prices it, and I have never regretted the arithmetic. Do not tell her I called it arithmetic.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "halem_stayed",
+      "atCount": 2
+     }
     },
     {
      "id": "halem_arithmetic",
@@ -1147,9 +1189,23 @@
       "minRegard": "trusted"
      },
      "lines": [
-      "Elara looks at you for a long moment, then reaches under the cloth — not to the tray, under it — and sets down a ring of plain braided tin. \"Mirei's. She left it on the cloth the morning she went, priced in her own hand. One quarter-coin.\" She does not touch it again. \"That was the cruelest thing she ever did, pricing it. She knew I could not argue a price. It has been not-for-sale for nine years and it is worth exactly one quarter-coin, and that is the whole trouble with it.\"",
-      "\"You keep looking at the tin ring.\" Elara's voice is light; her eyes are not. \"Go on, ask the real question. — No, I do not know where she is. Yes, I could find out; finding is a trade skill. I have had nine years of choosing not to, one day at a time.\" She covers it with the cloth again. \"Some provenance you do not verify. You just keep the object.\""
+      "Elara looks at you for a long moment, then reaches under the cloth — not to the tray, under it — and sets down a ring of plain braided tin. \"Mirei's. She left it on the cloth the morning she went, priced in her own hand. One quarter-coin.\" She does not touch it again. \"That was the cruelest thing she ever did, pricing it. She knew I could not argue a price. It has been not-for-sale for nine years and it is worth exactly one quarter-coin, and that is the whole trouble with it.\""
      ]
+    },
+    {
+     "id": "elara_ring_mirei",
+     "label": "Ask whether she ever looked for Mirei",
+     "gate": {
+      "minRegard": "trusted",
+      "requiresTopic": "elara_ring"
+     },
+     "lines": [
+      "\"You keep looking at the tin ring.\" Elara's voice is light; her eyes are not. \"There it is, then, the real question. — No, I do not know where she is. Yes, I could find out; finding is a trade skill. I have had nine years of choosing not to, one day at a time.\" She covers it with the cloth again. \"Some provenance you do not verify. You just keep the object.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "elara_ring",
+      "atCount": 2
+     }
     },
     {
      "id": "elara_losing",
@@ -1392,9 +1448,23 @@
       "minRegard": "trusted"
      },
      "lines": [
-      "Felra does not grin this time. \"My last run was a death notice. A rockfall crew, four names, and I was fast — I have told you I was the fastest of the line.\" She works a lace slowly. \"I came over the rise a half-day ahead of any other word, and I watched a woman hanging wash. Singing. Wife to one of the four names in my mouth.\" A long breath. \"I stood on that rise and understood I was not carrying a message. I was carrying the moment her life broke, and I had OUTRUN it, and the kindest thing I could do was walk the last mile slow.\" She sets the boot down. \"I delivered. Rule of the line. Then I bought this stall.\"",
-      "\"You asked about the last run again.\" Felra shakes her head, but not to refuse. \"The part I did not say: I still know the song she was singing. Both verses. I have never sung it and I have never forgotten it, and that is the whole trade of carrying words, right there. Buy your boots.\""
+      "Felra does not grin this time. \"My last run was a death notice. A rockfall crew, four names, and I was fast — I have told you I was the fastest of the line.\" She works a lace slowly. \"I came over the rise a half-day ahead of any other word, and I watched a woman hanging wash. Singing. Wife to one of the four names in my mouth.\" A long breath. \"I stood on that rise and understood I was not carrying a message. I was carrying the moment her life broke, and I had OUTRUN it, and the kindest thing I could do was walk the last mile slow.\" She sets the boot down. \"I delivered. Rule of the line. Then I bought this stall.\""
      ]
+    },
+    {
+     "id": "felra_stopped_song",
+     "label": "Ask what she still carries from that run",
+     "gate": {
+      "minRegard": "trusted",
+      "requiresTopic": "felra_stopped"
+     },
+     "lines": [
+      "\"Ah. The last run again.\" Felra shakes her head, but not to refuse. \"The part I did not say: I still know the song she was singing. Both verses. I have never sung it and I have never forgotten it, and that is the whole trade of carrying words, right there. Buy your boots.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "felra_stopped",
+      "atCount": 2
+     }
     },
     {
      "id": "felra_tenyears",
@@ -2386,9 +2456,23 @@
       "minRegard": "trusted"
      },
      "lines": [
-      "\"Because the cold is honest and the mud is not.\" Nalren holds his hands to the stall's little brazier as he says it. \"Mud takes things and lies about it — everything drowned is also ruined, half-eaten, guessed-at. The cold KEEPS. Every site I open is exactly what it was at the moment it stopped.\" He turns his hands over. \"Somebody has to be the one who sees Tartaria the way it actually was, and it turns out that man needs good gloves. So: gloves.\"",
-      "\"There is a second reason, since you ask twice, and it is smaller and truer.\" He does not look up from the brazier. \"Every winter the passes take somebody who went up wrong-geared. I fit every pair of boots in this stall like it is going up a pass in the dark, because one year, one of them will be, on somebody I sold them to. The cold is honest. I try to be worth trading with.\""
+      "\"Because the cold is honest and the mud is not.\" Nalren holds his hands to the stall's little brazier as he says it. \"Mud takes things and lies about it — everything drowned is also ruined, half-eaten, guessed-at. The cold KEEPS. Every site I open is exactly what it was at the moment it stopped.\" He turns his hands over. \"Somebody has to be the one who sees Tartaria the way it actually was, and it turns out that man needs good gloves. So: gloves.\""
      ]
+    },
+    {
+     "id": "nalren_why_second",
+     "label": "Ask if there is a second reason",
+     "gate": {
+      "minRegard": "trusted",
+      "requiresTopic": "nalren_why"
+     },
+     "lines": [
+      "\"There is a second reason, since you ask, and it is smaller and truer.\" He does not look up from the brazier. \"Every winter the passes take somebody who went up wrong-geared. I fit every pair of boots in this stall like it is going up a pass in the dark, because one year, one of them will be, on somebody I sold them to. The cold is honest. I try to be worth trading with.\""
+     ],
+     "legacyHeardWith": {
+      "topic": "nalren_why",
+      "atCount": 2
+     }
     },
     {
      "id": "nalren_arranged",

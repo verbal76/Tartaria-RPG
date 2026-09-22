@@ -77,6 +77,8 @@ import type { OutpostRaid } from '../engine/types';
 // OTA-1060 — giving somebody something, and them remembering the object.
 import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoveries, returnGiftFor, type GiftItem } from '../engine/gifting';
 import { giftBlockReason } from '../engine/giftEligibility';
+// OTA-1867 — the talk gates' reading of a save, lifted out of this file.
+import { talkContextFor } from './talkContext';
 // OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, topicSpent, alreadySaidLine, nothingToSayLine,
@@ -5506,40 +5508,6 @@ function applyGiftStanding(
   logRepChanges(get, giftChanges);
 }
 
-/** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
- *  stays free of store and save-shape knowledge. This is the first feature that
- *  reads the Phase 1 ledger for something the PLAYER chooses rather than
- *  something that happens at them. */
-function talkContextFor(
-  get: () => GameStore,
-  vendor: { id?: string; name: string; faction?: string | null },
-): import('../engine/dialogue').TalkContext {
-  const player = get().player;
-  const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
-  const faction = vendor.faction ?? rel?.factionId ?? null;
-  return {
-    regard: npcRegard(rel),
-    contractsTurnedIn: rel?.contractsTurnedIn ?? 0,
-    standing: faction
-      ? (player?.factionStanding.find((r) => r.factionId === faction)?.standing ?? 0)
-      : 0,
-    titles: player?.earnedTitles ?? [],
-    hasRecentRaidNews: !!raidNewsFor(get().worldMemory, rel, player?.hoursElapsed ?? 0),
-    // OTA-1059 — the fifth gate dimension. Defaults to the opening phase for a
-    // character who has not touched the main quest, so a missing mainQuest
-    // block reads as "the very beginning" rather than unlocking everything.
-    chapter: player?.mainQuest?.phase ?? 'hook',
-    cores: player?.mainQuest?.coresRecovered?.length ?? 0,
-    // OTA-1065 — the third place a Phase 3 decision lands: the cast can gate a
-    // topic on what you chose, so the world knows and says so.
-    choices: player ? choiceKeys(player) : [],
-    // OTA-1090 — the two new gate roads: gifts they LOVED (honoring who they
-    // are) and pocket-loss mumbles delivered (the thief's-only door).
-    lovedGifts: rel?.lovedGifts ?? 0,
-    pocketsMumbled: rel?.pocketsMumbled ?? 0,
-  };
-}
-
 /** ⚠ OTA-1066 — SAY IT OUT LOUD WHEN THE TIDE TURNS OVER.
  *
  *  The plan's warning about Phase 4 is that overtuned pressure punishes. The
@@ -7898,6 +7866,10 @@ export interface GameStore {
         /** OTA-1090 — the rung this conversation opened at, so the teaser's
          *  wording and its deflections speak to where you actually stand. */
         regard: import('../engine/npcMemory').NpcRegard;
+        /** ⚠ OTA-1867 — the faction this conversation opened against, so the
+         *  post-answer refresh (see raiseTopic) rebuilds the SAME gate context.
+         *  Re-deriving falls back to the ledger and could move `minStanding`. */
+        npcFaction: string | null;
         /** OTA-1090 — teaser taps THIS conversation; rotates the deflection. */
         teaserTaps: number;
         /** OTA-1095 — where this conversation begins in `gameLog`. The
@@ -8398,7 +8370,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // nothing is worse than not having it.
     if (!hasTopicsFor(npcId)) return;
     const vendor = { id: npcId, name: target.name, faction: target.faction ?? null };
-    const ctx = talkContextFor(get, vendor);
+    const ctx = talkContextFor(get().player, get().worldMemory, vendor);
     const topics = topicsFor(npcId, ctx);
     if (topics.length === 0) {
       get().appendLog('world', nothingToSayLine(target.name));
@@ -8410,7 +8382,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     set({ pendingTalk: {
       npcId, npcName: target.name, topics, role,
       flourishesUsed: [], flourishCount: 0,
-      lockedCount, regard: ctx.regard, teaserTaps: 0,
+      lockedCount, regard: ctx.regard, teaserTaps: 0, npcFaction: vendor.faction,
       // OTA-1095 — the high-water mark of the feed at the moment the
       // conversation opens. Everything after it belongs to this exchange.
       startedAtTs: Date.now(),
@@ -8429,7 +8401,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   hasUnspokenTalk: (nameOrId) => {
     const target = matchTalkable(talkablePeople(get), nameOrId);
     if (!target || !hasTopicsFor(target.id)) return false;
-    const ctx = talkContextFor(get, { id: target.id, name: target.name, faction: target.faction ?? null });
+    const ctx = talkContextFor(get().player, get().worldMemory, { id: target.id, name: target.name, faction: target.faction ?? null });
     const talked = get().worldMemory.talkedTopics ?? {};
     // ⚠ OTA-1784 — on `lines.length` a laned trader's glow never dims.
     // ⚠ OTA-1866 — and it asks `topicSpent` now, the same single reader the
@@ -8523,6 +8495,31 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           talkedTopics: { ...(st.worldMemory.talkedTopics ?? {}), [`${t.npcId}:${topic.id}`]: asked + 1 },
         },
       }));
+      // ⚠⚠ OTA-1867 — AND A QUESTION THIS ANSWER JUST UNLOCKED IS ASKABLE NOW.
+      // `pendingTalk.topics` is a snapshot taken at open, harmless while every
+      // gate asked about the WORLD — nothing a player does inside a conversation
+      // moves regard, standing, chapter, titles or Cores. `requiresTopic` is the
+      // first gate a conversation satisfies BY ITSELF, so without this the
+      // follow-up stays invisible until the sheet is closed and reopened, which
+      // reads as the second half being gone: the defect this release ends.
+      // Rebuilt through the same `topicsFor`/`lockedTopicCount` the open used,
+      // against the faction it opened with, so the only input that differs is
+      // the one the player just changed, and authored order puts the follow-up
+      // under its parent. ⚠ IT ONLY ADDS: a question already on the sheet must
+      // not vanish under the player's thumb. In play the tail is provably empty
+      // (`topicConsumed` only goes false→true), so this is a union WITH the
+      // authority, never a second hand-built list.
+      const fresh = talkContextFor(get().player, get().worldMemory, { id: t.npcId, name: t.npcName, faction: t.npcFaction });
+      const open = topicsFor(t.npcId, fresh);
+      set((st) => {
+        if (!st.pendingTalk || st.pendingTalk.npcId !== t.npcId) return {};
+        const kept = st.pendingTalk.topics.filter((x) => !open.some((o) => o.id === x.id));
+        return { pendingTalk: {
+          ...st.pendingTalk,
+          topics: kept.length ? [...open, ...kept] : open,
+          lockedCount: lockedTopicCount(t.npcId, fresh),
+        } };
+      });
     }
     void get().persist();
   },

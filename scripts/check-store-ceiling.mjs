@@ -92,8 +92,19 @@ const STORE = 'app/state/gameStore.ts';
  * responsibility, and it was in the store only because that is where it happened
  * to be typed. `handleTrapDive` moved to `app/state/trapDive.ts`, body
  * byte-identical, the name re-exported so no importer moved. 51 lines out, 29
- * back in, and again the ceiling takes the difference rather than banking it. */
-export const CEILING = 36815;
+ * back in, and again the ceiling takes the difference rather than banking it.
+ *
+ *    36812  OTA-1867      the talk context left the store
+ *
+ * ⚠⚠ A THIRD TIME, AND THE RULE PICKED THE FUNCTION. OTA-1867 gave the vendor
+ * topic gates a sixth dimension — conversation memory — and the file had ONE
+ * line of headroom. `talkContextFor` was never store work: it takes a player and
+ * a world memory and returns a plain context, with no `set`, no logging and no
+ * store surgery. Only its `get: () => GameStore` parameter tied it here. It
+ * moved to `app/state/talkContext.ts` reading the two values directly, body
+ * otherwise unchanged. 36 lines out, 29 back in (the new gate, its predicate and
+ * the post-answer refresh), and the ceiling takes the difference. */
+export const CEILING = 36812;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

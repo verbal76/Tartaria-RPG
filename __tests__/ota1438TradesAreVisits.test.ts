@@ -139,8 +139,11 @@ describe('OTA-1438 — what familiar actually opens, measured', () => {
       const g = t.gate?.minRegard;
       return !g || atOrBelow(g);
     }).length;
-    expect(topics.length).toBe(15);
-    // Ten of fifteen visible at familiar. The owner called it "most of his
+    // ⚠ OTA-1867 — sixteen, not fifteen: halem_stayed's second disclosure
+    // became its own trusted follow-up question. The rung's SHARE is what this
+    // test is about and it did not move — the new topic sits above familiar.
+    expect(topics.length).toBe(16);
+    // Ten of sixteen visible at familiar. The owner called it "most of his
     // conversation tree"; this is the number behind that sentence.
     expect(open).toBeGreaterThanOrEqual(9);
   });

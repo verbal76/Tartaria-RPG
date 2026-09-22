@@ -294,6 +294,9 @@ describe('OTA-1063 — in the exchange', () => {
         // OTA-1090 — the teaser fields ride along; this harness talks at
         // trusted with everything open, so the locked count is genuinely 0.
         lockedCount: 0, regard: 'trusted', teaserTaps: 0,
+        // OTA-1867 — the faction this conversation opened against, so the
+        // post-answer refresh rebuilds the same gate context it opened with.
+        npcFaction: null,
         // OTA-1095 — where this conversation's own transcript begins in the feed.
         // The harness opens the talk by hand, so start at the top of the log.
         startedAtTs: 0,

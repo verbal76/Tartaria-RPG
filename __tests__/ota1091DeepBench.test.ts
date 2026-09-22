@@ -24,11 +24,16 @@ const NINE = [
 ] as const;
 
 describe('OTA-1091 — every deep-bench vendor carries a full ladder', () => {
-  it('each of the nine has 14-16 topics', () => {
+  /* ⚠ OTA-1867 widened the top of this band from 16 to 17. Five of the nine
+   * each gained a follow-up question when their two-disclosure topics were
+   * split (Irma gained two), so the ladder is one or two rungs longer for them
+   * and unchanged for the rest. The floor is untouched: the point of this test
+   * is that nobody on the deep bench is thin. */
+  it('each of the nine has 14-17 topics', () => {
     for (const id of NINE) {
       const n = NPCS[id]!.topics.length;
       expect(n).toBeGreaterThanOrEqual(14);
-      expect(n).toBeLessThanOrEqual(16);
+      expect(n).toBeLessThanOrEqual(17);
     }
   });
 
@@ -94,7 +99,16 @@ describe('OTA-1091 — the owner-approved Irma arc is really in there', () => {
 
     const nimari = irma.find((t) => t.id === 'irma_nimari')!;
     expect(nimari.gate?.minRegard).toBe('trusted');
-    expect(nimari.lines.length).toBeGreaterThanOrEqual(2); // the re-ask goes deeper
+    // ⚠ OTA-1867 — this read `nimari.lines.length >= 2`, "the re-ask goes
+    // deeper". The depth is still there and is still hers; it is a SECOND
+    // QUESTION now rather than the same question asked twice, because the
+    // owner ruled every visible vendor question ask-once. Asserted where it
+    // actually lives: a follow-up on her own set, gated on this topic, holding
+    // the filed-survey disclosure.
+    const filed = irma.find((t) => t.id === 'irma_nimari_filed')!;
+    expect(filed.gate?.minRegard).toBe('trusted');
+    expect(filed.gate?.requiresTopic).toBe('irma_nimari');
+    expect(filed.lines.join(' ')).toContain('the Guild filed it');
 
     const galleries = irma.find((t) => t.id === 'irma_galleries')!;
     expect(galleries.gate?.minRegard).toBe('trusted');

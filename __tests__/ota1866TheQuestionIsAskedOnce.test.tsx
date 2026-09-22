@@ -16,7 +16,7 @@
  * ⚠⚠⚠ THE CLASS DEFECT — TWO READERS OF ONE FACT, AND THEY DISAGREED.
  * OTA-1784 made a class set's `lines` PARALLEL VOICES rather than a repeat
  * sequence, so a laned person has exactly ONE answer per topic, and introduced
- * `answersAvailable(topic, npcId)` to say so. The store was moved onto it —
+ * an `answersAvailable` reader to say so. The store was moved onto it —
  * `raiseTopic`'s already-said guard AND `hasUnspokenTalk`'s glow, whose own
  * comment reads "on `lines.length` a laned trader's glow never dims".
  * `TalkSheet` was not. It kept asking `talked >= topic.lines.length`.
@@ -28,9 +28,13 @@
  * and pressable for the rest of the character's life. 79 presses is simply how
  * long the owner kept pressing.
  *
- * ⚠ THE REPAIR IS ONE AUTHORITY, NOT A PATCH PER READER. `topicSpent` lives
- * beside `answersAvailable` in the dialogue engine and is what the store and
- * the list both ask. The divergence is not fixed; it is made unrepresentable.
+ * ⚠ THE REPAIR IS ONE AUTHORITY, NOT A PATCH PER READER. `topicSpent` lives in
+ * the dialogue engine and is what the store and the list both ask. The
+ * divergence is not fixed; it is made unrepresentable.
+ *
+ * ⚠ OTA-1867 closed the other half: the count `topicSpent` compares against is
+ * now the constant `ANSWERS_PER_QUESTION`, so the branch that diverged does not
+ * exist to drift. This suite was moved onto it and otherwise stands unchanged.
  *
  * ⚠ NOT A RACE. `raiseTopic` latches the counter synchronously inside the same
  * call that accepts the selection, so §F below drives 79 back-to-back presses
@@ -87,7 +91,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import rawTopics from '../app/data/npcs/dialogue_topics.json';
 import {
-  answersAvailable, topicsFor, hasTopicsFor, usesClassSet, classKeyFor,
+  ANSWERS_PER_QUESTION, topicSpent, topicsFor, hasTopicsFor, usesClassSet, classKeyFor,
   alreadySaidLine, type Topic, type TalkContext,
 } from '../app/engine/dialogue';
 import { useGameStore } from '../app/state/gameStore';
@@ -202,16 +206,25 @@ describe('A — every authored question has a stable, unique, vendor-scoped iden
     }
   });
 
-  it('a class set is laned — one answer per person — and an authored set is a sequence', () => {
+  /* ⚠ OTA-1867 — this used to assert the EXCEPTION: one answer for a laned
+   * person, `lines.length` for an authored one. The exception is gone. Both
+   * halves now assert the same universal fact, and the authored half also pins
+   * the corpus side of it — one authored line per question, so there is no
+   * second answer for a future reader to reach for. */
+  it('every set is ask-once, laned or authored, and an authored topic holds one line', () => {
     for (const k of CLASS_KEYS) {
       const id = personFor(k);
       expect(usesClassSet(id)).toBe(true);
-      for (const t of SETS[k]!.topics) expect(answersAvailable(t, id)).toBe(1);
+      for (const t of SETS[k]!.topics) expect(topicSpent(t, id, { [`${id}:${t.id}`]: 1 })).toBe(true);
     }
     for (const k of AUTHORED_KEYS) {
       expect(usesClassSet(k)).toBe(false);
-      for (const t of SETS[k]!.topics) expect(answersAvailable(t, k)).toBe(t.lines.length);
+      for (const t of SETS[k]!.topics) {
+        expect({ set: k, topic: t.id, lines: t.lines.length }).toEqual({ set: k, topic: t.id, lines: 1 });
+        expect(topicSpent(t, k, { [`${k}:${t.id}`]: 1 })).toBe(true);
+      }
     }
+    expect(ANSWERS_PER_QUESTION).toBe(1);
   });
 });
 
@@ -237,7 +250,7 @@ describe('B — ask-once holds across the whole vendor corpus', () => {
         const p = useGameStore.getState().player!;
         useGameStore.setState({ player: { ...p, pendingLead: null } as never });
         seatTalk(npcId, 'Somebody', [topic]);
-        const want = answersAvailable(topic, npcId);
+        const want = ANSWERS_PER_QUESTION;
         for (let i = 0; i < want + OVERPRESS; i++) useGameStore.getState().raiseTopic(topic.id);
         const refusals = worldLines().filter((l) => l === alreadySaidLine('Somebody')).length;
         const latched = countFor(npcId, topic.id);
@@ -256,7 +269,7 @@ describe('B — ask-once holds across the whole vendor corpus', () => {
     expect(countFor(npcId, topic.id)).toBe(0);
     useGameStore.getState().raiseTopic(topic.id);
     // Synchronously — not after narration, not after a queue drains.
-    expect(countFor(npcId, topic.id)).toBe(answersAvailable(topic, npcId));
+    expect(countFor(npcId, topic.id)).toBe(ANSWERS_PER_QUESTION);
   });
 
   it('the glow and the conversation agree about who still has something to say', () => {
@@ -268,11 +281,11 @@ describe('B — ask-once holds across the whole vendor corpus', () => {
       const topics = allOpenTopics(npcId);
       const wm = useGameStore.getState().worldMemory;
       const next = { ...(wm.talkedTopics ?? {}) };
-      for (const t of topics) next[`${npcId}:${t.id}`] = answersAvailable(t, npcId);
+      for (const t of topics) next[`${npcId}:${t.id}`] = ANSWERS_PER_QUESTION;
       useGameStore.setState({ worldMemory: { ...wm, talkedTopics: next } });
       seatTalk(npcId, 'Somebody', topics);
       for (const t of topics) {
-        expect({ set: k, topic: t.id, left: countFor(npcId, t.id) < answersAvailable(t, npcId) })
+        expect({ set: k, topic: t.id, left: countFor(npcId, t.id) < ANSWERS_PER_QUESTION })
           .toEqual({ set: k, topic: t.id, left: false });
       }
     }
@@ -326,7 +339,7 @@ describe('C — a consumed question is never offered again by the list', () => {
 
       // Consume the first one the way a player does.
       const first = topics[0]!;
-      for (let i = 0; i < answersAvailable(first, npcId); i++) {
+      for (let i = 0; i < ANSWERS_PER_QUESTION; i++) {
         useGameStore.getState().raiseTopic(first.id);
       }
 
@@ -343,7 +356,7 @@ describe('C — a consumed question is never offered again by the list', () => {
     const topics = allOpenTopics(npcId).filter((t) => !t.gate?.onlyRegard).slice(0, 3);
     seatTalk(npcId, 'Somebody', topics);
     for (const t of topics) {
-      for (let i = 0; i < answersAvailable(t, npcId); i++) useGameStore.getState().raiseTopic(t.id);
+      for (let i = 0; i < ANSWERS_PER_QUESTION; i++) useGameStore.getState().raiseTopic(t.id);
     }
     const after = renderTray();
     for (const t of topics) expect(after).toContain(`${t.label}  (asked)`);
@@ -376,7 +389,7 @@ describe('D — the conversation is remembered with the character', () => {
       JSON.stringify(useGameStore.getState().worldMemory),
     ) as Record<string, unknown>;
     useGameStore.setState({ worldMemory: { ...round } as never });
-    expect(countFor(npcId, topic.id)).toBe(answersAvailable(topic, npcId));
+    expect(countFor(npcId, topic.id)).toBe(ANSWERS_PER_QUESTION);
     seatTalk(npcId, 'Somebody', [topic]);
     expect(renderTray()).toContain(`${topic.label}  (asked)`);
   });

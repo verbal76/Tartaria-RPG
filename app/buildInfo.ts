@@ -31358,7 +31358,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * answers, gates, grants, inventory, prices, standing and navigation untouched.
  * ⚠ NOT CLAIMED: anything about non-vendor NPC conversation beyond the sets
  * this same machinery governs. */
-export const OTA_BUILD_ID = '2026-09-22-1866-a-question-is-asked-once';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-22-1866-a-question-is-asked-once';
+/* ⚠⚠⚠ OTA-1867 — THE SECOND DISCLOSURE IS ITS OWN QUESTION.
+ * Reading OTA-1866's exceptions found six authored topics holding TWO
+ * disclosures behind ONE label: irma_berrin, irma_nimari, halem_stayed,
+ * elara_ring, felra_stopped, nalren_why. Ask-once and a second answer cannot
+ * both be true — the second press is refused — so those six second paragraphs
+ * had become unreachable content.
+ * Owner ruling: every visible vendor conversation question is ask-once, and
+ * deeper conversation is a DISTINCT follow-up question. Each of the six is now
+ * a Q1 to Q2 pair: Q1 keeps its id, label and first paragraph; the second
+ * paragraph becomes its own stable topic gated on `TopicGate.requiresTopic`,
+ * the first gate dimension that asks about the CONVERSATION rather than the
+ * world. It resolves through `conversationMemory(npcId, talked)` against the
+ * same talkedTopics ledger, per person, and fails CLOSED without it.
+ * The old multi-ask authority is deleted rather than left dormant: the
+ * laned/authored branch is now the constant ANSWERS_PER_QUESTION, and no
+ * authored topic holds a second line.
+ * `raiseTopic` re-derives the open list from `topicsFor` after the counter
+ * write, so a follow-up unlocked by an answer is askable in that same
+ * conversation. `Topic.legacyHeardWith` is a bounded migration field on those
+ * six rows only: a pre-split save at count 2 already heard disclosure 2, so it
+ * is not offered again as new.
+ * ⚠ NOT CLAIMED: a class set's six lines are still PARALLEL VOICES inside one
+ * ask-once topic, not six player questions; nothing here changes non-vendor
+ * conversation, gameplay, presentation, grants, prices or navigation. */
+export const OTA_BUILD_ID = '2026-09-22-1867-the-second-disclosure-is-its-own-question';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';

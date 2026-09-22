@@ -165,6 +165,11 @@ describe('OTA-1090 — authoring lock: every gate key in the JSON is a real gate
     'minRegard', 'onlyRegard', 'requiresRecentRaid', 'requiresTitle',
     'minContractsTurnedIn', 'minStanding', 'minChapter', 'minCores',
     'requiresChoice', 'minLovedGifts', 'minPocketsMumbled',
+    // ⚠ OTA-1867 — the twelfth key, and the first that asks about the
+    // CONVERSATION rather than the world: the id of a topic on this person's
+    // own set that must already have been asked. This lock caught it, which is
+    // the lock working — a new gate dimension is added here deliberately.
+    'requiresTopic',
   ]);
 
   it('no unknown gate fields anywhere in dialogue_topics.json', () => {

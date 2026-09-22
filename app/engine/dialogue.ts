@@ -77,6 +77,28 @@ export interface TopicGate {
    *  (rel.pocketsMumbled). The DARK gate: a topic only a thief ever hears —
    *  someone airing suspicions to the very person robbing them blind. */
   minPocketsMumbled?: number;
+  /** ⚠⚠⚠ OTA-1867 — THE CONVERSATION ITSELF IS A GATE. The id of a topic on
+   *  THIS person's set that must already have been asked and answered before
+   *  this one is offered.
+   *
+   *  Every other field on this gate asks about the WORLD — what you carry, who
+   *  you are to them, how far the story has run. This one asks about the
+   *  CONVERSATION, and it is the only honest way to say "she will not tell you
+   *  the second half until you have heard the first". OTA-1866 left six authored
+   *  topics holding two disclosures behind one label, which the ask-once
+   *  contract cannot represent: a second press is refused, so the second half
+   *  was unreachable. Splitting them into two questions needs exactly this.
+   *
+   *  ⚠ PER PERSON, ALWAYS. The prerequisite is resolved against the SAME npcId
+   *  the gated topic is being offered for, through the same
+   *  `worldMemory.talkedTopics` ledger everything else reads — there is no
+   *  second key scheme and no way to write "ask Irma before Halem will say it".
+   *
+   *  ⚠ FAIL-CLOSED. A context that carries no conversation memory (every
+   *  OTA-1058..1866 test context, and any caller that predates this field)
+   *  reads as "nothing has been asked", so the follow-up stays locked. A
+   *  missing ledger never OPENS a door. */
+  requiresTopic?: string;
 }
 
 /** OTA-1061 — what a topic HANDS YOU, once, the first time it is raised.
@@ -135,6 +157,24 @@ export interface Topic {
   gate?: TopicGate;
   lines: string[];
   grants?: TopicGrant;
+  /** ⚠⚠ OTA-1867 — A MIGRATION FIELD, AND DELIBERATELY NOT A RULE.
+   *
+   *  Before this release six authored topics answered twice under one label.
+   *  A save from then can hold `<npc>:<topic> = 2`, which means that player HAS
+   *  ALREADY HEARD the second disclosure. Splitting it out into its own
+   *  question would offer them, as new, a thing they were told weeks ago.
+   *
+   *  So a converted follow-up carries the fact explicitly: "I used to be
+   *  line N of `topic`, and a counter at `atCount` means it was heard." It is
+   *  read in ONE place (`topicSpent`) and it names the exact old parent and the
+   *  exact old count, so it cannot generalise.
+   *
+   *  ⚠ THIS IS NOT "a follow-up inherits its parent's count". That rule would
+   *  be wrong for every ordinary follow-up authored after today, which must
+   *  start unheard the moment its parent is asked. Six rows carry this field;
+   *  no future row should, and `atCount: 2` is already unreachable in new play
+   *  because ask-once caps the parent counter at 1. */
+  legacyHeardWith?: { topic: string; atCount: number };
 }
 
 export interface NpcTopicSet {
@@ -166,6 +206,19 @@ export interface TalkContext {
    *  "nothing has passed between you", which is also what it means. */
   lovedGifts?: number;
   pocketsMumbled?: number;
+  /** ⚠⚠ OTA-1867 — WHAT THIS PERSON HAS ALREADY BEEN ASKED, as a question and
+   *  not as a table. Serves `TopicGate.requiresTopic`.
+   *
+   *  A PREDICATE rather than the ledger, on purpose. The ledger is one map for
+   *  the whole world and the gate layer has no business holding it: handed the
+   *  map, a future gate could read any person's row, and "spent" would have a
+   *  second definition living out here. Handed a closure built by
+   *  `conversationMemory(npcId, talked)`, the gate can ask exactly one thing —
+   *  "has THIS person answered THIS question" — and the answer still comes from
+   *  `topicSpent`, which remains the only definition of spent.
+   *
+   *  OPTIONAL, and absent means NO. See `requiresTopic`. */
+  topicConsumed?: (topicId: string) => boolean;
 }
 
 /** OTA-1062 — THE CLASS KEY: topics for people who are not authored one by one.
@@ -246,6 +299,11 @@ export function gateAllows(gate: TopicGate | undefined, ctx: TalkContext): boole
   if (gate.requiresChoice && !ctx.choices.includes(gate.requiresChoice)) return false;
   if (gate.minLovedGifts !== undefined && (ctx.lovedGifts ?? 0) < gate.minLovedGifts) return false;
   if (gate.minPocketsMumbled !== undefined && (ctx.pocketsMumbled ?? 0) < gate.minPocketsMumbled) return false;
+  // ⚠ OTA-1867 — ADDITIVE, like every clause above it. A follow-up carries its
+  // own ordinary gate AND this one, so "trusted, and only after she has told
+  // you about the ring" is simply both fields on one gate. No clause is
+  // replaced, and a topic without `requiresTopic` reads exactly as before.
+  if (gate.requiresTopic && !ctx.topicConsumed?.(gate.requiresTopic)) return false;
   return true;
 }
 
@@ -296,14 +354,27 @@ export function voiceLaneFor(npcId: string, lanes: number): number {
   return voiceSaltFor(npcId) % lanes;
 }
 
-/** How many answers THIS person has to this topic — which is one for anybody in
- *  a voice lane, and the whole authored sequence for an authored person. The
- *  caller's "already told you that" guard reads this rather than
- *  `topic.lines.length`, or a laned trader would hand out five more voices
- *  before admitting to a repeat. */
-export function answersAvailable(topic: Topic, npcId?: string): number {
-  return npcId && usesClassSet(npcId) ? 1 : topic.lines.length;
-}
+/** ⚠⚠⚠ OTA-1867 — ONE QUESTION, ONE ANSWER, FOR EVERYBODY.
+ *
+ *  This used to be a function, and the thing it computed was an EXCEPTION:
+ *  one answer for anybody in a voice lane, `topic.lines.length` for an authored
+ *  person. OTA-1784 introduced the split for a good reason and OTA-1866 proved
+ *  how expensive it was — the topic list read the other side of it for a year
+ *  and nobody could see the two readers disagree.
+ *
+ *  The exception is now gone at the source. The six authored topics that held
+ *  two disclosures under one label are two questions each (see
+ *  `TopicGate.requiresTopic`), so no authored topic has a second answer left to
+ *  give, and the owner's contract — *"Every visible vendor conversation
+ *  question is ask-once"* — is a CONSTANT rather than a branch two readers can
+ *  drift across. A class set's six `lines` remain six PARALLEL VOICES, which is
+ *  `voiceLaneFor`'s business and was never a count of answers.
+ *
+ *  ⚠ IT IS A CONSTANT SO THAT IT CANNOT COME BACK. A function whose body
+ *  reached for `topic.lines.length` again would restore the divergence in one
+ *  line; there is no body here to put it in. The corpus side is held by
+ *  ota1867's one-line invariant over every authored set. */
+export const ANSWERS_PER_QUESTION = 1;
 
 /**
  * ⚠⚠⚠ OTA-1866 — "HAS THIS ALREADY BEEN ASKED" IS ONE FACT, SO IT GETS ONE
@@ -336,7 +407,28 @@ export function topicSpent(
   npcId: string,
   talked: Record<string, number> | undefined,
 ): boolean {
-  return (talked?.[`${npcId}:${topic.id}`] ?? 0) >= answersAvailable(topic, npcId);
+  if ((talked?.[`${npcId}:${topic.id}`] ?? 0) >= ANSWERS_PER_QUESTION) return true;
+  // ⚠ OTA-1867 — AND A SAVE FROM BEFORE THE SPLIT HAS ALREADY HEARD IT. See
+  // `Topic.legacyHeardWith`. Six rows carry this; it names the old parent and
+  // the old count, and it only ever reports MORE spent, never less.
+  const prior = topic.legacyHeardWith;
+  return !!prior && (talked?.[`${npcId}:${prior.topic}`] ?? 0) >= prior.atCount;
+}
+
+/** ⚠⚠ OTA-1867 — the conversation, as the one question a gate may ask of it.
+ *  Serves `TalkContext.topicConsumed`; see that field for why it is a closure.
+ *
+ *  Resolved against THIS person's own set, so a `requiresTopic` naming a topic
+ *  somebody else owns finds nothing and reads false forever — the cross-person
+ *  prerequisite is not forbidden by a rule, it is simply not expressible. */
+export function conversationMemory(
+  npcId: string,
+  talked: Record<string, number> | undefined,
+): (topicId: string) => boolean {
+  return (topicId: string) => {
+    const prior = setFor(npcId)?.topics.find((t) => t.id === topicId);
+    return !!prior && topicSpent(prior, npcId, talked);
+  };
 }
 
 export function topicReply(topic: Topic, timesAsked: number, npcId?: string): string {

@@ -29,7 +29,8 @@
  */
 import {
   topicReply,
-  answersAvailable,
+  ANSWERS_PER_QUESTION,
+  topicSpent,
   usesClassSet,
   voiceLaneFor,
   topicsFor,
@@ -171,23 +172,35 @@ describe('OTA-1784 — asking twice still gets "I told you that"', () => {
   const front = ROADSIDE.topics.find((t) => t.id === 'c_front')!;
 
   /* ⚠⚠⚠ THE REGRESSION THIS PASS COULD EASILY HAVE SHIPPED. The caller's
-   * repeat guard reads `answersAvailable`, not `topic.lines.length`. Left on the
-   * raw array length, a trader would have handed out FIVE MORE TEMPERAMENTS
-   * before admitting to a repeat — six lanes read as one person's six moods,
-   * which is the exact instability the ruling forbids. One person, one answer. */
+   * repeat guard must NOT read `topic.lines.length`. Left on the raw array
+   * length, a trader would have handed out FIVE MORE TEMPERAMENTS before
+   * admitting to a repeat — six lanes read as one person's six moods, which is
+   * the exact instability the ruling forbids. One person, one answer.
+   *
+   * ⚠ OTA-1867 — and the guard is a CONSTANT now, not a computation with a
+   * branch in it, so there is no second side left for a reader to drift onto. */
   it('a laned trader has exactly one answer per topic', () => {
-    for (const id of TRADERS) expect(answersAvailable(front, id)).toBe(1);
+    for (const id of TRADERS) {
+      expect(topicSpent(front, id, {})).toBe(false);
+      expect(topicSpent(front, id, { [`${id}:${front.id}`]: 1 })).toBe(true);
+    }
   });
 
   it('and that is what it was before the pool grew, so nothing regressed', () => {
-    // The shipped behaviour: one line, so `asked >= 1` was already the repeat.
-    expect(answersAvailable(front, TRADERS[0]!)).toBe(1);
+    // The shipped behaviour: one accepted ask, so `asked >= 1` was already the
+    // repeat. Six lanes never extended it, and now nothing can.
+    expect(ANSWERS_PER_QUESTION).toBe(1);
   });
 
-  it('an authored person keeps their whole sequence', () => {
+  /* ⚠ OTA-1867 — this read "an authored person keeps their whole sequence", and
+   * the sequence is gone by owner ruling: the six two-line authored topics are
+   * six Q1→Q2 follow-up conversations, so an authored person is ask-once like
+   * everybody else and carries exactly one authored line per question. */
+  it('an authored person has one answer too, and one line to give it in', () => {
     const irma = NPCS.irma_ironhand!;
     for (const t of irma.topics) {
-      expect(answersAvailable(t, 'irma_ironhand')).toBe(t.lines.length);
+      expect({ topic: t.id, lines: t.lines.length }).toEqual({ topic: t.id, lines: 1 });
+      expect(topicSpent(t, 'irma_ironhand', { [`irma_ironhand:${t.id}`]: 1 })).toBe(true);
     }
   });
 });

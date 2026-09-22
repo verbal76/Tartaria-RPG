@@ -62,7 +62,7 @@ const openTalkAt = (ts: number) => {
     pendingTalk: {
       npcId: 'irma_ironhand', npcName: 'Irma Ironhand', topics: [],
       role: null, flourishesUsed: [], flourishCount: 0,
-      lockedCount: 0, regard: 'trusted', teaserTaps: 0,
+      lockedCount: 0, regard: 'trusted', teaserTaps: 0, npcFaction: null,
       startedAtTs: ts,
     },
   });
