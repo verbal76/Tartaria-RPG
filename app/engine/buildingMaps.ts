@@ -20,6 +20,10 @@
 // so an unpainted building falls back to plain chips, not to a guess.
 
 import type { BuildingRoom } from './buildings';
+// ⚠ OTA-1869 — the nav row's door marker reads the EXIT chip's own table, so
+// the two can never disagree about which room has a door. buildings.ts imports
+// nothing from here, so this direction is the acyclic one.
+import { buildingExitRooms } from './buildings';
 
 export type Frac = { fx: number; fy: number };
 export type Compass = 'N' | 'S' | 'E' | 'W' | 'NE' | 'NW' | 'SE' | 'SW';
@@ -293,11 +297,42 @@ export function buildingArrow(buildingId: string, from: string, to: string): str
   return d ? ARROW[d] : '';
 }
 
+/** ⚠⚠⚠ OTA-1869 — IS THIS DESTINATION THE ROOM WITH THE WAY OUT?
+ *
+ *  Owner, from an Abandoned Outpost interior: standing in the Vault, the
+ *  full-width `🚪 EXIT` is gone and Hall is just another room on the row —
+ *  nothing says Hall is where the door is. The game already knew: the EXIT
+ *  chip reads `roomHasExitDoor`, and the engine's typed-exit refusal even
+ *  names the room and points at it ("the door is back through Hall ↑"). The
+ *  one surface that never said so is the row the player is actually looking at.
+ *
+ *  ⚠ READ FROM `buildingExitRooms`, THE SAME TABLE THE EXIT CHIP READS. Not a
+ *  room name, not a template id: the entry room qualifies by construction and
+ *  `exitDoor: true` adds the rest, so a new template is marked correctly with
+ *  no edit here — and the row can never promise a door the button will not
+ *  offer, which is OTA-1271's failure with a picture attached.
+ *
+ *  ⚠ AND ONLY WHILE YOU ARE ELSEWHERE. The glyph is WAYFINDING — "go here to
+ *  get out" — so it has no work to do in the room you are standing in, where
+ *  the real EXIT control is already on screen directly beneath the row. */
+export function buildingRoomIsWayOut(
+  buildingId: string | null | undefined,
+  fromRoomId: string | null | undefined,
+  roomId: string | null | undefined,
+): boolean {
+  if (!buildingId || !roomId || roomId === fromRoomId) return false;
+  return buildingExitRooms(buildingId).some((r) => r.id === roomId);
+}
+
 /** The chip the player taps: arrow, room name, and a ✓ once the room has been
  *  walked THIS VISIT. Building state is transient by design (gameStore's
  *  activeBuildingId comment — a save made inside reloads you outside), so the
  *  marks are per-visit, which is also what outpost marks became at OTA-1410
- *  after the owner found a brand-new outpost already ticked. */
+ *  after the owner found a brand-new outpost already ticked.
+ *
+ *  ⚠ OTA-1869 — the door sits IMMEDIATELY BEFORE THE NAME, so it reads as a
+ *  fact about that room rather than a second control. The ✓ keeps its place;
+ *  visited and exit-bearing are independent, and a room can wear both. */
 export function buildingChipLabel(
   buildingId: string,
   fromRoomId: string,
@@ -306,5 +341,29 @@ export function buildingChipLabel(
 ): string {
   const arrow = buildingArrow(buildingId, fromRoomId, room.id);
   const tick = visitedRoomIds.includes(room.id) && room.id !== fromRoomId ? ' ✓' : '';
-  return `${arrow ? `${arrow} ` : ''}${room.shortName || room.name}${tick}`;
+  const door = buildingRoomIsWayOut(buildingId, fromRoomId, room.id) ? '🚪 ' : '';
+  return `${arrow ? `${arrow} ` : ''}${door}${room.shortName || room.name}${tick}`;
+}
+
+/** ⚠⚠ OTA-1869 — WHAT A SCREEN READER HEARS INSTEAD OF THE GLYPHS.
+ *
+ *  `TravelBtn` falls back to the visible label when no `a11yLabel` is given, so
+ *  before this a building room chip announced "↑ Hall ✓" — glyphs and all — and
+ *  adding a door would have made that worse. It says the room, then the two
+ *  facts in words, in the SAME grammar the outpost chips have used since
+ *  OTA-1369 ("Screen readers get the word, not the glyph").
+ *
+ *  ⚠ IT NEVER SAYS "EXIT". Activating this tile walks you to the room; the way
+ *  out is the control waiting there. A label that promised an exit would be a
+ *  lie the moment the finger landed. */
+export function buildingChipA11y(
+  buildingId: string,
+  fromRoomId: string,
+  room: Pick<BuildingRoom, 'id' | 'shortName' | 'name'>,
+  visitedRoomIds: readonly string[],
+): string {
+  const name = room.shortName || room.name;
+  const walked = visitedRoomIds.includes(room.id) && room.id !== fromRoomId;
+  const door = buildingRoomIsWayOut(buildingId, fromRoomId, room.id);
+  return `${name}${walked ? ', already explored' : ''}${door ? ', way out' : ''}`;
 }

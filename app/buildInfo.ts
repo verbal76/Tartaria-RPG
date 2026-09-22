@@ -31415,7 +31415,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * systems outside the vendor-topic tray; no device verification. Nothing here
  * changes topics, gates, prose, the Q1→Q2 graph, conversation memory, grants,
  * inventory, standing, missions, stock, prices or navigation. */
-export const OTA_BUILD_ID = '2026-09-22-1868-the-consumed-question-is-not-a-control';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-22-1868-the-consumed-question-is-not-a-control';
+/* ⚠⚠⚠ OTA-1869 — THE DOOR BELONGS ON THE ROOM YOU MUST REACH TO GET OUT.
+ * Owner, from an Abandoned Outpost interior on hardware: standing in the Vault,
+ * the full-width `🚪 EXIT` is gone and Hall is just another room on the row.
+ * Nothing said Hall is where the door is. The game knew — the EXIT chip reads
+ * `roomHasExitDoor`, both maps paint the door from `roomIsExit`, and the typed-
+ * exit refusal even names the room and points at it ("the door is back through
+ * Hall ↑"). The one surface that never said so is the row being looked at.
+ * SYSTEMIC, NOT AN OUTPOST BUG. The read-only audit walked both interior
+ * architectures — 5 BUILDING templates (20 rooms) and 1 HUB layout (15 rooms)
+ * re-skinned for 8 factions. 6 of 6 tie leaving to particular rooms; 0 of 6
+ * marked those rooms on the navigation row.
+ * THE RULE: destination owns an exterior exit AND destination is not the room
+ * you are in → that tile carries the existing door glyph, immediately before the
+ * name. It means "go here to find the way outside" and never "press this to
+ * exit": the tile is still room navigation, and the real EXIT is the control
+ * waiting in that room. Ownership is read from `buildingExitRooms` and
+ * `roomIsExit` — the EXIT chip's own tables — so the row can never promise a
+ * door the button will not offer.
+ * TWO DOORS WHERE THERE ARE TWO. The shack owns den + storage, the hub owns the
+ * Gate (`entrance`) and the Square (`exterior_door`); both are marked rather
+ * than collapsed to one preferred exit.
+ * The building chips gain a real accessibility label: TravelBtn falls back to
+ * the visible text, so without one a screen reader would have read the glyph.
+ * It says "Hall, way out" and never "exit" — the tile walks you there.
+ * ⚠ NOT CLAIMED: the building painted-map stays deliberately tick-only and was
+ * not touched; the hub map and MiniMap were evidence, not targets, and are
+ * unchanged; stale prose about the Workshop's tag is left as documentation debt;
+ * no exit mechanic, room graph, ownership table or EXIT handler changed; no
+ * physical-device verification. */
+export const OTA_BUILD_ID = '2026-09-22-1869-the-door-is-on-the-room-you-must-reach';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';

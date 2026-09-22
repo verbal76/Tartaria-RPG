@@ -22,11 +22,16 @@ describe('OTA-1277 (1) — the room buttons say where you have been', () => {
   it('⚠⚠ visited rooms carry a mark, unvisited do not', () => {
     const box = src('app', 'components', 'InputBox.tsx');
     // ⚠ OTA-1369 put a compass glyph ahead of the check, so the template moved.
-    // The RULE this test guards is unchanged and is asserted in both halves:
-    // a walked room carries the ✓, an unwalked one does not, and the mark still
-    // sits immediately before the name rather than after it.
+    // ⚠ OTA-1869 put the way-out door between the check and the name, so it
+    // moved again. The RULE this test guards is unchanged and is asserted in
+    // both halves: a walked room carries the ✓, an unwalked one does not, and
+    // the mark still leads the name rather than trailing it. The door is a fact
+    // about the LAYOUT and rides on walked and unwalked rooms alike, so it can
+    // never be read as the visited mark.
     expect(box).toContain('const walked = seen.has(targetId);');
-    expect(box).toContain('label: `${arrow} ${walked ? `✓ ${name}` : name}`,');
+    expect(box).toContain("label: `${arrow} ${walked ? '✓ ' : ''}${door}${name}`,");
+    // The mark is ahead of the name, never after it.
+    expect(box).not.toMatch(/label: `[^`]*\$\{name\}[^`]*✓/);
   });
 
   it('⚠⚠ it reads the SAME set fast-travel earns off — the mark cannot lie', () => {

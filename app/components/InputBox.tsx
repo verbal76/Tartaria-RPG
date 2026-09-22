@@ -66,7 +66,7 @@ import { reachBandsFor, reachFiresDown } from '../engine/types';
 // have to gender it. Without this they read "bring it up" about a companion
 // the player named and chose a sex for.
 import { applyDogPronouns } from '../engine/dogCompanion';
-import { buildingChipLabel, buildingMap } from '../engine/buildingMaps';
+import { buildingChipLabel, buildingChipA11y, buildingRoomIsWayOut, buildingMap } from '../engine/buildingMaps';
 // OTA-1170 — the dodge recharge bar reads its fill from one place.
 import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
 // OTA-1171 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
@@ -625,11 +625,23 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       // ✓ marks to. The check keeps its place immediately before the name.
       const arrow = DIR_ARROW[dir];
       const walked = seen.has(targetId);
+      /* ⚠⚠⚠ OTA-1869 — AND WHETHER THAT ROOM IS THE WAY OUT.
+       * `roomIsExit` is the predicate the EXIT chip and both maps already read,
+       * so this row cannot promise a door the button will not offer — which is
+       * OTA-1271's failure, the owner stranded where the rule and the layout
+       * disagreed. The hub owns TWO of them, the Gate by `entrance` and the
+       * Square by `exterior_door`, and BOTH are marked: picking a "preferred"
+       * exit would be inventing a rule the layout does not have.
+       * ⚠ These chips are destinations only (`hubRoom.exits[dir]`), so "not the
+       * room you are standing in" is structural here rather than a condition.
+       * The door sits immediately before the NAME, exactly as it does on the
+       * building chips, so the two interior systems read the same way. */
+      const door = roomIsExit(targetRoom) ? '🚪 ' : '';
       out.push({
-        label: `${arrow} ${walked ? `✓ ${name}` : name}`,
+        label: `${arrow} ${walked ? '✓ ' : ''}${door}${name}`,
         submit: `go ${dir}`,
         // Screen readers get the word, not the glyph.
-        a11y: `${dir}, ${targetRoom?.shortName ?? dir}${walked ? ', already explored' : ''}`,
+        a11y: `${dir}, ${targetRoom?.shortName ?? dir}${walked ? ', already explored' : ''}${door ? ', way out' : ''}`,
       });
     }
     return out;
@@ -803,9 +815,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   // and ✓; the rest keep the plain label. Branches on the plan
                   // existing, not on an id, so a third painting needs no edit
                   // here.
+                  /* ⚠⚠ OTA-1869 — THE DOOR DOES NOT DEPEND ON THE PAINTING.
+                     Arrows and ✓ do, because a plan is what a direction is ABOUT
+                     — but "this room has the way outside" is a fact about the
+                     LAYOUT, true of a template nobody has painted yet. Every
+                     current template has a plan, so today both arms agree; the
+                     unpainted arm is written so a sixth building is marked from
+                     the day it is added rather than the day it is drawn. */
                   label={buildingMap(activeBuildingId)
                     ? buildingChipLabel(activeBuildingId!, activeBuildingRoomId ?? '', r, buildingVisited)
-                    : r.shortName}
+                    : `${buildingRoomIsWayOut(activeBuildingId, activeBuildingRoomId, r.id) ? '🚪 ' : ''}${r.shortName}`}
+                  /* ⚠ Without this, TravelBtn falls back to the visible label —
+                     glyphs and all — so the new door would have been announced
+                     as "🚪". It says the room and then the facts in words, and
+                     it never says "exit": the tile walks you there. */
+                  a11yLabel={buildingChipA11y(activeBuildingId ?? '', activeBuildingRoomId ?? '', r, buildingVisited)}
                   active={r.id === activeBuildingRoomId}
                   onPress={() => goBuildingRoom(r.id)}
                 />

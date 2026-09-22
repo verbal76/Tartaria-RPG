@@ -337,7 +337,11 @@ describe('OTA-1429 — the ✓, and what it is scoped to', () => {
     // The room you are standing in shows as active, not as a ✓.
     expect(chip('outpost', 'hall', 'hall', ['hall', 'armory'])).toBe('hall');
     // Same builder, other buildings — no second code path to drift.
-    expect(chip('shack', 'den', 'storage', ['den', 'storage'])).toBe('↘ storage ✓');
+    // ⚠ OTA-1869 — the shack's `storage` carries `exitDoor: true`, so seen from
+    // the den it is a WAY OUT and wears the door as well as the ✓. That is the
+    // wayfinding marker, not a change to this ✓ rule: `armor_stall` below owns
+    // no door and is untouched, and every assertion above is byte-identical.
+    expect(chip('shack', 'den', 'storage', ['den', 'storage'])).toBe('↘ 🚪 storage ✓');
     expect(chip('market', 'market_square', 'armor_stall', ['market_square'])).toBe('↗ armor_stall');
   });
 
@@ -345,7 +349,13 @@ describe('OTA-1429 — the ✓, and what it is scoped to', () => {
     // The chip builder is only ever reached through the `buildingMap(...)` guard
     // in InputBox; pinned here so the guard cannot quietly be dropped.
     expect(INPUT).toContain('label={buildingMap(activeBuildingId)');
-    expect(INPUT).toContain(': r.shortName}');
+    /* ⚠ OTA-1869 — the unpainted arm still gets NO ARROW and NO ✓, which is the
+     * claim this test exists to make: a direction needs a plan to be about. It
+     * does now carry the door, because "this room has the way outside" is a fact
+     * about the LAYOUT and is true of a template nobody has drawn yet. Every
+     * current template is painted, so nothing changes today. */
+    expect(INPUT).toContain("}${r.shortName}`}");
+    expect(INPUT).not.toMatch(/: `\$\{[^`]*buildingArrow[^`]*\}\$\{r\.shortName\}`\}/);
   });
 
   it('⚠⚠ the marks are PER VISIT, seeded on entry and cleared on exit', () => {

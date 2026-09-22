@@ -232,8 +232,14 @@ describe('OTA-1369 — the arrow leads the chip', () => {
     // Owner: "a directional arrow in front of that name in the box". Arrow
     // first so the four glyphs line up as a column; the ✓ keeps its place
     // immediately before the name, as OTA-1277 placed it.
+    // ⚠ OTA-1869 added the way-out door between the check and the name, so the
+    // template moved. The CLAIM this test owns — the arrow leads, and it leads
+    // the check as well as the name — is unchanged and asserted below.
     expect(src).toContain('const arrow = DIR_ARROW[dir];');
-    expect(src).toContain('label: `${arrow} ${walked ? `✓ ${name}` : name}`,');
+    expect(src).toContain("label: `${arrow} ${walked ? '✓ ' : ''}${door}${name}`,");
+    // The arrow is composed FIRST: the hub chip's label opens with it, so
+    // nothing — check, door or name — can get in front of the compass column.
+    expect(src).toContain('label: `${arrow} ');
   });
 
   it('⚠ the east arrow can no longer be mistaken for a travel destination', () => {
