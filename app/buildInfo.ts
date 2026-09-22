@@ -31327,7 +31327,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * automation; the phone is the owner's to look at. */
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1862-the-beat-keeps-its-way-out';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1863-the-window-says-when-it-is-gone';
-export const OTA_BUILD_ID = '2026-09-22-1864-the-bench-leaves-a-trail';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-22-1864-the-bench-leaves-a-trail';
+/* ⚠⚠⚠ OTA-1865 — THE REPORT MUST NOT ERASE THE EVIDENCE IT WAS SENT TO REPORT.
+ * OTA-1864 shipped the CrucibleGuardModal touch ladder. The first real-device
+ * session carrying it raised the guard at 04:29:20.014, answered it 2.614s
+ * later, and sent a report at 04:31:09.863 — 109.8s and ~229 ring appends
+ * afterwards. The touch ring held 24. Every one of the seven stages the OTA
+ * exists to record had been evicted, and six of the 24 survivors were spent by
+ * the act of reporting itself. The ring is deepened to a measured 256; nothing
+ * about input routing, presentation, crafting or gameplay is touched.
+ * ⚠ NOT CLAIMED: that Freeze 2 is fixed, that OTA-1863 is proven effective, or
+ * that all freezes are now observable. This makes the instrument deep enough to
+ * hold an interaction of the age and event volume that was measured. */
+export const OTA_BUILD_ID = '2026-09-22-1865-the-report-keeps-the-evidence';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';

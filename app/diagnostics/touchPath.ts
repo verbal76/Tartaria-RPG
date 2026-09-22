@@ -57,10 +57,47 @@ import { MEM_KIND, annotateMemory } from './nativeMemoryRecorder';
  *  should say so rather than mis-read old bytes. */
 export const TOUCH_PATH_SCHEMA = 1;
 
-/** Ring size. Two dozen stages is several deliberate taps' worth of chain —
- *  enough to show the last complete interaction plus the ones that followed it
- *  into silence, and small enough that serialising it is trivial. */
-export const TOUCH_PATH_MAX_ENTRIES = 24;
+/** ⚠⚠⚠ OTA-1865 — 24 WAS SIZED FOR A TAP, AND THE REPORT IS SENT TWO MINUTES
+ *  LATER. THE NUMBER BELOW IS MEASURED, NOT CHOSEN.
+ *
+ *  OTA-1864 added the CrucibleGuardModal ladder (`pres react-mount` → `root`
+ *  → `in` → `enter` → `dispatch` → `done` → `pres react-unmount`) precisely so
+ *  a report could say how far a finger got into that guard. The first real
+ *  device session carrying it did raise the guard, answer it, and send a
+ *  report — and the report contained NOT ONE of those seven stages. Measured
+ *  off bundle muc6fdza52j7 (2026-09-22):
+ *
+ *    guard raised          04:29:20.014   guard answered   04:29:22.628
+ *    report snapshot       04:31:09.863   → the ladder was 109.8s old
+ *    ring at snapshot      24 entries spanning 21.4s, ids #411-#424
+ *
+ *  Between the ladder's first stage and the snapshot the ring took ~229
+ *  appends (conservative floor 188, counting only the certain ones): 79 repeat
+ *  dialogue taps at a MEASURED 2 entries each (`root` + `content controls`,
+ *  read off ids #411-#415), three craft submits, an inventory round trip,
+ *  three Crucible refusals, and the 24 browsing/report entries that survived.
+ *  A 24-deep ring was ~8x too shallow, so the instrument erased the interaction
+ *  it had been shipped to record — and the SEND LOG itself spent 6 of those 24
+ *  slots BEFORE the snapshot, a quarter of the evidence consumed by the act of
+ *  reporting.
+ *
+ *  ⚠⚠ 256 IS ~1.1x THE MEASURED 229, NOT A ROUND NUMBER PICKED FOR COMFORT.
+ *  It is ENOUGH history, not infinite history: the ring is still a fixed-count
+ *  FIFO that drops its oldest entry, so a long session costs exactly the same
+ *  as a short one, and history genuinely older than the window still expires.
+ *  At this depth the report's own six pre-snapshot stages cost 2.3% of the ring
+ *  instead of 25%, which is why no snapshot-timing change is needed as well.
+ *
+ *  ⚠ COST, MEASURED: ~17 KB per ring in the report (68 B/line × 256) against
+ *  113-230 KB bundles, ~25 KB in the persisted body, and a bounded ~77 KB of
+ *  heap on a process whose footprint is measured in gigabytes. The eviction is
+ *  still one `shift()` per append past the cap.
+ *
+ *  ⚠ THE DEPTH IS ON BOTH SIDES ON PURPOSE. The prior-boot trace has the same
+ *  defect: freeze classes G/H end in terminal root-only runs (19 / 24 / 16 / 4
+ *  measured), and at 24 a single frantic run erases the interaction that came
+ *  before the freeze — the one thing the persisted copy exists to carry. */
+export const TOUCH_PATH_MAX_ENTRIES = 256;
 
 /** A touch older than this cannot be claimed by a handler. Long enough to cover
  *  a badly stalled frame, short enough that a handler running after a real
