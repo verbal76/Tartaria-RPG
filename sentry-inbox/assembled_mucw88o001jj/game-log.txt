@@ -1,0 +1,996 @@
+Bug Report — Johnny Blaze · (2026-09-22-1866-a-question-is-asked-once) · Conversation repatolition
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-22T16:33:26.489Z
+Character: Johnny Blaze
+Slot ID: slot_mtrjgazg_fumkzk
+Race: Reclaimers
+Location: Samarran
+HP: 19/19
+
+--- DESCRIPTION ---
+Conversation repatolition
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-22T16:33:26.415Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 476
+  AAB: (build 476)
+  OTA: (2026-09-22-1866-a-question-is-asked-once)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-22T16:30:35.350Z
+  Last init success: 2026-09-22T16:30:36.563Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmucw49lc8d · started 2026-09-22T16:30:21.072Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 4 fatal (newest last)
+  ⚠⚠ 3 of 4 process kills landed on an OTA-apply boot
+  • 2026-09-07T03:23:14.327Z (22390m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (21472m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (19564m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-13T23:38:11.705Z (12535m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage boot:idle:awaiting-first-action
+      Process reclaimed while idle on the title screen — no game was in progress (9s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: boot:idle:awaiting-first-action · 807ms into the action · alive 8005ms after it
+      launch: died 8893ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-14T00:23:34.481Z (12490m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (23s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 2949ms into the action · alive 0ms after it
+      launch: died 22707ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-16T21:08:23.255Z (8365m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage native:cognition:done
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room iskan_veil · screen exploration
+      last checkpoint: native:cognition:done [q0] · 7526ms into the action · alive 2504ms after it
+      launch: died 43179ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 137ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-18T16:41:13.847Z (5752m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1840-the-house-keeps-its-key · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4958ms into the action · alive 0ms after it
+      launch: died 5002ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T20:16:45.657Z (5537m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room samarran · screen lore
+      last checkpoint: appstate:active→background · 70239ms into the action · alive 0ms after it
+      launch: died 94479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 416ms earlier via boot-front
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T21:11:04.127Z (5482m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4984ms into the action · alive 0ms after it
+      launch: died 5069ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-19T13:06:45.292Z (4527m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-19-1847-the-process-says-where-it-was · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded during play — last: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: boot:idle:awaiting-first-action · 795ms into the action · alive 12383ms after it
+      launch: died 13276ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: appstate:active→background at 2026-09-22T16:25:28.907Z (8 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 12.7ms/prompt-token · 2 generations thrown away (9.8s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  Native queue admission: 42 jobs · worst wait 0.7s (cognition) · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 36MB · last 36MB · net +24MB over 13 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 24MB gc 0ms/16 · ctx 0 · app=active · native idle q0 · warns 0
+    +15.4s ctx-event — heap 24MB gc 0ms/24 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+    +15.4s watch-start — heap 24MB gc 0ms/25 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +42.9s gen-settled [investigate_lore ok] — heap 28MB gc 0ms/69 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +48.4s gen-settled [investigate_lore ok] — heap 24MB gc 0ms/81 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +61.3s gen-settled [narration:scene_intro_fi] — heap 24MB gc 0ms/92 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q1 · warns 0
+    +85.6s heap-move — heap 32MB gc 0ms/106 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +103.3s gen-settled [narration:scene_intro_fi] — heap 32MB gc 0ms/118 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +113.8s gen-settled [ambient_fill ok] — heap 32MB gc 0ms/128 · ctx 1 ≈425MB est · app=active · native ambient_fill running q0 · warns 0
+   +153.7s gen-settled [narration:scene_intro_fi] — heap 28MB gc 0ms/177 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +157.5s gen-settled [flourish ok] — heap 28MB gc 0ms/187 · ctx 1 ≈425MB est · app=active · native flourish running q0 · warns 0
+   +166.0s heap-move — heap 36MB gc 0ms/207 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot:
+  2026-09-22T16:18:03.632Z #1 root
+  2026-09-22T16:18:04.564Z #2 root
+  2026-09-22T16:18:06.431Z #3 root
+  this boot:
+  2026-09-22T16:30:31.411Z #1 root p=none exploration
+  2026-09-22T16:30:31.412Z #1 content controls p=none exploration
+  2026-09-22T16:30:31.412Z #1 in travel:🚪 ENTER ⏱+25ms p=none exploration
+  2026-09-22T16:30:31.565Z #1 enter travel:🚪 ENTER p=none exploration
+  2026-09-22T16:30:31.565Z #1 admit travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T16:30:31.565Z #1 dispatch travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T16:30:31.571Z #1 done travel:🚪 ENTER (navigation) p=none exploration
+  2026-09-22T16:30:32.314Z #2 root p=none exploration
+  2026-09-22T16:30:32.315Z #2 content controls p=none exploration
+  2026-09-22T16:30:32.315Z #2 in travel:Den ⏱+20ms p=none exploration
+  2026-09-22T16:30:32.448Z #2 enter travel:Den p=none exploration
+  2026-09-22T16:30:32.448Z #2 admit travel:Den (navigation) p=none exploration
+  2026-09-22T16:30:32.448Z #2 dispatch travel:Den (navigation) p=none exploration
+  2026-09-22T16:30:32.450Z #2 done travel:Den (navigation) p=none exploration
+  2026-09-22T16:30:33.732Z #3 root p=none exploration
+  2026-09-22T16:30:33.732Z #3 content controls p=none exploration
+  2026-09-22T16:30:33.733Z #3 in quick:investigate ⏱+24ms p=none exploration
+  2026-09-22T16:30:33.882Z #3 enter quick:investigate p=none exploration
+  2026-09-22T16:30:33.882Z #3 admit quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:33.882Z #3 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:33.883Z #3 done quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:34.798Z #4 root p=S exploration
+  2026-09-22T16:30:34.798Z #5 modal p=S exploration
+  2026-09-22T16:30:34.799Z #5 in search:all ⏱+24ms p=S exploration
+  2026-09-22T16:30:34.931Z #5 enter search:all p=S exploration
+  2026-09-22T16:30:34.932Z #5 admit search:all (bulk) p=S exploration
+  2026-09-22T16:30:34.932Z #5 dispatch search:all (bulk) p=S exploration
+  2026-09-22T16:30:34.933Z #5 done search:all (bulk) p=S exploration
+  2026-09-22T16:30:39.632Z #6 root p=none exploration
+  2026-09-22T16:30:39.632Z #6 content controls p=none exploration
+  2026-09-22T16:30:39.632Z #6 in quick:dodge ⏱+5ms p=none exploration
+  2026-09-22T16:30:39.816Z #6 enter quick:dodge p=none exploration
+  2026-09-22T16:30:39.816Z #6 admit quick:dodge (callback) p=none exploration
+  2026-09-22T16:30:39.816Z #6 dispatch quick:dodge (callback) p=none exploration
+  2026-09-22T16:30:39.850Z #6 done quick:dodge (callback) p=none exploration
+  2026-09-22T16:30:40.384Z #7 root p=none exploration
+  2026-09-22T16:30:40.384Z #7 content controls p=none exploration
+  2026-09-22T16:30:40.385Z #7 in quick:bone crossbow ▲ ⏱+16ms p=none exploration
+  2026-09-22T16:30:40.517Z #7 enter quick:bone crossbow ▲ p=none exploration
+  2026-09-22T16:30:40.517Z #7 admit quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:40.517Z #7 dispatch quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:40.575Z #7 done quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:41.600Z #8 root p=none exploration
+  2026-09-22T16:30:41.600Z #8 content controls p=none exploration
+  2026-09-22T16:30:43.553Z #9 root p=none exploration
+  2026-09-22T16:30:43.554Z #9 content controls p=none exploration
+  2026-09-22T16:30:46.601Z #10 root p=none exploration
+  2026-09-22T16:30:46.602Z #10 content controls p=none exploration
+  2026-09-22T16:30:46.602Z #10 in quick:bone crossbow ▲ ⏱+20ms p=none exploration
+  2026-09-22T16:30:46.735Z #10 enter quick:bone crossbow ▲ p=none exploration
+  2026-09-22T16:30:46.735Z #10 admit quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:46.735Z #10 dispatch quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:46.788Z #10 done quick:bone crossbow ▲ (callback) p=none exploration
+  2026-09-22T16:30:47.568Z #11 root p=none exploration
+  2026-09-22T16:30:47.570Z #11 content controls p=none exploration
+  2026-09-22T16:30:49.520Z #12 root p=none exploration
+  2026-09-22T16:30:49.521Z #12 content controls p=none exploration
+  2026-09-22T16:30:51.287Z #13 root p=none exploration
+  2026-09-22T16:30:53.664Z #14 root p=none exploration
+  2026-09-22T16:30:54.454Z #15 root p=none exploration
+  2026-09-22T16:30:54.455Z #15 content controls p=none exploration
+  2026-09-22T16:30:58.405Z #16 root p=none exploration
+  2026-09-22T16:30:58.406Z #16 content controls p=none exploration
+  2026-09-22T16:30:58.406Z #16 in quick:investigate ⏱+15ms p=none exploration
+  2026-09-22T16:30:58.624Z #16 enter quick:investigate p=none exploration
+  2026-09-22T16:30:58.625Z #16 admit quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:58.625Z #16 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:58.625Z #16 done quick:investigate (callback) p=none exploration
+  2026-09-22T16:30:59.472Z #17 root p=S exploration
+  2026-09-22T16:30:59.474Z #18 modal p=S exploration
+  2026-09-22T16:30:59.475Z #18 in search:all ⏱+25ms p=S exploration
+  2026-09-22T16:30:59.661Z #18 enter search:all p=S exploration
+  2026-09-22T16:30:59.664Z #18 admit search:all (bulk) p=S exploration
+  2026-09-22T16:30:59.664Z #18 dispatch search:all (bulk) p=S exploration
+  2026-09-22T16:30:59.664Z #18 done search:all (bulk) p=S exploration
+  2026-09-22T16:31:01.022Z #19 root p=none exploration
+  2026-09-22T16:31:01.022Z #19 content controls p=none exploration
+  2026-09-22T16:31:01.022Z #19 in travel:↘ Storage ⏱+19ms p=none exploration
+  2026-09-22T16:31:01.140Z #19 enter travel:↘ Storage p=none exploration
+  2026-09-22T16:31:01.141Z #19 admit travel:↘ Storage (navigation) p=none exploration
+  2026-09-22T16:31:01.142Z #19 dispatch travel:↘ Storage (navigation) p=none exploration
+  2026-09-22T16:31:01.149Z #19 done travel:↘ Storage (navigation) p=none exploration
+  2026-09-22T16:31:02.231Z #20 root p=none exploration
+  2026-09-22T16:31:02.235Z #20 content controls p=none exploration
+  2026-09-22T16:31:02.237Z #20 in quick:take / salvage ⏱+24ms p=none exploration
+  2026-09-22T16:31:02.375Z #20 enter quick:take / salvage p=none exploration
+  2026-09-22T16:31:02.375Z #20 admit quick:take / salvage (callback) p=none exploration
+  2026-09-22T16:31:02.375Z #20 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-22T16:31:02.375Z #20 done quick:take / salvage (callback) p=none exploration
+  2026-09-22T16:31:03.223Z #21 root p=G exploration
+  2026-09-22T16:31:03.224Z #22 modal p=G exploration
+  2026-09-22T16:31:03.457Z #23 root p=G exploration
+  2026-09-22T16:31:03.459Z #24 modal p=G exploration
+  2026-09-22T16:31:03.459Z #24 in gather:all:scrap ⏱+8ms p=G exploration
+  2026-09-22T16:31:03.642Z #24 enter gather:all:scrap p=G exploration
+  2026-09-22T16:31:03.642Z #24 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-22T16:31:03.642Z #24 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-22T16:31:03.654Z #24 done gather:all:scrap (bulk) p=G exploration
+  2026-09-22T16:31:04.707Z #25 root p=none exploration
+  2026-09-22T16:31:04.707Z #25 content controls p=none exploration
+  2026-09-22T16:31:04.708Z #25 in quick:investigate ⏱+19ms p=none exploration
+  2026-09-22T16:31:04.859Z #25 enter quick:investigate p=none exploration
+  2026-09-22T16:31:04.860Z #25 admit quick:investigate (callback) p=none exploration
+  2026-09-22T16:31:04.860Z #25 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T16:31:04.860Z #25 done quick:investigate (callback) p=none exploration
+  2026-09-22T16:31:06.143Z #26 root p=S exploration
+  2026-09-22T16:31:06.145Z #27 modal p=S exploration
+  2026-09-22T16:31:06.146Z #27 in search:all ⏱+28ms p=S exploration
+  2026-09-22T16:31:06.261Z #27 enter search:all p=S exploration
+  2026-09-22T16:31:06.262Z #27 admit search:all (bulk) p=S exploration
+  2026-09-22T16:31:06.263Z #27 dispatch search:all (bulk) p=S exploration
+  2026-09-22T16:31:06.263Z #27 done search:all (bulk) p=S exploration
+  2026-09-22T16:31:11.142Z #28 root p=none exploration
+  2026-09-22T16:31:11.143Z #28 content feed p=none exploration
+  2026-09-22T16:31:13.045Z #29 root p=none exploration
+  2026-09-22T16:31:13.047Z #29 content controls p=none exploration
+  2026-09-22T16:31:13.048Z #29 in quick:more ▸ ⏱+20ms p=none exploration
+  2026-09-22T16:31:13.226Z #29 enter quick:more ▸ p=none exploration
+  2026-09-22T16:31:13.227Z #29 admit quick:more ▸ (callback) p=none exploration
+  2026-09-22T16:31:13.227Z #29 dispatch quick:more ▸ (callback) p=none exploration
+  2026-09-22T16:31:13.227Z #29 done quick:more ▸ (callback) p=none exploration
+  2026-09-22T16:31:14.893Z #30 root p=none exploration
+  2026-09-22T16:31:14.896Z #30 content controls p=none exploration
+  2026-09-22T16:31:14.897Z #30 in quick:craft ⏱+31ms p=none exploration
+  2026-09-22T16:31:15.081Z #30 enter quick:craft p=none exploration
+  2026-09-22T16:31:15.083Z #30 admit quick:craft (callback) p=none exploration
+  2026-09-22T16:31:15.083Z #30 dispatch quick:craft (callback) p=none exploration
+  2026-09-22T16:31:15.085Z #30 done quick:craft (callback) p=none exploration
+  2026-09-22T16:31:17.511Z #31 root p=none crafting
+  2026-09-22T16:31:18.494Z #32 root p=none crafting
+  2026-09-22T16:31:19.444Z #33 root p=none crafting
+  2026-09-22T16:31:20.494Z #34 root p=none crafting
+  2026-09-22T16:31:21.564Z #35 root p=none crafting
+  2026-09-22T16:31:24.237Z #36 root p=none crafting
+  2026-09-22T16:31:25.211Z #37 root p=none crafting
+  2026-09-22T16:31:25.431Z #0 pres craft:crucible-guard (react-mount) p=none crafting
+  2026-09-22T16:31:26.522Z #38 root p=none crafting
+  2026-09-22T16:31:26.524Z #39 modal p=none crafting
+  2026-09-22T16:31:26.525Z #39 in guard:spend ⏱+22ms p=none crafting
+  2026-09-22T16:31:26.671Z #39 enter guard:spend p=none crafting
+  2026-09-22T16:31:26.673Z #39 dispatch guard:spend p=none crafting
+  2026-09-22T16:31:26.684Z #39 done guard:spend p=none crafting
+  2026-09-22T16:31:26.722Z #0 pres craft:crucible-guard (react-unmount) p=none crafting
+  2026-09-22T16:31:31.256Z #40 root p=none crafting
+  2026-09-22T16:31:34.043Z #41 root p=none crafting
+  2026-09-22T16:31:34.977Z #42 root p=none crafting
+  2026-09-22T16:31:35.759Z #43 root p=none crafting
+  2026-09-22T16:31:36.877Z #44 root p=none crafting
+  2026-09-22T16:31:37.493Z #45 root p=none crafting
+  2026-09-22T16:31:38.093Z #46 root p=none crafting
+  2026-09-22T16:31:39.294Z #47 root p=none crafting
+  2026-09-22T16:31:39.994Z #48 root p=none crafting
+  2026-09-22T16:31:41.711Z #49 root p=none crafting
+  2026-09-22T16:31:42.444Z #50 root p=none crafting
+  2026-09-22T16:31:43.228Z #51 root p=none crafting
+  2026-09-22T16:31:43.912Z #52 root p=none crafting
+  2026-09-22T16:31:46.845Z #53 root p=none exploration
+  2026-09-22T16:31:46.848Z #53 content controls p=none exploration
+  2026-09-22T16:31:46.849Z #53 in quick:inventory ⏱+26ms p=none exploration
+  2026-09-22T16:31:46.997Z #53 enter quick:inventory p=none exploration
+  2026-09-22T16:31:47.000Z #53 admit quick:inventory (callback) p=none exploration
+  2026-09-22T16:31:47.000Z #53 dispatch quick:inventory (callback) p=none exploration
+  2026-09-22T16:31:47.003Z #53 done quick:inventory (callback) p=none exploration
+  2026-09-22T16:31:48.898Z #54 root p=none inventory
+  2026-09-22T16:31:49.630Z #55 root p=none inventory
+  2026-09-22T16:31:50.397Z #56 root p=none inventory
+  2026-09-22T16:31:51.631Z #57 root p=none inventory
+  2026-09-22T16:31:53.014Z #58 root p=none inventory
+  2026-09-22T16:31:55.751Z #59 root p=none inventory
+  2026-09-22T16:31:57.115Z #60 root p=none inventory
+  2026-09-22T16:32:02.265Z #61 root p=none inventory
+  2026-09-22T16:32:06.351Z #62 root p=none exploration
+  2026-09-22T16:32:06.353Z #62 content controls p=none exploration
+  2026-09-22T16:32:06.353Z #62 in travel:🚪 EXIT ⏱+23ms p=none exploration
+  2026-09-22T16:32:06.387Z #62 enter travel:🚪 EXIT p=none exploration
+  2026-09-22T16:32:06.388Z #62 admit travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-22T16:32:06.388Z #62 dispatch travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-22T16:32:06.395Z #62 done travel:🚪 EXIT (navigation) p=none exploration
+  2026-09-22T16:32:08.953Z #63 root p=none exploration
+  2026-09-22T16:32:08.956Z #63 content controls p=none exploration
+  2026-09-22T16:32:08.957Z #63 in quick:rest ⏱+27ms p=none exploration
+  2026-09-22T16:32:09.088Z #63 enter quick:rest p=none exploration
+  2026-09-22T16:32:09.090Z #63 admit quick:rest (callback) p=none exploration
+  2026-09-22T16:32:09.090Z #63 dispatch quick:rest (callback) p=none exploration
+  2026-09-22T16:32:09.109Z #63 done quick:rest (callback) p=none exploration
+  2026-09-22T16:32:12.253Z #64 root p=none exploration
+  2026-09-22T16:32:36.827Z #65 root p=none exploration
+  2026-09-22T16:32:36.831Z #65 content controls p=none exploration
+  2026-09-22T16:32:36.832Z #65 in travel:→ SAMARRAN ⏱+32ms p=none exploration
+  2026-09-22T16:32:36.995Z #65 enter travel:→ SAMARRAN p=none exploration
+  2026-09-22T16:32:36.996Z #65 admit travel:→ SAMARRAN (navigation) p=none exploration
+  2026-09-22T16:32:36.996Z #65 dispatch travel:→ SAMARRAN (navigation) p=none exploration
+  2026-09-22T16:32:37.050Z #65 done travel:→ SAMARRAN (navigation) p=none exploration
+  2026-09-22T16:32:38.562Z #66 root p=none exploration
+  2026-09-22T16:32:54.016Z #67 root p=none exploration
+  2026-09-22T16:32:55.482Z #68 root p=none exploration
+  2026-09-22T16:32:55.483Z #68 content controls p=none exploration
+  2026-09-22T16:32:56.333Z #69 root p=none exploration
+  2026-09-22T16:32:56.334Z #69 content controls p=none exploration
+  2026-09-22T16:32:57.233Z #70 root p=none exploration
+  2026-09-22T16:32:57.241Z #70 content controls p=none exploration
+  2026-09-22T16:32:58.052Z #71 root p=none exploration
+  2026-09-22T16:32:58.054Z #71 content controls p=none exploration
+  2026-09-22T16:32:58.819Z #72 root p=none exploration
+  2026-09-22T16:32:58.821Z #72 content controls p=none exploration
+  2026-09-22T16:32:59.535Z #73 root p=none exploration
+  2026-09-22T16:32:59.539Z #73 content controls p=none exploration
+  2026-09-22T16:33:00.217Z #74 root p=none exploration
+  2026-09-22T16:33:00.218Z #74 content controls p=none exploration
+  2026-09-22T16:33:00.768Z #75 root p=none exploration
+  2026-09-22T16:33:00.769Z #75 content controls p=none exploration
+  2026-09-22T16:33:01.003Z #76 root p=none exploration
+  2026-09-22T16:33:01.005Z #76 content controls p=none exploration
+  2026-09-22T16:33:01.201Z #77 root p=none exploration
+  2026-09-22T16:33:01.203Z #77 content controls p=none exploration
+  2026-09-22T16:33:01.401Z #78 root p=none exploration
+  2026-09-22T16:33:01.402Z #78 content controls p=none exploration
+  2026-09-22T16:33:01.584Z #79 root p=none exploration
+  2026-09-22T16:33:01.584Z #79 content controls p=none exploration
+  2026-09-22T16:33:01.784Z #80 root p=none exploration
+  2026-09-22T16:33:01.785Z #80 content controls p=none exploration
+  2026-09-22T16:33:01.984Z #81 root p=none exploration
+  2026-09-22T16:33:01.986Z #81 content controls p=none exploration
+  2026-09-22T16:33:02.168Z #82 root p=none exploration
+  2026-09-22T16:33:02.169Z #82 content controls p=none exploration
+  2026-09-22T16:33:02.384Z #83 root p=none exploration
+  2026-09-22T16:33:02.385Z #83 content controls p=none exploration
+  2026-09-22T16:33:02.584Z #84 root p=none exploration
+  2026-09-22T16:33:02.585Z #84 content controls p=none exploration
+  2026-09-22T16:33:02.768Z #85 root p=none exploration
+  2026-09-22T16:33:02.768Z #85 content controls p=none exploration
+  2026-09-22T16:33:03.001Z #86 root p=none exploration
+  2026-09-22T16:33:03.002Z #86 content controls p=none exploration
+  2026-09-22T16:33:03.168Z #87 root p=none exploration
+  2026-09-22T16:33:03.169Z #87 content controls p=none exploration
+  2026-09-22T16:33:04.586Z #88 root p=none exploration
+  2026-09-22T16:33:04.592Z #88 content controls p=none exploration
+  2026-09-22T16:33:07.651Z #89 root p=none exploration
+  2026-09-22T16:33:08.913Z #90 root p=none exploration
+  2026-09-22T16:33:11.486Z #91 root p=none exploration
+  2026-09-22T16:33:11.491Z #92 modal p=none exploration
+  2026-09-22T16:33:12.358Z #93 root p=none exploration
+  2026-09-22T16:33:12.359Z #94 modal p=none exploration
+  2026-09-22T16:33:26.308Z #95 root p=none exploration
+  2026-09-22T16:33:26.310Z #96 modal p=none exploration
+  2026-09-22T16:33:26.312Z #96 in report:send ⏱+14ms p=none exploration
+  2026-09-22T16:33:26.409Z #96 enter report:send p=none exploration
+  2026-09-22T16:33:26.414Z #96 admit report:send (described) p=none exploration
+  2026-09-22T16:33:26.414Z #96 dispatch report:send (described) p=none exploration
+  2026-09-22T16:33:26.414Z #96 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Johnny Blaze)
+  HP: 19/19  Stamina: 7/14  TC: 103  Corruption: 0
+  Pack: 49 distinct rows / 181 total
+
+Weapons (10)
+  Aether-Shard Spear (Uncommon, 2d6 piercing, dur 10/10, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 36/42, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, equipped:off, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, unequip:off, use
+  Acid-Etched Cudgel (1d8 bludgeoning, +1d4 acid coat, dur 16/21, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Flame of Aether Wand (1d6 burn, dur 14/14, [weapon,runecaster,rune_power,aetheric,fire])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-fist Wraps (1d10 bludgeoning, dur 23/27, equipped:main, [weapon,barehanded,melee])
+    actions: equip:off, unequip:main, use(off), repair
+  Pyric Wand (1d6 burn, dur 33/33, [weapon,runecaster])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 11/11, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Stormcalled Warstaff (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (6)
+  Echoing Steps Boots (dur 23/23, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet
+  Mud-Warden's Vest (dur 19/19, equipped:chest, AC +2 · Resists: slashing · WIS +2, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Reclaimer's Salvage Cap (dur 7/10, equipped:head, AC +2 · INV +2, [armor,head,cloth,helmet,reclaimers])
+    actions: unequip:head, repair
+  Salvager's Trench Coat (dur 14/17, AC +2 · Resists: cold · INT +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Tatter-Sewn Girdle (Rare, dur 35/35, equipped:legs, AC+3, unique, [fused,unique])
+    actions: unequip:legs
+  Wanderer's Worn Gauntlets (dur 13/16, AC +2 · STR +2, [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, repair, drop
+
+Dog Armor (1)
+  Riveted Leather Vest (Uncommon, dur 24/24, AC +2 (dog), [dog_armor,vest,leather,cloth])
+    actions: scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+
+Consumables (7)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])
+    actions: use(eat), drop
+  First Aid Kit ×2 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  First Aid Kit ×4 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Trail Rations ×7 ([food])
+    actions: use(eat), drop
+  Trail Rations ×4 ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+
+Coatings (1)
+  Acid Flask ×5 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+
+Tools (6)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Climbing Rope (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Mud Scanner ([exploration,relic,common,mud_dweller])
+    actions: equip:off, use(off), scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 300/300, [exploration,tool,common,race_starter,reclaimer])
+    actions: use, scrap, drop
+
+Materials (15)
+  Aether Crystal ×13 ([aether,crystal])
+    actions: drop
+  Aether Dust ×4 ([aether,dust,distillable])
+    actions: drop
+  Aether Mud ×7 ([mud,aether])
+    actions: drop
+  Aetheric Shard (Uncommon, [aether,crystal])
+    actions: drop
+  Automaton Circuit ×7 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×9 ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ([thrown,stone,improvised,heavy])
+    actions: drop
+  ◆ Flint Core Nodule (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Iron Core (Legendary, [construct,metal,boss,legendary,loot])
+    actions: scrap, drop
+  Mud Fragment ×7 ([mud])
+    actions: drop
+  Mudstone (Rare, [mud,stone])
+    actions: drop
+  ◆ Obsidian Chip (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  ◆ Salt-Cured Dowel (♥reserved, [trophy,wood])
+    actions: scrap, release-from-fusion, drop
+  Smooth Stone ×3 ([stone,junk,scrap])
+    actions: scrap, drop
+  Worn Tartarian Coin ×73 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (1)
+  ◆ Corroded Hinge Set ([trophy])
+    actions: save-for-fusion, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore,improvised,loot])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 429 of 3447 entries; older trimmed to fit a single email paste)
+
+[2026-09-22T16:33:21.299Z] [debug] persist sizes(KB): total=156 player=20 wm=44[rooms=15 events=1 memos=0 npcs=2 defeated=0 tags=0 discovered=0] log=88 scene=3
+[2026-09-22T16:33:04.720Z] [world] You let the conversation go and Odar Flameforge gets back to it.
+[2026-09-22T16:33:03.277Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:03.276Z] [player] Ask about their trade
+[2026-09-22T16:33:03.085Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:03.085Z] [player] Ask about their trade
+[2026-09-22T16:33:02.885Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:02.885Z] [player] Ask about their trade
+[2026-09-22T16:33:02.703Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:02.703Z] [player] Ask about their trade
+[2026-09-22T16:33:02.489Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:02.488Z] [player] Ask about their trade
+[2026-09-22T16:33:02.302Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:02.301Z] [player] Ask about their trade
+[2026-09-22T16:33:02.106Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:02.105Z] [player] Ask about their trade
+[2026-09-22T16:33:01.886Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:01.885Z] [player] Ask about their trade
+[2026-09-22T16:33:01.702Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:01.702Z] [player] Ask about their trade
+[2026-09-22T16:33:01.486Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:01.485Z] [player] Ask about their trade
+[2026-09-22T16:33:01.305Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:01.304Z] [player] Ask about their trade
+[2026-09-22T16:33:01.086Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:01.086Z] [player] Ask about their trade
+[2026-09-22T16:33:00.889Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:00.888Z] [player] Ask about their trade
+[2026-09-22T16:33:00.385Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:33:00.384Z] [player] Ask about their trade
+[2026-09-22T16:32:59.704Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:32:59.703Z] [player] Ask about their trade
+[2026-09-22T16:32:58.987Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:32:58.987Z] [player] Ask about their trade
+[2026-09-22T16:32:58.734Z] [debug] flourish: ✓ 3132ms
+[2026-09-22T16:32:58.700Z] [debug] qwen⏱ flourish ok 3031ms read 2277ms/write 733ms in 180t→out 22t thr2 12.7ms/t (86ch)
+[2026-09-22T16:32:58.202Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:32:58.201Z] [player] Ask about their trade
+[2026-09-22T16:32:57.384Z] [world] Something in the back of Odar Flameforge's shop ticks over and settles, and he does not look up at it.
+[2026-09-22T16:32:57.383Z] [world] Odar Flameforge picks up a finished piece and turns it. "Not the look. The look is for buyers. A good piece is one that fails SLOWLY — it warns you, it complains, it gives you a season of creaking before it lets go." They set it down. "Anything that breaks without warning first lied to you for years."
+[2026-09-22T16:32:57.383Z] [player] Ask what makes a piece good
+[2026-09-22T16:32:56.467Z] [world] Odar Flameforge gives you a look. "I have told you that one."
+[2026-09-22T16:32:56.467Z] [player] Ask about their trade
+[2026-09-22T16:32:55.601Z] [world] There is half a nod in it — you are a face now, if not much more than one.
+[2026-09-22T16:32:55.601Z] [world] "Fire," Odar says, and the forge behind him agrees. "Everything on this rack burns something. Mostly the thing you point it at. Occasionally you."
+[2026-09-22T16:32:55.600Z] [player] Ask about their trade
+[2026-09-22T16:32:54.931Z] [debug] homework: scene_intro "Samarran" ✓ 8608ms
+[2026-09-22T16:32:54.883Z] [debug] qwen⏱ narration:scene_intro_fill ok 8554ms read 7305ms/write 1204ms in 714t→out 33t thr1 10.2ms/t HIT-CAP (161ch)
+[2026-09-22T16:32:47.754Z] [reward] Sold Mud Heater Shield (Common) to Odar Flameforge for 14 TC. (103 TC on hand)
+[2026-09-22T16:32:46.324Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-22T16:32:37.050Z] [world] Everything costs what it costs now, and nobody apologises for it. The season has turned against buyers.
+[2026-09-22T16:32:37.050Z] [world] Tacked to the rope-head board, under fresher paper, you find a surface warrant gone soft with mud-damp — the seal legible, the name washed to a gray ghost. It might be yours. It might be anyone's. Down here even paper forgets, and it only took a season. You leave it where it hangs, retiring.
+[2026-09-22T16:32:37.049Z] [arbiter] (Dynasty route — ADDRESS the Samarran keepers in the old voice (try "address the keepers"). Prove the lineage and the Core lifts.)
+[2026-09-22T16:32:37.048Z] [world] Rare workings for sale: Rustbreaker Shield (200 TC), Sentinel Cleaver (200 TC), Shadow Caller Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-22T16:32:37.041Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Odar Flameforge, Fire-Weaponsmith. Proud and loud. Known for crafting fire-imbued weapons and armor with fire resistance."
+[2026-09-22T16:32:37.041Z] [world] Hoofbeats on the silt. Odar Flameforge draws up beside you, Fire-Weaponsmith's mark on the pack. "Trade?" they ask.
+[2026-09-22T16:32:37.041Z] [world] [Samarran] north: The Flooded Reliquary (1 tile, 3 hours) · east: The Cistern Intake (1 tile, 3 hours) · south: Thametan's Tower (3 tiles, 8 hours) · west: The Sunken Enclave (2 tiles, 5 hours)
+[2026-09-22T16:32:37.036Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-22T16:32:37.036Z] [world] You've left Samarran and entered Samarran. The research city. The hum here is not metaphor. It's pre-dawn dark. Odar Flameforge is the only soul in sight. north leads to The Flooded Reliquary; east leads to The Cistern Intake. Nothing named to the south or west.
+[2026-09-22T16:32:37.017Z] [debug] missions: none active · at=samarran travelTo=samarran
+[2026-09-22T16:32:37.017Z] [debug] scene: loc=samarran hub=- arrival=y opening=n passing=n
+[2026-09-22T16:32:37.015Z] [world] You walk north. You arrive at Samarran.
+[2026-09-22T16:32:36.994Z] [debug] ui: tap "→ SAMARRAN" ⏱+32ms
+[2026-09-22T16:32:31.922Z] [world] You set course for Samarran. 1 tile — about 3 hours of travel, all in. Tap the → SAMARRAN button on the travel row to press on; STOP TRAVEL to halt.
+[2026-09-22T16:32:15.007Z] [debug] qwen⏱ ✂ DISCARDED ambient_fill after 3640ms — ambient:fill-∅
+[2026-09-22T16:32:15.006Z] [debug] arbiter: ambient-fill ∅ 3696ms
+[2026-09-22T16:32:14.998Z] [debug] qwen⏱ ambient_fill ok 3640ms read 2568ms/write 1049ms in 357t→out 31t thr1 7.2ms/t HIT-CAP (149ch)
+[2026-09-22T16:32:09.249Z] [debug] persist sizes(KB): total=154 player=21 wm=41[rooms=17 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=89 scene=3
+[2026-09-22T16:32:09.179Z] [cognitive] REST  (75ms)
+[2026-09-22T16:32:09.103Z] [system] ⏳ Time passed: 8h
+[2026-09-22T16:32:09.102Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-22T16:32:09.102Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 9, night)
+[2026-09-22T16:32:09.101Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-22T16:32:09.101Z] [player] rest
+[2026-09-22T16:32:09.088Z] [debug] ui: tap "rest" ⏱+27ms
+[2026-09-22T16:32:06.393Z] [world] You step back outside, leaving shack behind.
+[2026-09-22T16:32:06.387Z] [debug] ui: tap "🚪 EXIT" ⏱+23ms
+[2026-09-22T16:32:04.464Z] [debug] homework: scene_intro "Samarran" ✓ 3156ms
+[2026-09-22T16:32:04.433Z] [debug] qwen⏱ narration:scene_intro_fill ok 3111ms read/write unusable (native mis-reported 47446ms/667ms — llama.rn split bug, not this call) in 719t→out 16t thr1 (75ch)
+[2026-09-22T16:32:01.311Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-22T16:31:46.996Z] [debug] ui: tap "inventory" ⏱+26ms
+[2026-09-22T16:31:26.683Z] [arbiter] The Arbiter eyes the Wanderer's Worn Gauntlets. "Short on stock: Patched Cloth 4 short. Gather, then return."
+[2026-09-22T16:31:26.682Z] [world] You repair the Tatter-Sewn Girdle. Back to full. (spent: Small Rock x2)
+[2026-09-22T16:31:26.681Z] [arbiter] The Arbiter nods. "Patched in: Smooth Stone → Small Rock."
+[2026-09-22T16:31:26.680Z] [arbiter] The Arbiter eyes the Salvager's Trench Coat. "Short on stock: Patched Cloth 4 short. Gather, then return."
+[2026-09-22T16:31:26.680Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Cap. "Short on stock: Patched Cloth 4 short. Gather, then return."
+[2026-09-22T16:31:26.678Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-09-22T16:31:26.677Z] [arbiter] The Arbiter nods. "Patched in: 2× Cloth Scrap → Patched Cloth, Spider Silk → Patched Cloth, Wasp Venom → Patched Cloth."
+[2026-09-22T16:31:25.380Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Mud-Warden's Vest — 1 piece of this is Crucible stock: Wasp Venom. Say the word and I'll set it aside instead."
+[2026-09-22T16:31:25.377Z] [arbiter] The Arbiter eyes the Mud-fist Wraps. "Short on stock: Stick 2 short. Gather, then return."
+[2026-09-22T16:31:25.374Z] [world] You repair the Echoing Steps Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-22T16:31:25.372Z] [arbiter] The Arbiter nods. "Patched in: Cloth Scrap → Patched Cloth."
+[2026-09-22T16:31:25.368Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)
+[2026-09-22T16:31:22.457Z] [cognitive] neutral  (696ms)
+[2026-09-22T16:31:22.453Z] [debug] homework: scene_intro "Samarran" ∅ 6171ms
+[2026-09-22T16:31:22.453Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6145ms — intro-fill:∅
+[2026-09-22T16:31:22.430Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6145ms read 0ms/write 0ms in 717t→out 0t thr1 (0ch)
+[2026-09-22T16:31:21.759Z] [reward] ✦ Crafted First Aid Kit ×2. The Arbiter watches you set the last piece.
+[2026-09-22T16:31:21.755Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0
+[2026-09-22T16:31:21.755Z] [player] craft First Aid Kit
+[2026-09-22T16:31:16.284Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-22T16:31:15.078Z] [debug] ui: tap "craft" ⏱+31ms
+[2026-09-22T16:31:13.225Z] [debug] ui: tap "more ▸" ⏱+20ms
+[2026-09-22T16:31:09.603Z] [debug] qwen⏱ investigate_lore ok 1603ms read 279ms/write 1297ms in 125t→out 40t thr2 2.2ms/t (166ch)
+[2026-09-22T16:31:08.000Z] [cognitive] neutral  (52ms)
+[2026-09-22T16:31:07.946Z] [world] You study the tin and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-22T16:31:07.944Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tin resolved=tin range=- enemies=0 hooks=0
+[2026-09-22T16:31:07.944Z] [player] investigate tin
+[2026-09-22T16:31:06.872Z] [debug] persist sizes(KB): total=148 player=23 wm=35[rooms=9 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=89 scene=2
+[2026-09-22T16:31:06.770Z] [cognitive] CLIMB  (44ms)
+[2026-09-22T16:31:06.711Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T16:31:06.710Z] [world] You scrape at the silt with the worn tartarian coin. Nothing of worth.
+[2026-09-22T16:31:06.708Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-09-22T16:31:06.708Z] [player] investigate the ground
+[2026-09-22T16:31:04.859Z] [debug] ui: tap "investigate" ⏱+19ms
+[2026-09-22T16:31:04.079Z] [debug] qwen⏱ investigate_lore ok 3883ms read 1403ms/write 2455ms in 125t→out 54t thr2 11.2ms/t (267ch)
+[2026-09-22T16:31:03.653Z] [reward]     • Corroded Hinge Set (Common)
+[2026-09-22T16:31:03.653Z] [reward]     • Worn Tartarian Coin x4 (Common)
+[2026-09-22T16:31:03.653Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-22T16:31:03.653Z] [reward]     • Aether Crystal (Common)
+[2026-09-22T16:31:03.652Z] [reward] ✦ Salvage haul:
+[2026-09-22T16:31:03.650Z] [world] The wire gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-22T16:31:03.650Z] [world] You break the shelf apart. Among the pieces, something worth keeping.
+[2026-09-22T16:31:03.649Z] [world] You break the sack apart. Among the pieces, something worth keeping.
+[2026-09-22T16:31:03.649Z] [world] You salvage the gate. The take is small but real.
+[2026-09-22T16:31:02.374Z] [debug] ui: tap "take / salvage" ⏱+24ms
+[2026-09-22T16:31:01.147Z] [world] Shelves of odds and ends. Sacks slumped against the wall, dented tins, a loose coil of wire. A plank gate at the back of the room hangs open on the yard.
+[2026-09-22T16:31:01.147Z] [world] You step into the storage.
+[2026-09-22T16:31:01.140Z] [debug] ui: tap "↘ Storage" ⏱+19ms
+[2026-09-22T16:31:00.177Z] [cognitive] neutral  (45ms)
+[2026-09-22T16:31:00.108Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T16:31:00.107Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-22T16:31:00.106Z] [world] The stove resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-22T16:31:00.102Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stove resolved=stove range=- enemies=0 hooks=0
+[2026-09-22T16:31:00.101Z] [player] investigate stove
+[2026-09-22T16:30:58.623Z] [debug] ui: tap "investigate" ⏱+15ms
+[2026-09-22T16:30:55.528Z] [arbiter] The Arbiter looks around. "The research city. The hum here is not metaphor."
+[2026-09-22T16:30:55.517Z] [reward] +9 TC pried from the dust.
+[2026-09-22T16:30:55.517Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 19). [3 enemies defeated]
+[2026-09-22T16:30:55.516Z] [reward] Mud Wasp defeated. You recover Aether Residue, Wasp Venom.
+[2026-09-22T16:30:55.511Z] [combat] Your blow with the bone crossbow lands clean — 13 damage. Mud Wasp crumples in the dust. The Aetherstone settles.
+[2026-09-22T16:30:55.510Z] [combat] Weakness exposed — Mud Wasp flinches. (piercing ×1.5 for 13)
+[2026-09-22T16:30:55.510Z] [combat] Piercing flares — +1 on hit (weak — bites deep!).
+[2026-09-22T16:30:55.509Z] [combat] You — d20 → 10 + DEX 13 − 1 (Ash Storm) = 22 vs Mud Wasp AC 8 — ✓ HIT
+[2026-09-22T16:30:55.509Z] [world] You seize the initiative. Mud Wasp has no time to react.
+[2026-09-22T16:30:55.456Z] [debug] dice⏱ damage: shown +48ms, tapped +4037ms, settled +829ms = 4914ms
+[2026-09-22T16:30:54.627Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T16:30:50.540Z] [debug] dice⏱ attack: shown +52ms, tapped +1084ms, settled +835ms = 1971ms
+[2026-09-22T16:30:49.705Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-22T16:30:48.568Z] [debug] dice⏱ initiative: shown +27ms, tapped +922ms, settled +829ms = 1778ms
+[2026-09-22T16:30:47.736Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-22T16:30:46.787Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T16:30:46.787Z] [world] You bring the bone crossbow to bear on Mud Wasp.
+[2026-09-22T16:30:46.786Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-22T16:30:46.785Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-22T16:30:46.782Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0
+[2026-09-22T16:30:46.782Z] [player] attack with the off-hand bone crossbow
+[2026-09-22T16:30:46.735Z] [debug] ui: tap "bone crossbow ▲" ⏱+20ms
+[2026-09-22T16:30:44.559Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-09-22T16:30:44.559Z] [combat] Your strike with the bone crossbow glances off. Mud Wasp seizes the opening.
+[2026-09-22T16:30:44.559Z] [combat] You — d20 → 1 + DEX 13 − 1 (Ash Storm) perfect opening (2× dice) = 13 vs Mud Wasp AC 8 — ✗ FUMBLE
+[2026-09-22T16:30:44.558Z] [combat] Mud Wasp — d20 → 5 + ATK 4 = 9 vs your AC 20 — ✗ MISS
+[2026-09-22T16:30:44.557Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-09-22T16:30:44.507Z] [debug] dice⏱ attack: shown +67ms, tapped +995ms, settled +837ms = 1899ms
+[2026-09-22T16:30:43.669Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-22T16:30:42.604Z] [debug] dice⏱ initiative: shown +32ms, tapped +1169ms, settled +832ms = 2033ms
+[2026-09-22T16:30:41.772Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-22T16:30:40.574Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T16:30:40.573Z] [world] Your bone crossbow comes around in an arc; Mud Wasp squares up to meet it.
+[2026-09-22T16:30:40.568Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-22T16:30:40.568Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-22T16:30:40.566Z] [arbiter] Ash Storm hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-09-22T16:30:40.564Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-22T16:30:40.562Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0
+[2026-09-22T16:30:40.562Z] [player] attack with the off-hand bone crossbow
+[2026-09-22T16:30:40.517Z] [debug] ui: tap "bone crossbow ▲" ⏱+16ms
+[2026-09-22T16:30:39.848Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T16:30:39.848Z] [arbiter] The Arbiter watches the mud wasp. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-22T16:30:39.848Z] [debug] arbiter: template (reason=combat)
+[2026-09-22T16:30:39.841Z] [combat] Dodge — d20 → 7 + DEX 13 = 20 vs ATK 7. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T16:30:39.840Z] [combat] Mud Wasp — d20 → 3 + ATK 4 = 7 vs your AC 20 — ✗ EVADED
+[2026-09-22T16:30:39.837Z] [world] You commit to the dodge. Slip Mud Wasp's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T16:30:39.829Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-22T16:30:39.829Z] [player] dodge
+[2026-09-22T16:30:39.816Z] [debug] ui: tap "dodge" ⏱+5ms
+[2026-09-22T16:30:36.717Z] [cognitive] neutral  (84ms)
+[2026-09-22T16:30:36.631Z] [debug] enemy: Mud Wasp hp=10 ac=8 atk=Poison Sting dmg=1D6 rarity=Common ap=3
+[2026-09-22T16:30:36.631Z] [combat] Mud Wasp — Poison Sting ready, 1D6 damage on a hit.
+[2026-09-22T16:30:36.631Z] [world] Something shifted while you were turned away — a Mud Wasp breaks cover, fast and low. (range: close)
+[2026-09-22T16:30:36.628Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stove resolved=stove range=- enemies=0 hooks=0
+[2026-09-22T16:30:36.627Z] [player] investigate stove
+[2026-09-22T16:30:36.534Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-22T16:30:35.468Z] [cognitive] CLIMB  (64ms)
+[2026-09-22T16:30:35.404Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T16:30:35.397Z] [world] You scrape at the silt with the worn tartarian coin. Nothing of worth.
+[2026-09-22T16:30:35.392Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-09-22T16:30:35.391Z] [player] investigate the ground
+[2026-09-22T16:30:35.352Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-22T16:30:33.881Z] [debug] ui: tap "investigate" ⏱+24ms
+[2026-09-22T16:30:32.447Z] [debug] ui: tap "Den" ⏱+20ms
+[2026-09-22T16:30:31.570Z] [world] A low room with a dead stove and a threadbare rug. A board creaks loose underfoot near the wall.
+[2026-09-22T16:30:31.570Z] [world] You step inside a leaning shack, into the den.
+[2026-09-22T16:30:31.564Z] [debug] ui: tap "🚪 ENTER" ⏱+25ms
+[2026-09-22T16:30:25.697Z] [debug] boot: life bmucw49lc8d started 2026-09-22T16:30:21.072Z · not an OTA apply (no handoff on disk)
+[2026-09-22T16:30:25.697Z] [debug] missions: none active · at=samarran
+[2026-09-22T16:30:25.696Z] [debug] ═══ SESSION 2026-09-22T16:30:25.694Z · build 2026-09-22-1866-a-question-is-asked-once · previous entry moments earlier ═══
+[2026-09-22T16:30:25.556Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Johnny Blaze. I kept watch while you were gone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-22T16:30:25.546Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.
+[2026-09-22T16:30:25.546Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-22T16:30:25.546Z] [debug] OTA session start: 2026-09-22-1866-a-question-is-asked-once.
+[2026-09-22T16:30:21.469Z] [debug] voice: bundled idle
+[2026-09-22T16:30:21.469Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T16:30:21.388Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T16:30:21.388Z] [debug] ota: Already up to date
+[2026-09-22T16:30:21.219Z] [debug] ota: Checking…
+[2026-09-22T16:30:21.218Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c942-df20-758c-ad86-f392f0edab86
+[2026-09-22T16:25:26.549Z] [debug] appstate: background → active (was background for 436456ms)
+[2026-09-22T16:18:10.087Z] [debug] appstate: active → background (was active for 9794ms)
+[2026-09-22T16:18:00.641Z] [debug] voice: bundled idle
+[2026-09-22T16:18:00.641Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T16:18:00.545Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T16:18:00.545Z] [debug] ota: Already up to date
+[2026-09-22T16:18:00.317Z] [debug] ota: Checking…
+[2026-09-22T16:18:00.317Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c942-df20-758c-ad86-f392f0edab86
+[2026-09-22T16:15:16.867Z] [debug] voice: bundled idle
+[2026-09-22T16:15:16.867Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T16:15:16.746Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T16:15:16.745Z] [debug] ota: Already up to date
+[2026-09-22T16:15:16.511Z] [debug] ota: Checking…
+[2026-09-22T16:15:16.511Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c942-df20-758c-ad86-f392f0edab86
+[2026-09-22T16:15:16.117Z] [debug] ota: Restarting to apply…
+[2026-09-22T16:15:16.116Z] [debug] ota: Saving progress…
+[2026-09-22T16:15:15.760Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T16:15:14.504Z] [debug] ota: Checking…
+[2026-09-22T16:15:14.504Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c8c2-583c-7383-8f75-9abbecaa0bfa
+[2026-09-22T13:13:11.259Z] [debug] voice: bundled idle
+[2026-09-22T13:13:11.254Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T13:13:10.208Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T13:13:10.208Z] [debug] ota: Already up to date
+[2026-09-22T13:13:10.149Z] [debug] ota: Checking…
+[2026-09-22T13:13:10.149Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c8c2-583c-7383-8f75-9abbecaa0bfa
+[2026-09-22T11:09:28.319Z] [debug] voice: bundled idle
+[2026-09-22T11:09:28.319Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T11:09:28.230Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T11:09:28.230Z] [debug] ota: Already up to date
+[2026-09-22T11:09:28.135Z] [debug] ota: Checking…
+[2026-09-22T11:09:28.135Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c8c2-583c-7383-8f75-9abbecaa0bfa
+[2026-09-22T11:09:27.924Z] [debug] ota: Restarting to apply…
+[2026-09-22T11:09:27.924Z] [debug] ota: Saving progress…
+[2026-09-22T11:09:27.823Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T11:09:26.915Z] [debug] ota: Checking…
+[2026-09-22T11:09:26.915Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c708-15d7-717d-b307-66960de3f40b
+[2026-09-22T10:50:56.195Z] [debug] appstate: active → background (was active for 7793ms)
+[2026-09-22T10:50:49.569Z] [debug] voice: bundled idle
+[2026-09-22T10:50:49.562Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T10:50:48.506Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T10:50:48.506Z] [debug] ota: Already up to date
+[2026-09-22T10:50:48.429Z] [debug] ota: Checking…
+[2026-09-22T10:50:48.429Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c708-15d7-717d-b307-66960de3f40b
+[2026-09-22T04:02:47.161Z] [debug] boot: life bmuc5er0ff6 started 2026-09-22T04:02:40.575Z · not an OTA apply (no handoff on disk)
+[2026-09-22T04:02:47.161Z] [debug] missions: none active · at=samarran
+[2026-09-22T04:02:47.161Z] [debug] ═══ SESSION 2026-09-22T04:02:47.157Z · build 2026-09-22-1864-the-bench-leaves-a-trail · previous entry moments earlier ═══
+[2026-09-22T04:02:47.007Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Johnny Blaze. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-22T04:02:46.996Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.
+[2026-09-22T04:02:46.994Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-22T04:02:46.993Z] [debug] OTA session start: 2026-09-22-1864-the-bench-leaves-a-trail.
+[2026-09-19T13:12:29.623Z] [debug] appstate: background → active (was background for 104145ms)
+[2026-09-19T13:10:45.478Z] [debug] appstate: active → background (was active for 4276ms)
+[2026-09-19T13:10:41.557Z] [debug] voice: bundled idle
+[2026-09-19T13:10:41.557Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T13:10:41.463Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T13:10:41.462Z] [debug] ota: Already up to date
+[2026-09-19T13:10:41.249Z] [debug] ota: Checking…
+[2026-09-19T13:10:41.248Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b9c9-939f-7cd1-8506-dacf3b1ef145
+[2026-09-19T13:10:38.395Z] [debug] appstate: background → active (was background for 74350ms)
+[2026-09-19T13:09:24.045Z] [debug] appstate: active → background (was active for 6747ms)
+[2026-09-19T13:09:17.579Z] [debug] voice: bundled idle
+[2026-09-19T13:09:17.579Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T13:09:17.465Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T13:09:17.465Z] [debug] ota: Already up to date
+[2026-09-19T13:09:17.332Z] [debug] ota: Checking…
+[2026-09-19T13:09:17.332Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b92c-c212-7be7-8356-66016fa5c4a1
+[2026-09-19T13:09:17.317Z] [debug] native-sdk verdict: answered false
+[2026-09-19T13:09:17.317Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-19T13:06:38.446Z] [debug] boot: life bmu8eillc4h started 2026-09-19T13:06:32.016Z · not an OTA apply (no handoff on disk)
+[2026-09-19T13:06:38.446Z] [debug] missions: none active · at=samarran
+[2026-09-19T13:06:38.446Z] [debug] ═══ SESSION 2026-09-19T13:06:38.443Z · build 2026-09-19-1847-the-process-says-where-it-was · previous entry moments earlier ═══
+[2026-09-19T13:06:38.292Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Johnny Blaze. We've still got ground to cover, you and I."
+[2026-09-19T13:06:38.292Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-19T13:06:38.292Z] [debug] OTA session start: 2026-09-19-1847-the-process-says-where-it-was.
+[2026-09-19T13:06:32.432Z] [debug] voice: bundled idle
+[2026-09-19T13:06:32.432Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T13:06:32.320Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T13:06:32.320Z] [debug] ota: Already up to date
+[2026-09-19T13:06:32.137Z] [debug] ota: Checking…
+[2026-09-19T13:06:32.137Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b92c-c212-7be7-8356-66016fa5c4a1
+[2026-09-19T12:26:44.788Z] [debug] appstate: background → active (was background for 66410ms)
+[2026-09-19T12:25:38.376Z] [debug] appstate: active → background (was active for 30347ms)
+[2026-09-19T12:25:12.468Z] [debug] ui: tap "map"
+[2026-09-19T12:25:08.028Z] [debug] appstate: background → active (was background for 7079ms)
+[2026-09-19T12:25:01.060Z] [debug] persist sizes(KB): total=155 player=22 wm=42[rooms=16 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=88 scene=3
+[2026-09-19T12:25:00.952Z] [debug] appstate: active → background (was active for 39838ms)
+[2026-09-19T12:24:54.664Z] [debug] ui: tap "☗ FALLEN"
+[2026-09-19T12:24:43.078Z] [debug] ui: tap "☗ FALLEN"
+[2026-09-19T12:24:39.342Z] [debug] ui: tap "◈ LORE"
+[2026-09-19T12:24:34.944Z] [debug] ui: tap "☗ FALLEN"
+[2026-09-19T12:24:26.513Z] [debug] boot: life bmu8d0cp2vd started 2026-09-19T12:24:21.062Z · not an OTA apply (no handoff on disk)
+[2026-09-19T12:24:26.511Z] [debug] missions: none active · at=samarran
+[2026-09-19T12:24:26.511Z] [debug] ═══ SESSION 2026-09-19T12:24:26.508Z · build 2026-09-19-1847-the-process-says-where-it-was · previous entry moments earlier ═══
+[2026-09-19T12:24:26.361Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Johnny Blaze. The buried country is no place to walk alone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-19T12:24:26.351Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.
+[2026-09-19T12:24:26.351Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-19T12:24:26.351Z] [debug] OTA session start: 2026-09-19-1847-the-process-says-where-it-was.
+[2026-09-19T12:23:34.101Z] [debug] voice: bundled idle
+[2026-09-19T12:23:34.100Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T12:23:34.004Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T12:23:34.003Z] [debug] ota: Already up to date
+[2026-09-19T12:23:33.725Z] [debug] ota: Checking…
+[2026-09-19T12:23:33.725Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b92c-c212-7be7-8356-66016fa5c4a1
+[2026-09-19T12:23:33.282Z] [debug] ota: Restarting to apply…
+[2026-09-19T12:23:33.281Z] [debug] ota: Saving progress…
+[2026-09-19T12:23:32.853Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-19T12:23:31.486Z] [debug] ota: Checking…
+[2026-09-19T12:23:31.486Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b71b-c960-75fa-b6e6-e734cc548458
+[2026-09-19T00:43:53.338Z] [debug] voice: bundled idle
+[2026-09-19T00:43:53.338Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T00:43:53.243Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T00:43:53.243Z] [debug] ota: Already up to date
+[2026-09-19T00:43:53.035Z] [debug] ota: Checking…
+[2026-09-19T00:43:53.035Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b71b-c960-75fa-b6e6-e734cc548458
+[2026-09-19T00:40:55.789Z] [debug] appstate: active → background (was active for 3841ms)
+[2026-09-19T00:40:52.248Z] [debug] voice: bundled idle
+[2026-09-19T00:40:52.247Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T00:40:52.156Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T00:40:52.156Z] [debug] ota: Already up to date
+[2026-09-19T00:40:51.986Z] [debug] ota: Checking…
+[2026-09-19T00:40:51.985Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b71b-c960-75fa-b6e6-e734cc548458
+[2026-09-19T00:40:37.891Z] [debug] voice: bundled idle
+[2026-09-19T00:40:37.890Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T00:40:37.807Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T00:40:37.807Z] [debug] ota: Already up to date
+[2026-09-19T00:40:37.698Z] [debug] ota: Checking…
+[2026-09-19T00:40:37.698Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b6c1-d74c-726c-bcd4-4f13255201b3
+[2026-09-19T00:35:44.828Z] [debug] appstate: active → background (was active for 4950ms)
+[2026-09-19T00:35:40.163Z] [debug] voice: bundled idle
+[2026-09-19T00:35:40.162Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T00:35:40.014Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T00:35:40.013Z] [debug] ota: Already up to date
+[2026-09-19T00:35:39.907Z] [debug] ota: Checking…
+[2026-09-19T00:35:39.906Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b6c1-d74c-726c-bcd4-4f13255201b3
+[2026-09-18T23:30:51.585Z] [debug] appstate: background → active (was background for 139668ms)
+[2026-09-18T23:28:31.917Z] [debug] appstate: active → background (was active for 3238ms)
+[2026-09-18T23:28:29.843Z] [debug] voice: bundled idle
+[2026-09-18T23:28:29.843Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T23:28:29.006Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T23:28:29.005Z] [debug] ota: Already up to date
+[2026-09-18T23:28:28.792Z] [debug] ota: Checking…
+[2026-09-18T23:28:28.791Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b6c1-d74c-726c-bcd4-4f13255201b3
+[2026-09-18T23:28:27.969Z] [debug] ota: Restarting to apply…
+[2026-09-18T23:28:27.968Z] [debug] ota: Saving progress…
+[2026-09-18T23:28:27.691Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T23:28:26.937Z] [debug] ota: Checking…
+[2026-09-18T23:28:26.937Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b65e-8410-76f8-b4b2-46c1a42931d3
+[2026-09-18T21:15:17.539Z] [debug] appstate: active → background (was active for 5844ms)
+[2026-09-18T21:15:12.074Z] [debug] voice: bundled idle
+[2026-09-18T21:15:12.074Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:15:12.003Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:15:12.003Z] [debug] ota: Already up to date
+[2026-09-18T21:15:11.748Z] [debug] ota: Checking…
+[2026-09-18T21:15:11.748Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b65e-8410-76f8-b4b2-46c1a42931d3
+[2026-09-18T21:15:07.251Z] [debug] appstate: background → active (was background for 188116ms)
+[2026-09-18T21:11:59.134Z] [debug] appstate: active → background (was active for 8516ms)
+[2026-09-18T21:11:50.955Z] [debug] voice: bundled idle
+[2026-09-18T21:11:50.954Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:11:50.887Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:11:50.887Z] [debug] ota: Already up to date
+[2026-09-18T21:11:50.653Z] [debug] ota: Checking…
+[2026-09-18T21:11:50.653Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b60c-0e18-732d-867e-aeb905855cb4
+[2026-09-18T21:11:50.635Z] [debug] native-sdk verdict: answered false
+[2026-09-18T21:11:50.635Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-18T21:10:59.506Z] [debug] voice: bundled idle
+[2026-09-18T21:10:59.506Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:10:59.409Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:10:59.409Z] [debug] ota: Already up to date
+[2026-09-18T21:10:59.213Z] [debug] ota: Checking…
+[2026-09-18T21:10:59.213Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b60c-0e18-732d-867e-aeb905855cb4
+[2026-09-18T21:05:01.211Z] [debug] appstate: background → active (was background for 9035ms)
+[2026-09-18T21:04:52.175Z] [debug] appstate: active → background (was active for 14182ms)
+[2026-09-18T21:04:37.993Z] [debug] appstate: background → active (was background for 14709ms)
+[2026-09-18T21:04:23.284Z] [debug] appstate: active → background (was active for 7928ms)
+[2026-09-18T21:04:15.708Z] [debug] voice: bundled idle
+[2026-09-18T21:04:15.707Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:04:15.621Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:04:15.621Z] [debug] ota: Already up to date
+[2026-09-18T21:04:15.395Z] [debug] ota: Checking…
+[2026-09-18T21:04:15.395Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b60c-0e18-732d-867e-aeb905855cb4
+[2026-09-18T20:37:04.474Z] [debug] appstate: active → background (was active for 39673ms)
+[2026-09-18T20:36:25.302Z] [debug] voice: bundled idle
+[2026-09-18T20:36:25.302Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T20:36:24.981Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T20:36:24.981Z] [debug] ota: Already up to date
+[2026-09-18T20:36:24.880Z] [debug] ota: Checking…
+[2026-09-18T20:36:24.879Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b60c-0e18-732d-867e-aeb905855cb4
+[2026-09-18T20:36:24.852Z] [debug] native-sdk verdict: answered false
+[2026-09-18T20:36:24.852Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-18T20:15:35.418Z] [debug] ui: tap "◈ LORE"
+[2026-09-18T20:15:21.001Z] [debug] boot: life bmu7edzyi2q started 2026-09-18T20:15:11.178Z · FOLLOWED AN OTA APPLY 416ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-18T20:15:21.000Z] [debug] missions: none active · at=samarran
+[2026-09-18T20:15:21.000Z] [debug] ═══ SESSION 2026-09-18T20:15:20.998Z · build 2026-09-18-1843-who-the-fallen-was · updated from 2026-09-18-1842-trading-not-debugging · previous entry moments earlier ═══
+[2026-09-18T20:15:20.846Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Johnny Blaze. We've still got ground to cover, you and I."
+[2026-09-18T20:15:20.845Z] [world] You step back into Samarran. The world waits for your move.
+[2026-09-18T20:15:20.845Z] [debug] OTA session start: 2026-09-18-1843-who-the-fallen-was.
+[2026-09-18T20:15:20.845Z] [debug] OTA applied: 2026-09-18-1842-trading-not-debugging → 2026-09-18-1843-who-the-fallen-was.
+[2026-09-18T18:30:03.017Z] [debug] voice: bundled idle
+[2026-09-18T18:30:03.017Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T18:30:02.898Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T18:30:02.898Z] [debug] ota: Already up to date
+[2026-09-18T18:30:02.716Z] [debug] ota: Checking…
+[2026-09-18T18:30:02.716Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b565-207e-7b21-86a1-cc99c620c978
+[2026-09-18T18:30:02.373Z] [debug] ota: Restarting to apply…
+[2026-09-18T18:30:02.373Z] [debug] ota: Saving progress…
+[2026-09-18T18:30:02.107Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T18:30:01.191Z] [debug] ota: Checking…
+[2026-09-18T18:30:01.191Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0b509-247a-7bec-9ecd-bcd310c54d62
+[2026-09-18T18:30:01.176Z] [debug] native-sdk verdict: answered false
+[2026-09-18T18:30:01.176Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-18T16:41:09.116Z] [debug] voice: bundled idle
+[2026-09-18T16:41:09.116Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T16:41:09.041Z] [debug] ota: boot check result = noUpdate
+
+=== END REPORT ===
