@@ -1,0 +1,1060 @@
+Bug Report — Permannu · (2026-09-22-1870-the-road-belongs-to-the-next-task) · Freeze
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-22T21:43:10.489Z
+Character: Permannu
+Slot ID: slot_mu9z9l9q_ip9bpv
+Race: Tartarian Giants
+Location: Cradle of Dusk
+HP: 50/59
+
+--- DESCRIPTION ---
+Freeze
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-22T21:43:10.397Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-22-1870-the-road-belongs-to-the-next-task)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-22T21:42:52.504Z
+  Last init success: 2026-09-22T21:42:57.598Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmud7a5xbw0 · started 2026-09-22T21:42:52.031Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 7 recorded (newest last)
+  ⚠⚠ 3 of 7 process kills landed on an OTA-apply boot
+  • 2026-09-19T20:02:55.215Z (4420m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room outpost_quarters · screen exploration
+      last checkpoint: rendered · 31ms into the action · alive 787ms after it
+      launch: died 27074407ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r1/l0/p1/dn0
+  • 2026-09-19T20:45:42.388Z (4377m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-20T01:42:10.103Z (4081m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1853-the-ring-learns-who · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet) — begun 4m before the last sign of life; treat the action label as stale, not as the killer
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: appstate:inactive→background · 262490ms into the action · alive 0ms after it
+      launch: died 803123ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 147ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o2/r2/l0/p1/dn0
+  • 2026-09-21T21:31:59.422Z (1451m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "roll"
+      doing: tap "roll" · room iskan_veil · screen exploration
+      last checkpoint: appstate:inactive→background · 28194ms into the action · alive 0ms after it
+      launch: died 196203ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o3/r3/l0/p1/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:34:21.255Z (1449m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: action "craft Mudstone"
+      doing: action "craft Mudstone" · room iskan_veil · screen crafting
+      last checkpoint: appstate:inactive→background · 17512ms into the action · alive 0ms after it
+      launch: died 140411ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:35:12.282Z (1448m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: appstate:inactive→background · 49867ms into the action · alive 0ms after it
+      launch: died 49901ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-22T21:42:49.444Z (0m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-22-1870-the-road-belongs-to-the-next-task · stage appstate:inactive→background
+      Process died with no orderly exit while: action "investigate Gale Binder Wand"
+      doing: action "investigate Gale Binder Wand" · room cradle_of_dusk · screen exploration
+      last checkpoint: appstate:inactive→background · 52501ms into the action · alive 0ms after it
+      launch: died 1860846ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 120ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o2/r2/l0/p1/dn0)
+      its own model ledger at the last stamp: o4/r3/l1/p1/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: action "investigate Gale Binder Wand"
+     Where: cradle_of_dusk on exploration screen
+     Last seen alive: 2026-09-22T21:42:49.444Z (0 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:inactive→background (+52501ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  ⚠ Native queue admission: 30 jobs · worst wait 3.6s (cognition) · 1 past 3s
+  App state trail: active
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 28MB · last 28MB · net +16MB over 4 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=inactive · native idle q0 · warns 0
+     +0.1s appstate [inactive→active] — heap 12MB gc 0ms/4 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/11 · ctx 0 · app=active · native voice running q1 · warns 0
+    +10.0s heap-move — heap 28MB gc 0ms/65 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  Present but not yet read this session — no snapshot has been primed.
+  ⚠ NOT a reading of zero.
+Touch path
+  prior boot:
+  2026-09-22T21:38:55.350Z #346 root p=G exploration
+  2026-09-22T21:38:55.351Z #347 modal p=G exploration
+  2026-09-22T21:38:55.845Z #348 root p=G exploration
+  2026-09-22T21:38:55.849Z #349 modal p=G exploration
+  2026-09-22T21:38:55.849Z #349 in gather:all:scrap p=G exploration
+  2026-09-22T21:38:55.993Z #349 enter gather:all:scrap p=G exploration
+  2026-09-22T21:38:55.997Z #349 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:38:55.998Z #349 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:38:56.022Z #349 done gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:38:57.083Z #350 root p=G exploration
+  2026-09-22T21:38:57.087Z #351 modal p=G exploration
+  2026-09-22T21:38:57.087Z #351 in gather:chain hook p=G exploration
+  2026-09-22T21:38:57.210Z #351 enter gather:chain hook p=G exploration
+  2026-09-22T21:38:57.212Z #351 admit gather:chain hook (investigate) p=G exploration
+  2026-09-22T21:38:57.212Z #351 dispatch gather:chain hook (investigate) p=G exploration
+  2026-09-22T21:38:57.212Z #351 dispatch sheet:deferred (dismiss-wait-armed) ⏱+400ms p=G exploration
+  2026-09-22T21:38:57.213Z #351 done gather:chain hook (investigate) p=G exploration
+  2026-09-22T21:38:57.629Z #351 dispatch sheet:deferred (fallback-release) p=none exploration
+  2026-09-22T21:39:04.812Z #352 root p=none exploration
+  2026-09-22T21:39:04.817Z #352 content controls p=none exploration
+  2026-09-22T21:39:04.817Z #352 in quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:04.911Z #352 enter quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:04.915Z #352 admit quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:04.915Z #352 dispatch quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:05.000Z #352 done quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:05.696Z #353 root p=none exploration
+  2026-09-22T21:39:05.700Z #353 content controls p=none exploration
+  2026-09-22T21:39:07.162Z #354 root p=none exploration
+  2026-09-22T21:39:07.167Z #354 content controls p=none exploration
+  2026-09-22T21:39:08.513Z #355 root p=none exploration
+  2026-09-22T21:39:08.517Z #355 content controls p=none exploration
+  2026-09-22T21:39:13.147Z #356 root p=none exploration
+  2026-09-22T21:39:13.151Z #356 content controls p=none exploration
+  2026-09-22T21:39:13.151Z #356 in quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:13.261Z #356 enter quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:13.265Z #356 admit quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:13.265Z #356 dispatch quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:13.341Z #356 done quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:13.963Z #357 root p=none exploration
+  2026-09-22T21:39:13.967Z #357 content controls p=none exploration
+  2026-09-22T21:39:15.363Z #358 root p=none exploration
+  2026-09-22T21:39:15.367Z #358 content controls p=none exploration
+  2026-09-22T21:39:18.747Z #359 root p=none exploration
+  2026-09-22T21:39:18.752Z #359 content controls p=none exploration
+  2026-09-22T21:39:18.752Z #359 in quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:18.861Z #359 enter quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:18.866Z #359 admit quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:18.866Z #359 dispatch quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:18.941Z #359 done quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:19.580Z #360 root p=none exploration
+  2026-09-22T21:39:19.584Z #360 content controls p=none exploration
+  2026-09-22T21:39:20.880Z #361 root p=none exploration
+  2026-09-22T21:39:20.885Z #361 content controls p=none exploration
+  2026-09-22T21:39:22.330Z #362 root p=none exploration
+  2026-09-22T21:39:22.335Z #362 content controls p=none exploration
+  2026-09-22T21:39:24.731Z #363 root p=none exploration
+  2026-09-22T21:39:24.735Z #363 content controls p=none exploration
+  2026-09-22T21:39:24.736Z #363 in quick:dodge p=none exploration
+  2026-09-22T21:39:24.845Z #363 enter quick:dodge p=none exploration
+  2026-09-22T21:39:24.849Z #363 admit quick:dodge (callback) p=none exploration
+  2026-09-22T21:39:24.849Z #363 dispatch quick:dodge (callback) p=none exploration
+  2026-09-22T21:39:24.890Z #363 done quick:dodge (callback) p=none exploration
+  2026-09-22T21:39:25.498Z #364 root p=none exploration
+  2026-09-22T21:39:25.502Z #364 content controls p=none exploration
+  2026-09-22T21:39:25.502Z #364 in quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:25.628Z #364 enter quick:touch wand ✦ p=none exploration
+  2026-09-22T21:39:25.633Z #364 admit quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:25.633Z #364 dispatch quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:25.710Z #364 done quick:touch wand ✦ (callback) p=none exploration
+  2026-09-22T21:39:26.580Z #365 root p=none exploration
+  2026-09-22T21:39:26.585Z #365 content controls p=none exploration
+  2026-09-22T21:39:27.864Z #366 root p=none exploration
+  2026-09-22T21:39:27.868Z #366 content controls p=none exploration
+  2026-09-22T21:39:29.130Z #367 root p=none exploration
+  2026-09-22T21:39:29.134Z #367 content controls p=none exploration
+  2026-09-22T21:39:30.630Z #368 root p=none exploration
+  2026-09-22T21:39:30.635Z #368 content controls p=none exploration
+  2026-09-22T21:40:33.031Z #369 root p=none exploration
+  2026-09-22T21:40:33.032Z #369 content controls p=none exploration
+  2026-09-22T21:40:33.032Z #369 in quick:investigate p=none exploration
+  2026-09-22T21:40:33.197Z #369 enter quick:investigate p=none exploration
+  2026-09-22T21:40:33.197Z #369 admit quick:investigate (callback) p=none exploration
+  2026-09-22T21:40:33.197Z #369 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T21:40:33.197Z #369 done quick:investigate (callback) p=none exploration
+  2026-09-22T21:40:34.230Z #370 root p=S exploration
+  2026-09-22T21:40:34.231Z #371 modal p=S exploration
+  2026-09-22T21:40:34.231Z #371 in search:fog cloud p=S exploration
+  2026-09-22T21:40:34.413Z #371 enter search:fog cloud p=S exploration
+  2026-09-22T21:40:34.414Z #371 admit search:fog cloud (chip) p=S exploration
+  2026-09-22T21:40:34.414Z #371 dispatch search:fog cloud (chip) p=S exploration
+  2026-09-22T21:40:34.414Z #371 dispatch sheet:deferred (dismiss-wait-armed) ⏱+400ms p=S exploration
+  2026-09-22T21:40:34.414Z #371 done search:fog cloud (chip) p=S exploration
+  2026-09-22T21:40:34.817Z #371 dispatch sheet:deferred (fallback-release) p=none exploration
+  2026-09-22T21:40:38.968Z #372 root p=none exploration
+  2026-09-22T21:40:38.972Z #372 content controls p=none exploration
+  2026-09-22T21:40:38.972Z #372 in quick:approach p=none exploration
+  2026-09-22T21:40:39.115Z #372 enter quick:approach p=none exploration
+  2026-09-22T21:40:39.119Z #372 admit quick:approach (callback) p=none exploration
+  2026-09-22T21:40:39.119Z #372 dispatch quick:approach (callback) p=none exploration
+  2026-09-22T21:40:39.175Z #372 done quick:approach (callback) p=none exploration
+  2026-09-22T21:41:09.053Z #373 root p=none exploration
+  2026-09-22T21:41:09.057Z #373 content controls p=none exploration
+  2026-09-22T21:41:09.058Z #373 in quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:09.217Z #373 enter quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:09.221Z #373 admit quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:09.221Z #373 dispatch quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:09.302Z #373 done quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:10.151Z #374 root p=none exploration
+  2026-09-22T21:41:10.154Z #374 content controls p=none exploration
+  2026-09-22T21:41:11.569Z #375 root p=none exploration
+  2026-09-22T21:41:11.574Z #375 content controls p=none exploration
+  2026-09-22T21:41:12.953Z #376 root p=none exploration
+  2026-09-22T21:41:12.958Z #376 content controls p=none exploration
+  2026-09-22T21:41:14.354Z #377 root p=none exploration
+  2026-09-22T21:41:14.358Z #377 content controls p=none exploration
+  2026-09-22T21:41:16.904Z #378 root p=none exploration
+  2026-09-22T21:41:16.906Z #378 content controls p=none exploration
+  2026-09-22T21:41:16.907Z #378 in quick:investigate p=none exploration
+  2026-09-22T21:41:17.018Z #378 enter quick:investigate p=none exploration
+  2026-09-22T21:41:17.020Z #378 admit quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:17.020Z #378 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:17.020Z #378 done quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:23.357Z #379 root p=S exploration
+  2026-09-22T21:41:23.361Z #380 modal p=S exploration
+  2026-09-22T21:41:23.362Z #380 in search:fog cloud p=S exploration
+  2026-09-22T21:41:23.455Z #380 enter search:fog cloud p=S exploration
+  2026-09-22T21:41:23.459Z #380 admit search:fog cloud (chip) p=S exploration
+  2026-09-22T21:41:23.459Z #380 dispatch search:fog cloud (chip) p=S exploration
+  2026-09-22T21:41:23.459Z #380 dispatch sheet:deferred (dismiss-wait-armed) ⏱+400ms p=S exploration
+  2026-09-22T21:41:23.459Z #380 done search:fog cloud (chip) p=S exploration
+  2026-09-22T21:41:23.873Z #380 dispatch sheet:deferred (fallback-release) p=none exploration
+  2026-09-22T21:41:24.986Z #381 root p=none exploration
+  2026-09-22T21:41:24.987Z #381 content controls p=none exploration
+  2026-09-22T21:41:24.987Z #381 in quick:take / salvage p=none exploration
+  2026-09-22T21:41:25.086Z #381 enter quick:take / salvage p=none exploration
+  2026-09-22T21:41:25.087Z #381 admit quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:25.087Z #381 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:25.087Z #381 done quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:28.573Z #382 root p=G exploration
+  2026-09-22T21:41:28.578Z #383 modal p=G exploration
+  2026-09-22T21:41:28.579Z #383 in gather:all:scrap p=G exploration
+  2026-09-22T21:41:28.705Z #383 enter gather:all:scrap p=G exploration
+  2026-09-22T21:41:28.709Z #383 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:28.709Z #383 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:28.719Z #383 done gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:32.525Z #384 root p=none exploration
+  2026-09-22T21:41:32.529Z #384 content controls p=none exploration
+  2026-09-22T21:41:32.530Z #384 in travel:→ ? p=none exploration
+  2026-09-22T21:41:32.639Z #384 enter travel:→ ? p=none exploration
+  2026-09-22T21:41:32.642Z #384 admit travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:32.642Z #384 dispatch travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:32.668Z #384 done travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:35.291Z #385 root p=none exploration
+  2026-09-22T21:41:35.295Z #385 content controls p=none exploration
+  2026-09-22T21:41:35.296Z #385 in quick:investigate p=none exploration
+  2026-09-22T21:41:35.422Z #385 enter quick:investigate p=none exploration
+  2026-09-22T21:41:35.426Z #385 admit quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:35.426Z #385 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:35.427Z #385 done quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:36.040Z #386 root p=S exploration
+  2026-09-22T21:41:36.042Z #387 modal p=S exploration
+  2026-09-22T21:41:36.042Z #387 in search:all p=S exploration
+  2026-09-22T21:41:36.181Z #387 enter search:all p=S exploration
+  2026-09-22T21:41:36.184Z #387 admit search:all (bulk) p=S exploration
+  2026-09-22T21:41:36.184Z #387 dispatch search:all (bulk) p=S exploration
+  2026-09-22T21:41:36.184Z #387 done search:all (bulk) p=S exploration
+  2026-09-22T21:41:37.425Z #388 root p=none exploration
+  2026-09-22T21:41:37.432Z #388 content controls p=none exploration
+  2026-09-22T21:41:37.433Z #388 in quick:take / salvage p=none exploration
+  2026-09-22T21:41:37.555Z #388 enter quick:take / salvage p=none exploration
+  2026-09-22T21:41:37.558Z #388 admit quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:37.558Z #388 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:37.558Z #388 done quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:38.571Z #389 root p=G exploration
+  2026-09-22T21:41:38.572Z #390 modal p=G exploration
+  2026-09-22T21:41:38.572Z #390 in gather:all:gear p=G exploration
+  2026-09-22T21:41:38.704Z #390 enter gather:all:gear p=G exploration
+  2026-09-22T21:41:38.705Z #390 admit gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:38.705Z #390 dispatch gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:38.707Z #390 done gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:39.355Z #391 root p=G exploration
+  2026-09-22T21:41:39.356Z #392 modal p=G exploration
+  2026-09-22T21:41:39.356Z #392 in gather:all:scrap p=G exploration
+  2026-09-22T21:41:39.506Z #392 enter gather:all:scrap p=G exploration
+  2026-09-22T21:41:39.511Z #392 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:39.511Z #392 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:39.528Z #392 done gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:41.075Z #393 root p=none exploration
+  2026-09-22T21:41:41.079Z #393 content controls p=none exploration
+  2026-09-22T21:41:41.080Z #393 in travel:→ ? p=none exploration
+  2026-09-22T21:41:41.223Z #393 enter travel:→ ? p=none exploration
+  2026-09-22T21:41:41.226Z #393 admit travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:41.226Z #393 dispatch travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:41.260Z #393 done travel:→ ? (navigation) p=none exploration
+  2026-09-22T21:41:42.575Z #394 root p=none exploration
+  2026-09-22T21:41:42.580Z #394 content controls p=none exploration
+  2026-09-22T21:41:42.580Z #394 in quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:42.723Z #394 enter quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:42.727Z #394 admit quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:42.727Z #394 dispatch quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:42.823Z #394 done quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:43.558Z #395 root p=none exploration
+  2026-09-22T21:41:43.563Z #395 content controls p=none exploration
+  2026-09-22T21:41:44.992Z #396 root p=none exploration
+  2026-09-22T21:41:44.996Z #396 content controls p=none exploration
+  2026-09-22T21:41:46.091Z #397 root p=none exploration
+  2026-09-22T21:41:46.096Z #397 content controls p=none exploration
+  2026-09-22T21:41:47.433Z #398 root p=none exploration
+  2026-09-22T21:41:47.436Z #398 content controls p=none exploration
+  2026-09-22T21:41:48.826Z #399 root p=none exploration
+  2026-09-22T21:41:48.830Z #399 content controls p=none exploration
+  2026-09-22T21:41:51.194Z #400 root p=none exploration
+  2026-09-22T21:41:51.198Z #400 content controls p=none exploration
+  2026-09-22T21:41:51.198Z #400 in quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:51.341Z #400 enter quick:🔥 scrap-welded cu p=none exploration
+  2026-09-22T21:41:51.345Z #400 admit quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:51.345Z #400 dispatch quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:51.432Z #400 done quick:🔥 scrap-welded cu (callback) p=none exploration
+  2026-09-22T21:41:54.327Z #401 root p=none exploration
+  2026-09-22T21:41:54.331Z #401 content controls p=none exploration
+  2026-09-22T21:41:54.331Z #401 in quick:investigate p=none exploration
+  2026-09-22T21:41:54.441Z #401 enter quick:investigate p=none exploration
+  2026-09-22T21:41:54.445Z #401 admit quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:54.445Z #401 dispatch quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:54.446Z #401 done quick:investigate (callback) p=none exploration
+  2026-09-22T21:41:55.142Z #402 root p=S exploration
+  2026-09-22T21:41:55.144Z #403 modal p=S exploration
+  2026-09-22T21:41:55.144Z #403 in search:all p=S exploration
+  2026-09-22T21:41:55.273Z #403 enter search:all p=S exploration
+  2026-09-22T21:41:55.275Z #403 admit search:all (bulk) p=S exploration
+  2026-09-22T21:41:55.275Z #403 dispatch search:all (bulk) p=S exploration
+  2026-09-22T21:41:55.275Z #403 done search:all (bulk) p=S exploration
+  2026-09-22T21:41:56.693Z #404 root p=none exploration
+  2026-09-22T21:41:56.697Z #404 content controls p=none exploration
+  2026-09-22T21:41:56.698Z #404 in quick:take / salvage p=none exploration
+  2026-09-22T21:41:56.824Z #404 enter quick:take / salvage p=none exploration
+  2026-09-22T21:41:56.825Z #404 admit quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:56.825Z #404 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:56.826Z #404 done quick:take / salvage (callback) p=none exploration
+  2026-09-22T21:41:57.857Z #405 root p=G exploration
+  2026-09-22T21:41:57.857Z #406 modal p=G exploration
+  2026-09-22T21:41:57.857Z #406 in gather:all:gear p=G exploration
+  2026-09-22T21:41:58.023Z #406 enter gather:all:gear p=G exploration
+  2026-09-22T21:41:58.023Z #406 admit gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:58.023Z #406 dispatch gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:58.025Z #406 done gather:all:gear (bulk) p=G exploration
+  2026-09-22T21:41:58.726Z #407 root p=G exploration
+  2026-09-22T21:41:58.731Z #408 modal p=G exploration
+  2026-09-22T21:41:59.309Z #409 root p=G exploration
+  2026-09-22T21:41:59.313Z #410 modal p=G exploration
+  2026-09-22T21:41:59.314Z #410 in gather:all:scrap p=G exploration
+  2026-09-22T21:41:59.441Z #410 enter gather:all:scrap p=G exploration
+  2026-09-22T21:41:59.445Z #410 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:59.445Z #410 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:41:59.470Z #410 done gather:all:scrap (bulk) p=G exploration
+  2026-09-22T21:42:01.543Z #411 root p=none exploration
+  this boot:
+  2026-09-22T21:43:00.361Z #1 root p=none exploration
+  2026-09-22T21:43:01.696Z #2 root p=none exploration
+  2026-09-22T21:43:02.862Z #3 root p=none exploration
+  2026-09-22T21:43:03.464Z #4 root p=none exploration
+  2026-09-22T21:43:05.097Z #5 root p=none exploration
+  2026-09-22T21:43:05.097Z #6 modal p=none exploration
+  2026-09-22T21:43:06.530Z #7 root p=none exploration
+  2026-09-22T21:43:06.530Z #8 modal p=none exploration
+  2026-09-22T21:43:10.281Z #9 root p=none exploration
+  2026-09-22T21:43:10.281Z #10 modal p=none exploration
+  2026-09-22T21:43:10.282Z #10 in report:send p=none exploration
+  2026-09-22T21:43:10.395Z #10 enter report:send p=none exploration
+  2026-09-22T21:43:10.395Z #10 admit report:send (described) p=none exploration
+  2026-09-22T21:43:10.395Z #10 dispatch report:send (described) p=none exploration
+  2026-09-22T21:43:10.396Z #10 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Permannu)
+  HP: 50/59  Stamina: 11/16  TC: 92  Corruption: 13
+  Pack: 108 distinct rows / 392 total
+  Dog: Salt (Mutt) loyalty 80 HP 17/17
+
+Weapons (20)
+  Aetheric Touch Wand (1d6 aetheric, dur 33/45, equipped:off, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, unequip:off, use, repair
+  Aetheric Touch Wand (1d6 aetheric, dur 17/17, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 4/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 29/29, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Energy Blade (Uncommon, 1d8 burn, dur 43/43, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 25/25, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 15/15, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 13/13, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant Bone Longbow (1d8 piercing, dur 32/32, [weapon,ranged,two_handed,bow,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Humming Bolt-Rig (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Iron Spear (1d8 piercing, dur 26/26, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Lightfoot Dash Wand (1d6 aetheric, dur 20/20, [runecaster,rune_power,aetheric,buff])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetized Rod (1d6 electrical, dur 25/25, [weapon,melee,single_handed,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 31/31, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Long Axe (1d8 slashing, dur 26/26, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rail Saber (1d8 electrical, dur 40/40, [weapon,melee,two_handed,energy,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rust-Eaten Halberd (Uncommon, dur 25/25, 1d8 slashing, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing True Tartarians Scrap-Welded Cudgel (Legendary, +1d4 burn coat, dur 27/35, equipped:main, 2d6 slashing, resist:degradation, unique, [fused,unique,faction_gear,true_tartarians,degradation])
+    actions: equip:off, unequip:main, use(off), repair
+  Veilkeeper Blades (Legendary, dur 53/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+
+Armor (12)
+  Aether-Walker's Cape (dur 23/24, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, repair, drop
+  Aetheric Scout Greaves (dur 24/24, equipped:legs, AC +1 · Resists: aetheric · Regen: +1 stamina per action · WIS +1, [armor,legs,greaves,tartarian_giants])
+    actions: unequip:legs
+  Architect's Mask of Vision (dur 27/27, AC +1 · Resists: slashing · INT +1, [armor,head,mask,face,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Architect's Outer Mantle (dur 18/18, AC +1 · HP +1, [armor,cloak,outer,architectural_sentinels])
+    actions: equip:cloak, use, scrap, drop
+  Echoing Steps Boots (dur 27/29, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet, repair
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 27/28, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest, repair
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 7/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Scale-Lapped Visor (Rare, dur 32/35, equipped:head, AC+3, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:head, repair
+  Sentinel's Chestplate (dur 15/15, AC +2 · HP +10 · STR +2, [armor,chest,plate,architectural_sentinels])
+    actions: equip:chest, use, scrap, drop
+  Sentinel's Gauntlets (dur 11/17, AC +2 · HP +5 · STR +2, [armor,hands,gauntlets,architectural_sentinels])
+    actions: equip:hands, use, scrap, repair, drop
+
+Amulets & Rings (3)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (12)
+  Blue Aetheric Fungus ×3 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blue Cap Mushroom ×4 ([food,foraged,mushroom,blue])
+    actions: use(eat), drop
+  Blueberries (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Field Dressing ×5 ([healing,crafted])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted,climb_top])
+    actions: use(apply), drop
+  Forager's Stew ×4 (Uncommon, [food,cooked,stew])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ×2 ([alcohol,drink])
+    actions: use(drink), drop
+  Smoke-Cured Jerky Strip ×6 ([food,treat,dog_treat])
+    actions: use(eat), drop
+  Trail Rations ×2 ([food])
+    actions: use(eat), drop
+  Trail Rations ([food,gift])
+    actions: use(eat), drop
+  Wild Carrot ×6 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Lettuce ×5 ([food,foraged,leafy])
+    actions: use(eat), drop
+
+Coatings (3)
+  Acid Flask ×10 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Incendiary Paste ×2 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Searing Paste ×12 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (6)
+  Aetheric Compass ×2 (Uncommon, dur 25/25, +1 WIS (passive), [detection,navigation,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 105/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (49)
+  Aether Crystal ×11 ([aether,crystal])
+    actions: drop
+  Aether Crystal ([aether,crystal])
+    actions: drop
+  Aether Dust ×3 ([aether,dust,distillable])
+    actions: drop
+  Aether Mud ([mud,aether])
+    actions: drop
+  Aether Wing ([organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Cloth (Rare, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Dust (Uncommon, [aether,loot,bonus])
+    actions: scrap, drop
+  Aetheric Shard ×5 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetheric Shard ×3 (Uncommon, [aether,shard,crystal])
+    actions: drop
+  Automaton Circuit ×13 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×17 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail ×2 ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ×5 ([thrown,stone,improvised,heavy])
+    actions: drop
+  Blank Runecaster Casing (Common) ×2 ([runecaster,casing,blank,loot])
+    actions: drop
+  Bone Fragment ×2 ([bone,junk,scrap])
+    actions: drop
+  Bone Sliver ([bone,junk,scrap])
+    actions: drop
+  ◆ Chipped Phial Neck (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  Cloth Scrap ×2 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Coarse Canvas Patch (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Corroded Hinge Set ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Crystalline Echo ([crystal,aether,trophy,loot])
+    actions: scrap, save-for-fusion, drop
+  Fire Essence (Uncommon, [aether,alchemy,burn,loot])
+    actions: scrap, drop
+  Firewood ([wood,fuel,campfire,weightless])
+    actions: scrap, drop
+  ◆ Flint-and-Twine Bundle ([trophy,fiber,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Frayed Rigging Twine (♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  ◆ Glass-Beaded Strap (Uncommon, [trophy,crystal,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Knotted Sinew Braid ([trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  Kraken Ink (Legendary, stolen, [organic,boss,legendary])
+    actions: scrap, drop
+  ◆ Mortar-Bound Cobble ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Mud Cloth ×2 (Uncommon, [trophy,loot,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Essence (Uncommon, [mud,aether])
+    actions: scrap, drop
+  Mud Fragment ×30 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  Patched Cloth ×3 ([fiber,cloth,loot])
+    actions: drop
+  ◆ River-Worn Pebble Set (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Salamander Scale ×2 (Uncommon, [organic,scale,burn,aether,loot])
+    actions: scrap, drop
+  Scrap Metal ×33 ([metal])
+    actions: drop
+  Scrap Metal ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  ◆ Slate-Weighted Netting ×2 ([trophy,fiber,stone])
+    actions: scrap, save-for-fusion, drop
+  Small Rock ([thrown,stone,improvised])
+    actions: drop
+  Smooth Stone ×14 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×2 ([organic,fiber])
+    actions: drop
+  Spider Silk ([fiber,organic])
+    actions: drop
+  Stick ×21 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Verdigris Bell Fragment ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Wasp Venom ([organic,alchemy,poison,venom,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Waxed Yarn Bundle (♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  Worn Tartarian Coin ×81 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (1)
+  Eternal Dynasty Sigil ([sigil,eternal_dynasty,keepsake])
+    actions: drop
+
+Quest Items (2)
+  Folded Note ([note,quest,lore,improvised])
+    actions: drop
+  Iskan-Veil Core (Legendary, [quest,aetheric_core,main_quest,cloth])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 388 of 3847 entries; older trimmed to fit a single email paste)
+
+[2026-09-22T21:42:59.580Z] [debug] send-log: crash on record (2026-09-22T21:42:49.444Z) — game log pushed automatically, delivered to Sentry, #mud7abi7aswl cleared from disk
+[2026-09-22T21:42:59.198Z] [debug] boot: life bmud7a5xbw0 started 2026-09-22T21:42:52.031Z · not an OTA apply (no handoff on disk)
+[2026-09-22T21:42:59.198Z] [debug] missions: · at=cradle_of_dusk travelTo=hidden_market
+[2026-09-22T21:42:59.198Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-22T21:42:59.198Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-22T21:42:59.198Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-22T21:42:59.197Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token
+[2026-09-22T21:42:59.196Z] [debug] ═══ SESSION 2026-09-22T21:42:59.194Z · build 2026-09-22-1870-the-road-belongs-to-the-next-task · previous entry moments earlier ═══
+[2026-09-22T21:42:59.068Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Permannu. I kept watch while you were gone."
+[2026-09-22T21:42:59.068Z] [world] You step back into Cradle of Dusk. The world waits for your move.
+[2026-09-22T21:42:59.067Z] [debug] OTA session start: 2026-09-22-1870-the-road-belongs-to-the-next-task.
+[2026-09-22T21:42:57.459Z] [debug] voice⏱ gap 1217ms (wait 100ms + synth 1115ms, live) "Choose your character."
+[2026-09-22T21:42:56.199Z] [debug] voice: bundled ready
+[2026-09-22T21:42:52.622Z] [debug] voice: bundled loading
+[2026-09-22T21:42:52.622Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-22T21:42:52.488Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T21:42:52.488Z] [debug] ota: Already up to date
+[2026-09-22T21:42:52.196Z] [debug] native-sdk verdict: answered false
+[2026-09-22T21:42:52.196Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-22T21:42:52.163Z] [debug] appstate: inactive → active (was inactive for 99ms)
+[2026-09-22T21:42:52.073Z] [debug] ota: Checking…
+[2026-09-22T21:42:52.073Z] [debug] ota: boot check — enabled=true channel=preview rt=2.5.0 updateId=01a0caf0-9c9c-7a38-a777-9c3ac9b9e045
+[2026-09-22T21:42:45.811Z] [debug] appstate: active → inactive (was active for 588425ms)
+[2026-09-22T21:42:18.586Z] [debug] homework: scene_intro "The Slack Flats" ✓ 10652ms
+[2026-09-22T21:42:18.564Z] [debug] qwen⏱ narration:scene_intro_fill ok 10577ms read 9806ms/write 758ms in 730t→out 33t thr1 13.4ms/t HIT-CAP (172ch)
+[2026-09-22T21:42:07.935Z] [debug] homework: intro-fill armed after 8256ms idle
+[2026-09-22T21:41:59.470Z] [reward]     • Verdigris Bell Fragment (Common)
+[2026-09-22T21:41:59.469Z] [reward]     • Scrap Metal x6 (Common)
+[2026-09-22T21:41:59.469Z] [reward] ✦ Salvage haul:
+[2026-09-22T21:41:59.469Z] [world] Behind the scale, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-09-22T21:41:59.468Z] [world] You strip the mast carefully. Something usable comes free in your hand.
+[2026-09-22T21:41:59.468Z] [world] You work the flooded chest apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-22T21:41:59.468Z] [world] You break the flood lantern apart. Among the pieces, something worth keeping.
+[2026-09-22T21:41:59.467Z] [world] You strip the dust-buried fallen sentinel husk carefully. Something usable comes free in your hand.
+[2026-09-22T21:41:59.465Z] [reward] ✦ The Giant's Watch's story is complete — every fragment recovered.
+[2026-09-22T21:41:59.464Z] [reward] ✦ Found Fourth Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-09-22T21:41:58.200Z] [debug] qwen⏱ investigate_lore ok 1180ms read 329ms/write 829ms in 129t→out 42t thr2 2.6ms/t (168ch)
+[2026-09-22T21:41:58.025Z] [reward] ✦ Architect's Mask of Vision (Common).
+[2026-09-22T21:41:58.025Z] [world] You turn the Architect's Mask of Vision over once, then keep it.
+[2026-09-22T21:41:58.024Z] [reward] ✦ Gale Binder Wand (Common).
+[2026-09-22T21:41:58.024Z] [world] The Gale Binder Wand fits the hand better than it has any right to.
+[2026-09-22T21:41:57.021Z] [cognitive] neutral  (60ms)
+[2026-09-22T21:41:56.959Z] [world] You study the Gale Binder Wand and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-22T21:41:56.958Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=gale binder wand resolved=Gale Binder Wand range=- enemies=0 hooks=1
+[2026-09-22T21:41:56.958Z] [player] investigate Gale Binder Wand
+[2026-09-22T21:41:56.823Z] [debug] ui: tap "take / salvage"
+[2026-09-22T21:41:55.805Z] [cognitive] CLIMB  (48ms)
+[2026-09-22T21:41:55.735Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T21:41:55.735Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T21:41:55.735Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-22T21:41:55.734Z] [reward] You scrape at the silt with the worn tartarian coin. ✦ Recovered Small Rock (Common).
+[2026-09-22T21:41:55.730Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-09-22T21:41:55.729Z] [player] investigate the ground
+[2026-09-22T21:41:54.440Z] [debug] ui: tap "investigate"
+[2026-09-22T21:41:51.420Z] [reward] +7 TC pried from the dust.
+[2026-09-22T21:41:51.419Z] [reward] Aetherbat defeated. You recover Crystalline Echo, Aether Wing.
+[2026-09-22T21:41:51.418Z] [combat] Aetherbat blisters — clinging fire sears 3. (0/15 HP, 2 turns left)
+[2026-09-22T21:41:51.416Z] [debug] parser: intent=attack conf=1.00 verb=attack target=true tartarians scrap welded cudgel resolved=True Tartarians Scrap-Welded Cudgel range=close enemies=1 hooks=1
+[2026-09-22T21:41:51.415Z] [player] attack with the true tartarians scrap-welded cudgel
+[2026-09-22T21:41:51.340Z] [debug] ui: tap "🔥 scrap-welded cudgel ⚔ ★"
+[2026-09-22T21:41:49.934Z] [debug] persist sizes(KB): total=199 player=39 wm=60[rooms=24 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=96 scene=4
+[2026-09-22T21:41:49.838Z] [arbiter] "Tartaria does not award style points," the Arbiter says, eyes on the aetherbat. "End it."
+[2026-09-22T21:41:49.838Z] [combat] Aetherbat — d20 → 5 + ATK 4 = 9 vs your AC 19 — ✗ MISS
+[2026-09-22T21:41:49.837Z] [combat] Searing True Tartarians Scrap-Welded Cudgel — 3 burn bites in and festers (3 turns).
+[2026-09-22T21:41:49.837Z] [combat] Your strike with the searing true tartarians scrap-welded cudgel lands for 14. Aetherbat staggers — 1 HP remaining. It answers.
+[2026-09-22T21:41:49.836Z] [combat] Weakness exposed — Aetherbat flinches. (slashing ×1.5 for 14)
+[2026-09-22T21:41:49.835Z] [combat] You — d20 → 8 + STR 16 − 1 (Whisper Fog) = 23 vs Aetherbat AC 9 — ✓ HIT
+[2026-09-22T21:41:49.835Z] [world] You seize the initiative. Aetherbat has no time to react.
+[2026-09-22T21:41:49.761Z] [debug] dice⏱ coating: shown +66ms, tapped +480ms, settled +821ms = 1367ms
+[2026-09-22T21:41:48.940Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:48.393Z] [debug] dice⏱ damage: shown +64ms, tapped +482ms, settled +819ms = 1365ms
+[2026-09-22T21:41:47.574Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:47.027Z] [debug] dice⏱ attack: shown +64ms, tapped +1599ms, settled +820ms = 2483ms
+[2026-09-22T21:41:46.207Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:44.543Z] [debug] dice⏱ initiative: shown +78ms, tapped +838ms, settled +820ms = 1736ms
+[2026-09-22T21:41:43.723Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:42.808Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:41:42.808Z] [world] You bring the searing true tartarians scrap-welded cudgel to bear on Aetherbat.
+[2026-09-22T21:41:42.806Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:41:42.804Z] [debug] attack: target=Aetherbat range=close reach.bands=[close] reach.label=True Tartarians Scrap-Welded Cudgel bareHand=false
+[2026-09-22T21:41:42.801Z] [debug] parser: intent=attack conf=1.00 verb=attack target=true tartarians scrap welded cudgel resolved=True Tartarians Scrap-Welded Cudgel range=close enemies=1 hooks=1
+[2026-09-22T21:41:42.801Z] [player] attack with the true tartarians scrap-welded cudgel
+[2026-09-22T21:41:42.723Z] [debug] ui: tap "🔥 scrap-welded cudgel ⚔"
+[2026-09-22T21:41:41.257Z] [world] Whatever you turned over here is still turned over.
+[2026-09-22T21:41:41.257Z] [combat] Aetherbat closes — Sonic Scream ready, 1D6 damage on a hit. (range: close)
+[2026-09-22T21:41:41.248Z] [world] Movement low and fast — an Aetherbat cuts across your path. You're closer than either of you wanted to be.
+[2026-09-22T21:41:41.246Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east — 3 tiles, about 8 hours of travel.
+[2026-09-22T21:41:41.243Z] [debug] spawn: gear=[Gale Binder Wand, Architect's Mask of Vision] window=10 roster=new
+[2026-09-22T21:41:41.223Z] [debug] ui: tap "→ ?"
+[2026-09-22T21:41:39.527Z] [reward]     • Knotted Sinew Braid (Common)
+[2026-09-22T21:41:39.527Z] [reward]     • Worn Tartarian Coin x20 (Common)
+[2026-09-22T21:41:39.527Z] [reward] ✦ Salvage haul:
+[2026-09-22T21:41:39.526Z] [world] You salvage the salt-crusted buried reclaimer cache. The take is small but real.
+[2026-09-22T21:41:39.526Z] [world] You work the rusted chest apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-22T21:41:39.526Z] [world] You break the mast apart. Among the pieces, something worth keeping.
+[2026-09-22T21:41:39.161Z] [debug] native queue: 105 jobs · worst wait 4.9s (investigate_lore) · 4 past 3s · running investigate_lore 1.2s
+[2026-09-22T21:41:39.160Z] [debug] qwen⏱ stats — investigate_lore n19 avg2.0s max6.2s read0.6s/write0.7s ⚠1unusable in128t→out34t ms/tok 2.1-13.0 wait0.7s | narration:scene_intro_fill n6 avg6.6s max11.1s read9.8s/write0.7s ⚠4unusable in783t→out22t ms/tok 12.9-12.9 cap4 ⏸2 ✂2/16.5s | item_synthesis_hw n2 avg3.1s max4.9s read2.2s/write0.8s in334t→out44t ms/tok 1.2-12.0 | flourish n1 avg2.4s max2.4s read2.0s/write0.3s in174t→out17t ms/tok 11.7-11.7 | forge_name n1 avg3.5s max3.5s read2.3s/write1.2s in208t→out63t ms/tok 11.2-11.2 cap1 | ambient n1 avg5.0s max5.0s read4.6s in368t→out17t ms/tok 12.5-12.5 ⏸1 ✂1/5.0s || WASTED 3 calls / 21.5s
+[2026-09-22T21:41:39.160Z] [debug] qwen⏱ investigate_lore ok 1181ms read 347ms/write 824ms in 131t→out 42t thr2 2.6ms/t (179ch)
+[2026-09-22T21:41:38.707Z] [reward] ✦ Architect's Outer Mantle (Common).
+[2026-09-22T21:41:38.707Z] [world] The Architect's Outer Mantle is cold through your glove.
+[2026-09-22T21:41:38.706Z] [reward] ✦ Mud Long Axe (Common).
+[2026-09-22T21:41:38.706Z] [world] The Mud Long Axe is lighter than it looks, which is its own kind of warning.
+[2026-09-22T21:41:38.706Z] [reward] ✦ Magnetized Rod (Common).
+[2026-09-22T21:41:38.706Z] [world] The Magnetized Rod is heavier than it looks. Most things down here are.
+[2026-09-22T21:41:37.981Z] [cognitive] SEARCH · TALK  (66ms)
+[2026-09-22T21:41:37.913Z] [world] The Architect's Outer Mantle sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-22T21:41:37.912Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect outer mantle resolved=Architect's Outer Mantle range=- enemies=0 hooks=1
+[2026-09-22T21:41:37.911Z] [player] investigate Architect's Outer Mantle
+[2026-09-22T21:41:37.555Z] [debug] ui: tap "take / salvage"
+[2026-09-22T21:41:36.719Z] [cognitive] CLIMB  (48ms)
+[2026-09-22T21:41:36.650Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T21:41:36.649Z] [world] You scrape at the silt with the worn tartarian coin. Nothing of worth.
+[2026-09-22T21:41:36.646Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-09-22T21:41:36.645Z] [player] investigate the ground
+[2026-09-22T21:41:35.422Z] [debug] ui: tap "investigate"
+[2026-09-22T21:41:32.668Z] [world] A wagon, abandoned and broken-axled, leans into the mud ahead.
+[2026-09-22T21:41:32.667Z] [reward] ✦ Recovered Trail Rations.
+[2026-09-22T21:41:32.666Z] [arbiter] "There's a buried gate two days east," the drifter says, not stopping. "I wouldn't open it."
+[2026-09-22T21:41:32.666Z] [world] A figure trudges toward you across the silt — staff, mud-cloak, eyes that have been further than yours.
+[2026-09-22T21:41:32.663Z] [world] You walk south through open silt. The compass points south into open ground.
+[2026-09-22T21:41:32.659Z] [debug] spawn: gear=[Architect's Outer Mantle, Magnetized Rod, Mud Long Axe] window=10 roster=new
+[2026-09-22T21:41:32.639Z] [debug] ui: tap "→ ?"
+[2026-09-22T21:41:28.719Z] [reward]     • Scrap Metal x3 (Common)
+[2026-09-22T21:41:28.718Z] [reward] ✦ Salvage haul:
+[2026-09-22T21:41:28.718Z] [world] You work the chain hook over. A part of it comes loose, intact.
+[2026-09-22T21:41:26.064Z] [debug] qwen⏱ investigate_lore ok 2055ms read 1369ms/write 680ms in 128t→out 35t thr2 10.7ms/t (154ch)
+[2026-09-22T21:41:25.086Z] [debug] ui: tap "take / salvage"
+[2026-09-22T21:41:24.046Z] [debug] persist sizes(KB): total=207 player=38 wm=70[rooms=35 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=95 scene=3
+[2026-09-22T21:41:23.989Z] [cognitive] neutral  (39ms)
+[2026-09-22T21:41:23.926Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T21:41:23.926Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-22T21:41:23.925Z] [world] You take the measure of the fog cloud. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-22T21:41:23.920Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fog cloud resolved=fog cloud range=- enemies=0 hooks=0
+[2026-09-22T21:41:23.919Z] [player] investigate fog cloud
+[2026-09-22T21:41:17.018Z] [debug] ui: tap "investigate"
+[2026-09-22T21:41:15.377Z] [arbiter] The Arbiter looks around. "Walk among the statues. Do not touch them. They were people, very recently in their own time."
+[2026-09-22T21:41:15.364Z] [reward] +2 TC pried from the dust.
+[2026-09-22T21:41:15.363Z] [reward] Mud Wasp defeated. You recover Wasp Venom.
+[2026-09-22T21:41:15.362Z] [combat] Your blow with the searing true tartarians scrap-welded cudgel lands clean — 12 damage. Mud Wasp crumples in the dust. The Aetherstone settles.
+[2026-09-22T21:41:15.362Z] [combat] You — d20 → 13 + STR 16 − 1 (Whisper Fog) = 28 vs Mud Wasp AC 8 — ✓ HIT
+[2026-09-22T21:41:15.361Z] [world] You seize the initiative. Mud Wasp has no time to react.
+[2026-09-22T21:41:15.289Z] [debug] dice⏱ coating: shown +54ms, tapped +519ms, settled +820ms = 1393ms
+[2026-09-22T21:41:14.469Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:13.895Z] [debug] dice⏱ damage: shown +59ms, tapped +503ms, settled +811ms = 1373ms
+[2026-09-22T21:41:13.084Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:12.521Z] [debug] dice⏱ attack: shown +62ms, tapped +517ms, settled +820ms = 1399ms
+[2026-09-22T21:41:11.701Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:11.121Z] [debug] dice⏱ initiative: shown +27ms, tapped +973ms, settled +820ms = 1820ms
+[2026-09-22T21:41:10.301Z] [debug] ui: tap "roll"
+[2026-09-22T21:41:09.302Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:41:09.302Z] [world] You raise the searing true tartarians scrap-welded cudgel toward Mud Wasp. The room narrows around the both of you.
+[2026-09-22T21:41:09.300Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:41:09.298Z] [debug] attack: target=Mud Wasp range=close reach.bands=[close] reach.label=True Tartarians Scrap-Welded Cudgel bareHand=false
+[2026-09-22T21:41:09.295Z] [debug] parser: intent=attack conf=1.00 verb=attack target=true tartarians scrap welded cudgel resolved=True Tartarians Scrap-Welded Cudgel range=close enemies=1 hooks=0
+[2026-09-22T21:41:09.295Z] [player] attack with the true tartarians scrap-welded cudgel
+[2026-09-22T21:41:09.217Z] [debug] ui: tap "🔥 scrap-welded cudgel ⚔"
+[2026-09-22T21:40:39.175Z] [world] ▸ The Bog Dragon of Old Drakova: this is a later step's ground — not yet. First: find the Drakovan reeve at Drakova — talk it through.
+[2026-09-22T21:40:39.175Z] [combat] Mud Wasp — d20 → 4 + ATK 4 = 8 vs your AC 19 — ✗ MISS
+[2026-09-22T21:40:39.171Z] [world] You close the gap with Mud Wasp. (range: close / arm's reach)
+[2026-09-22T21:40:39.171Z] [debug] move: field advance target=Mud Wasp d 1.50->0.50 band mid->close
+[2026-09-22T21:40:39.169Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-09-22T21:40:39.166Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wasp resolved=Mud Wasp range=mid enemies=1 hooks=0
+[2026-09-22T21:40:39.166Z] [player] approach Mud Wasp
+[2026-09-22T21:40:39.133Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-09-22T21:40:39.115Z] [debug] ui: tap "approach"
+[2026-09-22T21:40:36.579Z] [cognitive] neutral  (1741ms)
+[2026-09-22T21:40:34.835Z] [debug] enemy: Mud Wasp hp=10 ac=8 atk=Poison Sting dmg=1D6 rarity=Common ap=3
+[2026-09-22T21:40:34.835Z] [combat] Mud Wasp — Poison Sting ready, 1D6 damage on a hit.
+[2026-09-22T21:40:34.835Z] [world] Something shifted while you were turned away — a Mud Wasp breaks cover, fast and low. (range: close)
+[2026-09-22T21:40:34.833Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fog cloud resolved=fog cloud range=- enemies=0 hooks=0
+[2026-09-22T21:40:34.833Z] [player] investigate fog cloud
+[2026-09-22T21:40:33.641Z] [debug] homework: scene_intro "Cradle of Dusk" ✓ 785ms
+[2026-09-22T21:40:33.615Z] [debug] qwen⏱ narration:scene_intro_fill ok 693ms read 0ms/write 682ms in 815t→out 34t thr1 HIT-CAP (136ch)
+[2026-09-22T21:40:33.196Z] [debug] ui: tap "investigate"
+[2026-09-22T21:40:32.858Z] [debug] homework: intro-fill armed after 9735ms idle
+[2026-09-22T21:39:59.006Z] [debug] homework: scene_intro "Cradle of Dusk" ✓ 11153ms
+[2026-09-22T21:39:58.978Z] [debug] qwen⏱ narration:scene_intro_fill ok 11089ms read/write unusable (native mis-reported 15357ms/777ms — llama.rn split bug, not this call) in 815t→out 33t thr1 HIT-CAP (147ch)
+[2026-09-22T21:39:50.981Z] [dog_quest] The Arbiter studies the new pair. "Salt, then. The chain is off. The road is open."
+[2026-09-22T21:39:50.981Z] [world] Salt circles three times and curls beside you. His breathing slows to yours.
+[2026-09-22T21:39:50.980Z] [world] A Mutt. Salt. The name settles on the dog like a coat.
+[2026-09-22T21:39:47.854Z] [debug] homework: intro-fill armed after 8704ms idle
+[2026-09-22T21:39:46.035Z] [debug] voice⏱ gap 3197ms (wait 15ms + synth 3175ms, live) "Your journey has led you through the sha…"
+[2026-09-22T21:39:42.887Z] [debug] qwen⏱ ✂ DISCARDED ambient after 4990ms — ambient:preempted
+[2026-09-22T21:39:42.887Z] [debug] arbiter: ambient cut short 5039ms — yielded to the player
+[2026-09-22T21:39:42.859Z] [debug] qwen⏱ ambient preempted 4990ms read 4613ms/write 341ms in 368t→out 17t thr1 12.5ms/t (85ch)
+[2026-09-22T21:39:31.689Z] [arbiter] The Arbiter looks around. "Ships lie where the storms left them, crews intact, frozen mid-gesture."
+[2026-09-22T21:39:31.676Z] [reward] +12 TC pried from the dust.
+[2026-09-22T21:39:31.676Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-09-22T21:39:31.676Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 59). [14 enemies defeated]
+[2026-09-22T21:39:31.675Z] [reward] Reclaimer Deserter defeated. You recover Scrap Metal, Mud Cloth ×2.
+[2026-09-22T21:39:31.673Z] [combat] Final strike with the aetheric touch wand for 14. Reclaimer Deserter is still. The Aetherstone hums on, indifferent.
+[2026-09-22T21:39:31.672Z] [combat] Aetheric flares — +3 on hit.
+[2026-09-22T21:39:31.671Z] [combat] The Aetheric Touch Wand knits you back together — +6 HP.
+[2026-09-22T21:39:31.670Z] [combat] You — d20 → 9 + INT 4 − 1 (Whisper Fog) perfect opening (2× dice) = 12 vs Reclaimer Deserter AC 9 — ✓ HIT
+[2026-09-22T21:39:31.670Z] [combat] Reclaimer Deserter — d20 → 6 + ATK 4 = 10 vs your AC 19 — ✗ MISS
+[2026-09-22T21:39:31.669Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-09-22T21:39:31.599Z] [debug] dice⏱ damage: shown +60ms, tapped +635ms, settled +820ms = 1515ms
+[2026-09-22T21:39:30.779Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:30.082Z] [debug] dice⏱ attack: shown +59ms, tapped +1670ms, settled +820ms = 2549ms
+[2026-09-22T21:39:29.262Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:27.532Z] [debug] dice⏱ initiative: shown +29ms, tapped +976ms, settled +820ms = 1825ms
+[2026-09-22T21:39:26.712Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:25.708Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:39:25.708Z] [world] Your aetheric touch wand comes around in an arc; Reclaimer Deserter squares up to meet it.
+[2026-09-22T21:39:25.705Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-22T21:39:25.705Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:39:25.702Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:39:25.699Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-22T21:39:25.699Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:39:25.628Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:39:24.888Z] [world] ▸ The Bog Dragon of Old Drakova: this is a later step's ground — not yet. First: find the Drakovan reeve at Drakova — talk it through.
+[2026-09-22T21:39:24.887Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:39:24.885Z] [combat] Dodge — d20 → 15 + DEX 12 = 27 vs ATK 22. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T21:39:24.884Z] [combat] Reclaimer Deserter — d20 → 18 + ATK 4 = 22 vs your AC 19 — ✗ EVADED
+[2026-09-22T21:39:24.876Z] [world] You commit to the dodge. Slip Reclaimer Deserter's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T21:39:24.873Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-22T21:39:24.873Z] [player] dodge
+[2026-09-22T21:39:24.845Z] [debug] ui: tap "dodge"
+[2026-09-22T21:39:23.425Z] [debug] persist sizes(KB): total=206 player=38 wm=70[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=95 scene=4
+[2026-09-22T21:39:23.334Z] [combat] Your strike with the aetheric touch wand lands for 3. Reclaimer Deserter staggers — 4 HP remaining. It answers.
+[2026-09-22T21:39:23.332Z] [combat] The Aetheric Touch Wand knits you back together — +5 HP.
+[2026-09-22T21:39:23.331Z] [combat] You — d20 → 15 + INT 4 − 1 (Whisper Fog) = 18 vs Reclaimer Deserter AC 9 — ✓ HIT
+[2026-09-22T21:39:23.331Z] [combat] Reclaimer Deserter — d20 → 12 + ATK 4 = 16 vs your AC 19 — ✗ MISS
+[2026-09-22T21:39:23.330Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-09-22T21:39:23.265Z] [debug] dice⏱ damage: shown +59ms, tapped +537ms, settled +820ms = 1416ms
+[2026-09-22T21:39:22.445Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:21.848Z] [debug] dice⏱ attack: shown +61ms, tapped +434ms, settled +820ms = 1315ms
+[2026-09-22T21:39:21.028Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:20.532Z] [debug] dice⏱ initiative: shown +28ms, tapped +743ms, settled +821ms = 1592ms
+[2026-09-22T21:39:19.711Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:18.941Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:39:18.941Z] [world] Your aetheric touch wand comes around in an arc; Reclaimer Deserter squares up to meet it.
+[2026-09-22T21:39:18.938Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:39:18.936Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:39:18.932Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-22T21:39:18.932Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:39:18.861Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:39:16.403Z] [combat] Reclaimer Deserter deals 4 bludgeoning damage [edge of reach — halved]. You have 32 HP remaining.
+[2026-09-22T21:39:16.368Z] [arbiter] "You hit what you commit to," the Arbiter says. "The reclaimer deserter hears the difference."
+[2026-09-22T21:39:16.368Z] [combat] The aetheric touch wand cuts air. Reclaimer Deserter answers immediately.
+[2026-09-22T21:39:16.367Z] [combat] The Aetheric Touch Wand knits you back together — +2 HP.
+[2026-09-22T21:39:16.366Z] [combat] You — d20 → 1 + INT 4 − 1 (Whisper Fog) = 4 vs Reclaimer Deserter AC 8 — ✗ FUMBLE
+[2026-09-22T21:39:16.366Z] [combat] Reclaimer Deserter — d20 → 17 + ATK 4 = 21 vs your AC 19 — ✓ HIT
+[2026-09-22T21:39:16.364Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-09-22T21:39:16.298Z] [debug] dice⏱ attack: shown +58ms, tapped +570ms, settled +821ms = 1449ms
+[2026-09-22T21:39:15.477Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:14.848Z] [debug] dice⏱ initiative: shown +29ms, tapped +658ms, settled +821ms = 1508ms
+[2026-09-22T21:39:14.027Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:13.341Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:39:13.341Z] [world] You raise the aetheric touch wand toward Reclaimer Deserter. The room narrows around the both of you.
+[2026-09-22T21:39:13.338Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:39:13.336Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:39:13.333Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-22T21:39:13.332Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:39:13.261Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:39:09.552Z] [combat] Reclaimer Deserter is left exposed — easier to hit.
+[2026-09-22T21:39:09.552Z] [combat] Your strike with the aetheric touch wand lands for 7. Reclaimer Deserter staggers — 7 HP remaining. It answers.
+[2026-09-22T21:39:09.551Z] [combat] Aetheric flares — +3 on hit.
+[2026-09-22T21:39:09.551Z] [combat] The Aetheric Touch Wand knits you back together — +3 HP.
+[2026-09-22T21:39:09.550Z] [combat] You — d20 → 17 + INT 4 − 1 (Whisper Fog) = 20 vs Reclaimer Deserter AC 9 — ✓ HIT
+[2026-09-22T21:39:09.549Z] [combat] Reclaimer Deserter — d20 → 3 + ATK 4 = 7 vs your AC 19 — ✗ MISS
+[2026-09-22T21:39:09.548Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-09-22T21:39:09.481Z] [debug] dice⏱ damage: shown +67ms, tapped +495ms, settled +821ms = 1383ms
+[2026-09-22T21:39:08.660Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:08.098Z] [debug] dice⏱ attack: shown +63ms, tapped +566ms, settled +820ms = 1449ms
+[2026-09-22T21:39:07.277Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:06.647Z] [debug] dice⏱ initiative: shown +35ms, tapped +802ms, settled +820ms = 1657ms
+[2026-09-22T21:39:05.827Z] [debug] ui: tap "roll"
+[2026-09-22T21:39:05.000Z] [world] ▸ The Bog Dragon of Old Drakova: this is a later step's ground — not yet. First: find the Drakovan reeve at Drakova — talk it through.
+[2026-09-22T21:39:04.991Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:39:04.991Z] [world] You bring the aetheric touch wand to bear on Reclaimer Deserter.
+[2026-09-22T21:39:04.987Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:39:04.985Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:39:04.982Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=mid enemies=1 hooks=0
+[2026-09-22T21:39:04.981Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:39:04.910Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:38:57.681Z] [dog_quest] You come up on the chain hook, and past it the slag-floor opens out. The Reclaimer Deserter is there, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. "Walk on. This one's not yours."
+[2026-09-22T21:38:57.675Z] [player] investigate chain hook
+[2026-09-22T21:38:56.021Z] [reward]     • Corroded Hinge Set (Common)
+[2026-09-22T21:38:56.021Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-22T21:38:56.018Z] [reward]     • Slate-Weighted Netting (Common)
+[2026-09-22T21:38:56.018Z] [reward]     • Bent Nail (Common)
+[2026-09-22T21:38:56.018Z] [reward] ✦ Salvage haul:
+[2026-09-22T21:38:56.017Z] [world] Tucked inside the sea lantern: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-22T21:38:56.017Z] [world] You salvage the salt-crusted buried reclaimer cache. The take is small but real.
+[2026-09-22T21:38:56.016Z] [world] The rusted anchor gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-09-22T21:38:56.016Z] [world] You break the bell tower apart. Among the pieces, something worth keeping.
+[2026-09-22T21:38:55.293Z] [debug] qwen⏱ investigate_lore ok 2083ms read 1535ms/write 539ms in 129t→out 27t thr2 11.9ms/t (110ch)
+[2026-09-22T21:38:54.760Z] [reward] ✦ Iron Spear (Common).
+[2026-09-22T21:38:54.760Z] [world] Whatever the Iron Spear was lying against, it lets go without much argument.
+[2026-09-22T21:38:54.076Z] [reward] ✦ Rail Saber (Common).
+[2026-09-22T21:38:54.076Z] [world] The Rail Saber had settled into the ground. You unsettle it.
+[2026-09-22T21:38:53.275Z] [debug] persist sizes(KB): total=204 player=37 wm=70[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=94 scene=3
+[2026-09-22T21:38:53.211Z] [cognitive] neutral  (66ms)
+[2026-09-22T21:38:53.143Z] [world] You run a hand along the Rail Saber. Cold, set fast in place, and about as talkative as the rest of the buried world.
+[2026-09-22T21:38:53.142Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rail saber resolved=Rail Saber range=- enemies=0 hooks=0
+[2026-09-22T21:38:53.142Z] [player] investigate Rail Saber
+[2026-09-22T21:38:53.130Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-09-22T21:38:53.009Z] [debug] ui: tap "take / salvage"
+[2026-09-22T21:38:51.989Z] [cognitive] CLIMB  (76ms)
+[2026-09-22T21:38:51.912Z] [system] ⏳ Time passed: 24 min
+[2026-09-22T21:38:51.911Z] [reward] You scrape at the silt with the worn tartarian coin. ✦ Recovered Big Rock (Common).
+[2026-09-22T21:38:51.907Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-09-22T21:38:51.906Z] [player] investigate the ground
+[2026-09-22T21:38:50.625Z] [debug] ui: tap "investigate"
+[2026-09-22T21:38:48.880Z] [combat] Mud Harpy deals 4 slashing damage [armor −35%]. You have 30 HP remaining.
+[2026-09-22T21:38:48.830Z] [arbiter] The Arbiter looks around. "The sky here is bruised with old Aether. It glows at hours that are not dusk."
+[2026-09-22T21:38:48.818Z] [reward] +20 TC pried from the dust.
+[2026-09-22T21:38:48.817Z] [reward] Mud Harpy defeated. You recover Mud Fragment ×3.
+[2026-09-22T21:38:48.816Z] [combat] Your blow with the aetheric touch wand lands clean — 7 damage. Mud Harpy crumples in the dust. The Aetherstone settles.
+[2026-09-22T21:38:48.815Z] [combat] Aetheric flares — +3 on hit.
+[2026-09-22T21:38:48.814Z] [combat] The Aetheric Touch Wand knits you back together — +3 HP.
+[2026-09-22T21:38:48.813Z] [combat] You — d20 → 12 + INT 4 − 1 (Whisper Fog) + 2 (point blank) = 17 vs Mud Harpy AC 11 — ✓ HIT
+[2026-09-22T21:38:48.812Z] [combat] Mud Harpy — d20 → 17 + ATK 7 = 24 vs your AC 19 — ✓ HIT
+[2026-09-22T21:38:48.811Z] [world] Mud Harpy moves first. The pressure is immediate.
+[2026-09-22T21:38:48.746Z] [debug] dice⏱ damage: shown +65ms, tapped +531ms, settled +820ms = 1416ms
+[2026-09-22T21:38:47.926Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:47.330Z] [debug] dice⏱ attack: shown +66ms, tapped +579ms, settled +820ms = 1465ms
+[2026-09-22T21:38:46.509Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:45.863Z] [debug] dice⏱ initiative: shown +35ms, tapped +1253ms, settled +820ms = 2108ms
+[2026-09-22T21:38:45.043Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:43.756Z] [world] ▸ The Bog Dragon of Old Drakova: this is a later step's ground — not yet. First: find the Drakovan reeve at Drakova — talk it through.
+[2026-09-22T21:38:43.756Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:38:43.756Z] [world] You raise the aetheric touch wand toward Mud Harpy. The room narrows around the both of you.
+[2026-09-22T21:38:43.753Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:38:43.750Z] [debug] attack: target=Mud Harpy range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:38:43.746Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=0
+[2026-09-22T21:38:43.746Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:38:43.676Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:38:42.117Z] [arbiter] The Arbiter does not look away from the mud harpy. "Decide quickly. It already has."
+[2026-09-22T21:38:42.117Z] [combat] Mud Harpy — d20 → 5 + ATK 7 = 12 vs your AC 19 — ✗ MISS
+[2026-09-22T21:38:42.115Z] [combat] Mud Harpy is left exposed — easier to hit.
+[2026-09-22T21:38:42.115Z] [combat] Your strike with the aetheric touch wand lands for 9. Mud Harpy staggers — 7 HP remaining. It answers.
+[2026-09-22T21:38:42.114Z] [combat] Aetheric flares — +2 on hit.
+[2026-09-22T21:38:42.114Z] [combat] The Aetheric Touch Wand knits you back together — +2 HP.
+[2026-09-22T21:38:42.113Z] [combat] You — d20 → 9 + INT 4 − 1 (Whisper Fog) + 2 (point blank) perfect opening (2× dice) = 14 vs Mud Harpy AC 12 — ✓ HIT
+[2026-09-22T21:38:42.112Z] [world] You seize the initiative. Mud Harpy has no time to react.
+[2026-09-22T21:38:42.046Z] [debug] dice⏱ damage: shown +68ms, tapped +1660ms, settled +819ms = 2547ms
+[2026-09-22T21:38:41.226Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:39.496Z] [debug] dice⏱ attack: shown +67ms, tapped +1362ms, settled +821ms = 2250ms
+[2026-09-22T21:38:38.675Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:37.246Z] [debug] dice⏱ initiative: shown +35ms, tapped +837ms, settled +821ms = 1693ms
+[2026-09-22T21:38:36.425Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:35.554Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:38:35.554Z] [world] You commit forward with the aetheric touch wand. Mud Harpy watches your hands.
+[2026-09-22T21:38:35.552Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-22T21:38:35.552Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:38:35.551Z] [debug] attack: target=Mud Harpy range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+[2026-09-22T21:38:35.547Z] [combat] Mud Harpy shakes off the last of the fire — the True Tartarians Scrap-Welded Cudgel has run its course.
+[2026-09-22T21:38:35.545Z] [combat] Mud Harpy blisters — clinging fire sears 1. (16/87 HP, 0 turns left)
+[2026-09-22T21:38:35.534Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric touch wand resolved=Aetheric Touch Wand range=close enemies=1 hooks=0
+[2026-09-22T21:38:35.529Z] [player] attack with the off-hand aetheric touch wand
+[2026-09-22T21:38:35.442Z] [debug] ui: tap "touch wand ✦"
+[2026-09-22T21:38:34.721Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:38:34.714Z] [combat] Dodge — d20 → 12 + DEX 12 = 24 vs ATK 10. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-22T21:38:34.714Z] [combat] Mud Harpy — d20 → 3 + ATK 7 = 10 vs your AC 19 — ✗ EVADED
+[2026-09-22T21:38:34.706Z] [combat] Mud Harpy blisters — clinging fire sears 1. (17/87 HP, 1 turn left)
+[2026-09-22T21:38:34.706Z] [world] You commit to the dodge. Slip Mud Harpy's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-22T21:38:34.702Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-22T21:38:34.702Z] [player] dodge
+[2026-09-22T21:38:34.675Z] [debug] ui: tap "dodge"
+[2026-09-22T21:38:32.163Z] [combat] Mud Harpy deals 5 slashing damage [armor −35%]. You have 32 HP remaining.
+[2026-09-22T21:38:32.117Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The mud harpy is patient. Be patienter."
+[2026-09-22T21:38:32.116Z] [combat] Mud Harpy — d20 → 12 + ATK 7 = 19 vs your AC 19 — ✓ HIT
+[2026-09-22T21:38:32.115Z] [combat] Mud Harpy is left exposed — easier to hit.
+[2026-09-22T21:38:32.115Z] [combat] Your strike with the aetheric touch wand lands for 5. Mud Harpy staggers — 18 HP remaining. It answers.
+[2026-09-22T21:38:32.113Z] [combat] Aetheric flares — +2 on hit.
+[2026-09-22T21:38:32.112Z] [combat] The Aetheric Touch Wand knits you back together — +3 HP.
+[2026-09-22T21:38:32.111Z] [combat] You — d20 → 13 + INT 4 − 1 (Whisper Fog) + 2 (point blank) = 18 vs Mud Harpy AC 12 — ✓ HIT
+[2026-09-22T21:38:32.111Z] [world] You seize the initiative. Mud Harpy has no time to react.
+[2026-09-22T21:38:32.045Z] [debug] dice⏱ damage: shown +66ms, tapped +446ms, settled +820ms = 1332ms
+[2026-09-22T21:38:31.225Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:30.712Z] [debug] dice⏱ attack: shown +66ms, tapped +512ms, settled +821ms = 1399ms
+[2026-09-22T21:38:29.891Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:29.312Z] [debug] dice⏱ initiative: shown +37ms, tapped +705ms, settled +820ms = 1562ms
+[2026-09-22T21:38:28.492Z] [debug] ui: tap "roll"
+[2026-09-22T21:38:27.752Z] [world] ▸ The Bog Dragon of Old Drakova: this is a later step's ground — not yet. First: find the Drakovan reeve at Drakova — talk it through.
+[2026-09-22T21:38:27.752Z] [system] ⏳ Time passed: 6 min
+[2026-09-22T21:38:27.751Z] [world] You raise the aetheric touch wand toward Mud Harpy. The room narrows around the both of you.
+[2026-09-22T21:38:27.748Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-09-22T21:38:27.746Z] [debug] attack: target=Mud Harpy range=close reach.bands=[far,mid,close] reach.label=Aetheric Touch Wand bareHand=false
+
+=== END REPORT ===

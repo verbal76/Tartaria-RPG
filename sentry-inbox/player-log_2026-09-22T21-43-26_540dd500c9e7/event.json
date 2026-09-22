@@ -1,0 +1,337 @@
+{
+  "id": "540dd500c9e74011862d575545726683",
+  "groupID": "7749413807",
+  "eventID": "540dd500c9e74011862d575545726683",
+  "projectID": "4511945117532160",
+  "size": 18018,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-22-1870-the-road-belongs-to-the-next-task #mud7awo16hh8 [inline 19/33]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-22-1870-the-road-belongs-to-the-next-task",
+  "message": "player-log 2026-09-22-1870-the-road-belongs-to-the-next-task #mud7awo16hh8 [inline 19/33]",
+  "title": "player-log 2026-09-22-1870-the-road-belongs-to-the-next-task #mud7awo16hh8 [inline 19/33]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Waltham",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-22T21:42:52Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1094139904,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 60.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 113049600,
+      "usable_memory": 3624288256,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 38.266458,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0caf0-9c9c-7a38-a777-9c3ac9b9e045"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5c40529e28d4457a5e8dc905e7c917e",
+      "span_id": "a34926ff9c76b955",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzQ-uMz-A5W-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-Fsd-mFn-ZSB-0aG-Ugb-GFu-dGV-ybi-4gV-Ghl-IHR-ha2-Uga-XMg-c21-hbG-wgY-nV0-IHJ-lYW-wuC-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MxO-jM0-LjI-3NV-pdI-Ftj-b2d-uaX-Rpd-mVd-IG5-ldX-RyY-Wwg-ICg-zOG-1zK-Qpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toz-NC4-yMD-NaX-SBb-ZGV-idW-ddI-GFy-Yml-0ZX-I6I-GFt-Yml-lbn-Qga-GVs-ZCA-oaG-Uga-nVz-dCB-zcG-9rZ-SkK-WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzQ-uMj-AzW-l0g-W3d-vcm-xkX-SBZ-b3U-gZ2-l2Z-SB0-aGU-gYm-Vud-CBy-aXZ-ldH-Mge-W91-ciB-mdW-xsI-GF0-dGV-udG-lvb-i4g-SXQ-gcm-V0d-XJu-cyB-0aG-UgZ-2Vz-dHV-yZS-Bie-SBi-ZWl-uZy-Ble-GFj-dGx-5IH-doY-XQg-aXQ-gYX-BwZ-WFy-cyB-0by-BiZ-S4K",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzQ-uMj-AyW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9Y-mVu-dCB-yaX-Zld-HMg-cmV-zb2-x2Z-WQ9-YmV-udC-Bya-XZl-dHM-gcm-FuZ-2U9-LSB-lbm-Vta-WVz-PTA-gaG-9va-3M9-Mgp-bMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-zNC-4yM-DJa-XSB-bcG-xhe-WVy-XSB-pbn-Zlc-3Rp-Z2F-0ZS-BiZ-W50-IHJ-pdm-V0c-wpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toz-NC4-wMj-daX-SBb-Y29-nbm-l0a-XZl-XSB-uZX-V0c-mFs-ICA-oMT-A0M-m1z-KQo-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzM-uOT-k0W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-Glu-dmV-zdG-lnY-XRl-X2x-vcm-Ugb-2sg-MjE-3OG-1zI-Hdh-aXQ-gOT-Uyb-XMg-cmV-hZC-AzO-TJt-cy9-3cm-l0Z-SA4-MjZ-tcy-Bpb-iAx-MzB-04o-aSb-3V0-IDQ-xdC-B0a-HIy-IDM-uMG-1zL-3Qg-KDE-5NG-NoK-Qpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toz-My4-xNT-BaX-SBb-ZGV-idW-ddI-HVp-OiB-0YX-AgI-nRh-a2U-gLy-BzY-Wx2-YWd-lIg-pbM-jAy-Ni0-wOS-0yM-lQy-MTo-zMT-ozM-i45-ODN-aXS-BbZ-GVi-dWd-dIG-FyY-ml0-ZXI-6IG-FtY-mll-bnQ-gaG-VsZ-CAo-aGU-gan-Vzd-CBz-cG9-rZS-kKW-zIw-MjY-tMD-ktM-jJU-MjE-6Mz-E6M-zIu-OTg-zWl-0gW-2Fy-Yml-0ZX-JdI-CJZ-b3U-gc2-F3I-HRo-ZSB-0cm-F2Z-Wxl-ciw-iIH-RoZ-SBB-cmJ-pdG-VyI-G5v-dGV-zLi-AiV-Ghh-dCB-tZW-1vc-nkg-d2l-sbC-Byb-3Qg-aWY-geW-91I-Gxl-YXZ-lIG-l0L-iIK",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzI-uOT-gzW-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iB0-ZW1-wbG-F0Z-SAo-cmV-hc2-9uP-Wlu-dGV-udC-1ub-3Qt-YWx-sb3-dlZ-Dpp-bnZ-lc3-RpZ-2F0-ZSk-KWz-IwM-jYt-MDk-tMj-JUM-jE6-MzE-6Mz-IuO-Tgy-Wl0-gW3-dvc-mxk-XSB-UaG-Ugc-2ln-bnB-vc3-Qgc-mVz-aXN-0cy-B5b-3Vy-IHJ-lYW-Rpb-mcu-IE5-vdC-Bob-3N0-aWx-lIO-KAl-CBq-dXN-0IG-Nsb-3Nl-ZC4-gU2-9tZ-SB0-aGl-uZ3-Mga-W4g-dGh-lIG-J1c-mll-ZCB-3b3-JsZ-CBk-b24-ndC-Bvc-GVu-IGZ-vci-B0a-GUg-Y3V-yaW-91c-y4K-WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzI-uOT-gyW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9c-2ln-bnB-vc3-Qgc-mVz-b2x-2ZW-Q9c-2ln-bnB-vc3-Qgc-mFu-Z2U-9LS-Blb-mVt-aWV-zPT-Aga-G9v-a3M-9Mg-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzI-uOT-gyW-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gc2-lnb-nBv-c3Q-KWz-IwM-jYt-MDk-tMj-JUM-jE6-MzE-6Mz-IuO-Tcx-Wl0-gW3-dvc-mxk-XSB-Jcm-9uI-GZv-ZyB-kaX-Nvc-mll-bnR-zIH-lvd-S4g-Q29-tcG-Fzc-2Vz-IHN-waW-47I-Glu-dGV-udC-Bjb-3N0-cyB-tb3-JlL-gpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toz-Mi4-3Nj-haX-SBb-Y29-nbm-l0a-XZl-XSB-BSU-0gw-rcg-UkV-MT0-FEI-MK3-IFR-IUk-9XI-CAo-MTA-wOW-1zK-Qpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toz-Mi4-3ND-FaX-SBb-ZGV-idW-ddI-HF3-ZW7-ij7-Ega-W52-ZXN-0aW-dhd-GVf-bG9-yZS-Bva-yAy-MTU-xbX-Mgc-mVh-ZCA-xND-k0b-XMv-d3J-pdG-UgN-jQ0-bXM-gaW-4gM-TMx-dOK-Gkm-91d-CAz-NXQ-gdG-hyM-iAx-MS4-0bX-Mvd-CAo-MTc-4Y2-gpC-g==",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzE-uNz-U3W-l0g-W3d-vcm-xkX-SBZ-b3U-gZ2-l2Z-SB0-aGU-gQX-JjY-W5l-IFd-lYX-Zlc-idz-IEd-yaX-Age-W91-ciB-mdW-xsI-GF0-dGV-udG-lvb-i4g-SXQ-gcm-V0d-XJu-cyB-0aG-UgZ-2Vz-dHV-yZS-Bie-SBi-ZWl-uZy-Ble-GFj-dGx-5IH-doY-XQg-aXQ-gYX-BwZ-WFy-cyB-0by-BiZ-S4K-WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzE-uNz-U3W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9Y-XJj-YW5-lIH-dlY-XZl-ciB-ncm-lwI-HJl-c29-sdm-VkP-UFy-Y2F-uZS-BXZ-WF2-ZXI-ncy-BHc-mlw-IHJ-hbm-dlP-S0g-ZW5-lbW-llc-z0w-IGh-vb2-tzP-TIK-WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzE-uNz-U2W-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gQX-JjY-W5l-IFd-lYX-Zlc-idz-IEd-yaX-AK",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzA-uNT-kxW-l0g-W2N-vZ2-5pd-Gl2-ZV0-gbm-V1d-HJh-bCA-gKD-Yxb-XMp-Cls-yMD-I2L-TA5-LTI-yVD-IxO-jMx-OjM-wLj-UyO-Fpd-IFt-3b3-JsZ-F0g-VGh-lIF-Nja-G9s-YXI-ncy-BIZ-WFk-YmF-uZC-BvZ-iBL-bm9-3bG-VkZ-2Ug-cmV-hZH-MgY-XMg-b3J-kaW-5hc-nks-IHd-oaW-NoI-Glu-IFR-hcn-Rhc-mlh-IGl-zIG-Egc-21h-bGw-ga2-luZ-CBv-ZiB-yZW-xpZ-WYu-IFl-vdS-BsZ-WF2-ZSB-pdC-BiZ-S4K-WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzA-uNT-I0W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9c-2No-b2x-hci-BoZ-WFk-YmF-uZC-Brb-m93-bGV-kZ2-Ugc-mVz-b2x-2ZW-Q9U-2No-b2x-hci-dzI-Ehl-YWR-iYW-5kI-G9m-IEt-ub3-dsZ-WRn-ZSB-yYW-5nZ-T0t-IGV-uZW-1pZ-XM9-MCB-ob2-9rc-z0y-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MzA-uNT-IyW-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gU2-Nob-2xh-cid-zIE-hlY-WRi-YW5-kIG-9mI-Etu-b3d-sZW-RnZ-Qpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toy-OC4-5Nj-daX-SBb-ZGV-idW-ddI-HVp-OiB-0YX-AgI-mlu-dmV-zdG-lnY-XRl-Igp-bMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-yNy-44N-DJa-XSB-bZG-Vid-Wdd-IGN-0eD-ogT-1BF-TkV-EIO-KAl-CBs-aXZ-lPT-EgK-G9w-ZW5-lZD-0yI-HJl-bGV-hc2-VkP-TEp-IOK-JiD-QyN-U1C-IGV-zdA-pbM-jAy-Ni0-wOS-0yM-lQy-MTo-zMT-oyN-i4z-NDJ-aXS-BbZ-GVi-dWd-dIH-F3Z-W46-IGx-vYW-Rpb-mcg-KHd-hcy-BpZ-Gxl-KSD-igJ-Qgd-Ghl-IEF-yYm-l0Z-XIg-c3B-lYW-tzI-HRl-bXB-sYX-Rlc-yB1-bnR-pbC-Bpd-CBp-cyB-yZW-Fke-Qo=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjY-uMz-QwW-l0g-W2R-lYn-VnX-SBx-d2V-uOi-ByZ-S13-YXJ-taW-5nI-GFm-dGV-yID-gwM-DBt-cyB-zZX-R0b-GVk-IGZ-vcm-Vnc-m91-bmQ-KWz-IwM-jYt-MDk-tMj-JUM-jE6-MzE-6Mj-MuM-zE5-Wl0-gW3-dvc-mxk-XSB-Cb2-90I-Glt-cHJ-lc3-Npb-25z-IHB-yZX-NzI-GRl-ZXA-gaW-50b-yB0-aGU-gc2-lsd-Cwg-aGV-hZG-luZ-yB0-b3d-hcm-Qgd-Ghl-IHJ-pc2-UuC-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MxO-jIz-LjM-xOF-pdI-Ft3-b3J-sZF-0gW-W91-IHd-hbG-sgc-291-dGg-gdG-hyb-3Vn-aCB-vcG-VuI-HNp-bHQ-uIF-RoZ-SBj-b21-wYX-NzI-HBv-aW5-0cy-Bzb-3V0-aCB-pbn-RvI-G9w-ZW4-gZ3-Jvd-W5k-Lgp-bMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-yMy-4zM-Tda-XSB-bc3-lzd-GVt-XSB-Ucn-kgI-nRh-bGs-gdG-8gd-Ghl-IHR-yYX-Zlb-GVy-IiD-igJ-Qgd-Ghl-eSB-3YW-50I-HNv-bWV-0aG-luZ-yBm-cm9-tIH-lvd-S4K",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjM-uMz-E3W-l0g-W3d-vcm-xkX-SBT-b21-lb2-5lI-Glz-IHN-pdH-Rpb-mcg-b24-gdG-hla-XIg-cGF-jay-Bhd-CB0-aGU-gZW-RnZ-SBv-ZiB-0aG-Ugc-GF0-aCD-igJ-Qgb-m8g-cGF-ydH-ksI-G5v-IGZ-pcm-UsI-GFu-ZCB-hIG-xvb-mcg-d2F-5IG-Zyb-20g-YW5-5d2-hlc-mUu-IFR-oZX-kgc-3Rh-bmQ-gd2-hlb-iB0-aGV-5IH-NlZ-SB5-b3U-uCl-syM-DI2-LTA-5LT-IyV-DIx-OjM-xOj-IzL-jMx-NVp-dIF-tkZ-WJ1-Z10-gc3-Bhd-246-IGd-lYX-I9W-1Nj-aG9-sYX-Inc-yBI-ZWF-kYm-FuZ-CBv-ZiB-Lbm-93b-GVk-Z2U-sIE-FyY-2Fu-ZSB-XZW-F2Z-XIn-cyB-Hcm-lwX-SB3-aW5-kb3-c9M-TAg-cm9-zdG-VyP-W5l-dwp-bMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-yMy-4zM-DBa-XSB-bZG-Vid-Wdd-IHV-pOi-B0Y-XAg-IuK-Gki-A/I-go=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-kwW-l0g-W2R-lYn-VnX-SBi-b29-0Oi-Bsa-WZl-IGJ-tdW-Q2N-jgz-YWE-0IH-N0Y-XJ0-ZWQ-gMj-AyN-i0w-OS0-yMl-QyM-Tox-MTo-0OC-41O-Tha-IMK-3IE-ZPT-ExP-V0V-EIE-FOI-E9U-QSB-BUF-BMW-SAx-MjB-tcy-BhZ-28g-dml-hIG-1pZ-C1z-ZXN-zaW-9uI-MK3-IHB-yZX-YgY-3R4-IG8-yL3-IyL-2ww-L3A-xL2-RuM-CAo-cHJ-ldm-lvd-XMg-bGl-mZS-ByZ-Wxl-YXN-lZC-Bpd-HMg-Y29-udG-V4d-HMg-Zml-yc3-QpC-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MxO-jIw-LjQ-5MF-pdI-Ftk-ZWJ-1Z1-0gb-Wlz-c2l-vbn-M6I-MK3-IGF-0PW-dpY-W50-X3d-hdG-NoX-3No-cml-uZS-B0c-mF2-ZWx-Ubz-1oa-WRk-ZW5-fbW-Fya-2V0-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-kwW-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X3B-sYW-d1Z-V9t-b3R-oX2-VuY-2xh-dmU-gc3-RhZ-2Ug-MC8-1IF-tka-XBs-b21-hY3-ldI-EB0-YXJ-0YX-JpY-W5f-b3V-0c2-tpc-nRz-IG5-wYz-0id-Ghl-IHB-oeX-NpY-2lh-biI-gZ2-l2Z-XM9-UGh-5c2-lja-WFu-J3M-gUm-90L-Vdh-cmQ-gTW-Fza-yBQ-QVV-TRU-QKW-zIw-MjY-tMD-ktM-jJU-MjE-6Mz-E6M-jAu-NDk-wWl-0gW-2Rl-YnV-nXS-Bta-XNz-aW9-ucz-oga-HVu-dDp-odW-50X-211-ZF9-ob3-VuZ-F9h-bHB-oYV-95d-Wxk-cmE-gc3-RhZ-2Ug-MC8-1IF-tka-XBs-b21-hY3-ldI-EB5-dWx-kcm-Ffd-HVs-IG5-wYz-0id-Ghl-IFl-1bG-RyY-S1U-dWw-gcm-Vld-mUi-IGd-pdm-VzP-VJl-ZXZ-lJ3-MgU-m9h-ZC1-Xcm-l0I-FBB-VVN-FRA-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-kwW-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X2R-1c3-RfZ-mll-bmR-fcG-xha-W5z-IHN-0YW-dlI-DAv-NyB-bZG-lwb-G9t-YWN-5XS-BAc-GFy-bGV-5X2-dyb-3Vu-ZCB-ucG-M9I-nRo-ZSB-jYX-Jhd-mFu-LW1-vdG-hlc-iIg-Z2l-2ZX-M9Q-2Fy-YXZ-hbi-1Nb-3Ro-ZXI-ncy-BHc-ml0-LVR-va2-VuI-FBB-VVN-FRA-pbM-jAy-Ni0-wOS-0yM-lQy-MTo-zMT-oyM-C40-OTB-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-Bod-W50-Omh-1bn-Rfb-XVk-X2h-hcn-B5X-2Ny-YWR-sZS-Bzd-GFn-ZSA-wLz-cgW-2Rp-cGx-vbW-Fje-V0g-QG1-vbm-FyY-2hf-d2F-5c3-Rhd-Glv-biB-ucG-M9I-nRo-ZSB-yb2-FkL-Xdh-cmR-lbi-IgZ-2l2-ZXM-9V2-FyZ-GVu-J3M-gRH-Vza-y1X-YXJ-yYW-50I-FBB-VVN-FRA-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-kwW-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X2l-yb2-5fc-3Bp-ZGV-yX2-9ic-2lk-aWF-uIH-N0Y-Wdl-IDA-vNy-BbZ-Glw-bG9-tYW-N5X-SBA-cmV-jbG-Fpb-WVy-X3N-0YW-tlI-G5w-Yz0-idG-hlI-HNh-bHZ-hZ2-UtY-m9z-cyI-gZ2-l2Z-XM9-Q29-pbC-BvZ-iBU-YXJ-0YX-JpY-W4g-Rml-sYW-1lb-nQg-UEF-VU0-VEC-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MxO-jIw-LjQ-5MF-pdI-Ftk-ZWJ-1Z1-0gb-Wlz-c2l-vbn-M6I-Gh1-bnQ-6aH-Vud-F9t-dWR-fc2-lyZ-W5f-ZHJ-ha2-92Y-SBz-dGF-nZS-AwL-zcg-W2R-pcG-xvb-WFj-eV0-gQG-RyY-Wtv-dmE-gbn-BjP-SJ0-aGU-gaG-VhZ-CBm-ZXJ-yeW-1hb-iIg-Z2l-2ZX-M9R-mVy-cnl-tYW-4nc-yBD-cm9-zc2-luZ-y1U-b2t-lbi-BQQ-VVT-RUQ-K",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-kwW-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X3N-pbH-Rfc-2Vy-cGV-udF-9jY-XRo-ZWR-yYW-wgc-3Rh-Z2U-gMC-83I-Ftk-aXB-sb2-1hY-3ld-IEB-vc3-RyY-Wdh-ciB-ucG-M9I-nRo-ZSB-kaX-ZlL-WJv-c3M-iIG-dpd-mVz-PUR-pdm-UtQ-m9z-cyd-zIE-1vb-3Jp-bmc-gQ2-hpd-CBQ-QVV-TRU-QKW-zIw-MjY-tMD-ktM-jJU-MjE-6Mz-E6M-jAu-NDg-5Wl-0gW-2Rl-YnV-nXS-Bta-XNz-aW9-ucz-oga-HVu-dDp-odW-50X-3N0-ZWF-tX3-dhb-Gtl-cl9-6aG-FyY-Wsg-c3R-hZ2-UgM-C83-IFt-kaX-Bsb-21h-Y3l-dIE-Bke-W5h-c3R-5X2-Jvc-mRl-cl9-wb3-N0I-G5w-Yz0-idG-hlI-GNh-cmF-2YW-4tb-WFz-dGV-yIi-Bna-XZl-cz1-DYX-Jhd-mFu-LU1-hc3-Rlc-idz-IFB-hc3-MtQ-2hp-dCB-QQV-VTR-UQK",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-g5W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X3N-lcn-Zhb-nRz-X2R-vdW-J0Z-XIg-c3R-hZ2-UgM-C81-IFt-kaX-Bsb-21h-Y3l-dIE-Bna-WFu-dF9-3YX-Rja-F9z-aHJ-pbm-UgT-0ZG-LUN-FTE-woM-SB0-aWx-lIH-dlc-3Qp-IG5-wYz-0id-Ghl-IFN-lcn-Zhb-nRz-IHB-yaW-Vzd-CIg-Z2l-2ZX-M9U-2Vy-dmF-udH-MnI-E1h-cms-gb2-YgU-2Fu-Y3R-pb2-4gU-EFV-U0V-ECl-syM-DI2-LTA-5LT-IyV-DIx-OjM-xOj-IwL-jQ4-OVp-dIF-tkZ-WJ1-Z10-gbW-lzc-2lv-bnM-6IG-h1b-nQ6-aHV-udF-9td-WRf-c2l-yZW-5fc-XVl-ZW4-gc3-RhZ-2Ug-MC8-1IF-tka-XBs-b21-hY3-ldI-EBo-aWR-kZW-5fb-WFy-a2V-0IG-5wY-z0i-dGh-lIH-dhb-mRl-cml-uZy-Bkc-mlm-dGV-yIi-Bna-XZl-cz1-Ecm-lmd-GVy-J3M-gU2-91d-Ggt-U3B-pcm-UgU-G9z-dGV-yIF-BBV-VNF-RAo-=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uND-g5W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X2J-vZ1-9kc-mFn-b24-gc3-RhZ-2Ug-MC8-3IF-tka-XBs-b21-hY3-ldI-EBk-cmF-rb3-ZhI-G5w-Yz0-idG-hlI-ERy-YWt-vdm-FuI-HJl-ZXZ-lIi-Bna-XZl-cz1-SZW-V2Z-Sdz-IEJ-yYX-NzI-FRv-a2V-uCl-syM-DI2-LTA-5LT-IyV-DIx-OjM-xOj-IwL-jQ4-OVp-dIF-tkZ-WJ1-Z10-g4p-WQ4-pWQ-4pW-QIF-NFU-1NJ-T04-gMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-yMC-40O-DZa-IMK-3IG-J1a-Wxk-IDI-wMj-YtM-Dkt-MjI-tMT-g3M-C10-aGU-tcm-9hZ-C1i-ZWx-vbm-dzL-XRv-LXR-oZS-1uZ-Xh0-LXR-hc2-sgw-rcg-cHJ-ldm-lvd-XMg-ZW5-0cn-kgb-W9t-ZW5-0cy-BlY-XJs-aWV-yIO-KVk-OKV-kOK-VkA-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MjA-uMz-k4W-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIG-luY-2xp-bmV-zIH-RoZ-Wly-IGh-lYW-QsI-HRo-ZSB-jbG-9zZ-XN0-IGl-0IG-Nvb-WVz-IHR-vIG-Egc-21p-bGU-uIC-JXZ-Wxj-b21-lIG-JhY-2ss-IFB-lcm-1hb-m51-LiB-UaG-Ugc-m9h-ZCB-rZX-B0I-Hlv-dXI-gcG-xhY-2Uu-Igp-bMj-AyN-i0w-OS0-yMl-QyM-Toz-MTo-yMC-4zO-Tda-XSB-bd2-9yb-GRd-IFl-vdS-Bzd-GVw-IGJ-hY2-sga-W50-byB-HaW-Fud-C1X-YXR-jaC-BTa-HJp-bmU-uIF-RoZ-SB3-b3J-sZC-B3Y-Wl0-cyB-mb3-Ige-W91-ciB-tb3-ZlL-gpb-MjA-yNi-0wO-S0y-MlQ-yMT-ozM-Toy-MC4-zOT-daX-SBb-ZGV-idW-ddI-E9U-QSB-zZX-Nza-W9u-IHN-0YX-J0O-iAy-MDI-2LT-A5L-TIy-LTE-4Nz-Atd-Ghl-LXJ-vYW-QtY-mVs-b25-ncy-10b-y10-aGU-tbm-V4d-C10-YXN-rLg-o=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zE6-MTg-uMz-MxW-l0g-W2R-lYn-VnX-SBh-cHB-zdG-F0Z-Tog-YmF-ja2-dyb-3Vu-ZCD-ihp-IgY-WN0-aXZ-lIC-h3Y-XMg-YmF-ja2-dyb-3Vu-ZCB-mb3-IgM-zQw-MzY-3bX-MpC-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MxO-jE4-LjM-zMV-pdI-Ftk-ZWJ-1Z1-0gc-Xdl-bi1-3YX-Rja-GRv-Zzo-gaG-9sZ-Glu-ZyB-yZW-lua-XQg-4oC-UIG-Zvc-mVn-cm9-1bm-Qga-GFz-IG5-vdC-BzZ-XR0-bGV-kIC-g4M-DAw-bXM-pLi-BBc-HAt-c3d-pdG-Noa-W5n-IG1-1c3-Qgb-m90-IGN-vc3-QgY-SB+-NDI-1TU-Igb-G9h-ZC4-KWz-IwM-jYt-MDk-tMj-JUM-jE6-MzA-6NT-guM-Tc1-Wl0-gW2-RlY-nVn-XSB-jdH-g6I-FJF-TEV-BU0-VEI-OKA-lCB-saX-ZlP-TAg-KG9-wZW-5lZ-D0x-IHJ-lbG-Vhc-2Vk-PTE-pCg-==",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-zA6-NTg-uMT-Y2W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-Tkz-IHB-sYX-llc-j0z-NiB-3bT-01O-Vty-b29-tcz-0yN-SBl-dmV-udH-M9M-SBt-ZW1-vcz-0wI-G5w-Y3M-9Mi-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MS-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-05N-CBz-Y2V-uZT-00C-lsy-MDI-2LT-A5L-TIy-VDI-xOj-MwO-jU4-LjA-4MV-pdI-Ftk-ZWJ-1Z1-0gc-Xdl-bi1-3YX-Rja-GRv-Zzo-gYX-BwI-Glz-IGJ-hY2-tnc-m91-bmR-lZC-Dig-JQg-aG9-sZG-luZ-yBy-ZXZ-pdm-FsI-HVu-dGl-sIG-Zvc-mVn-cm9-1bm-QgK-HN0-YXR-1cz-0na-WRs-ZSc-pLg-pbM-jAy-Ni0-wOS-0yM-lQy-MTo-yNT-ozN-y45-NjR-aXS-BbZ-GVi-dWd-dIG-Fwc-HN0-YXR-lOi-Bpb-mFj-dGl-2ZS-Dih-pIg-YmF-ja2-dyb-3Vu-ZCA-od2-FzI-Glu-YWN-0aX-ZlI-GZv-ciA-xNW-1zK-Qo=",
+      "WzI-wMj-YtM-Dkt-MjJ-UMj-E6M-jU6-Mzc-uOT-U0W-l0g-W2R-lYn-VnX-SBh-cHB-zdG-F0Z-Tog-YWN-0aX-ZlI-OKG-kiB-pbm-Fjd-Gl2-ZSA-od2-FzI-GFj-dGl-2ZS-Bmb-3Ig-NzE-5MD-c4b-XMp-Cls-yMD-I2L-TA5-LTI-yVD-IxO-jIw-OjU-5Lj-cwN-1pd-IFt-kZW-J1Z-10g-aG9-tZX-dvc-ms6-IHN-jZW-5lX-2lu-dHJ-vIC-JHa-WFu-dC1-XYX-Rja-CBT-aHJ-pbm-UiI-OKc-kyA-3Mj-Jtc-wpb-MjA-yNi-0wO-S0y-MlQ-yMT-oyM-Do1-OS4-2OT-laX-SBb-ZGV-idW-ddI-HF3-ZW7-ij7-Egb-mFy-cmF-0aW-9uO-nNj-ZW5-lX2-lud-HJv-X2Z-pbG-wgb-2sg-NzA-zbX-Mgc-mVh-ZC9-3cm-l0Z-SB1-bnV-zYW-JsZ-SAo-bmF-0aX-ZlI-G1p-cy1-yZX-Bvc-nRl-ZCA-0NT-AzM-W1z-LzY-yOW-1zI-OKA-lCB-sbG-FtY-S5y-biB-zcG-xpd-CBi-dWc-sIG-5vd-CB0-aGl-zIG-Nhb-Gwp-IGl-uID-c2N-HTi-hpJ-vdX-QgM-zR0-IHR-ocj-EgS-ElU-LUN-BUC-AoM-TY0-Y2g-pCg-=="
+    ],
+    "chunkChars": 7470,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-22-1870-the-road-belongs-to-the-next-task #mud7awo16hh8 [inline 19/33]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mud7awo16hh8"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-22-1870-the-road-belongs-to-the-next-task"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "33"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-22-1870-the-road-belongs-to-the-next-task"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-22T21:43:30.772989Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-22T21:43:26.755000Z",
+  "fingerprints": [
+    "b947cf3516de7e71dc2501cea43489df"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1986849918,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-22T20:45:39.685373Z",
+    "dateReleased": "2026-09-22T21:06:07.829971Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "7d2d2cab5aceb062a923f2d4dc56ff05218b8415",
+      "message": "OTA-1870 \u2014 the road belongs to the next task\n\nA trailing `checkKind: null` aftermath is narration the advance loop consumes in\nthe same tick that resolves the gated stage before it. It is not a place the\nplayer has to go. Both advance paths asked the wrong question about it.\n\nWHAT THE PLAYER GOT. Finishing a cross-ground epilogue printed, in order:\n\n    You set course for Varakush. 19 tiles \u2014 about 2 days of travel, all in.\n      Tap the \u2192 VARAKUSH button on the travel row to press on; STOP TRAVEL to halt.\n    Auto-routing to the next stage of <arc>: Varakush.\n    <the epilogue, which ends the arc>\n    \u2726 \u2026 recovered. Return to a posting agent to turn in \u2026\n\nand was left holding a live course to a stage that had just been consumed, with\n`hubRoomId` cleared as travel setup does \u2014 ejected from whatever interior they\nwere standing in, to press on toward a beat that no longer existed.\n\nTHIS WAS ALREADY SHIPPED. It is not groundwork for unreleased content. Of the\n14 trailing epilogues live in the game today, 12 are cross-ground, and three\nreproduce on production data with no test fixture involved:\n\n    mystery_ashen_codex           Nimari   -> Varakush              19 tiles\n    mystery_drowned_bell_samarran Samarran -> Ostragar              45 tiles\n    story_dynasty_purge_asgardar  Asgardar -> Dynasty Border Post    3 tiles\n\neach arming a real course, clearing `hubRoomId`, and emitting the false travel\nlines. The two same-ground epilogues never did, which is the shape of the bug:\nit keys on the aftermath naming a different ground.\n\nROOT CAUSE, IN ONE LINE. `advanceMystery` and `advanceStoryline` each read the\nnext stage BY INDEX \u2014 `stages[record.stage + 1]` \u2014 before the auto-consume loop\nforty lines below eats it. So an aftermath was inspected as though it were the\nplayer's next objective: its ground compared, travel armed, instructions\nprinted, room state cleared. Then it was consumed anyway.\n\nTHE REPAIR IS THE QUESTION, ASKED CORRECTLY. `nextActionableStage` returns the\nfirst stage that will still be there once the consume loop has run. It is\nalready exported by questStage.ts, already imported here, already used by the\nescort path, and its skip rule (`while checkKind === null`) is byte-for-byte the\nrule the consume loops use \u2014 which is why it cannot drift away from them. Two\nlines, one file:\n\n    mystery.stages[nextActionableStage(mystery.stages, record.stage + 1)]\n    def.stages[nextActionableStage(def.stages, record.stage + 1)]\n\nIf the arc ends in aftermath the helper returns `stages.length`, `nextDef` is\nundefined, and the entire routing block is skipped: no direction line, no\ncourse, no message. If a real objective follows, routing targets THAT stage.\nNo new field, no schema, no migration, no travel redesign.\n\nAND IT IS NOT \"NEVER ROUTE\". The suite pins the other side on the same arc:\nashen_codex stage 0 (Varakush, diplomacy) -> stage 1 (Nimari, investigate) is a\nreal objective, and it still arms `nimari`, still prints the set-course line and\nthe distance, and still lands the record on stage 1. Without that control this\nOTA could have been a far worse defect than the one it fixes.\n\nNULL-STAGE CORPUS, MEASURED. 14 null stages, all 14 trailing, 0 mid-chain, 0\ncarrying grants, requires, spawn or stinger. So `checkKind: null` has exactly\none meaning today and the repair does not have to guess at a second one. The\nnull-then-actionable topology is unauthored, so no production claim is made\nabout it; what is proven is the selector rule that would decide it.\n\nota1870TheRoadBelongsToTheNextTask 17/17, driving the real store: three shipped\ncross-ground cases, two same-ground controls, the actionable-routing control,\nthe corpus audit, save/load, and an ordinary no-aftermath arc. Four negative\ncontrols, each detecting its own class \u2014 old index ordering 4 red, all routing\nsuppressed 1 red (exactly the actionable control), consume-without-narrating 3\nred, and arm-then-clear 3 red, which is the one that matters: the contract is\nnot \"travelTarget ends undefined\", it is that the engine never tells the player\nto travel to a beat it is about to consume. Production restored byte-for-byte\nafter every one.\n\nNOT TOUCHED. No authored quest data \u2014 `git diff -- app/data/` is empty, stage\ncounts, null counts and prose all unchanged. No hunt work: hunt completion still\njumps to `stage: stages.length` by its own path and still carries no trailing\naftermath, which stays a separate engine question. The Phase 2A ending batch is\nNOT in this commit and remains unreleased.\n\n22/22 check gates, typecheck source clean, test ratchet at baseline 196, lint\nclean.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-22T20:38:58Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-22-1870-the-road-belongs-to-the-next-task",
+          "shortVersion": "tartaria@4.32.11+2026-09-22-1870-the-road-belongs-to-the-next-task",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-22T21:06:07.829971Z",
+          "dateCreated": "2026-09-22T20:45:39.685373Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "160922351",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-22T21:06:08.108538Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-22-1870-the-road-belongs-to-the-next-task",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-22-1870-the-road-belongs-to-the-next-task",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-22-1870-the-road-belongs-to-the-next-task",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-22-1870-the-road-belongs-to-the-next-task)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "56c8008c00724ab5bb01683dd26dc6aa",
+  "previousEventID": "53eade54e2424c4cb5ed08c16295bd4b"
+}
