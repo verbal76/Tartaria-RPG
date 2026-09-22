@@ -3,6 +3,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
+// ⚠⚠⚠ OTA-1864 — THIS SCREEN WAS NEVER OBSERVED, AND THE DEVICE PROVED IT.
+// The 2026-09-21 crafting freeze could not be classified because nothing here
+// emits touch evidence: 67 seconds of crafting — two crafts, six repairs, TWO
+// SUCCESSFULLY ANSWERED Crucible guards — produced ZERO touch-path entries while
+// the ring sat half empty (#19..#22, room to spare). So the absence of a touch
+// during the freeze proved nothing at all. Same observer InventoryScreen has
+// carried since OTA-1818; no new vocabulary, no second architecture.
+import { noteRootTouch, setTouchPathContext } from '../diagnostics/touchPath';
 import { tRowStyle, TTabBar } from '../ui/tartariaKit'; // OTA-1759 row chassis · OTA-1762 tab bar
 import { repairCostMaterials } from '../engine/scrapEngine';
 // OTA-1650 — the golem's weapon lives outside the pack; the repair list needs it.
@@ -681,8 +689,23 @@ export function CraftingScreen() {
   // tabs surfaces the next hint correctly.
   const hint = TAB_HINTS[tab];
 
+  /* ⚠⚠ OTA-1864 — NAME THE SCREEN BEFORE ANY TOUCH IS STAMPED. Without this the
+     ring keeps whatever the last instrumented screen set, and every crafting
+     record would read `exploration` — a wrong label is worse than no label in a
+     forensic trace. Exactly InventoryScreen's call, in exactly its position.
+     `presentation` stays 'none' here because this screen does not own the guard's
+     visibility; the guard reports its own lifetime through `pres` instead, which
+     is why no new store subscription is added and nothing re-renders. */
+  setTouchPathContext({ screen: 'crafting', presentation: 'none' });
+
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      /* ⚠⚠⚠ OTA-1864 — T0 FOR THE BENCH. Capture phase, RETURNS FALSE, never
+         becomes the responder, mints one interaction id for the finger. The
+         controls below keep the responder negotiation they have today. */
+      onStartShouldSetResponderCapture={() => { noteRootTouch('root'); return false; }}
+    >
       <FirstTimeHint
         id={hint.id ?? `crafting_tab_${tab}`}
         title={hint.title}

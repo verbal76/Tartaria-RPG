@@ -31326,7 +31326,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * ⚠ NOT CLAIMED: physical-device confirmation. SE regression is covered in
  * automation; the phone is the owner's to look at. */
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1862-the-beat-keeps-its-way-out';
-export const OTA_BUILD_ID = '2026-09-21-1863-the-window-says-when-it-is-gone';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1863-the-window-says-when-it-is-gone';
+export const OTA_BUILD_ID = '2026-09-22-1864-the-bench-leaves-a-trail';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';

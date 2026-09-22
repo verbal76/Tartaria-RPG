@@ -18,11 +18,23 @@
 // alone, in red. Nothing about tapping past this modal quickly ends with material
 // gone: the backdrop and the hardware back close it as CANCEL, which spends and
 // saves nothing.
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
 import { useHumanAction } from '../state/humanActivity';
+// ⚠⚠⚠ OTA-1864 — THE GUARD THAT WAS NEVER ANSWERED, AND COULD NOT BE READ.
+// On 2026-09-21 this modal came up over `craft Mudstone` at 21:34:03.760 and no
+// answer ever ran; JS stayed demonstrably alive to 21:34:21.255 and the owner
+// force-closed. Which of "no touch reached JS" / "touch reached the surface but
+// not the control" / "the handler never began" happened is UNDECIDABLE, because
+// this file emitted nothing. It is not a hypothetical gap: TWO answers on THIS
+// modal, 25 seconds earlier in the same session, also left no record.
+//
+// ⚠⚠ OBSERVATION ONLY. No <Modal> prop changes, no onDismiss, no
+// presentationHandoff, no mounting change, no new async boundary, no timer. The
+// ladder below is the SHIPPED OTA-1813/1818 vocabulary, nothing invented.
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
 /* ⚠⚠⚠ PHASE 3 — THE PLANES ARE THE DEPTH; the kit style is only the material.
@@ -70,6 +82,30 @@ export function CrucibleGuardModal() {
     setTicked(prompt ? prompt.atRisk.map((a) => a.id) : []);
   }, [seed, prompt]);
 
+  /* ⚠⚠⚠ OTA-1864 — REACT PRESENTATION LIFETIME. NOT NATIVE DISMISSAL.
+   *
+   * This component still does `if (!prompt) return null`, so the <Modal>
+   * unmounts and — per react-native 0.81.5's Modal, which drops its
+   * `modalDismissed` subscription in componentWillUnmount — NOTHING here can
+   * know when iOS finished tearing the window down. OTA-1863 is where that
+   * distinction was learned and it is not being blurred now: `react-mount` and
+   * `react-unmount` claim the React layer and only the React layer.
+   *
+   * ⚠ WHAT IT BUYS. A recurrence can say whether the guard was still presented
+   * (React-wise) for the whole silent interval, which separates "the answer ran
+   * and the card stayed up" from "the card was never up". `#0` is OTA-1814's
+   * non-interaction id — `nextId` starts at 1, so it can never collide. */
+  const presented = useRef(false);
+  useEffect(() => {
+    const up = prompt !== null;
+    if (presented.current === up) return;
+    presented.current = up;
+    noteStage(0, 'pres', {
+      control: 'craft:crucible-guard',
+      reason: up ? 'react-mount' : 'react-unmount',
+    });
+  }, [prompt]);
+
   if (!prompt) return null;
 
   const atRisk = prompt.atRisk;
@@ -83,10 +119,41 @@ export function CrucibleGuardModal() {
 
   const close = () => resolve('cancel');
 
+  /* ⚠⚠⚠ OTA-1864 — THE LADDER, IN WORDS THAT ALREADY EXIST.
+   *   root     — the capture below: a finger reached this surface at all
+   *   in       — onPressIn: it reached THIS control
+   *   enter    — the control's own callback began
+   *   dispatch — execution reached the store action
+   *   done     — the SYNCHRONOUS action returned
+   * A missing rung is the finding. Production never interprets it; the reader does.
+   *
+   * ⚠⚠ NO try/catch, DELIBERATELY. If `run` throws, `done` is simply never
+   * written — which IS the signal — and the exception propagates exactly as it
+   * does today. Catching it would change behaviour and destroy the evidence.
+   * ⚠ `run` is called inline: no promise, no scheduler, no new boundary. */
+  const answered = (control: string, run: () => void) => () => {
+    const tp = noteHandlerEnter(control);
+    noteStage(tp, 'dispatch', { control });
+    run();
+    noteStage(tp, 'done', { control });
+  };
+
   return (
     <Modal visible transparent animationType="fade" onRequestClose={close}>
-      <TouchableWithoutFeedback onPress={close}>
-        <View style={styles.backdrop}>
+      <TouchableWithoutFeedback
+        onPressIn={(e) => { notePressIn('guard:backdrop', e); }}
+        onPress={answered('guard:backdrop', close)}
+      >
+        <View
+          style={styles.backdrop}
+          /* ⚠⚠⚠ OTA-1864 — MODAL_TOUCH, exactly as ClimbModal/GatherModal/
+             SearchModal carry it. This card is presented by a native <Modal>, so
+             its content is NOT inside CraftingScreen's tree and the T0 observer
+             there never sees these touches. CAPTURE PHASE, RETURNS FALSE: this
+             view never becomes the responder, so every control below keeps the
+             responder negotiation it has today, unchanged. */
+          onStartShouldSetResponderCapture={() => { noteRootTouch('modal'); return false; }}
+        >
           <TouchableWithoutFeedback onPress={() => {}}>
             <View style={styles.card}>
               <Text style={styles.kicker}>♥ CRUCIBLE STOCK</Text>
@@ -124,14 +191,22 @@ export function CrucibleGuardModal() {
                 nothing is spent.
               </Text>
 
-              <Pressable style={styles.saveAll} onPress={() => resolve('save-all')}>
+              <Pressable
+                style={styles.saveAll}
+                onPressIn={(e) => { notePressIn('guard:save-all', e); }}
+                onPress={answered('guard:save-all', () => resolve('save-all'))}
+              >
                 <Text style={styles.saveAllText}>♥ SAVE ALL FOR THE CRUCIBLE</Text>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [kit.ctl, styles.saveSome, (noneTicked || allTicked) && styles.dim, pressed && kit.controlPressed]}
                 disabled={noneTicked || allTicked}
-                onPress={() => resolve('save', ticked)}
+                /* ⚠ A DISABLED Pressable never runs onPressIn OR onPress, so a tap
+                   here writes NOTHING below `root`. That is correct and is not a
+                   rejection: nothing was addressed, so nothing refused. */
+                onPressIn={(e) => { notePressIn('guard:save-ticked', e); }}
+                onPress={answered('guard:save-ticked', () => resolve('save', ticked))}
               >
 {({ pressed }) => (<>
                 <Text style={styles.saveSomeText}>
@@ -142,13 +217,21 @@ export function CrucibleGuardModal() {
 </Pressable>
 
               <View style={styles.footRow}>
-                <Pressable style={({ pressed }) => [kit.ctl, styles.cancel, pressed && kit.controlPressed]} onPress={close}>
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.cancel, pressed && kit.controlPressed]}
+                  onPressIn={(e) => { notePressIn('guard:cancel', e); }}
+                  onPress={answered('guard:cancel', close)}
+                >
 {({ pressed }) => (<>
                   <Text style={styles.cancelText}>CANCEL</Text>
                   {ctlPlanes(pressed)}
                 </>)}
 </Pressable>
-                <Pressable style={({ pressed }) => [kit.ctl, styles.spend, pressed && kit.controlPressed]} onPress={() => resolve('spend')}>
+                <Pressable
+                  style={({ pressed }) => [kit.ctl, styles.spend, pressed && kit.controlPressed]}
+                  onPressIn={(e) => { notePressIn('guard:spend', e); }}
+                  onPress={answered('guard:spend', () => resolve('spend'))}
+                >
 {({ pressed }) => (<>
                   <Text style={styles.spendText}>SPEND IT ALL</Text>
                   {ctlPlanes(pressed)}
