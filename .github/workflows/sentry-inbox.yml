@@ -16,6 +16,28 @@
 name: Sentry inbox sync (hourly clock)
 
 on:
+  # ⚠⚠ 2026-09-22 — A HAND ON THE CLOCK. The owner pushed a freeze log minutes
+  # after the 21:10Z tick, and the evidence could not be fetched for a full hour:
+  # a `schedule:` cannot be fired early, and the request.txt push route produced
+  # no run for THREE consecutive request commits on golem-line. With no manual
+  # route the relay had no third way in and the owner was left waiting on a clock
+  # while a fresh recurrence sat unread in Sentry.
+  #
+  # `workflow_dispatch` is surfaced — and accepted by the dispatch REST endpoint
+  # — ONLY for a definition present on the DEFAULT branch, which is why this
+  # belongs here and not on golem-line. The same reason build-apk.yml needed its
+  # stub; this branch documents that pattern four times already.
+  #
+  # ⚠ IT DOES NOT TOUCH THE READER. This sits in the trigger block, ABOVE
+  # `jobs:`, and the drift guard below compares ONLY the `jobs:` block precisely
+  # because triggers differ between the two copies by design. main's reader stays
+  # byte-identical to golem-line's canonical one (662 lines, verified), so the
+  # hourly route's staleness check is unaffected in either direction.
+  #
+  # The job checks out `ref: golem-line` whatever fired it, so a dispatched run
+  # reads Sentry and commits evidence to exactly the tree the hourly run does.
+  # This is the hourly run, early — not a second, weaker path.
+  workflow_dispatch:
   # ⚠ 2026-08-26 — THE HOURLY CLOCK, on the owner's word: "we need to set you
   # to pull all sentry when I start a new session or periodically." A session
   # start can't be hooked server-side, so the relay pulls on its own schedule
