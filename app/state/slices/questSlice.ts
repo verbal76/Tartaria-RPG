@@ -2595,7 +2595,27 @@ export const createQuestSlice = (
       const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
       deps.grantStageItems(get, set, mystery.title, mystery.stages, record.stage, record.stage + 1);
       grantedM = grantedNames(get, mystery.stages, record.stage, record.stage + 1);
-      const nextDef = mystery.stages[record.stage + 1];
+      // ⚠⚠⚠ OTA-1870 — THE ROAD BELONGS TO THE NEXT TASK, NOT TO A BEAT WE ARE
+      // ABOUT TO CONSUME. This read was `stages[record.stage + 1]`, which is the
+      // next stage by INDEX — including a trailing `checkKind: null` aftermath
+      // that the auto-consume loop forty lines below eats in this same tick. So
+      // a cross-ground epilogue armed a real travel course to its own ground,
+      // printed "You set course for X … Tap the → X button to press on" and
+      // "Auto-routing to the next stage", cleared `hubRoomId` as travel setup
+      // does — and THEN consumed the beat, leaving the player holding a course
+      // to a stage that no longer exists. Measured on shipped content:
+      // mystery_ashen_codex routed 19 tiles to Varakush, drowned_bell 45 tiles
+      // to Ostragar, story_dynasty_purge_asgardar 3 tiles to the Border Post.
+      // 12 of the 14 shipped epilogues are cross-ground, so this was live.
+      // `nextActionableStage` is the question actually being asked — which
+      // stage will still be there when the dust settles — and it is the SAME
+      // skip rule the consume loops use (verb alone), already used by the
+      // escort path above. If the arc ends in aftermath it returns
+      // `stages.length`, `nextDef` is undefined, and the whole routing block is
+      // skipped: no direction line, no course, no message. If a real objective
+      // follows the aftermath, routing targets THAT stage, which is what the
+      // player is actually being sent to.
+      const nextDef = mystery.stages[nextActionableStage(mystery.stages, record.stage + 1)];
       if (nextDef) {
         const anchor = CM.contractAnchorId(mystery);
         const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
@@ -2988,7 +3008,10 @@ export const createQuestSlice = (
       const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
       deps.grantStageItems(get, set, def.title, def.stages, record.stage, record.stage + 1);
       grantedS = grantedNames(get, def.stages, record.stage, record.stage + 1);
-      const nextDef = def.stages[record.stage + 1];
+      // ⚠⚠ OTA-1870 — the storyline half of the same contract; see the note in
+      // advanceMystery above. This path carried a byte-for-byte copy of the
+      // index read, and `story_dynasty_purge_asgardar` reproduced the defect.
+      const nextDef = def.stages[nextActionableStage(def.stages, record.stage + 1)];
       if (nextDef) {
         const anchor = CM.contractAnchorId(def);
         const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
