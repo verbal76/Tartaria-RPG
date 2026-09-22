@@ -266,11 +266,41 @@ export function TalkSheet() {
               {ordered.map((t) => {
                 const asked = spent(t);
                 return (
+                  /* ⚠⚠⚠ #193 — THE TRAY REMEMBERS THE QUESTION; THE CONTROL NO
+                     LONGER OFFERS AN ACTION.
+                     `asked` decided the border, the ink and the `(asked)` word
+                     and NOTHING ELSE: `onPress` was unconditional, so a spent
+                     row was still a live key. The player pressed it, the state
+                     layer refused correctly, and the refusal went to the feed —
+                     a control whose whole remaining function was to say no. A
+                     Pixel 10 Pro XL session with Odar Flameforge: 20 selections,
+                     2 real answers, 18 identical refusals, 18 of 19 repeats on
+                     one row. The owner: "Conversation repatolition".
+                     Ask-once was never broken. What was broken is that a
+                     question with nothing left to give still behaved like a
+                     choice. So the row stays — a list that silently shrinks
+                     reads as the game losing content (OTA-1866) — and stops
+                     being a control.
+                     ⚠⚠ `disabled` IS THE REPAIR, not an empty onPress. A
+                     disabled Pressable never becomes the touch responder
+                     (Pressability: `onStartShouldSetResponder` returns
+                     `!disabled`), so onPressIn never fires, `pressed` can never
+                     go true, and the press language above and the planes below
+                     stay at rest without either expression being rewritten. The
+                     `onPress` ternary and `accessibilityState` say the same
+                     thing again where a reader and a screen reader can see it —
+                     VendorScreen's known row is the house shape for this.
+                     ⚠ The state layer's own already-said guard STAYS. Prevention
+                     here and refusal there are different jobs: nothing stops a
+                     stale or programmatic caller reaching `raiseTopic`, and when
+                     one does it must still refuse a second answer. */
                   <Pressable
                     key={t.id}
                     style={({ pressed }) => [kit.ctl, styles.topicBtn, asked && styles.topicBtnSpent, pressed && kit.controlPressed]}
-                    onPress={() => raise(t.id)}
+                    onPress={asked ? undefined : () => raise(t.id)}
+                    disabled={asked}
                     accessibilityRole="button"
+                    accessibilityState={{ disabled: asked }}
                     accessibilityLabel={asked ? `${t.label}, already asked` : t.label}
                   >
 {({ pressed }) => (<>

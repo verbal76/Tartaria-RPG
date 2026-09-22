@@ -31383,7 +31383,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * ⚠ NOT CLAIMED: a class set's six lines are still PARALLEL VOICES inside one
  * ask-once topic, not six player questions; nothing here changes non-vendor
  * conversation, gameplay, presentation, grants, prices or navigation. */
-export const OTA_BUILD_ID = '2026-09-22-1867-the-second-disclosure-is-its-own-question';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-22-1867-the-second-disclosure-is-its-own-question';
+/* ⚠⚠⚠ OTA-1868 — THE TRAY REMEMBERS THE QUESTION; THE CONTROL NO LONGER
+ * OFFERS AN ACTION.
+ * OTA-1866 and OTA-1867 were both about STATE, and both were right. This one is
+ * about the CONTROL. Measured on hardware 2026-09-22, vendor Odar Flameforge:
+ * 20 question selections, 2 distinct questions, 2 legitimate first answers, 18
+ * defensive refusals, 18 of 19 selections on one row, every refusal the same
+ * sentence. The owner's word for it: "Conversation repatolition".
+ * Nothing about ask-once failed. The question really was consumed, `topicSpent`
+ * really said so, and `raiseTopic` really refused the second answer. What failed
+ * is that a question with NOTHING LEFT TO GIVE still behaved like a live
+ * control: `asked` decided the border, the ink and the word `(asked)` and
+ * nothing else, while `onPress` stayed unconditional. The player pressed a dead
+ * key and spent a feed line being told no.
+ * Owner ruling (A): a consumed vendor question REMAINS VISIBLE as `(asked)` and
+ * is completely disabled and non-actionable. The row stays — a list that
+ * silently shrinks reads as the game losing content — and stops being a control.
+ * `disabled` is the repair, not an empty handler: a disabled Pressable never
+ * becomes the touch responder, so onPressIn never fires, the pressed face is
+ * unreachable, the planes stay at rest, and onPress is gated again. The rule is
+ * `topicSpent` and nothing else — no vendor name, no topic id, no six-row
+ * exception — so it reaches authored rows, class voice lanes, both halves of
+ * the six OTA-1867 pairs and every migrated legacy state alike.
+ * ⚠ The state layer's already-said guard STAYS. UI prevention and state-layer
+ * defence are different jobs: normal play can no longer reach `raiseTopic` on a
+ * spent topic, but a stale or programmatic caller still can, and must still be
+ * refused a second answer.
+ * ⚠ NOT CLAIMED: `alreadySaidLine` was not removed and keeps its one caller;
+ * no claim that nothing can ever reach that guard; no claim about dialogue
+ * systems outside the vendor-topic tray; no device verification. Nothing here
+ * changes topics, gates, prose, the Q1→Q2 graph, conversation memory, grants,
+ * inventory, standing, missions, stock, prices or navigation. */
+export const OTA_BUILD_ID = '2026-09-22-1868-the-consumed-question-is-not-a-control';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1860-the-answer-belongs-to-the-card';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1859-the-beat-paid-by-leaving';
