@@ -80,8 +80,8 @@ function sortWith(
 
 const RARITY_RANK: Record<string, number> = { Common: 0, Uncommon: 1, Rare: 2, Legendary: 3 };
 const byName = (a: InventoryItem, b: InventoryItem) => a.name.localeCompare(b.name);
-const byRarity = (a: InventoryItem, b: InventoryItem) =>
-  (RARITY_RANK[a.rarity ?? 'Common'] - RARITY_RANK[b.rarity ?? 'Common']) || byName(a, b);
+const rank = (i: InventoryItem) => RARITY_RANK[i.rarity ?? 'Common'] ?? 0;
+const byRarity = (a: InventoryItem, b: InventoryItem) => (rank(a) - rank(b)) || byName(a, b);
 const byQty = (a: InventoryItem, b: InventoryItem) => (a.quantity - b.quantity) || byName(a, b);
 const byKind = (a: InventoryItem, b: InventoryItem) =>
   ((a.kind ?? '').localeCompare(b.kind ?? '')) || byName(a, b);
@@ -98,16 +98,17 @@ const AXES: Array<[string, (a: InventoryItem, b: InventoryItem) => number]> = [
  *   - name:   Aetherstone/Cloth/Patched/Scrap all sort before "Worn …"
  *   - rarity: a Legendary and a Rare outrank a Common coin
  *   - qty:    the coin holds the largest stack, so ascending buries it last
- *   - kind:   'misc' sorts after 'material'
+ *   - kind:   the coin is kind 'misc'; catalog materials carry no kind at all
+ *             (materials.json has no kind field), so '' sorts before 'misc'
  */
 function population(): InventoryItem[] {
   return [
-    mat('Aetherstone Fragment', { rarity: 'Rare', quantity: 3, kind: 'material' }),
-    mat('Cloth Scrap', { rarity: 'Common', quantity: 12, kind: 'material' }),
+    mat('Aetherstone Fragment', { rarity: 'Rare', quantity: 3, kind: undefined }),
+    mat('Cloth Scrap', { rarity: 'Common', quantity: 12, kind: undefined }),
     mat(COIN, { rarity: 'Common', quantity: 22, kind: 'misc', tags: ['currency', 'metal'] }),
-    mat('Monarch Sigil Ingot', { rarity: 'Legendary', quantity: 1, kind: 'material' }),
-    mat('Patched Cloth', { rarity: 'Uncommon', quantity: 4, kind: 'material' }),
-    mat('Scrap Metal', { rarity: 'Common', quantity: 9, kind: 'material' }),
+    mat('Monarch Sigil Ingot', { rarity: 'Legendary', quantity: 1, kind: undefined }),
+    mat('Patched Cloth', { rarity: 'Uncommon', quantity: 4, kind: undefined }),
+    mat('Scrap Metal', { rarity: 'Common', quantity: 9, kind: undefined }),
   ];
 }
 
@@ -141,7 +142,7 @@ describe('OTA-1871 — claim 1: the pin leads Materials on every axis, both dire
     for (const dir of [1, -1] as const) {
       it(`${axisName} ${dir === 1 ? 'asc' : 'desc'} — the coin is index 0 of Materials`, () => {
         const section = materialsSection(sortWith(population(), axis, dir));
-        expect(section[0].name).toBe(COIN);
+        expect(section[0]!.name).toBe(COIN);
       });
     }
   }
@@ -149,18 +150,18 @@ describe('OTA-1871 — claim 1: the pin leads Materials on every axis, both dire
   it('leads even when the axis alone would bury it last (qty ascending)', () => {
     // Control: with the pin off, the biggest stack sorts to the END ascending.
     const unpinned = materialsSection(sortWith(population(), byQty, 1, false));
-    expect(unpinned[unpinned.length - 1].name).toBe(COIN);
+    expect(unpinned[unpinned.length - 1]!.name).toBe(COIN);
     // With the pin on, the same axis puts it first.
     const pinned = materialsSection(sortWith(population(), byQty, 1, true));
-    expect(pinned[0].name).toBe(COIN);
+    expect(pinned[0]!.name).toBe(COIN);
   });
 
   it('leads a Legendary on the rarity axis, which is the case the owner named', () => {
     const section = materialsSection(sortWith(population(), byRarity, -1, true));
-    expect(section[0].name).toBe(COIN);
+    expect(section[0]!.name).toBe(COIN);
     // …and the Legendary is still the top of what follows, so descending rarity
     // still means something under the pin.
-    expect(section[1].name).toBe('Monarch Sigil Ingot');
+    expect(section[1]!.name).toBe('Monarch Sigil Ingot');
   });
 });
 
@@ -200,8 +201,8 @@ describe('OTA-1871 — claim 2: everything else follows the selected sort, untou
     const desc = materialsSection(sortWith(two, byQty, -1, true));
     expect(desc.slice(0, 2).map((i) => i.quantity)).toEqual([30, 4]);
     // Scrap Metal is never pulled above either coin.
-    expect(asc[2].name).toBe('Scrap Metal');
-    expect(desc[2].name).toBe('Scrap Metal');
+    expect(asc[2]!.name).toBe('Scrap Metal');
+    expect(desc[2]!.name).toBe('Scrap Metal');
   });
 });
 
@@ -217,7 +218,7 @@ describe('OTA-1871 — claim 3: the pin belongs to Materials and stays there', (
       earmarked,
     ];
     const section = sortWith(quest, byName, 1, true);
-    expect(section[0].name).toBe('Ashen Codex Page');
+    expect(section[0]!.name).toBe('Ashen Codex Page');
   });
 
   it('the pin never reorders a non-Materials section', () => {
