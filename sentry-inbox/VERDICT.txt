@@ -9,10 +9,6 @@
     1 page(s), 16 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703017060/events/?full=false
     1 page(s), 26 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7715872039/events/?full=false
-    1 page(s), 9 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7715872102/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7715960018/events/?full=false
     1 page(s), 18 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7715960076/events/?full=false
@@ -190,7 +186,7 @@
   /organizations/hot-attic-games-llc/issues/7746981148/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7746985981/events/?full=false
-    1 page(s), 61 rows — COMPLETE — ended short of a full page
+    1 page(s), 91 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7746986031/events/?full=false
     1 page(s), 4 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7746987022/events/?full=false
@@ -201,6 +197,10 @@
     1 page(s), 21 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7746990214/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7747599123/events/?full=false
+    1 page(s), 48 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7747599169/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -216,6 +216,8 @@
     mu8czg6uupeh: 24/56 parts
     mu959anvpigm: 30/35 parts
     mubrkcddy8dv: 21/25 parts
+    muc5z7cnubvh: 30/37 parts
+    muc6fh1tj2l7: 32/38 parts
   scrub cost per bundle:
     mtavnjvdw4u4: 4 redactions, 60000 chars
     mtavou0hiube: 1 redactions, 9994 chars

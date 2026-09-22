@@ -1,0 +1,1465 @@
+Bug Report — Permannu · (2026-09-22-1864-the-bench-leaves-a-trail) · Talking repeats
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-22T04:31:09.958Z
+Character: Permannu
+Slot ID: slot_mu9z9l9q_ip9bpv
+Race: Tartarian Giants
+Location: Giant-Watch Shrine
+HP: 57/58
+
+--- DESCRIPTION ---
+Talking repeats
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-22T04:31:09.866Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-22-1864-the-bench-leaves-a-trail)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-22T04:23:29.104Z
+  Last init success: 2026-09-22T04:23:30.679Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (count reset — it described a previous build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmuc658yi77 · started 2026-09-22T04:23:16.890Z
+  Followed an OTA apply 77ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 6 recorded (newest last)
+  ⚠⚠ 2 of 6 process kills landed on an OTA-apply boot
+  • 2026-09-19T20:02:55.215Z (3388m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room outpost_quarters · screen exploration
+      last checkpoint: rendered · 31ms into the action · alive 787ms after it
+      launch: died 27074407ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r1/l0/p1/dn0
+  • 2026-09-19T20:45:42.388Z (3345m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-20T01:42:10.103Z (3049m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1853-the-ring-learns-who · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet) — begun 4m before the last sign of life; treat the action label as stale, not as the killer
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: appstate:inactive→background · 262490ms into the action · alive 0ms after it
+      launch: died 803123ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 147ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o2/r2/l0/p1/dn0
+  • 2026-09-21T21:31:59.422Z (419m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "roll"
+      doing: tap "roll" · room iskan_veil · screen exploration
+      last checkpoint: appstate:inactive→background · 28194ms into the action · alive 0ms after it
+      launch: died 196203ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o3/r3/l0/p1/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:34:21.255Z (417m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: action "craft Mudstone"
+      doing: action "craft Mudstone" · room iskan_veil · screen crafting
+      last checkpoint: appstate:inactive→background · 17512ms into the action · alive 0ms after it
+      launch: died 140411ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:35:12.282Z (416m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: appstate:inactive→background · 49867ms into the action · alive 0ms after it
+      launch: died 49901ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠ Memory warnings: 8 this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 6.8s · 2 job kinds queued >3s · worst 12.1ms/prompt-token · 2 generations thrown away (19.2s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 89 jobs · worst wait 6.8s (ambient) · 6 past 3s · 1 cut as obsolete
+  App state trail: inactive → active
+Model contexts
+  Live now: 0
+  Opened: 2 · Released: 2 · Peak live: 1
+  Stragglers cleaned by the lifecycle guard: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 140MB · last 136MB · net +124MB over 52 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+    +10.0s heap-move — heap 20MB gc 0ms/28 · ctx 0 · app=active · native idle q0 · warns 0
+    +13.7s ctx-event — heap 24MB gc 0ms/37 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+    +13.8s watch-start — heap 24MB gc 0ms/38 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +18.8s heap-move — heap 32MB gc 0ms/61 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +19.8s gen-settled [investigate_lore ok] — heap 32MB gc 0ms/61 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +22.0s gen-settled [investigate_lore ok] — heap 36MB gc 0ms/69 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +28.8s heap-move — heap 48MB gc 0ms/99 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +38.9s heap-move — heap 56MB gc 0ms/121 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +53.9s heap-move — heap 64MB gc 0ms/152 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +64.0s heap-move — heap 72MB gc 0ms/165 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +84.6s gen-settled [investigate_lore ok] — heap 72MB gc 0ms/209 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +91.3s gen-settled [investigate_lore ok] — heap 72MB gc 0ms/237 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +113.1s gen-settled [narration:scene_intro pr] — heap 72MB gc 0ms/310 · ctx 1 ≈425MB est · app=active · native narration:scene_intro running q4 · warns 0
+   +115.7s gen-settled [investigate_lore ok] — heap 76MB gc 0ms/322 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+   +116.7s gen-settled [investigate_lore ok] — heap 76MB gc 0ms/324 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+   +121.9s gen-settled [investigate_lore ok] — heap 76MB gc 0ms/363 · ctx 1 ≈425MB est · app=active · native investigate_lore running q3 · warns 0
+   +127.5s gen-settled [ambient preempted] — heap 76MB gc 0ms/394 · ctx 1 ≈425MB est · app=active · native ambient running q2 · warns 0
+   +130.1s gen-settled [investigate_lore ok] — heap 76MB gc 0ms/404 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +132.8s mem-warning — heap 72MB gc 0ms/413 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 1
+   +134.6s ctx-event — heap 72MB gc 0ms/427 · ctx 0 · app=active · native teardown running q0 · warns 1
+   +134.6s mem-warn-settled [freed-ctx] — heap 72MB gc 0ms/429 · ctx 0 · app=active · native idle q0 · warns 1
+   +174.3s heap-move — heap 84MB gc 1ms/616 · ctx 0 · app=active · native idle q0 · warns 1
+   +184.3s heap-move — heap 92MB gc 1ms/635 · ctx 0 · app=active · native idle q0 · warns 1
+   +194.3s heap-move — heap 100MB gc 1ms/650 · ctx 0 · app=active · native idle q0 · warns 1
+   +204.4s heap-move — heap 108MB gc 1ms/674 · ctx 0 · app=active · native idle q0 · warns 1
+   +214.4s heap-move — heap 116MB gc 1ms/711 · ctx 0 · app=active · native idle q0 · warns 1
+   +219.4s heap-move — heap 124MB gc 1ms/735 · ctx 0 · app=active · native idle q0 · warns 1
+   +224.4s heap-move — heap 132MB gc 1ms/760 · ctx 0 · app=active · native voice running q1 · warns 1
+   +224.8s mem-warning — heap 128MB gc 1ms/765 · ctx 0 · app=active · native voice running q1 · warns 2
+   +224.8s mem-warn-settled [freed-nothing] — heap 128MB gc 1ms/765 · ctx 0 · app=active · native voice running q1 · warns 2
+   +227.5s mem-warning — heap 124MB gc 1ms/788 · ctx 0 · app=active · native llm running q0 · warns 3
+   +227.5s mem-warn-settled [freed-nothing] — heap 124MB gc 1ms/788 · ctx 0 · app=active · native llm running q0 · warns 3
+   +227.5s mem-warning — heap 120MB gc 1ms/793 · ctx 0 · app=active · native llm running q0 · warns 4
+   +227.5s mem-warn-settled [freed-nothing] — heap 120MB gc 1ms/793 · ctx 0 · app=active · native llm running q0 · warns 4
+   +227.6s ctx-event — heap 120MB gc 1ms/794 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 4
+   +227.6s ctx-event — heap 120MB gc 1ms/794 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 4
+   +227.6s mem-warning — heap 116MB gc 1ms/800 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 5
+   +227.6s mem-warn-settled [freed-nothing] — heap 116MB gc 1ms/800 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 5
+   +227.6s mem-warning — heap 112MB gc 1ms/804 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 6
+   +227.6s mem-warn-settled [freed-nothing] — heap 112MB gc 1ms/804 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 6
+   +227.7s mem-warning — heap 108MB gc 1ms/808 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 7
+   +227.7s mem-warn-settled [freed-nothing] — heap 108MB gc 1ms/808 · ctx 1 ≈425MB est · app=active · native teardown running q0 · warns 7
+   +227.7s ctx-event — heap 108MB gc 1ms/808 · ctx 0 · app=active · native teardown running q0 · warns 7
+   +378.8s appstate [active→inactive] — heap 108MB gc 1ms/1188 · ctx 0 · app=inactive · native idle q0 · warns 7
+   +384.2s appstate [inactive→active] — heap 108MB gc 1ms/1191 · ctx 0 · app=active · native idle q0 · warns 7
+   +440.3s heap-move — heap 116MB gc 1ms/1331 · ctx 0 · app=active · native idle q0 · warns 7
+   +445.4s heap-move — heap 124MB gc 1ms/1362 · ctx 0 · app=active · native idle q0 · warns 7
+   +450.4s heap-move — heap 132MB gc 1ms/1390 · ctx 0 · app=active · native idle q0 · warns 7
+   +460.4s heap-move — heap 140MB gc 1ms/1414 · ctx 0 · app=active · native idle q0 · warns 7
+   +465.9s mem-warning — heap 136MB gc 2ms/1418 · ctx 0 · app=active · native idle q0 · warns 8
+   +465.9s mem-warn-settled [freed-nothing] — heap 136MB gc 2ms/1418 · ctx 0 · app=active · native idle q0 · warns 8
+Native memory flight recorder (Build 190)
+  ⚠ footprint = task_vm_info.phys_footprint (the number Jetsam judges).
+    NOT a heap. available = os_proc_available_memory(), an OS advisory —
+    NOT the exact Jetsam threshold. Bands below are diagnostic hypotheses,
+    not established universal iPhone danger thresholds.
+  Process start: 1590MB (earliest sample — EVIDENCE, not a baseline)
+  Footprint: analysis baseline 1580MB · peak 1792MB · last 1184MB · high water 1792MB  [SEVERE]
+  Shape: RATCHET — retained -396MB vs analysis baseline · recovery 100% · floor rose 4 time(s), +464MB travelled (churn, NOT memory still held)
+  OS said available: min 306MB
+  Sampler: samples 926 · evicted 414 · events 673 · warnings 8 · bursts 15+16ext · cadence 100ms
+  ⚠⚠ PREVIOUS LIFE — the last checkpoint written by a process that did not
+     come back. This is the only trace a Jetsam kill can ever leave us.
+     MEMORY_WARNING at 1676MB (high water 1692MB, baseline 972MB) after 876s · 38 warning(s) · unknown · build 2026-09-21-1862-the-beat-keeps-its-way-out
+  MetricKit: no payload delivered yet (iOS delivers ~daily) — undelivered, NOT healthy
+  Retained steps: 10 (floor window 10, rise ≥48MB held 8 samples)
+    STEP 1:   +160.3s →   +168.3s · floor 1270 → 1320MB (+50 retained) · peak 1386MB · recovered 57%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 2:   +191.3s →   +199.3s · floor 1320 → 1373MB (+53 retained) · peak 1792MB · recovered 89%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 3:   +203.2s →   +211.0s · floor 1373 → 1420MB (+47 retained) · peak 1792MB · recovered 89%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 4:   +211.1s →   +211.9s · floor 1420 → 1592MB (+172 retained) · peak 1708MB · recovered 40%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 5:   +212.5s →   +213.3s · floor 1592 → 1634MB (+42 retained) · peak 1708MB · recovered 64%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 6:   +332.0s →   +340.0s · floor 1316 → 1369MB (+53 retained) · peak 1370MB · recovered 2%
+      inside: HERMES_HEAP×2
+        +331.2s HERMES_HEAP/108 — 1354MB
+        +336.3s HERMES_HEAP/108 — 1369MB
+    STEP 7:   +391.5s →   +399.5s · floor 1349 → 1409MB (+60 retained) · peak 1488MB · recovered 57%
+      inside: ROUTE_UNMOUNT×1 · ROUTE_MOUNT×1 · HERMES_HEAP×2
+        +391.1s ROUTE_UNMOUNT/23491 — 1391MB
+        +391.1s ROUTE_MOUNT/36426 — 1391MB
+        +391.5s HERMES_HEAP/108 — 1409MB
+        +396.5s HERMES_HEAP/108 — 1410MB
+    STEP 8:   +415.5s →   +423.5s · floor 1409 → 1454MB (+45 retained) · peak 1665MB · recovered 82%
+      inside: HERMES_HEAP×3 · REPORT_COMPOSE_START×1 · REPORT_COMPOSE_END×1
+        +411.5s HERMES_HEAP/108 — 1435MB
+        +411.5s REPORT_COMPOSE_START — 1435MB
+        +411.5s REPORT_COMPOSE_END — 1435MB
+        +416.5s HERMES_HEAP/108 — 1454MB
+        +421.5s HERMES_HEAP/112 — 1476MB
+    STEP 9:   +426.5s →   +434.6s · floor 1454 → 1508MB (+54 retained) · peak 1665MB · recovered 74%
+      inside: HERMES_HEAP×3
+        +421.5s HERMES_HEAP/112 — 1476MB
+        +426.6s HERMES_HEAP/116 — 1510MB
+        +431.6s HERMES_HEAP/124 — 1549MB
+    STEP 10:   +435.6s →   +443.6s · floor 1508 → 1611MB (+103 retained) · peak 1665MB · recovered 34%
+      inside: HERMES_HEAP×3
+        +431.6s HERMES_HEAP/124 — 1549MB
+        +436.6s HERMES_HEAP/132 — 1627MB
+        +441.6s HERMES_HEAP/136 — 1646MB
+  Events (last 64):
+      +271.0s HERMES_HEAP/108 — 1334MB · unknown
+      +276.1s HERMES_HEAP/108 — 1335MB · unknown
+      +278.9s ROUTE_UNMOUNT/65428 — 1334MB · unknown
+      +278.9s ROUTE_MOUNT/36426 — 1334MB · unknown
+      +280.4s T5_DONE/227 — 1354MB · unknown
+      +281.1s HERMES_HEAP/108 — 1354MB · unknown
+      +281.8s ROUTE_UNMOUNT/36426 — 1354MB · unknown
+      +281.8s ROUTE_MOUNT/56436 — 1354MB · unknown
+      +281.8s T5_DONE/228 — 1354MB · unknown
+      +286.1s HERMES_HEAP/108 — 1341MB · unknown
+      +291.1s HERMES_HEAP/108 — 1338MB · unknown
+      +291.1s REPORT_COMPOSE_START — 1338MB · unknown
+      +291.1s REPORT_COMPOSE_END — 1338MB · unknown
+      +296.1s HERMES_HEAP/108 — 1354MB · unknown
+      +301.1s HERMES_HEAP/108 — 1348MB · unknown
+      +306.2s HERMES_HEAP/108 — 1350MB · unknown
+      +311.2s HERMES_HEAP/108 — 1350MB · unknown
+      +316.2s HERMES_HEAP/108 — 1351MB · unknown
+      +321.2s HERMES_HEAP/108 — 1351MB · unknown
+      +326.2s HERMES_HEAP/108 — 1352MB · unknown
+      +331.2s HERMES_HEAP/108 — 1354MB · unknown
+      +336.3s HERMES_HEAP/108 — 1369MB · unknown
+      +341.3s HERMES_HEAP/108 — 1370MB · unknown
+      +346.3s HERMES_HEAP/108 — 1355MB · unknown
+      +351.4s HERMES_HEAP/108 — 1357MB · unknown
+      +351.4s REPORT_COMPOSE_START — 1357MB · unknown
+      +351.4s REPORT_COMPOSE_END — 1357MB · unknown
+      +356.4s HERMES_HEAP/108 — 1357MB · unknown
+      +361.4s HERMES_HEAP/108 — 1360MB · unknown
+      +365.0s WILL_RESIGN_ACTIVE/2 — 1361MB · inactive
+      +366.4s HERMES_HEAP/108 — 1361MB · inactive
+      +370.5s DID_BECOME_ACTIVE/1 — 1373MB · active
+      +371.4s HERMES_HEAP/108 — 1374MB · active
+      +371.6s ROUTE_UNMOUNT/56436 — 1374MB · active
+      +371.6s ROUTE_MOUNT/36426 — 1374MB · active
+      +376.0s ROUTE_UNMOUNT/36426 — 1392MB · active
+      +376.0s ROUTE_MOUNT/23491 — 1392MB · active
+      +376.0s T5_DONE/284 — 1392MB · active
+      +376.4s HERMES_HEAP/108 — 1389MB · active
+      +381.4s HERMES_HEAP/108 — 1387MB · active
+      +386.5s HERMES_HEAP/108 — 1389MB · active
+      +391.1s ROUTE_UNMOUNT/23491 — 1391MB · active
+      +391.1s ROUTE_MOUNT/36426 — 1391MB · active
+      +391.5s HERMES_HEAP/108 — 1409MB · active
+      +396.5s HERMES_HEAP/108 — 1410MB · active
+      +401.5s HERMES_HEAP/108 — 1410MB · active
+      +406.5s HERMES_HEAP/108 — 1410MB · active
+      +411.5s HERMES_HEAP/108 — 1435MB · active
+      +411.5s REPORT_COMPOSE_START — 1435MB · active
+      +411.5s REPORT_COMPOSE_END — 1435MB · active
+      +416.5s HERMES_HEAP/108 — 1454MB · active
+      +421.5s HERMES_HEAP/112 — 1476MB · active
+      +426.6s HERMES_HEAP/116 — 1510MB · active
+      +431.6s HERMES_HEAP/124 — 1549MB · active
+      +436.6s HERMES_HEAP/132 — 1627MB · active
+      +441.6s HERMES_HEAP/136 — 1646MB · active
+      +445.8s ROUTE_UNMOUNT/36426 — 1639MB · active
+      +445.8s ROUTE_MOUNT/58656 — 1639MB · active
+      +445.9s AUDIO_PLAYER_CREATE/58003 — 1640MB · active
+      +446.6s HERMES_HEAP/140 — 1639MB · active
+      +451.6s HERMES_HEAP/140 — 1645MB · active
+      +451.9s MEMORY_WARNING/8 — 1689MB · active
+      +452.1s JS_MEMORY_WARNING/8 — 1176MB · active
+      +452.1s REPORT_COMPOSE_START — 1176MB · active
+  Samples (last 512 of 512):
+      +121.6s 1590MB rss 1211MB avail 508MB · unknown · nominal · burst
+      +121.7s 1580MB rss 1178MB avail 518MB · unknown · nominal · burst
+      +121.8s 1580MB rss 1178MB avail 518MB · unknown · nominal · burst
+      +121.9s 1580MB rss 1178MB avail 518MB · unknown · nominal · burst
+      +122.0s 1580MB rss 1178MB avail 518MB · unknown · nominal · burst
+      +122.1s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.2s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.3s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.4s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.5s 1579MB rss 1178MB avail 519MB malloc 1589MB/4240666blk · unknown · nominal · burst
+      +122.6s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.7s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.8s 1579MB rss 1178MB avail 519MB · unknown · nominal · burst
+      +122.9s 1596MB rss 1166MB avail 502MB · unknown · nominal · burst
+      +123.0s 1596MB rss 1166MB avail 502MB · unknown · nominal · burst
+      +123.1s 1596MB rss 1166MB avail 502MB · unknown · nominal · burst
+      +123.2s 1580MB rss 1166MB avail 518MB · unknown · nominal · burst
+      +123.3s 1580MB rss 1166MB avail 518MB · unknown · nominal · burst
+      +123.4s 1581MB rss 1167MB avail 517MB · unknown · nominal · burst
+      +123.5s 1581MB rss 1167MB avail 517MB malloc 1593MB/4245593blk · unknown · nominal · burst
+      +123.6s 1581MB rss 1155MB avail 517MB · unknown · nominal · burst
+      +123.7s 1581MB rss 1155MB avail 517MB · unknown · nominal · burst
+      +123.8s 1581MB rss 1155MB avail 517MB · unknown · nominal · burst
+      +123.9s 1581MB rss 1155MB avail 517MB · unknown · nominal · burst
+      +124.0s 1581MB rss 1155MB avail 517MB · unknown · nominal · burst
+      +124.1s 1581MB rss 1156MB avail 517MB · unknown · nominal · burst
+      +124.2s 1599MB rss 1164MB avail 499MB · unknown · nominal · burst
+      +124.3s 1599MB rss 1164MB avail 499MB · unknown · nominal · burst
+      +124.4s 1599MB rss 1164MB avail 499MB · unknown · nominal · burst
+      +124.5s 1599MB rss 1164MB avail 499MB malloc 1595MB/4249463blk · unknown · nominal · burst
+      +124.6s 1599MB rss 1164MB avail 499MB · unknown · nominal · burst
+      +124.7s 1582MB rss 1164MB avail 516MB · unknown · nominal · burst
+      +124.8s 1582MB rss 1164MB avail 516MB · unknown · nominal · burst
+      +124.9s 1582MB rss 1164MB avail 516MB · unknown · nominal · burst
+      +125.0s 1604MB rss 1162MB avail 494MB · unknown · nominal · burst
+      +125.1s 1604MB rss 1162MB avail 494MB · unknown · nominal · burst
+      +125.2s 1604MB rss 1162MB avail 494MB · unknown · nominal · burst
+      +125.3s 1604MB rss 1162MB avail 494MB · unknown · nominal · burst
+      +125.4s 1603MB rss 1162MB avail 495MB · unknown · nominal · burst
+      +125.5s 1581MB rss 1162MB avail 517MB malloc 1599MB/4252651blk · unknown · nominal · burst
+      +125.6s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +125.7s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +125.8s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +125.9s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +126.0s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +126.1s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +126.2s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +126.3s 1581MB rss 1162MB avail 517MB · unknown · nominal · burst
+      +126.4s 1272MB rss 942MB avail 826MB · unknown · nominal · burst
+      +126.5s 1287MB rss 944MB avail 811MB malloc 1219MB/4127032blk · unknown · nominal · burst
+      +126.6s 1286MB rss 944MB avail 812MB · unknown · nominal · burst
+      +126.7s 1286MB rss 944MB avail 812MB · unknown · nominal · burst
+      +126.8s 1286MB rss 944MB avail 812MB · unknown · nominal · burst
+      +126.9s 1286MB rss 944MB avail 812MB · unknown · nominal · burst
+      +127.0s 1286MB rss 944MB avail 812MB · unknown · nominal · burst
+      +127.1s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.2s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.3s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.4s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.5s 1270MB rss 944MB avail 828MB malloc 1219MB/4127290blk · unknown · nominal · burst
+      +127.6s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.7s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.8s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +127.9s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.0s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.1s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.2s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.3s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.4s 1270MB rss 944MB avail 828MB · unknown · nominal · burst
+      +128.5s 1271MB rss 944MB avail 827MB · unknown · nominal · burst
+      +128.6s 1275MB rss 944MB avail 823MB malloc 1219MB/4129396blk · unknown · nominal · burst
+      +128.7s 1275MB rss 944MB avail 823MB · unknown · nominal · burst
+      +128.8s 1275MB rss 944MB avail 823MB · unknown · nominal · burst
+      +128.9s 1275MB rss 944MB avail 823MB · unknown · nominal · burst
+      +129.0s 1275MB rss 945MB avail 823MB · unknown · nominal · burst
+      +129.1s 1292MB rss 945MB avail 806MB · unknown · nominal
+      +130.2s 1272MB rss 946MB avail 826MB malloc 1227MB/4135072blk · unknown · nominal
+      +131.1s 1272MB rss 948MB avail 826MB · unknown · nominal
+      +132.2s 1271MB rss 949MB avail 827MB malloc 1237MB/4140372blk · unknown · nominal
+      +133.2s 1286MB rss 951MB avail 812MB malloc 1240MB/4141924blk · unknown · nominal
+      +134.3s 1271MB rss 950MB avail 827MB malloc 1240MB/4142191blk · unknown · nominal
+      +135.3s 1271MB rss 950MB avail 827MB malloc 1240MB/4142255blk · unknown · nominal
+      +136.3s 1273MB rss 954MB avail 825MB malloc 1246MB/4146038blk · unknown · nominal
+      +137.3s 1272MB rss 954MB avail 826MB malloc 1246MB/4146613blk · unknown · nominal
+      +138.1s 1272MB rss 954MB avail 826MB · unknown · nominal
+      +139.3s 1275MB rss 956MB avail 823MB malloc 1249MB/4148737blk · unknown · nominal
+      +140.2s 1275MB rss 958MB avail 823MB · unknown · nominal
+      +141.2s 1276MB rss 958MB avail 822MB malloc 1252MB/4151336blk · unknown · nominal
+      +142.2s 1295MB rss 965MB avail 803MB malloc 1257MB/4152842blk · unknown · nominal
+      +143.1s 1299MB rss 973MB avail 799MB · unknown · nominal
+      +144.3s 1307MB rss 984MB avail 791MB malloc 1269MB/4161718blk · unknown · nominal
+      +145.3s 1284MB rss 984MB avail 814MB malloc 1269MB/4161710blk · unknown · nominal
+      +146.3s 1288MB rss 991MB avail 810MB malloc 1274MB/4164159blk · unknown · nominal
+      +147.2s 1288MB rss 991MB avail 810MB · unknown · nominal
+      +148.3s 1293MB rss 994MB avail 805MB malloc 1274MB/4166293blk · unknown · nominal
+      +149.3s 1290MB rss 998MB avail 808MB · unknown · nominal
+      +150.2s 1312MB rss 1003MB avail 786MB malloc 1285MB/4172610blk · unknown · nominal
+      +151.3s 1323MB rss 1017MB avail 775MB malloc 1293MB/4176303blk · unknown · nominal
+      +152.2s 1300MB rss 1017MB avail 798MB · unknown · nominal
+      +153.3s 1298MB rss 1022MB avail 800MB malloc 1295MB/4179201blk · unknown · nominal
+      +154.2s 1320MB rss 1029MB avail 778MB · unknown · nominal
+      +155.3s 1303MB rss 1030MB avail 795MB malloc 1302MB/4183180blk · unknown · nominal
+      +156.2s 1331MB rss 1036MB avail 767MB · unknown · nominal
+      +157.3s 1307MB rss 1038MB avail 791MB malloc 1306MB/4187383blk · unknown · nominal
+      +158.2s 1313MB rss 1044MB avail 785MB · unknown · nominal
+      +159.3s 1344MB rss 1057MB avail 754MB malloc 1319MB/4193315blk · unknown · nominal
+      +160.3s 1320MB rss 1057MB avail 778MB malloc 1319MB/4193675blk · unknown · nominal
+      +161.1s 1340MB rss 1061MB avail 758MB · unknown · nominal
+      +162.1s 1322MB rss 1061MB avail 776MB malloc 1322MB/4196544blk · unknown · nominal
+      +163.1s 1322MB rss 1061MB avail 776MB malloc 1322MB/4196607blk · unknown · nominal
+      +164.1s 1346MB rss 1069MB avail 752MB malloc 1326MB/4198550blk · unknown · nominal
+      +165.1s 1328MB rss 1069MB avail 770MB malloc 1326MB/4197714blk · unknown · nominal
+      +166.1s 1321MB rss 1061MB avail 777MB malloc 1331MB/4213532blk · unknown · nominal
+      +167.3s 1321MB rss 1062MB avail 777MB malloc 1331MB/4213316blk · unknown · nominal
+      +168.3s 1321MB rss 1062MB avail 777MB malloc 1331MB/4213653blk · unknown · nominal
+      +169.3s 1321MB rss 1061MB avail 777MB malloc 1331MB/4213667blk · unknown · nominal
+      +170.3s 1342MB rss 1083MB avail 756MB malloc 1335MB/4224117blk · unknown · nominal
+      +171.3s 1340MB rss 1083MB avail 758MB malloc 1335MB/4224507blk · unknown · nominal
+      +172.3s 1361MB rss 1098MB avail 737MB malloc 1340MB/4227120blk · unknown · nominal
+      +173.3s 1343MB rss 1098MB avail 755MB malloc 1340MB/4227573blk · unknown · nominal
+      +174.3s 1343MB rss 1098MB avail 755MB · unknown · nominal
+      +175.3s 1343MB rss 1098MB avail 755MB malloc 1340MB/4226948blk · unknown · nominal
+      +176.3s 1343MB rss 1098MB avail 755MB malloc 1340MB/4226361blk · unknown · nominal
+      +177.3s 1343MB rss 1098MB avail 755MB · unknown · nominal
+      +178.2s 1344MB rss 1099MB avail 754MB malloc 1341MB/4227301blk · unknown · nominal
+      +179.2s 1372MB rss 1106MB avail 726MB · unknown · nominal
+      +180.2s 1352MB rss 1103MB avail 746MB malloc 1348MB/4230230blk · unknown · nominal
+      +181.1s 1358MB rss 1107MB avail 740MB · unknown · nominal
+      +182.3s 1353MB rss 1107MB avail 745MB malloc 1350MB/4231742blk · unknown · nominal
+      +183.3s 1376MB rss 1113MB avail 722MB malloc 1355MB/4233832blk · unknown · nominal
+      +184.2s 1382MB rss 1120MB avail 716MB · unknown · nominal
+      +185.3s 1362MB rss 1120MB avail 736MB malloc 1358MB/4236924blk · unknown · nominal
+      +186.3s 1362MB rss 1120MB avail 736MB malloc 1358MB/4236996blk · unknown · nominal
+      +187.3s 1386MB rss 1127MB avail 712MB · unknown · nominal
+      +188.3s 1367MB rss 1127MB avail 731MB malloc 1364MB/4239722blk · unknown · nominal
+      +189.3s 1367MB rss 1127MB avail 731MB · unknown · nominal
+      +190.1s 1367MB rss 1127MB avail 731MB malloc 1364MB/4240577blk · unknown · nominal
+      +191.3s 1373MB rss 1136MB avail 725MB malloc 1370MB/4241601blk · unknown · nominal
+      +192.3s 1375MB rss 1138MB avail 723MB malloc 1371MB/4243494blk · unknown · nominal
+      +193.3s 1375MB rss 1138MB avail 723MB malloc 1371MB/4243556blk · unknown · nominal
+      +194.3s 1406MB rss 1145MB avail 692MB · unknown · nominal
+      +195.1s 1382MB rss 1145MB avail 716MB malloc 1376MB/4245421blk · unknown · nominal
+      +196.1s 1387MB rss 1151MB avail 711MB · unknown · nominal
+      +197.3s 1416MB rss 1162MB avail 682MB malloc 1386MB/4254093blk · unknown · nominal
+      +198.3s 1392MB rss 1162MB avail 706MB malloc 1386MB/4254228blk · unknown · nominal
+      +199.3s 1415MB rss 1167MB avail 683MB malloc 1389MB/4257255blk · unknown · nominal
+      +200.2s 1398MB rss 1169MB avail 700MB · unknown · nominal
+      +201.3s 1404MB rss 1170MB avail 694MB malloc 1391MB/4259544blk · unknown · nominal
+      +202.2s 1404MB rss 1176MB avail 694MB · unknown · nominal
+      +203.2s 1432MB rss 1186MB avail 666MB malloc 1405MB/4265874blk · unknown · nominal
+      +204.3s 1444MB rss 1195MB avail 654MB malloc 1411MB/4269440blk · unknown · nominal
+      +205.3s 1420MB rss 1195MB avail 678MB malloc 1411MB/4269643blk · unknown · nominal
+      +206.3s 1426MB rss 1205MB avail 672MB malloc 1418MB/4271611blk · unknown · nominal
+      +207.3s 1426MB rss 1205MB avail 672MB malloc 1418MB/4272050blk · unknown · nominal
+      +208.2s 1431MB rss 1213MB avail 667MB · unknown · nominal
+      +209.1s 1432MB rss 1214MB avail 666MB malloc 1423MB/4275999blk · unknown · nominal
+      +210.1s 1440MB rss 1221MB avail 658MB · unknown · nominal
+      +211.0s 1792MB rss 1332MB avail 306MB malloc 1675MB/5533871blk · unknown · nominal · burst
+      +211.1s 1635MB rss 1312MB avail 463MB · unknown · nominal · burst
+      +211.2s 1592MB rss 1342MB avail 506MB · unknown · nominal · burst
+      +211.3s 1594MB rss 1363MB avail 504MB · unknown · nominal · burst
+      +211.4s 1594MB rss 1380MB avail 504MB · unknown · nominal · burst
+      +211.5s 1595MB rss 1391MB avail 503MB · unknown · nominal · burst
+      +211.6s 1596MB rss 1374MB avail 502MB · unknown · nominal · burst
+      +211.7s 1596MB rss 1377MB avail 502MB · unknown · nominal · burst
+      +211.8s 1598MB rss 1379MB avail 500MB · unknown · nominal · burst
+      +211.9s 1598MB rss 1380MB avail 500MB · unknown · nominal · burst
+      +212.0s 1598MB rss 1397MB avail 500MB malloc 1507MB/4317401blk · unknown · nominal · burst
+      +212.1s 1619MB rss 1425MB avail 479MB · unknown · nominal · burst
+      +212.2s 1619MB rss 1427MB avail 479MB · unknown · nominal · burst
+      +212.3s 1620MB rss 1429MB avail 478MB · unknown · nominal · burst
+      +212.4s 1621MB rss 1430MB avail 477MB · unknown · nominal · burst
+      +212.5s 1641MB rss 1415MB avail 457MB · unknown · nominal · burst
+      +212.6s 1650MB rss 1426MB avail 448MB · unknown · nominal · burst
+      +212.7s 1634MB rss 1419MB avail 464MB · unknown · nominal · burst
+      +212.8s 1658MB rss 1417MB avail 440MB · unknown · nominal · burst
+      +212.9s 1668MB rss 1422MB avail 430MB · unknown · nominal · burst
+      +213.0s 1671MB rss 1422MB avail 427MB malloc 1622MB/4650929blk · unknown · nominal · burst
+      +213.1s 1676MB rss 1402MB avail 422MB · unknown · nominal · burst
+      +213.2s 1676MB rss 1351MB avail 422MB · unknown · nominal · burst
+      +213.3s 1658MB rss 1364MB avail 440MB · unknown · nominal · burst
+      +213.4s 1653MB rss 1364MB avail 445MB · unknown · nominal · burst
+      +213.5s 1652MB rss 1403MB avail 446MB · unknown · nominal · burst
+      +213.6s 1652MB rss 1445MB avail 446MB · unknown · nominal · burst
+      +213.7s 1674MB rss 1430MB avail 424MB · unknown · nominal · burst
+      +213.8s 1708MB rss 1375MB avail 390MB · unknown · nominal · burst
+      +213.9s 1651MB rss 890MB avail 447MB · unknown · nominal · burst
+      +214.0s 1648MB rss 887MB avail 450MB malloc 1576MB/4313653blk · unknown · nominal · burst
+      +214.1s 1348MB rss 802MB avail 750MB · unknown · nominal · burst
+      +214.2s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.3s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.4s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.5s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.6s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.7s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.8s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +214.9s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +215.0s 1328MB rss 802MB avail 770MB malloc 1203MB/4188994blk · unknown · nominal · burst
+      +215.1s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +215.2s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +215.3s 1328MB rss 802MB avail 770MB · unknown · nominal · burst
+      +215.4s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +215.5s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +215.6s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +215.7s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +215.8s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +215.9s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.0s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.1s 1328MB rss 803MB avail 770MB malloc 1206MB/4189228blk · unknown · nominal · burst
+      +216.2s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.3s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.4s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.5s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.6s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.7s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.8s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +216.9s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.0s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.1s 1328MB rss 803MB avail 770MB malloc 1206MB/4189289blk · unknown · nominal · burst
+      +217.2s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.3s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.4s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.5s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.6s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.7s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.8s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +217.9s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.0s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.1s 1328MB rss 803MB avail 770MB malloc 1206MB/4189594blk · unknown · nominal · burst
+      +218.2s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.3s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.4s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.5s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.6s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.7s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.8s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +218.9s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.0s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.1s 1328MB rss 803MB avail 770MB malloc 1206MB/4187995blk · unknown · nominal · burst
+      +219.2s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.3s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.4s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.5s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.6s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.7s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.8s 1328MB rss 803MB avail 770MB · unknown · nominal · burst
+      +219.9s 1347MB rss 823MB avail 751MB · unknown · nominal · burst
+      +220.0s 1347MB rss 823MB avail 751MB · unknown · nominal · burst
+      +220.1s 1347MB rss 823MB avail 751MB malloc 1211MB/4191097blk · unknown · nominal · burst
+      +220.2s 1347MB rss 823MB avail 751MB · unknown · nominal · burst
+      +220.3s 1347MB rss 823MB avail 751MB · unknown · nominal · burst
+      +220.4s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +220.5s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +220.6s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +220.7s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +220.8s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +220.9s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +221.0s 1328MB rss 823MB avail 770MB · unknown · nominal · burst
+      +221.1s 1327MB rss 824MB avail 771MB malloc 1211MB/4191177blk · unknown · nominal · burst
+      +221.2s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.3s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.4s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.5s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.6s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.7s 1327MB rss 824MB avail 771MB · unknown · nominal · burst
+      +221.8s 1328MB rss 824MB avail 770MB · unknown · nominal · burst
+      +221.9s 1328MB rss 824MB avail 770MB · unknown · nominal · burst
+      +222.0s 1330MB rss 826MB avail 768MB · unknown · nominal · burst
+      +222.1s 1330MB rss 828MB avail 768MB malloc 1216MB/4194280blk · unknown · nominal · burst
+      +222.2s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.3s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.4s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.5s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.6s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.7s 1330MB rss 828MB avail 768MB · unknown · nominal · burst
+      +222.8s 1331MB rss 828MB avail 767MB · unknown · nominal · burst
+      +222.9s 1331MB rss 828MB avail 767MB · unknown · nominal · burst
+      +223.0s 1336MB rss 828MB avail 762MB · unknown · nominal · burst
+      +223.1s 1336MB rss 828MB avail 762MB · unknown · nominal · burst
+      +223.2s 1336MB rss 828MB avail 762MB malloc 1216MB/4194714blk · unknown · nominal · burst
+      +223.3s 1336MB rss 828MB avail 762MB · unknown · nominal · burst
+      +223.4s 1341MB rss 829MB avail 757MB · unknown · nominal · burst
+      +223.5s 1350MB rss 828MB avail 748MB · unknown · nominal · burst
+      +223.6s 1350MB rss 828MB avail 748MB · unknown · nominal · burst
+      +223.7s 1350MB rss 828MB avail 748MB · unknown · nominal · burst
+      +223.8s 1350MB rss 828MB avail 748MB · unknown · nominal · burst
+      +223.9s 1350MB rss 829MB avail 748MB · unknown · nominal · burst
+      +224.0s 1330MB rss 829MB avail 768MB · unknown · nominal
+      +225.1s 1356MB rss 832MB avail 742MB malloc 1226MB/4199614blk · unknown · nominal
+      +226.0s 1352MB rss 836MB avail 746MB · unknown · nominal
+      +227.0s 1334MB rss 836MB avail 764MB malloc 1231MB/4202478blk · unknown · nominal
+      +228.0s 1334MB rss 837MB avail 764MB malloc 1232MB/4205477blk · unknown · nominal
+      +229.0s 1355MB rss 842MB avail 743MB malloc 1235MB/4205945blk · unknown · nominal
+      +230.0s 1336MB rss 842MB avail 762MB malloc 1237MB/4208758blk · unknown · nominal
+      +231.0s 1335MB rss 841MB avail 763MB malloc 1237MB/4208965blk · unknown · nominal
+      +232.0s 1316MB rss 841MB avail 782MB malloc 1237MB/4209080blk · unknown · nominal
+      +233.0s 1316MB rss 841MB avail 782MB malloc 1237MB/4209175blk · unknown · nominal
+      +234.0s 1316MB rss 841MB avail 782MB malloc 1237MB/4209229blk · unknown · nominal
+      +235.0s 1317MB rss 838MB avail 781MB malloc 1237MB/4211245blk · unknown · nominal
+      +236.0s 1319MB rss 838MB avail 779MB malloc 1241MB/4211399blk · unknown · nominal
+      +237.0s 1319MB rss 838MB avail 779MB malloc 1241MB/4211343blk · unknown · nominal
+      +238.0s 1323MB rss 838MB avail 775MB malloc 1240MB/4211766blk · unknown · nominal
+      +239.0s 1319MB rss 839MB avail 779MB malloc 1240MB/4211701blk · unknown · nominal
+      +240.0s 1318MB rss 836MB avail 780MB malloc 1241MB/4213457blk · unknown · nominal
+      +241.0s 1318MB rss 836MB avail 780MB malloc 1241MB/4213526blk · unknown · nominal
+      +242.0s 1318MB rss 823MB avail 780MB malloc 1241MB/4213671blk · unknown · nominal
+      +243.0s 1318MB rss 823MB avail 780MB malloc 1241MB/4214763blk · unknown · nominal
+      +244.0s 1324MB rss 824MB avail 774MB malloc 1245MB/4214933blk · unknown · nominal
+      +245.0s 1318MB rss 824MB avail 780MB malloc 1244MB/4216201blk · unknown · nominal
+      +246.0s 1325MB rss 827MB avail 773MB malloc 1249MB/4216308blk · unknown · nominal
+      +247.0s 1320MB rss 827MB avail 778MB malloc 1249MB/4216756blk · unknown · nominal
+      +248.0s 1320MB rss 827MB avail 778MB malloc 1249MB/4216849blk · unknown · nominal
+      +249.0s 1320MB rss 825MB avail 778MB malloc 1249MB/4217422blk · unknown · nominal
+      +250.0s 1321MB rss 825MB avail 777MB malloc 1250MB/4218491blk · unknown · nominal
+      +251.0s 1322MB rss 824MB avail 776MB · unknown · nominal
+      +252.0s 1322MB rss 824MB avail 776MB malloc 1250MB/4219891blk · unknown · nominal
+      +253.0s 1324MB rss 828MB avail 774MB malloc 1254MB/4220004blk · unknown · nominal
+      +254.0s 1324MB rss 828MB avail 774MB malloc 1254MB/4222627blk · unknown · nominal
+      +255.0s 1325MB rss 830MB avail 773MB · unknown · nominal
+      +256.0s 1324MB rss 831MB avail 774MB malloc 1257MB/4222006blk · unknown · nominal
+      +257.0s 1325MB rss 831MB avail 773MB · unknown · nominal
+      +258.0s 1328MB rss 835MB avail 770MB malloc 1263MB/4223711blk · unknown · nominal
+      +259.0s 1328MB rss 835MB avail 770MB malloc 1263MB/4224398blk · unknown · nominal
+      +260.0s 1328MB rss 836MB avail 770MB malloc 1263MB/4225743blk · unknown · nominal
+      +261.0s 1329MB rss 836MB avail 769MB malloc 1263MB/4227453blk · unknown · nominal
+      +262.0s 1335MB rss 840MB avail 763MB malloc 1271MB/4228788blk · unknown · nominal
+      +263.0s 1330MB rss 841MB avail 768MB · unknown · nominal
+      +264.0s 1329MB rss 841MB avail 769MB malloc 1268MB/4231063blk · unknown · nominal
+      +265.0s 1329MB rss 841MB avail 769MB · unknown · nominal
+      +266.0s 1330MB rss 841MB avail 768MB malloc 1269MB/4233846blk · unknown · nominal
+      +267.0s 1338MB rss 845MB avail 760MB malloc 1274MB/4234421blk · unknown · nominal
+      +268.0s 1332MB rss 845MB avail 766MB malloc 1273MB/4236137blk · unknown · nominal
+      +269.0s 1337MB rss 845MB avail 761MB malloc 1276MB/4237033blk · unknown · nominal
+      +270.0s 1332MB rss 846MB avail 766MB malloc 1276MB/4238711blk · unknown · nominal
+      +271.0s 1334MB rss 848MB avail 764MB malloc 1279MB/4238492blk · unknown · nominal
+      +272.0s 1334MB rss 849MB avail 764MB malloc 1279MB/4239121blk · unknown · nominal
+      +273.0s 1334MB rss 848MB avail 764MB malloc 1279MB/4239295blk · unknown · nominal
+      +274.0s 1334MB rss 848MB avail 764MB malloc 1279MB/4239901blk · unknown · nominal
+      +275.0s 1334MB rss 848MB avail 764MB malloc 1279MB/4240138blk · unknown · nominal
+      +276.0s 1335MB rss 849MB avail 763MB · unknown · nominal
+      +277.0s 1339MB rss 849MB avail 759MB malloc 1282MB/4241882blk · unknown · nominal
+      +278.0s 1334MB rss 849MB avail 764MB malloc 1282MB/4241841blk · unknown · nominal
+      +279.0s 1353MB rss 858MB avail 745MB malloc 1292MB/4257099blk · unknown · nominal
+      +280.0s 1354MB rss 859MB avail 744MB malloc 1287MB/4255169blk · unknown · nominal
+      +281.0s 1354MB rss 859MB avail 744MB malloc 1289MB/4256209blk · unknown · nominal
+      +282.0s 1355MB rss 861MB avail 743MB malloc 1290MB/4255930blk · unknown · nominal
+      +283.0s 1337MB rss 861MB avail 761MB malloc 1290MB/4255986blk · unknown · nominal
+      +284.0s 1339MB rss 860MB avail 759MB malloc 1290MB/4259776blk · unknown · nominal
+      +285.0s 1341MB rss 863MB avail 757MB malloc 1294MB/4259977blk · unknown · nominal
+      +286.0s 1341MB rss 863MB avail 757MB malloc 1294MB/4260037blk · unknown · nominal
+      +287.0s 1341MB rss 863MB avail 757MB malloc 1294MB/4260207blk · unknown · nominal
+      +288.0s 1338MB rss 863MB avail 760MB malloc 1291MB/4261453blk · unknown · nominal
+      +289.0s 1338MB rss 863MB avail 760MB malloc 1291MB/4261568blk · unknown · nominal
+      +290.0s 1338MB rss 863MB avail 760MB malloc 1291MB/4261808blk · unknown · nominal
+      +291.0s 1338MB rss 863MB avail 760MB malloc 1291MB/4261875blk · unknown · nominal
+      +292.0s 1347MB rss 859MB avail 751MB malloc 1294MB/4275601blk · unknown · nominal
+      +293.0s 1348MB rss 859MB avail 750MB · unknown · nominal
+      +294.0s 1348MB rss 859MB avail 750MB malloc 1295MB/4276333blk · unknown · nominal
+      +295.0s 1348MB rss 858MB avail 750MB malloc 1295MB/4277229blk · unknown · nominal
+      +296.0s 1354MB rss 859MB avail 744MB malloc 1299MB/4277617blk · unknown · nominal
+      +297.0s 1349MB rss 859MB avail 749MB · unknown · nominal
+      +298.0s 1349MB rss 859MB avail 749MB malloc 1299MB/4278341blk · unknown · nominal
+      +299.0s 1348MB rss 859MB avail 750MB malloc 1297MB/4278164blk · unknown · nominal
+      +300.0s 1348MB rss 859MB avail 750MB · unknown · nominal
+      +301.0s 1348MB rss 859MB avail 750MB malloc 1298MB/4279619blk · unknown · nominal
+      +302.0s 1355MB rss 862MB avail 743MB malloc 1301MB/4280007blk · unknown · nominal
+      +303.0s 1350MB rss 862MB avail 748MB · unknown · nominal
+      +304.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4280327blk · unknown · nominal
+      +305.0s 1355MB rss 862MB avail 743MB malloc 1301MB/4280458blk · unknown · nominal
+      +306.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4280793blk · unknown · nominal
+      +307.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4281092blk · unknown · nominal
+      +308.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4281280blk · unknown · nominal
+      +309.0s 1350MB rss 862MB avail 748MB · unknown · nominal
+      +310.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4281293blk · unknown · nominal
+      +311.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4281592blk · unknown · nominal
+      +312.0s 1350MB rss 862MB avail 748MB malloc 1301MB/4281491blk · unknown · nominal
+      +313.0s 1351MB rss 862MB avail 747MB malloc 1301MB/4282041blk · unknown · nominal
+      +314.0s 1351MB rss 862MB avail 747MB malloc 1301MB/4282215blk · unknown · nominal
+      +315.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284173blk · unknown · nominal
+      +316.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284381blk · unknown · nominal
+      +317.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284824blk · unknown · nominal
+      +318.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284648blk · unknown · nominal
+      +319.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284704blk · unknown · nominal
+      +320.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4284643blk · unknown · nominal
+      +321.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4285364blk · unknown · nominal
+      +322.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4286049blk · unknown · nominal
+      +323.0s 1351MB rss 866MB avail 747MB malloc 1305MB/4286279blk · unknown · nominal
+      +324.0s 1351MB rss 865MB avail 747MB malloc 1305MB/4285736blk · unknown · nominal
+      +325.0s 1351MB rss 865MB avail 747MB malloc 1305MB/4285931blk · unknown · nominal
+      +326.0s 1352MB rss 867MB avail 746MB malloc 1309MB/4286605blk · unknown · nominal
+      +327.0s 1352MB rss 867MB avail 746MB malloc 1309MB/4286798blk · unknown · nominal
+      +328.0s 1354MB rss 870MB avail 744MB malloc 1315MB/4288898blk · unknown · nominal
+      +329.0s 1354MB rss 870MB avail 744MB malloc 1315MB/4289156blk · unknown · nominal
+      +330.0s 1354MB rss 870MB avail 744MB malloc 1315MB/4289089blk · unknown · nominal
+      +331.0s 1354MB rss 870MB avail 744MB malloc 1315MB/4289681blk · unknown · nominal
+      +332.0s 1369MB rss 883MB avail 729MB malloc 1320MB/4314329blk · unknown · nominal
+      +333.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4315102blk · unknown · nominal
+      +334.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4315268blk · unknown · nominal
+      +335.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4315372blk · unknown · nominal
+      +336.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4315450blk · unknown · nominal
+      +337.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4315791blk · unknown · nominal
+      +338.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4316187blk · unknown · nominal
+      +339.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4316375blk · unknown · nominal
+      +340.0s 1369MB rss 883MB avail 729MB malloc 1321MB/4316619blk · unknown · nominal
+      +341.0s 1370MB rss 883MB avail 728MB malloc 1321MB/4316707blk · unknown · nominal
+      +342.0s 1370MB rss 883MB avail 728MB malloc 1321MB/4316509blk · unknown · nominal
+      +343.0s 1370MB rss 883MB avail 728MB malloc 1321MB/4316772blk · unknown · nominal
+      +344.0s 1370MB rss 883MB avail 728MB malloc 1321MB/4316851blk · unknown · nominal
+      +345.0s 1349MB rss 884MB avail 749MB malloc 1320MB/4309888blk · unknown · nominal
+      +346.0s 1355MB rss 885MB avail 743MB malloc 1322MB/4319232blk · unknown · nominal
+      +347.0s 1355MB rss 885MB avail 743MB malloc 1323MB/4319419blk · unknown · nominal
+      +348.0s 1355MB rss 886MB avail 743MB malloc 1323MB/4320009blk · unknown · nominal
+      +349.0s 1355MB rss 886MB avail 743MB malloc 1323MB/4319690blk · unknown · nominal
+      +350.0s 1362MB rss 890MB avail 736MB · unknown · nominal
+      +351.0s 1357MB rss 890MB avail 741MB malloc 1328MB/4319553blk · unknown · nominal
+      +352.0s 1358MB rss 890MB avail 740MB malloc 1329MB/4320804blk · unknown · nominal
+      +353.0s 1358MB rss 894MB avail 740MB malloc 1333MB/4320675blk · unknown · nominal
+      +354.0s 1358MB rss 894MB avail 740MB malloc 1333MB/4319803blk · unknown · nominal
+      +355.0s 1356MB rss 894MB avail 742MB malloc 1333MB/4324040blk · unknown · nominal
+      +356.0s 1357MB rss 894MB avail 741MB malloc 1333MB/4324571blk · unknown · nominal
+      +357.0s 1357MB rss 894MB avail 741MB · unknown · nominal
+      +358.0s 1357MB rss 893MB avail 741MB malloc 1333MB/4325414blk · unknown · nominal
+      +359.0s 1368MB rss 899MB avail 730MB malloc 1338MB/4325975blk · unknown · nominal
+      +360.0s 1361MB rss 899MB avail 737MB malloc 1338MB/4325816blk · unknown · nominal
+      +361.0s 1361MB rss 899MB avail 737MB malloc 1338MB/4326126blk · unknown · nominal
+      +362.0s 1360MB rss 898MB avail 738MB · unknown · nominal
+      +363.0s 1368MB rss 901MB avail 730MB malloc 1340MB/4327687blk · unknown · nominal
+      +364.0s 1361MB rss 900MB avail 737MB malloc 1340MB/4327735blk · unknown · nominal
+      +370.0s 1373MB rss 525MB avail 725MB malloc 1319MB/4300873blk · inactive · nominal
+      +371.5s 1374MB rss 527MB avail 724MB malloc 1320MB/4301060blk · active · nominal
+      +372.5s 1392MB rss 546MB avail 706MB malloc 1326MB/4314019blk · active · nominal
+      +373.5s 1392MB rss 545MB avail 706MB malloc 1326MB/4314020blk · active · nominal
+      +374.5s 1392MB rss 545MB avail 706MB malloc 1326MB/4314036blk · active · nominal
+      +375.5s 1392MB rss 545MB avail 706MB malloc 1326MB/4314076blk · active · nominal
+      +376.5s 1389MB rss 542MB avail 709MB malloc 1327MB/4316340blk · active · nominal
+      +377.5s 1375MB rss 542MB avail 723MB malloc 1327MB/4314924blk · active · nominal
+      +378.5s 1390MB rss 558MB avail 708MB malloc 1343MB/4323832blk · active · nominal
+      +379.5s 1387MB rss 561MB avail 711MB · active · nominal
+      +380.5s 1387MB rss 561MB avail 711MB malloc 1351MB/4343825blk · active · nominal
+      +381.5s 1387MB rss 561MB avail 711MB · active · nominal
+      +382.5s 1387MB rss 561MB avail 711MB malloc 1351MB/4344062blk · active · nominal
+      +383.5s 1387MB rss 561MB avail 711MB malloc 1351MB/4344175blk · active · nominal
+      +384.5s 1387MB rss 560MB avail 711MB · active · nominal
+      +385.5s 1387MB rss 561MB avail 711MB malloc 1353MB/4344475blk · active · nominal
+      +386.5s 1389MB rss 559MB avail 709MB malloc 1354MB/4349424blk · active · nominal
+      +387.5s 1390MB rss 560MB avail 708MB · active · nominal
+      +388.5s 1390MB rss 560MB avail 708MB malloc 1355MB/4351342blk · active · nominal
+      +389.5s 1390MB rss 560MB avail 708MB malloc 1355MB/4351387blk · active · nominal
+      +390.5s 1391MB rss 561MB avail 707MB malloc 1357MB/4352326blk · active · nominal
+      +391.5s 1409MB rss 576MB avail 689MB malloc 1361MB/4364920blk · active · nominal
+      +392.5s 1427MB rss 594MB avail 671MB malloc 1363MB/4366307blk · active · nominal
+      +393.5s 1410MB rss 594MB avail 688MB malloc 1363MB/4366353blk · active · nominal
+      +394.5s 1426MB rss 596MB avail 672MB malloc 1365MB/4368851blk · active · nominal
+      +395.5s 1410MB rss 596MB avail 688MB malloc 1366MB/4369215blk · active · nominal
+      +396.5s 1410MB rss 596MB avail 688MB malloc 1365MB/4369149blk · active · nominal
+      +397.5s 1410MB rss 596MB avail 688MB malloc 1366MB/4369263blk · active · nominal
+      +398.5s 1410MB rss 596MB avail 688MB malloc 1366MB/4369351blk · active · nominal
+      +399.5s 1410MB rss 596MB avail 688MB malloc 1366MB/4369390blk · active · nominal
+      +400.5s 1410MB rss 596MB avail 688MB malloc 1364MB/4368715blk · active · nominal
+      +401.5s 1410MB rss 596MB avail 688MB malloc 1364MB/4368742blk · active · nominal
+      +402.5s 1410MB rss 596MB avail 688MB malloc 1364MB/4369094blk · active · nominal
+      +403.5s 1410MB rss 596MB avail 688MB · active · nominal
+      +404.5s 1410MB rss 579MB avail 688MB malloc 1364MB/4369256blk · active · nominal
+      +405.5s 1410MB rss 579MB avail 688MB malloc 1364MB/4369420blk · active · nominal
+      +406.5s 1410MB rss 579MB avail 688MB malloc 1364MB/4369514blk · active · nominal
+      +407.5s 1410MB rss 579MB avail 688MB malloc 1364MB/4369822blk · active · nominal
+      +408.5s 1410MB rss 579MB avail 688MB · active · nominal
+      +409.5s 1431MB rss 601MB avail 667MB malloc 1372MB/4372865blk · active · nominal
+      +410.5s 1434MB rss 604MB avail 664MB malloc 1374MB/4374712blk · active · nominal
+      +411.5s 1435MB rss 609MB avail 663MB · active · nominal
+      +412.5s 1443MB rss 621MB avail 655MB malloc 1395MB/4390034blk · active · nominal
+      +413.5s 1446MB rss 630MB avail 653MB malloc 1406MB/4396488blk · active · nominal
+      +414.5s 1454MB rss 644MB avail 644MB malloc 1422MB/4405986blk · active · nominal
+      +415.5s 1464MB rss 657MB avail 634MB · active · nominal
+      +416.5s 1455MB rss 663MB avail 643MB malloc 1444MB/4423017blk · active · nominal
+      +417.5s 1454MB rss 663MB avail 644MB malloc 1444MB/4423063blk · active · nominal
+      +418.5s 1468MB rss 667MB avail 630MB malloc 1447MB/4425347blk · active · nominal
+      +419.5s 1471MB rss 670MB avail 627MB malloc 1451MB/4427243blk · active · nominal
+      +420.5s 1470MB rss 671MB avail 628MB · active · nominal
+      +421.5s 1476MB rss 678MB avail 622MB malloc 1457MB/4432439blk · active · nominal
+      +422.5s 1488MB rss 689MB avail 610MB malloc 1467MB/4439853blk · active · nominal
+      +423.5s 1496MB rss 707MB avail 602MB · active · nominal
+      +424.5s 1488MB rss 710MB avail 610MB malloc 1486MB/4452236blk · active · nominal
+      +425.5s 1500MB rss 710MB avail 598MB malloc 1486MB/4454252blk · active · nominal
+      +426.5s 1508MB rss 720MB avail 590MB malloc 1497MB/4458182blk · active · nominal
+      +427.5s 1518MB rss 734MB avail 580MB malloc 1509MB/4465798blk · active · nominal
+      +428.5s 1511MB rss 739MB avail 587MB malloc 1511MB/4467881blk · active · nominal
+      +429.5s 1528MB rss 747MB avail 570MB · active · nominal
+      +430.5s 1538MB rss 762MB avail 560MB malloc 1532MB/4483129blk · active · nominal
+      +431.5s 1548MB rss 778MB avail 550MB · active · nominal
+      +432.5s 1576MB rss 774MB avail 522MB malloc 1555MB/4502725blk · active · nominal
+      +433.6s 1619MB rss 765MB avail 479MB malloc 1574MB/4513522blk · active · nominal
+      +434.6s 1611MB rss 768MB avail 487MB malloc 1575MB/4517100blk · active · nominal
+      +435.6s 1611MB rss 768MB avail 487MB · active · nominal
+      +436.5s 1627MB rss 763MB avail 471MB malloc 1579MB/4521312blk · active · nominal
+      +437.5s 1629MB rss 712MB avail 469MB · active · nominal
+      +438.5s 1644MB rss 676MB avail 454MB malloc 1599MB/4540108blk · active · nominal
+      +439.6s 1646MB rss 680MB avail 452MB malloc 1603MB/4541029blk · active · nominal
+      +440.6s 1646MB rss 679MB avail 452MB malloc 1603MB/4541152blk · active · nominal
+      +441.6s 1646MB rss 679MB avail 452MB malloc 1603MB/4541635blk · active · nominal
+      +442.6s 1646MB rss 678MB avail 452MB malloc 1603MB/4541700blk · active · nominal
+      +443.6s 1646MB rss 678MB avail 452MB malloc 1603MB/4541810blk · active · nominal
+      +444.6s 1665MB rss 681MB avail 433MB malloc 1607MB/4544030blk · active · nominal
+      +445.6s 1639MB rss 681MB avail 459MB · active · nominal
+      +446.6s 1639MB rss 684MB avail 459MB malloc 1608MB/4546809blk · active · nominal
+      +447.6s 1630MB rss 670MB avail 468MB malloc 1608MB/4547481blk · active · nominal
+      +448.5s 1630MB rss 670MB avail 468MB · active · nominal
+      +449.6s 1631MB rss 671MB avail 467MB malloc 1608MB/4549653blk · active · nominal
+      +450.6s 1631MB rss 671MB avail 467MB malloc 1608MB/4550129blk · active · nominal
+      +451.5s 1635MB rss 657MB avail 463MB · active · nominal
+      +452.0s 1348MB rss 708MB avail 750MB malloc 1150MB/3573804blk · active · nominal · burst
+      +452.1s 1184MB rss 708MB avail 914MB · active · nominal · burst
+  (snapshot taken 7s before this report)
+Touch path
+  prior boot:
+  2026-09-22T04:18:31.794Z #621 pres report:receipt (requested) p=none exploration
+  2026-09-22T04:18:31.798Z #621 pres report:receipt (shown) p=none exploration
+  2026-09-22T04:18:32.507Z #622 root p=none exploration
+  2026-09-22T04:18:32.665Z #621 pres report:receipt (dismissed) p=none exploration
+  2026-09-22T04:18:33.152Z #623 root p=none exploration
+  2026-09-22T04:18:33.985Z #624 root p=none exploration
+  2026-09-22T04:18:33.985Z #625 modal p=none exploration
+  2026-09-22T04:18:34.667Z #626 root p=none exploration
+  2026-09-22T04:18:34.668Z #627 modal p=none exploration
+  2026-09-22T04:18:34.668Z #627 in report:send p=none exploration
+  2026-09-22T04:18:34.782Z #627 enter report:send p=none exploration
+  2026-09-22T04:18:34.783Z #627 admit report:send (fulllog) p=none exploration
+  2026-09-22T04:18:34.783Z #627 dispatch report:send (fulllog) p=none exploration
+  2026-09-22T04:18:34.783Z #627 dispatch report:send (compose) p=none exploration
+  2026-09-22T04:18:34.859Z #627 done report:send (handed-off) p=none exploration
+  2026-09-22T04:18:35.023Z #627 admit report:send (sent) p=none exploration
+  2026-09-22T04:18:35.023Z #627 done report:send (resolved) p=none exploration
+  2026-09-22T04:18:35.023Z #627 pres report:receipt (requested) p=none exploration
+  2026-09-22T04:18:35.027Z #627 pres report:receipt (shown) p=none exploration
+  2026-09-22T04:18:35.768Z #628 root p=none exploration
+  2026-09-22T04:18:35.949Z #627 pres report:receipt (dismissed) p=none exploration
+  2026-09-22T04:18:37.019Z #629 root p=none exploration
+  2026-09-22T04:18:38.454Z #630 root p=none exploration
+  2026-09-22T04:18:39.668Z #631 root p=none exploration
+  this boot:
+  2026-09-22T04:30:48.460Z #411 root p=none exploration
+  2026-09-22T04:30:48.461Z #411 content controls p=none exploration
+  2026-09-22T04:30:48.694Z #412 root p=none exploration
+  2026-09-22T04:30:48.694Z #412 content controls p=none exploration
+  2026-09-22T04:30:48.894Z #413 root p=none exploration
+  2026-09-22T04:30:48.894Z #413 content controls p=none exploration
+  2026-09-22T04:30:49.094Z #414 root p=none exploration
+  2026-09-22T04:30:49.094Z #414 content controls p=none exploration
+  2026-09-22T04:30:54.813Z #415 root p=none exploration
+  2026-09-22T04:30:54.813Z #415 content controls p=none exploration
+  2026-09-22T04:30:56.346Z #416 root p=none exploration
+  2026-09-22T04:30:57.947Z #417 root p=none exploration
+  2026-09-22T04:30:59.212Z #418 root p=none exploration
+  2026-09-22T04:31:00.898Z #419 root p=none exploration
+  2026-09-22T04:31:00.899Z #420 modal p=none exploration
+  2026-09-22T04:31:02.797Z #421 root p=none exploration
+  2026-09-22T04:31:02.797Z #422 modal p=none exploration
+  2026-09-22T04:31:09.734Z #423 root p=none exploration
+  2026-09-22T04:31:09.735Z #424 modal p=none exploration
+  2026-09-22T04:31:09.735Z #424 in report:send p=none exploration
+  2026-09-22T04:31:09.863Z #424 enter report:send p=none exploration
+  2026-09-22T04:31:09.863Z #424 admit report:send (described) p=none exploration
+  2026-09-22T04:31:09.863Z #424 dispatch report:send (described) p=none exploration
+  2026-09-22T04:31:09.863Z #424 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Permannu)
+  HP: 57/58  Stamina: 16/16  TC: 5  Corruption: 11
+  Pack: 87 distinct rows / 309 total
+
+Weapons (12)
+  Aetheric Touch Wand (1d6 aetheric, dur 45/45, equipped:off, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, unequip:off, use
+  Aetheric Touch Wand (1d6 aetheric, dur 17/17, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Blaster (1d6 burn, dur 42/42, equipped:main, [weapon,ranged,dual_wield,firearm,unknowing_masses])
+    actions: equip:off, unequip:main, use(off)
+  Earthshaker Wand (1d6 bludgeoning, dur 29/29, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Energy Blade (Uncommon, 1d8 burn, dur 43/43, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Gale Binder Wand (1d6 force, dur 19/25, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Gale Binder Wand (1d6 force, dur 15/15, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Humming Bolt-Rig (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Lightfoot Dash Wand (1d6 aetheric, dur 20/20, [runecaster,rune_power,aetheric,buff])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 31/31, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rust-Eaten Halberd (Uncommon, dur 25/25, 1d8 slashing, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Veilkeeper Blades (Legendary, dur 53/55, 1d8+3 piercing, unique, [core_guardian_set,aether_born,piercing,paired,parry_bonus])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+
+Armor (7)
+  Aether-Walker's Cape (dur 24/24, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Scout Greaves (dur 24/24, equipped:legs, AC +1 · Resists: aetheric · Regen: +1 stamina per action · WIS +1, [armor,legs,greaves,tartarian_giants])
+    actions: unequip:legs
+  Echoing Steps Boots (dur 29/29, equipped:feet, AC +1 · Regen: +2 HP per action · DEX +1, [armor,feet,boots,race_starter,reclaimer])
+    actions: unequip:feet
+  Grey Leather of Iskan-Veil (Legendary, dur 65/65, AC+3, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 28/28, equipped:chest, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers])
+    actions: unequip:chest
+  Scale-Lapped Visor (Rare, dur 35/35, equipped:head, AC+3, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:head
+  Sentinel's Gauntlets (dur 17/17, AC +2 · HP +5 · STR +2, [armor,hands,gauntlets,architectural_sentinels])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (4)
+  Aetheric Locket (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+  Tartarian Oath-Band (Uncommon, dur 35/35, ♥reserved, STR +2, [ring,faction_gear,true_tartarians,oath])
+    actions: equip:ring, use, scrap, release-from-fusion, drop
+
+Consumables (9)
+  Blue Aetheric Fungus ×3 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blue Cap Mushroom ×4 ([food,foraged,mushroom,blue])
+    actions: use(eat), drop
+  Blueberries (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Field Dressing ×5 ([healing,crafted])
+    actions: use(eat), drop
+  Forager's Stew ×4 (Uncommon, [food,cooked,stew])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ×2 ([alcohol,drink])
+    actions: use(drink), drop
+  Smoke-Cured Jerky Strip ×6 ([food,treat,dog_treat])
+    actions: use(eat), drop
+  Wild Carrot ×5 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Lettuce ×5 ([food,foraged,leafy])
+    actions: use(eat), drop
+
+Coatings (3)
+  Acid Flask ×10 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Incendiary Paste ×2 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Searing Paste ×13 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (5)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 135/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (37)
+  Aether Crystal ×7 ([aether,crystal])
+    actions: drop
+  Aether Crystal ([aether,crystal])
+    actions: drop
+  Aether Mud ([mud,aether])
+    actions: drop
+  Aetheric Cloth (Uncommon, [fiber,aether])
+    actions: scrap, drop
+  Aetheric Dust (Uncommon, [aether,loot,bonus])
+    actions: scrap, drop
+  Aetheric Shard ×5 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetheric Shard ×3 ([aether,shard])
+    actions: drop
+  Automaton Circuit ×13 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×16 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail ×2
+    actions: scrap, drop
+  Big Rock ×4 ([thrown,stone,improvised,heavy])
+    actions: drop
+  Blank Runecaster Casing (Common) ×2 ([runecaster,casing,blank,loot])
+    actions: drop
+  Bone Fragment ×2 ([bone,junk,scrap])
+    actions: drop
+  Bone Sliver ([bone,junk,scrap])
+    actions: drop
+  ◆ Bone-Handled Rivet (Uncommon, ♥reserved, [trophy,organic,metal])
+    actions: scrap, release-from-fusion, drop
+  Cloth Scrap ×2 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Clouded Lens Blank (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Coiled Snare Thread (♥reserved, [trophy,fiber])
+    actions: scrap, release-from-fusion, drop
+  ◆ Flint-and-Twine Bundle ×2 (♥reserved, [trophy,fiber,stone])
+    actions: scrap, release-from-fusion, drop
+  ◆ Glass-Beaded Strap ×2 (Uncommon, ♥reserved, [trophy,crystal,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Hollow Quill Sheaf (Uncommon, ♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  Kraken Ink (Legendary, stolen, [organic,boss,legendary])
+    actions: scrap, drop
+  ◆ Mortar-Bound Cobble ×2 (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Mud Essence (Uncommon, [mud,aether])
+    actions: scrap, drop
+  Mud Fragment ×25 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead ×2 (♥reserved, [trophy,crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ River-Worn Pebble Set (♥reserved, [trophy,stone])
+    actions: scrap, release-from-fusion, drop
+  Scrap Metal ×17 ([metal])
+    actions: drop
+  Scrap Metal ([metal])
+    actions: drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  ◆ Slate-Weighted Netting ×2 (♥reserved, [trophy,fiber,stone])
+    actions: scrap, release-from-fusion, drop
+  Smooth Stone ×13 ([stone,junk,scrap])
+    actions: scrap, drop
+  Stick ×20 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Tattered Gauze Roll (♥reserved, [trophy,cloth])
+    actions: scrap, release-from-fusion, drop
+  ◆ Verdigris Bell Fragment (♥reserved, [trophy,metal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Warped Plank Offcut (♥reserved, [trophy,wood])
+    actions: scrap, release-from-fusion, drop
+  Worn Tartarian Coin ×53 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (8)
+  ◆ Chipped Phial Neck (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  ◆ Coarse Canvas Patch (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  ◆ Copper-Threaded Veil (Uncommon, ♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  Eternal Dynasty Sigil ([sigil,eternal_dynasty,keepsake])
+    actions: drop
+  ◆ Fractured Geode Half (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  ◆ Frayed Rigging Twine (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  ◆ Tin Valve Housing (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+  ◆ Waxed Yarn Bundle (♥reserved, [trophy])
+    actions: release-from-fusion, drop
+
+Quest Items (2)
+  Folded Note ([note,quest,lore,improvised])
+    actions: drop
+  Iskan-Veil Core (Legendary, [quest,aetheric_core,main_quest,cloth])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 396 of 3821 entries; older trimmed to fit a single email paste)
+
+[2026-09-22T04:31:02.797Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:31:02.797Z] [debug] ⚠⚠ MEMORY WARNING #8 from the OS (238.2s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=192KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:30:54.995Z] [world] You let the conversation go and Ilva Sidelong gets back to it.
+[2026-09-22T04:30:49.143Z] [world] Ilva Sidelong drops their voice. "There's more. It costs more than asking, that's all."
+[2026-09-22T04:30:48.960Z] [world] Ilva Sidelong shakes their head, but slower than they used to. "Keep coming around and we'll see."
+[2026-09-22T04:30:48.760Z] [world] Ilva Sidelong looks at you a moment longer than usual. "Nearly. You're nearly there."
+[2026-09-22T04:30:48.595Z] [world] Ilva Sidelong drops their voice. "There's more. It costs more than asking, that's all."
+[2026-09-22T04:30:48.344Z] [world] Ilva Sidelong shakes their head, but slower than they used to. "Keep coming around and we'll see."
+[2026-09-22T04:30:48.144Z] [world] Ilva Sidelong looks at you a moment longer than usual. "Nearly. You're nearly there."
+[2026-09-22T04:30:47.944Z] [world] Ilva Sidelong drops their voice. "There's more. It costs more than asking, that's all."
+[2026-09-22T04:30:47.727Z] [world] Ilva Sidelong shakes their head, but slower than they used to. "Keep coming around and we'll see."
+[2026-09-22T04:30:47.510Z] [world] Ilva Sidelong looks at you a moment longer than usual. "Nearly. You're nearly there."
+[2026-09-22T04:30:47.294Z] [world] Ilva Sidelong drops their voice. "There's more. It costs more than asking, that's all."
+[2026-09-22T04:30:47.060Z] [world] Ilva Sidelong shakes their head, but slower than they used to. "Keep coming around and we'll see."
+[2026-09-22T04:30:46.262Z] [world] Ilva Sidelong looks at you a moment longer than usual. "Nearly. You're nearly there."
+[2026-09-22T04:30:44.510Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:44.510Z] [player] Ask why they trade out here
+[2026-09-22T04:30:44.327Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:44.327Z] [player] Ask why they trade out here
+[2026-09-22T04:30:44.110Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:44.110Z] [player] Ask how far they range
+[2026-09-22T04:30:43.927Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:43.927Z] [player] Ask how far they range
+[2026-09-22T04:30:43.727Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:43.727Z] [player] Ask how far they range
+[2026-09-22T04:30:43.527Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:43.527Z] [player] Ask how far they range
+[2026-09-22T04:30:43.344Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:43.343Z] [player] Ask how far they range
+[2026-09-22T04:30:43.127Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:43.127Z] [player] Ask how far they range
+[2026-09-22T04:30:42.927Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:42.927Z] [player] Ask why the stall is here
+[2026-09-22T04:30:42.744Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:42.743Z] [player] Ask why the stall is here
+[2026-09-22T04:30:42.543Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:42.543Z] [player] Ask why the stall is here
+[2026-09-22T04:30:42.343Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:42.343Z] [player] Ask why the stall is here
+[2026-09-22T04:30:42.160Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:42.160Z] [player] Ask why the stall is here
+[2026-09-22T04:30:41.943Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:41.943Z] [player] Ask how far they range
+[2026-09-22T04:30:41.760Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:41.760Z] [player] Ask how far they range
+[2026-09-22T04:30:41.577Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:41.577Z] [player] Ask how far they range
+[2026-09-22T04:30:41.377Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:41.376Z] [player] Ask how far they range
+[2026-09-22T04:30:41.177Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:41.177Z] [player] Ask how far they range
+[2026-09-22T04:30:40.993Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.993Z] [player] Ask how far they range
+[2026-09-22T04:30:40.810Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.810Z] [player] Ask why they trade out here
+[2026-09-22T04:30:40.610Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.610Z] [player] Ask why they trade out here
+[2026-09-22T04:30:40.427Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.426Z] [player] Ask why they trade out here
+[2026-09-22T04:30:40.227Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.227Z] [player] Ask why they trade out here
+[2026-09-22T04:30:40.027Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:40.027Z] [player] Ask why they trade out here
+[2026-09-22T04:30:39.813Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:39.813Z] [player] Ask why they trade out here
+[2026-09-22T04:30:38.277Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:38.277Z] [player] Ask why they trade out here
+[2026-09-22T04:30:38.027Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:38.027Z] [player] Ask why they trade out here
+[2026-09-22T04:30:37.793Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:37.793Z] [player] Ask why they trade out here
+[2026-09-22T04:30:37.527Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:37.527Z] [player] Ask why they trade out here
+[2026-09-22T04:30:37.210Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:37.210Z] [player] Ask why they trade out here
+[2026-09-22T04:30:36.877Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:36.877Z] [player] Ask why they trade out here
+[2026-09-22T04:30:36.494Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:36.493Z] [player] Ask why they trade out here
+[2026-09-22T04:30:36.096Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:36.095Z] [player] Ask why they trade out here
+[2026-09-22T04:30:34.226Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:34.226Z] [player] Ask why the stall is here
+[2026-09-22T04:30:34.026Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:34.026Z] [player] Ask how far they range
+[2026-09-22T04:30:33.826Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:33.826Z] [player] Ask why they trade out here
+[2026-09-22T04:30:33.627Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:33.626Z] [player] Ask why they trade out here
+[2026-09-22T04:30:33.428Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:33.428Z] [player] Ask why they trade out here
+[2026-09-22T04:30:33.243Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:33.243Z] [player] Ask how far they range
+[2026-09-22T04:30:33.026Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:33.026Z] [player] Ask why the stall is here
+[2026-09-22T04:30:32.843Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:32.843Z] [player] Ask why the stall is here
+[2026-09-22T04:30:32.628Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:32.628Z] [player] Ask how far they range
+[2026-09-22T04:30:32.279Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:32.279Z] [player] Ask why they trade out here
+[2026-09-22T04:30:31.897Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:31.896Z] [player] Ask how far they range
+[2026-09-22T04:30:31.247Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:31.246Z] [player] Ask why the stall is here
+[2026-09-22T04:30:30.416Z] [world] Ilva Sidelong shifts the pack higher on their shoulder and does not put it down.
+[2026-09-22T04:30:30.413Z] [world] "Somebody has to be on the road, and the somebodies with people behind walls will not do it." A shrug. "Mine are not behind walls. So it is me. It pays for the roof they are under. That is the whole of the reason and I have never needed a better one."
+[2026-09-22T04:30:30.412Z] [player] Ask why they trade out here
+[2026-09-22T04:30:29.546Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:29.545Z] [player] Ask how far they range
+[2026-09-22T04:30:28.699Z] [world] Whatever Ilva Sidelong is chewing goes over to the other cheek.
+[2026-09-22T04:30:28.697Z] [world] "Two stretches. The second one only because there is a household on it with nobody else calling." A tired lift of the shoulders. "It is not good business. It is the round I do."
+[2026-09-22T04:30:28.696Z] [player] Ask how far they range
+[2026-09-22T04:30:26.793Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:26.793Z] [player] Ask why the stall is here
+[2026-09-22T04:30:26.593Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:26.592Z] [player] Ask why the stall is here
+[2026-09-22T04:30:26.409Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:26.409Z] [player] Ask why the stall is here
+[2026-09-22T04:30:26.209Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:26.209Z] [player] Ask why the stall is here
+[2026-09-22T04:30:26.026Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:26.026Z] [player] Ask why the stall is here
+[2026-09-22T04:30:25.826Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:25.826Z] [player] Ask why the stall is here
+[2026-09-22T04:30:25.643Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:25.642Z] [player] Ask why the stall is here
+[2026-09-22T04:30:25.443Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:25.443Z] [player] Ask why the stall is here
+[2026-09-22T04:30:25.259Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:25.259Z] [player] Ask why the stall is here
+[2026-09-22T04:30:25.059Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:25.059Z] [player] Ask why the stall is here
+[2026-09-22T04:30:24.859Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:24.859Z] [player] Ask why the stall is here
+[2026-09-22T04:30:24.676Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:24.676Z] [player] Ask why the stall is here
+[2026-09-22T04:30:24.476Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:24.476Z] [player] Ask why the stall is here
+[2026-09-22T04:30:24.292Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:24.292Z] [player] Ask why the stall is here
+[2026-09-22T04:30:24.144Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:24.144Z] [player] Ask why the stall is here
+[2026-09-22T04:30:23.909Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:23.909Z] [player] Ask why the stall is here
+[2026-09-22T04:30:23.726Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:23.726Z] [player] Ask why the stall is here
+[2026-09-22T04:30:23.526Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:23.526Z] [player] Ask why the stall is here
+[2026-09-22T04:30:23.326Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:23.326Z] [player] Ask why the stall is here
+[2026-09-22T04:30:23.126Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:23.126Z] [player] Ask why the stall is here
+[2026-09-22T04:30:22.942Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:22.942Z] [player] Ask why the stall is here
+[2026-09-22T04:30:22.742Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:22.742Z] [player] Ask why the stall is here
+[2026-09-22T04:30:22.559Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:22.559Z] [player] Ask why the stall is here
+[2026-09-22T04:30:22.359Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:22.359Z] [player] Ask why the stall is here
+[2026-09-22T04:30:22.159Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:22.159Z] [player] Ask why the stall is here
+[2026-09-22T04:30:21.959Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:21.959Z] [player] Ask why the stall is here
+[2026-09-22T04:30:21.776Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:21.776Z] [player] Ask why the stall is here
+[2026-09-22T04:30:21.363Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:21.362Z] [player] Ask why the stall is here
+[2026-09-22T04:30:20.628Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:20.627Z] [player] Ask why the stall is here
+[2026-09-22T04:30:20.029Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:20.029Z] [player] Ask why the stall is here
+[2026-09-22T04:30:19.446Z] [world] Ilva Sidelong gives you a look. "I have told you that one."
+[2026-09-22T04:30:19.445Z] [player] Ask why the stall is here
+[2026-09-22T04:30:05.034Z] [system] The Crucible costs 25 TC to fire; you have 5.
+[2026-09-22T04:30:04.347Z] [system] The Crucible costs 25 TC to fire; you have 5.
+[2026-09-22T04:30:02.981Z] [system] The Crucible costs 25 TC to fire; you have 5.
+[2026-09-22T04:29:46.626Z] [debug] ui: tap "inventory"
+[2026-09-22T04:29:42.481Z] [debug] persist sizes(KB): total=192 player=32 wm=57[rooms=28 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=89 scene=14
+[2026-09-22T04:29:41.132Z] [debug] appstate: inactive → active (was inactive for 5445ms)
+[2026-09-22T04:29:36.212Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-09-22T04:29:35.688Z] [debug] appstate: active → inactive (was active for 365008ms)
+[2026-09-22T04:29:33.369Z] [cognitive] neutral  (67ms)
+[2026-09-22T04:29:33.300Z] [reward] ✦ Crafted Acid Flask. The Arbiter watches you set the last piece.
+[2026-09-22T04:29:33.299Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=1
+[2026-09-22T04:29:33.299Z] [player] craft Acid Flask
+[2026-09-22T04:29:29.340Z] [cognitive] neutral  (52ms)
+[2026-09-22T04:29:29.287Z] [reward] ✦ Crafted Searing Paste ×13. The Arbiter watches you set the last piece.
+[2026-09-22T04:29:29.265Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:29:29.265Z] [player] craft Searing Paste
+[2026-09-22T04:29:22.698Z] [cognitive] neutral  (40ms)
+[2026-09-22T04:29:22.634Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:29:22.634Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:29:22.634Z] [reward] ✦ Crafted Field Dressing ×5. The Arbiter watches you set the last piece.
+[2026-09-22T04:29:22.628Z] [arbiter] The Arbiter nods. "Stripped for parts: 5× Cloth Scrap → Patched Cloth."
+[2026-09-22T04:29:22.621Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:29:22.621Z] [player] craft Field Dressing
+[2026-09-22T04:29:20.060Z] [cognitive] neutral  (46ms)
+[2026-09-22T04:29:20.014Z] [arbiter] "Crafting 5× Field Dressing would strip 5× Cloth Scrap → Patched Cloth from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-22T04:29:20.007Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:29:20.007Z] [player] craft Field Dressing
+[2026-09-22T04:29:19.949Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-09-22T04:28:57.883Z] [cognitive] USE_ITEM  (51ms)
+[2026-09-22T04:28:57.804Z] [reward] ✦ Crafted Rustbane Charm. The Arbiter watches you set the last piece.
+[2026-09-22T04:28:57.804Z] [arbiter] The Arbiter nods. "Stripped for parts: Smooth Stone → Small Rock."
+[2026-09-22T04:28:57.802Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:28:57.802Z] [player] craft Rustbane Charm
+[2026-09-22T04:28:55.852Z] [cognitive] USE_ITEM  (61ms)
+[2026-09-22T04:28:55.790Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:28:55.790Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:28:55.790Z] [arbiter] "Crafting Rustbane Charm would strip Smooth Stone → Small Rock from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-22T04:28:55.788Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:28:55.787Z] [player] craft Rustbane Charm
+[2026-09-22T04:28:44.923Z] [cognitive] SEARCH · TRAVEL · USE_ITEM  (76ms)
+[2026-09-22T04:28:44.846Z] [reward] ✦ Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.
+[2026-09-22T04:28:44.845Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:28:44.844Z] [player] craft Tartarian Oath-Band
+[2026-09-22T04:28:32.606Z] [debug] persist sizes(KB): total=193 player=32 wm=57[rooms=28 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=90 scene=14
+[2026-09-22T04:28:32.588Z] [cognitive] neutral  (64ms)
+[2026-09-22T04:28:32.523Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-22T04:28:32.523Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:28:32.523Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:28:32.523Z] [arbiter] The Arbiter pushes the schematic back. "You're carrying a Pulse Scanner already, and it reads the same band a second one would. One is the whole answer — build a scanner for a band you can't read yet, or spend the parts on something that isn't a duplicate."
+[2026-09-22T04:28:32.522Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=Pulse Scanner range=- enemies=0 hooks=1
+[2026-09-22T04:28:32.519Z] [player] craft Pulse Scanner
+[2026-09-22T04:28:26.232Z] [cognitive] USE_ITEM  (74ms)
+[2026-09-22T04:28:26.156Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:28:26.156Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:28:26.156Z] [reward] ✦ Crafted Aetheric Scanner. The Arbiter watches you set the last piece.
+[2026-09-22T04:28:26.154Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aetheric scanner resolved=- range=- enemies=0 hooks=1
+[2026-09-22T04:28:26.154Z] [player] craft Aetheric Scanner
+[2026-09-22T04:28:15.320Z] [world] You repair the Scale-Lapped Visor. Back to full. (spent: Small Rock x2)
+[2026-09-22T04:28:15.319Z] [arbiter] The Arbiter nods. "Patched in: Smooth Stone → Small Rock."
+[2026-09-22T04:28:15.317Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-09-22T04:28:15.316Z] [arbiter] The Arbiter nods. "Patched in: 4× Cloth Scrap → Patched Cloth."
+[2026-09-22T04:28:15.312Z] [world] You repair the Echoing Steps Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-22T04:28:15.311Z] [arbiter] The Arbiter nods. "Patched in: Spider Silk → Patched Cloth, 3× Cloth Scrap → Patched Cloth."
+[2026-09-22T04:28:15.306Z] [world] You repair the Compact Blaster. Back to full. (spent: Scrap Metal x4, Stick x2)
+[2026-09-22T04:28:15.302Z] [world] You repair the Aetheric Touch Wand. Back to full. (spent: Scrap Metal x4, Stick x2)
+[2026-09-22T04:28:15.297Z] [world] You repair the Aetheric Scout Greaves. Back to full. (spent: Patched Cloth x4)
+[2026-09-22T04:28:15.294Z] [arbiter] The Arbiter nods. "Patched in: 2× Spider Silk → Patched Cloth."
+[2026-09-22T04:28:12.423Z] [debug] ui: tap "craft"
+[2026-09-22T04:28:11.039Z] [debug] ui: tap "more ▸"
+[2026-09-22T04:28:07.068Z] [reward] Bought the Cutpurse's Band working for 200 TC. ✦ Recipe learned (Rare)! Open Crafting to forge it — you'll still need the materials.
+[2026-09-22T04:28:00.889Z] [reward] ✦ You read them well. +1 CHA (base 11, 10 as you stand).
+[2026-09-22T04:28:00.887Z] [reward] They don't charge a friend full price — 5 TC stayed in your pouch.
+[2026-09-22T04:28:00.886Z] [reward] Bought 5× Wild Lettuce from Ilva Sidelong for 70 TC. (205 TC left)
+[2026-09-22T04:27:59.221Z] [reward] They don't charge a friend full price — 8 TC stayed in your pouch.
+[2026-09-22T04:27:59.220Z] [reward] Bought 4× Forager's Stew from Ilva Sidelong for 144 TC. (275 TC left)
+[2026-09-22T04:27:57.354Z] [reward] They don't charge a friend full price — 2 TC stayed in your pouch.
+[2026-09-22T04:27:57.353Z] [reward] Bought Blueberries from Ilva Sidelong for 36 TC. (419 TC left)
+[2026-09-22T04:27:54.953Z] [reward] Bought 3× Blue Cap Mushroom from Ilva Sidelong for 21 TC. (455 TC left)
+[2026-09-22T04:27:52.398Z] [debug] persist sizes(KB): total=193 player=32 wm=56[rooms=28 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=90 scene=15
+[2026-09-22T04:27:52.237Z] [reward] Bought 5× Red Cap Mushroom from Ilva Sidelong for 30 TC. (476 TC left)
+[2026-09-22T04:27:47.815Z] [reward] Sold 5× Wild Lettuce (Common) to Ilva Sidelong for 25 TC (5 TC each). (506 TC on hand)
+[2026-09-22T04:27:44.850Z] [reward] Sold 4× Forager's Stew (Uncommon) to Ilva Sidelong for 56 TC (14 TC each). (481 TC on hand)
+[2026-09-22T04:27:42.865Z] [reward] Sold Blueberries (Uncommon) to Ilva Sidelong for 14 TC. (425 TC on hand)
+[2026-09-22T04:27:36.151Z] [reward] Sold Aetheric Cog (Common) to Ilva Sidelong for 5 TC. (411 TC on hand)
+[2026-09-22T04:27:34.139Z] [reward] Sold Salvager's Worn Gloves (Common) to Ilva Sidelong for 6 TC. (406 TC on hand)
+[2026-09-22T04:27:34.138Z] [reward] Sold Aether-Weaver's Mantle (Common) to Ilva Sidelong for 6 TC. (400 TC on hand)
+[2026-09-22T04:27:34.136Z] [reward] Sold Mud-Seer's Hood (Common) to Ilva Sidelong for 6 TC. (394 TC on hand)
+[2026-09-22T04:27:34.135Z] [reward] Sold Cloak of the Mud Shaman (Common) to Ilva Sidelong for 6 TC. (388 TC on hand)
+[2026-09-22T04:27:34.134Z] [reward] Sold Shaman's Warden Gloves (Common) to Ilva Sidelong for 6 TC. (382 TC on hand)
+[2026-09-22T04:27:34.132Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Ilva Sidelong for 6 TC. (376 TC on hand)
+[2026-09-22T04:27:34.131Z] [reward] Sold Architect's Field Jacket (Common) to Ilva Sidelong for 6 TC. (370 TC on hand)
+[2026-09-22T04:27:34.130Z] [reward] Sold Wanderer's Worn Gauntlets (Common) to Ilva Sidelong for 6 TC. (364 TC on hand)
+[2026-09-22T04:27:34.128Z] [reward] Sold Reclaimer's Gloves (Common) to Ilva Sidelong for 6 TC. (358 TC on hand)
+[2026-09-22T04:27:34.127Z] [reward] Sold Aetheric Scout Greaves (Common) to Ilva Sidelong for 6 TC. (352 TC on hand)
+[2026-09-22T04:27:34.125Z] [reward] Sold Wanderer's Worn Gauntlets (Common) to Ilva Sidelong for 6 TC. (346 TC on hand)
+[2026-09-22T04:27:34.124Z] [reward] Sold Titan's Vest (Common) to Ilva Sidelong for 8 TC. (340 TC on hand)
+[2026-09-22T04:27:34.122Z] [reward] Sold Rough-Hewn Chestplate (Common) to Ilva Sidelong for 8 TC. (332 TC on hand)
+[2026-09-22T04:27:34.121Z] [reward] Sold Stone-Stride Greaves (Common) to Ilva Sidelong for 8 TC. (324 TC on hand)
+[2026-09-22T04:27:34.119Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Ilva Sidelong for 8 TC. (316 TC on hand)
+[2026-09-22T04:27:34.117Z] [reward] Sold Lost Scholar's Robe (Common) to Ilva Sidelong for 8 TC. (308 TC on hand)
+[2026-09-22T04:27:34.115Z] [reward] Sold Sentinel's Chestplate (Common) to Ilva Sidelong for 10 TC. (300 TC on hand)
+[2026-09-22T04:27:34.113Z] [reward] Sold Pocket Knife (Common) to Ilva Sidelong for 12 TC. (290 TC on hand)
+[2026-09-22T04:27:34.111Z] [reward] Sold Mud Sledge (Common) to Ilva Sidelong for 12 TC. (278 TC on hand)
+[2026-09-22T04:27:34.109Z] [reward] Sold Compact Laser Pistol (Ranged) (Common) to Ilva Sidelong for 12 TC. (266 TC on hand)
+[2026-09-22T04:27:34.107Z] [reward] Sold Throwing Knife (Common) to Ilva Sidelong for 12 TC. (254 TC on hand)
+[2026-09-22T04:27:34.104Z] [reward] Sold Rust Dagger (Common) to Ilva Sidelong for 13 TC. (242 TC on hand)
+[2026-09-22T04:27:34.102Z] [reward] Sold Magnetized Rod (Common) to Ilva Sidelong for 14 TC. (229 TC on hand)
+[2026-09-22T04:27:34.100Z] [reward] Sold Bone Club (Common) to Ilva Sidelong for 13 TC. (215 TC on hand)
+[2026-09-22T04:27:34.097Z] [reward] Sold Tartarian Bone Knife (Common) to Ilva Sidelong for 13 TC. (202 TC on hand)
+[2026-09-22T04:27:34.094Z] [reward] Sold Bonebreaker Mace (Common) to Ilva Sidelong for 13 TC. (189 TC on hand)
+[2026-09-22T04:27:34.091Z] [reward] Sold Short Hunting Bow (Common) to Ilva Sidelong for 13 TC. (176 TC on hand)
+[2026-09-22T04:27:34.088Z] [reward] Sold Bog-Hide Buckler (Common) to Ilva Sidelong for 13 TC. (163 TC on hand)
+[2026-09-22T04:27:34.085Z] [reward] Sold Bog-Hide Buckler (Common) to Ilva Sidelong for 13 TC. (150 TC on hand)
+[2026-09-22T04:27:34.081Z] [reward] Sold Bone Shiv (Stealth) (Common) to Ilva Sidelong for 14 TC. (137 TC on hand)
+[2026-09-22T04:27:34.073Z] [reward] Sold Magnetized Rod (Common) to Ilva Sidelong for 14 TC. (123 TC on hand)
+[2026-09-22T04:27:34.066Z] [reward] Sold Iron Spear (Common) to Ilva Sidelong for 14 TC. (109 TC on hand)
+[2026-09-22T04:27:26.515Z] [arbiter] The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: 58 HP and a Rare weapon. You sit at 57 HP."
+[2026-09-22T04:27:26.513Z] [arbiter] The Arbiter taps the poster. "Travel to the Sunken Enclave to begin. The Plague Moth won't come to you."
+[2026-09-22T04:27:26.513Z] [reward] ✦ Hunt accepted — The Plague Moth of the Sunken Enclave (parked). A wasting sickness spreads from the Sunken Enclave's upper vaults. A Plague Moth breeds in the dark, dusting the air with rot. URGENT — 1080 TC.
+[2026-09-22T04:27:26.512Z] [arbiter] The Arbiter watches you sign. "Another for the slate."
+[2026-09-22T04:27:26.508Z] [debug] accept: hunt hunt_plague_moth_enclave tracked=false
+[2026-09-22T04:27:19.838Z] [world] You let the conversation go and Ilva Sidelong gets back to it.
+[2026-09-22T04:27:18.909Z] [world] Ilva Sidelong shifts the pack higher on their shoulder and does not put it down.
+[2026-09-22T04:27:18.907Z] [world] "Because it is a day and a half out and a day and a half back, and I can still be under my own roof twice a week." It is recited, the way a route is recited. "Any farther and the arithmetic stops working for the people waiting."
+[2026-09-22T04:27:18.906Z] [player] Ask why the stall is here
+[2026-09-22T04:27:16.506Z] [debug] persist sizes(KB): total=192 player=43 wm=56[rooms=28 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=91 scene=3
+[2026-09-22T04:27:16.462Z] [cognitive] RETREAT · DISENGAGE · HIDE  (56ms)
+[2026-09-22T04:27:16.405Z] [system] ⏳ Time passed: 1h
+[2026-09-22T04:27:16.405Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:27:16.405Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:27:16.404Z] [arbiter] "There are paths from this place," the Arbiter murmurs. "Ask, and I will tell you what I know."
+[2026-09-22T04:27:16.404Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:27:16.404Z] [world] Rare workings for sale: Cutpurse's Band (200 TC), Elder Golem Greatsword (500 TC), Elder Golem Pike (500 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-22T04:27:16.398Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Ilva Sidelong, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move."
+[2026-09-22T04:27:16.397Z] [world] You hear a kettle whistling before you see them. Ilva Sidelong, fence, has made camp here.
+[2026-09-22T04:27:16.397Z] [world] You think back to the jar from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-09-22T04:27:16.396Z] [world] [Giant-Watch Shrine] north: open ground · east: Cradle of Dusk (5 tiles, 13 hours) · south: The Central Pillars (5 tiles, 13 hours) · west: Builders' Survey Camp (6 tiles, 15 hours)
+[2026-09-22T04:27:16.394Z] [system] Weather effect — Iron Fog: -1 DEX
+[2026-09-22T04:27:16.393Z] [world] It is a little emptier than you remember, or you are.
+Light bends slightly around nothing in particular.
+Hazard: Aetherstone Seal. Hardened Aether-mud, stronger than stone. No standard tool will pierce it.
+You are at Giant-Watch Shrine. A roadside vigil-shrine of the Servants of the Giants at the frontier, where keepers wait and watch before the long road down to the giant vaults.
+[2026-09-22T04:27:16.393Z] [world] A dense rust-colored fog that smells of forge and old blood. Compasses spin.
+[2026-09-22T04:27:16.385Z] [debug] missions: unchanged since 2026-09-22T04:23:25.871Z — 10 contracts (dumped in full then) · at=giant_watch_shrine travelTo=hidden_market here=hunt:hunt_servants_doubter
+[2026-09-22T04:27:16.385Z] [debug] scene: loc=giant_watch_shrine hub=- arrival=n opening=n passing=y
+[2026-09-22T04:27:16.385Z] [world] You let yourself out the Court's side door and into the open ground. The outpost falls away behind you.
+[2026-09-22T04:27:16.383Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-09-22T04:27:16.382Z] [player] leave outpost
+[2026-09-22T04:27:16.338Z] [debug] ui: tap "🚪 EXIT"
+[2026-09-22T04:27:15.529Z] [reward]     • Aether Crystal (Common)
+[2026-09-22T04:27:15.529Z] [reward] ✦ Salvage haul:
+[2026-09-22T04:27:15.528Z] [world] You salvage the leaning royal vault pedestal. The take is small but real.
+[2026-09-22T04:27:14.471Z] [debug] ui: tap "take / salvage"
+[2026-09-22T04:27:14.030Z] [cognitive] SEARCH  (48ms)
+[2026-09-22T04:27:13.981Z] [world] The leaning royal vault pedestal resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-22T04:27:13.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=leaning royal vault pedestal resolved=leaning royal vault pedestal range=- enemies=0 hooks=0
+[2026-09-22T04:27:13.980Z] [player] investigate leaning royal vault pedestal
+[2026-09-22T04:27:12.537Z] [debug] ui: tap "investigate"
+[2026-09-22T04:27:10.458Z] [cognitive] neutral  (39ms)
+[2026-09-22T04:27:10.401Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-22T04:27:10.400Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-22T04:27:10.400Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-22T04:27:10.400Z] [world] Paths: north to Reliquary · south to Vigil Door · east to Forge · west to Refectory. (Type 'leave outpost' to head into the wilds.)
+[2026-09-22T04:27:10.399Z] [world] Something has shifted here, and you cannot say what.
+[2026-09-22T04:27:10.399Z] [world] Tomb Vigil — The Tomb-Lit Court. A round chamber lit only by tomb-lanterns, each named after a sleeping Giant. The map-stone in the middle marks where the Giants lie.
+[2026-09-22T04:27:10.396Z] [debug] missions: unchanged since 2026-09-22T04:23:25.871Z — 10 contracts (dumped in full then) · at=giant_watch_shrine travelTo=hidden_market here=hunt:hunt_servants_doubter
+[2026-09-22T04:27:10.395Z] [debug] scene: loc=giant_watch_shrine hub=outpost_central arrival=n opening=n passing=y
+[2026-09-22T04:27:10.395Z] [world] You head on to the Court.
+[2026-09-22T04:27:10.394Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-22T04:27:10.394Z] [player] go south
+[2026-09-22T04:27:10.354Z] [debug] ui: tap "↓ ✓ COURT"
+[2026-09-22T04:27:05.840Z] [debug] qwen-watchdog: 7 memory warnings this session — STANDING DOWN for good. This device will not hold the context; narration stays on templates.
+[2026-09-22T04:27:04.682Z] [cognitive] neutral  (41ms)
+[2026-09-22T04:27:04.623Z] [world] Paths: south to Court · east to Workshop · west to Records. (Type 'leave outpost' to head into the wilds.)
+[2026-09-22T04:27:04.622Z] [world] The mud has moved since you were last through. Not much. Some.
+[2026-09-22T04:27:04.621Z] [world] Tomb Vigil — The Reliquary of the Sleepers. Smaller artifacts from the Giants' burial — a ring, a tooth-pendant, the spike of a broken Giant-blade. Each is wrapped in lichen-silk and named by its keeper.
+[2026-09-22T04:27:04.620Z] [debug] missions: unchanged since 2026-09-22T04:23:25.871Z — 10 contracts (dumped in full then) · at=giant_watch_shrine travelTo=hidden_market here=hunt:hunt_servants_doubter
+[2026-09-22T04:27:04.620Z] [debug] scene: loc=giant_watch_shrine hub=outpost_relic_vault arrival=n opening=n passing=y
+[2026-09-22T04:27:04.620Z] [world] You head on to the Reliquary.
+[2026-09-22T04:27:04.620Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-22T04:27:04.619Z] [player] go east
+[2026-09-22T04:27:04.612Z] [debug] ui: tap "→ ✓ RELIQUARY"
+[2026-09-22T04:27:04.597Z] [debug] qwen-watchdog: reinit #1 settled in 3774ms → status='idle'.
+[2026-09-22T04:27:04.582Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-09-22T04:27:04.568Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:27:04.568Z] [debug] ⚠⚠ MEMORY WARNING #7 from the OS (0.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=182KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:27:04.545Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:27:04.545Z] [debug] ⚠⚠ MEMORY WARNING #6 from the OS (0.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=182KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:27:04.521Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:27:04.521Z] [debug] ⚠⚠ MEMORY WARNING #5 from the OS (0.1s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=182KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:27:04.484Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)
+[2026-09-22T04:27:04.469Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-09-22T04:27:04.430Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:27:04.430Z] [debug] ⚠⚠ MEMORY WARNING #4 from the OS (0.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=182KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:27:04.394Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-09-22T04:27:04.394Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (2.6s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=1 · save=182KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-09-22T04:27:03.354Z] [reward] ✦ Salvager's Worn Gloves (Common).
+[2026-09-22T04:27:03.354Z] [world] The Salvager's Worn Gloves goes into the pack by feel. You have done this a great many times.
+[2026-09-22T04:27:03.353Z] [reward] ✦ Pocket Knife (Common).
+[2026-09-22T04:27:03.353Z] [world] You pocket the Pocket Knife and check the horizon, in that order.
+[2026-09-22T04:27:03.088Z] [cognitive] DISENGAGE  (1000ms)
+[2026-09-22T04:27:02.626Z] [reward]     • Frayed Rigging Twine (Common)
+[2026-09-22T04:27:02.626Z] [reward]     • Aether Dust x3 (Common)
+[2026-09-22T04:27:02.626Z] [reward]     • Cloth Scrap (Common)
+[2026-09-22T04:27:02.626Z] [reward]     • Scrap Metal x5 (Common)
+[2026-09-22T04:27:02.626Z] [reward]     • Aetheric Cloth (Uncommon)
+[2026-09-22T04:27:02.626Z] [reward] ✦ Salvage haul:
+[2026-09-22T04:27:02.626Z] [world] You lever something loose from the weathered maintenance tunnel ladder — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-09-22T04:27:02.626Z] [world] You work the tilted tartarian power conduit over. A part of it comes loose, intact.
+[2026-09-22T04:27:02.626Z] [world] Something papery rustles as you strip the leaning submerged library shelf. You pull free a journal leaf.
+[2026-09-22T04:27:02.626Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-09-22T04:27:02.625Z] [world] The jar yields little of value, though a Cloth Scrap ends up in your pack.
+[2026-09-22T04:27:02.625Z] [world] You work the dust-buried capacitor coil rack over. A part of it comes loose, intact.
+[2026-09-22T04:27:02.625Z] [world] You break the desk apart. Among the pieces, something worth keeping.
+[2026-09-22T04:27:02.623Z] [reward] ✦ Found Verse Five — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-22T04:27:02.088Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-22T04:27:02.087Z] [world] You take the measure of the Pocket Knife. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-09-22T04:27:02.087Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pocket knife resolved=Pocket Knife range=- enemies=0 hooks=0
+[2026-09-22T04:27:02.087Z] [player] investigate Pocket Knife
+[2026-09-22T04:27:01.775Z] [debug] ui: tap "take / salvage"
+[2026-09-22T04:27:01.753Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='loading'), so this freed 0 bytes. The pressure is coming from something else.
+
+=== END REPORT ===
