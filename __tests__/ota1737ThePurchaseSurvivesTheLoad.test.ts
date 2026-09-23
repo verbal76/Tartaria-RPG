@@ -90,6 +90,21 @@ function deadDog(): void {
   const dead = createDogCompanion({ name: 'Old Boy', breed: 'mutt', rawSex: 'male', startingProfile: 'mongrel', currentHour: 0 });
   useGameStore.setState({ player: { ...S().player!, dog: { ...dead, status: 'dead' } } } as never);
 }
+/* ⚠⚠ AMENDED AT OTA-1874 — A DOG ROW IS NOT A ROW NAMED AFTER ONE. This
+ * suite found its row by matching the word dog, case-insensitively, against
+ * the offer's NAME. That worked while the single catalog entry was called
+ * 'Kennel Dog'. Every shelf dog is an individual of a named breed now —
+ * 'Border Collie', 'Royal Hound' — and almost none of those strings contain
+ * the word, so the old predicate silently matched nothing and these tests died
+ * on `undefined` rather than failing a claim. Asked of the OFFER instead: it
+ * carries the rolled animal. Strictly stronger, because a rope row called
+ * 'Dogtooth Cord' would have satisfied the old spelling and cannot satisfy
+ * this one. */
+const dogRowOf = (v: { offers: ReadonlyArray<{ itemName: string; price: number; dog?: unknown }> }) =>
+  v.offers.find((o) => !!o.dog);
+const shelfHasADog = (): boolean =>
+  (S().currentScene!.vendor!.offers).some((o) => !!o.dog);
+
 function dogShelf(): VendorInstance {
   const v = withReplacementDogOffer(stall([{ itemName: 'Rope', price: 10, quantity: 2 }]), S().player!, S().worldMemory)!;
   useGameStore.setState({ currentScene: { ...S().currentScene!, vendor: v, enemies: [], enemyHps: [] } } as never);
@@ -100,7 +115,7 @@ describe('OTA-1737 (3A) - a paid dog survives the load', () => {
   it('⚠⚠⚠ buy → save before naming → load → the purchase stands → name it → dog obtained', async () => {
     await boot(5000); deadDog();
     const v = dogShelf();
-    const row = v.offers.find((o) => /dog/i.test(o.itemName))!;
+    const row = dogRowOf(v)!;
     S().buyFromVendor(row.itemName, 1); await flush();
     expect(S().player!.tc).toBe(5000 - row.price);
     expect(S().worldMemory.pendingDogOnboarding?.rescueData.scenario).toBe('market');
@@ -115,13 +130,13 @@ describe('OTA-1737 (3A) - a paid dog survives the load', () => {
   });
   it('⚠⚠⚠ no refund, no duplicate: reload around the boundary any way you like', async () => {
     await boot(5000); deadDog();
-    const v = dogShelf(); const row = v.offers.find((o) => /dog/i.test(o.itemName))!;
+    const v = dogShelf(); const row = dogRowOf(v)!;
     S().buyFromVendor(row.itemName, 1); await flush();
     await reload();
     // a second purchase while the first is owed is refused, unpaid
     const tc1 = S().player!.tc;
     dogShelf();                                                                 // shelf projection: no dog row while pending
-    expect(S().currentScene!.vendor!.offers.some((o) => /dog/i.test(o.itemName))).toBe(false);
+    expect(shelfHasADog()).toBe(false);
     S().buyFromVendor(row.itemName, 1); await flush();
     expect(S().player!.tc).toBe(tc1);
     await reload();                                                             // reload again before naming: still one pending
@@ -131,8 +146,26 @@ describe('OTA-1737 (3A) - a paid dog survives the load', () => {
     expect(hasActiveDog(S().player!)).toBe(true);
     expect(S().worldMemory.pendingDogOnboarding ?? null).toBeNull();
     expect(S().player!.tc).toBe(5000 - row.price);
+    /* ⚠⚠⚠ INVERTED BY OWNER RULING AT OTA-1874, NOT RELAXED. This read
+     *  `expect(shelfHasADog()).toBe(false)` — with a living dog at your side
+     *  the shelf went silent, because `hasActiveDog` suppressed the market.
+     *  The companion lifecycle removes that gate by name: *"a one-active-
+     *  companion system in which the player can deliberately replace a LIVING
+     *  dog"*. A market that hides itself the moment you succeed is the exact
+     *  thing this OTA was written to end, so the claim now asserts the new
+     *  rule rather than the retired one.
+     *
+     *  ⚠ WHAT IT WAS GUARDING IS KEPT, and kept where it is still true: the
+     *  pending check twelve lines up is untouched, so an acquisition already
+     *  in flight still closes the counter. That was always the real "no
+     *  duplicate" protection; owning a dog was never what made it safe. */
     dogShelf();
-    expect(S().currentScene!.vendor!.offers.some((o) => /dog/i.test(o.itemName))).toBe(false);
+    expect(hasActiveDog(S().player!)).toBe(true);
+    expect(shelfHasADog()).toBe(true);
+    // …and it is still ONE dog and ONE charge: the open shelf tempts, it does
+    // not take. Nothing was spent by the offer merely existing.
+    expect(S().player!.tc).toBe(5000 - row.price);
+    expect(S().worldMemory.pendingDogOnboarding ?? null).toBeNull();
   });
   it('⚠⚠ the amnesty still clears a wedged RESCUE (its whole purpose) — and only that', () => {
     const wedged = { pendingDogOnboarding: { stage: 'breed', rescueData: { scenario: 'snare' } }, dogRescueTipFired: true } as unknown as Parameters<typeof dogRescueAmnesty>[1];

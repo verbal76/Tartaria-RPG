@@ -217,6 +217,13 @@ export function InventoryScreen() {
   const legendTextColor = useReadableMuted();
   const equipItem = useHumanAction('equipItem');
   const unequipSlot = useHumanAction('unequipSlot');
+  /* ⚠⚠ THROUGH THE HUMAN SEAM, LIKE EVERY OTHER MUTATION ON THIS SCREEN.
+   * `setDogVest` is an ACCOUNTED name, and OTA-1834 §6's census caught this
+   * screen reaching it as `useGameStore.getState().setDogVest(...)` — a bare
+   * store seam that mutates without stamping player activity. That is exactly
+   * the Baker #13 false-idle class: a player who equips a vest and puts the
+   * phone down looks idle from the moment of the tap, and homework arms early. */
+  const setDogVest = useHumanAction('setDogVest');
   // OTA-1114 — is something swinging at you right now? The take-off confirm
   // says a different thing mid-fight, because that is the case the owner's
   // death log actually is: AC 16 → 10 with five raiders on the tile.
@@ -1116,17 +1123,14 @@ export function InventoryScreen() {
       buttons.push({
         label: `Unequip (worn by ${player?.dog?.name ?? 'your dog'})`,
         onPress: () => {
-          const pDog = useGameStore.getState().player;
-          if (!pDog?.dog) { closeModal(); return; }
-          useGameStore.setState((s) => s.player && s.player.dog
-            ? {
-                player: {
-                  ...s.player,
-                  dog: { ...s.player.dog, equipped: { vest: null, vestId: null } },
-                },
-              }
-            : s);
-          useGameStore.getState().appendLog('world', `You unbuckle the ${pending.item.name} from ${pDog.dog.name}.`);
+          /* ⚠ THROUGH THE STORE'S ONE DOG-EQUIPMENT PATH. This was a
+           * hand-written `setState` plus its own log line, which was fine while
+           * this screen was the only surface that could take a vest off. The
+           * dog COMPARISON card has to do it too — you cannot be told "the vest
+           * leaves with the dog" and be given no way to keep it — and a second
+           * hand-written copy is how two surfaces start disagreeing about what
+           * "equipped" means. `setDogVest` is this logic MOVED, not re-typed. */
+          setDogVest(null);
           closeModal();
         },
         tone: 'neutral',
@@ -1141,24 +1145,10 @@ export function InventoryScreen() {
         // The right answer was sitting in the sibling branch.
         label: `Equip on ${player!.dog!.name}`,
         onPress: () => {
-          // Route via submitPlayerAction so the engine's equip-on-dog
-          // path can grow without UI changes. Falls back to direct
-          // state mutation since no parser intent exists yet for
-          // dog-equip (Phase 5 deferred a dedicated verb).
-          const p = useGameStore.getState().player;
-          if (!p?.dog) { closeModal(); return; }
-          useGameStore.setState((s) => s.player && s.player.dog
-            ? {
-                player: {
-                  ...s.player,
-                  dog: {
-                    ...s.player.dog,
-                    equipped: { vest: pending.item.name, vestId: pending.item.id },
-                  },
-                },
-              }
-            : s);
-          useGameStore.getState().appendLog('world', `You strap the ${pending.item.name} onto ${p.dog.name}.`);
+          // ⚠ The same one path, the other direction — see the Unequip branch
+          // above. Keyed on the INSTANCE the player tapped, never the name:
+          // two same-named vests can sit at different reinforcement levels.
+          setDogVest(pending.item.id);
           closeModal();
         },
         tone: 'primary',

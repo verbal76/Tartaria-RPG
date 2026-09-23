@@ -31454,7 +31454,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * Tartarian Coin was audited and stays out of both — five shipped recipes
  * consume it and one named NPC likes it as a gift, so it keeps its exclusions
  * and gets no third button. */
-export const OTA_BUILD_ID = '2026-09-23-1873-the-sale-is-read-before-it-is-made';
+/* OTA-1874 — THE DOG YOU CHOOSE IS THE DOG YOU GET.
+ *
+ * The dog system becomes an ongoing companion market with a deliberate
+ * replacement lifecycle. Owner: *"a one-active-companion system in which the
+ * player can deliberately replace a living dog after seeing exactly what is
+ * being gained and lost."*
+ *
+ * Breeds carry BANDS and every vendor dog is an INDIVIDUAL rolled inside them,
+ * so you buy potential rather than a finished animal, and each dog now has its
+ * own per-stat ceiling at or below the engine's absolute 30. A living dog no
+ * longer hides the stall — that gate was the one line making the market
+ * unreachable for anyone past the rescue arc, and the owner ruled it out.
+ *
+ * The adoption is one atomic transaction: the coin leaves, the old companion is
+ * RELEASED (alive — not dead, not Fallen, no resurrection), its worn vest goes
+ * with it, and the naming card opens carrying the rolled sheet, so the animal
+ * that arrives is the animal that was inspected. Legacy dogs migrate to
+ * max(profileCeiling, currentStat) — deterministic, and no earned development
+ * is ever reduced. */
+export const OTA_BUILD_ID = '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get';
+// SUPERSEDED: '2026-09-23-1873-the-sale-is-read-before-it-is-made'
 // SUPERSEDED: '2026-09-23-1872-the-keyboard-leaves-the-card-a-room'
 // SUPERSEDED: '2026-09-22-1871-the-coin-sits-where-you-can-reach-it'
 // SUPERSEDED: '2026-09-22-1870-the-road-belongs-to-the-next-task'

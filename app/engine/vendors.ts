@@ -14,6 +14,20 @@ import type { StallCategory } from './buildings';
 export interface VendorOffer {
   itemName: string;
   price: number;
+  /** ⚠⚠⚠ A DOG ROW IS AN ANIMAL, NOT A CATALOG ENTRY.
+   *
+   *  Every other offer on this shelf names a THING the catalog can rebuild
+   *  from its name. A dog cannot: each one is rolled inside its breed's
+   *  ranges, so two Border Collies on two stalls are two different animals
+   *  and the one the player inspected is the one they must get. The rolled
+   *  sheet therefore rides on the offer itself — the same move OTA-1732 made
+   *  for buy-back, which keeps the sold INSTANCE rather than re-minting from
+   *  a name.
+   *
+   *  ⚠ `dog.offerId` is what the comparison card holds and the confirm
+   *  re-finds, so a stall that refreshed under an open card fails safe
+   *  instead of quietly selling a different dog. */
+  dog?: import('./dogBreeds').ProspectiveDog;
   /** ⚠⚠⚠ OTA-1732 (F1) — THE ACTUAL OBJECTS THE PLAYER SOLD INTO THIS LINE.
    *
    *  Owner: *"I do NOT accept selling a weapon and buying that same weapon back

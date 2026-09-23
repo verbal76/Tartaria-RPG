@@ -296,15 +296,43 @@ describe('OTA-346 — hasActiveDog gates the puppy-vendor replacement arc', () =
     // not less — so the count states what is actually there and the replacement
     // acquisition path is pinned by name below.
     expect((src.match(/!hasActiveDog\(/g) ?? []).length).toBeGreaterThanOrEqual(3);
-    // ⚠⚠ AND THE REPLACEMENT PATH OBEYS IT TOO — the market's shelf gate and its
-    // counter gate both ASK hasActiveDog rather than re-deriving "has a dog" from
-    // a raw field, which is the whole point of OTA-346's rule.
-    expect(src).toContain('hasActiveDog: hasActiveDog(player),');
+    /* ⚠⚠ AMENDED BY OWNER RULING — ONE OF THE TWO GATES WAS REMOVED ON PURPOSE.
+     *
+     *  This pinned `hasActiveDog: hasActiveDog(player),` — the SHELF gate,
+     *  which suppressed the dog row for anyone who already owned a dog. The
+     *  reachability audit proved that made the market invisible to nearly
+     *  everyone past the rescue arc, and the owner ruled it out: *"That is NOT
+     *  the final owner design contract."* A player with a living companion must
+     *  be able to encounter, inspect and compare another.
+     *
+     *  The RULE this test exists for — "ask `hasActiveDog`, never re-derive it
+     *  from a raw `player.dog`" (OTA-346) — is untouched, and is now pinned in
+     *  both directions instead of one. */
+    // 1. The shelf gate is GONE, and must not come back.
+    expect(src).not.toContain('hasActiveDog: hasActiveDog(player),');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const market = require('fs').readFileSync(
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('path').resolve(__dirname, '../app/engine/dogMarket.ts'), 'utf-8') as string;
+    /* ⚠ COMMENT-STRIPPED — OTA-1721's lesson, and it bit here immediately.
+     *  dogMarket's own header EXPLAINS that `hasActiveDog` is no longer a gate,
+     *  so a raw read finds the string in the prose that documents its removal
+     *  and the instrument reports on itself. */
+    const codeOnly = (s: string): string =>
+      s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(market).toContain('withReplacementDogOffer');   // self-test: right file
+    expect(codeOnly(market)).not.toContain('hasActiveDog');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const slice = require('fs').readFileSync(
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('path').resolve(__dirname, '../app/state/slices/vendorSlice.ts'), 'utf-8') as string;
+    /* 2. The COUNTER gate survives and still asks the predicate. A typed
+     *    `buy <breed>` must not replace a living companion silently — the
+     *    owner's *"this is not 'silently replace the current dog'"* — so this
+     *    is the one place the question is still asked, and it is asked through
+     *    `hasActiveDog`, never through a raw field. */
     expect(slice).toContain('deps.hasActiveDog(player)');
+    expect(slice).not.toMatch(/if\s*\(\s*player\.dog\s*\)/);
     // ...and the old raw truthy dog guards are gone from those spawn sites.
     expect(src).not.toMatch(/!wm\.pendingDogOnboarding &&\s*\n\s*!get\(\)\.player\?\.dog &&/);
   });

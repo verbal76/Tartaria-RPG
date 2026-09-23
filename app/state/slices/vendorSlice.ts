@@ -75,6 +75,11 @@ type SetState = (
 
 export interface VendorSlice {
   buyFromVendor: (itemName: string, qty?: number) => void;
+  /** ⚠⚠⚠ THE FINAL CONFIRMATION OF A DOG ADOPTION, and the ONLY path that
+   *  spends the coin, releases a living companion and lets its gear go with it.
+   *  Keyed on the prospective dog's `offerId` — not its name — so the animal
+   *  that is handed over is provably the animal the comparison card showed. */
+  adoptVendorDog: (offerId: string) => void;
   /** ⚠ OTA-1481 — `units` sells N of the stack as ONE transaction: one state
    *  write, one log line, one ledger entry, one persist. The buy side has done
    *  quantity since arb92; the sell side was left looping the screen-side, and
@@ -103,6 +108,32 @@ export interface VendorSliceDeps {
  *  sell-back. Deep by design: they carry the risk of holding hot goods, and
  *  the cut is what keeps steal-and-fence from beating honest selling. */
 const FENCE_STOLEN_CUT = 0.4;
+
+/* ⚠⚠⚠ WHY THERE IS NO MODULE-SCOPE DOUBLE-PRESS LATCH HERE. THIS IS A
+ *  MEASUREMENT, NOT AN OPINION.
+ *
+ *  OTA-1734 and OTA-1873 both fixed the same-frame double-confirm class with a
+ *  synchronous latch, so one was written here first — this is the write where a
+ *  second execution would spend the price twice and release two dogs, neither
+ *  of which can be bought back. It was then put under a negative control:
+ *  disabled, with the suite's "two presses in one frame pay once" claim run
+ *  against it. The claim STAYED GREEN. Disabled alongside the in-write
+ *  re-check, still green. Alongside the planner's re-check too, still green. It
+ *  went red only when the shelf removal was disabled as well — and then three
+ *  presses charged three times, which is the defect the claim is about.
+ *
+ *  ⚠ THE REASON IS THE LAYER, and it matters because the OTA-1873 lesson is
+ *  still right where it applies. A React confirm sheet's guard lives in
+ *  `useState`, which does not update inside the frame, so a second tap really
+ *  does re-enter on stale truth — that is what the ref latch is for, and the
+ *  comparison card's own confirm will still need one. A STORE action reads its
+ *  guards back out of the store, and zustand applies `set` synchronously: by
+ *  the time a second call runs, `get()` already shows the purchase. Three
+ *  independent conditions therefore each catch it on their own — the dog is off
+ *  the shelf, an onboarding is pending, and the coin is spent.
+ *
+ *  A latch here would be a fourth guard no test can ever fail, standing in
+ *  front of three that can. It was removed rather than kept for comfort. */
 
 export const createVendorSlice = (
   set: SetState,
@@ -237,33 +268,36 @@ export const createVendorSlice = (
           get().appendLog('system', `${scene.vendor.name} has no ${dogRow.itemName} to sell.`);
           return;
         }
-        // ⚠ Re-checked at the counter, not just at the shelf. The offer row was
-        // built when the scene began; a dog acquired since then (a rescue that
-        // resolved, a naming card still open) must not be able to buy a second.
+        /* ⚠⚠⚠ A TYPED `buy` WILL NOT REPLACE A LIVING COMPANION.
+         *
+         *  Owner, on what this feature is: *"a one-active-companion system in
+         *  which the player can deliberately replace a living dog AFTER SEEING
+         *  EXACTLY WHAT IS BEING GAINED AND LOST"* — and, by name, *"this is
+         *  not 'silently replace the current dog'."* A typed command shows the
+         *  player nothing. It cannot be the confirmation for a write that sets
+         *  a named companion free and takes its vest with it, so it refuses
+         *  and points at the surface that does the showing.
+         *
+         *  ⚠ THIS IS NOT THE OLD SUPPRESSION GATE COMING BACK. The old gate
+         *  hid the dog from a player who had one. This one sells it — through
+         *  the comparison card, which is the only place the trade can be read
+         *  before it is made. With no dog at your side there is nothing to
+         *  lose and nothing to compare, so the typed path goes straight
+         *  through to the same transaction. */
         if (deps.hasActiveDog(player)) {
-          get().appendLog('system', `You already have a dog at your side.`);
+          get().appendLog(
+            'system',
+            `${scene.vendor.name} keeps hold of the lead. "You've a dog already. Look them over together first — then tell me."`
+            + ` (Open the ${dogRow.itemName} on the counter to set it beside ${player.dog?.name ?? 'your dog'} before you decide.)`,
+          );
           return;
         }
-        if (get().worldMemory.pendingDogOnboarding) {
-          get().appendLog('system', `You're still settling the dog you just took on.`);
+        const offerId = row.dog?.offerId ?? null;
+        if (!offerId) {
+          get().appendLog('system', `${scene.vendor.name} has no ${dogRow.itemName} to sell.`);
           return;
         }
-        if (player.tc < row.price) {
-          get().appendLog('system', `${scene.vendor.name} keeps a hand on the lead. "${row.price} TC, and I don't come down on a good dog. Come back heavier."`);
-          return;
-        }
-        set((s) => (s.player ? {
-          player: { ...s.player, tc: s.player.tc - row.price },
-          worldMemory: {
-            ...s.worldMemory,
-            pendingDogOnboarding: {
-              stage: 'breed' as const,
-              rescueData: { scenario: 'market' as const, startingProfile: dogRow.profile },
-            },
-          },
-        } : s));
-        get().appendLog('reward', `Bought ${dogRow.itemName} for ${row.price} TC. ✦ ${dogRow.blurb}`);
-        void get().persist();
+        get().adoptVendorDog(offerId);
         return;
       }
     }
@@ -574,6 +608,105 @@ export const createVendorSlice = (
       // a CHA push). Passive perception WIS still trains on outcome paths
       // (turn-ins, whispers, novel travel, surviving encounters).
     }
+    void get().persist();
+  },
+
+  /** ⚠⚠⚠ THE ADOPTION. FOUR IRREVERSIBLE THINGS IN ONE SYNCHRONOUS WRITE.
+   *
+   *  Coin leaves, a living companion is set free, its vest leaves the pack with
+   *  it, and the naming card opens. The owner's two hard rules on this write:
+   *
+   *    *"Until FINAL confirmation: no TC spent, no old dog released, no gear
+   *     destroyed, no prospective dog acquired."*
+   *    *"Do not permit an interrupted onboarding flow to produce: old dog gone
+   *     / TC gone / new dog vanished."*
+   *
+   *  Both are structural here rather than promised. The FIRST holds because
+   *  `planDogAdoption` computes the whole transaction without touching
+   *  anything, and every refusal returns before a single field is written. The
+   *  SECOND holds because the one `set` below is atomic — zustand applies it
+   *  synchronously — and the persist that follows writes a save in which the
+   *  purchase is complete and only the naming remains. There is no reachable
+   *  state where the coin is gone and the onboarding is not.
+   *
+   *  ⚠ THE GUARDS ARE ASKED TWICE. Once before the write, to produce an honest
+   *  refusal line, and again INSIDE the updater against `s`, because between
+   *  the read and the write another action could have resolved (a rescue
+   *  landing, a purse emptied). The inner pass has no message — it just
+   *  declines to write — which is the only fail-safe direction for a
+   *  transaction that cannot be undone. */
+  adoptVendorDog(offerId) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!player) return;
+    if (!scene?.vendor) { get().appendLog('system', "There's no one here to trade with."); return; }
+    // The same two doors every purchase goes through — see buyFromVendor.
+    if (scene.enemies.length > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — purchases disabled while the tutorial is running.');
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const DA = require('../../engine/dogAdoption') as typeof import('../../engine/dogAdoption');
+    const plan = DA.planDogAdoption({
+      player,
+      worldMemory: state.worldMemory,
+      vendorName: scene.vendor.name,
+      // ⚠ THE LIVE ROW, FOUND BY IDENTITY. If the stall refreshed under an open
+      // card this is undefined and the plan refuses — it is never retargeted to
+      // whatever animal is standing there now (owner rule 27).
+      liveOffer: scene.vendor.offers.find((o) => o.dog?.offerId === offerId) ?? null,
+      expectedOfferId: offerId,
+    });
+    if (!plan.ok) { get().appendLog('system', plan.message); return; }
+
+    /* ⚠ `committed` IS READ SYNCHRONOUSLY AFTER `set`, which zustand applies
+     *  synchronously. It is the only honest way to log: an updater that
+     *  declined must not produce a line saying a dog was bought. */
+    let committed = false;
+    set((s) => {
+      if (!s.player || !s.currentScene?.vendor) return s;
+      // Re-asked against the LIVE state, silently. See the header.
+      if (!s.currentScene.vendor.offers.some((o) => o.dog?.offerId === offerId)) return s;
+      if (s.worldMemory.pendingDogOnboarding) return s;
+      if ((s.player.tc ?? 0) < plan.price) return s;
+      const applied = DA.applyDogAdoption(s.player, s.worldMemory, plan);
+      committed = true;
+      return {
+        player: applied.player,
+        worldMemory: applied.worldMemory,
+        // ⚠ THE DOG LEAVES THE SHELF IN THE SAME WRITE THAT BUYS IT. Two
+        // numbers describing one counter must move together, or the stall goes
+        // on offering an animal it has already handed over.
+        currentScene: {
+          ...s.currentScene,
+          vendor: {
+            ...s.currentScene.vendor,
+            offers: s.currentScene.vendor.offers.filter((o) => o.dog?.offerId !== offerId),
+          },
+        },
+      };
+    });
+    if (!committed) return;
+
+    /* The feed keeps the whole trade, in the order it happened. The release
+     * line comes first because that is what the player gave up, and it names
+     * the dog — the owner's standing rule that a dog affordance uses its name.
+     * ⚠ 'world', not the death channel: this dog is alive and walking away. */
+    if (plan.released) {
+      get().appendLog(
+        'world',
+        `You slip the collar off ${plan.released.name} one last time. ${plan.released.name} looks back once, then goes — free, and somewhere out there still.`,
+      );
+      if (plan.surrendered) {
+        get().appendLog('world', `The ${plan.surrendered.name} goes with ${plan.released.name}. It was never yours to keep twice.`);
+      }
+    }
+    get().appendLog('reward', `Bought ${plan.dog.breedLabel} for ${plan.price} TC. ✦ ${plan.dog.trait}`);
     void get().persist();
   },
 

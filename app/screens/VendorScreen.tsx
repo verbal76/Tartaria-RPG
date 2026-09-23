@@ -7,6 +7,8 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import { useTeachingSlot } from '../components/useFirstTimeHint'; // OTA-1738
 import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { dogMarketRowByName } from '../engine/dogMarket'; // OTA-1738 — the dog row, by the market's own lookup
+import type { ProspectiveDog } from '../engine/dogBreeds';
+import { DogComparisonModal } from '../components/DogComparisonModal';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance, lootPurposeLine } from '../components/itemPreview';
@@ -168,6 +170,11 @@ export function VendorScreen() {
   const stealFromVendor = useHumanAction('stealFromVendor');
   const dismissVendor = useGameStore((s) => s.dismissVendor);
   const reinforceWithVendor = useHumanAction('reinforceWithVendor');
+  /** ⚠ The adoption's FINAL confirmation and the ONE dog-equipment path. Both
+   *  go through `useHumanAction` like every other player-initiated write here,
+   *  so the activity accounting (OTA-1807) sees them as player actions. */
+  const adoptVendorDog = useHumanAction('adoptVendorDog');
+  const setDogVest = useHumanAction('setDogVest');
   const acceptFactionQuest = useHumanAction('acceptFactionQuest');
   const acceptHunt = useHumanAction('acceptHunt');
   const acceptMystery = useHumanAction('acceptMystery');
@@ -189,6 +196,15 @@ export function VendorScreen() {
    *  ⚠ Declared with the other hooks, ABOVE the early-return guard, for the
    *  reason the sellSort comment below spells out. */
   const [bulkExcluded, setBulkExcluded] = useState<ExcludedIds>(NOTHING_EXCLUDED);
+  /* ⚠⚠⚠ THE PROSPECTIVE DOG THE COMPARISON CARD IS OPEN ON.
+   *  Held here, as the ROLLED ANIMAL rather than a row index or a name, for the
+   *  reason owner rule 27 exists: the card must go on describing the individual
+   *  it was opened with even if the stall refreshes underneath it. The confirm
+   *  then hands the store that animal's `offerId`, and the store re-finds it on
+   *  the live vendor — so a refresh makes the sale FAIL, never retarget.
+   *  ⚠ Declared with the other hooks, above the early-return guard, for the
+   *  reason the sellSort comment below spells out. */
+  const [dogOnCounter, setDogOnCounter] = useState<ProspectiveDog | null>(null);
   // v2.4.1 (OTA 022) — sellSort must live ABOVE the early-return guard
   // below. The prior position (line 104) made hook count depend on
   // vendor being non-null: when a vendor was dismissed mid-render
@@ -1091,8 +1107,21 @@ export function VendorScreen() {
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
                   <TouchableOpacity
-                    style={[styles.offerBody, (knownRow || !canAfford) && styles.offerBodyBroke]}
-                    onPress={knownRow ? undefined : () => openBuy(o.itemName, effPrice)}
+                    /* ⚠⚠⚠ A LIVING ANIMAL DOES NOT OPEN THE BUY SHEET.
+                     *  Every other row here leads to "buy N of this for M TC",
+                     *  which is the right card for a rope and exactly the wrong
+                     *  one for a trade that can set a named companion free. The
+                     *  dog row opens the comparison surface instead — a READING
+                     *  card that mutates nothing — and the irreversible write
+                     *  sits behind its own confirmation two taps away.
+                     *  ⚠ THE DIM IS NOT A GATE. `offerBodyBroke` greys a row
+                     *  the player cannot afford, and for a dog that greying must
+                     *  not stop the tap: being short of the coin is precisely
+                     *  when you want to go and look at what you are saving for
+                     *  (owner rule 16 — affordability visible, never blocking
+                     *  inspection). The card itself says the shortfall. */
+                    style={[styles.offerBody, (knownRow || (!canAfford && !o.dog)) && styles.offerBodyBroke]}
+                    onPress={knownRow ? undefined : () => (o.dog ? setDogOnCounter(o.dog) : openBuy(o.itemName, effPrice))}
                     disabled={knownRow}
                     activeOpacity={0.7}
                     accessibilityRole="button"
@@ -1127,8 +1156,12 @@ export function VendorScreen() {
                     )}
                   </TouchableOpacity>
                   {/* OTA 030 — STEAL button. DC stamped on the chip so the
-                      player knows the risk before tapping. */}
-                  {!tutorialDemoVendor && (
+                      player knows the risk before tapping.
+                      ⚠ NOT ON A DOG. The store refuses it too (that is where
+                      the rule lives, so the typed `steal <breed>` is covered),
+                      but a button that exists only to be refused is a lie about
+                      what the game affords. */}
+                  {!tutorialDemoVendor && !o.dog && (
                     <TouchableOpacity
                       onPress={() => openSteal(o.itemName)}
                       style={styles.stealBtn}
@@ -1561,6 +1594,28 @@ export function VendorScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* ⚠⚠⚠ THE COMPARISON SURFACE. Mounted beside the ordinary confirm sheet
+          rather than inside it, because it is not a confirmation: it is the
+          READING the owner's headline is about — *"after seeing exactly what is
+          being gained and lost"* — and it mutates nothing at all until its own
+          second card is answered.
+          ⚠ `dogOnCounter` is the ROLLED ANIMAL, held by this screen. The card
+          keeps describing that individual even if the stall refreshes
+          underneath it, and the confirm hands the store only its `offerId` —
+          so a refreshed stall makes the sale fail rather than quietly hand
+          over a different dog (owner rule 27). */}
+      <DogComparisonModal
+        visible={dogOnCounter !== null}
+        prospective={dogOnCounter}
+        dog={player.dog}
+        inventory={player.inventory}
+        tc={player.tc}
+        vendorName={vendor.name}
+        onUnequipVest={() => setDogVest(null)}
+        onAdopt={(offerId) => adoptVendorDog(offerId)}
+        onClose={() => setDogOnCounter(null)}
+      />
 
       <BrandedModal
         visible={pending !== null}

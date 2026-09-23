@@ -79,6 +79,9 @@ type SetState = (
 export interface InventorySlice {
   equipItem: (itemName: string, slot: EquipSlot, itemId?: string) => void;
   unequipSlot: (slot: EquipSlot) => void;
+  /** ⚠ The ONE dog-equipment path. `null` takes the vest off; an instance id
+   *  puts that exact copy on. See the implementation for why it exists. */
+  setDogVest: (itemId: string | null) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
   /** ⚠ OTA-1657 — the HEALING POUCH: three pockets, each holding a whole stack
    *  of anything that mends. stowInMedkit loads one, removeFromMedkit pulls it
@@ -351,6 +354,54 @@ export const createInventorySlice = (
     // OTA-352 — loadout snapshot on equip change, so a log review can confirm
     // the piece's bonuses (incl. weapon/cloak/fused stealth) landed in effectiveStats.
     { const live = get().player; if (live) get().appendLog('debug', deps.debugLoadout(live)); }
+    void get().persist();
+  },
+
+  /** ⚠⚠⚠ THE ONE PLACE A DOG'S VEST GOES ON OR COMES OFF.
+   *
+   *  This did not exist. `InventoryScreen` carried the whole thing inline —
+   *  two hand-written `useGameStore.setState` calls, one per direction, plus
+   *  their own log lines — and that was fine while exactly one screen could do
+   *  it. The comparison card needs to take a vest off too (you cannot be told
+   *  "the vest leaves with the dog" and have no way to keep it), and a SECOND
+   *  hand-written equipment path is how two surfaces start disagreeing about
+   *  what "equipped" means. So the logic moved here and the inventory screen
+   *  calls it; there is no second copy to drift.
+   *
+   *  ⚠ `itemId` null TAKES THE VEST OFF. Otherwise the instance is resolved out
+   *  of the pack by id — never by name, because two same-named vests can sit at
+   *  different reinforcement levels and the player tapped one of them.
+   *
+   *  ⚠ THE VEST NEVER LEAVES `inventory`. Equipping writes the dog's `equipped`
+   *  pair and nothing else, which is why the adoption path has to delete an
+   *  inventory instance to make "the gear goes with the dog" true. */
+  setDogVest(itemId) {
+    const player = get().player;
+    const dog = player?.dog;
+    if (!player || !dog) return;
+    if (dog.status === 'dead' || dog.status === 'abandoned') return;
+    if (itemId === null) {
+      const wornName = dog.equipped?.vest ?? null;
+      if (!wornName) return;
+      set((s) => (s.player && s.player.dog
+        ? { player: { ...s.player, dog: { ...s.player.dog, equipped: { vest: null, vestId: null } } } }
+        : s));
+      get().appendLog('world', `You unbuckle the ${wornName} from ${dog.name}.`);
+      void get().persist();
+      return;
+    }
+    const item = (player.inventory ?? []).find((it) => it.id === itemId);
+    if (!item) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const DC = require('../../engine/dogCompanion') as typeof import('../../engine/dogCompanion');
+    // ⚠ OTA-1603's ONE predicate, not a raw `kind` check: a legacy Crucible
+    // vest's stored kind drifted, and the narrow test is what left the owner
+    // holding dog armor with no affordance that agreed it was dog armor.
+    if (!DC.itemIsDogArmor(item)) return;
+    set((s) => (s.player && s.player.dog
+      ? { player: { ...s.player, dog: { ...s.player.dog, equipped: { vest: item.name, vestId: item.id } } } }
+      : s));
+    get().appendLog('world', `You strap the ${item.name} onto ${dog.name}.`);
     void get().persist();
   },
 

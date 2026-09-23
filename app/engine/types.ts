@@ -1873,6 +1873,19 @@ export interface DogCompanion {
   hp: number;
   hpMax: number;
   stats: { strength: number; dexterity: number; intelligence: number };
+  /** ⚠⚠⚠ THIS DOG'S OWN CEILING — the thing the market actually sells.
+   *
+   *  Before the dog market there was ONE cap for every dog alive
+   *  (`DOG_MAX_TRAINED_STAT = 30`, module-private in dogCompanion.ts), which is
+   *  precisely why "that one could go further than this one" could not be said.
+   *  30 survives as the absolute engine maximum; this is the PERSONAL ceiling
+   *  at or below it, and `trainDogStat` reads it.
+   *
+   *  ⚠ OPTIONAL, AND ABSENT IS NOT A BUG. Every save written before the market
+   *  has none. `migrateLegacyDogPotential` fills it once, deterministically,
+   *  from the dog's profile lifted by whatever it has already earned — so a
+   *  veteran never loses a point and never silently inherits 30/30/30. */
+  potential?: { strength: number; dexterity: number; intelligence: number };
   statProgress: { strength: number; dexterity: number; intelligence: number };
   /** 0-100; decays without feeding. Thresholds 50/30/15/0 fire
    *  escalating Arbiter beats; 0 = abandoned permanently. */
@@ -1931,9 +1944,42 @@ export interface PendingDogOnboarding {
     // `player.dog` wholesale from a fresh `createDogCompanion`.
     scenario: 'smelter' | 'wagon' | 'cellar' | 'snare' | 'puppy_vendor' | 'puppy_rubble' | 'market';
     startingProfile: DogStartingProfile;
+    /** ⚠ THE MARKET DOG'S ROLLED SHEET, carried through onboarding.
+     *  A rescued dog is built from its profile's table; a BOUGHT dog is a
+     *  specific animal that was rolled on a shelf and inspected before the
+     *  player paid, so `finishDogOnboarding` must build THAT animal and not a
+     *  fresh average of its breed. Absent for all five rescue scenarios, which
+     *  is why every one of them is untouched by this. */
+    market?: {
+      breedId: string;
+      breedLabel: string;
+      stats: { strength: number; dexterity: number; intelligence: number };
+      potential: { strength: number; dexterity: number; intelligence: number };
+      hpMax: number;
+    };
   };
   breed?: string;
   name?: string;
+}
+
+/** ⚠⚠⚠ A RELEASED DOG IS NOT A DEAD DOG, AND THIS IS THE WHOLE RECORD.
+ *
+ *  Owner: replacing a living companion SETS IT FREE. It is alive in the world.
+ *  It does not enter the death/Fallen lifecycle (which has its own type, its
+ *  own Last Walk and its own rests), and it does not become a collection.
+ *
+ *  ⚠ WHAT IS DELIBERATELY NOT HERE, because the owner ruled it out by name:
+ *  no Former Companions tab, no kennel, no map marker, no interaction, no
+ *  reacquisition, no combat entity, no schedule, no quest. This is the minimum
+ *  identity a later line of environmental flavour would need to say "that was
+ *  yours once", and nothing else. It is not Pokémon storage. */
+export interface ReleasedDog {
+  /** The dog's own id, so a record can never be written twice for one animal. */
+  id: string;
+  name: string;
+  breed: string;
+  /** Game-clock hour it was let go — enough for "a while back" phrasing. */
+  releasedAtHour: number;
 }
 
 /** 2026-05-25 [MECHANIC-1b] — Golem sidekick companion. Summoned
@@ -2390,6 +2436,11 @@ export interface WorldMemory {
    *  the onboarding handler when this is non-null. Cleared on
    *  finalize (after the sex stage). */
   pendingDogOnboarding?: PendingDogOnboarding | null;
+  /** ⚠ Dogs the player set free to make room for another, newest first and
+   *  bounded. Kept ONLY so the world can recognise one later in passing; see
+   *  `ReleasedDog` for everything this deliberately is not. Never read by
+   *  combat, the map, the dossier or any vendor. */
+  releasedDogs?: ReleasedDog[];
   /** OTA-120 — set true ONLY when player.dog.status transitions to
    *  'dead' via the combat-death path (HP 0 + fight lost; gem-revive
    *  skips). Drives the Phase 6 puppy-vendor safety net trigger.

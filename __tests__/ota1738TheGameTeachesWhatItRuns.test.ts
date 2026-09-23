@@ -63,7 +63,7 @@ import { PITY_KILL_INTERVAL } from '../app/engine/resurrectionRules';
 import { TEACHINGS, ALL_TEACHINGS, DOG_FEEDING_LINE, MOVEMENT_COST_LINE } from '../app/components/teachingRegistry';
 import { TUTORIAL_STEPS, TUTORIAL_DOCS_FULL, TUT_LOCK_BEATS, isTutorialLocked } from '../app/components/tutorialSteps';
 import { LOYALTY_DECAY_HOURS, DOG_LOYALTY_BANDS, createDogCompanion } from '../app/engine/dogCompanion';
-import { REPLACEMENT_DOG_PRICE, FACTION_DOG_PRICE, ORDINARY_DOG, FACTION_DOGS, dogMarketRowByName } from '../app/engine/dogMarket';
+import { ORDINARY_DOG_PRICE_SPAN, FACTION_DOG_PRICE_SPAN, ALL_DOG_MARKET_ROWS, dogMarketRowByName } from '../app/engine/dogMarket';
 import { REINFORCE_MAX_LEVEL, repairCost } from '../app/engine/durability';
 import { scrapSuccessChance, repairCostMaterials, scrapOutputFor, canScrap } from '../app/engine/scrapEngine';
 import { spareThrowingSpear } from '../app/engine/bandolierEligibility';
@@ -391,10 +391,26 @@ describe('OTA-1738 — the counter', () => {
   it('⚠ reinforcement and dog prices are quoted from their constants', () => {
     expect(TEACHINGS.reinforce_first.body).toContain(`+${REINFORCE_MAX_LEVEL}`);
     expect(TEACHINGS.reinforce_first.body).toMatch(/ceiling only|stays worn/i);
-    expect(TEACHINGS.dog_replacement_first.body).toContain(`${REPLACEMENT_DOG_PRICE} TC`);
-    expect(TEACHINGS.dog_replacement_first.body).toContain(`${FACTION_DOG_PRICE}`);
-    expect(dogMarketRowByName(ORDINARY_DOG.itemName)?.price).toBe(REPLACEMENT_DOG_PRICE);
-    for (const row of Object.values(FACTION_DOGS)) expect(row.price).toBe(FACTION_DOG_PRICE);
+    /* ⚠⚠ AMENDED AT OTA-1874 — SAME CLAIM, AND IT NOW CATCHES MORE.
+     *  This pinned the card against two flat constants and one catalog row
+     *  (`ORDINARY_DOG`), neither of which survives an individually-priced
+     *  market. The invariant the suite is FOR — the card quotes what the shelf
+     *  actually charges — is unchanged, so it is asked of the shelf: the range
+     *  in the copy must bracket EVERY price a player can be shown, ordinary and
+     *  faction alike. The old pin could not have caught a breed priced outside
+     *  the quoted figure; this fails the moment one is added. */
+    const body = TEACHINGS.dog_replacement_first.body;
+    expect(body).toContain(`${ORDINARY_DOG_PRICE_SPAN[0]}\u2013${ORDINARY_DOG_PRICE_SPAN[1]} TC`);
+    expect(body).toContain(`${FACTION_DOG_PRICE_SPAN[0]}`);
+    for (const row of ALL_DOG_MARKET_ROWS) {
+      const span = row.faction === null ? ORDINARY_DOG_PRICE_SPAN : FACTION_DOG_PRICE_SPAN;
+      expect(row.price).toBeGreaterThanOrEqual(span[0]);
+      expect(row.price).toBeLessThanOrEqual(span[1]);
+      expect(dogMarketRowByName(row.itemName)?.price).toBe(row.price);
+    }
+    // ⚠ AND THE OLD GATE IS GONE FROM THE COPY TOO: the market no longer waits
+    // for your dog to die, so a card that says it does teaches a retired rule.
+    expect(body).not.toMatch(/with your dog gone/i);
   });
 });
 

@@ -103,8 +103,22 @@ const STORE = 'app/state/gameStore.ts';
  * store surgery. Only its `get: () => GameStore` parameter tied it here. It
  * moved to `app/state/talkContext.ts` reading the two values directly, body
  * otherwise unchanged. 36 lines out, 29 back in (the new gate, its predicate and
- * the post-answer refresh), and the ceiling takes the difference. */
-export const CEILING = 36812;
+ * the post-answer refresh), and the ceiling takes the difference.
+ *
+ *    36794  OTA-1874      the dog market's own work went to the dog market
+ *
+ * ⚠⚠ A FOURTH TIME, AND THE OWNER RULED IT RATHER THAN THE RULE. The dog-market
+ * package needed the store to build a replacement offer, and `withReplacementDogOffer`
+ * had been typed here — 60 lines of pure, store-free dog-market behaviour whose
+ * only tie to this file was where someone happened to write it. The package came
+ * in 38 lines OVER and the obvious move was to raise the number. The owner refused
+ * it in as many words: *"Do NOT raise the gameStore.ts line-count ratchet. The
+ * ratchet is doing its job."* So the function moved to `app/engine/dogMarket.ts`
+ * beside `dogOfferFor`, the name re-exported so both call sites read the same, and
+ * what the package added is paid for out of what the store gave back. 60 lines out,
+ * 42 back in across the whole package — and the ceiling comes DOWN onto the result,
+ * because a ratchet with 18 lines of slack in it is 18 lines somebody will spend. */
+export const CEILING = 36794;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

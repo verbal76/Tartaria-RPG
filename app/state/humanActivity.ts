@@ -125,8 +125,16 @@ export const HUMAN_GAMEPLAY_MUTATIONS = [
   // vendor
   'buyFromVendor', 'sellToVendor', 'stealFromVendor', 'reinforceWithVendor',
   'acceptHunt', 'acceptMystery', 'acceptStoryline', 'acceptFactionQuest',
+  // ⚠ The dog adoption's FINAL confirmation — the most consequential press on
+  // the vendor screen, since coin, a living companion and a worn vest all
+  // leave in one write. The accounting must certainly not read the player as
+  // idle through it.
+  'adoptVendorDog',
   // inventory
   'equipItem', 'unequipSlot', 'useInventoryItem', 'dropInventoryItem',
+  // ⚠ The ONE dog-equipment path, reached from the pack AND from the dog
+  // comparison card. Two surfaces, one action.
+  'setDogVest',
   'scrapInventoryItem', 'applyCoating', 'applyCoatingToArmor',
   'stowInBandolier', 'stowInMedkit', 'stowInPouch', 'unpouchItem',
   'removeFromBandolier', 'removeFromMedkit', 'giveGift', 'useHealBatch',

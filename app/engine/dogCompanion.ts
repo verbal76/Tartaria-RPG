@@ -341,10 +341,34 @@ export function createDogCompanion(args: {
   rawSex: string;
   startingProfile: DogStartingProfile;
   currentHour: number;
+  /** ⚠⚠ THE BOUGHT DOG'S ROLLED SHEET. A rescued dog is built from its
+   *  profile's table; a dog off a shelf is a SPECIFIC animal the player
+   *  inspected and paid for, so when this is present it wins — otherwise the
+   *  comparison card would have promised one animal and delivered its breed's
+   *  average. Absent for all five rescue scenarios, which is why every one of
+   *  them comes out of here byte-identical to before. */
+  market?: {
+    stats: { strength: number; dexterity: number; intelligence: number };
+    potential: { strength: number; dexterity: number; intelligence: number };
+    hpMax: number;
+  };
 }): DogCompanion {
-  const base = STARTING_STATS[args.startingProfile];
+  const base = args.market?.stats ?? STARTING_STATS[args.startingProfile];
   // OTA-1420 — rolled, not read off the table. See rollStartingDogHP.
-  const hpMax = rollStartingDogHP(args.startingProfile);
+  const hpMax = args.market?.hpMax ?? rollStartingDogHP(args.startingProfile);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const BR = require('./dogBreeds') as typeof import('./dogBreeds');
+  /* ⚠ A RESCUED DOG GETS A CEILING TOO. Without one it would fall back to the
+   *  absolute engine maximum and the free dog would quietly be the best animal
+   *  in the game — the exact inversion the market exists to avoid. The profile
+   *  table is the same authority the legacy migration reads, so a rescued dog
+   *  and a migrated veteran of the same profile agree. */
+  const potential = args.market?.potential
+    ?? BR.legacyPotentialFor(args.startingProfile, {
+      strength: base.strength,
+      dexterity: base.dexterity,
+      intelligence: base.intelligence,
+    });
   return {
     id: `dog_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     name: args.name.slice(0, 16).trim() || 'Marrow',
@@ -361,6 +385,7 @@ export function createDogCompanion(args: {
       dexterity: base.dexterity,
       intelligence: base.intelligence,
     },
+    potential,
     statProgress: { strength: 0, dexterity: 0, intelligence: 0 },
     loyalty: 80,
     lastFedAtHour: args.currentHour,
@@ -586,6 +611,71 @@ export interface DogTrainResult {
   leveled: { stat: DogStatKey; from: number; to: number; hpGained: number } | null;
 }
 
+/** ⚠ ONE READING OF "how far can THIS dog take that stat". Every caller that
+ *  wants a ceiling — the trainer, the comparison card, the migration's own
+ *  idempotence check — asks here, so a personal ceiling and the engine maximum
+ *  can never be two different answers in two places. */
+export function dogStatCeiling(
+  dog: Pick<DogCompanion, 'potential' | 'stats'>,
+  stat: DogStatKey,
+): number {
+  const personal = dog.potential?.[stat];
+  if (typeof personal !== 'number' || !Number.isFinite(personal)) return DOG_MAX_TRAINED_STAT;
+  /* ⚠⚠⚠ NO DOG IS EVER STRANDED ABOVE ITS OWN CEILING, AND THIS IS WHERE THAT
+   *  IS GUARANTEED RATHER THAN HOPED FOR.
+   *
+   *  The owner's Option D rule — `migratedPotential(stat) >= currentStat` — was
+   *  first implemented only inside the migration. That was not enough, and a
+   *  regression proved it: `createDogCompanion` stamps a potential from the
+   *  profile table at BIRTH, using starting stats, so any development earned
+   *  afterwards could climb past the frozen ceiling. `trainDogStat` then
+   *  returned progress 0 for ever, silently, with no message and no way back.
+   *
+   *  Enforcing `max(personal, current)` HERE makes the guarantee a property of
+   *  the one reading every caller shares, so it holds for a migrated dog, a
+   *  freshly-rescued one, a bought one, and any dog a future path constructs
+   *  by hand. A dog sitting at its ceiling still stops — that is the design —
+   *  but it stops AT what it earned, never below it. */
+  const earned = Math.max(0, Math.round(dog.stats?.[stat] ?? 0));
+  const ceiling = Math.max(Math.max(0, Math.round(personal)), earned);
+  return Math.min(DOG_MAX_TRAINED_STAT, ceiling);
+}
+
+/** The absolute engine maximum, exported so the market's roller and the legacy
+ *  migration clamp to the same number this trainer stops at. */
+export function dogAbsoluteMaxStat(): number {
+  return DOG_MAX_TRAINED_STAT;
+}
+
+/** ⚠⚠⚠ THE LEGACY DOG'S MIGRATION — deterministic, lossless, and run once.
+ *
+ *  Owner ruling: the old universal 30 was an ENGINE rule from before dogs had
+ *  individual potential. It must NOT become every legacy dog's personal
+ *  ceiling — a grandfathered 30/30/30 veteran would be the best animal that
+ *  can ever exist and the market would have nothing to offer. Equally, no dog
+ *  may lose a point it earned.
+ *
+ *  So each stat lands at `max(profileCeiling, currentDevelopedStat)`:
+ *  the profile's shape, lifted wherever the dog has already gone further. A
+ *  dog trained past its profile keeps every point AND keeps room to use it.
+ *
+ *  ⚠ ONCE. Returns the dog untouched when `potential` is already present, so
+ *  a reload cannot re-derive (and therefore cannot raise) a ceiling as the dog
+ *  keeps training. That is what makes repeated loads idempotent rather than a
+ *  slow upward drift.
+ *
+ *  ⚠ NO RANDOMNESS. The same saved dog always migrates to the same numbers. */
+export function migrateLegacyDogPotential<T extends DogCompanion | null | undefined>(dog: T): T {
+  if (!dog) return dog;
+  if (dog.potential) return dog;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const B = require('./dogBreeds') as typeof import('./dogBreeds');
+  return {
+    ...dog,
+    potential: B.legacyPotentialFor(dog.startingProfile, dog.stats),
+  } as T;
+}
+
 /** OTA-1412 — the clause that says the frame toughened, appended to whichever
  *  stat line the caller prints. ONE owner: the dog trains at four separate
  *  call sites (bite, distract, an INT beat, and now surviving a hit) and each
@@ -608,21 +698,29 @@ export function trainDogStat(
 ): DogTrainResult {
   if (!success) return { dog, leveled: null };
   const baseStat = dog.stats[stat];
-  // OTA-800 — ceiling reached: stop training (see DOG_MAX_TRAINED_STAT).
-  if (baseStat >= DOG_MAX_TRAINED_STAT) return { dog, leveled: null };
+  /* ⚠⚠⚠ THE CEILING BELONGS TO THIS DOG NOW, NOT TO THE ENGINE.
+   *
+   *  OTA-800 put ONE cap on every dog alive, which is exactly why the market
+   *  could never say "that one could go further than this one". The personal
+   *  ceiling is the stop; `DOG_MAX_TRAINED_STAT` stays as the absolute maximum
+   *  nothing may pass. A dog carrying no `potential` — a save read before the
+   *  load-migration fills it, or a hand-built fixture — behaves exactly as it
+   *  always did, which is why nothing downstream had to change. */
+  const ceiling = dogStatCeiling(dog, stat);
+  if (baseStat >= ceiling) return { dog, leveled: null };
   const award = dogProgressAwardFor(baseStat);
   if (award <= 0) return { dog, leveled: null };
   const prev = dog.statProgress[stat];
   let progress = prev + award;
   let next = baseStat;
   let leveled: DogTrainResult['leveled'] = null;
-  while (progress >= DOG_LEVEL_UP_THRESHOLD && next < DOG_MAX_TRAINED_STAT) {
+  while (progress >= DOG_LEVEL_UP_THRESHOLD && next < ceiling) {
     progress -= DOG_LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next, hpGained: 0 };
   }
-  if (next >= DOG_MAX_TRAINED_STAT) progress = 0;
+  if (next >= ceiling) progress = 0;
   // OTA-1412 — a stat level-up also toughens the dog, exactly as arb170 does for
   // the golem: +3 max HP, healed by the same amount so a level-up never lowers
   // the fraction of the bar that is full. Awarded per LEVEL-UP, not per stat, so

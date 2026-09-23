@@ -22,7 +22,7 @@
 // a climb's prize or a story answer.
 
 import { REINFORCE_MAX_LEVEL } from '../engine/durability';
-import { REPLACEMENT_DOG_PRICE, FACTION_DOG_PRICE } from '../engine/dogMarket';
+import { ORDINARY_DOG_PRICE_SPAN, FACTION_DOG_PRICE_SPAN } from '../engine/dogMarket';
 import { scrapSuccessChance } from '../engine/scrapEngine';
 import { COATING_DOT_TURNS } from '../engine/weaponCoating';
 import { LOYALTY_DECAY_HOURS, DOG_LOYALTY_BANDS } from '../engine/dogCompanion';
@@ -149,9 +149,17 @@ export const TEACHINGS = {
     body: 'A trader mends for TC — the bill climbs with the points missing. Your own bench (CRAFT → REPAIR) mends the same piece for materials instead: twice what it would salvage into. Either way it is back to full.',
   },
   dog_replacement_first: {
-    id: 'dog_replacement_first', group: 'companions', when: 'the first trader offering a dog after yours is gone',
+    id: 'dog_replacement_first', group: 'companions', when: 'the first trader with a dog on the counter',
     title: 'A dog for sale',
-    body: `With your dog gone, a trader can sell you a grown one for ${REPLACEMENT_DOG_PRICE} TC — one at a time, named on the spot. A faction’s own breed costs ${FACTION_DOG_PRICE} and needs their trust first.`,
+    /* ⚠⚠⚠ AMENDED AT OTA-1874, AND IT WAS WRONG IN TWO PLACES AT ONCE.
+     *  "With your dog gone" was the OLD gate — the market was invisible to
+     *  anyone holding a living dog — and the companion lifecycle removes it,
+     *  so the card described a rule the game no longer runs. And the flat
+     *  price stopped being a price the moment dogs were rolled individually:
+     *  a player told "600 TC" and shown 675 was misinformed by his own
+     *  tutorial. Both figures now come from the breed bands themselves, so
+     *  this sentence cannot drift from the shelf again. */
+    body: `A trader can sell you a grown dog — ${ORDINARY_DOG_PRICE_SPAN[0]}–${ORDINARY_DOG_PRICE_SPAN[1]} TC for an ordinary breed, ${FACTION_DOG_PRICE_SPAN[0]} and up for a faction’s own, which needs their trust first. Each one is an individual: the price follows how far it could go, not what it can do today. You keep one dog at a time, so taking a new one means letting yours go — and you will see exactly what you gain and lose before you confirm.`,
   },
   // ── companions ───────────────────────────────────────────────────────────
   golem_first_v2: {

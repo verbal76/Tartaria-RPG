@@ -110,8 +110,39 @@ describe('OTA-1420 — two dogs off the same rescue are no longer identical', ()
       });
       expect(d.hp).toBe(d.hpMax);
     }
-    expect(DOG).toContain('const hpMax = rollStartingDogHP(args.startingProfile);');
+    /* ⚠⚠ AMENDED — THE SPELLING MOVED, THE CLAIM DID NOT. This pinned the exact
+     *  line `const hpMax = rollStartingDogHP(args.startingProfile);`. The dog
+     *  market now hands `createDogCompanion` the sheet a shelf dog was rolled
+     *  with, so the line reads `args.market?.hpMax ?? rollStartingDogHP(...)`.
+     *
+     *  Rewriting the literal to the new string would prove nothing, so the
+     *  claim is made BEHAVIOURALLY on both branches — which is strictly more
+     *  than the old pin covered, because it could not see the market branch. */
+    expect(DOG).toContain('rollStartingDogHP(args.startingProfile)');
     expect(DOG).toContain('hp: hpMax,');
+
+    // ⚠ A RESCUED DOG STILL ROLLS. 200 builds of one profile landing on a
+    // single hpMax would mean the dice stopped being thrown.
+    const rolled = new Set<number>();
+    for (let i = 0; i < 200; i++) {
+      rolled.add(createDogCompanion({
+        name: 'X', breed: 'b', rawSex: 'they', startingProfile: 'hound', currentHour: 0,
+      }).hpMax);
+    }
+    expect(rolled.size).toBeGreaterThan(1);
+
+    // ⚠ A BOUGHT DOG TAKES ITS OWN SHEET'S HP — the animal inspected is the
+    // animal that arrives — and hp still equals hpMax, so it is not born hurt.
+    const bought = createDogCompanion({
+      name: 'X', breed: 'b', rawSex: 'they', startingProfile: 'hound', currentHour: 0,
+      market: {
+        stats: { strength: 9, dexterity: 12, intelligence: 10 },
+        potential: { strength: 15, dexterity: 22, intelligence: 17 },
+        hpMax: 17,
+      },
+    });
+    expect(bought.hpMax).toBe(17);
+    expect(bought.hp).toBe(bought.hpMax);
   });
 
   it('⚠ …and the STATS are still fixed per profile — only HP was rolled', () => {

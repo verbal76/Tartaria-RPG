@@ -32,6 +32,7 @@ import {
   trainDogStat,
   dogHpGainClause,
   healLegacyDogVest,
+  migrateLegacyDogPotential,
   LOYALTY_DECAY_HOURS,
   type RescueScenarioId,
   type RescueScenario,
@@ -2355,57 +2356,14 @@ export function withTechniqueTextOffer(
   return { ...vendor, offers: [...vendor.offers, offer] };
 }
 
-/** ⚠⚠⚠ OTA-1726 — THE ROAD BACK TO A DOG. Owner's canon: *"once dog gameplay is
- *  unlocked, loss of an individual dog does not permanently remove access to
- *  dogs"* — ordinary replacements bought through market / random-vendor
- *  mechanisms at substantial cost, faction dogs better and gated on faction
- *  access as well as coin.
- *
- *  ⚠ THIRD INSTANCE OF A TWICE-DOCUMENTED PATTERN, not a new system. Same shape
- *  as `withSkyreacherChartOffer` and `withTechniqueTextOffer` directly above:
- *  append one conditional row to a vendor's offers, gates in a pure engine
- *  function so they can be tested without a store. Like the technique text and
- *  unlike the chart there is NO die roll — a route into a whole feature that
- *  appears 18% of the time is indistinguishable from a route that does not
- *  exist, and this is the only route back to a companion.
- *
- *  ⚠⚠ WHAT IT REPLACES. The old road back was the puppy vendor: a single-shot
- *  flag (`puppyVendorOwed`) that flipped on the dog's death, offered you a pup
- *  for one Common item, and told you to type `accept puppy` — a phrase with no
- *  parser verb and no handler anywhere in the app. It could not be completed by
- *  anyone. Worse, its no-tradeable-item branch set `puppyVendorUsed: true` and
- *  retired itself FOREVER, so a player whose pack happened to be empty when it
- *  fired lost access to dogs for the rest of that save. Every part of that
- *  contradicts the canon; none of it was worth repairing. */
-export function withReplacementDogOffer(
-  vendor: VendorInstance | null,
-  player: PlayerCharacter | null,
-  wm: WorldMemory,
-): VendorInstance | null {
-  if (!vendor || !player) return vendor;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const DM = require('../engine/dogMarket') as typeof import('../engine/dogMarket');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { hasFactionRapport } = require('../engine/factionRapport') as typeof import('../engine/factionRapport');
-  // ⚠ nativeFaction first, for the reason withTechniqueTextOffer states: OTA-1186
-  // skins a site to its OWNER, and a dog belongs to whoever the vendor really
-  // answers for.
-  const faction = vendor.nativeFaction ?? vendor.faction;
-  const offer = DM.dogOfferFor({
-    vendorFaction: faction,
-    hasRapport: hasFactionRapport(player.completedFactionQuestIds, faction),
-    // ⚠⚠ THE FIRST-DOG ENCOUNTER IS STILL THE INTRODUCTION. `player.dog` is
-    // non-null for a dead or abandoned dog too (OTA-346 keeps the record), so
-    // this reads "has ever had a dog" — exactly the canon gate. Without it a
-    // fresh character could buy past five authored rescue scenarios.
-    hadDogEver: !!player.dog,
-    hasActiveDog: hasActiveDog(player),
-    onboardingPending: !!wm.pendingDogOnboarding,
-  });
-  if (!offer) return vendor;
-  if (vendor.offers.some((o) => o.itemName === offer.itemName)) return vendor;
-  return { ...vendor, offers: [...vendor.offers, offer] };
-}
+/** ⚠ OTA-1726's dog-market row helper MOVED to `engine/dogMarket` — it is pure,
+ *  store-free dog-market behaviour and belongs beside `dogOfferFor`. Re-exported
+ *  here so existing importers (and the two vendor-generation call sites below)
+ *  are unchanged. Owner: *"pure/store-free dog-market behavior does not belong
+ *  permanently inside the monolithic store merely to preserve an old
+ *  source-layout assertion."* */
+import { withReplacementDogOffer } from '../engine/dogMarket';
+export { withReplacementDogOffer };
 
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
@@ -3760,7 +3718,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
-    dog: p.dog ?? null,
+    // ⚠⚠ …and a dog saved before dogs had an individual ceiling gets one here,
+    // once. See dogCompanion.migrateLegacyDogPotential for the whole rule.
+    dog: migrateLegacyDogPotential(p.dog ?? null),
     // OTA-143 — migrate pre-OTA-126 travelTargets. Older saves stored
     // travelTarget as { locationId } with no distanceRemaining field.
     // The ExplorationScreen badge fell to its legacy Manhattan-recompute
@@ -7076,6 +7036,10 @@ export interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string, qty?: number) => void;
+  /** ⚠ The FINAL confirmation of a dog adoption, keyed on the prospective dog's
+   *  `offerId`. See vendorSlice — it is the only path that spends the coin,
+   *  releases a living companion and lets its gear go with it. */
+  adoptVendorDog: (offerId: string) => void;
   /** OTA-708 — `social` (default true) drives whether this sale trains CHA.
    *  A BULK sale is one negotiation, so the VendorScreen loop passes social:true
    *  only on the first unit and false for the rest — otherwise dumping a big stack
@@ -7394,6 +7358,9 @@ export interface GameStore {
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot, itemId?: string) => void;
   unequipSlot: (slot: EquipSlot) => void;
+  /** ⚠ The ONE dog-equipment path — `null` unequips. Two surfaces need it now
+   *  (pack, comparison card); inventorySlice carries the full note. */
+  setDogVest: (itemId: string | null) => void;
   /** OTA-239 — Tool Pouch. Stow an inventory item by name into the
    *  pouch (max 3). Pouched items stay in player.inventory but
    *  surface in the InventoryScreen TOOL POUCH section + give the
@@ -25877,6 +25844,16 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       return;
     }
 
+    // ⚠ YOU CANNOT POCKET A DOG. The rule and the reason live in dogMarket's
+    // `offerIsALivingAnimal`; this path only has to ask, as the buy path has
+    // since OTA-1726. A refusal, never a silent return (B15).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const DMsteal = require('../engine/dogMarket') as typeof import('../engine/dogMarket');
+    if (DMsteal.offerIsALivingAnimal(offer)) {
+      get().appendLog('arbiter', DMsteal.STEAL_A_DOG_REFUSAL);
+      return;
+    }
+
     // OTA 030 — tiered DC by vendor source. Steal works against any
     // vendor in the game (hub or roadside); your DEX is the modifier
     // so leveling DEX or wielding DEX-buffing food/gear directly
@@ -35235,7 +35212,10 @@ function finalizeDogOnboarding(
     .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
     .replace(/[.!?]+$/, '')
     .trim();
-  const breed = (cleaned || trimmedBreed).slice(0, 24) || 'mutt';
+  // ⚠ A BOUGHT DOG FALLS BACK TO THE SHELF'S BREED, not 'mutt' — clearing the
+  // pre-filled field must not rename a Greyhound. Rescues have no `market`.
+  const breedFallback = pending.rescueData.market?.breedLabel ?? 'mutt';
+  const breed = (cleaned || trimmedBreed).slice(0, 24) || breedFallback;
   const name = nameRaw.trim().slice(0, 16) || defaultDogName();
   const rawSex = sexRaw.trim().slice(0, 8) || 'unknown';
   const dog = createDogCompanion({
@@ -35244,6 +35224,8 @@ function finalizeDogOnboarding(
     rawSex,
     startingProfile: pending.rescueData.startingProfile,
     currentHour: player.hoursElapsed ?? 0,
+    // ⚠ The animal inspected is the animal that arrives. Undefined for rescues.
+    market: pending.rescueData.market,
   });
   // The feed keeps a complete record of what the card collected.
   get().appendLog('world', `A ${breed}. ${dog.name}. The name settles on the dog like a coat.`);

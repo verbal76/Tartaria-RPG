@@ -49,7 +49,6 @@ jest.mock('../app/state/accessibility', () => ({
 import { useGameStore, withReplacementDogOffer, hasActiveDog, tickDogStatus } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { createDogCompanion } from '../app/engine/dogCompanion';
-import * as DM from '../app/engine/dogMarket';
 import type { VendorInstance } from '../app/engine/vendors';
 
 jest.setTimeout(300000);
@@ -82,6 +81,19 @@ function shelf(): VendorInstance | null {
   return withReplacementDogOffer(stall(), s.player!, s.worldMemory);
 }
 const offers = (): string[] => (shelf()?.offers ?? []).map((o) => o.itemName);
+/* ⚠⚠ AMENDED — THE SHELF SELLS A ROLLED ANIMAL, NOT A CATALOG ROW. This suite
+ * asked for 'Kennel Dog' by name. There is no such row: every vendor dog is an
+ * individual rolled inside its breed's bands, so the question "is the market
+ * open?" is now "is there a DOG ROW", and a purchase names whatever breed is
+ * actually standing there. Every claim below is the same claim, re-pinned. */
+const dogRow = () => (shelf()?.offers ?? []).find((o) => !!o.dog) ?? null;
+const sellsADog = (): boolean => !!dogRow();
+/** Buy whatever dog the CURRENT scene vendor is holding. */
+function buyTheDog(): void {
+  const v = useGameStore.getState().currentScene?.vendor;
+  const row = (v?.offers ?? []).find((o) => !!o.dog);
+  useGameStore.getState().buyFromVendor(row ? row.itemName : 'no dog on this counter', 1);
+}
 function putStall(v: VendorInstance | null): void {
   const s = useGameStore.getState();
   useGameStore.setState({ currentScene: { ...s.currentScene!, vendor: v, enemies: [] } } as never);
@@ -95,42 +107,64 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
     for (const status of [null, 'with_player', 'waiting_at_base', 'abandoned', 'dead'] as const) {
       await boot();
       setDog(status === null ? null : { status });
-      rows.push(`  dog=${String(status).padEnd(16)} active=${String(hasActiveDog(useGameStore.getState().player)).padEnd(5)} shelf=${offers().includes('Kennel Dog') ? 'SELLS' : 'silent'}`);
+      rows.push(`  dog=${String(status).padEnd(16)} active=${String(hasActiveDog(useGameStore.getState().player)).padEnd(5)} shelf=${sellsADog() ? 'SELLS' : 'silent'}`);
     }
-    W('\nSTATUS MATRIX (shelf should be silent while a dog is usable, and sell once it is not —');
+    W('\nSTATUS MATRIX (shelf is silent ONLY before the rescue arc; after it, it sells at every status —');
     W('but NEVER for a character who has not met the dog system):');
     for (const r of rows) W(r);
-    // never had a dog at all
+    /* ⚠⚠⚠ ONE ROW OF THIS MATRIX IS INVERTED BY OWNER RULING, and it is the
+     *  row the whole companion market turns on. This asserted that a USABLE
+     *  dog silenced the shelf. The reachability audit proved that hid the
+     *  market from nearly everyone past the rescue arc, and the owner ruled it
+     *  out: *"That is NOT the final owner design contract."* A player with a
+     *  living dog must be able to encounter, inspect and compare another. */
+    // never had a dog at all — the rescue arc is still the introduction
     await boot(); setDog(null);
-    expect(offers()).not.toContain('Kennel Dog');
-    // usable dog present
+    expect(sellsADog()).toBe(false);
+    // ⚠ INVERTED: a usable dog NO LONGER hides the stall
     for (const s of ['with_player', 'waiting_at_base'] as const) {
       await boot(); setDog({ status: s });
-      expect(offers()).not.toContain('Kennel Dog');
+      expect(sellsADog()).toBe(true);
     }
-    // dog gone
+    // dog gone — unchanged, and still the OTA-1726 point
     for (const s of ['abandoned', 'dead'] as const) {
       await boot(); setDog({ status: s });
-      expect(offers()).toContain('Kennel Dog');
+      expect(sellsADog()).toBe(true);
     }
+    // ⚠ AND THE SURVIVING GATE: an acquisition already in flight blocks a second
+    await boot(); setDog({ status: 'dead' });
+    useGameStore.setState({ worldMemory: {
+      ...useGameStore.getState().worldMemory,
+      pendingDogOnboarding: { stage: 'breed', rescueData: { scenario: 'snare', startingProfile: 'mongrel' } },
+    } } as never);
+    expect(sellsADog()).toBe(false);
   });
 
   it('⚠⚠⚠ TC IS CHARGED EXACTLY ONCE, even on a double buy in one breath', async () => {
     await boot(1000); setDog({ status: 'dead' });
     putStall(shelf());
+    /* ⚠⚠ AMENDED — ONE CHARGE, AT THAT ANIMAL'S OWN PRICE. This subtracted the
+     *  flat `DM.REPLACEMENT_DOG_PRICE`. Dogs are priced individually off their
+     *  rolled potential now, so a flat pin would only ever have been true by
+     *  luck. The claim — charged ONCE, never twice — is unchanged and is asked
+     *  of the price on the row actually standing on the counter. */
+    const row = (useGameStore.getState().currentScene!.vendor!.offers).find((o) => !!o.dog)!;
+    const price = row.price;
     const before = useGameStore.getState().player!.tc;
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1);
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1);
+    buyTheDog();
+    buyTheDog();
     await flush();
-    W(`  double buy: TC ${before} -> ${useGameStore.getState().player!.tc} (one dog costs ${DM.REPLACEMENT_DOG_PRICE})`);
-    expect(useGameStore.getState().player!.tc).toBe(before - DM.REPLACEMENT_DOG_PRICE);
+    const after = useGameStore.getState().player!.tc;
+    W(`  double buy: TC ${before} -> ${after} (this dog costs ${price})`);
+    expect(after).toBe(before - price);
+    expect(before - after).toBeLessThan(price * 2);   // the second press bought nothing
     expect(pend()).not.toBeNull();
   });
 
   it('⚠⚠ NO DUPLICATE DOG: confirming twice yields one dog and clears the card', async () => {
     await boot(1000); setDog({ status: 'dead' });
     putStall(shelf());
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+    buyTheDog(); await flush();
     useGameStore.getState().confirmDogOnboarding('mutt', 'Ash', 'female'); await flush();
     const first = dog()!;
     useGameStore.getState().confirmDogOnboarding('mutt', 'Bram', 'male'); await flush();
@@ -152,9 +186,9 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
     // The old puppy vendor retired itself forever when the pack was empty. A
     // temporary economic condition must never close the road.
     await boot(0); setDog({ status: 'dead' });
-    expect(offers()).toContain('Kennel Dog');          // still offered
+    expect(sellsADog()).toBe(true);                     // still offered
     putStall(shelf());
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+    buyTheDog(); await flush();
     // ⚠ toBeFalsy, not toBeNull: on a save that has never opened a naming card the
     // field is absent rather than explicitly null, and both mean the same thing here.
     expect(pend()).toBeFalsy();                         // refused, nothing spent
@@ -163,7 +197,7 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
     const p = useGameStore.getState().player!;
     useGameStore.setState({ player: { ...p, tc: 700 } } as never);
     putStall(shelf());
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+    buyTheDog(); await flush();
     expect(pend()).not.toBeNull();
   });
 
@@ -171,7 +205,7 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
     await boot(5000); setDog({ status: 'dead' });
     for (let round = 1; round <= 3; round++) {
       putStall(shelf());
-      useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+      buyTheDog(); await flush();
       useGameStore.getState().confirmDogOnboarding('mutt', `Dog${round}`, 'female'); await flush();
       expect(dog()!.name).toBe(`Dog${round}`);
       expect(hasActiveDog(useGameStore.getState().player)).toBe(true);
@@ -185,20 +219,33 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
     const p = useGameStore.getState().player!;
     useGameStore.setState({ player: { ...p, completedFactionQuestIds: [] } } as never);
     const v = stall({ id: 'named_probe', faction: 'true_tartarians', nativeFaction: 'true_tartarians' } as never);
-    const s0 = useGameStore.getState();
-    expect((withReplacementDogOffer(v, s0.player!, s0.worldMemory)?.offers ?? []).map((o) => o.itemName))
-      .toContain('Kennel Dog');                        // no rapport → the ordinary dog
+    /* ⚠⚠ AMENDED — SAME GATE, PINNED ON THE ANIMAL RATHER THAN A CATALOG NAME.
+     *  This read `toContain('Kennel Dog')`: the one ordinary row the old
+     *  catalog had. There is no catalog now, so "the player got the ordinary
+     *  dog, not the faction dog" is asked of the animal itself — it must be
+     *  standing there (the road is never closed by a missing gate) and its
+     *  breed must carry NO faction. That is strictly more than the old pin:
+     *  the name 'Kennel Dog' could not have caught a faction breed leaking
+     *  under a different label, and `faction === null` catches every one. */
+    const rowAt = (vi: VendorInstance) => {
+      const s = useGameStore.getState();
+      return (withReplacementDogOffer(vi, s.player!, s.worldMemory)?.offers ?? [])
+        .find((o) => !!o.dog) ?? null;
+    };
+    const before = rowAt(v);
+    expect(before).not.toBeNull();                     // the shelf is still open
+    expect(before!.dog!.faction).toBeNull();           // no rapport → the ordinary dog
     await useGameStore.getState().persist();
     await useGameStore.getState().hydrate(); await flush();
-    const s1 = useGameStore.getState();
-    expect((withReplacementDogOffer(v, s1.player!, s1.worldMemory)?.offers ?? []).map((o) => o.itemName))
-      .toContain('Kennel Dog');                        // still no rapport after reload
+    const after = rowAt(v);
+    expect(after).not.toBeNull();
+    expect(after!.dog!.faction).toBeNull();            // still no rapport after reload
   });
 
   it('⚠⚠⚠ pendingDogOnboarding CANNOT STRAND THE SAVE across a reload', async () => {
     await boot(1000); setDog({ status: 'dead' });
     putStall(shelf());
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+    buyTheDog(); await flush();
     expect(pend()).not.toBeNull();
     await useGameStore.getState().persist();
     await useGameStore.getState().hydrate(); await flush();
@@ -217,14 +264,24 @@ describe('DOG LIFECYCLE - the whole transition matrix', () => {
              equipped: { vest: 'Padded Dog Vest', vestId: 'v1' } });
     const old = dog()!;
     putStall(shelf());
-    useGameStore.getState().buyFromVendor('Kennel Dog', 1); await flush();
+    buyTheDog(); await flush();
     await useGameStore.getState().persist();
     await useGameStore.getState().hydrate(); await flush();
+    /* ⚠⚠ AMENDED — THE DOG THAT ARRIVES IS THE DOG THAT WAS ON THE COUNTER.
+     *  This pinned `stats.strength === 10`, the mongrel profile's flat base,
+     *  because every replacement used to be a catalog dog. A purchase now
+     *  carries the individual sheet the player inspected, so the base is
+     *  whatever that animal rolled. The claim is unchanged in substance and
+     *  stronger in reach: it must match the PAID-FOR sheet exactly, and it
+     *  must not be the dead dog's developed 17. The old literal could not
+     *  have told those two apart — 10 is neither. */
+    const paidFor = pend()!.rescueData!.market!;
     useGameStore.getState().confirmDogOnboarding('mutt', 'Ash', 'female'); await flush();
     const d = dog()!;
     expect(d.id).not.toBe(old.id);
     expect(d.name).not.toBe(old.name);
-    expect(d.stats.strength).toBe(10);
+    expect(d.stats).toEqual(paidFor.stats);
+    expect(d.stats.strength).not.toBe(old.stats.strength);   // 17 was EARNED, and dies with it
     expect(d.statProgress.strength).toBe(0);
     expect(d.equipped.vest).toBeNull();
     expect(d.loyalty).not.toBe(97);
