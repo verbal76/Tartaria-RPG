@@ -62,6 +62,17 @@ interface Props {
     max: number;
     onChange: (v: number) => void;
   };
+  /** ⚠⚠ OTA-1873 — CALLER CONTENT THAT BELONGS IN THE SCROLLING MIDDLE.
+   *  A bulk sale's review list is one row per piece, so its height comes from
+   *  DATA — the exact thing OTA-1799 ruled may never be unbounded. This card
+   *  already solved that: OTA-1614 pinned the header above and the buttons
+   *  below a middle that scrolls. So the list rides THAT region rather than a
+   *  second modal architecture, and it inherits the 85% cap, the reachable
+   *  scrim and the un-pushable-away buttons for free.
+   *  ⚠ It is named for WHERE it goes, not for what it is, because where it goes
+   *  IS the contract: content handed here can never push the confirm off the
+   *  card, no matter how long the player's pack gets. */
+  scrollContent?: React.ReactNode;
   buttons: BrandedModalButton[];
   /** arb73 — render in-tree (absolute overlay) instead of a native <Modal>.
    *  iPad/iOS can present a native <Modal> INVISIBLY (renders nothing but its
@@ -98,6 +109,7 @@ export function BrandedModal({
   contextLine,
   textInput,
   quantityStepper,
+  scrollContent,
   buttons,
   inline,
   onRequestClose,
@@ -180,6 +192,10 @@ export function BrandedModal({
           </View>
         </View>
       ) : null}
+      {/* ⚠ OTA-1873 — last in the scrolling middle, under the context line that
+          explains the boundary, so the player reads WHAT this sweep takes
+          before reading WHICH pieces it took. */}
+      {scrollContent ?? null}
     </>
   );
   // ⚠⚠⚠ OTA-1799 — THE ACTION ROW IS A LIST WHEN THE CALLER MAKES IT ONE.

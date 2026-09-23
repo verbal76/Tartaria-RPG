@@ -31445,7 +31445,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * unchanged; stale prose about the Workshop's tag is left as documentation debt;
  * no exit mechanic, room graph, ownership table or EXIT handler changed; no
  * physical-device verification. */
-export const OTA_BUILD_ID = '2026-09-23-1872-the-keyboard-leaves-the-card-a-room';
+/* ⚠⚠⚠ OTA-1873 — THE SALE IS READ BEFORE IT IS MADE. Both vendor sweeps —
+ * SELL ALL COMMON GEAR and SELL ALL LOOT — now open a scrollable review listing
+ * every eligible piece, all of them in, a tap to keep one out and a tap to put
+ * it back, a live count and TC total, and an explicit confirm; cancel mutates
+ * nothing. Eligibility is untouched: the two planners still decide WHAT may be
+ * swept, and the review can only subtract from what they returned. The Worn
+ * Tartarian Coin was audited and stays out of both — five shipped recipes
+ * consume it and one named NPC likes it as a gift, so it keeps its exclusions
+ * and gets no third button. */
+export const OTA_BUILD_ID = '2026-09-23-1873-the-sale-is-read-before-it-is-made';
+// SUPERSEDED: '2026-09-23-1872-the-keyboard-leaves-the-card-a-room'
 // SUPERSEDED: '2026-09-22-1871-the-coin-sits-where-you-can-reach-it'
 // SUPERSEDED: '2026-09-22-1870-the-road-belongs-to-the-next-task'
 // SUPERSEDED: '2026-09-22-1869-the-door-is-on-the-room-you-must-reach'

@@ -14,6 +14,14 @@ import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } fr
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { planCommonGearSale, planLootSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1232 — one-tap Common gear clear-out
+// ⚠⚠ OTA-1873 — the REVIEW authority. The two plans above still decide what is
+//   eligible; these decide, of that, what the player still wants in. Pure, and
+//   read both to DRAW the list and to SELL from it, so the number the player
+//   confirms and the rows that leave the pack can never be two answers.
+import {
+  reviewRowsFor, includedCandidates, reviewTotals, toggleExclusion, reviewIsEmpty,
+  NOTHING_EXCLUDED, type ExcludedIds,
+} from '../engine/bulkSellReview';
 import { rarityHexColor } from '../components/InventoryCategorize';
 import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1341 — the ladder reaches the display too
@@ -64,8 +72,15 @@ type Pending =
   | { mode: 'dismiss' }
   // ⚠ OTA-1232 — the count and the total ARE the safety on a bulk sell, so they
   // are carried into the confirm rather than recomputed when it fires.
-  | { mode: 'bulkSellCommonGear'; count: number; total: number }
-  | { mode: 'bulkSellLoot'; count: number; total: number }
+  /* ⚠⚠ OTA-1873 — THESE TWO ARMS CARRY NO NUMBERS ANY MORE, AND THAT IS THE
+   *  REPAIR. They used to snapshot `count` and `total` at the tap, while
+   *  `confirmAction` re-planned against the LIVE list at the yes — so the sheet
+   *  could truthfully offer a number the sale would not pay. With a review list
+   *  in between, where the player spends real time vetoing rows, that gap stops
+   *  being theoretical. The mode is now the whole message; every number on the
+   *  card is derived from the live plan minus the live vetoes. */
+  | { mode: 'bulkSellCommonGear' }
+  | { mode: 'bulkSellLoot' }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
   // ⚠⚠ OTA-1734 — REINFORCEMENT IS A SERVICE THE COUNTER SELLS, so it rides the
   // same `pending` sheet every other purchase does rather than a screen of its
@@ -163,6 +178,17 @@ export function VendorScreen() {
   // arb151 — vendor CONTRACTS popup (mission-board style) open/closed.
   const [contractsOpen, setContractsOpen] = useState(false);
   const [pending, setPending] = useState<Pending>(null);
+  /* ⚠⚠⚠ OTA-1873 — THE VETO, AND IT LIVES EXACTLY AS LONG AS THE POPUP DOES.
+   *  Instance ids the player has tapped OUT of the bulk sale currently under
+   *  review. Cleared when a sweep is OPENED, so every review starts with every
+   *  eligible piece in — opt-out, never opt-in — and cleared again on cancel so
+   *  "not this time" can never leak into the next visit or the next sweep.
+   *  ⚠ It is NOT persisted and NOT a reservation: the game already has three
+   *  durable ways to say "never sell this" (reserve for fusion, save for quest,
+   *  a coating), and every one of them is honoured one layer up by the plan.
+   *  ⚠ Declared with the other hooks, ABOVE the early-return guard, for the
+   *  reason the sellSort comment below spells out. */
+  const [bulkExcluded, setBulkExcluded] = useState<ExcludedIds>(NOTHING_EXCLUDED);
   // v2.4.1 (OTA 022) — sellSort must live ABOVE the early-return guard
   // below. The prior position (line 104) made hook count depend on
   // vendor being non-null: when a vendor was dismissed mid-render
@@ -463,7 +489,14 @@ export function VendorScreen() {
   const stealDc = vendor.demeanor === 'sketchy' ? 11 : vendor.demeanor === 'honest' ? 14 : 16;
   const openSteal = (itemName: string) => setPending({ mode: 'steal', itemName, dc: stealDc });
   const openDismiss = () => setPending({ mode: 'dismiss' });
-  const cancel = () => setPending(null);
+  /** ⚠⚠ OTA-1873 — CANCEL MUTATES NOTHING, AND NOW IT ALSO REMEMBERS NOTHING.
+   *  It closes the sheet — it never called a sell action and still does not —
+   *  and it drops the review's vetoes, because a veto is a sentence about THIS
+   *  transaction and a transaction that was called off has none. */
+  const cancel = () => {
+    setPending(null);
+    setBulkExcluded(NOTHING_EXCLUDED);
+  };
   const confirmAction = () => {
     if (!pending) return;
     if (pending.mode === 'buy') buyFromVendor(pending.itemName);
@@ -478,8 +511,12 @@ export function VendorScreen() {
       // ledger, same standing effects the per-unit loop paid; what changed is
       // the cost of paying them — one state write and one persist per row
       // instead of per piece. Only the first row is the negotiation (OTA-727).
+      // ⚠⚠ OTA-1873 — AND THE PLAYER'S VETOES ARE SUBTRACTED FROM THAT FRESH
+      // PLAN, not from the snapshot they were ticked against. `includedCandidates`
+      // filters by INSTANCE ID, so a row vetoed in the review is the row left
+      // alone here even if a same-named copy joined the plan in between.
       let bulkRowIdx = 0;
-      for (const row of planCommonGearSale(bulkSellable).rows) {
+      for (const row of includedCandidates(planCommonGearSale(bulkSellable), bulkExcluded)) {
         const reps = Math.max(1, row.item.quantity ?? 1);
         sellToVendor(row.item.name, row.item.id, { social: bulkRowIdx === 0, units: reps });
         bulkRowIdx++;
@@ -489,8 +526,9 @@ export function VendorScreen() {
       // ⚠ OTA-1706 — same contract as the gear sweep above: re-plan at fire time
       // against the LIVE list, one call per row with the whole stack as `units`,
       // and only the first row negotiates.
+      // ⚠ OTA-1873 — same veto, same instance-id filter, same fresh plan.
       let lootRowIdx = 0;
-      for (const row of planLootSale(bulkSellable).rows) {
+      for (const row of includedCandidates(planLootSale(bulkSellable), bulkExcluded)) {
         const reps = Math.max(1, row.item.quantity ?? 1);
         sellToVendor(row.item.name, row.item.id, { social: lootRowIdx === 0, units: reps });
         lootRowIdx++;
@@ -503,6 +541,9 @@ export function VendorScreen() {
       else if (pending.kind === 'storyline') acceptStoryline(pending.title);
     }
     setPending(null);
+    // ⚠ OTA-1873 — the vetoes die with the transaction they belonged to, on the
+    //   way out of a COMPLETED sale as well as a cancelled one.
+    setBulkExcluded(NOTHING_EXCLUDED);
   };
 
   /* ⚠⚠ OTA-1734 — the SHEET's quote, re-read from the LIVE item on every render.
@@ -663,6 +704,40 @@ export function VendorScreen() {
   const bulkHeldBack = planCommonGearSale(
     sellable.filter(({ item }) => !!gateLossFor(item.name)),
   ).rows.map((r) => ({ name: r.item.name, label: gateLossFor(r.item.name)!.label }));
+  /* ⚠⚠⚠ OTA-1873 — THE SWEEP UNDER REVIEW, RE-PLANNED EVERY RENDER.
+   *
+   *  Owner: a bulk sale should open a list you can read and veto rows in before
+   *  anything is sold. That needs ONE live plan the popup draws from, the
+   *  heading counts from, the button labels from and `confirmAction` sells
+   *  from — because the moment those are four derivations they are four chances
+   *  to disagree, and a confirm button whose number is not the number that
+   *  leaves your pack is the defect OTA-1307 is named after.
+   *
+   *  ⚠ Derived, never stored. `pending` no longer needs to carry a count or a
+   *  total for these two modes: the plan is recomputed from the CURRENT
+   *  `bulkSellable` on every render, so a piece sold by hand from the rows
+   *  behind the popup simply stops being in it. That is OTA-1232's own
+   *  staleness rule, now enforced for the DISPLAY as well as for the sale.
+   *
+   *  ⚠ Eligibility is not re-decided here. `planCommonGearSale` /
+   *  `planLootSale` answer that, with every guard they have learned; this only
+   *  subtracts the player's own vetoes from what they returned. */
+  const bulkPlan = pending?.mode === 'bulkSellCommonGear'
+    ? planCommonGearSale(bulkSellable)
+    : pending?.mode === 'bulkSellLoot'
+      ? planLootSale(bulkSellable)
+      : null;
+  const bulkReviewRows = bulkPlan ? reviewRowsFor(bulkPlan, bulkExcluded) : [];
+  const bulkTotals = bulkPlan
+    ? reviewTotals(bulkPlan, bulkExcluded)
+    : { count: 0, total: 0, excludedCount: 0 };
+  const bulkNothingLeft = bulkPlan ? reviewIsEmpty(bulkPlan, bulkExcluded) : true;
+  /** Open a sweep for review. ⚠ The veto set is cleared HERE, not on close, so a
+   *  review can never open holding a tick from a sale the player backed out of. */
+  const openBulkReview = (mode: 'bulkSellCommonGear' | 'bulkSellLoot') => {
+    setBulkExcluded(NOTHING_EXCLUDED);
+    setPending({ mode });
+  };
   const sellableById = new Map(sellable.map((row) => [row.item.id, row]));
   const selectedRows = sellSelected
     .map((id) => sellableById.get(id))
@@ -1328,7 +1403,7 @@ export function VendorScreen() {
               if (plan.count === 0) return null;
               return (
                 <Pressable
-                  onPress={() => setPending({ mode: 'bulkSellCommonGear', count: plan.count, total: plan.total })}
+                  onPress={() => openBulkReview('bulkSellCommonGear')}
                   style={({ pressed }) => [styles.bulkSellBtn, tControlDepth(pressed)]}
                   accessibilityRole="button"
                   accessibilityLabel={`Sell all ${plan.count} Common gear pieces for ${plan.total} coin`}
@@ -1350,7 +1425,7 @@ export function VendorScreen() {
               if (lootPlan.count === 0) return null;
               return (
                 <Pressable
-                  onPress={() => setPending({ mode: 'bulkSellLoot', count: lootPlan.count, total: lootPlan.total })}
+                  onPress={() => openBulkReview('bulkSellLoot')}
                   style={({ pressed }) => [styles.bulkSellBtn, tControlDepth(pressed)]}
                   accessibilityRole="button"
                   accessibilityLabel={`Sell all ${lootPlan.count} loot pieces for ${lootPlan.total} coin`}
@@ -1469,10 +1544,14 @@ export function VendorScreen() {
         title={
           pending?.mode === 'dismiss'
             ? `Dismiss ${vendor.name}?`
+            /* ⚠ OTA-1873 — the heading counts the LIVE selection, so it falls as
+               the player unticks rows and reads 0 when they have unticked them
+               all. Same numbers as the list below it and the button beneath it,
+               because all three come from `bulkTotals`. */
             : pending?.mode === 'bulkSellCommonGear'
-              ? `Sell ${pending.count} Common ${pending.count === 1 ? 'piece' : 'pieces'}?`
+              ? `Sell ${bulkTotals.count} Common ${bulkTotals.count === 1 ? 'piece' : 'pieces'}?`
             : pending?.mode === 'bulkSellLoot'
-              ? `Sell ${pending.count} loot ${pending.count === 1 ? 'piece' : 'pieces'}?`
+              ? `Sell ${bulkTotals.count} loot ${bulkTotals.count === 1 ? 'piece' : 'pieces'}?`
             : pending?.mode === 'sell'
               ? `Sell to ${vendor.name}`
               : pending?.mode === 'steal'
@@ -1521,7 +1600,7 @@ export function VendorScreen() {
               // Crucible would burn and nothing a recipe needs. The third names
               // what the player's OWN marks held back, because a hold-out nobody
               // explains reads as the button missing pieces (OTA-1349).
-              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nLoot only — the scrap the Crucible melts. Anything a recipe calls for, anything you reserved for fusion or a quest, and anything you already forged is left alone.${(() => {
+              ? `+${bulkTotals.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + bulkTotals.total} TC\n\nLoot only — the scrap the Crucible melts. Anything a recipe calls for, anything you reserved for fusion or a quest, and anything you already forged is left alone.${(() => {
                 const spared = planLootSale(bulkSellable).sparedCoated;
                 return spared > 0 ? `\n\n⚠ ${spared} ${spared === 1 ? 'piece' : 'pieces'} held back — you reserved ${spared === 1 ? 'it' : 'them'}.` : '';
               })()}`
@@ -1531,7 +1610,7 @@ export function VendorScreen() {
               // NOT in the sweep, because a player who cannot see the boundary
               // has to take it on trust — and Common covers rations, scrap and
               // Aether Dust, which this must never touch.
-              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials, anything you forged at the Crucible and anything you coated are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}${(() => {
+              ? `+${bulkTotals.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + bulkTotals.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials, anything you forged at the Crucible and anything you coated are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}${(() => {
                 // ⚠ OTA-1683 — the coated pieces the sweep stepped around, counted
                 // in the same breath as the gate hold-backs, for the same reason:
                 // a hold-out nobody explains reads as the button refusing to work.
@@ -1587,6 +1666,65 @@ export function VendorScreen() {
                       : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
                     : undefined
         }
+        /* ⚠⚠⚠ OTA-1873 — THE REVIEW: EVERY PIECE THE SWEEP IS ABOUT TO TAKE,
+         *  ONE ROW EACH, BEFORE ANYTHING IS SOLD.
+         *
+         *  Owner: the count and the total say how much is leaving; they never
+         *  say WHICH. So the sweep now opens a list you can read — and veto
+         *  rows in — and only then a confirm.
+         *
+         *  ⚠ Tapping a row toggles it OUT of this sale and back IN; nothing is
+         *  sold, saved, reserved or written until the confirm. The tick, the
+         *  heading above and the button below are three readings of ONE number
+         *  (`bulkTotals`), so they cannot disagree.
+         *
+         *  ⚠ It rides the card's SCROLLING middle (OTA-1614/1799), so a pack
+         *  with forty eligible pieces cannot push CANCEL off the screen — the
+         *  exact failure the APPLY ACID FLASK list was photographed doing. No
+         *  second modal architecture, no new component, no height from data
+         *  that is not inside a scroller. */
+        scrollContent={
+          bulkPlan ? (
+            <View style={styles.reviewList}>
+              <Text style={styles.reviewLead}>
+                {bulkTotals.excludedCount > 0
+                  ? `Tap a row to keep it — ${bulkTotals.excludedCount} ${bulkTotals.excludedCount === 1 ? 'piece' : 'pieces'} kept.`
+                  : 'Tap a row to keep it out of this sale.'}
+              </Text>
+              {bulkReviewRows.map((row) => (
+                <Pressable
+                  key={row.id}
+                  onPress={() => setBulkExcluded(toggleExclusion(bulkExcluded, row.id))}
+                  style={({ pressed }) => [
+                    kit.ctl,
+                    styles.reviewRow,
+                    !row.included && styles.reviewRowOut,
+                    pressed && kit.controlPressed,
+                  ]}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: row.included }}
+                  accessibilityLabel={`${row.name}${row.quantity > 1 ? ` times ${row.quantity}` : ''}, ${row.lineTotal} coin, ${row.included ? 'selling' : 'kept'}`}
+                >
+{({ pressed }) => (<>
+                  <Text style={[styles.reviewTick, !row.included && styles.reviewTextOut]}>
+                    {row.included ? '✓' : '—'}
+                  </Text>
+                  <Text
+                    style={[styles.reviewName, !row.included && styles.reviewTextOut]}
+                    numberOfLines={1}
+                  >
+                    {row.name}{row.quantity > 1 ? ` ×${row.quantity}` : ''}
+                  </Text>
+                  <Text style={[styles.reviewPrice, !row.included && styles.reviewTextOut]}>
+                    {row.lineTotal} TC
+                  </Text>
+                  {ctlPlanes(pressed)}
+                </>)}
+                </Pressable>
+              ))}
+            </View>
+          ) : undefined
+        }
         buttons={
           // ⚠⚠ OTA-1307 — THE CONFIRM HAD NO CONFIRM BUTTON.
           //
@@ -1610,11 +1748,18 @@ export function VendorScreen() {
           // screen could call it. A title and a body were written for this mode
           // and a button was not, so the sweep looked implemented from every
           // angle except the one that does the work.
+          // ⚠⚠ OTA-1873 — AND NOW THE LABEL IS THE LIVE SELECTION, NOT THE TAP'S.
+          // The button says exactly what the ticked rows above it come to, and
+          // when the player has unticked everything it is replaced by a single
+          // dismissal rather than left standing as a confirm that would sell
+          // nothing — which is OTA-1307's dead button wearing a different coat.
           pending?.mode === 'bulkSellCommonGear' || pending?.mode === 'bulkSellLoot'
-            ? [
-                { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
-                { label: `Sell ${pending.count} for ${pending.total} TC`, onPress: confirmAction, tone: 'primary' as const },
-              ]
+            ? (bulkNothingLeft
+                ? [{ label: 'Keep everything', onPress: cancel, tone: 'neutral' as const }]
+                : [
+                    { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
+                    { label: `Sell ${bulkTotals.count} for ${bulkTotals.total} TC`, onPress: confirmAction, tone: 'primary' as const },
+                  ])
           : pending?.mode === 'dismiss'
             ? [
                 { label: 'Cancel', onPress: cancel, tone: 'neutral' },
@@ -1786,6 +1931,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bulkSellText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
+  /* ⚠ OTA-1873 — the review list. No height of its own: it is as tall as its
+   *  rows and sits inside the card's scrolling middle, which is what bounds it. */
+  reviewList: { marginTop: 10, gap: 4 },
+  reviewLead: { color: '#a2977b', fontSize: 10, letterSpacing: 0.5, marginBottom: 4 },
+  reviewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 9,
+    borderRadius: 2,
+  },
+  /* ⚠ A vetoed row stays legible and stays in place — it is dimmed, never
+   *  removed. A list that reflows under the finger is a list you lose your
+   *  place in, and the player has to be able to put a piece back. */
+  reviewRowOut: { opacity: 0.45 },
+  reviewTick: { color: '#c9a86a', fontSize: 12, width: 12, textAlign: 'center' },
+  reviewName: { color: '#d9cdb4', fontSize: 12, flex: 1 },
+  reviewPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
+  reviewTextOut: { color: '#7d7462', textDecorationLine: 'line-through' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
   sortLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginRight: 4 },
   sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },

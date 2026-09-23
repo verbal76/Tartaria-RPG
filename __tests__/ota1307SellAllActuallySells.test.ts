@@ -115,7 +115,21 @@ describe('OTA-1307 — sell-all-common actually sells', () => {
     const btns = SCREEN.slice(SCREEN.indexOf('buttons={'), SCREEN.indexOf('onRequestClose={cancel}', SCREEN.indexOf('buttons={')));
     const branch = btns.slice(btns.indexOf("pending?.mode === 'bulkSellCommonGear'"));
     const upToNext = branch.slice(0, branch.indexOf(': pending?.mode ==='));
-    expect(upToNext).toContain('${pending.count}');
-    expect(upToNext).toContain('${pending.total}');
+    /* ⚠⚠ OTA-1873 — THE SPELLING MOVED; THE CLAIM DID NOT, AND IT GOT STRICTER.
+     * This used to pin the literals `${pending.count}` / `${pending.total}`,
+     * which read as "the label says how big this is" only by accident of there
+     * being one way to write it. Those two fields were a SNAPSHOT taken at the
+     * tap, while `confirmAction` has re-planned against the live list since
+     * OTA-1232 — so the pinned spelling was the weaker of the two available,
+     * and it becomes indefensible once a review list sits between the tap and
+     * the yes. The label now reads the LIVE selection.
+     * ⚠ So this asserts the count and the total are interpolated from SOME
+     * source, and — new here — that the branch actually wires `confirmAction`,
+     * which is the thing OTA-1307 exists about and which the two substrings
+     * never checked. A branch printing both numbers over a dead `cancel` passed
+     * the old pin and fails this one. */
+    expect(/\$\{[A-Za-z0-9_.?!]*\bcount\}/.test(upToNext)).toBe(true);
+    expect(/\$\{[A-Za-z0-9_.?!]*\btotal\}/.test(upToNext)).toBe(true);
+    expect(upToNext).toContain('onPress: confirmAction');
   });
 });
