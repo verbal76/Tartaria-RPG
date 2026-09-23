@@ -344,6 +344,22 @@ export function VendorScreen() {
    *  and is cleared when a sheet is OPENED, so "one confirm sheet spends at most
    *  once" holds while +1 → +2 → +3 from three separate sheets stays possible. */
   const reinforceLatch = useRef<string | null>(null);
+  /* ⚠⚠⚠ OTA-1873 — ONE REVIEW, ONE SWEEP, AND THE SECOND PRESS IS NOT HARMLESS.
+   *
+   *  `setPending(null)` is a React state update, so a second tap landing in the
+   *  same frame re-enters `confirmAction` with the SAME `pending` and the same
+   *  closed-over row list. `sellToVendor` is not fooled about the piece that
+   *  just left — it re-reads the live store and resolves by instance id — but
+   *  when that id is gone it FALLS BACK TO A NAME LOOKUP, and the fallback can
+   *  land on a different copy of that name which was never in the plan: a piece
+   *  the planner deliberately spared (a coating, OTA-1683) or one the player
+   *  had just vetoed in the review. Measured: two Rusted Blades, one coated —
+   *  the coated one left the pack on the second press.
+   *
+   *  ⚠ So the sweep takes the SAME synchronous latch the reinforcement above
+   *  uses, cleared when a review is OPENED. One review spends at most once;
+   *  opening the sweep again is a new transaction and works normally. */
+  const bulkLatch = useRef<string | null>(null);
   const openReinforce = (item: InventoryItem) => {
     reinforceLatch.current = null;
     setPending({ mode: 'reinforce', itemName: item.name, itemId: item.id });
@@ -499,6 +515,12 @@ export function VendorScreen() {
   };
   const confirmAction = () => {
     if (!pending) return;
+    // ⚠ OTA-1873 — the bulk latch, declared above. Synchronous, so it closes the
+    //   same-frame door `setPending(null)` cannot.
+    if (pending.mode === 'bulkSellCommonGear' || pending.mode === 'bulkSellLoot') {
+      if (bulkLatch.current === pending.mode) return;
+      bulkLatch.current = pending.mode;
+    }
     if (pending.mode === 'buy') buyFromVendor(pending.itemName);
     else if (pending.mode === 'sell') sellToVendor(pending.itemName, pending.itemId);
     else if (pending.mode === 'steal') stealFromVendor(pending.itemName);
@@ -735,6 +757,7 @@ export function VendorScreen() {
   /** Open a sweep for review. ⚠ The veto set is cleared HERE, not on close, so a
    *  review can never open holding a tick from a sale the player backed out of. */
   const openBulkReview = (mode: 'bulkSellCommonGear' | 'bulkSellLoot') => {
+    bulkLatch.current = null;
     setBulkExcluded(NOTHING_EXCLUDED);
     setPending({ mode });
   };

@@ -585,6 +585,136 @@ describe('§L the review arithmetic, on its own', () => {
   });
 });
 
+// ─────────────────────────── §N one confirm spends once ────────────────────
+describe('§N a second confirm in the same frame cannot spend twice', () => {
+  /** Press the live confirm twice inside ONE act — the shape a real double tap
+   *  takes, where `setPending(null)` has not re-rendered yet and every closure
+   *  the second press reads is still the first press's. */
+  function confirmTwice(tree: Tree): void {
+    const btn = tree.root.findAll(
+      (n) => typeof n.props?.onPress === 'function' && /^SELL \d+ FOR \d+ TC$/.test(textOf(n).trim()),
+    )[0]!;
+    renderer.act(() => {
+      (btn.props.onPress as () => void)();
+      (btn.props.onPress as () => void)();
+    });
+  }
+
+  it('the purse grows by the shown total exactly once', () => {
+    setPack(gearPack());
+    const tree = mount();
+    openSweep(tree, 'SELL ALL COMMON GEAR');
+    const shown = confirmTotal(tree);
+    const tcBefore = tcNow();
+    confirmTwice(tree);
+    expect(tcNow() - tcBefore).toBe(shown);
+  });
+
+  /* ⚠⚠⚠ THE REAL HAZARD, AND IT IS NOT "SELLS THE SAME PIECE TWICE".
+   *  `sellToVendor` re-reads the LIVE store and resolves by instance id, so the
+   *  piece that just left cannot leave again. But when that id is gone it FALLS
+   *  BACK TO A NAME LOOKUP — `?? player.inventory.find(i => i.name === itemName
+   *  && i.quantity > 0)` — and a second press replays the FIRST press's row
+   *  list, so the fallback can land on a DIFFERENT copy of that name that was
+   *  never in the plan: one the planner deliberately spared, or one the player
+   *  just vetoed in the review. A coated piece is the sharpest case, because
+   *  OTA-1683 exists to keep the sweep off exactly that copy. */
+  it('a spared coated copy of the same name is not swept up by the second press', () => {
+    const plain = gearPack()[0]!;
+    setPack([plain, { ...plain, id: 'coated_twin', coating: 'acid' }]);
+    const tree = mount();
+    openSweep(tree, 'SELL ALL COMMON GEAR');
+    expect(reviewRows(tree)).toHaveLength(1);          // only the plain copy is eligible
+    confirmTwice(tree);
+    expect(inv().filter((i) => i.name === plain.name).map((i) => i.id)).toEqual(['coated_twin']);
+  });
+
+  /* ⚠ THIS ONE IS A CONTRACT CLAIM, NOT A LATCH DETECTOR — said plainly because
+   *  it passes with the latch removed. The replayed list holds only the INCLUDED
+   *  rows, whose names have already left the pack, so the name fallback finds
+   *  nothing to take and the veto survives either way. The coated case above is
+   *  what actually catches a missing latch; this pins the outcome a player cares
+   *  about (the kept piece is kept, the purse moves once) across a double tap.
+   *  ⚠ Two different names, because two instances of ONE name merge into a
+   *  single stack on the way into the pack (`stackCompatible`, OTA-1737). */
+  it('a row the player vetoed is not swept up by the second press either', () => {
+    setPack(gearPack());
+    const tree = mount();
+    openSweep(tree, 'SELL ALL COMMON GEAR');
+    const kept = GEAR_NAMES[0]!;
+    tapRow(tree, kept);
+    const shown = confirmTotal(tree);
+    const tcBefore = tcNow();
+    confirmTwice(tree);
+    expect([kept, qty(kept)]).toEqual([kept, 1]);
+    expect(tcNow() - tcBefore).toBe(shown);
+  });
+});
+
+// ─────────────────────────── §O every dismissal is a cancel ────────────────
+describe('§O dismissing the review without confirming mutates nothing', () => {
+  it("the card's own close path (backdrop / Android back) sells nothing", () => {
+    setPack(gearPack());
+    const tree = mount();
+    const before = { tc: tcNow(), names: inv().map((i) => `${i.name}:${i.quantity}`).sort() };
+    openSweep(tree, 'SELL ALL COMMON GEAR');
+    /* ⚠ `onRequestClose` is what the scrim tap and the Android hardware back
+     *  button both reach — the two dismissals a CANCEL-only test never covers. */
+    const modal = tree.root.findAll((n) => typeof n.props?.onRequestClose === 'function')[0]!;
+    renderer.act(() => { (modal.props.onRequestClose as () => void)(); });
+    expect({ tc: tcNow(), names: inv().map((i) => `${i.name}:${i.quantity}`).sort() }).toEqual(before);
+    expect(reviewRows(tree)).toHaveLength(0);
+  });
+
+  it('and it drops the vetoes with the transaction', () => {
+    setPack(gearPack());
+    const tree = mount();
+    openSweep(tree, 'SELL ALL COMMON GEAR');
+    tapRow(tree, GEAR_NAMES[0]!);
+    const modal = tree.root.findAll((n) => typeof n.props?.onRequestClose === 'function')[0]!;
+    renderer.act(() => { (modal.props.onRequestClose as () => void)(); });
+    press(tree, 'SELL ALL COMMON GEAR');
+    expect(reviewRows(tree).every(rowIsIn)).toBe(true);
+  });
+});
+
+// ─────────────────────────── §P loot is semantic, not priced ───────────────
+describe('§P a useful material does not become Loot because it has a price', () => {
+  /* ⚠⚠ THE LINE OTA-1706 DREW, RE-ASSERTED FROM THE OTHER SIDE. Scrap Metal
+   *  sells, and a player clearing a pack would happily be paid for it — but it
+   *  is a recipe ingredient, so `isForgeableLootReagent` refuses it and the loot
+   *  sweep must never list it. This is the claim a price-based predicate would
+   *  break, and nothing else in the suite would notice. */
+  const SCRAP = () => ({
+    id: 'scrap_1', name: 'Scrap Metal', kind: 'misc', rarity: 'Common',
+    quantity: 6, tags: ['metal', 'scrap', 'loot'],
+  });
+
+  it('Scrap Metal is genuinely worth TC at this counter', () => {
+    setPack([SCRAP()]);
+    const tree = mount();
+    press(tree, 'SELL');
+    expandSections(tree);
+    // It is listed for sale — so a price-based loot rule WOULD have swept it.
+    expect(has(tree, 'Scrap Metal')).toBe(true);
+  });
+
+  it('and it is still not in the loot review', () => {
+    setPack([...lootPack(), SCRAP()]);
+    const tree = mount();
+    openSweep(tree, 'SELL ALL LOOT');
+    expect(reviewRows(tree).map(rowName).some((n) => n.startsWith('Scrap Metal'))).toBe(false);
+  });
+
+  it('and a confirmed loot sweep leaves the whole stack behind', () => {
+    setPack([...lootPack(), SCRAP()]);
+    const tree = mount();
+    openSweep(tree, 'SELL ALL LOOT');
+    press(tree, `SELL ${confirmCount(tree)} FOR ${confirmTotal(tree)} TC`);
+    expect(qty('Scrap Metal')).toBe(6);
+  });
+});
+
 // ─────────────────────────── §M — the coin is in neither list ───────────────
 describe('§M the Worn Tartarian Coin is in neither review', () => {
   const coinRow = () => ({
