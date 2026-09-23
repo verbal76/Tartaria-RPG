@@ -291,7 +291,19 @@ describe('OTA-1718 — ⚠⚠⚠ the audit: every text-entry surface, accounted 
     // audit rather than the patch.
     for (const f of ['DogOnboardingModal.tsx', 'GolemNamingModal.tsx']) {
       const s = src('app', 'components', f);
-      expect({ f, measured: s.includes('paddingBottom: 32 + kbInset') }).toEqual({ f, measured: true });
+      // ⚠⚠ OTA-1872 — WHAT IS PINNED IS THE MEASUREMENT, NOT WHERE IT IS SPENT.
+      // This asserted the literal `paddingBottom: 32 + kbInset`, which was this
+      // suite's own choice of WHERE to pay the inset: as trailing padding inside
+      // the scroller. On a small Android phone that proved to be the wrong
+      // place — it buys scroll distance and never shrinks the scroller, so the
+      // card still laid out against the whole window with its lower half behind
+      // the keyboard. DogOnboardingModal now pays it on the SCRIM instead
+      // (`24 + kbInset`), which is what KeyboardSafeCard has always done.
+      // ⚠ The claim this suite owns survives intact and is still checked below:
+      // the inset is MEASURED from the live keyboard, never a fixed offset, and
+      // it is genuinely spent in a padding rather than computed and dropped.
+      // GolemNamingModal still spells it `32 + kbInset` and still passes.
+      expect({ f, measured: /paddingBottom:\s*\d+\s*\+\s*kbInset/.test(s) }).toEqual({ f, measured: true });
       expect({ f, hook: s.includes('keyboardInset(useCardViewport())') }).toEqual({ f, hook: true });
       // ⚠ And the hook sits ABOVE the `return null` guards. My first cut put it
       // beside the render, which is a conditional hook — a different bug, added

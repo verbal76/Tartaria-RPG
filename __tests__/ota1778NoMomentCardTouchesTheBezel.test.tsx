@@ -73,9 +73,25 @@ function bodyOf(src: string, key: string): string | null {
 // ═══ 1. THE THREE MOVED, AND THE OTHER THREE DID NOT MOVE ════════════════════
 describe('⚠⚠⚠ all six moment beats now share one outer geometry', () => {
   test('every one of the six reads the kit\'s scrim and declares none of its own', () => {
+    /* ⚠⚠ OTA-1872 — THE SPELLING IS SUPERSEDED; THE RULE IS NOT, AND IS NOW
+     * STRICTER. This asserted the literal `style={kit.momentScrim}`, which read
+     * as "uses the kit's scrim" only by accident of there being one way to write
+     * it. DogOnboardingModal now composes a KEYBOARD INSET onto that scrim
+     * (`[kit.momentScrim, { paddingBottom: 24 + kbInset }]`) so its scroller
+     * stops at the keyboard's edge instead of running on underneath it.
+     * ⚠ THIS SUITE'S OWN CLAIM IS UNTOUCHED — no bezel-to-bezel, no private
+     * backdrop: the kit's centring, 24pt gutter and colour all still apply. And
+     * the composed member may ONLY be a keyboard-derived bottom inset, so this
+     * refuses MORE than the substring did, not less: a card that composed a
+     * `padding: 0` to win back the bezel now fails here. */
+    const READS_SCRIM = /style=\{(?:kit\.momentScrim\}|\[\s*kit\.momentScrim\s*,)/;
+    const COMPOSED = /style=\{\[\s*kit\.momentScrim\s*,([^\]]*)\]\}/;
+    const KEYBOARD_ONLY = /^\s*\{\s*paddingBottom:[^{}]*kbInset[^{}]*\}\s*$/;
     for (const n of SIX) {
       const code = codeOf(cmp(n));
-      expect([n, code.includes('style={kit.momentScrim}')]).toEqual([n, true]);
+      expect([n, READS_SCRIM.test(code)]).toEqual([n, true]);
+      const extra = COMPOSED.exec(code);
+      if (extra) expect([n, KEYBOARD_ONLY.test(extra[1]!)]).toEqual([n, true]);
       expect([n, bodyOf(cmp(n), 'backdrop')]).toEqual([n, null]);
     }
   });

@@ -139,9 +139,23 @@ export function DogOnboardingModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={commit}>
-      <View style={kit.momentScrim}>
+      {/* ⚠⚠⚠ OTA-1872 — THE INSET IS SPENT ON THE SCRIM, NOT ON THE CONTENT.
+          OTA-1718 paid it as trailing padding INSIDE the scroller, which buys
+          scroll DISTANCE and never shrinks the scroller: `momentScrim` is
+          `flex: 1` of the full Modal frame, so the ScrollView kept its whole
+          window height and its lower portion lay underneath the keyboard. The
+          card was laid out against the whole screen and the player had to find
+          a drag to rescue a control drawn where no finger reaches.
+          ⚠⚠ Paying it HERE makes the scroller's viewport equal the visible box,
+          so the card scrolls inside the room the keyboard left. This is the
+          idiom KeyboardSafeCard already uses for the same reason
+          (`[styles.scrim, { paddingBottom: inset }]`) — no second architecture.
+          ⚠ 24 is `momentScrim.padding`, restated so it is not silently dropped.
+          Keyboard closed, `kbInset` is 0 and this resolves to exactly the 24 the
+          scrim already had, which is why the closed layout is byte-identical. */}
+      <View style={[kit.momentScrim, { paddingBottom: 24 + kbInset }]}>
         <ScrollView
-          contentContainerStyle={[styles.scroll, { paddingBottom: 32 + kbInset }]}
+          contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

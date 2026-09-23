@@ -31445,7 +31445,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * unchanged; stale prose about the Workshop's tag is left as documentation debt;
  * no exit mechanic, room graph, ownership table or EXIT handler changed; no
  * physical-device verification. */
-export const OTA_BUILD_ID = '2026-09-22-1871-the-coin-sits-where-you-can-reach-it';
+export const OTA_BUILD_ID = '2026-09-23-1872-the-keyboard-leaves-the-card-a-room';
+// SUPERSEDED: '2026-09-22-1871-the-coin-sits-where-you-can-reach-it'
 // SUPERSEDED: '2026-09-22-1870-the-road-belongs-to-the-next-task'
 // SUPERSEDED: '2026-09-22-1869-the-door-is-on-the-room-you-must-reach'
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-21-1861-the-ground-stays-under-the-boots';
