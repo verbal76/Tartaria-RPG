@@ -102,13 +102,17 @@ import type { VendorInstance, VendorOffer } from '../app/engine/vendors';
 const flush = (): Promise<unknown> => new Promise((r) => setTimeout(r, 0));
 jest.setTimeout(240000);
 
+/* ⚠ `tags` IS REQUIRED ON InventoryItem — and it is not ceremony here: OTA-1737's
+ * stackCompatible keys the merge on every behaviour-bearing row property, and
+ * the vest paths read tags. An untagged fixture is a row the engine could never
+ * actually hold. */
 const VEST: InventoryItem = {
-  id: 'vest_worn_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1,
+  id: 'vest_worn_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1, tags: [],
 };
 const SPARE_VEST: InventoryItem = {
-  id: 'vest_spare_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1,
+  id: 'vest_spare_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1, tags: [],
 };
-const ROPE: InventoryItem = { id: 'rope_1', name: 'Rope', kind: 'misc', quantity: 3 };
+const ROPE: InventoryItem = { id: 'rope_1', name: 'Rope', kind: 'misc', quantity: 3, tags: [] };
 
 const stall = (): VendorInstance => ({
   id: 'roadside_honest_test', name: 'Duvo Saltbeard', title: 'roadside trader',
@@ -222,8 +226,14 @@ describe('OTA-1874 §B - the adoption', () => {
     expect(s.worldMemory.releasedDogs).toEqual([
       { id: expect.any(String), name: 'Rocky', breed: 'mutt', releasedAtHour: 412 },
     ]);
-    // ⚠ RELEASED IS NOT DEAD. The Fallen lifecycle is untouched by this write.
-    expect(s.worldMemory.fallenDogs ?? []).toEqual([]);
+    /* ⚠ RELEASED IS NOT DEAD, and the claim is now asked of a field that
+     *  EXISTS. `worldMemory.fallenDogs` is not on WorldMemory — the optional
+     *  chain made this assertion vacuously true against a typo, which is the
+     *  shape of test this package has already had to widen twice. The real
+     *  record of a release is `releasedDogs`; a release writes there and the
+     *  dog's own status is what says whether it died. */
+    expect((s.worldMemory.releasedDogs ?? []).length).toBe(1);
+    expect(s.player!.dog ?? null).toBeNull();
     // the naming card is open, carrying the sheet that was on the shelf
     const pend = s.worldMemory.pendingDogOnboarding!;
     expect(pend.stage).toBe('breed');

@@ -90,7 +90,29 @@ jest.mock('expo-updates', () => ({}));
 import React from 'react';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { act, create, type ReactTestRenderer, type ReactTestInstance } from 'react-test-renderer';
+/* ⚠ `react-test-renderer` SHIPS NO BUNDLED TYPES IN THIS TREE, and adding
+ * @types just to satisfy one import would put a dependency in package.json for
+ * a test-only concern. The require is typed locally instead — narrowly, to the
+ * surface this suite actually touches — so the test-typecheck ratchet stays at
+ * baseline rather than growing to buy a convenience. This is the pattern
+ * ota1233 / ota1236 / ota1243 / ota1836 already use, for the same reason. */
+interface ReactTestInstance {
+  readonly props: Record<string, any>;
+  readonly children: ReadonlyArray<ReactTestInstance | string>;
+  findAll(fn: (n: ReactTestInstance) => boolean, opts?: { deep?: boolean }): ReactTestInstance[];
+}
+interface ReactTestRenderer {
+  readonly root: ReactTestInstance;
+  unmount(): void;
+  toJSON(): unknown;
+}
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const RTR = require('react-test-renderer') as {
+  act(cb: () => void): void;
+  create(el: React.ReactElement): ReactTestRenderer;
+};
+const act = RTR.act;
+const create = RTR.create;
 import { useGameStore, withReplacementDogOffer } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { createDogCompanion } from '../app/engine/dogCompanion';
@@ -104,8 +126,8 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 const flush = (): Promise<unknown> => new Promise((r) => setTimeout(r, 0));
 jest.setTimeout(240000);
 
-const VEST: InventoryItem = { id: 'vest_worn_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1 };
-const SPARE: InventoryItem = { id: 'vest_spare_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1 };
+const VEST: InventoryItem = { id: 'vest_worn_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1, tags: [] };
+const SPARE: InventoryItem = { id: 'vest_spare_1', name: 'Padded Dog Vest', kind: 'dog_armor', quantity: 1, tags: [] };
 
 /* ─────────────────────────── harness ─────────────────────────── */
 
@@ -140,8 +162,8 @@ function allText(node: ReactTestInstance | ReactTestRenderer): string {
  *  matches the scrim and silently cancels. */
 function pressables(r: ReactTestRenderer): ReactTestInstance[] {
   return r.root
-    .findAll((n) => typeof n.props?.onPress === 'function' && !n.props?.disabled, { deep: true })
-    .sort((a, b) => allText(a).trim().length - allText(b).trim().length);
+    .findAll((n: ReactTestInstance) => typeof n.props?.onPress === 'function' && !n.props?.disabled, { deep: true })
+    .sort((a: ReactTestInstance, b: ReactTestInstance) => allText(a).trim().length - allText(b).trim().length);
 }
 function pressText(r: ReactTestRenderer, needle: string): void {
   const hit = pressables(r).find((n) => allText(n).toUpperCase().includes(needle.toUpperCase()));
@@ -263,7 +285,7 @@ describe('OTA-1874 §G - the card prints four numbers, not an abstraction', () =
     const st = useGameStore.getState();
     const legacy = { ...st.player!.dog! } as Record<string, unknown>;
     delete legacy.potential;
-    useGameStore.setState({ player: { ...st.player!, dog: legacy } as PlayerCharacter });
+    useGameStore.setState({ player: { ...st.player!, dog: legacy } as unknown as PlayerCharacter });
     const rowsL = comparisonRows(useGameStore.getState().player!.dog, fixedProspect());
     for (const row of rowsL) {
       expect(row.current!.max).toBe(DC.dogStatCeiling(useGameStore.getState().player!.dog!, row.stat));
