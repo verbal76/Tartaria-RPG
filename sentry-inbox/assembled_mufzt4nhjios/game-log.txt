@@ -2103,3 +2103,79 @@ Amulets & Rings (13)
 [2026-09-09T04:55:32.555Z] [debug] dice⏱ coating2: shown +406ms, tapped +452ms, settled +833ms = 1691ms
 [2026-09-09T04:55:31.721Z] [debug] ui: tap "roll" ⏱+17ms
 [2026-09-09T04:55:30.857Z] [debug] dice⏱ coating: shown +406ms, tapped +658ms, settled +833ms = 1897ms
+[2026-09-09T04:55:30.023Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T04:55:28.955Z] [debug] dice⏱ damage: shown +407ms, tapped +407ms, settled +836ms = 1650ms
+[2026-09-09T04:55:28.119Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-09T04:55:27.303Z] [debug] dice⏱ attack: shown +392ms, tapped +460ms, settled +833ms = 1685ms
+[2026-09-09T04:55:26.470Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-09T04:55:25.618Z] [debug] dice⏱ initiative: shown +528ms, tapped +1301ms, settled +829ms = 2658ms
+[2026-09-09T04:55:24.788Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-09T04:55:23.487Z] [debug] render⏱ 362ms after engine-done · feed 500
+[2026-09-09T04:55:23.043Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T04:55:23.042Z] [world] You bring the acid-etched corrupted auralite talon to bear on Conspiracy Architects Raider 1.
+[2026-09-09T04:55:22.791Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-09T04:55:22.707Z] [combat] Conspiracy Architects Raider 1 blackens — corruption eats 1. (5/18 HP, 2 turns left)
+[2026-09-09T04:55:22.707Z] [combat] Conspiracy Architects Raider 1 smokes — acid eats 4. (6/18 HP, 2 turns left)
+[2026-09-09T04:55:22.621Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=2
+[2026-09-09T04:55:22.621Z] [player] attack with the auralite talon
+[2026-09-09T04:55:22.403Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+19ms
+[2026-09-09T04:55:16.297Z] [combat] Conspiracy Architects Raider 3 deals 2 bludgeoning damage [edge of reach — halved]. You have 45 HP remaining.
+[2026-09-09T04:55:15.700Z] [combat] Acid-Etched Corrupted Auralite Talon — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-09T04:55:15.700Z] [combat] Acid-Etched Corrupted Auralite Talon — 4 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-09T04:55:15.700Z] [combat] Conspiracy Architects Raider 1 takes 8 with the acid-etched corrupted auralite talon. It reels: 10 left. Then it fights back.
+[2026-09-09T04:55:15.693Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, ×0.5 for 8)
+[2026-09-09T04:55:15.693Z] [combat] You — d20 → 9 + INT 16 = 25 vs Conspiracy Architects Raider 1 AC 12 — ✓ HIT
+[2026-09-09T04:55:15.692Z] [combat] Conspiracy Architects Raider 4 and 1 other close the distance.
+[2026-09-09T04:55:15.692Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 3 takes 1 bludgeoning. (20 HP left)
+[2026-09-09T04:55:15.690Z] [combat] Conspiracy Architects Raider 3 — d20 → 19 + ATK 9 = 28 vs your AC 24 — ✓ HIT
+[2026-09-09T04:55:15.687Z] [combat] Rust takes 3. (1/17 HP left)
+[2026-09-09T04:55:15.686Z] [combat] Conspiracy Architects Raider 2 turns on Rust — d20 8 + ATK 8 = 16 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T04:55:15.686Z] [combat] Conspiracy Architects Raider 1 — d20 → 3 + ATK 8 = 11 vs your AC 24 — ✗ MISS
+[2026-09-09T04:55:15.682Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.
+[2026-09-09T04:55:15.634Z] [debug] dice⏱ coating2: shown +406ms, tapped +476ms, settled +834ms = 1716ms
+[2026-09-09T04:55:14.800Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-09T04:55:13.917Z] [debug] dice⏱ coating: shown +415ms, tapped +466ms, settled +833ms = 1714ms
+[2026-09-09T04:55:13.084Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-09T04:55:12.201Z] [debug] dice⏱ damage: shown +405ms, tapped +458ms, settled +835ms = 1698ms
+[2026-09-09T04:55:11.366Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-09T04:55:10.500Z] [debug] dice⏱ attack: shown +402ms, tapped +514ms, settled +832ms = 1748ms
+[2026-09-09T04:55:09.668Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-09T04:55:08.751Z] [debug] dice⏱ initiative: shown +528ms, tapped +1399ms, settled +835ms = 2762ms
+[2026-09-09T04:55:07.915Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-09T04:55:06.516Z] [debug] render⏱ 364ms after engine-done · feed 500
+[2026-09-09T04:55:06.070Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T04:55:06.070Z] [world] You bring the acid-etched corrupted auralite talon to bear on Conspiracy Architects Raider 1.
+[2026-09-09T04:55:05.821Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-09T04:55:05.655Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=2
+[2026-09-09T04:55:05.654Z] [player] attack with the auralite talon
+[2026-09-09T04:55:05.551Z] [system] dodging (parry) fades.
+[2026-09-09T04:55:05.348Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+17ms
+[2026-09-09T04:55:02.698Z] [debug] render⏱ 544ms after engine-done · feed 500
+[2026-09-09T04:55:02.070Z] [system] ⏳ Time passed: 6 min
+[2026-09-09T04:55:02.070Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-09T04:55:02.070Z] [debug] arbiter: template (reason=combat)
+[2026-09-09T04:55:02.069Z] [combat] Conspiracy Architects Raider 5 and 2 others close the distance.
+[2026-09-09T04:55:01.986Z] [combat] Rust takes 7. (4/17 HP left)
+[2026-09-09T04:55:01.903Z] [combat] Conspiracy Architects Raider 2 turns on Rust — d20 18 + ATK 8 = 26 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T04:55:01.903Z] [combat] Rust takes 6. (11/17 HP left)
+[2026-09-09T04:55:01.819Z] [combat] Conspiracy Architects Raider 1 turns on Rust — d20 12 + ATK 8 = 20 vs Rust's AC 9 — ✓ HIT
+[2026-09-09T04:55:01.734Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-09T04:55:01.645Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-09T04:55:01.645Z] [player] dodge
+[2026-09-09T04:55:01.516Z] [debug] ui: tap "dodge" ⏱+20ms
+[2026-09-09T04:54:50.213Z] [debug] ui: tap "rust (17/17)" ⏱+195ms
+[2026-09-09T04:54:49.325Z] [cognitive] REST  (1025ms)
+[2026-09-09T04:54:48.527Z] [debug] render⏱ 659ms after engine-done · feed 500
+[2026-09-09T04:54:47.868Z] [arbiter] "The Conspiracy Architects do not forgive a friend of the Forgotten Order," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-09T04:54:47.867Z] [world] A Conspiracy Architects war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Forgotten Order.
+[2026-09-09T04:54:47.676Z] [system] ⏳ Time passed: 8h
+[2026-09-09T04:54:47.675Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T04:54:47.675Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-09T04:54:47.674Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 75, morning)
+[2026-09-09T04:54:47.674Z] [world] Rust tests three spots and settles on the one nearest your boot.
+[2026-09-09T04:54:47.672Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-09T04:54:47.670Z] [player] rest
+[2026-09-09T04:54:47.658Z] [debug] ui: tap "rest" ⏱+24ms
+[2026-09-09T04:54:46.941Z] [cognitive] REST  (240ms)
+[2026-09-09T04:54:46.509Z] [system] ⏳ Time passed: 8h
+[2026-09-09T04:54:46.508Z] [debug] arbiter: ambient held (he just spoke)
