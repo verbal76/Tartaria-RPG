@@ -31655,7 +31655,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * when the layout grows back — the commonest way height returns is the keyboard
  * dismissing, and being thrown out of the page mid-sentence is worse than staying.
  * No physical-device verification. */
-export const OTA_BUILD_ID = '2026-09-24-1878-the-transcript-keeps-a-door';
+/* OTA-1879 — THE ROLL LEAVES ROOM TO READ (#210, combat-roll proportionality).
+ *
+ * The owner watched a fight on a large, tall phone and the combat-roll surface
+ * still pressed the transcript off the screen. His objective is a conservation
+ * order, not a redesign: SAME LOOK · SAME INFORMATION · SAME INTERACTION ·
+ * SMALLER FOOTPRINT. Option A approved; Option B (re-composing the card) was
+ * explicitly NOT approved and is not done here.
+ *
+ * ⚠⚠⚠ THE FORENSICS FOUND NO GROWTH TO REMOVE, and that is the finding.
+ * DiceRoller reads no window, no device and no scale — `useUiScale` clamps to 1
+ * at width >= 390, so a wide phone gets neither capping nor vertical relief —
+ * which means the panel is the SAME height on a 4.7" screen and a 6.8" one. It
+ * was simply ~368pt at the post-roll peak, of which ~112pt (30%) was AIR: the
+ * container's 14pt padding nested inside the card's own 14pt padding, five 8pt
+ * gaps, and four small margins doubling gaps they already sat beside. The
+ * transcript is the only flexible region on that screen (OTA-179), so it paid
+ * for every one of those pixels.
+ *
+ * ⚠⚠ SO THIS IS SPACING AND NOTHING ELSE. Every font size, weight,
+ * letter-spacing, colour, border, radius, word, element, handler and timing is
+ * exactly what shipped; no row was merged and nothing was removed. Measured on
+ * one line-box model with the LIVE font sizes, so both sides of the comparison
+ * differ only in spacing:
+ *
+ *     attack post-roll (the peak)   366.6 -> 326.6   -40.0pt  -10.9%
+ *     attack pre-roll               277.3 -> 240.3   -37.0pt
+ *     damage pre-roll               275.8 -> 231.8   -44.0pt
+ *     damage post-roll              343.7 -> 306.7   -37.0pt
+ *
+ * ⚠ TWO SMALLER GEOMETRY FACTS, BOTH FIXED HERE. OTA-255's `advancingHint`
+ * claims in its own comment to take the ROLL button's footprint and did not —
+ * 39.6 against 48.8, so the panel JUMPED every time dice landed. The button came
+ * down to the hint (40.8, within 1.2pt) rather than the hint rising, because the
+ * hint belongs to the post-roll state and that is the peak. The ROLL face is
+ * therefore ~41pt, so the TOUCH target is restored with a hitSlop instead of
+ * with pixels. And `card.minHeight` was 80 against a sparsest-pre-roll content
+ * box of ~29pt; it is now 64, derived from that state and documented at the
+ * style, still leaving the notation ~13pt of clearance beyond the padding.
+ *
+ * NOT CLAIMED: physical visual acceptance on the owner's hardware. The geometry
+ * contract is proven by test; how it LOOKS on the Pixel is the owner's call. */
+export const OTA_BUILD_ID = '2026-09-24-1879-the-roll-leaves-room-to-read';
+// SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
 // SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'
 // SUPERSEDED: '2026-09-24-1876-the-ending-is-not-a-receipt'
 // SUPERSEDED: '2026-09-24-1875-the-list-gets-its-scroll-back'

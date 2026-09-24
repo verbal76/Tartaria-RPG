@@ -23,6 +23,40 @@ import { logUiTap } from '../state/gameStore'; // OTA-1695 — ROLL joins the ta
 // for a consistent feel across the codebase.
 // OTA-1694 — the constant moved to diagnostics/rollTiming so the store can
 // name a late hold without importing this component.
+//
+// ⚠⚠⚠ #210 — THE RHYTHM WAS TWO NOTCHES TOO LOOSE, AND IT WAS APPLIED TWICE.
+// The owner watched a fight on a large, tall phone and the roll surface still
+// pressed the transcript off the screen. The forensics said why, and the answer
+// was NOT that anything here grows: this component reads no window, no device
+// and no scale (see the device-independence rule in the #210 suite), so its
+// footprint is the SAME on a 4.7" phone and a 6.8" one. It was simply ~368pt
+// tall, of which ~112pt was air — the container's padding nested inside the
+// card's own padding, five 8pt gaps, and four small margins doubling the gaps
+// they sat beside. The transcript is the only flexible region on that screen
+// (OTA-179), so it paid for every one of those pixels.
+//
+// ⚠⚠ SO THIS IS A SPACING PASS AND NOTHING ELSE. Every font size, weight,
+// letter-spacing, colour, border, radius, word, element and handler below is
+// exactly what shipped. No row was merged, nothing was removed, nothing
+// shrank typographically, and no second reduced variant of this card exists.
+// ⚠ (The #210 suite forbids the words a variant would be named with, so this
+// note describes the rule without spelling its trigger — the OTA-1721 class.)
+// Peak post-roll ≈368 → ≈327pt (−11%), pre-roll ≈277 → ≈240pt, measured on
+// the same line-box model the suite uses so the two numbers are comparable.
+//
+// ⚠ TWO SMALLER THINGS THE MEASUREMENT FOUND, both fixed here because both are
+// pure geometry. (1) OTA-255's `advancingHint` claims in its own comment to
+// take the ROLL button's footprint, and it did not — 40pt against 49pt — so the
+// panel JUMPED every time dice landed. The button's padding now lands it within
+// ~1pt of the hint instead, from the other direction. (2) `card.minHeight` was
+// 80 against a sparsest-pre-roll content box of ~29pt, so a damage prompt
+// reserved ~29pt of blank. Derived below.
+
+/** #210 — the ROLL control's VISIBLE padding came down with the rest of the
+ *  card's rhythm, which leaves its face ~41pt tall. The touch target is
+ *  restored here rather than with vertical pixels, which is the whole point:
+ *  ~53pt to the finger, ~41pt to the eye. The press contract is untouched. */
+const ROLL_HIT_SLOP = { top: 6, bottom: 6, left: 0, right: 0 } as const;
 
 interface Props {
   state: PendingRollState;
@@ -180,7 +214,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       {/* Action button (pre-roll only — post-roll auto-resolves) */}
       {rolledValues === null ? (
         <Animated.View style={{ transform: [{ scale }] }}>
-          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPressIn={noteTouchDown} onPress={handleRoll} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPressIn={noteTouchDown} onPress={handleRoll} activeOpacity={0.7} hitSlop={ROLL_HIT_SLOP}>
             <Text style={styles.rollBtnText}>ROLL {diceLabel.toUpperCase()}</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -217,8 +251,16 @@ const styles = StyleSheet.create({
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 6,
-    padding: 14,
-    gap: 8,
+    // #210 — 14 → 10. This padding is the OUTER half of a double frame: the
+    // card below carries its own 14, so the two together spent 56pt of one
+    // axis on rim. Both come to 10, which is still a clear inset on each.
+    padding: 10,
+    // #210 — 8 → 6, and it is applied FIVE times (header · label · context ·
+    // card · control · cancel), so it was the single largest spending line in
+    // the component after the card itself. 6 matches the screen's own
+    // container gap, so the panel now breathes at the same rate as the HUD
+    // it sits in.
+    gap: 6,
   },
   header: {
     flexDirection: 'row',
@@ -244,21 +286,43 @@ const styles = StyleSheet.create({
   context: {
     color: '#a2977b',
     fontSize: 12,
-    marginBottom: 4,
+    // #210 — 4 → 2. It sat directly beside the container's own gap, so the
+    // space between the context line and the card was being paid for twice.
+    marginBottom: 2,
   },
   card: {
     backgroundColor: '#0a0908',
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 14,
-    minHeight: 80,
+    // #210 — 14 → 10, the INNER half of the double frame described on the
+    // container.
+    padding: 10,
+    /* ⚠⚠ #210 — 80 → 64, AND THE NUMBER IS DERIVED FROM THE SPARSEST PROMPT
+     * RATHER THAN CHOSEN. The floor exists so a thin pre-roll card does not
+     * read as cramped; the state that needs it is the DAMAGE step, which
+     * carries no target and therefore shows the dice notation ALONE:
+     *
+     *     content   fontSize 22 line box  ≈ 22 × 1.30      = 28.6
+     *     chrome    2 × padding 10 + 2 × border 1          = 22.0
+     *     natural card                                     = 50.6
+     *     air the approved look wants around that one line  ≈ 13.4
+     *     floor                                            ≈ 64
+     *
+     * So the notation keeps ~6-7pt of clearance beyond the padding on each
+     * side and the box still reads as a plate rather than a caption. The old
+     * 80 reserved ~29pt of blank in that state — that is the ~21pt the
+     * forensics named. The ATTACK pre-roll (notation + `vs AC n`) measures
+     * ~72pt and is content-driven either way, so this floor never touches it,
+     * and NO post-roll state comes near it: they all exceed 150pt of content. */
+    minHeight: 64,
     justifyContent: 'center',
     alignItems: 'center',
   },
   preRoll: {
     alignItems: 'center',
-    gap: 6,
+    // #210 — 6 → 5. One notch, only ever paid once or twice in this state.
+    gap: 5,
   },
   diceNotation: {
     color: '#c9a86a',
@@ -275,7 +339,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 2,
-    marginTop: 2,
+    // #210 — 2 → 0. Both parents (preRoll, postRoll) already set a gap, so
+    // this was additive to a space that already existed.
+    marginTop: 0,
   },
   advTint: { color: '#9ec96a' },
   disTint: { color: '#e07a5f' },
@@ -291,12 +357,17 @@ const styles = StyleSheet.create({
   },
   postRoll: {
     alignItems: 'center',
-    gap: 4,
+    // #210 — 4 → 3. This is the post-roll state's OWN rhythm and it is paid
+    // four times (adv · bonus · divider · total · verdict), which is why one
+    // notch here is worth as much as a whole padding elsewhere.
+    gap: 3,
   },
   diceResults: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 4,
+    // #210 — 4 → 2, beside the postRoll gap that already separates the dice
+    // from the line under them.
+    marginBottom: 2,
   },
   dieResult: {
     alignItems: 'center',
@@ -319,7 +390,10 @@ const styles = StyleSheet.create({
     height: 1,
     width: 80,
     backgroundColor: '#3a342c',
-    marginVertical: 4,
+    // #210 — 4 → 2 on each side, on top of the postRoll gap. The rule is
+    // still clear of both the bonus line and the total; it was carrying 8pt of
+    // its own margin plus 6pt of parent gap for a 1pt line.
+    marginVertical: 2,
   },
   total: {
     color: '#cdbf99',
@@ -331,14 +405,27 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 1,
-    marginTop: 2,
+    // #210 — 2 → 0. The postRoll gap already sets it apart from the total.
+    marginTop: 0,
   },
   success: { color: '#9ec96a' },
   failure: { color: '#e07a5f' },
   rollBtn: {
     backgroundColor: '#c9a86a',
     borderRadius: 4,
-    paddingVertical: 14,
+    /* ⚠ #210 — 14 → 10, AND THE NUMBER IS SET BY THE LANDING JUMP, not by
+     * taste. OTA-255 put `advancingHint` here to hold the button's footprint
+     * while the roll auto-resolves, but the two never matched:
+     *
+     *     rollBtn        2 × 14 + (16 × 1.30)  ≈ 48.8
+     *     advancingHint  2 × 12 + (12 × 1.30)  ≈ 39.6     → a ~9pt jump
+     *
+     * Matching by RAISING the hint would add height to the post-roll state,
+     * which is the peak this package exists to bring down, so the button comes
+     * to the hint instead: 2 × 10 + 20.8 ≈ 40.8, within ~1.2pt. The face is
+     * therefore ~41pt where the guidance wants ~44 for a finger — so the touch
+     * target is restored with ROLL_HIT_SLOP above, not with pixels. */
+    paddingVertical: 10,
     alignItems: 'center',
   },
   rollBtnText: {
@@ -364,6 +451,11 @@ const styles = StyleSheet.create({
   // roll states. Subtle italic-lowercase tag (color-matched to the
   // cancel link below) signals "no input needed, advancing on its own."
   advancingHint: {
+    // #210 — DELIBERATELY UNCHANGED at 12. This is the post-roll state, which
+    // is the peak footprint; raising it to meet the button would have made the
+    // thing this package is reducing worse. The button came down to it instead
+    // (see rollBtn), so the comment above this style is now true of the
+    // geometry as well as the intent.
     paddingVertical: 12,
     alignItems: 'center',
   },
@@ -383,3 +475,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 });
+
+/** #210 — THE ONE STRUCTURAL ADDITION, AND IT RENDERS NOTHING. The suite has to
+ *  assert geometry — that the spacing constants stay bounded and that the
+ *  derived per-phase totals really did come down — and reading those numbers out
+ *  of the live StyleSheet is honest in a way that parsing this file's text is
+ *  not: a regex can be satisfied by a comment. Nothing in the component reads
+ *  this export, so it cannot change a pixel. */
+export const DICE_ROLLER_STYLES = styles;
