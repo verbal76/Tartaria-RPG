@@ -1,0 +1,392 @@
+{
+  "id": "323a1be20b2e4d72896b22c60576afeb",
+  "groupID": "7690450029",
+  "eventID": "323a1be20b2e4d72896b22c60576afeb",
+  "projectID": "4511945117532160",
+  "size": 5933,
+  "entries": [
+    {
+      "data": {
+        "values": [
+          {
+            "type": "TypeError",
+            "value": "Network request failed",
+            "mechanism": {
+              "type": "onunhandledrejection",
+              "handled": true
+            },
+            "threadId": null,
+            "module": null,
+            "stacktrace": {
+              "frames": [
+                {
+                  "filename": "app:///main.jsbundle",
+                  "absPath": "app:///main.jsbundle",
+                  "module": "main",
+                  "package": null,
+                  "platform": null,
+                  "instructionAddr": null,
+                  "symbolAddr": null,
+                  "function": "anonymous",
+                  "rawFunction": null,
+                  "symbol": null,
+                  "context": [],
+                  "lineNo": 1,
+                  "colNo": 444966,
+                  "parentIndex": null,
+                  "sampleCount": null,
+                  "inApp": true,
+                  "trust": null,
+                  "errors": null,
+                  "lock": null,
+                  "sourceLink": null,
+                  "vars": null
+                }
+              ],
+              "framesOmitted": null,
+              "registers": null,
+              "hasSystemFrames": true
+            },
+            "rawStacktrace": {
+              "frames": [
+                {
+                  "filename": "app:///main.jsbundle",
+                  "absPath": "app:///main.jsbundle",
+                  "module": null,
+                  "package": null,
+                  "platform": null,
+                  "instructionAddr": null,
+                  "symbolAddr": null,
+                  "function": "anonymous",
+                  "rawFunction": null,
+                  "symbol": null,
+                  "context": [],
+                  "lineNo": 1,
+                  "colNo": 444966,
+                  "parentIndex": null,
+                  "sampleCount": null,
+                  "inApp": true,
+                  "trust": null,
+                  "errors": null,
+                  "lock": null,
+                  "sourceLink": null,
+                  "vars": null
+                }
+              ],
+              "framesOmitted": null,
+              "registers": null,
+              "hasSystemFrames": true
+            },
+            "rawValue": null,
+            "rawModule": null,
+            "rawType": null
+          }
+        ],
+        "hasSystemFrames": true,
+        "excOmitted": null
+      },
+      "type": "exception"
+    }
+  ],
+  "dist": "2026-09-24-1877-the-hunt-reads-its-last-beat",
+  "message": "",
+  "title": "TypeError: Network request failed",
+  "location": "app:///main.jsbundle",
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "East Bridgewater",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T19:35:19Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 66699264,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 95.0,
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 133054464,
+      "usable_memory": 3531751424,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 57.572916,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d310-1075-74bb-88c8-4e27638142f9"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": false,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ebf2a6083375486289fc31ac9db11263",
+      "span_id": "835cfcc7b21c66d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "error",
+  "metadata": {
+    "filename": "app:///main.jsbundle",
+    "function": "anonymous",
+    "in_app_frame_mix": "in-app-only",
+    "synthetic": false,
+    "type": "TypeError",
+    "value": "Network request failed"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1877-the-hunt-reads-its-last-beat"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "handled",
+      "value": "yes"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "exception"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "mechanism",
+      "value": "onunhandledrejection"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1877-the-hunt-reads-its-last-beat"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T19:37:08.899487Z",
+  "errors": [
+    {
+      "type": "js_no_source",
+      "message": "Source code was not found",
+      "data": {
+        "symbolicator_type": "missing_source",
+        "url": "app:///main.jsbundle"
+      }
+    }
+  ],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "anonymous(main)",
+  "dateCreated": "2026-09-24T19:35:19.535000Z",
+  "fingerprints": [
+    "355a0976fea288b97f9e47c4089b376f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1989873588,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-24T05:32:04.639988Z",
+    "dateReleased": "2026-09-24T10:57:26.481883Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ead0d901ddd8f5d59cda9041b9384abf18a2aa97",
+      "message": "OTA-1877 \u2014 the hunt reads its last beat\n\nA hunt can now carry an authored trailing `checkKind: null` beat behind its\nfinal boss, and the player will actually read it. ENGINE SUPPORT ONLY \u2014 not one\nline of hunt prose is written here, and no hunt data file has a diff.\n\nNOTHING SHIPPED CHANGES, AND THE SUITE PINS WHY. All 18 hunts end ON their final\nboss (13 standard_7 at index 6, 5 bait_switch_5 at index 4) and zero carry a\ntrailing beat, so `lastBoss + 1` and `stages.length` are the same number for\nevery one of them and the new loop body never runs. This is a capability, not a\nfix to live content.\n\nTHE DEFECT WAS PROVEN THROUGH THE REAL DEFEAT PATH, not by calling a helper.\n`advanceHunt` has consumed AND READ OUT trailing null stages since OTA-1219, but\nthe final boss FREEZES for the kill (OTA-796), so the last stage never reaches\n`advanceHunt`. The defeat credit is the only way out of it, and it wrote\n`stage: stages.length` outright. On a fixture shaped boss -> beat, a real\n`resolveEnemyDefeat` measured stage 0 -> 2 with the beat NEVER logged, the hunt\nturn-in-eligible immediately, and the skip surviving a persist. There was no\nrecovery path afterwards: the stage that would have read the beat is already\nbehind the record.\n\nONE SEMANTIC OWNER, NOT A SECOND COPY. `readOutTrailingHuntBeats` is OTA-1219's\nloop extracted into `questSlice`; `advanceHunt` delegates to it from\n`record.stage + 1` and the defeat credit calls it from the FINAL BOSS INDEX + 1.\nIt is deliberately NOT `nextActionableStage`, which computes an index and\nknows nothing about the log \u2014 the contract is that the beat is READ OUT exactly\nonce, so the owner has to be the thing that both advances and narrates. That\nhelper's own header (OTA-1583) named this class already and repaired the escort\nclear; this is the sibling kill path left behind.\n\nTHE BOUNDARY IS CROSSED ONCE, AND BOTH EDGES ARE LOAD-BEARING. `rec.stage >=\nlastBoss` becomes the window `>= lastBoss && <= lastBoss + 1`. The old open form\nwas harmless while the credit only rewrote `stages.length` over itself \u2014 a second\nkill of a respawned target re-logged the close line and nothing else \u2014 but a\ncredit that READS a beat would read it again, hence the new upper edge. The lower\nedge is OTA-426's rule kept exactly: several hunts carry a MID-hunt boss stage\nthat spawns the same scaled target, and killing it there must not complete the\nhunt and skip the back half. Narrowing to `=== lastBoss` was tried and was WRONG\n\u2014 caught by OTA-426's own suite, which says so in as many words: `advanceHunt(6)\nlands the record at stage 7`. So the guard reasons from progression rather than\nfrom whether an epilogue exists: with no trailing beat a re-kill still only\nre-logs a line, and consuming a beat puts the record PAST the window so it can\nnever be read twice.\n\nNO ECONOMY CHANGE, and the forensics are why rather than the intent. The kill\npays nothing \u2014 it logs \"return to a posting agent\"; `turnInHunt` pays, gated on\n`if (record.stage < candidate.stages.length) refuse`. So `stage` is the turn-in\nELIGIBILITY gate and the bounty is the turn-in's alone. Measured at the kill on\na 780-bounty fixture: TC 100 -> 110, which is ordinary spoils, not the bounty.\n`turnInHunt` is untouched, as are rewards, spawns, enemy stats, travel, native\ncode, DISPLAY_VERSION and runtimeVersion.\n\nPERSISTENCE, STATED EXACTLY AND NOT ONE WORD FURTHER. The walked stage lives on\n`player.activeHunts`, which is in the save payload \u2014 the field the turn-in gate\nreads and the field that stops the boundary being re-credited. What the test\nproves is narrower: the record still carries the walked stage across a\n`persist()` call, which is not a storage round-trip. NARRATION PERSISTENCE IS NOT\nCLAIMED \u2014 `gameLog` appears zero times in the save system, so a read-out beat is\ntransient by construction. That is the existing contract; this change neither\nalters it nor pretends otherwise.\n\nTHREE NEGATIVE CONTROLS, none committed. NC1 (restore the jump AND remove the\nread-out call) 4 red including the one-beat case \u2014 the first attempt replaced\nonly the written stage, left the call in place, and went 1 red, which is exactly\nwhy the control had to remove the call. NC2 (guard open again) red on the\nduplicate case. NC3 (arithmetic correct, narration removed) 4 red \u2014 the proof\nthat this suite tests READ-OUT and not index maths.\n\n  ota1877TheHuntReadsItsLastBeat   9/9 \u2014 corpus invariant, one beat read once,\n                                   shipped shape unchanged, duplicate defeat\n                                   inert, two beats in order, stop at the first\n                                   actionable stage, no bogus travel armed,\n                                   bounty not paid at the kill, progression\n                                   survives a persist\n  hunt + epilogue neighbours       5 suites, 115/115\n  fast surface                     1376/1376 suites \u00b7 16,027 passed \u00b7 3 skipped\n  typecheck:ci                     exit 0\n  typecheck:tests                  OK \u2014 at baseline (196), no growth\n  lint                             clean\n  check gates                      22/22\n\nThe new suite's player fixture spreads OTA-1484's `placedAt` rather than writing\na bare `currentLocationId`, so the shrink-only ratchet holds at 54 and the\n\"ground does not move\" assertion is measuring the engine and not a lucky frame.\n\nNOT CLAIMED. The 18 hunt ending texts are a separate content package and are not\nbegun here. No physical-device verification.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T05:25:03Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1877-the-hunt-reads-its-last-beat",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1877-the-hunt-reads-its-last-beat",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T10:57:26.481883Z",
+          "dateCreated": "2026-09-24T05:32:04.639988Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161543593",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T10:57:26.859070Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1877-the-hunt-reads-its-last-beat",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1877-the-hunt-reads-its-last-beat",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1877-the-hunt-reads-its-last-beat",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1877-the-hunt-reads-its-last-beat)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4bf57a02a3074dd681f347d5754cc267",
+  "previousEventID": "00bf71e7340348b58039557e1b9a60c3"
+}
