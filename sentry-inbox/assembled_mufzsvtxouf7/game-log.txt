@@ -1,0 +1,782 @@
+Bug Report — Cheddar Bob · (2026-09-24-1880-the-constraint-teaches-its-door) · More rendered hooks?
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-24T20:36:47.009Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Asgardar
+HP: 40/47
+
+--- DESCRIPTION ---
+More rendered hooks?
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-24T20:36:46.879Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 476
+  AAB: (build 476)
+  OTA: (2026-09-24-1880-the-constraint-teaches-its-door)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-24T20:36:25.713Z
+  Last init success: 2026-09-24T20:36:26.292Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmufzsf4kcs · started 2026-09-24T20:36:25.364Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 3 fatal (newest last)
+  ⚠⚠ 2 of 3 process kills landed on an OTA-apply boot
+  • 2026-09-13T23:38:11.705Z (15659m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage boot:idle:awaiting-first-action
+      Process reclaimed while idle on the title screen — no game was in progress (9s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: boot:idle:awaiting-first-action · 807ms into the action · alive 8005ms after it
+      launch: died 8893ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-14T00:23:34.481Z (15613m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (23s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 2949ms into the action · alive 0ms after it
+      launch: died 22707ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-16T21:08:23.255Z (11488m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage native:cognition:done
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room iskan_veil · screen exploration
+      last checkpoint: native:cognition:done [q0] · 7526ms into the action · alive 2504ms after it
+      launch: died 43179ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 137ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-18T16:41:13.847Z (8876m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1840-the-house-keeps-its-key · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4958ms into the action · alive 0ms after it
+      launch: died 5002ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T20:16:45.657Z (8660m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room samarran · screen lore
+      last checkpoint: appstate:active→background · 70239ms into the action · alive 0ms after it
+      launch: died 94479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 416ms earlier via boot-front
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T21:11:04.127Z (8606m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4984ms into the action · alive 0ms after it
+      launch: died 5069ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-19T13:06:45.292Z (7650m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-19-1847-the-process-says-where-it-was · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded during play — last: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: boot:idle:awaiting-first-action · 795ms into the action · alive 12383ms after it
+      launch: died 13276ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-24T18:53:39.824Z (103m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-24-1879-the-roll-leaves-room-to-read · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded on the title screen — no game was in progress (11s after boot, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: boot:idle:awaiting-first-action · 1081ms into the action · alive 9721ms after it
+      launch: died 10896ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-24T20:36:11.483Z (1m ago) — screen crash (recovered)
+      build 4.32.11 · 2026-09-24-1880-the-constraint-teaches-its-door · stage screen-render
+      Rendered more hooks than during the previous render.
+      
+          at FusionPickerModal (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/b0367c09f617fe9980aebbc91bae361d:1:4243867)
+          at RCTView (<anonymous>)
+          at View (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/b0367c09f617fe9980aebbc91bae361d:1:235116)
+  • 2026-09-24T20:36:24.936Z (0m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-24-1880-the-constraint-teaches-its-door · stage homework-done
+      Process died with no orderly exit while: action "fuse"
+      doing: action "fuse" · room asgardar · screen exploration
+      last checkpoint: homework-done · 8863ms into the action · alive 4717ms after it
+      launch: died 394372ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: action "fuse"
+     Where: asgardar on exploration screen
+     Last seen alive: 2026-09-24T20:36:20.219Z (0 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: homework-done (+8863ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 28MB · last 28MB · net +16MB over 3 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/10 · ctx 0 · app=active · native idle q0 · warns 0
+    +10.0s heap-move — heap 28MB gc 0ms/67 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot:
+  2026-09-24T20:34:01.990Z #1 root p=none exploration
+  2026-09-24T20:34:01.991Z #1 content controls p=none exploration
+  2026-09-24T20:34:01.991Z #1 in quick:plasma thrower 🔥  ⏱+20ms p=none exploration
+  2026-09-24T20:34:02.058Z #1 enter quick:plasma thrower 🔥  p=none exploration
+  2026-09-24T20:34:02.058Z #1 admit quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:02.058Z #1 dispatch quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:02.140Z #1 done quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:05.107Z #2 root p=none exploration
+  2026-09-24T20:34:05.108Z #2 content controls p=none exploration
+  2026-09-24T20:34:06.992Z #3 root p=none exploration
+  2026-09-24T20:34:06.992Z #3 content controls p=none exploration
+  2026-09-24T20:34:08.561Z #4 root p=none exploration
+  2026-09-24T20:34:08.562Z #4 content controls p=none exploration
+  2026-09-24T20:34:12.177Z #5 root p=none exploration
+  2026-09-24T20:34:12.177Z #5 content controls p=none exploration
+  2026-09-24T20:34:12.177Z #5 in quick:dodge ⏱+27ms p=none exploration
+  2026-09-24T20:34:12.262Z #5 enter quick:dodge p=none exploration
+  2026-09-24T20:34:12.262Z #5 admit quick:dodge (callback) p=none exploration
+  2026-09-24T20:34:12.263Z #5 dispatch quick:dodge (callback) p=none exploration
+  2026-09-24T20:34:12.323Z #5 done quick:dodge (callback) p=none exploration
+  2026-09-24T20:34:13.861Z #6 root p=none exploration
+  2026-09-24T20:34:13.862Z #6 content controls p=none exploration
+  2026-09-24T20:34:13.862Z #6 in quick:plasma thrower 🔥  ⏱+19ms p=none exploration
+  2026-09-24T20:34:14.012Z #6 enter quick:plasma thrower 🔥  p=none exploration
+  2026-09-24T20:34:14.012Z #6 admit quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:14.013Z #6 dispatch quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:14.091Z #6 done quick:plasma thrower 🔥  (callback) p=none exploration
+  2026-09-24T20:34:14.845Z #7 root p=none exploration
+  2026-09-24T20:34:14.846Z #7 content controls p=none exploration
+  2026-09-24T20:34:16.246Z #8 root p=none exploration
+  2026-09-24T20:34:16.247Z #8 content controls p=none exploration
+  2026-09-24T20:34:17.612Z #9 root p=none exploration
+  2026-09-24T20:34:17.612Z #9 content controls p=none exploration
+  2026-09-24T20:34:20.646Z #10 root p=none exploration
+  2026-09-24T20:34:20.646Z #10 content feed p=none exploration
+  2026-09-24T20:34:26.313Z #11 root p=none exploration
+  2026-09-24T20:34:26.313Z #11 content controls p=none exploration
+  2026-09-24T20:34:26.314Z #11 in quick:pyric wand 🔥 ★ ⏱+27ms p=none exploration
+  2026-09-24T20:34:26.382Z #11 enter quick:pyric wand 🔥 ★ p=none exploration
+  2026-09-24T20:34:26.383Z #11 admit quick:pyric wand 🔥 ★ (callback) p=none exploration
+  2026-09-24T20:34:26.383Z #11 dispatch quick:pyric wand 🔥 ★ (callback) p=none exploration
+  2026-09-24T20:34:26.467Z #11 done quick:pyric wand 🔥 ★ (callback) p=none exploration
+  2026-09-24T20:34:27.169Z #12 root p=none exploration
+  2026-09-24T20:34:27.173Z #12 content controls p=none exploration
+  2026-09-24T20:34:28.514Z #13 root p=none exploration
+  2026-09-24T20:34:28.515Z #13 content controls p=none exploration
+  2026-09-24T20:34:30.133Z #14 root p=none exploration
+  2026-09-24T20:34:30.133Z #14 content controls p=none exploration
+  2026-09-24T20:34:35.033Z #15 root p=none exploration
+  2026-09-24T20:34:47.129Z #16 root p=none exploration
+  2026-09-24T20:36:11.254Z #17 root p=none exploration
+  this boot:
+  2026-09-24T20:36:32.535Z #1 root p=none exploration
+  2026-09-24T20:36:34.187Z #2 root p=none exploration
+  2026-09-24T20:36:36.063Z #3 root p=none exploration
+  2026-09-24T20:36:36.063Z #4 modal p=none exploration
+  2026-09-24T20:36:36.932Z #5 root p=none exploration
+  2026-09-24T20:36:36.933Z #6 modal p=none exploration
+  2026-09-24T20:36:46.776Z #7 root p=none exploration
+  2026-09-24T20:36:46.777Z #8 modal p=none exploration
+  2026-09-24T20:36:46.802Z #8 in report:send ⏱+50ms p=none exploration
+  2026-09-24T20:36:46.876Z #8 enter report:send p=none exploration
+  2026-09-24T20:36:46.877Z #8 admit report:send (described) p=none exploration
+  2026-09-24T20:36:46.877Z #8 dispatch report:send (described) p=none exploration
+  2026-09-24T20:36:46.877Z #8 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cheddar Bob)
+  HP: 40/47  Stamina: 22/23  TC: 2  Corruption: 7
+  Pack: 228 distinct rows / 1556 total
+  Dog: Rust (Mutt) loyalty 100 HP 17/17
+
+Weapons (38)
+  Aether Axe ×3 (Legendary, 2d8 aetheric, dur 59/59, [weapon,melee,two_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Crystal Blade (Uncommon, 1d8 slashing, dur 25/25, [weapon,blade,melee,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, +1d6 cold coat, dur 40/41, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 38/38, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 37/42, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 3/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Charged Bone Siege Crossbow (Uncommon, 2d6 piercing, +1d6 electrical coat, dur 23/26, [weapon,ranged,two_handed,crossbow,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cantor's Tuning Fork (Legendary, dur 50/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 29/29, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 44/44, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 25/26, ♥reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Golem Sledge (Rare, 2d8 bludgeoning, dur 32/32, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 39/39, stolen, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-Iron Greatblade (Rare, 2d8 slashing, dur 30/30, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 31/35, equipped:main, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:off, unequip:main, use(off), repair
+  Pulse-Woven Edge (Legendary, dur 45/45, ♥reserved, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop
+  Pyric Wand (1d6 burn, dur 22/24, equipped:off, [weapon,runecaster])
+    actions: equip:main, unequip:off, use, repair
+  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 33/35, ♥reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Sealwarden Chain (Legendary, dur 60/60, 1d8+3 bludgeoning, unique, [core_guardian_set,aether_born,exotic,reach,bind_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 20/34, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Frost-Rimed Sentinel Cleaver (Rare, 2d8 slashing, +1d6 cold coat, dur 18/25, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Spark-Riven Bolt-Rig (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Sparkstrike Wand (1d6 electrical, dur 44/44, [weapon,runecaster,rune_power,aetheric,electrical])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tooth-Set Warstaff (Uncommon, dur 25/25, 1d8 bludgeoning, resist:poison, unique, [fused,unique,poison])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (20)
+  Aether-Walker's Boots (Uncommon, dur 26/27, equipped:feet, AC +4 · Resists: aetheric, acid (coated), cold (coated) · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet, repair
+  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 · Resists: aetheric · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Anvil-Struck Bulwark (Rare, dur 25/25, ♥reserved, AC+2, resist:degradation, unique, [fused,unique,faction_gear,reclaimers_guild,degradation])
+    actions: equip:head, use, scrap, release-from-fusion, drop
+  Architect's Sight Enhancer (Uncommon, dur 32/35, equipped:head, AC +3 · Resists: cold, cold (coated) · Regen: +1 HP per action · WIS +3 · INT +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: unequip:head, repair
+  Auralite Greaves (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:legs, use, scrap, drop
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Aegis (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Bulwark (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Forge-Black Bulwark (Rare, dur 35/35, AC+3, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 · Resists: slashing, aetheric · INT +3 · INT +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 64/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: unequip:legs, repair
+  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 · Resists: aetheric · CHA +5 · DEX +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Matriarch's Aegis (Legendary, dur 60/60, AC+2, resist:aetheric, unique, [core_guardian_set,aether_born,ac:2,head,will_save])
+    actions: equip:head, use, scrap, drop
+  Mud-glass Scales (Uncommon, dur 47/49, equipped:chest, AC +4 · Resists: piercing, burn (coated) · HP +1 · Regen: +2 stamina per action · Bites back: 1 damage to whatever hits you, in its own element, [armor,chest,scale,mud_glass,true_tartarians])
+    actions: unequip:chest, repair
+  Mudstone Bulwark (Rare, dur 61/61, AC +4 · Resists: bludgeoning, piercing · HP +30 · Bites back: 2 damage to whatever hits you, in its own element, [armor,chest,heavy,stone,mud])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Cloak (dur 10/13, AC +2 · Resists: cold, burn (coated), acid (coated) · DEX +2 · STE +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Relic Hunter's Gauntlets (Uncommon, dur 24/27, AC +4 · Resists: slashing, cold (coated), burn (coated) · DEX +4 · STR +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, repair, drop
+  Sealwarden Vest (Legendary, dur 70/70, AC+3, resist:aetheric, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Singing Hood (Uncommon, dur 25/25, AC+2, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:head, use, scrap, drop
+
+Shields (1)
+  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (1)
+  ◆ Aetheric Padded Vest (Rare, dur 25/28, ♥reserved, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, repair, release-from-fusion, drop
+
+Amulets & Rings (13)
+  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 · Resists aetheric: −10% incoming damage of each, on top of armour, [ring,aether,crafted])
+    actions: equip:ring, use, scrap, drop
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Amulet of the Silt Warden ×2 (Rare, dur 40/40, equipped:amulet, WIS +2 · Resists poison, corruption: −20% incoming damage of each, on top of armour, [amulet,mud,crafted])
+    actions: unequip:amulet
+  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])
+    actions: equip:ring, use, scrap, drop
+  Minor Aetheric Amulet (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,aether])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Scribe's Signet ×2 (Uncommon, dur 35/35, INT +2 · WIS +1, [ring,signet,scholarly,crafted])
+    actions: equip:ring, use, scrap, drop
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 383 of 3748 entries; older trimmed to fit a single email paste)
+
+[2026-09-24T20:36:32.071Z] [debug] send-log: crash on record (2026-09-24T20:36:24.936Z) — game log pushed automatically, delivered to Sentry, #mufzsk25hsud cleared from disk
+[2026-09-24T20:36:31.610Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T20:36:31.609Z] [debug] boot: life bmufzsf4kcs started 2026-09-24T20:36:25.364Z · not an OTA apply (no handoff on disk)
+[2026-09-24T20:36:31.609Z] [debug] missions: · at=asgardar
+[2026-09-24T20:36:31.609Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: mystery:mystery_temporal_watch stage 2/5 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T20:36:31.609Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T20:36:31.608Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T20:36:31.608Z] [debug] ═══ SESSION 2026-09-24T20:36:31.605Z · build 2026-09-24-1880-the-constraint-teaches-its-door · previous entry moments earlier ═══
+[2026-09-24T20:36:31.348Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Cheddar Bob. I kept watch while you were gone."
+[2026-09-24T20:36:31.348Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-09-24T20:36:31.348Z] [debug] OTA session start: 2026-09-24-1880-the-constraint-teaches-its-door.
+[2026-09-24T20:36:25.770Z] [debug] voice: bundled idle
+[2026-09-24T20:36:25.770Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T20:36:25.689Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T20:36:25.689Z] [debug] ota: Already up to date
+[2026-09-24T20:36:25.442Z] [debug] ota: Checking…
+[2026-09-24T20:36:25.442Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d514-c862-7f3d-b961-e04f9cb04efb
+[2026-09-24T20:36:25.430Z] [debug] native-sdk verdict: answered false
+[2026-09-24T20:36:25.430Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-24T20:36:20.218Z] [debug] homework: scene_intro "Asgardar" ✓ 2449ms
+[2026-09-24T20:36:20.213Z] [debug] qwen⏱ narration:scene_intro_fill ok 2440ms read 986ms/write 1402ms in 826t→out 33t thr1 1.2ms/t HIT-CAP (160ch)
+[2026-09-24T20:36:17.771Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-24T20:36:11.357Z] [player] fuse
+[2026-09-24T20:36:04.925Z] [reward] They don't charge a friend full price — 1 TC stayed in your pouch.
+[2026-09-24T20:36:04.925Z] [reward] Bought Aether Mud from Halem the Trader for 7 TC. (2 TC left)
+[2026-09-24T20:36:02.879Z] [reward] They don't charge a friend full price — 8 TC stayed in your pouch.
+[2026-09-24T20:36:02.879Z] [reward] Bought 4× Patched Cloth from Halem the Trader for 84 TC. (9 TC left)
+[2026-09-24T20:35:53.064Z] [reward] Halem the Trader works your Plasma Thrower over the anvil. ✦ Reinforced 2/3 — durability 26/30 → 31/35. (−300 TC, Scrap Metal ×8, Stick ×4)
+[2026-09-24T20:35:49.832Z] [reward] Halem the Trader works your Plasma Thrower over the anvil. ✦ Reinforced 1/3 — durability 21/25 → 26/30. (−140 TC, Scrap Metal ×4, Stick ×2)
+[2026-09-24T20:35:31.039Z] [debug] homework: scene_intro "Asgardar" ✓ 3310ms
+[2026-09-24T20:35:31.029Z] [debug] qwen⏱ narration:scene_intro_fill ok 3281ms read 2134ms/write 1113ms in 826t→out 33t thr1 2.6ms/t HIT-CAP (163ch)
+[2026-09-24T20:35:27.729Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-24T20:35:19.541Z] [reward] Sold 59× Worn Tartarian Coin (Common) to Halem the Trader for 295 TC (5 TC each). (533 TC on hand)
+[2026-09-24T20:35:12.923Z] [reward] Sold 3× Bone Bolt (Common) to Halem the Trader for 15 TC (5 TC each). (238 TC on hand)
+[2026-09-24T20:35:07.930Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Halem the Trader for 5 TC. (223 TC on hand)
+[2026-09-24T20:35:07.927Z] [reward] Sold Seer's Veil of the Aether (Common) to Halem the Trader for 6 TC. (218 TC on hand)
+[2026-09-24T20:35:07.923Z] [reward] Sold Plasma Dagger (Common) to Halem the Trader for 13 TC. (212 TC on hand)
+[2026-09-24T20:35:07.918Z] [reward] Sold Compact Laser Pistol (Ranged) (Common) to Halem the Trader for 14 TC. (199 TC on hand)
+[2026-09-24T20:34:52.888Z] [debug] homework: scene_intro "Asgardar" ∅ 15219ms
+[2026-09-24T20:34:52.888Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 15187ms — intro-fill:∅
+[2026-09-24T20:34:52.862Z] [debug] qwen⏱ narration:scene_intro_fill ok 15187ms read 11381ms/write 3752ms in 826t→out 33t thr1 13.8ms/t HIT-CAP (142ch)
+[2026-09-24T20:34:47.473Z] [debug] persist sizes(KB): total=411 player=89 wm=224[rooms=132 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=93 scene=5
+[2026-09-24T20:34:37.670Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-24T20:34:31.133Z] [reward] +18 TC pried from the dust.
+[2026-09-24T20:34:31.133Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.
+[2026-09-24T20:34:31.130Z] [reward] Reclaimer Ambusher defeated. You recover Bone Bolt ×3.
+[2026-09-24T20:34:31.129Z] [combat] Your blow with the pyric wand lands clean — 8 damage. Reclaimer Ambusher crumples in the dust. The Aetherstone settles.
+[2026-09-24T20:34:31.128Z] [combat] Weakness exposed — Reclaimer Ambusher flinches. (burn ×1.5 for 8)
+[2026-09-24T20:34:31.126Z] [combat] You — d20 → 8 + INT 15 − 1 (Ash Storm) = 22 vs Reclaimer Ambusher AC 11 — ✓ HIT
+[2026-09-24T20:34:31.126Z] [combat] Reclaimer Ambusher — d20 → 8 + ATK 7 = 15 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-24T20:34:31.123Z] [world] Reclaimer Ambusher moves first. The pressure is immediate.
+[2026-09-24T20:34:31.068Z] [debug] dice⏱ damage: shown +103ms, tapped +709ms, settled +819ms = 1631ms
+[2026-09-24T20:34:30.249Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-24T20:34:29.436Z] [debug] dice⏱ attack: shown +78ms, tapped +403ms, settled +836ms = 1317ms
+[2026-09-24T20:34:28.599Z] [debug] ui: tap "roll" ⏱+28ms
+[2026-09-24T20:34:28.117Z] [debug] dice⏱ initiative: shown +56ms, tapped +766ms, settled +833ms = 1655ms
+[2026-09-24T20:34:27.284Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-24T20:34:26.465Z] [system] ⏳ Time passed: 6 min
+[2026-09-24T20:34:26.464Z] [world] You bring the pyric wand to bear on Reclaimer Ambusher.
+[2026-09-24T20:34:26.457Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-24T20:34:26.454Z] [debug] attack: target=Reclaimer Ambusher range=far reach.bands=[distant,far,mid,close] reach.label=Pyric Wand bareHand=false
+[2026-09-24T20:34:26.450Z] [combat] Reclaimer Ambusher suffers — burn eats 2. (4/31 HP, 1 turn left)
+[2026-09-24T20:34:26.441Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand pyric wand resolved=Pyric Wand range=far enemies=1 hooks=0
+[2026-09-24T20:34:26.441Z] [player] attack with the off-hand pyric wand
+[2026-09-24T20:34:26.400Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-09-24T20:34:26.381Z] [debug] ui: tap "pyric wand 🔥 ★" ⏱+27ms
+[2026-09-24T20:34:18.586Z] [combat] Reclaimer Ambusher — d20 → 4 + ATK 7 = 11 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-24T20:34:18.586Z] [debug] ac-shift 22→24: race/base 11 + gear 20 + title 1 → trimmed 24 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-24T20:34:18.583Z] [combat] Burn sets in — 2/turn for 2 turns.
+[2026-09-24T20:34:18.583Z] [combat] Clean hit with the plasma thrower for 11. Reclaimer Ambusher has 6 left and does not back away.
+[2026-09-24T20:34:18.581Z] [combat] Weakness exposed — Reclaimer Ambusher flinches. (burn ×1.5 for 11)
+[2026-09-24T20:34:18.578Z] [combat] You — d20 → 8 + WIS 19 − 1 (Ash Storm) perfect opening (2× dice) = 26 vs Reclaimer Ambusher AC 11 — ✓ HIT
+[2026-09-24T20:34:18.578Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-24T20:34:18.533Z] [debug] dice⏱ damage: shown +71ms, tapped +427ms, settled +820ms = 1318ms
+[2026-09-24T20:34:17.713Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-24T20:34:17.215Z] [debug] dice⏱ attack: shown +114ms, tapped +479ms, settled +835ms = 1428ms
+[2026-09-24T20:34:16.380Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-24T20:34:15.786Z] [debug] dice⏱ initiative: shown +55ms, tapped +821ms, settled +823ms = 1699ms
+[2026-09-24T20:34:14.962Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-24T20:34:14.088Z] [system] ⏳ Time passed: 6 min
+[2026-09-24T20:34:14.088Z] [world] You bring the plasma thrower to bear on Reclaimer Ambusher.
+[2026-09-24T20:34:14.082Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-24T20:34:14.081Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-24T20:34:14.078Z] [debug] attack: target=Reclaimer Ambusher range=far reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-24T20:34:14.074Z] [combat] Reclaimer Ambusher shakes off the last of the coating — the burn has run its course.
+[2026-09-24T20:34:14.074Z] [combat] Reclaimer Ambusher suffers — burn eats 1. (17/31 HP, 0 turns left)
+[2026-09-24T20:34:14.070Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=far enemies=1 hooks=0
+[2026-09-24T20:34:14.070Z] [player] attack with the plasma thrower
+[2026-09-24T20:34:14.030Z] [system] acid (from Reclaimer Ambusher) fades.
+[2026-09-24T20:34:14.011Z] [debug] ui: tap "plasma thrower 🔥 ★" ⏱+19ms
+[2026-09-24T20:34:12.321Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T20:34:12.321Z] [system] ⏳ Time passed: 6 min
+[2026-09-24T20:34:12.320Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The reclaimer ambusher is patient. Be patienter."
+[2026-09-24T20:34:12.320Z] [debug] arbiter: template (reason=combat)
+[2026-09-24T20:34:12.309Z] [combat] Dodge — d20 → 2 + DEX 23 = 25 vs ATK 22. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-24T20:34:12.308Z] [combat] Reclaimer Ambusher — d20 → 15 + ATK 7 = 22 vs your AC 22 — ✗ EVADED
+[2026-09-24T20:34:12.297Z] [combat] Reclaimer Ambusher suffers — burn eats 1. (18/31 HP, 1 turn left)
+[2026-09-24T20:34:12.296Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-24T20:34:12.288Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=0
+[2026-09-24T20:34:12.288Z] [player] dodge
+[2026-09-24T20:34:12.261Z] [debug] ui: tap "dodge" ⏱+27ms
+[2026-09-24T20:34:09.540Z] [arbiter] The Arbiter watches the reclaimer ambusher. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-09-24T20:34:09.539Z] [combat] Reclaimer Ambusher — d20 → 8 + ATK 7 = 15 vs your AC 22 — ✗ MISS
+[2026-09-24T20:34:09.536Z] [combat] Burn sets in — 1/turn for 2 turns.
+[2026-09-24T20:34:09.536Z] [combat] Reclaimer Ambusher takes 3 with the plasma thrower. It reels: 19 left. Then it fights back.
+[2026-09-24T20:34:09.534Z] [combat] Weakness exposed — Reclaimer Ambusher flinches. (burn ×1.5 for 3)
+[2026-09-24T20:34:09.529Z] [combat] You — d20 → 5 + WIS 19 − 1 (Ash Storm) = 23 vs Reclaimer Ambusher AC 11 — ✓ HIT
+[2026-09-24T20:34:09.529Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.
+[2026-09-24T20:34:09.480Z] [debug] dice⏱ damage: shown +81ms, tapped +631ms, settled +820ms = 1532ms
+[2026-09-24T20:34:08.660Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-24T20:34:07.947Z] [debug] dice⏱ attack: shown +80ms, tapped +914ms, settled +836ms = 1830ms
+[2026-09-24T20:34:07.111Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-24T20:34:06.115Z] [debug] dice⏱ initiative: shown +56ms, tapped +3086ms, settled +836ms = 3978ms
+[2026-09-24T20:34:05.278Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-24T20:34:03.024Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-24T20:34:02.140Z] [system] ⏳ Time passed: 6 min
+[2026-09-24T20:34:02.139Z] [world] Your plasma thrower comes around in an arc; Reclaimer Ambusher squares up to meet it.
+[2026-09-24T20:34:02.131Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-24T20:34:02.126Z] [debug] attack: target=Reclaimer Ambusher range=far reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-24T20:34:02.121Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=far enemies=1 hooks=0
+[2026-09-24T20:34:02.118Z] [player] attack with the plasma thrower
+[2026-09-24T20:34:02.074Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-24T20:34:02.057Z] [debug] ui: tap "plasma thrower 🔥 ★" ⏱+20ms
+[2026-09-24T20:33:59.305Z] [debug] boot: life bmufzjyhwv9 started 2026-09-24T20:29:50.564Z · not an OTA apply (no handoff on disk)
+[2026-09-24T20:33:59.305Z] [debug] missions: · at=asgardar
+[2026-09-24T20:33:59.305Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: mystery:mystery_temporal_watch stage 2/5 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T20:33:59.305Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T20:33:59.304Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T20:33:59.304Z] [debug] ═══ SESSION 2026-09-24T20:33:59.300Z · build 2026-09-24-1880-the-constraint-teaches-its-door · previous entry moments earlier ═══
+[2026-09-24T20:33:59.042Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-09-24T20:33:59.042Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-09-24T20:33:59.042Z] [debug] OTA session start: 2026-09-24-1880-the-constraint-teaches-its-door.
+[2026-09-24T20:33:57.624Z] [debug] appstate: background → active (was background for 226121ms)
+[2026-09-24T20:30:11.502Z] [debug] appstate: active → background (was active for 20893ms)
+[2026-09-24T20:29:51.587Z] [debug] voice: bundled idle
+[2026-09-24T20:29:51.587Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T20:29:51.483Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T20:29:51.482Z] [debug] ota: Already up to date
+[2026-09-24T20:29:50.642Z] [debug] ota: Checking…
+[2026-09-24T20:29:50.642Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d514-c862-7f3d-b961-e04f9cb04efb
+[2026-09-24T20:23:38.331Z] [debug] ui: tap "✚ heals (3)" ⏱+7ms
+[2026-09-24T20:23:37.746Z] [debug] ui: tap "✚ heals (3)" ⏱+15ms
+[2026-09-24T20:23:36.962Z] [debug] ui: tap "✚ heals (3)" ⏱+25ms
+[2026-09-24T20:23:35.712Z] [debug] ui: tap "✚ heals (3)" ⏱+12ms
+[2026-09-24T20:23:33.352Z] [combat] Reclaimer Ambusher deals 7 bludgeoning damage +3 acid [Mud-glass Scales took it]. You have 40 HP remaining.
+[2026-09-24T20:23:33.276Z] [combat] Your armour turns the blow back — Reclaimer Ambusher takes 1 bludgeoning. (22 HP left)
+[2026-09-24T20:23:33.270Z] [combat] Reclaimer Ambusher — d20 → 16 + ATK 7 = 23 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-24T20:23:33.264Z] [reward] Rust sinks teeth into Reclaimer Ambusher for 8 piercing. (23 HP left)
+[2026-09-24T20:23:33.264Z] [reward] Rust lunges at Reclaimer Ambusher — d20 8 + STR 12 = 20 vs AC 11 — ✓ HIT
+[2026-09-24T20:23:33.264Z] [world] Your dog gives the golem a wide arc and watches it sideways. Both will fight.
+[2026-09-24T20:23:33.259Z] [player] bite
+[2026-09-24T20:23:31.861Z] [debug] ui: tap "rust (17/17)" ⏱+28ms
+[2026-09-24T20:23:30.690Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-24T20:23:29.876Z] [combat] Reclaimer Ambusher — d20 → 3 + ATK 9 = 12 vs your AC 24 — ✗ MISS
+[2026-09-24T20:23:29.856Z] [combat] Reclaimer Ambusher retaliates — d20 10 + 6 hits Rampart for 1 (20% resisted). (33/44)
+[2026-09-24T20:23:29.856Z] [world] Rampart's strike sails wide of Reclaimer Ambusher.
+[2026-09-24T20:23:29.855Z] [combat] Rampart attacks Reclaimer Ambusher — d20 5 + 2 = 7 vs AC 11 — ✗ MISS
+[2026-09-24T20:23:29.855Z] [player] use golem
+[2026-09-24T20:23:29.833Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-24T20:23:29.814Z] [debug] ui: tap "golem (34/44)" ⏱+19ms
+[2026-09-24T20:23:27.688Z] [debug] send-log: crash on record (2026-09-24T18:53:39.824Z) — game log pushed automatically, delivered to Sentry, #mufzbqu8eyu2 cleared from disk
+[2026-09-24T20:23:27.224Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T20:23:27.224Z] [debug] boot: life bmufzbmxnrp started 2026-09-24T20:23:22.331Z · FOLLOWED AN OTA APPLY 350ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-24T20:23:27.224Z] [debug] missions: · at=asgardar
+[2026-09-24T20:23:27.224Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T20:23:27.224Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T20:23:27.224Z] [debug] missions: mystery:mystery_temporal_watch stage 2/5 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T20:23:27.224Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T20:23:27.223Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T20:23:27.222Z] [debug] ═══ SESSION 2026-09-24T20:23:27.220Z · build 2026-09-24-1880-the-constraint-teaches-its-door · updated from 2026-09-24-1879-the-roll-leaves-room-to-read · previous entry moments earlier ═══
+[2026-09-24T20:23:26.975Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Cheddar Bob. The road kept your place. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-24T20:23:26.971Z] [world] The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.
+[2026-09-24T20:23:26.971Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-09-24T20:23:26.970Z] [debug] OTA session start: 2026-09-24-1880-the-constraint-teaches-its-door.
+[2026-09-24T20:23:26.970Z] [debug] OTA applied: 2026-09-24-1879-the-roll-leaves-room-to-read → 2026-09-24-1880-the-constraint-teaches-its-door.
+[2026-09-24T20:23:22.783Z] [debug] voice: bundled idle
+[2026-09-24T20:23:22.783Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T20:23:22.659Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T20:23:22.658Z] [debug] ota: Already up to date
+[2026-09-24T20:23:22.383Z] [debug] ota: Checking…
+[2026-09-24T20:23:22.383Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d514-c862-7f3d-b961-e04f9cb04efb
+[2026-09-24T20:23:21.980Z] [debug] ota: Restarting to apply…
+[2026-09-24T20:23:21.980Z] [debug] ota: Saving progress…
+[2026-09-24T20:23:21.520Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T20:23:19.263Z] [debug] ota: Checking…
+[2026-09-24T20:23:19.263Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d449-20ca-7afd-92ad-976a8d72ff0d
+[2026-09-24T20:23:19.251Z] [debug] native-sdk verdict: answered false
+[2026-09-24T20:23:19.251Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-24T18:53:29.549Z] [debug] voice: bundled idle
+[2026-09-24T18:53:29.549Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T18:53:29.451Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T18:53:29.450Z] [debug] ota: Already up to date
+[2026-09-24T18:53:29.022Z] [debug] ota: Checking…
+[2026-09-24T18:53:29.022Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d449-20ca-7afd-92ad-976a8d72ff0d
+[2026-09-24T16:45:03.663Z] [debug] voice: bundled idle
+[2026-09-24T16:45:03.663Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T16:45:03.498Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T16:45:03.497Z] [debug] ota: Already up to date
+[2026-09-24T16:45:03.111Z] [debug] ota: Checking…
+[2026-09-24T16:45:03.111Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d449-20ca-7afd-92ad-976a8d72ff0d
+[2026-09-24T16:40:33.812Z] [debug] voice: bundled idle
+[2026-09-24T16:40:33.811Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T16:40:33.660Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T16:40:33.655Z] [debug] ota: Already up to date
+[2026-09-24T16:40:33.067Z] [debug] ota: Checking…
+[2026-09-24T16:40:33.066Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d449-20ca-7afd-92ad-976a8d72ff0d
+[2026-09-24T16:40:32.497Z] [debug] ota: Restarting to apply…
+[2026-09-24T16:40:32.496Z] [debug] ota: Saving progress…
+[2026-09-24T16:40:31.881Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T16:40:26.279Z] [debug] ota: Checking…
+[2026-09-24T16:40:26.279Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d3c2-a5c1-7be3-bc92-69e1a42bdfc0
+[2026-09-24T14:16:28.995Z] [debug] voice: bundled idle
+[2026-09-24T14:16:28.994Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T14:16:28.893Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T14:16:28.893Z] [debug] ota: Already up to date
+[2026-09-24T14:16:28.600Z] [debug] ota: Checking…
+[2026-09-24T14:16:28.600Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d3c2-a5c1-7be3-bc92-69e1a42bdfc0
+[2026-09-24T14:16:28.359Z] [debug] ota: Restarting to apply…
+[2026-09-24T14:16:28.359Z] [debug] ota: Saving progress…
+[2026-09-24T14:16:28.236Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T14:16:27.709Z] [debug] ota: Checking…
+[2026-09-24T14:16:27.709Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d30e-46d9-7781-b911-e56d7046a590
+[2026-09-24T14:10:42.448Z] [debug] voice: bundled idle
+[2026-09-24T14:10:42.448Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T14:10:42.339Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T14:10:42.339Z] [debug] ota: Already up to date
+[2026-09-24T14:10:42.149Z] [debug] ota: Checking…
+[2026-09-24T14:10:42.149Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d30e-46d9-7781-b911-e56d7046a590
+[2026-09-24T13:44:51.749Z] [debug] voice: bundled idle
+[2026-09-24T13:44:51.749Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T13:44:51.657Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T13:44:51.656Z] [debug] ota: Already up to date
+[2026-09-24T13:44:51.572Z] [debug] ota: Checking…
+[2026-09-24T13:44:51.572Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d30e-46d9-7781-b911-e56d7046a590
+[2026-09-24T12:18:32.155Z] [debug] dice⏱ initiative: shown +63ms, tapped +2754ms, settled +830ms = 3647ms
+[2026-09-24T12:18:31.325Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-24T12:18:28.512Z] [system] ⏳ Time passed: 6 min
+[2026-09-24T12:18:28.512Z] [world] Your plasma thrower comes around in an arc; Reclaimer Ambusher squares up to meet it.
+[2026-09-24T12:18:28.504Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-09-24T12:18:28.500Z] [arbiter] Ash Storm hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-09-24T12:18:28.495Z] [debug] attack: target=Reclaimer Ambusher range=far reach.bands=[distant,far,mid,close] reach.label=Plasma Thrower bareHand=false
+[2026-09-24T12:18:28.491Z] [debug] parser: intent=attack conf=1.00 verb=attack target=plasma thrower resolved=Plasma Thrower range=far enemies=1 hooks=0
+[2026-09-24T12:18:28.490Z] [player] attack with the plasma thrower
+[2026-09-24T12:18:28.407Z] [debug] ui: tap "plasma thrower 🔥 ★" ⏱+16ms
+[2026-09-24T12:18:24.753Z] [cognitive] REST  (124ms)
+[2026-09-24T12:18:24.581Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:24.580Z] [debug] enemy: Reclaimer Ambusher hp=31 ac=11 atk=Crossbow Volley dmg=1D6 rarity=Uncommon ap=6
+[2026-09-24T12:18:24.580Z] [world] A Reclaimer Ambusher crosses the last of the open and does not stop coming. The rest is over.
+[2026-09-24T12:18:24.579Z] [arbiter] The Arbiter goes still. "Whatever found you had all night to leave. It stayed."
+[2026-09-24T12:18:24.567Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:24.567Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 79, morning)
+[2026-09-24T12:18:24.566Z] [world] You listen for her breathing and lose it in the wind, which means she is asleep.
+[2026-09-24T12:18:24.564Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:24.564Z] [player] rest
+[2026-09-24T12:18:24.556Z] [debug] ui: tap "rest" ⏱+10ms
+[2026-09-24T12:18:24.066Z] [cognitive] REST  (123ms)
+[2026-09-24T12:18:23.886Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:23.885Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-24T12:18:23.885Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-24T12:18:23.884Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:23.884Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 79, night)
+[2026-09-24T12:18:23.883Z] [world] Her ribs rise and fall and slow until you cannot hear them.
+[2026-09-24T12:18:23.881Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:23.880Z] [player] rest
+[2026-09-24T12:18:23.873Z] [debug] ui: tap "rest" ⏱+11ms
+[2026-09-24T12:18:23.260Z] [cognitive] REST  (90ms)
+[2026-09-24T12:18:23.140Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T12:18:23.132Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:23.132Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-24T12:18:23.132Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-24T12:18:23.130Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:23.130Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 78, afternoon)
+[2026-09-24T12:18:23.130Z] [world] Rust does the old circle — some instinct about grass that has not been grass in a thousand years.
+[2026-09-24T12:18:23.128Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:23.127Z] [player] rest
+[2026-09-24T12:18:23.111Z] [debug] ui: tap "rest" ⏱+21ms
+[2026-09-24T12:18:19.742Z] [cognitive] REST  (112ms)
+[2026-09-24T12:18:19.587Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:19.586Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:19.586Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 78, morning)
+[2026-09-24T12:18:19.586Z] [world] Rust tests three spots and settles on the one nearest your boot.
+[2026-09-24T12:18:19.584Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:19.584Z] [player] rest
+[2026-09-24T12:18:19.572Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-24T12:18:19.130Z] [cognitive] REST  (102ms)
+[2026-09-24T12:18:18.977Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:18.977Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:18.976Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:18.976Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 78, night)
+[2026-09-24T12:18:18.976Z] [world] Rust paws the ground flat before trusting it, then folds down onto it.
+[2026-09-24T12:18:18.975Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:18.975Z] [player] rest
+[2026-09-24T12:18:18.971Z] [debug] ui: tap "rest" ⏱+18ms
+[2026-09-24T12:18:18.696Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-24T12:18:18.534Z] [cognitive] REST  (100ms)
+[2026-09-24T12:18:18.395Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:18.395Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:18.395Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-24T12:18:18.394Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-24T12:18:18.394Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-24T12:18:18.394Z] [world] You rest for 8 hours. +4 HP, +1 stamina recovered. (Day 77, afternoon)
+[2026-09-24T12:18:18.394Z] [world] Rust turns twice, thinks about a third, and drops where she stands.
+[2026-09-24T12:18:18.393Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:18.393Z] [player] rest
+[2026-09-24T12:18:18.388Z] [debug] ui: tap "rest" ⏱+11ms
+[2026-09-24T12:18:17.920Z] [cognitive] REST  (126ms)
+[2026-09-24T12:18:17.794Z] [system] ⏳ Time passed: 8h
+[2026-09-24T12:18:17.793Z] [arbiter] The Arbiter looks around. "The capital sleeps under Aetherstone, breathing through cracks no shovel can widen."
+[2026-09-24T12:18:17.793Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-24T12:18:17.791Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.
+[2026-09-24T12:18:17.791Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-24T12:18:17.790Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 77, morning)
+[2026-09-24T12:18:17.790Z] [world] Rust circles three times and curls beside you. Her breathing slows to yours.
+[2026-09-24T12:18:17.788Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-24T12:18:17.787Z] [player] rest
+[2026-09-24T12:18:17.776Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-24T12:18:17.772Z] [debug] ui: tap "rest" ⏱+16ms
+[2026-09-24T12:18:15.664Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T12:18:15.664Z] [debug] boot: life bmufhzni421 started 2026-09-24T12:18:09.724Z · not an OTA apply (no handoff on disk)
+[2026-09-24T12:18:15.664Z] [debug] missions: · at=asgardar
+[2026-09-24T12:18:15.664Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T12:18:15.664Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: mystery:mystery_temporal_watch stage 2/5 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T12:18:15.663Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T12:18:15.662Z] [debug] ═══ SESSION 2026-09-24T12:18:15.659Z · build 2026-09-24-1877-the-hunt-reads-its-last-beat · previous entry moments earlier ═══
+[2026-09-24T12:18:15.390Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-24T12:18:15.387Z] [world] The Reclaimers' Guild updated its standing-board while you were gone. Your name is on it.
+[2026-09-24T12:18:15.386Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-09-24T12:18:15.386Z] [debug] OTA session start: 2026-09-24-1877-the-hunt-reads-its-last-beat.
+[2026-09-24T12:18:10.000Z] [debug] voice: bundled idle
+[2026-09-24T12:18:10.000Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T12:18:09.945Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T12:18:09.945Z] [debug] ota: Already up to date
+[2026-09-24T12:18:09.882Z] [debug] ota: Checking…
+[2026-09-24T12:18:09.881Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d30e-46d9-7781-b911-e56d7046a590
+[2026-09-24T11:52:57.334Z] [debug] appstate: active → background (was active for 6582ms)
+[2026-09-24T11:52:50.936Z] [debug] voice: bundled idle
+[2026-09-24T11:52:50.935Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T11:52:50.872Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T11:52:50.872Z] [debug] ota: Already up to date
+[2026-09-24T11:52:50.772Z] [debug] ota: Checking…
+[2026-09-24T11:52:50.772Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d30e-46d9-7781-b911-e56d7046a590
+[2026-09-24T11:52:50.540Z] [debug] ota: Restarting to apply…
+[2026-09-24T11:52:50.538Z] [debug] ota: Saving progress…
+[2026-09-24T11:52:50.400Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T11:52:49.438Z] [debug] ota: Checking…
+[2026-09-24T11:52:49.438Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0d11c-7f21-747c-a238-341a2627ae48
+[2026-09-24T02:09:01.652Z] [debug] ui: tap "missions" ⏱+23ms
+[2026-09-24T02:08:59.176Z] [debug] boot: life bmuew83w4rb started 2026-09-24T02:08:52.660Z · not an OTA apply (no handoff on disk)
+[2026-09-24T02:08:59.176Z] [debug] missions: · at=asgardar
+[2026-09-24T02:08:59.175Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T02:08:59.175Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T02:08:59.175Z] [debug] missions: mystery:mystery_temporal_watch stage 2/5 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T02:08:59.175Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T02:08:59.175Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T02:08:59.175Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T02:08:59.174Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T02:08:59.174Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+
+=== END REPORT ===

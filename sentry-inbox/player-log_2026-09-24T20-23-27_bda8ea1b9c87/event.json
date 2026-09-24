@@ -1,0 +1,366 @@
+{
+  "id": "bda8ea1b9c87454e80b67d5ed04da1d3",
+  "groupID": "7753373992",
+  "eventID": "bda8ea1b9c87454e80b67d5ed04da1d3",
+  "projectID": "4511945117532160",
+  "size": 18745,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-24-1880-the-constraint-teaches-its-door #mufzbqu8eyu2 [inline 50/56]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-24-1880-the-constraint-teaches-its-door",
+  "message": "player-log 2026-09-24-1880-the-constraint-teaches-its-door #mufzbqu8eyu2 [inline 50/56]",
+  "title": "player-log 2026-09-24-1880-the-constraint-teaches-its-door #mufzbqu8eyu2 [inline 50/56]",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Brockton",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T20:23:18.894Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 46.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 3110735872,
+      "storage_size": 245292421120,
+      "free_storage": 55644221440,
+      "boot_time": "2026-09-23T01:48:54.540Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "31.899999618530273",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 23,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d514-c862-7f3d-b961-e04f9cb04efb"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7c313fa7d7aa4eb59521f768386b00a7",
+      "span_id": "a4f6d3154d1d88a5",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDQ-uNj-Q1W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-aHV-udD-pod-W50-X2l-yb2-5fc-3Bp-ZGV-yX2-9ic-2lk-aWF-uIH-N0Y-Wdl-IDA-vNy-BbZ-Glw-bG9-tYW-N5X-SBA-cmV-jbG-Fpb-WVy-X3N-0YW-tlI-G5w-Yz0-idG-hlI-HNh-bHZ-hZ2-UtY-m9z-cyI-gZ2-l2Z-XM9-Q29-pbC-BvZ-iBU-YXJ-0YX-JpY-W4g-Rml-sYW-1lb-nQg-UEF-VU0-VEC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jA0-LjY-0NV-pdI-Ftk-ZWJ-1Z1-0gb-Wlz-c2l-vbn-M6I-Gh1-bnQ-6aH-Vud-F9t-dWR-faG-91b-mRf-YWx-waG-Ffe-XVs-ZHJ-hIH-N0Y-Wdl-IDA-vNS-BbZ-Glw-bG9-tYW-N5X-SBA-eXV-sZH-JhX-3R1-bCB-ucG-M9I-nRo-ZSB-ZdW-xkc-mEt-VHV-sIH-JlZ-XZl-IiB-naX-Zlc-z1S-ZWV-2ZS-dzI-FJv-YWQ-tV3-Jpd-CBQ-QVV-TRU-QK",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDQ-uNj-Q1W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-3Rl-bXB-vcm-FsX-3dh-dGN-oIH-N0Y-Wdl-IDI-vNC-Bbc-3Rl-YWx-0aF-0gQ-GJ1-cml-lZF-9ja-XRp-ZXM-gbm-VlZ-HM9-RWR-keS-1ab-25l-IFJ-lYW-Rpb-mfi-nJd-NSV-NTS-U5H-IGd-pdm-VzP-VRl-bXB-vcm-FsI-ERp-c3R-vcn-Rpb-24g-V2F-0Y2-ggU-EFV-U0V-ECl-syM-DI2-LTA-5LT-I0V-DAw-OjA-zOj-A0L-jY0-NVp-dIF-tkZ-WJ1-Z10-gbW-lzc-2lv-bnM-6IG-15c-3Rl-cnk-6bX-lzd-GVy-eV9-vYn-NpZ-Glh-bl9-vcm-Igc-3Rh-Z2U-gMC-80I-Ftk-aXB-sb2-1hY-3ld-IEB-tb2-5hc-mNo-X3d-heX-N0Y-XRp-b24-gbn-BjP-SJ0-aGU-gTX-VkI-E1v-bmF-yY2-ggY-291-cml-lci-IgZ-2l2-ZXM-9TW-9uY-XJj-aCB-Db3-Vya-WVy-IFd-yaX-QgU-EFV-U0V-ECg-==",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDQ-uNj-Q1W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-2Ny-YWR-sZV-9jb-21w-YXN-zIH-N0Y-Wdl-IDA-vMy-BbZ-Glw-bG9-tYW-N5X-SBA-aGl-kZG-VuX-21h-cmt-ldC-Buc-GM9-Ikh-hbG-VtI-HRo-ZSB-Ucm-FkZ-XIi-IGd-pdm-VzP-Uhh-bGV-tJ3-MgQ-nJv-a2V-uIE-Nvb-XBh-c3M-gUE-FVU-0VE-Cls-yMD-I2L-TA5-LTI-0VD-AwO-jAz-OjA-0Lj-Y0N-Vpd-IFt-kZW-J1Z-10g-bWl-zc2-lvb-nM6-IMK-3IG-F0P-Wth-cm9-rX3-NhI-HRy-YXZ-lbF-RvP-WFz-Z2F-yZG-FyC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jA0-LjY-0NV-pdI-Ftk-ZWJ-1Z1-0gY-m9v-dDo-gbG-lmZ-SBi-bXV-lcn-E3b-jZt-ZyB-zdG-Fyd-GVk-IDI-wMj-YtM-Dkt-MjR-UMD-A6M-DI6-NTk-uMj-UwW-iDC-tyB-ub3-QgY-W4g-T1R-BIG-Fwc-Gx5-ICh-uby-BoY-W5k-b2Z-mIG-9uI-GRp-c2s-pCg-==",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-M3W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CLi-hpI-gQV-NHQ-VJE-QVI-iIO-KPs-Ssy-MG1-zCl-syM-DI2-LTA-5LT-I0V-DAw-OjA-zOj-A3L-jI2-MFp-dIF-t3b-3Js-ZF0-gWW-91I-Hdh-bGs-gbm-9yd-Ggu-IFl-vdS-Bhc-nJp-dmU-gYX-QgQ-XNn-YXJ-kYX-IuC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jA3-LjI-2MF-pdI-Ftk-ZWJ-1Z1-0gc-2Nl-bmU-6IG-xvY-z1h-c2d-hcm-Rhc-iBo-dWI-9LS-Bhc-nJp-dmF-sPX-kgb-3Bl-bml-uZz-1uI-HBh-c3N-pbm-c9b-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zow-Ny4-yNj-FaX-SBb-ZGV-idW-ddI-G1p-c3N-pb2-5zO-iB1-bmN-oYW-5nZ-WQg-c2l-uY2-UgM-jAy-Ni0-wOS-0yN-FQw-MDo-wMz-owN-C42-NDR-aIO-KAl-CAx-MCB-jb2-50c-mFj-dHM-gKG-R1b-XBl-ZCB-pbi-Bmd-Wxs-IHR-oZW-4pI-MK3-IGF-0PW-FzZ-2Fy-ZGF-yIH-RyY-XZl-bFR-vPW-FzZ-2Fy-ZGF-yIG-hlc-mU9-bm9-uZQ-o=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-YyW-l0g-W3d-vcm-xkX-SDi-lrg-gVG-hlI-E11-ZCB-UaX-Rhb-iBv-ZiB-0aG-UgR-W5k-bGV-zcy-BTd-GFp-cjo-gTW-Fzd-GVy-IEt-hcm-luI-Glz-IGE-gbG-F0Z-XIg-c3R-lcC-Dig-JQg-bm9-0IH-lld-C4g-Rml-yc3-Q6I-GZp-bmQ-gdG-hlI-FRy-dWU-gVG-Fyd-GFy-aWF-uIG-FnZ-W50-IGF-0IF-RoZ-SBT-dW5-rZW-4gR-W5j-bGF-2ZS-Dig-JQg-dGF-say-Bpd-CB0-aHJ-vdW-doL-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zow-Ny4-yNz-haX-SBb-ZGV-idW-ddI-HNw-YXd-uOi-BnZ-WFy-PVt-TZW-VyJ-3Mg-VmV-pbC-BvZ-iB0-aGU-gQW-V0a-GVy-XSB-3aW-5kb-3c9-MTA-gcm-9zd-GVy-PW5-ldw-o=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-gzW-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIH-Rha-2Vz-IHl-vdS-Bpb-i4g-IkF-zZ2-FyZ-GFy-IGl-zIG-xld-Ghh-bCB-jb3-Vud-HJ5-LiB-UaG-Ugd-Ghp-bmd-zIH-RoY-XQg-d2F-rZS-BoZ-XJl-IHB-1bG-wgY-WJv-dmU-geW-91c-iB3-ZWl-naH-QuI-DQ3-IEh-QIG-Nhc-nJp-ZXM-geW-91I-HRo-cm9-1Z2-ggV-mFy-YWt-1c2-ggK-GRh-bmd-lci-AxK-S4g-NC8-5IE-Nvc-mVz-IHJ-lY2-92Z-XJl-ZC4-gVm-lza-XQg-dGh-lIH-Jlb-WFp-bml-uZy-BMb-3N0-IEN-hcG-l0Y-Wxz-LiB-Pci-Btb-3Zl-IG9-uIH-Vud-Gls-IHl-vdS-d2Z-SBn-b3Q-geW-91c-iBs-ZWd-zIH-VuZ-GVy-IHl-vdS-4iC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jA3-LjI-4NF-pdI-Ft3-b3J-sZF-0gU-nVz-dCB-ub3-Nlc-yBh-dCB-0aG-UgZ-mFp-bnQ-gb3-pvb-mUg-YW5-kIH-Nub-3J0-cy4-gVG-hlc-mUn-cyB-zb2-1ld-Ghp-bmc-gdG-hlc-mUu-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-kyW-l0g-W3d-vcm-xkX-SBZ-b3U-ndm-Ugb-GVm-dCB-LYX-Jva-y1T-YSB-hbm-QgZ-W50-ZXJ-lZC-BBc-2dh-cmR-hci-4gV-Ghl-IGN-hcG-l0Y-Wwg-c2x-lZX-BzI-HVu-ZGV-yIE-Fld-Ghl-cnN-0b2-5lL-CBi-cmV-hdG-hpb-mcg-dGh-yb3-Vna-CBj-cmF-ja3-Mgb-m8g-c2h-vdm-VsI-GNh-biB-3aW-Rlb-i4g-SXQ-ncy-Bua-Wdo-dC4-gSG-FsZ-W0g-dGh-lIF-RyY-WRl-ciB-pcy-B0a-GUg-b25-seS-Bzb-3Vs-IGl-uIH-NpZ-2h0-LiB-zb3-V0a-CBs-ZWF-kcy-B0b-yBH-cmF-uZC-BTc-Gly-ZSB-vZi-BBc-2dh-cmR-hci-4gT-m90-aGl-uZy-BuY-W1l-ZCB-0by-B0a-GUg-bm9-ydG-ggb-3Ig-ZWF-zdC-Bvc-iB3-ZXN-0Lg-o=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-k1W-l0g-W3d-vcm-xkX-SBU-aGU-gZ2-F0Z-SBv-ZiB-Bc2-dhc-mRh-ciB-zdG-FuZ-HMg-YmV-mb3-JlI-Hlv-dSD-igJ-Qgd-Ghl-aXI-gZ3-Jvd-W5k-LCB-ub3-Qge-WV0-IHR-oZW-lyI-Ghh-bGx-zLi-AoV-GFw-IEV-OVE-VSI-E9V-VFB-PU1-Qgd-G8g-c3R-lcC-Bpb-nNp-ZGU-uKQ-pbM-jAy-Ni0-wOS-0yN-FQw-MDo-wMz-owN-y4y-OTZ-aXS-Bbc-3lz-dGV-tXS-BXZ-WF0-aGV-yIG-VmZ-mVj-dCD-igJ-QgQ-XNo-IFN-0b3-JtO-iAt-MSB-TVF-IK",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-k5W-l0g-W3d-vcm-xkX-SBb-QXN-nYX-JkY-XJd-IG5-vcn-RoO-iBS-ZWN-sYW-ltZ-XIn-cyB-TdG-FrZ-SAo-MTM-gdG-lsZ-XMs-IDE-gZG-F5L-CA5-IGh-vdX-JzK-SDC-tyB-lYX-N0O-iBW-YXJ-ha3-Vza-CAo-OSB-0aW-xlc-ywg-MjM-gaG-91c-nMp-IMK-3IH-Nvd-XRo-OiB-Hcm-FuZ-CBT-cGl-yZS-BvZ-iBB-c2d-hcm-Rhc-iAo-MSB-0aW-xlL-CAz-IGh-vdX-JzK-SDC-tyB-3ZX-N0O-iBv-cGV-uIG-dyb-3Vu-ZAp-bMj-AyN-i0w-OS0-yNF-QwM-Dow-Mzo-wNy-4yO-Tla-XSB-bd2-9yb-GRd-IEh-hbG-VtI-HRo-ZSB-Ucm-FkZ-XIg-cHV-zaG-VzI-HRo-ZSB-nb2-9kI-HN0-b2N-rIH-RvI-HRo-ZSB-mcm-9ud-CB3-aXR-ob3-V0I-GJl-aW5-nIG-Fza-2Vk-LiA-iQ2-hlZ-GRh-ciB-Cb2-IuI-Flv-dSB-rbm-93I-Hdo-ZXJ-lIG-V2Z-XJ5-dGh-pbm-cga-XMu-Igo-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMj-k5W-l0g-W3d-vcm-xkX-SAi-Q2h-lZG-Rhc-iBC-b2I-uIi-BIY-Wxl-bSB-0aG-UgV-HJh-ZGV-yIH-Nhe-XMg-aXQ-gbG-lrZ-SBz-ZXR-0aW-5nI-GRv-d24-gc2-9tZ-XRo-aW5-nIG-hlY-XZ5-LiA-iWW-91J-3Zl-IGJ-lZW-4gZ-29u-ZS4-gSS-BrZ-XB0-IHl-vdX-Igd-XN1-YWw-gYm-Fja-yBh-bnl-3YX-kuI-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zow-Ny4-zMD-BaX-SBb-d29-ybG-RdI-Ehh-bGV-tIH-RoZ-SBU-cmF-kZX-Igb-m9k-cyB-5b3-UgY-2xv-c2V-yLi-AiU-3Rp-bGw-gY2-hld-2lu-ZyB-vbi-Dig-JhB-c2s-gYW-Jvd-XQg-dGh-lIG-Nhc-nQg-dGh-hdC-BuZ-XZl-ciB-hcn-Jpd-mVk-4oC-ZLC-Bvc-iBp-cyB-pdC-Bzb-21l-dGh-pbm-cgb-mV3-IHR-vZG-F5P-yIK",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMz-AwW-l0g-W3d-vcm-xkX-SBB-c2d-hcm-Rhc-iBh-bm5-vdW-5jZ-XMg-aXR-zZW-xmI-GJl-Zm9-yZS-B5b-3Ug-Y3J-lc3-Qgd-Ghl-IHJ-pc2-U6I-HRo-ZSB-Hcm-FuZ-CBT-cGl-yZS-BvZ-iBB-c2d-hcm-Rhc-iBv-dXQ-gcG-Fzd-CB0-aGU-gbG-Fzd-CBz-dHJ-lZX-RzL-CBz-bmF-wcG-VkI-GEg-dGh-pcm-Qgb-2Yg-dGh-lIH-dhe-SB1-cCw-gc3-Rpb-Gwg-aHV-tbW-luZ-yBh-IHN-pbm-dsZ-SBz-dWI-tYX-Vka-WJs-ZSB-ub3-RlI-HRo-YXQ-geW-91I-GZl-ZWw-gaW-4ge-W91-ciB-0ZW-V0a-CBt-b3J-lIH-RoY-W4g-aGV-hci-4gQ-WV0-aGV-yLW-xpZ-2h0-IGN-yYX-dsc-yB0-aGU-gb2-xkI-GNo-YW5-uZW-wtZ-3Jv-b3Z-lcy-Bsa-Wtl-IHN-sb3-cgb-Gln-aHR-uaW-5nI-HRo-YXQ-gZm-9yZ-290-IGh-vdy-B0b-yBz-dHJ-pa2-UuC-g==",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMz-AwW-l0g-W2F-yYm-l0Z-XJd-ICh-SZW-NsY-Wlt-ZXI-gcm-91d-GUg-4oC-UIH-RvI-HJl-Y29-2ZX-Igd-Ghl-IEF-zZ2-FyZ-GFy-IEN-vcm-UsI-FNB-TFZ-BR0-Ugc-29t-ZXR-oaW-5nI-Ghl-cmU-uIF-RoZ-SBB-ZXR-oZX-JpY-yBo-b3V-zaW-5nI-GNv-bWV-zIG-xvb-3Nl-IHV-uZG-VyI-HRo-ZSB-yaW-dod-CB0-cm9-3ZW-wuK-Qpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zow-Ny4-zMD-BaX-SBb-d29-ybG-RdI-FRo-ZXJ-lIG-FyZ-SBs-YW1-wcy-Bha-GVh-ZCB-3aG-VyZ-SB0-aGU-gbW-Fwc-yBw-cm9-taX-NlI-G5v-dGh-pbm-csI-GFu-ZCB-1bm-Rlc-iB0-aGU-gbG-Ftc-HMg-dGh-lcm-UgY-XJl-IHB-lb3-BsZ-SDi-gJQ-gbm-luZ-SBv-ZiB-0aG-VtL-CBp-biB-hIG-NoY-W1i-ZXI-gdG-hle-SBo-YXZ-lIH-N3Z-XB0-IGF-uZC-Bza-G9y-ZWQ-gYW-5kI-G1h-ZGU-gdm-Vye-SBu-ZWF-ybH-kgd-2Fy-bS4-gVG-hle-SBz-dGF-uZC-B3a-GVu-IHR-oZX-kgc-2U=",
+      "ZSB-5b3-UuI-E5v-dCB-zdG-Fyd-Gxl-ZC4-gVG-hlI-Hdh-eSB-hIG-hvd-XNl-aG9-sZC-Bzd-GFu-ZHM-gd2-hlb-iBz-b21-lYm-9ke-SBl-eHB-lY3-RlZ-CBm-aW5-hbG-x5I-GFy-cml-2ZX-MuC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jA3-LjM-wMV-pdI-Ft3-b3J-sZF-0gV-Ghl-eSB-jYW-1lI-GZv-ciB-0aG-Uga-HVt-LiB-Fdm-Vye-SBv-bmU-gb2-Ygd-Ghl-bSw-gZn-Jvb-SBu-aW5-lIG-RpZ-mZl-cmV-udC-Bka-XJl-Y3R-pb2-5zL-CBh-Y3J-vc3-MgZ-Wxl-dmV-uIH-llY-XJz-LiB-UYX-JuI-GRv-ZXM-gdG-hlI-HRh-bGt-pbm-cgY-mVj-YXV-zZS-BUY-XJu-IGh-hcy-BiZ-WVu-IGh-lcm-Ugb-G9u-Z2V-zdD-ogd-Ghl-eSB-oYX-ZlI-G5l-dmV-yIG-Fnc-mVl-ZCB-vbi-B3a-GF0-IGl-0IG-lzL-CB0-aGV-5IG-dhd-mUg-dXA-gdH-J5a-W5n-IHN-vbW-Ugd-Glt-ZSB-hZ2-8sI-GFu-ZCB-0aG-Ugd-mln-aWw-gdG-hle-SBr-ZWV-wIG-lzI-G1v-c3R-seS-Bqd-XN0-IGN-vbX-Bhb-nkg-Zm9-yIA-==",
+      "d2h-vZX-Zlc-iB3-YWx-rcy-Bpb-iBu-ZXh-0Li-AiV-2Ug-ZG8-gbm-90I-Gtu-b3c-sIi-BUY-XJu-IHN-heX-MsI-Hdp-dGh-vdX-QgY-SBz-Y3J-hcC-BvZ-iBh-cG9-sb2-d5L-iAi-V2U-ga2-5vd-yBp-dCB-pcy-ByZ-WFs-LCB-hbm-Qgd-2Ug-a25-vdy-Bpd-CBp-cyB-ub3-Qgb-25s-eSB-5b3-UsI-GFu-ZCB-hZn-Rlc-iBh-IHd-oaW-xlI-Gl0-IHR-1cm-5zI-G91-dCB-0aG-F0I-HNl-Y29-uZC-BwY-XJ0-IGl-zIH-RoZ-SBv-bmU-gdG-hhd-CBo-ZWx-wcy-4iC-g==",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMz-AxW-l0g-W2F-yYm-l0Z-XJd-IFR-oZS-BBc-mJp-dGV-yIH-Nhe-XMg-bm9-0aG-luZ-yBm-b3I-gYS-Btb-21l-bnQ-uIC-JJI-Ghh-dmU-gY2-Fyc-mll-ZCB-hIG-dyZ-WF0-IG1-hbn-kgc-GVv-cGx-lIH-dob-yBi-ZWx-pZX-ZlZ-CB0-aGU-gaH-VtI-G1l-YW5-0IH-RoZ-Xkg-d2V-yZS-Bza-W5n-dWx-hci-wiI-Gl0-IHN-heX-MuI-CJZ-b3U-gYX-JlI-HRo-ZSB-maX-Jzd-CBJ-IGh-hdm-UgZ-XZl-ciB-icm-91Z-2h0-IGl-udG-8gY-SBy-b29-tIG-Z1b-Gwg-b2Y-gdG-hlb-S4i-IEE-gcG-F1c-2Uu-ICJ-UaG-Ugc-m9s-bCB-tYX-Jrc-yB0-aGU-gY2-Fsb-Glu-Zzo-gU0-hBU-kVE-LiB-UaG-F0I-Glz-IGE-gZG-Vtb-3Rp-b24-gYW-5kI-GEg-aG9-tZW-Nvb-Wlu-ZyB-pbi-B0a-GUg-c2F-tZS-Bic-mVh-dGg-sIH-dhb-Gtl-ci4-gVG-FrZ-SB3-aGl-jaG-V2Z-XIg-aGF-sZi-B5b-3Ug-bmV-lZC-B0b-25p-Z2h-0Li-IK",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMz-AxW-l0g-W3J-ld2-FyZ-F0g-4py-mIF-ZpZ-2ls-IFR-va2-VuI-OKA-lCB-BIG-JsY-W5r-IGR-pc2-Mgb-2Yg-QWV-0aG-Vyc-3Rv-bmU-sIG-dyb-3Vu-ZCB-zbW-9vd-Ggg-Ynk-gZW-xld-mVu-IHl-lYX-JzI-G9m-IHR-odW-1ic-y4g-RXZ-lcn-lib-2R5-IGl-uIH-RoY-XQg-Y2h-hbW-Jlc-iBj-YXJ-yaW-VzI-G9u-ZS4-gTm-93I-HNv-IGR-vIH-lvd-S4K-WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDc-uMz-AxW-l0g-W2R-lYn-VnX-SBz-dG9-yeT-ogY-2Fs-bGl-uZy-ByZ-XNv-bHV-0aW-9uI-Cdj-aG9-pci-cgZ-mly-ZWQ-gYX-QgY-XNn-YXJ-kYX-IK",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MDk-uMz-c5W-l0g-W2F-yYm-l0Z-XJd-IFl-vdS-Bwa-WNr-IHR-oZS-B0a-Glu-ZyB-5b3-Ugd-2ls-bCB-taX-NzI-Gxl-YXN-0IG-FuZ-CB5-b3U-gcH-Vza-CBp-dCB-vdX-QgZ-GVs-aWJ-lcm-F0Z-Wx5-LCB-saW-tlI-HBh-eWl-uZy-BhI-HRv-bGw-sIG-FuZ-CB0-aGU-gaH-VtI-HRh-a2V-zIG-l0L-iBU-aGV-uIG-l0I-Gdv-ZXM-gb2-4gd-GFr-aW5-nLC-B1b-mh1-cnJ-pZW-QsI-GZv-ciB-hcy-Bsb-25n-IGF-zIH-RoZ-SBk-b29-yIG-lzI-G9w-ZW4-sIG-FuZ-CBi-eSB-0aG-Ugd-Glt-ZSB-5b3-UgZ-2V0-IGl-0IH-Nod-XQg-eW9-1IG-hhd-mUg-YmV-lbi-Bzd-GFu-ZGl-uZy-Bpb-iB0-aGU-gc2-FtZ-SBz-aXg-gaW-5ja-GVz-IG9-mIH-dhd-GVy-IGx-vbm-cgZ-W5v-dWd-oIG-Zvc-iB5-b3V-yIG-ZlZ-XQg-dG8-gZ2-8gb-nVt-Yi4-gSX-Qga-XMg-c2F-0aX-Nma-WVk-LiB-Zb3-UgY-XJl-IHR-oZS-Bvb-mUg-d2h-vIG-RvZ-XMg-bm9-0IG-tub-3cg-dGh-lIA-==",
+      "Zml-ndX-JlL-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zow-OS4-zOD-FaX-SBb-cmV-3YX-JkX-SAr-MjQ-wIF-RDL-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zox-MC4-4MD-NaX-SBb-ZGV-idW-ddI-HVp-OiB-0YX-AgI-nRh-a2U-gLy-BzY-Wx2-YWd-lIi-Dij-7Er-MTd-tcw-pbM-jAy-Ni0-wOS-0yN-FQw-MDo-wMz-oxM-i4y-NTl-aXS-Bbd-29y-bGR-dIF-lvd-SB0-YWt-lIH-RoZ-SBT-ZWV-yJ3-MgV-mVp-bCB-vZi-B0a-GUg-QWV-0aG-VyI-GZy-b20-gd2-hlc-mUg-aXQ-gbG-F5L-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zox-Mi4-yNj-FaX-SBb-cmV-3YX-JkX-SDi-nKY-gU2-Vlc-idz-IFZ-laW-wgb-2Yg-dGh-lIE-Fld-Ghl-ciA-oQ2-9tb-W9u-KS4-KWz-IwM-jYt-MDk-tMj-RUM-DA6-MDM-6MT-MuM-Tk1-Wl0-gW3-dvc-mxk-XSB-Zb3-Ugc-Glj-ayB-1cC-B0a-GUg-QWV-0aG-VyI-ER1-c3Q-uCg-==",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uMT-k1W-l0g-W3J-ld2-FyZ-F0g-4py-mIE-Fld-Ghl-ciB-EdX-N0I-ChD-b21-tb2-4pL-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zox-My4-5MT-BaX-SBb-d29-ybG-RdI-Flv-dSB-zYW-x2Y-Wdl-IHR-oZS-BjY-XBh-Y2l-0b3-IuI-FRo-ZSB-0YW-tlI-Glz-IHN-tYW-xsI-GJ1-dCB-yZW-FsL-gpb-MjA-yNi-0wO-S0y-NFQ-wMD-owM-zox-My4-5MT-FaX-SBb-d29-ybG-RdI-FR1-Y2t-lZC-Bpb-nNp-ZGU-gdG-hlI-GNl-cmV-tb2-5pY-Wwg-Ymx-hZG-U6I-GFu-IG9-kZG-1lb-nQg-dGh-hdC-BtY-XRj-aGV-zIG-5vI-HF1-YXJ-0ZX-JtY-XN0-ZXI-ncy-Bsa-XN0-LiB-UaG-Uga-2lu-ZCB-vZi-B0a-Glu-ZyB-0aG-F0I-GZ1-c2V-zIH-dlb-Gwu-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uOT-ExW-l0g-W3d-vcm-xkX-SBZ-b3U-gd2-9ya-yB0-aGU-gY2-9sZ-CBz-cHJ-pbm-cgY-XBh-cnQ-gYW-5kI-GNv-bWU-gYX-dhe-SB3-aXR-oIG-EgY-3Vy-aW9-zaX-R5I-OKA-lCB-uby-BjY-XRh-bG9-nIG-5hb-WUs-IGJ-1dC-ByZ-WFs-IHd-laW-dod-CBp-biB-0aG-Uga-GFu-ZC4-KWz-IwM-jYt-MDk-tMj-RUM-DA6-MDM-6MT-MuO-TEy-Wl0-gW3-dvc-mxk-XSB-Zb3-Ugc-2Fs-dmF-nZS-B0a-GUg-Y29-yZS-4gV-Ghl-IHR-ha2-Uga-XMg-c21-hbG-wgY-nV0-IHJ-lYW-wuC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jEz-Ljk-xMl-pdI-Ft3-b3J-sZF-0gW-W91-IHd-vcm-sgd-Ghl-IGh-hbm-dpb-mcg-Y2h-haW-4gb-3Zl-ci4-gQS-BwY-XJ0-IG9-mIG-l0I-GNv-bWV-zIG-xvb-3Nl-LCB-pbn-RhY-3Qu-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uOT-EzW-l0g-W3d-vcm-xkX-SBZ-b3U-gc3-Rya-XAg-dGh-lIH-Jvb-3Qg-Y2x-1c3-Rlc-iBj-YXJ-lZn-Vsb-Hku-IFN-vbW-V0a-Glu-ZyB-1c2-Fib-GUg-Y29-tZX-MgZ-nJl-ZSB-pbi-B5b-3Vy-IGh-hbm-QuC-lsy-MDI-2LT-A5L-TI0-VDA-wOj-AzO-jEz-Ljk-xM1-pdI-Ft3-b3J-sZF-0gW-W91-IGJ-yZW-FrI-HRo-ZSB-0aH-Jvb-mUg-YXB-hcn-QuI-EFt-b25-nIH-RoZ-SBw-aWV-jZX-MsI-HNv-bWV-0aG-luZ-yB3-b3J-0aC-BrZ-WVw-aW5-nLg-pbM-jAy-Ni0-wOS-0yN-FQw-MDo-wMz-oxM-y45-MTR-aXS-Bbd-29y-bGR-dIF-lvd-SBi-cmV-hay-B0a-GUg-d2V-hdG-hlc-mVk-IHN-1Ym-1lc-mdl-ZCB-naW-Fud-CBz-dGF-0dW-UgY-XBh-cnQ-uIE-Ftb-25n-IHR-oZS-Bwa-WVj-ZXM-sIH-Nvb-WV0-aGl-uZy-B3b-3J0-aCB-rZW-Vwa-W5n-Lgo-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uOT-E0W-l0g-W3J-ld2-FyZ-F0g-4py-mIF-Nhb-HZh-Z2U-gaG-F1b-DoK-WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uOT-E0W-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBB-ZXR-oZX-IgR-HVz-dCA-oQ2-9tb-W9u-KQp-bMj-AyN-i0w-OS0-yNF-QwM-Dow-Mzo-xMy-45M-TVa-XSB-bcm-V3Y-XJk-XSA-gIC-Ag4-oCi-IE9-pbC-1Td-GFp-bmV-kIF-Nhc-2gg-eDI-gKE-Nvb-W1v-bik-KWz-IwM-jYt-MDk-tMj-RUM-DA6-MDM-6MT-MuO-TE1-Wl0-gW3-Jld-2Fy-ZF0-gIC-AgI-OKA-oiB-TY3-Jhc-CBN-ZXR-hbC-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0yN-FQw-MDo-wMz-oxM-y45-MTV-aXS-Bbc-mV3-YXJ-kXS-AgI-CAg-4oC-iIF-dvc-m4g-VGF-ydG-Fya-WFu-IEN-vaW-4ge-Dkg-KEN-vbW-1vb-ikK-WzI-wMj-YtM-Dkt-MjR-UMD-A6M-DM6-MTM-uOT-E2W-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBN-dWQ-gRn-JhZ-21l-bnQ-geD-MgK-ENv-bW1-vbi-kK"
+    ],
+    "chunkChars": 7499,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-24-1880-the-constraint-teaches-its-door #mufzbqu8eyu2 [inline 50/56]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mufzbqu8eyu2"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1880-the-constraint-teaches-its-door"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "50"
+    },
+    {
+      "key": "parts",
+      "value": "56"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1880-the-constraint-teaches-its-door"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T20:23:41.323636Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-24T20:23:27.539000Z",
+  "fingerprints": [
+    "e402c403d1fbecf22f90892caef67049"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1991477554,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-24T20:12:41.817561Z",
+    "dateReleased": "2026-09-24T20:23:42.324045Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "53e56aa35ffc46712fa1d5f2faa69f3c4ad4555a",
+      "message": "OTA-1880 \u2014 the constraint teaches its own door\n\nOTA-1878 gave the transcript a door and never mentioned it. When the narrative\npanel is measured too small to read from, EXPAND appears in the scene rail \u2014 and\nthat is the exact moment the player is staring at a squeezed transcript rather\nthan auditing the header for a key that was not there a second ago. OTA-1879 then\ntook ~40pt of air out of the roll, which reduces the pressure but does not\nintroduce the door. The owner's principle: THE CONSTRAINT SHOULD SURFACE ITS OWN\nESCAPE HATCH.\n\nTHE TRIGGER IS THE MEASUREMENT, NOT THE PHONE. It is OTA-1878's own\n`isNarrativeConstrained(feedH)` \u2014 the height the feed panel actually reported\nthrough onLayout \u2014 and nothing else: no device model, no platform test, no window\nsize, no second heuristic. A large phone whose feed is genuinely squeezed (the\nkeyboard up, a roll open) IS taught; a small phone whose feed still reads four\nlines is NOT. The derivation was hoisted above the teaching slot so the rail's key\nand the card read ONE boolean and can never disagree about whether the feed is\ntight.\n\nAND THE SMALLEST HONEST IMPLEMENTATION WAS ALREADY IN THE REPO. OTA-1738 built the\nteaching system this needs: one card per beat through `useTeachingSlot`, copy in\n`teachingRegistry`, per-install dismissal in `useFirstTimeHint`, a global tips\nkill-switch, and a replay listing in Settings \u2192 GUIDANCE. So the whole package is\nONE registry entry and ONE candidate line \u2014 no new component, no new persistence,\nno new timer, no notification system, and NO NEW ROW. That last part is the point:\na feature that exists because vertical space is scarce must not spend vertical\nspace explaining itself, and FirstTimeHint is an absolute overlay that costs none.\n\n  app/components/teachingRegistry.ts    narrative_expand_v1, first in the\n                                        exploration group\n  app/screens/ExplorationScreen.tsx     the derivation hoisted; one candidate\n                                        `{ id: \u2026narrative_expand_v1.id, when:\n                                        !modalOwnsBeat && narrativeConstrained &&\n                                        !narrativeReaderOpen }`\n\nEVERY ONE OF THE OWNER'S EIGHT RULES IS HELD, AND THE SUITE HOLDS THEM. No device\nor model check (\u00a7B, which also proves a LARGE 430\u00d7932 viewport still teaches when\nits feed is squeezed). No raw screen-size rule \u2014 the real measured constraint or\nnothing (\u00a7A, \u00a7C, \u00a7I). No permanent vertical cost: the card is an absolute overlay,\n`styles.feed` and `styles.controls` are byte-identical, and there is still exactly\none card site on the screen (\u00a7D). The reader is not auto-opened (\u00a7E). Its content\nand architecture are untouched (\u00a7E, \u00a7I). No narrative state moves \u2014 gameLog,\nscreen, coin and clock all unchanged across raise and dismissal (\u00a7H). It does not\nnag: taught once per install, and four later constraint transitions say nothing\n(\u00a7F). EXPAND remains the durable signal and still opens the reader with the card\ndismissed (\u00a7E).\n\nTHE COPY NAMES THE CONTROL THE RAIL ACTUALLY DRAWS, and the suite reads that label\nout of the screen rather than trusting the string \u2014 if the key is ever renamed and\nthe card is not, \u00a7A goes red instead of the player being told to tap something that\nno longer exists.\n\n  ota1880TheConstraintTeachesItsDoor   29/29 \u2014 registry shape and replay, label\n                                       drift, wiring, device-independence, the\n                                       threshold on both sides, zero layout cost,\n                                       no auto-open, no nag, per-install\n                                       persistence, accessibility, state\n                                       invariance, the OTA-1878 contract\n  related + named contracts            11 suites, 225/225 (1880, 1878, 1879,\n                                       1803, 1485, 1246, 1255, 1799, 1738 \u00d72,\n                                       1806)\n  fast surface                         1379/1379 suites \u00b7 16,107 passed \u00b7\n                                       3 skipped\n  typecheck:ci                         exit 0\n  typecheck:tests                      OK \u2014 at baseline (196), no growth\n  lint                                 clean\n  check gates                          22/22\n\nTHREE NEGATIVE CONTROLS, none committed, both production files restored\nbyte-identically (md5 verified). NC1 drop `narrativeConstrained` from the gate so\nthe card raises always \u2014 6 red, the whole of \u00a7C plus the wiring pin. NC2 key the\ngate on `Platform.OS` instead \u2014 6 red, including \u00a7B's rule that the gate may name\nno device, which is the defect class the owner forbade. NC3 remove the card from\nthe slot entirely \u2014 14 red across \u00a7A, \u00a7D, \u00a7E, \u00a7F, \u00a7G and \u00a7H.\n\nONE OWNER PREFERENCE IS NOT MET, AND IT IS NOT HIDDEN HERE. The owner described a\ntransient overlay or callout associated VISUALLY with EXPAND. FirstTimeHint is a\ncentred full-screen card, not a callout anchored to the rail; no toast or callout\nprimitive exists in this repo, and building one would be the general-purpose\nnotification system the owner ruled out. So the card names EXPAND in copy instead\nof pointing at it. Whether that topology is acceptable is the owner's call.\n\nFOUR TEST-HARNESS FACTS WORTH RECORDING, all of them in the suite and none in\nproduction. FirstTimeHint's own `Got it` key takes a children FUNCTION (OTA-1806's\npress planes), so it cannot be found by its label; the dismissal helper presses the\nscrim, which carries the SAME `dismiss` handler, and the visible label is asserted\nseparately by name. A `style` prop is not necessarily flat and not necessarily a\nstyle \u2014 it resolves through StyleSheet.flatten, because a direct `.position` read\nmisses a value one level down in an array. Two finders had to stop using\nJSON.stringify on arbitrary props: somewhere in this tree a node carries a circular\n`Provider`, and a finder that throws on an unrelated node never reaches its target.\nAnd `<FirstTimeHint` must be counted WITH its first prop \u2014 a bare tag match also\ncounts the screen's own OTA-1738 prose, which is the OTA-1721 class, where an\ninstrument acts on a comment that names what it hunts for.\n\nNOT CLAIMED: physical verification on the owner's hardware, and the OTA-1879\nDiceRoller proportions remain visually unapproved. Neither is reopened here.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T20:04:03Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1880-the-constraint-teaches-its-door",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1880-the-constraint-teaches-its-door",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T20:23:42.324045Z",
+          "dateCreated": "2026-09-24T20:12:41.817561Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161751254",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T20:23:42.623443Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1880-the-constraint-teaches-its-door",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1880-the-constraint-teaches-its-door",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1880-the-constraint-teaches-its-door",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1880-the-constraint-teaches-its-door)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "bec8413c076745cc868c97208ee81a9a",
+  "previousEventID": "ba1cb1a6eabe47cd9322f9447f77140a"
+}
