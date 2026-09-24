@@ -1,0 +1,1702 @@
+=== TARTARIA LOG · 193033 CHARS · BEGIN ===
+[2026-09-16T04:10:50.801Z] [debug] APK session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:10:50.803Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=y passing=n
+[2026-09-16T04:10:50.803Z] [debug] missions: none active · at=monarch_waystation
+[2026-09-16T04:10:50.808Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows] window=0 roster=new
+[2026-09-16T04:10:50.809Z] [world] Of the Tartarian Giants, sworn to the Mud Monarchs: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.
+[2026-09-16T04:10:50.809Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere.
+[2026-09-16T04:10:50.809Z] [world] A map-stone hums softly at the center of the camp — old enough to remember roads the Flood erased. A glass hail presses on the world — -1 DEX. What you do here is yours to choose.
+[2026-09-16T04:10:50.810Z] [world] Paths: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-16T04:10:50.887Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu3l259m_3iqqs5 left intact
+[2026-09-16T04:10:57.992Z] [arbiter] The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."
+[2026-09-16T04:10:58.041Z] [debug] persist: skipped — player record missing core identity (name=∅, raceId=✓, stats=✓); slot slot_mu3l259m_3iqqs5 left intact
+[2026-09-16T04:11:05.802Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=0
+[2026-09-16T04:11:06.028Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=0
+[2026-09-16T04:11:11.133Z] [player] Verbal
+[2026-09-16T04:11:11.136Z] [arbiter] "Well met, Verbal. To business."
+[2026-09-16T04:11:11.139Z] [reward] ✦ A crash-test kit lands in Verbal's pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.
+[2026-09-16T04:11:11.140Z] [reward] ✦ The Arbiter unrolls the whole ledger for Verbal: every hunt, mystery, storyline and faction quest is open on the board — 50 contracts and 65 faction quests — plus all five Skyreacher Maps, every great climb already charted. Test freely.
+[2026-09-16T04:11:11.140Z] [arbiter] "First, get your bearings. Tap LOOK AROUND YOU — I'll read the room for you: what's here, your way out, and whatever you're still chasing. Use it any time you're lost."
+[2026-09-16T04:11:11.244Z] [reward] ✦ A Resurrection Gem is set aside for Verbal — the buried world keeps its own. (2 held)
+[2026-09-16T04:11:12.505Z] [debug] ui: tap "look around you" ⏱+19ms
+[2026-09-16T04:11:12.515Z] [player] look
+[2026-09-16T04:11:12.516Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:11:12.517Z] [world] You look around. You're in The Atrium (The Monarch's Waystation). You see: Bone Splitter Axe, Salvaged Bow, Wanderer's Face of Shadows, sign, brick, gate, arch, lantern, tilted capacitor coil rack, stripped sentinel diagnostic console, table. Exits: north to Standards · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-16T04:11:12.518Z] [world] One shelf of books doesn't match the others — same spines, no dust, and they don't quite sit flush against the wall.
+[2026-09-16T04:11:12.519Z] [arbiter] "A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You'll want a weapon."
+[2026-09-16T04:11:13.789Z] [debug] ui: tap "take / salvage" ⏱+17ms
+[2026-09-16T04:11:17.127Z] [player] take cudgel
+[2026-09-16T04:11:17.131Z] [world] You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your off hand without thinking.
+[2026-09-16T04:11:17.132Z] [reward] ✦ Cudgel (Common). [equipped]
+[2026-09-16T04:11:17.132Z] [arbiter] "Good. Keep it close."
+[2026-09-16T04:11:17.134Z] [arbiter] "That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."
+[2026-09-16T04:11:19.039Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-16T04:11:20.826Z] [player] take Mud-Warden's Vest
+[2026-09-16T04:11:20.827Z] [world] You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.
+[2026-09-16T04:11:20.827Z] [reward] ✦ Mud-Warden's Vest (Common).
+[2026-09-16T04:11:20.830Z] [debug] stats: STR5 DEX7 INT1 WIS7 CHA5 STE0 | gear: WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel chest=Mud-Warden's Vest
+[2026-09-16T04:11:20.917Z] [arbiter] "Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it's on your head."
+[2026-09-16T04:11:22.491Z] [debug] ui: tap "★ Take & wear Reclaimer's Salvage Cap — your head slot is bare"
+[2026-09-16T04:11:22.493Z] [world] You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.
+[2026-09-16T04:11:22.493Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-09-16T04:11:22.499Z] [debug] stats: STR5 DEX7 INT2 WIS7 CHA5 STE0 | gear: INT+1,WIS+1,STR+2 | worn: main=Mud-fist Wraps off=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest
+[2026-09-16T04:11:22.500Z] [arbiter] "Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."
+[2026-09-16T04:11:25.633Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=5
+[2026-09-16T04:11:25.759Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=5
+[2026-09-16T04:11:25.816Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=5
+[2026-09-16T04:11:34.210Z] [player] take rope
+[2026-09-16T04:11:34.211Z] [world] You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.
+[2026-09-16T04:11:34.212Z] [reward] ✦ Reclaimer's Rope (Common).
+[2026-09-16T04:11:34.212Z] [arbiter] "Good. That rope earns its keep."
+[2026-09-16T04:11:34.213Z] [arbiter] "That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."
+[2026-09-16T04:11:35.559Z] [debug] ui: tap "take / salvage" ⏱+14ms
+[2026-09-16T04:11:37.410Z] [player] salvage broken chest plate
+[2026-09-16T04:11:37.411Z] [world] You pop the rusted plate off its strap and it comes apart along old hammer-marks.
+[2026-09-16T04:11:37.411Z] [reward] ✦ Plate Fragment x2 (Common). [salvaged]
+[2026-09-16T04:11:37.412Z] [arbiter] "Now the rope earns its keep. Tap CLIMB — top out, then climb back down."
+[2026-09-16T04:11:38.527Z] [debug] ui: tap "climb" ⏱+23ms
+[2026-09-16T04:11:39.996Z] [player] climb arch
+[2026-09-16T04:11:39.996Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:40.000Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 1/3 cleared.
+[2026-09-16T04:11:40.001Z] [world] You reach the first hold of the arch (tier 1/3). Higher still to go.
+[2026-09-16T04:11:40.001Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:42.511Z] [debug] ui: tap "climb up (1/3)" ⏱+24ms
+[2026-09-16T04:11:42.526Z] [player] climb arch
+[2026-09-16T04:11:42.527Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:42.529Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 2/3 cleared.
+[2026-09-16T04:11:42.530Z] [world] You reach the last stretch of the arch (tier 2/3). Higher still to go.
+[2026-09-16T04:11:42.530Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:43.313Z] [debug] ui: tap "climb up (2/3)" ⏱+16ms
+[2026-09-16T04:11:43.342Z] [player] climb arch
+[2026-09-16T04:11:43.343Z] [debug] parser: intent=climb conf=1.00 verb=climb target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-09-16T04:11:43.347Z] [world] You loop your Reclaimer's Rope around the arch and walk the line. Tier 3/3 cleared.
+[2026-09-16T04:11:43.347Z] [world] You reach the top of the arch (tier 3/3). The view changes; the room reads differently from here.
+[2026-09-16T04:11:43.348Z] [reward] ✦ A small pouch, tucked where only a climber would look — 15 TC. High places keep things for whoever bothers to reach them.
+[2026-09-16T04:11:43.349Z] [system] ⏳ Time passed: 30 min
+[2026-09-16T04:11:44.345Z] [debug] ui: tap "climb down" ⏱+12ms
+[2026-09-16T04:11:44.371Z] [player] climb down
+[2026-09-16T04:11:44.371Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-16T04:11:44.373Z] [world] You make your way back down the arch. Boots back on the ground.
+[2026-09-16T04:11:44.373Z] [arbiter] "The north door is locked. Tap INVESTIGATE."
+[2026-09-16T04:11:44.374Z] [system] ⏳ Time passed: 15 min
+[2026-09-16T04:11:45.660Z] [debug] ui: tap "investigate" ⏱+13ms
+[2026-09-16T04:11:47.377Z] [player] investigate door
+[2026-09-16T04:11:47.377Z] [world] You crouch by the door. The latch is set into a frame that's seen worse — a single shove on the right bracket lifts it. The door swings open.
+[2026-09-16T04:11:47.378Z] [arbiter] "The way's open. Pick this place over, or step out and begin. Your call. Out there every step costs 1 stamina and a little time; REST brings it back."
+[2026-09-16T04:11:49.149Z] [debug] voice: bundled loading
+[2026-09-16T04:11:49.462Z] [arbiter] "Take your time. Tap EXIT when you're ready."
+[2026-09-16T04:11:50.875Z] [debug] voice: bundled ready
+[2026-09-16T04:11:51.552Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-16T04:11:55.190Z] [debug] ui: tap "take / salvage" ⏱+22ms
+[2026-09-16T04:11:57.311Z] [world] You take the Bone Splitter Axe from where it lay.
+[2026-09-16T04:11:57.311Z] [reward] ✦ Bone Splitter Axe (Common).
+[2026-09-16T04:11:57.319Z] [world] You pick up the Salvaged Bow.
+[2026-09-16T04:11:57.319Z] [reward] ✦ Salvaged Bow (Common).
+[2026-09-16T04:11:57.322Z] [world] You lift the Wanderer's Face of Shadows clear.
+[2026-09-16T04:11:57.322Z] [reward] ✦ Wanderer's Face of Shadows (Common).
+[2026-09-16T04:11:57.439Z] [debug] persist sizes(KB): total=61 player=28 wm=18[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=13 scene=2
+[2026-09-16T04:11:58.171Z] [world] You work the brick over. A part of it comes loose, intact.
+[2026-09-16T04:11:58.172Z] [world] Tucked inside the gate: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-16T04:11:58.172Z] [world] You salvage the lantern. The take is small but real.
+[2026-09-16T04:11:58.172Z] [world] You work the sign apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-16T04:11:58.172Z] [world] You salvage the stripped sentinel diagnostic console. The take is small but real.
+[2026-09-16T04:11:58.172Z] [world] You strip the table carefully. Something usable comes free in your hand.
+[2026-09-16T04:11:58.172Z] [world] You salvage the tilted capacitor coil rack. The take is small but real.
+[2026-09-16T04:11:58.173Z] [reward] ✦ Salvage haul:
+[2026-09-16T04:11:58.173Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Smoked Glass Chip (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Aether Crystal (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Splintered Haft End (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Scrap Metal x2 (Common)
+[2026-09-16T04:11:58.173Z] [reward]     • Aether Dust (Common)
+[2026-09-16T04:12:16.542Z] [debug] appstate: active → background (was active for 134807ms)
+[2026-09-16T04:12:22.022Z] [debug] qwen: LOAD FAILED — GGUF download failed: Software caused connection abort (gguf 208.3MB on disk (~398MB nominal); NO SENTINEL; disk free 59.8GB)
+[2026-09-16T04:14:11.904Z] [debug] appstate: background → active (was background for 109881ms)
+[2026-09-16T04:14:11.982Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-09-16T04:14:21.207Z] [debug] send-log: #mu3l6nkdnob4 — DELIVERED (inline, no attachments): beacon out, 3/3 parts accepted (21222 chars) — flush said yes, transport took every part
+[2026-09-16T04:14:22.039Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #1).
+[2026-09-16T04:14:26.807Z] [debug] appstate: active → background (was active for 14903ms)
+[2026-09-16T04:14:32.223Z] [debug] qwen-watchdog: reinit #1 settled in 10181ms → status='failed'.
+[2026-09-16T04:14:40.630Z] [debug] appstate: background → active (was background for 13822ms)
+[2026-09-16T04:14:40.635Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #2).
+[2026-09-16T04:14:48.577Z] [debug] send-log: #mu3l78ovjqx9 — DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (22307 chars) — flush said yes, transport took every part
+[2026-09-16T04:14:52.572Z] [debug] appstate: active → background (was active for 11942ms)
+[2026-09-16T04:14:57.981Z] [debug] qwen-watchdog: reinit #2 settled in 17346ms → status='failed'.
+[2026-09-16T04:23:52.467Z] [debug] appstate: background → active (was background for 539894ms)
+[2026-09-16T04:23:52.498Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #3).
+[2026-09-16T04:23:54.392Z] [debug] persist sizes(KB): total=66 player=29 wm=19[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=17 scene=2
+[2026-09-16T04:24:05.120Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:24:05.120Z] [debug] ota: Checking…
+[2026-09-16T04:24:05.231Z] [debug] ota: Already up to date
+[2026-09-16T04:24:05.231Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:24:05.375Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:24:05.376Z] [debug] voice: bundled idle
+[2026-09-16T04:24:17.526Z] [debug] appstate: active → background (was active for 12460ms)
+[2026-09-16T04:24:20.100Z] [debug] appstate: background → active (was background for 2575ms)
+[2026-09-16T04:24:42.668Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:24:42.669Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:24:42.669Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-09-16T04:24:42.670Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-16T04:24:42.799Z] [debug] ═══ SESSION 2026-09-16T04:24:42.799Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:24:42.803Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:24:42.804Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:24:42.805Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:24:42.806Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:24:42.806Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:24:42.806Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:24:42.808Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.809Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:24:42.810Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:24:42.811Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.812Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.813Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:24:42.813Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:24:42.813Z] [debug] boot: life bmu3lj625mn started 2026-09-16T04:24:04.973Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:24:47.224Z] [debug] ui: tap "✦ ability" ⏱+12ms
+[2026-09-16T04:24:48.309Z] [reward] ✦ Legacy of Power — Aether floods your limbs. +2 STR for 3 rounds.
+[2026-09-16T04:24:49.361Z] [debug] ui: tap "use aetheric torch" ⏱+23ms
+[2026-09-16T04:24:49.364Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-16T04:24:49.397Z] [player] use Aetheric Torch
+[2026-09-16T04:24:49.398Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=aetheric torch resolved=Aetheric Torch range=- enemies=0 hooks=1
+[2026-09-16T04:24:49.401Z] [world] You fix the Aetheric Torch's aetheric light on the shelf. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the shelf — investigate it and it will give up something rare.
+[2026-09-16T04:24:49.405Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-16T04:24:49.406Z] [system] ⏳ Time passed: 15 min
+[2026-09-16T04:24:49.463Z] [cognitive] USE_ITEM · THROW  (56ms)
+[2026-09-16T04:24:51.740Z] [debug] ui: tap "↑ STANDARDS" ⏱+24ms
+[2026-09-16T04:24:51.768Z] [player] go north
+[2026-09-16T04:24:51.768Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-16T04:24:51.770Z] [world] You head on to the Standards.
+[2026-09-16T04:24:51.770Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n
+[2026-09-16T04:24:51.773Z] [debug] missions: unchanged since 2026-09-16T04:24:42.803Z — 115 contracts (dumped in full then) · at=monarch_waystation here=hunt:hunt_mud_harpy_cradle,mystery:mystery_obsidian_orb,mystery:mystery_hollow_crown,storyline:story_monarch_silence,storyline:story_monarch_ledger_of_silence
+[2026-09-16T04:24:51.777Z] [debug] spawn: gear=[Architect's Aetheric Boots, Bone Shortsword] window=3 roster=new
+[2026-09-16T04:24:51.779Z] [world] Monarch Court — The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.
+[2026-09-16T04:24:51.779Z] [world] Paths: north to Strongroom · south to Atrium · east to Arsenal · west to Banquet. (Type 'leave outpost' to head into the wilds.)
+[2026-09-16T04:24:51.780Z] [system] Weather effect — Glass Hail: -1 DEX
+[2026-09-16T04:24:51.895Z] [cognitive] TRAVEL  (113ms)
+[2026-09-16T04:24:53.309Z] [debug] ui: tap "take / salvage" ⏱+29ms
+[2026-09-16T04:24:54.652Z] [world] You take the Architect's Aetheric Boots from where it lay.
+[2026-09-16T04:24:54.653Z] [reward] ✦ Architect's Aetheric Boots (Common).
+[2026-09-16T04:24:54.654Z] [world] You pick up the Bone Shortsword.
+[2026-09-16T04:24:54.655Z] [reward] ✦ Bone Shortsword (Common).
+[2026-09-16T04:24:55.646Z] [world] Tucked inside the bench: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-16T04:24:55.646Z] [world] You work the door over. A part of it comes loose, intact.
+[2026-09-16T04:24:55.646Z] [world] You work the lantern over. A part of it comes loose, intact.
+[2026-09-16T04:24:55.647Z] [world] You break the mud-glazed tartarian power conduit apart. Among the pieces, something worth keeping.
+[2026-09-16T04:24:55.647Z] [world] You strip the tilting royal vault pedestal down. Mostly debris — but a Bent Nail comes loose at the bottom of the pile.
+[2026-09-16T04:24:55.647Z] [world] Already worked over: tilted engine room toolbench.
+[2026-09-16T04:24:55.648Z] [reward] ✦ Salvage haul:
+[2026-09-16T04:24:55.648Z] [reward]     • Tin Valve Housing (Common)
+[2026-09-16T04:24:55.649Z] [reward]     • Bent Nail x3 (Common)
+[2026-09-16T04:24:55.649Z] [reward]     • Aether Dust x3 (Common)
+[2026-09-16T04:24:55.649Z] [reward]     • Aether Crystal (Common)
+[2026-09-16T04:24:57.326Z] [debug] ui: tap "map"
+[2026-09-16T04:25:14.290Z] [debug] persist sizes(KB): total=97 player=34 wm=19[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=43 scene=2
+[2026-09-16T04:25:22.866Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:25:22.866Z] [debug] ota: Checking…
+[2026-09-16T04:25:26.233Z] [debug] ota: Already up to date
+[2026-09-16T04:25:26.236Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:25:26.396Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:25:26.396Z] [debug] voice: bundled idle
+[2026-09-16T04:25:28.671Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:25:28.671Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:25:28.671Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-09-16T04:25:28.847Z] [debug] ═══ SESSION 2026-09-16T04:25:28.847Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:25:28.851Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:25:28.854Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:25:28.855Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:25:28.856Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:25:28.857Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.858Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:25:28.859Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.860Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.861Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.861Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:28.862Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:25:28.862Z] [debug] boot: life bmu3lku2dux started 2026-09-16T04:25:22.741Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:25:39.852Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:25:39.853Z] [debug] ota: Checking…
+[2026-09-16T04:25:39.996Z] [debug] ota: Already up to date
+[2026-09-16T04:25:39.996Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:25:40.108Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:25:40.112Z] [debug] voice: bundled idle
+[2026-09-16T04:25:50.102Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:25:50.102Z] [debug] ota: Checking…
+[2026-09-16T04:25:50.188Z] [debug] ota: Already up to date
+[2026-09-16T04:25:50.188Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:25:50.327Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:25:50.327Z] [debug] voice: bundled idle
+[2026-09-16T04:25:54.468Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:25:54.469Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:25:54.469Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-09-16T04:25:54.595Z] [debug] ═══ SESSION 2026-09-16T04:25:54.595Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:25:54.598Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:25:54.598Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:25:54.598Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:25:54.598Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:25:54.599Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:25:54.600Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:25:54.601Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.602Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.604Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:25:54.605Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.606Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:25:54.607Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:25:54.607Z] [debug] boot: life bmu3llf1uxa started 2026-09-16T04:25:49.938Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:26:03.101Z] [debug] send-log: #mu3llp3kr6w7 — DELIVERED (inline, no attachments): beacon out, 11/11 parts accepted (78067 chars) — flush said yes, transport took every part
+[2026-09-16T04:26:10.523Z] [debug] send-log: #mu3lluuvbbwx — DELIVERED (inline, no attachments): beacon out, 7/7 parts accepted (48287 chars) — flush said yes, transport took every part
+[2026-09-16T04:26:20.128Z] [debug] send-log: #mu3lm2a9ht2z — DELIVERED (inline, no attachments): beacon out, 7/7 parts accepted (48231 chars) — flush said yes, transport took every part
+[2026-09-16T04:44:40.746Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:44:40.746Z] [debug] ota: Checking…
+[2026-09-16T04:44:40.834Z] [debug] ota: Already up to date
+[2026-09-16T04:44:40.835Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:44:40.980Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:44:40.981Z] [debug] voice: bundled idle
+[2026-09-16T04:45:04.002Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-16T04:45:04.003Z] [debug] native-sdk verdict: answered false
+[2026-09-16T04:45:04.009Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:45:04.010Z] [debug] ota: Checking…
+[2026-09-16T04:45:04.113Z] [debug] ota: Already up to date
+[2026-09-16T04:45:04.113Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:45:04.210Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:45:04.211Z] [debug] voice: bundled idle
+[2026-09-16T04:45:07.830Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:45:07.830Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:45:07.831Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-09-16T04:45:08.081Z] [debug] ═══ SESSION 2026-09-16T04:45:08.080Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:45:08.084Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:45:08.084Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:45:08.084Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:45:08.084Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:45:08.085Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:45:08.086Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:45:08.087Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:45:08.088Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.090Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.091Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:45:08.092Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.093Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.094Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:08.094Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:45:08.094Z] [debug] boot: life bmu3ma5gsab started 2026-09-16T04:45:03.916Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:45:08.214Z] [debug] send-log: crash on record (2026-09-16T04:44:54.078Z) — game log pushed automatically, delivered to Sentry, #mu3ma8pudp5m cleared from disk
+[2026-09-16T04:45:14.982Z] [debug] appstate: active → background (was active for 11008ms)
+[2026-09-16T04:45:22.119Z] [debug] appstate: background → active (was background for 7137ms)
+[2026-09-16T04:45:33.012Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:45:33.012Z] [debug] ota: Checking…
+[2026-09-16T04:45:33.103Z] [debug] ota: Already up to date
+[2026-09-16T04:45:33.103Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:45:33.251Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:45:33.251Z] [debug] voice: bundled idle
+[2026-09-16T04:45:37.326Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:45:37.327Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:45:37.327Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-09-16T04:45:37.462Z] [debug] ═══ SESSION 2026-09-16T04:45:37.461Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:45:37.467Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:45:37.467Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:45:37.467Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:45:37.468Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:45:37.469Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:45:37.470Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:45:37.471Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:45:37.472Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:45:37.475Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:45:37.475Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:45:37.475Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:45:37.475Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:45:37.475Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.476Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.477Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:45:37.478Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:45:37.479Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.480Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:45:37.481Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:45:37.481Z] [debug] boot: life bmu3mart5h5 started 2026-09-16T04:45:32.873Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:45:46.107Z] [debug] appstate: active → background (was active for 13149ms)
+[2026-09-16T04:45:55.345Z] [debug] appstate: background → active (was background for 9238ms)
+[2026-09-16T04:46:01.051Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:46:01.051Z] [debug] ota: Checking…
+[2026-09-16T04:46:01.114Z] [debug] ota: Already up to date
+[2026-09-16T04:46:01.115Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:46:01.255Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:46:01.255Z] [debug] voice: bundled idle
+[2026-09-16T04:47:02.855Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:47:02.856Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:47:02.856Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again."
+[2026-09-16T04:47:02.992Z] [debug] ═══ SESSION 2026-09-16T04:47:02.991Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:47:02.995Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:47:02.995Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:47:02.995Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:47:02.996Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:47:02.998Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:47:02.999Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:47:03.000Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:47:03.001Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.002Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.003Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:47:03.004Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.005Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.006Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.006Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:47:03.006Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:47:03.006Z] [debug] boot: life bmu3mcm0hia started 2026-09-16T04:46:58.673Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:48:52.697Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-16T04:48:52.697Z] [debug] native-sdk verdict: answered false
+[2026-09-16T04:48:52.706Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-16T04:48:52.706Z] [debug] ota: Checking…
+[2026-09-16T04:48:53.391Z] [debug] ota: Already up to date
+[2026-09-16T04:48:53.392Z] [debug] ota: boot check result = noUpdate
+[2026-09-16T04:48:53.503Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-16T04:48:53.503Z] [debug] voice: bundled idle
+[2026-09-16T04:48:56.578Z] [debug] OTA session start: 2026-09-15-1824-the-helper-is-called-not-quoted.
+[2026-09-16T04:48:56.579Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-16T04:48:56.579Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-09-16T04:48:56.692Z] [debug] ═══ SESSION 2026-09-16T04:48:56.691Z · build 2026-09-15-1824-the-helper-is-called-not-quoted · previous entry moments earlier ═══
+[2026-09-16T04:48:56.696Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-16T04:48:56.696Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-16T04:48:56.696Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-16T04:48:56.696Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-16T04:48:56.697Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-16T04:48:56.698Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-16T04:48:56.700Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-16T04:48:56.701Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.702Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.703Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-16T04:48:56.704Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-16T04:48:56.705Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.706Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.707Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-16T04:48:56.707Z] [debug] missions: · at=monarch_waystation
+[2026-09-16T04:48:56.707Z] [debug] boot: life bmu3mf1xplw started 2026-09-16T04:48:52.621Z · not an OTA apply (no handoff on disk)
+[2026-09-16T04:48:56.900Z] [debug] send-log: crash on record (2026-09-16T04:47:10.233Z) — game log pushed automatically, delivered to Sentry, #mu3mf545w4my cleared from disk
+[2026-09-16T04:48:58.384Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-
+[2026-09-16T04:48:58.505Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:48:58.539Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:49:03.294Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-16T04:49:03.297Z] [system] Legacy of Power fades.
+[2026-09-16T04:49:03.299Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (−1 HP)
+[2026-09-16T04:49:03.331Z] [player] do you know what time it is?
+[2026-09-16T04:49:03.331Z] [debug] parser: intent=ask conf=1.00 verb=what target=time resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:49:03.333Z] [arbiter] "The Arbiter," the Arbiter says. "I have walked these places longer than I will tell you. I do not roll your dice and I do not decide your story. I notice. I narrate. I remember more than I let on. Some of it is mine."
+[2026-09-16T04:49:03.407Z] [cognitive] neutral  (71ms)
+[2026-09-16T04:49:10.109Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-
+[2026-09-16T04:49:10.206Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-
+[2026-09-16T04:49:10.278Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-09-16T04:49:15.955Z] [player] what is west of me?
+[2026-09-16T04:49:15.957Z] [debug] parser: intent=ask conf=1.00 verb=what target=west resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:49:15.963Z] [arbiter] The Arbiter gestures west. "Iskan-Veil lies west — 3 tiles, about 8 hours of travel."
+[2026-09-16T04:49:15.970Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-16T04:49:16.056Z] [cognitive] neutral  (74ms)
+[2026-09-16T04:49:20.522Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-09-16T04:49:20.620Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-
+[2026-09-16T04:49:20.679Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-09-16T04:49:24.346Z] [player] who are you?
+[2026-09-16T04:49:24.347Z] [debug] parser: intent=ask conf=1.00 verb=who target=- resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:49:24.348Z] [arbiter] The Arbiter watches you for a moment. "I am the Arbiter. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the silt did to the seam between them."
+[2026-09-16T04:49:24.410Z] [cognitive] neutral  (60ms)
+[2026-09-16T04:49:28.692Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-09-16T04:49:28.808Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:49:28.856Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:49:34.450Z] [player] who are the guardians?
+[2026-09-16T04:49:34.451Z] [debug] parser: intent=ask conf=1.00 verb=who target=guardians resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:49:34.452Z] [arbiter] "The Aether-Born Order," the Arbiter says. "A non-playable sub-faction — a semi-religious order dedicated to guarding the nine Tartarian Cores that keep the buried cities' grid alive. Each Capital has its own Guardian (a former high priest, kept living by the Core they swore to protect). To them, taking a Core is sacrilege. Flee freely and the Guardian fully restores; you have to win the fight in one sitting."
+[2026-09-16T04:49:34.453Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-16T04:49:34.506Z] [cognitive] neutral  (52ms)
+[2026-09-16T04:49:49.499Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-
+[2026-09-16T04:49:49.607Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:49:49.649Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-
+[2026-09-16T04:49:55.857Z] [player] you sounded like a Wikipedia you know that
+[2026-09-16T04:49:55.858Z] [debug] parser: intent=gesture conf=1.00 verb=sound target=like wikipedia know resolved=- range=- enemies=0 hooks=0
+[2026-09-16T04:49:55.861Z] [world] You set the like wikipedia know sounding. The note hangs, thins, and is gone — a signal thrown out to a country that stopped listening when the flood came.
+[2026-09-16T04:50:11.825Z] [debug] appstate: active → background (was active for 79148ms)
+[2026-09-17T22:39:00.801Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=81b7d488-e2c3-4cb0-87db-78cd0ae1c41b
+[2026-09-17T22:39:00.801Z] [debug] ota: Checking…
+[2026-09-17T22:39:02.163Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-17T22:39:02.469Z] [debug] ota: Saving progress…
+[2026-09-17T22:39:02.471Z] [debug] ota: Restarting to apply…
+[2026-09-17T22:39:02.828Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b04d-acd5-74d6-b063-bddafe173331
+[2026-09-17T22:39:02.829Z] [debug] ota: Checking…
+[2026-09-17T22:39:03.053Z] [debug] ota: Already up to date
+[2026-09-17T22:39:03.054Z] [debug] ota: boot check result = noUpdate
+[2026-09-17T22:39:03.591Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-17T22:39:03.592Z] [debug] voice: bundled idle
+[2026-09-18T16:41:01.479Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b04d-acd5-74d6-b063-bddafe173331
+[2026-09-18T16:41:01.479Z] [debug] ota: Checking…
+[2026-09-18T16:41:02.680Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T16:41:02.963Z] [debug] ota: Saving progress…
+[2026-09-18T16:41:02.964Z] [debug] ota: Restarting to apply…
+[2026-09-18T16:41:03.418Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b551-0dda-79d8-8ed3-5016f0c86517
+[2026-09-18T16:41:03.418Z] [debug] ota: Checking…
+[2026-09-18T16:41:03.660Z] [debug] ota: Already up to date
+[2026-09-18T16:41:03.661Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T16:41:03.741Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T16:41:03.741Z] [debug] voice: bundled idle
+[2026-09-18T16:41:06.750Z] [debug] appstate: active → background (was active for 3416ms)
+[2026-09-18T16:41:14.261Z] [debug] appstate: background → active (was background for 7510ms)
+[2026-09-18T16:42:38.809Z] [debug] appstate: active → background (was active for 84547ms)
+[2026-09-18T18:36:57.613Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b551-0dda-79d8-8ed3-5016f0c86517
+[2026-09-18T18:36:57.613Z] [debug] ota: Checking…
+[2026-09-18T18:36:57.755Z] [debug] ota: Already up to date
+[2026-09-18T18:36:57.756Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T18:36:57.971Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T18:36:57.972Z] [debug] voice: bundled idle
+[2026-09-18T18:49:59.782Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b551-0dda-79d8-8ed3-5016f0c86517
+[2026-09-18T18:49:59.783Z] [debug] ota: Checking…
+[2026-09-18T18:50:01.023Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T18:50:01.339Z] [debug] ota: Saving progress…
+[2026-09-18T18:50:01.339Z] [debug] ota: Restarting to apply…
+[2026-09-18T18:50:01.739Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b5d3-d8bc-78a4-807f-5c2adf4f7ef1
+[2026-09-18T18:50:01.739Z] [debug] ota: Checking…
+[2026-09-18T18:50:01.927Z] [debug] ota: Already up to date
+[2026-09-18T18:50:01.928Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T18:50:02.011Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T18:50:02.011Z] [debug] voice: bundled idle
+[2026-09-18T21:03:51.826Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b5d3-d8bc-78a4-807f-5c2adf4f7ef1
+[2026-09-18T21:03:51.827Z] [debug] ota: Checking…
+[2026-09-18T21:03:55.009Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T21:03:55.416Z] [debug] ota: Saving progress…
+[2026-09-18T21:03:55.417Z] [debug] ota: Restarting to apply…
+[2026-09-18T21:03:55.779Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b608-e2a2-76e8-bda2-a1b2948ef0a3
+[2026-09-18T21:03:55.779Z] [debug] ota: Checking…
+[2026-09-18T21:03:56.014Z] [debug] ota: Already up to date
+[2026-09-18T21:03:56.015Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:03:56.168Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:03:56.168Z] [debug] voice: bundled idle
+[2026-09-18T21:04:00.783Z] [debug] appstate: active → background (was active for 5025ms)
+[2026-09-18T21:05:05.357Z] [debug] appstate: background → active (was background for 64571ms)
+[2026-09-18T21:05:29.005Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b608-e2a2-76e8-bda2-a1b2948ef0a3
+[2026-09-18T21:05:29.005Z] [debug] ota: Checking…
+[2026-09-18T21:05:29.202Z] [debug] ota: Already up to date
+[2026-09-18T21:05:29.203Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:05:29.294Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:05:29.294Z] [debug] voice: bundled idle
+[2026-09-18T21:05:40.497Z] [debug] appstate: active → background (was active for 11511ms)
+[2026-09-18T21:11:07.051Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b608-e2a2-76e8-bda2-a1b2948ef0a3
+[2026-09-18T21:11:07.052Z] [debug] ota: Checking…
+[2026-09-18T21:11:09.173Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-18T21:11:09.389Z] [debug] ota: Saving progress…
+[2026-09-18T21:11:09.389Z] [debug] ota: Restarting to apply…
+[2026-09-18T21:11:09.793Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b657-6ee7-7870-bd2b-3dbdcc1d775f
+[2026-09-18T21:11:09.793Z] [debug] ota: Checking…
+[2026-09-18T21:11:10.060Z] [debug] ota: Already up to date
+[2026-09-18T21:11:10.060Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T21:11:10.143Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T21:11:10.143Z] [debug] voice: bundled idle
+[2026-09-18T21:11:12.573Z] [debug] appstate: active → background (was active for 2808ms)
+[2026-09-18T22:46:00.894Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b657-6ee7-7870-bd2b-3dbdcc1d775f
+[2026-09-18T22:46:00.894Z] [debug] ota: Checking…
+[2026-09-18T22:46:01.214Z] [debug] ota: Already up to date
+[2026-09-18T22:46:01.214Z] [debug] ota: boot check result = noUpdate
+[2026-09-18T22:46:01.525Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-18T22:46:01.525Z] [debug] voice: bundled idle
+[2026-09-18T22:46:05.409Z] [debug] appstate: active → background (was active for 4534ms)
+[2026-09-19T00:35:49.506Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b657-6ee7-7870-bd2b-3dbdcc1d775f
+[2026-09-19T00:35:49.506Z] [debug] ota: Checking…
+[2026-09-19T00:35:50.808Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-19T00:35:51.055Z] [debug] ota: Saving progress…
+[2026-09-19T00:35:51.056Z] [debug] ota: Restarting to apply…
+[2026-09-19T00:35:51.433Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b702-7d11-7073-a07b-24eee1321e48
+[2026-09-19T00:35:51.433Z] [debug] ota: Checking…
+[2026-09-19T00:35:51.643Z] [debug] ota: Already up to date
+[2026-09-19T00:35:51.644Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T00:35:51.721Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T00:35:51.722Z] [debug] voice: bundled idle
+[2026-09-19T00:35:58.737Z] [debug] appstate: active → background (was active for 7368ms)
+[2026-09-19T13:08:56.100Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b702-7d11-7073-a07b-24eee1321e48
+[2026-09-19T13:08:56.101Z] [debug] ota: Checking…
+[2026-09-19T13:09:00.353Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-19T13:09:00.865Z] [debug] ota: Saving progress…
+[2026-09-19T13:09:00.866Z] [debug] ota: Restarting to apply…
+[2026-09-19T13:09:01.400Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b9c5-1b76-78a4-86ae-570cb821b8f5
+[2026-09-19T13:09:01.401Z] [debug] ota: Checking…
+[2026-09-19T13:09:01.809Z] [debug] ota: Already up to date
+[2026-09-19T13:09:01.810Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T13:09:01.893Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T13:09:01.894Z] [debug] voice: bundled idle
+[2026-09-19T13:09:06.309Z] [debug] appstate: active → background (was active for 4933ms)
+[2026-09-19T14:33:48.188Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b9c5-1b76-78a4-86ae-570cb821b8f5
+[2026-09-19T14:33:48.188Z] [debug] ota: Checking…
+[2026-09-19T14:33:51.252Z] [debug] ota: Already up to date
+[2026-09-19T14:33:51.255Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T14:33:51.397Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T14:33:51.397Z] [debug] voice: bundled idle
+[2026-09-19T15:09:12.115Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0b9c5-1b76-78a4-86ae-570cb821b8f5
+[2026-09-19T15:09:12.115Z] [debug] ota: Checking…
+[2026-09-19T15:09:13.229Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-19T15:09:13.601Z] [debug] ota: Saving progress…
+[2026-09-19T15:09:13.602Z] [debug] ota: Restarting to apply…
+[2026-09-19T15:09:14.170Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ba27-24f7-7cc3-a738-c1afc27e0f7f
+[2026-09-19T15:09:14.171Z] [debug] ota: Checking…
+[2026-09-19T15:09:14.566Z] [debug] ota: Already up to date
+[2026-09-19T15:09:14.567Z] [debug] ota: boot check result = noUpdate
+[2026-09-19T15:09:14.682Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T15:09:14.682Z] [debug] voice: bundled idle
+[2026-09-19T15:09:19.041Z] [debug] appstate: active → background (was active for 4994ms)
+[2026-09-19T23:54:04.001Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ba27-24f7-7cc3-a738-c1afc27e0f7f
+[2026-09-19T23:54:04.001Z] [debug] ota: Checking…
+[2026-09-19T23:54:12.354Z] [debug] OTA session start: 2026-09-19-1850-gems-belong-to-the-character.
+[2026-09-19T23:54:12.356Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-19T23:54:12.357Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.
+[2026-09-19T23:54:12.368Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-19T23:54:12.507Z] [debug] ═══ SESSION 2026-09-19T23:54:12.505Z · build 2026-09-19-1850-gems-belong-to-the-character · previous entry moments earlier ═══
+[2026-09-19T23:54:12.508Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc="the Drakovan reeve" gives=Reeve's Brass Token PAUSED
+[2026-09-19T23:54:12.508Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_sludge_behemoth stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Coordinate Tube PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_servants_doubter stage 0/5 [diplomacy] @giant_watch_shrine npc="the Servants priest" gives=Servants' Mark of Sanction PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 0/7 [diplomacy] @dynasty_border_post npc="the caravan-master" gives=Caravan-Master's Pass-Chit PAUSED
+[2026-09-19T23:54:12.509Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 0/7 [diplomacy] @ostragar npc="the dive-boss" gives=Dive-Boss's Mooring Chit PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_shade_endless_stair stage 0/7 [diplomacy] @pilgrim_waycamp npc="the stair-warden" gives=Warden's Tally of the Missing PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 0/7 [diplomacy] @drakova npc="the head ferryman" gives=Ferryman's Crossing-Token PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_apparition_red_tower stage 0/7 [diplomacy] @varakush npc="the Order archivist" gives=Archivist's Requisition PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 0/7 [diplomacy] @monarch_waystation HERE npc="the road-warden" gives=Warden's Dusk-Warrant PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 0/7 [diplomacy] @parley_ground npc="the caravan-mother" gives=Caravan-Mother's Grit-Token PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 0/7 [diplomacy] @builders_survey_camp npc="the lodge-surveyor" gives=Lodge Survey Warrant PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 0/5 [diplomacy] @tartarian_outskirts npc="the physician" gives=Physician's Rot-Ward Mask PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: hunt:hunt_salamander_voronov stage 0/5 [diplomacy] @voronov npc="the Voronov engineer" gives=Engineer's Conduit Chit PAUSED
+[2026-09-19T23:54:12.510Z] [debug] missions: mystery:mystery_red_tower stage 0/4 [diplomacy] @varakush npc="the Order scholar" gives=Scholar's Survey Chit PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_leviathan_eye stage 0/4 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Jar of Aetherstone Packing PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Guild Eddy-Gauge PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_servants_hum stage 0/5 [diplomacy] @giant_watch_shrine npc="Vael" gives=Vael's Three Listening Stones PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_weeping_core stage 0/4 [diplomacy] @varakush npc="the Order savant" gives=Sealed Catch-Vial PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_aetherborn_foundling stage 0/4 [diplomacy] @dynasty_border_post npc="the Dynasty agent" gives=Dynasty Seal PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 0/4 [diplomacy] @ostragar npc="the bell-founder" gives=Founder's Tuning-Rod PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_singing_stone_ostragar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-scribe" gives=Lodge Brace-Kit PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_monarch_redaction stage 0/4 [diplomacy] @architect_blind npc="the Architect handler" gives=Market Letter of Credit PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_second_flood_cipher stage 0/4 [diplomacy] @revivalist_field_camp npc="the Revivalist cell-leader" gives=Glyph-Frame PAUSED
+[2026-09-19T23:54:12.511Z] [debug] missions: mystery:mystery_cartographers_last_map stage 0/4 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Merik's Estate Claim-Chit PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: mystery:mystery_giants_tooth stage 0/4 [diplomacy] @pilgrim_waycamp npc="the pilgrim-elder" gives=Listening-Cord PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: mystery:mystery_hollow_crown stage 0/4 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Hoard Manifest PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: mystery:mystery_ashen_codex stage 0/4 [diplomacy] @varakush npc="the Order archivist" gives=Ash-Frame PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: mystery:mystery_tuning_fork_asgardar stage 0/4 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=Lodge-Master's Common Fork PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: mystery:mystery_pale_signal stage 0/4 [diplomacy] @parley_ground npc="the hooded buyer" gives=Beat-Counter PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_order_red_tower stage 0/9 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Fragment Map PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_tartarian_ascension stage 0/8 [diplomacy] @tartarian_enclave npc="Korash of the Deep" gives=Korash's Trial-Token PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_reclaimer_relic_run stage 0/7 [diplomacy] @reclaimer_stake npc="the Reclaimers Guild Speaker" gives=Sealed Five-Mark Map PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_monarch_silence stage 0/8 [diplomacy] @monarch_waystation HERE npc="Dr. Lucius Kincaid" gives=Kincaid's List of Six PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 0/6 [diplomacy] @monarch_waystation HERE npc="the Monarch factor" gives=Factor's Name and Route PAUSED
+[2026-09-19T23:54:12.512Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 0/7 [diplomacy] @tartarian_enclave npc="the enclave-mother" gives=Enclave-Mother's Ash Mark PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_dynasty_blood_aetherborn stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty proctor" gives=Proctor's Fetch-Order PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_servants_giant_watch_vigil stage 0/6 [diplomacy] @giant_watch_shrine npc="the vigil-keeper" gives=Vigil-Keeper's Ear-Stone PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_builders_scripture_in_stone stage 0/6 [diplomacy] @builders_survey_camp npc="the lodge-master" gives=The Lodge's Faulty Rubbing PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_revivalist_sashas_gambit stage 0/6 [diplomacy] @revivalist_field_camp npc="Sasha Ironheart" gives=Sasha's Core-Line Order PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_reclaimer_highest_bidder stage 0/6 [diplomacy] @reclaimer_stake npc="the Reclaimer broker" gives=Auction Floor-Warrant PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_architect_silence_protocol stage 0/6 [diplomacy] @architect_blind npc="the Architect handler" gives=The Protocol Order PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_order_drowned_library stage 0/6 [diplomacy] @varakush npc="Vesryn" gives=Vesryn's Case-Straps PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: storyline:story_dynasty_purge_asgardar stage 0/6 [diplomacy] @dynasty_border_post npc="the Dynasty enforcer" gives=The Enforcer's Retirement Order PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4] PAUSED
+[2026-09-19T23:54:12.513Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_architects_starter [fetch=Small Rock×5] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_revivalists_starter [fetch=Spider Silk×4] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_reclaimers_pinch stage 0/2 [advanceOn=any] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_tartarians_giant stage 0/2 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.514Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_dynasty_pretender stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_builders_regulator stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_architects_evidence stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_architects_informant stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_revivalists_dig stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_revivalists_headline stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_servants_vigil stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-19T23:54:12.515Z] [debug] missions: faction:fq_reclaimers_guild_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_mud_monarchs_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_servants_of_giants_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_eternal_dynasty_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_conspiracy_architects_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_stone_builders_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_tartarian_revivalists_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_stone_builders_survey_escort [single objective] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_forgotten_order_pilgrims_escort [single objective] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_eternal_dynasty_envoy_escort [single objective] PAUSED
+[2026-09-19T23:54:12.516Z] [debug] missions: faction:fq_tartarian_revivalists_scholars_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_stone_builders_mason_crew_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_stone_builders_chainmen_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_stone_builders_founders_bones_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_stone_builders_charter_signatories_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_forgotten_order_almoners_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_forgotten_order_relic_bearers_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_forgotten_order_confessor_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_eternal_dynasty_census_takers_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_eternal_dynasty_ledgermen_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_eternal_dynasty_heirs_tutor_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_eternal_dynasty_treaty_scribes_escort [single objective] PAUSED
+[2026-09-19T23:54:12.517Z] [debug] missions: faction:fq_tartarian_revivalists_cataloguers_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_tartarian_revivalists_glyph_readers_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_tartarian_revivalists_first_stone_keepers_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_tartarian_revivalists_ashfall_pilgrimage_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_mud_monarchs_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_forgotten_order_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_reclaimers_guild_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_true_tartarians_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_eternal_dynasty_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_conspiracy_architects_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.519Z] [debug] missions: faction:fq_servants_of_giants_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.520Z] [debug] missions: faction:fq_stone_builders_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.520Z] [debug] missions: faction:fq_tartarian_revivalists_stranded_escort [single objective] PAUSED
+[2026-09-19T23:54:12.520Z] [debug] missions: · at=monarch_waystation
+[2026-09-19T23:54:12.520Z] [debug] boot: life bmu91nbut1u started 2026-09-19T23:54:03.845Z · not an OTA apply (no handoff on disk)
+[2026-09-19T23:54:14.008Z] [debug] ota: Error
+[2026-09-19T23:54:14.008Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim.golem/files/.expo-internal/2a81c947f012f41f9196b8f4007f780a:1:4028519)
+[2026-09-19T23:54:14.009Z] [debug] ota: boot check result = errored
+[2026-09-19T23:54:14.089Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T23:54:14.090Z] [debug] voice: bundled idle
+[2026-09-19T23:54:29.949Z] [debug] send-log: #mu91nvxz49wq — DELIVERED (inline, no attachments): beacon out, 7/7 parts accepted (49300 chars) — flush said yes, transport took every part
+[2026-09-20T02:24:38.510Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ba74-4610-712b-a562-2443be689348
+[2026-09-20T02:24:38.511Z] [debug] ota: Checking…
+[2026-09-20T02:24:41.688Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T02:24:42.146Z] [debug] ota: Saving progress…
+[2026-09-20T02:24:42.147Z] [debug] ota: Restarting to apply…
+[2026-09-20T02:24:42.589Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bc18-2061-7860-af38-1c66a2ffa1ad
+[2026-09-20T02:24:42.589Z] [debug] ota: Checking…
+[2026-09-20T02:24:42.906Z] [debug] ota: Already up to date
+[2026-09-20T02:24:42.907Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:24:42.990Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:24:42.990Z] [debug] voice: bundled idle
+[2026-09-20T02:24:47.521Z] [debug] appstate: active → background (was active for 4946ms)
+[2026-09-20T02:24:49.149Z] [debug] appstate: background → active (was background for 1628ms)
+[2026-09-20T02:24:53.223Z] [debug] appstate: active → background (was active for 4074ms)
+[2026-09-20T02:26:11.497Z] [debug] appstate: background → active (was background for 78274ms)
+[2026-09-20T02:27:59.718Z] [debug] appstate: active → background (was active for 108220ms)
+[2026-09-20T02:28:47.299Z] [debug] appstate: background → active (was background for 47581ms)
+[2026-09-20T02:30:12.378Z] [debug] appstate: active → background (was active for 85079ms)
+[2026-09-20T02:53:52.486Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bc18-2061-7860-af38-1c66a2ffa1ad
+[2026-09-20T02:53:52.486Z] [debug] ota: Checking…
+[2026-09-20T02:53:56.081Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T02:53:56.584Z] [debug] ota: Saving progress…
+[2026-09-20T02:53:56.586Z] [debug] ota: Restarting to apply…
+[2026-09-20T02:53:57.094Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bcb7-96e3-7094-af6f-b148b973ab42
+[2026-09-20T02:53:57.094Z] [debug] ota: Checking…
+[2026-09-20T02:53:57.449Z] [debug] ota: Already up to date
+[2026-09-20T02:53:57.449Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:53:57.598Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:53:57.598Z] [debug] voice: bundled idle
+[2026-09-20T02:54:01.037Z] [debug] appstate: active → background (was active for 3996ms)
+[2026-09-20T03:38:59.757Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bcb7-96e3-7094-af6f-b148b973ab42
+[2026-09-20T03:38:59.757Z] [debug] ota: Checking…
+[2026-09-20T03:39:00.591Z] [debug] ota: Already up to date
+[2026-09-20T03:39:00.592Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T03:39:00.704Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T03:39:00.704Z] [debug] voice: bundled idle
+[2026-09-20T12:23:20.836Z] [debug] crash-ledger: native SDK verdict on the life that died — crashed=no (1 record annotated)
+[2026-09-20T12:23:20.837Z] [debug] native-sdk verdict: answered false
+[2026-09-20T12:23:20.843Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bcb7-96e3-7094-af6f-b148b973ab42
+[2026-09-20T12:23:20.843Z] [debug] ota: Checking…
+[2026-09-20T12:23:23.324Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T12:23:23.803Z] [debug] ota: Saving progress…
+[2026-09-20T12:23:23.805Z] [debug] ota: Restarting to apply…
+[2026-09-20T12:23:24.328Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bce7-1b47-72ee-b42d-914e7e11a5bc
+[2026-09-20T12:23:24.328Z] [debug] ota: Checking…
+[2026-09-20T12:23:24.622Z] [debug] ota: Already up to date
+[2026-09-20T12:23:24.623Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T12:23:24.701Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T12:23:24.701Z] [debug] voice: bundled idle
+[2026-09-20T12:23:33.393Z] [debug] appstate: active → background (was active for 9095ms)
+[2026-09-20T23:00:07.146Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0bce7-1b47-72ee-b42d-914e7e11a5bc
+[2026-09-20T23:00:07.146Z] [debug] ota: Checking…
+[2026-09-20T23:00:10.054Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T23:00:10.541Z] [debug] ota: Saving progress…
+[2026-09-20T23:00:10.542Z] [debug] ota: Restarting to apply…
+[2026-09-20T23:00:11.016Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c108-a7c4-755e-82f1-83c4a613168b
+[2026-09-20T23:00:11.016Z] [debug] ota: Checking…
+[2026-09-20T23:00:11.349Z] [debug] ota: Already up to date
+[2026-09-20T23:00:11.350Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T23:00:11.423Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T23:00:11.425Z] [debug] voice: bundled idle
+[2026-09-20T23:00:16.228Z] [debug] appstate: active → background (was active for 5281ms)
+[2026-09-21T18:11:30.018Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c108-a7c4-755e-82f1-83c4a613168b
+[2026-09-21T18:11:30.019Z] [debug] ota: Checking…
+[2026-09-21T18:11:31.137Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T18:11:31.508Z] [debug] ota: Saving progress…
+[2026-09-21T18:11:31.509Z] [debug] ota: Restarting to apply…
+[2026-09-21T18:11:31.926Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c35c-6c9b-7cdc-a6e1-70d4b9a793ce
+[2026-09-21T18:11:31.926Z] [debug] ota: Checking…
+[2026-09-21T18:11:32.304Z] [debug] ota: Already up to date
+[2026-09-21T18:11:32.305Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T18:11:32.398Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T18:11:32.398Z] [debug] voice: bundled idle
+[2026-09-21T18:11:38.742Z] [debug] appstate: active → background (was active for 6848ms)
+[2026-09-22T11:09:19.284Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c35c-6c9b-7cdc-a6e1-70d4b9a793ce
+[2026-09-22T11:09:19.284Z] [debug] ota: Checking…
+[2026-09-22T11:09:20.767Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T11:09:20.903Z] [debug] ota: Saving progress…
+[2026-09-22T11:09:20.903Z] [debug] ota: Restarting to apply…
+[2026-09-22T11:09:21.202Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c78c-84e3-73ff-97b1-2d2d37df0597
+[2026-09-22T11:09:21.202Z] [debug] ota: Checking…
+[2026-09-22T11:09:21.315Z] [debug] ota: Already up to date
+[2026-09-22T11:09:21.316Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T11:09:21.822Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T11:09:21.822Z] [debug] voice: bundled idle
+[2026-09-22T11:09:25.218Z] [debug] appstate: active → background (was active for 4080ms)
+[2026-09-22T16:59:00.886Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0c78c-84e3-73ff-97b1-2d2d37df0597
+[2026-09-22T16:59:00.886Z] [debug] ota: Checking…
+[2026-09-22T16:59:02.029Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T16:59:02.353Z] [debug] ota: Saving progress…
+[2026-09-22T16:59:02.354Z] [debug] ota: Restarting to apply…
+[2026-09-22T16:59:02.822Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca0b-05e9-76fb-b8a3-bf4911b9bd16
+[2026-09-22T16:59:02.822Z] [debug] ota: Checking…
+[2026-09-22T16:59:03.051Z] [debug] ota: Already up to date
+[2026-09-22T16:59:03.052Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T16:59:03.182Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T16:59:03.183Z] [debug] voice: bundled idle
+[2026-09-22T16:59:06.392Z] [debug] appstate: active → background (was active for 3633ms)
+[2026-09-22T17:19:21.752Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca0b-05e9-76fb-b8a3-bf4911b9bd16
+[2026-09-22T17:19:21.752Z] [debug] ota: Checking…
+[2026-09-22T17:19:21.918Z] [debug] ota: Already up to date
+[2026-09-22T17:19:21.918Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T17:19:22.017Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T17:19:22.017Z] [debug] voice: bundled idle
+[2026-09-22T17:53:18.072Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca0b-05e9-76fb-b8a3-bf4911b9bd16
+[2026-09-22T17:53:18.072Z] [debug] ota: Checking…
+[2026-09-22T17:53:18.270Z] [debug] ota: Already up to date
+[2026-09-22T17:53:18.271Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T17:53:18.486Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T17:53:18.486Z] [debug] voice: bundled idle
+[2026-09-22T17:53:23.844Z] [debug] appstate: active → background (was active for 5789ms)
+[2026-09-22T18:11:33.368Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca0b-05e9-76fb-b8a3-bf4911b9bd16
+[2026-09-22T18:11:33.368Z] [debug] ota: Checking…
+[2026-09-22T18:11:35.794Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T18:11:36.252Z] [debug] ota: Saving progress…
+[2026-09-22T18:11:36.254Z] [debug] ota: Restarting to apply…
+[2026-09-22T18:11:36.794Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca4c-cfe0-7909-9167-90c5f28677b5
+[2026-09-22T18:11:36.794Z] [debug] ota: Checking…
+[2026-09-22T18:11:37.261Z] [debug] ota: Already up to date
+[2026-09-22T18:11:37.264Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T18:11:37.638Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T18:11:37.638Z] [debug] voice: bundled idle
+[2026-09-22T18:11:41.401Z] [debug] appstate: active → background (was active for 4641ms)
+[2026-09-22T18:30:22.068Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca4c-cfe0-7909-9167-90c5f28677b5
+[2026-09-22T18:30:22.068Z] [debug] ota: Checking…
+[2026-09-22T18:30:22.280Z] [debug] ota: Already up to date
+[2026-09-22T18:30:22.280Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T18:30:22.601Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T18:30:22.602Z] [debug] voice: bundled idle
+[2026-09-22T18:30:29.510Z] [debug] appstate: active → background (was active for 7466ms)
+[2026-09-22T21:28:22.724Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0ca4c-cfe0-7909-9167-90c5f28677b5
+[2026-09-22T21:28:22.724Z] [debug] ota: Checking…
+[2026-09-22T21:28:23.766Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T21:28:23.907Z] [debug] ota: Saving progress…
+[2026-09-22T21:28:23.908Z] [debug] ota: Restarting to apply…
+[2026-09-22T21:28:24.185Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cadd-df83-7798-a741-7cc0b5468851
+[2026-09-22T21:28:24.186Z] [debug] ota: Checking…
+[2026-09-22T21:28:24.304Z] [debug] ota: Already up to date
+[2026-09-22T21:28:24.305Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T21:28:24.906Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T21:28:24.906Z] [debug] voice: bundled idle
+[2026-09-22T21:28:28.741Z] [debug] appstate: active → background (was active for 4580ms)
+[2026-09-23T02:09:36.021Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cadd-df83-7798-a741-7cc0b5468851
+[2026-09-23T02:09:36.022Z] [debug] ota: Checking…
+[2026-09-23T02:09:37.140Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-23T02:09:37.283Z] [debug] ota: Saving progress…
+[2026-09-23T02:09:37.283Z] [debug] ota: Restarting to apply…
+[2026-09-23T02:09:37.525Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cbf3-c8e8-77d4-830c-bf7b3de31bef
+[2026-09-23T02:09:37.525Z] [debug] ota: Checking…
+[2026-09-23T02:09:37.636Z] [debug] ota: Already up to date
+[2026-09-23T02:09:37.636Z] [debug] ota: boot check result = noUpdate
+[2026-09-23T02:09:37.702Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-23T02:09:37.702Z] [debug] voice: bundled idle
+[2026-09-23T02:09:43.027Z] [debug] appstate: active → background (was active for 5520ms)
+[2026-09-24T00:52:46.541Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cbf3-c8e8-77d4-830c-bf7b3de31bef
+[2026-09-24T00:52:46.541Z] [debug] ota: Checking…
+[2026-09-24T00:52:51.304Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T00:52:51.821Z] [debug] ota: Saving progress…
+[2026-09-24T00:52:51.821Z] [debug] ota: Restarting to apply…
+[2026-09-24T00:52:52.199Z] [debug] ota: boot check result = applied
+[2026-09-24T00:52:52.340Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cf5e-1cea-789e-877c-30ac62df13cf
+[2026-09-24T00:52:52.341Z] [debug] ota: Checking…
+[2026-09-24T00:52:52.562Z] [debug] ota: Already up to date
+[2026-09-24T00:52:52.562Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T00:52:52.939Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T00:52:52.939Z] [debug] voice: bundled idle
+[2026-09-24T00:52:53.999Z] [debug] appstate: active → background (was active for 1669ms)
+[2026-09-24T01:06:29.771Z] [debug] appstate: background → active (was background for 815771ms)
+[2026-09-24T01:06:34.366Z] [debug] appstate: active → background (was active for 4596ms)
+[2026-09-24T01:06:49.063Z] [debug] appstate: background → active (was background for 14698ms)
+[2026-09-24T01:07:02.948Z] [debug] appstate: active → background (was active for 13884ms)
+[2026-09-24T01:08:09.941Z] [debug] appstate: background → active (was background for 66994ms)
+[2026-09-24T01:08:16.450Z] [debug] appstate: active → background (was active for 6509ms)
+[2026-09-24T01:10:13.407Z] [debug] appstate: background → active (was background for 116955ms)
+[2026-09-24T01:11:21.300Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cf5e-1cea-789e-877c-30ac62df13cf
+[2026-09-24T01:11:21.301Z] [debug] ota: Checking…
+[2026-09-24T01:11:21.541Z] [debug] ota: Already up to date
+[2026-09-24T01:11:21.542Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:11:22.275Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:11:22.276Z] [debug] voice: bundled idle
+[2026-09-24T01:19:20.610Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0cf5e-1cea-789e-877c-30ac62df13cf
+[2026-09-24T01:19:20.611Z] [debug] ota: Checking…
+[2026-09-24T01:19:21.976Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-24T01:19:22.346Z] [debug] ota: Saving progress…
+[2026-09-24T01:19:22.348Z] [debug] ota: Restarting to apply…
+[2026-09-24T01:19:22.808Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:19:22.808Z] [debug] ota: Checking…
+[2026-09-24T01:19:23.092Z] [debug] ota: Already up to date
+[2026-09-24T01:19:23.092Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:19:23.404Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:19:23.404Z] [debug] voice: bundled idle
+[2026-09-24T01:19:26.337Z] [debug] appstate: active → background (was active for 3585ms)
+[2026-09-24T01:23:20.520Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:23:20.520Z] [debug] ota: Checking…
+[2026-09-24T01:23:20.690Z] [debug] ota: Already up to date
+[2026-09-24T01:23:20.690Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:23:20.944Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:23:20.945Z] [debug] voice: bundled idle
+[2026-09-24T01:23:59.491Z] [debug] appstate: active → background (was active for 38996ms)
+[2026-09-24T01:25:17.070Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:25:17.070Z] [debug] ota: Checking…
+[2026-09-24T01:25:17.367Z] [debug] ota: Already up to date
+[2026-09-24T01:25:17.368Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:25:18.097Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:25:18.098Z] [debug] voice: bundled idle
+[2026-09-24T01:25:26.164Z] [debug] appstate: active → background (was active for 9104ms)
+[2026-09-24T01:29:13.414Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:29:13.414Z] [debug] ota: Checking…
+[2026-09-24T01:29:13.697Z] [debug] ota: Already up to date
+[2026-09-24T01:29:13.698Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:29:13.771Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:29:13.771Z] [debug] voice: bundled idle
+[2026-09-24T01:30:34.441Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:30:34.441Z] [debug] ota: Checking…
+[2026-09-24T01:30:34.687Z] [debug] ota: Already up to date
+[2026-09-24T01:30:34.688Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:30:34.786Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:30:34.786Z] [debug] voice: bundled idle
+[2026-09-24T01:30:41.780Z] [debug] appstate: active → background (was active for 7405ms)
+[2026-09-24T01:30:55.291Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:30:55.291Z] [debug] ota: Checking…
+[2026-09-24T01:30:55.461Z] [debug] ota: Already up to date
+[2026-09-24T01:30:55.462Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:30:55.543Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:30:55.543Z] [debug] voice: bundled idle
+[2026-09-24T01:31:12.220Z] [debug] ota: boot check — enabled=true channel=golem-line rt=2.5.0 updateId=01a0d0f8-8586-70f4-9ecd-bd9bac0f5668
+[2026-09-24T01:31:12.220Z] [debug] ota: Checking…
+[2026-09-24T01:31:12.520Z] [debug] ota: Already up to date
+[2026-09-24T01:31:12.521Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T01:31:12.593Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T01:31:12.593Z] [debug] voice: bundled idle
+[2026-09-24T01:31:35.049Z] [debug] OTA session start: 2026-09-24-1875-the-list-gets-its-scroll-back.
+[2026-09-24T01:31:35.049Z] [world] You step back into The Monarch's Waystation. The world waits for your move.
+[2026-09-24T01:31:35.049Z] [world] The Reclaimers' Guild updated its standing-board while you were gone. Your name is on it.
+[2026-09-24T01:31:35.061Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+
+=== END LOG · 193033 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-24T01:31:35.218Z
+
+Install
+  App ID: com.hotatticgames.tartarprim.golem
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 474
+  AAB: (build 474)
+  OTA: (2026-09-24-1875-the-list-gets-its-scroll-back)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-24T01:31:12.541Z
+  Last init success: 2026-09-24T01:31:13.115Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmueuvno84t · started 2026-09-24T01:31:12.152Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 3 recorded, 1 fatal (newest last)
+  • 2026-09-16T04:44:54.078Z (11327m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-15-1824-the-helper-is-called-not-quoted · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (13s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 13359ms into the action · alive 0ms after it
+      launch: died 13434ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-16T04:47:10.233Z (11324m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-15-1824-the-helper-is-called-not-quoted · stage boot:idle:awaiting-first-action
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: boot:idle:awaiting-first-action · 1096ms into the action · alive 10419ms after it
+      launch: died 11560ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-20T03:39:07.911Z (5632m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-20-1854-one-slot-per-interaction · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded on the title screen — no game was in progress (8s after boot, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: boot:idle:awaiting-first-action · 1498ms into the action · alive 6662ms after it
+      launch: died 8264ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: appstate:active→background at 2026-09-24T01:31:02.284Z (1 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 12MB · last 12MB · net +0MB over 1 mark
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot: (trace present, no stages)
+  this boot: (no stages yet)
