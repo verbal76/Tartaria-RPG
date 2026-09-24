@@ -31696,7 +31696,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  *
  * NOT CLAIMED: physical visual acceptance on the owner's hardware. The geometry
  * contract is proven by test; how it LOOKS on the Pixel is the owner's call. */
-export const OTA_BUILD_ID = '2026-09-24-1879-the-roll-leaves-room-to-read';
+/* OTA-1880 — THE CONSTRAINT TEACHES ITS OWN DOOR (#211, escape-hatch
+ * discoverability).
+ *
+ * OTA-1878 gave the transcript a door and never mentioned it. When the narrative
+ * panel is measured too small to read from, EXPAND appears in the scene rail —
+ * which is also the exact moment the player is staring at a squeezed transcript
+ * rather than auditing the header for a key that was not there a second ago. The
+ * owner's principle: THE CONSTRAINT SHOULD SURFACE ITS OWN ESCAPE HATCH.
+ *
+ * ⚠⚠⚠ THE TRIGGER IS THE MEASUREMENT, NOT THE PHONE. It is OTA-1878's own
+ * `isNarrativeConstrained(feedH)` — the height the feed panel actually reported
+ * through onLayout — and nothing else. No device model, no platform test, no
+ * window size, no second heuristic. A large phone whose feed is genuinely
+ * squeezed (keyboard up, roll open) IS taught; a small phone whose feed still
+ * reads four lines is NOT. The derivation was hoisted so the rail's key and the
+ * card read ONE boolean and can never disagree about whether the feed is tight.
+ *
+ * ⚠⚠ AND THE SMALLEST HONEST IMPLEMENTATION WAS ALREADY IN THE REPO. OTA-1738
+ * built the teaching system this needs — one card per beat via `useTeachingSlot`,
+ * copy in `teachingRegistry`, per-install dismissal in `useFirstTimeHint`, a
+ * global tips kill-switch, and a replay listing in Settings -> GUIDANCE. So this
+ * package is ONE registry entry plus ONE candidate line: no new component, no new
+ * persistence, no new timer, no notification system, and NO NEW ROW. That last
+ * part is the point — a feature that exists because vertical space is scarce must
+ * not spend vertical space explaining itself, and FirstTimeHint is an absolute
+ * overlay that consumes none.
+ *
+ * ⚠ THE CARD IS NOT THE ESCAPE HATCH; EXPAND IS. The card does not auto-open the
+ * reader, changes no narrative and no game state, is shown once per install, and
+ * names the control by the label the rail actually draws — the suite reads that
+ * label out of the screen and fails if the two ever drift apart. The expanded
+ * reader's content and architecture are untouched.
+ *
+ * NOT CLAIMED: physical verification on the owner's hardware. */
+export const OTA_BUILD_ID = '2026-09-24-1880-the-constraint-teaches-its-door';
+// SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'
 // SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
 // SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'
 // SUPERSEDED: '2026-09-24-1876-the-ending-is-not-a-receipt'

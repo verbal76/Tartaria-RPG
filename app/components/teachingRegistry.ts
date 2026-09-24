@@ -45,6 +45,30 @@ const SCRAP_BASE = pct(scrapSuccessChance(10, 10));
 
 export const TEACHINGS = {
   // ── exploration ──────────────────────────────────────────────────────────
+  /* ⚠⚠⚠ #211 — THE CONSTRAINT SURFACES ITS OWN ESCAPE HATCH. OTA-1878 gave the
+   * transcript a door when the panel is measured too small to read from, and
+   * OTA-1879 took ~40pt of air out of the combat roll so the door is needed less
+   * often. Neither told the player the door exists: EXPAND appears in the scene
+   * bar exactly when the transcript is squeezed, which is also the moment a
+   * player is least likely to be studying the header for a new key.
+   *
+   * ⚠⚠ ITS TRIGGER IS THE MEASURED CONSTRAINT, NOT A PHONE. The card fires off
+   * `isNarrativeConstrained(feedH)` — the same derived height the key itself
+   * renders on — so a large phone whose feed really is squeezed gets taught, and
+   * a small one whose feed is fine does not. No model check exists anywhere in
+   * this path, by rule.
+   *
+   * ⚠ AND THE CARD IS NOT THE ESCAPE HATCH. It is dismissed once per install
+   * like every other card here; EXPAND remains the durable control and keeps
+   * appearing whenever the measurement says it is needed. The body names the
+   * control by the label the rail actually draws — the #211 suite reads that
+   * label out of the screen and fails if the two ever drift apart. */
+  narrative_expand_v1: {
+    id: 'narrative_expand_v1', group: 'exploration',
+    when: 'the first time the narrative panel is measured too small to read from',
+    title: 'Room to read',
+    body: 'When the transcript is squeezed this small, EXPAND in the scene bar opens the same narrative full-screen. Tap it whenever you need the room.',
+  },
   picker_colour_lanes: {
     id: 'picker_colour_lanes', group: 'exploration', when: 'the first room picker with two or more colour lanes',
     title: 'The room, by colour',

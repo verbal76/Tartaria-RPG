@@ -1270,6 +1270,15 @@ export function ExplorationScreen() {
     const { availableRaceAbilities } = require('../engine/raceAbilities') as typeof import('../engine/raceAbilities');
     return availableRaceAbilities(player, inFightNow).length > 0;
   })();
+  /* ⚠⚠ OTA-1878 — IS THE TRANSCRIPT STILL THE PRIMARY READER? One boolean,
+     derived from one measured height. Nothing downstream of this branches on a
+     device, a platform or a window size.
+     ⚠ #211 — it is read TWICE now: the scene rail's EXPAND key renders on it,
+     and the teaching slot below asks the same question to decide whether the
+     player has ever been told the key is there. One derivation, so the card and
+     the control can never disagree about whether the feed is squeezed. */
+  const narrativeConstrained = isNarrativeConstrained(feedH);
+
   const screenTeaching = useTeachingSlot([
     // combat — the primer (a Modal) has already had its beat; these follow it
     { id: TEACH.elevation_first_fight.id, when: !modalOwnsBeat && inFightNow && !!currentScene?.elevatedOn && !!currentScene?.enemiesAtBase },
@@ -1280,6 +1289,22 @@ export function ExplorationScreen() {
     { id: TEACH.combat_readout.id, when: !modalOwnsBeat && inFightNow && combatPrimerSeen && enemiesDefeatedEver >= 1 },
     // exploration — each keyed on the sheet the player was actually shown, or on
     // a durable fact of the scene / pack
+    /* ⚠⚠⚠ #211 — THE CONSTRAINT TEACHES ITS OWN ESCAPE HATCH, AND IT COSTS NO
+       LAYOUT. OTA-1878 put EXPAND in the scene rail the moment the transcript is
+       measured too small to read from; nothing told the player it had appeared.
+       This is that card, and it is FIRST among the exploration beats on purpose:
+       every other card explains a mechanic whose consequences the player then
+       reads in the transcript, so a squeezed transcript is the one thing worth
+       saying before anything else.
+       ⚠⚠ `narrativeConstrained` IS THE WHOLE TRIGGER — the same measured height
+       the key renders on, never a model, a platform or a window size. A large
+       phone whose feed really is squeezed is taught; a small phone whose feed is
+       fine is not.
+       ⚠ AND IT WAITS FOR A CLOSED READER. FirstTimeHint is an absolute overlay,
+       not a Modal (OTA-234), so it would land UNDER nothing and OVER the reader —
+       teaching a door to somebody already standing in it. Same latch-and-wait
+       reasoning as every sheet-keyed card above. */
+    { id: TEACH.narrative_expand_v1.id, when: !modalOwnsBeat && narrativeConstrained && !narrativeReaderOpen },
     { id: TEACH.picker_colour_lanes.id, when: !modalOwnsBeat && pickerLanesTaught },
     { id: TEACH.climb_first.id, when: !modalOwnsBeat && climbTaught && tutorialStep === null },
     { id: TEACH.torch_first_v2.id, when: !modalOwnsBeat && (currentScene?.hooks ?? []).some((h) => !!h.torchCharged) },
@@ -1506,11 +1531,6 @@ export function ExplorationScreen() {
   // Set from render, so a touch stage never has to read a store to know where
   // it happened. Cheap, bounded, and it wakes no subscriber.
   setTouchPathContext({ screen: 'exploration', presentation: presentationToken });
-
-  /* ⚠⚠ OTA — IS THE TRANSCRIPT STILL THE PRIMARY READER? One boolean, derived
-     from one measured height. Nothing downstream of this branches on a device,
-     a platform or a window size. */
-  const narrativeConstrained = isNarrativeConstrained(feedH);
 
   return (
     <KeyboardAvoidingView
