@@ -36,7 +36,7 @@ import type { GameStore } from './gameStore';
 import type { PlayerCharacter, Enemy, Quest } from '../engine/types';
 import { findChain, makeStolenGoods, whisperTargetGrid } from '../engine/whispers';
 import { findHuntById } from '../engine/hunts';
-import { resolveStageEscortClear } from './slices/questSlice';
+import { resolveStageEscortClear, readOutTrailingHuntBeats } from './slices/questSlice';
 
 type Get = () => GameStore;
 /** ⚠ The WIDE set signature (object OR updater), matching the slices': the
@@ -160,16 +160,68 @@ export function creditDefeatedTarget(
       for (let i = 0; i < def.stages.length; i++) {
         if (def.stages[i]?.checkKind === 'boss') lastBoss = i;
       }
-      return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= lastBoss;
+      // ⚠⚠⚠ OTA-1877 — AT THE BOUNDARY, OR ONE STEP INTO IT — BUT NOT BEYOND.
+      // `>=` was harmless while the credit only rewrote `stages.length` over
+      // itself: a second kill of a respawned target re-fired and re-logged the
+      // close line, and nothing else happened. It stops being harmless the moment
+      // the credit also READS a trailing beat, because the re-fire would read it
+      // again.
+      //
+      // ⚠⚠ BUT `=== lastBoss` IS TOO NARROW, and OTA-426's own suite says why in
+      // as many words: `advanceHunt(6) lands the record at stage 7`. The final
+      // boss does not always freeze — a record can legitimately sit at
+      // `lastBoss + 1` when the kill lands, and that kill must still complete the
+      // hunt. Both are the SAME uncredited boundary, approached two ways.
+      //
+      // So the guard is a WINDOW, and each edge is load-bearing:
+      //   `>= lastBoss`     OTA-426's rule, kept exactly. Several hunts carry a
+      //     MID-hunt `boss` stage that spawns the same scaled target; killing it
+      //     there must NOT complete the hunt and skip the back half. Dropping this
+      //     edge let a stage-4 kill finish a 7-stage hunt — caught by OTA-426's own
+      //     suite, which is why it is spelled out here rather than trusted.
+      //   `<= lastBoss + 1` the new edge, and it reasons from progression rather
+      //     than from whether an epilogue exists:
+      //   no trailing beat  — `lastBoss + 1 === stages.length`, so a re-kill after
+      //     the credit still matches and still only re-logs a line. Exactly
+      //     today's behaviour, deliberately unchanged.
+      //   trailing beat(s)  — consuming them puts the record PAST `lastBoss + 1`,
+      //     so a re-kill no longer matches and the beat cannot be read twice.
+      // The invariant that matters — a trailing beat is read exactly once — is
+      // carried by the consumption itself, not by a flag.
+      return enemy.name === `${def.targetEnemyName} (hunted)`
+        && rec.stage >= lastBoss && rec.stage <= lastBoss + 1;
     });
   if (matchingHunt && matchingHunt.def) {
+    // ⚠⚠⚠ OTA-1877 — THE KILL WALKS THE REST OF THE CHAIN INSTEAD OF JUMPING IT.
+    // This wrote `stage: stages.length` outright, which is the same number for all
+    // 18 shipped hunts (every one ends ON its final boss) but steps over any
+    // authored trailing beat unread — and the skip persists, so nothing later can
+    // recover it. `readOutTrailingHuntBeats` is the semantic `advanceHunt` has used
+    // since OTA-1219: walk the `checkKind: null` beats, reading each one out, and
+    // stop at the next actionable stage or the end.
+    // ⚠ THE WALK STARTS AFTER THE BOSS, NOT AFTER THE RECORD. The record may sit at
+    // `lastBoss` (frozen) or already at `lastBoss + 1`, and both are the same
+    // uncredited boundary — so `rec.stage + 1` would overshoot the end of a hunt in
+    // the second case. `lastBossOf` re-derives the index the matcher just used.
+    const lastBossIdx = (() => {
+      let i = -1;
+      for (let k = 0; k < matchingHunt.def!.stages.length; k++) {
+        if (matchingHunt.def!.stages[k]?.checkKind === 'boss') i = k;
+      }
+      return i;
+    })();
+    const walked = readOutTrailingHuntBeats(
+      get,
+      matchingHunt.def.stages,
+      lastBossIdx + 1,
+    );
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
               activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                h.id === matchingHunt.rec.id ? { ...h, stage: matchingHunt.def!.stages.length } : h,
+                h.id === matchingHunt.rec.id ? { ...h, stage: walked } : h,
               ),
             },
           }

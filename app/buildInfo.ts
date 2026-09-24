@@ -31545,7 +31545,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * the owner's call), no existing epilogue changed, and the roadmap's verbless
  * stand-in wording ("it moves on its own") is recorded as pre-existing debt
  * rather than repaired here. No physical-device verification. */
-export const OTA_BUILD_ID = '2026-09-24-1876-the-ending-is-not-a-receipt';
+/* OTA-1877 — THE HUNT READS ITS LAST BEAT (engine support; no hunt prose).
+ *
+ * A hunt can now carry an authored trailing `checkKind: null` beat behind its
+ * final boss and the player will actually read it. NOTHING SHIPPED CHANGES: all
+ * 18 hunts end ON their final boss (13 standard_7 at index 6, 5 bait_switch_5 at
+ * index 4) and ZERO carry a trailing beat, so `lastBoss + 1` and `stages.length`
+ * are the same number for every one of them. This is a capability, not a fix to
+ * live content.
+ *
+ * THE DEFECT, PROVEN THROUGH THE REAL DEFEAT PATH. `advanceHunt` has consumed and
+ * READ OUT trailing null stages since OTA-1219, but the final boss FREEZES for the
+ * kill (OTA-796), so it never reaches `advanceHunt`. The defeat credit was the only
+ * way out of the last stage and it wrote `stage: stages.length` outright: a
+ * fixture shaped boss -> beat measured stage 0 -> 2, the beat never logged, turn-in
+ * eligible immediately, and the skip surviving a persist. `nextActionableStage`'s
+ * own header (OTA-1583) named this class already and fixed the ESCORT clear; this
+ * was the sibling kill path left behind.
+ *
+ * ONE SEMANTIC OWNER. `readOutTrailingHuntBeats` is OTA-1219's loop extracted, not
+ * a second copy: `advanceHunt` delegates to it from `record.stage + 1` and the
+ * defeat credit calls it from the FINAL BOSS INDEX + 1 — not from the record, which
+ * may legitimately sit either on the boss stage or one past it, both being the same
+ * uncredited boundary. It is deliberately NOT `nextActionableStage`, which computes
+ * an index and knows nothing about the log — the contract is that the beat is READ
+ * OUT exactly once, so the owner must both advance and narrate. NC3 proves the
+ * difference: breaking only the narration, with the stage arithmetic left correct,
+ * turns four tests red.
+ *
+ * AND THE BOUNDARY IS CROSSED ONCE. `rec.stage >= lastBoss` became a WINDOW,
+ * `>= lastBoss && <= lastBoss + 1`, and both edges are load-bearing. The old open
+ * form was harmless while the credit only rewrote `stages.length` over itself (a
+ * second kill re-logged the close line and nothing else), but a credit that READS a
+ * beat would read it again — hence the new upper edge. The lower edge is OTA-426's
+ * rule kept exactly: several hunts carry a MID-hunt boss stage spawning the same
+ * scaled target, and killing it there must not complete the hunt and skip the back
+ * half. Narrowing to `=== lastBoss` was tried and was WRONG, caught by OTA-426's own
+ * suite, which says so in as many words: `advanceHunt(6) lands the record at stage
+ * 7`. The guard reasons from progression, not from whether an epilogue exists, so it
+ * is right for a hunt with none and for one with several: with no trailing beat
+ * `lastBoss + 1 === stages.length` and a re-kill still only re-logs a line, while
+ * consuming a beat puts the record PAST the window so it cannot be read twice.
+ *
+ * NO ECONOMY CHANGE, and the forensics are why: the kill pays nothing. It logs
+ * "return to a posting agent"; `turnInHunt` pays, gated on `stage < stages.length`.
+ * So `stage` is the turn-in eligibility gate and the bounty is the turn-in's
+ * alone. `turnInHunt` is untouched.
+ *
+ * PERSISTENCE, STATED EXACTLY AND NOT ONE WORD FURTHER: the walked stage lives on
+ * `player.activeHunts`, which is in the save payload — that is the field the turn-in
+ * gate reads and the field that stops the boss boundary being re-credited. What the
+ * test actually proves is narrower than that: the record still carries the walked
+ * stage across a `persist()` call, which is not a storage round-trip. NARRATION
+ * PERSISTENCE IS NOT CLAIMED AT ALL, and cannot be: `gameLog` appears zero times in
+ * the save system, so a read-out beat is transient by construction. That is the
+ * existing contract; this OTA neither changes it nor pretends otherwise. */
+export const OTA_BUILD_ID = '2026-09-24-1877-the-hunt-reads-its-last-beat';
+// SUPERSEDED: '2026-09-24-1876-the-ending-is-not-a-receipt'
 // SUPERSEDED: '2026-09-24-1875-the-list-gets-its-scroll-back'
 // SUPERSEDED: '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get'
 // SUPERSEDED: '2026-09-23-1873-the-sale-is-read-before-it-is-made'

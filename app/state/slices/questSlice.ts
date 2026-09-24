@@ -209,6 +209,44 @@ export interface QuestSliceDeps {
 }
 
 /**
+ * ⚠⚠⚠ OTA-1877 — ONE OWNER FOR "WALK PAST THE TRAILING BEATS AND READ THEM OUT".
+ *
+ * OTA-1219 gave `advanceHunt` the consume loop mysteries and storylines have had
+ * since OTA-871: a `checkKind: null` stage is a beat no verb can pay, so the chain
+ * walks past it AND READS IT, rather than wedging on it. That loop lived inside
+ * `advanceHunt` — and the final boss stage never reaches `advanceHunt`, because it
+ * FREEZES for the kill (OTA-796). The only way out of the last stage is the defeat
+ * credit, and that wrote `stage: stages.length` outright, so a trailing beat behind
+ * a final boss was stepped over unread and the skip persisted.
+ *
+ * ⚠ `nextActionableStage` is NOT the owner of this, and forcing it to be would be
+ * the wrong repair: it answers where the next payable stage is and deliberately
+ * knows nothing about the log. The contract is that the beat is READ OUT exactly
+ * once, so the owner has to be the thing that both advances and narrates. That
+ * helper's own header (OTA-1583) named this class already — "the auto-consume
+ * loops, which live inside advance*, not in the kill path, never saw it" — and
+ * fixed the escort clear directly below. This is the kill path left behind.
+ *
+ * ⚠ ARITHMETIC UNCHANGED FOR EVERY SHIPPED HUNT. All 18 end ON their final boss,
+ * so `from` already equals `stages.length` and the loop body never runs. The
+ * capability is new; today's behaviour is not.
+ */
+export function readOutTrailingHuntBeats(
+  get: () => GameStore,
+  stages: ReadonlyArray<{ narration: string; arbiter: string | null; checkKind: string | null }>,
+  from: number,
+): number {
+  let at = Math.max(0, from);
+  while (at < stages.length && stages[at]!.checkKind === null) {
+    const epi = stages[at]!;
+    get().appendLog('world', epi.narration);
+    if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+    at++;
+  }
+  return at;
+}
+
+/**
  * ⚠⚠⚠ OTA-1583 — THE ESCORT CLEAR, MOVED OUT OF THE COMBAT PATH.
  *
  * It lived inside `resolveEnemyDefeat` in gameStore: ninety lines of
@@ -2199,13 +2237,10 @@ export const createQuestSlice = (
       // No hunt authors a mid-chain null today, but the day one does, a stage
       // no verb can match must not wedge the chain (that is exactly how every
       // freshly-accepted hunt got stuck at stage 0 until this OTA).
-      let nextStage = record.stage + 1;
-      while (nextStage < hunt.stages.length && hunt.stages[nextStage]!.checkKind === null) {
-        const epi = hunt.stages[nextStage]!;
-        get().appendLog('world', epi.narration);
-        if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
-        nextStage++;
-      }
+      // ⚠ OTA-1877 — the loop itself moved to `readOutTrailingHuntBeats` so the
+      // final-boss defeat credit can share this exact semantic instead of
+      // owning a second copy of it. Behaviour here is unchanged.
+      const nextStage = readOutTrailingHuntBeats(get, hunt.stages, record.stage + 1);
       set((s) =>
         s.player
           ? {
