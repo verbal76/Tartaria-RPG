@@ -179,7 +179,13 @@ describe('OTA-1380 — both JS capture points write the ledger', () => {
     // and it did NOT replace what was already there — lastCrash still feeds the
     // title-screen pill, crashSave still captures the save bytes for repro
     expect(app).toContain("'@tartaria/lastCrash'");
-    expect(app).toContain('captureActiveCrashSave(`fatal:${stage}`)');
+    // ⚠ OTA-1882 — pinned WITHOUT the closing paren, exactly as the boundary
+    // assertion below already was. The fatal handler now also passes a crash
+    // correlation id, so a byte-exact pin on the whole call broke while the fact
+    // it guards — this handler captures the save under stage `fatal:${stage}` —
+    // did not change. Same claim, spelled so an added argument cannot fake a
+    // regression. (Named debt #80: source-text pins are the fragile kind.)
+    expect(app).toContain('captureActiveCrashSave(`fatal:${stage}`');
   });
 
   it('⚠ the render boundary does too — the crash nobody reports', () => {

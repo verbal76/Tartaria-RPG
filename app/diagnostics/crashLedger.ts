@@ -32,6 +32,7 @@
 // the clipboard bug-report path reads the same ledger.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
+import { crashCorrelationId } from './crashCorrelation';
 
 export const CRASH_LEDGER_KEY = '@tartaria/crashLedger';
 
@@ -216,7 +217,12 @@ export function recordCrash(
   try {
     const ts = rec.ts ?? Date.now();
     const full: CrashRecord = {
-      id: `${ts}_${rec.kind}`,
+      // ⚠ OTA-1882 — the same spelling the crashed-save capture uses, CALLED from
+      // the one leaf that owns it instead of written out twice. Output is
+      // byte-identical to what this line always produced; `crashCorrelation.ts`
+      // carries why the key is ts+kind and why it is a correlation key rather
+      // than a claim of global uniqueness.
+      id: crashCorrelationId(ts, rec.kind),
       ts,
       kind: rec.kind,
       stage: clip(rec.stage || 'unknown', 60),

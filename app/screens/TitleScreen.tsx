@@ -35,6 +35,7 @@ import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
+import { utf8Bytes } from '../diagnostics/portableReport'; // OTA-1882 — the card's unit
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, loadSlot, summaryFactionId, type SlotSummary } from '../engine/saveSystem';
@@ -2469,7 +2470,16 @@ function CopyCrashedSaveLine(): React.ReactElement | null {
   }, []);
   if (!capture) return null;
   const ageMin = Math.max(1, Math.floor((Date.now() - capture.capturedAt) / 60000));
-  const bytes = capture.raw?.length ?? 0;
+  // ⚠⚠ OTA-1882 (#214) — THE CARD SAID "bytes" AND COUNTED SOMETHING ELSE. This
+  // was `capture.raw?.length`, which is UTF-16 code units, printed beside the word
+  // `bytes`. For a save that is mostly ASCII the two are close enough that nobody
+  // caught it, but they are not the same number and the label was simply false —
+  // one emoji is a `.length` of 2 and four bytes. It now measures what it claims.
+  // ⚠ This is the RETAINED ARTIFACT's size and has nothing to do with the paste
+  // budget: the artifact stays whole at whatever size it is, and the clipboard is
+  // bounded separately (PORTABLE_REPORT_MAX_BYTES). Two different numbers, two
+  // different jobs, deliberately not reconciled.
+  const bytes = capture.raw ? utf8Bytes(capture.raw) : 0;
   const doCopy = async () => {
     try {
       const stamped = buildCrashSaveExport(capture, buildBasicDeviceSummary());

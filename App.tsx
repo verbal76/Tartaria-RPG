@@ -20,6 +20,10 @@ import {
   runMLResetMigrationIfNeeded, // the one-time API 36 transition amnesty
 } from './app/diagnostics/mlHealth';
 import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; // OTA-1276 · LAG-1
+// OTA-1882 (#214) — static, because the correlation key must exist before either
+// crash writer is reached; the writers themselves stay lazy `require`s so a
+// module that is not ready cannot cost us the other write.
+import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
@@ -170,11 +174,16 @@ try {
       // the next launch can COPY CRASHED SAVE for repro. Separate try so a
       // failure here never blocks the lastCrash write above. Best-effort and
       // fire-and-forget; captureActiveCrashSave never throws.
+      // ⚠⚠ OTA-1882 (#214) — one timestamp for one crash, as on the boundary path
+      // below. Taken here, before either writer runs, so the capture and the
+      // ledger row cannot key themselves to two different instants.
+      const fatalTs = Date.now();
+      const fatalCorrelationId = crashCorrelationId(fatalTs, 'js-fatal');
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const cs = require('./app/diagnostics/crashSave');
         const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
-        void cs.captureActiveCrashSave(`fatal:${stage}`);
+        void cs.captureActiveCrashSave(`fatal:${stage}`, { correlationId: fatalCorrelationId });
       } catch { /* ignore — module/AS not ready */ }
       // ⚠⚠ OTA-1380 — AND THE LEDGER, which is the durable copy. The
       // `@tartaria/lastCrash` write above is a SINGLE SLOT: crash twice and the
@@ -193,6 +202,8 @@ try {
           stack: err?.stack ?? '',
           isFatal: !!isFatal,
           sinceBoot: Date.now() - bootTime,
+          // OTA-1882 — the same instant the capture above was keyed to.
+          ts: fatalTs,
         });
       } catch { /* ignore — module/AS not ready */ }
       const sinceBoot = Date.now() - bootTime;
@@ -1495,12 +1506,22 @@ class ScreenErrorBoundary extends React.Component<
     // arb130 — ALSO capture the error message + React component stack, so the
     // crashed-save report names the EXACT component that faulted/looped (e.g.
     // pinning "Maximum update depth exceeded" to its screen/overlay) — no adb.
+    // ⚠⚠⚠ OTA-1882 (#214) — ONE TIMESTAMP FOR ONE CRASH. The capture below and
+    // the ledger record further down are two records of the SAME event, and the
+    // bounded paste can only name the full evidence if both agree on the key. Two
+    // independent `Date.now()` reads a few lines apart do NOT agree — they differ
+    // by however long the capture took — so `ts` is taken ONCE here and handed to
+    // both sides. `kind` is fixed for this handler, so the key is fully determined
+    // at this point with no randomness and nothing read back later.
+    const crashTs = Date.now();
+    const correlationId = crashCorrelationId(crashTs, 'js-boundary');
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const cs = require('./app/diagnostics/crashSave');
       void cs.captureActiveCrashSave('screen-render', {
         error: (error?.message ?? String(error)).slice(0, 300),
         componentStack: (errorInfo?.componentStack ?? '').slice(0, 1800),
+        correlationId,
       });
     } catch { /* ignore */ }
     // ⚠ OTA-1380 — a recovered screen crash is still a crash, and it is the one
@@ -1516,6 +1537,9 @@ class ScreenErrorBoundary extends React.Component<
         message: error?.message ?? String(error),
         stack: errorInfo?.componentStack ?? error?.stack ?? '',
         isFatal: false,
+        // OTA-1882 — the SAME instant the capture was keyed to, so the ledger row
+        // and the crashed-save export carry one correlation key, not two.
+        ts: crashTs,
       });
     } catch { /* ignore */ }
   }

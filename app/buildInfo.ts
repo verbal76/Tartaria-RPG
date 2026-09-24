@@ -31768,7 +31768,58 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * no-signal shape appears twice earlier in the same ledger under unrelated taps
  * ("missions", "LORE"), and the shared word "fuse" is a stale in-flight marker,
  * not a causal link. Not closed here, and not widened here. */
-export const OTA_BUILD_ID = '2026-09-24-1881-the-crucible-keeps-its-hooks';
+/* ── OTA-1882 — THE PASTE FITS IN THE WINDOW (#214) ────────────────────────────
+ *
+ * The owner's title screen offered `CRASHED SAVE CAPTURED · screen-render · 60m
+ * ago · 420072 bytes` with a COPY CRASHED SAVE button. He pressed it and could not
+ * paste the result anywhere. A diagnostic nobody can deliver is not a diagnostic.
+ *
+ * THE 420,072 WAS NOT THE CLIPBOARD, AND THE CLIPBOARD WAS WORSE. That number was
+ * `capture.raw.length` — UTF-16 code units of the RETAINED save, printed beside the
+ * word "bytes" while counting something else. The clipboard is a different object:
+ * on the normal parse-OK path it is `JSON.stringify({ player, worldMemory })` with
+ * the gameLog excluded, and a real 607,188-byte save produces a 405,288-byte
+ * export. Measured against the owner's own ingested COPY evidence (59,818 bytes),
+ * 95.9% of an export is that one blob, and the growth inside it is all legitimate
+ * play: inventory 37.3%, visitedRooms 18.5%, worldEvents 15.0%.
+ *
+ * SO THE DEFECT WAS A MISSING CEILING, NOT A LEAK. Every sibling diagnostic path
+ * in this repo owns a budget — LOG_CHARS_CAP 40,000 for the email paste,
+ * FULL_LOG_CHARS_CAP 200,000 for the Sentry push, INVENTORY_CHARS_CAP 12,000,
+ * LOG_ATTACHMENT_MAX_CHARS 800,000, CRASH_LEDGER_CAP 10. The owner-facing
+ * clipboard was the only export with none. It now has one: 40,000 UTF-8 BYTES,
+ * taken from the project's own human-paste precedent rather than invented.
+ *
+ * ⚠⚠⚠ AND THE EVIDENCE IS UNTOUCHED. `raw` in `@tartaria/lastCrashSave` is the
+ * only copy of a save that can never be loaded (OTA-341/343), so nothing here
+ * trims it — not at capture, not at retention. The full bundle already reaches us
+ * independently; the owner's own log recorded it going out automatically. The
+ * compact paste therefore does not have to CARRY the state, only NAME it.
+ *
+ * ⚠⚠ WHICH IS WHY THERE IS A CORRELATION KEY, AND WHY IT IS NOT `bundleId`. The
+ * relay's bundle id contains `Math.random()`, is minted at send-staging time, and
+ * in this very incident did not exist when the capture was written — the process
+ * died first and the push happened on the next boot. Reading "the newest pending
+ * bundle" would bind a crashed save to whatever an adjacent crash, a manual SEND
+ * LOG or a retry last touched. The key is instead the crash's own facts, `ts` and
+ * `kind`, through one leaf helper both the ledger and the capture CALL; the same
+ * two values already travel to us inside the relayed crash-ledger summary.
+ * It is a CORRELATION key, not a unique id: a same-millisecond same-kind pair
+ * resolves to one key, which is what `recordCrash` has always deduped to.
+ *
+ * THE OVERSIZED PATHS ARE BUILT STRUCTURALLY, NEVER BY CUTTING JSON. Chronological
+ * collections keep their newest entries; current-state collections say so instead
+ * of pretending a head slice is the whole pack; every partial rendering states its
+ * original, retained and omitted counts. The corrupt-save path keeps a bounded
+ * head-anchored excerpt with its true omitted byte count, repairs nothing, and
+ * says the full malformed bytes are still on the device. Reports already under
+ * budget leave unchanged.
+ *
+ * AND THE CARD'S LABEL IS NOW TRUE — it measures UTF-8 bytes. That number is the
+ * retained artifact and stays a separate concept from the paste budget.
+ *
+ * NOT CLAIMED: physical clipboard/paste verification on the owner's hardware. */
+export const OTA_BUILD_ID = '2026-09-24-1882-the-paste-fits-in-the-window';
 // SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'
 // SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
 // SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'
