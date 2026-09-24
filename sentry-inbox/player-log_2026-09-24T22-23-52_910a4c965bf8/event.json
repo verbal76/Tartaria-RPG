@@ -1,0 +1,337 @@
+{
+  "id": "910a4c965bf84868895381d480a357a7",
+  "groupID": "7753356791",
+  "eventID": "910a4c965bf84868895381d480a357a7",
+  "projectID": "4511945117532160",
+  "size": 17740,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mley8okb [inline 18/41]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-24-1879-the-roll-leaves-room-to-read",
+  "message": "player-log 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mley8okb [inline 18/41]",
+  "title": "player-log 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mley8okb [inline 18/41]",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T20:09:00Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1523613696,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 90.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 39321600,
+      "usable_memory": 3471294464,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 37.773208,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d44a-fa73-7669-8f5a-deee8b477823"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4fbcde15c4784a63bfb92ad3152d9819",
+      "span_id": "bf6ffacb246d4401",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTg-uMD-c1W-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gU2-NyY-XAt-Rm9-yZ2-VkI-EJy-ZWF-zdH-BsY-XRl-Cls-yMD-I2L-TA5-LTI-0VD-IyO-jIw-OjU-2Lj-gwM-1pd-IFt-kZW-J1Z-10g-dWk-6IH-Rhc-CAi-aW5-2ZX-N0a-Wdh-dGU-iCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-U0L-jY3-OVp-dIF-thc-mJp-dGV-yXS-BUa-GUg-QXJ-iaX-Rlc-iBl-eWV-zIH-lvd-XIg-bmV-3IH-BpZ-WNl-cy4-gIl-lvd-SBj-b3V-sZC-BtY-Wtl-IGE-gRn-Jvc-3Qg-UGF-zdG-Ugb-m93-LCB-pZi-B5b-3Ug-d2F-udG-VkL-iIK-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTQ-uNj-Y2W-l0g-W3J-ld2-FyZ-F0g-Kzc-gVE-Mgc-HJp-ZWQ-gZn-Jvb-SB0-aGU-gZH-Vzd-C4K-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTQ-uNj-Y1W-l0g-W3J-ld2-FyZ-F0g-TXV-kIE-JvY-XIg-ZGV-mZW-F0Z-WQu-IFl-vdS-ByZ-WNv-dmV-yIE-11Z-HN0-b25-lLg-o=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTQ-uNj-YzW-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-c2h-ha2-VzI-G9m-ZiB-0aG-Ugb-GFz-dCB-vZi-B0a-GUg-Zml-yZS-Dig-JQg-dGh-lIF-Ryd-WUg-VGF-ydG-Fya-WFu-cyB-TY3-Jhc-C1X-ZWx-kZW-QgQ-3Vk-Z2V-sIG-hhc-yBy-dW4-gaX-RzI-GNv-dXJ-zZS-4KW-zIw-MjY-tMD-ktM-jRU-MjI-6Mj-A6N-TQu-NjY-zWl-0gW-2Nv-bWJ-hdF-0gT-XVk-IEJ-vYX-IgY-mxp-c3R-lcn-Mg4-oCU-IGN-saW-5na-W5n-IGZ-pcm-Ugc-2Vh-cnM-gMi-4gK-DAv-MjA-gSF-AsI-DAg-dHV-ybn-Mgb-GVm-dCk-K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTQ-uNj-YxW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-10c-nVl-IHR-hcn-Rhc-mlh-bnM-gc2-NyY-XAg-d2V-sZG-VkI-GN1-ZGd-lbC-ByZ-XNv-bHZ-lZD-1Uc-nVl-IFR-hcn-Rhc-mlh-bnM-gU2-NyY-XAt-V2V-sZG-VkI-EN1-ZGd-lbC-ByY-W5n-ZT1-jbG-9zZ-SBl-bmV-taW-VzP-TEg-aG9-va3-M9M-gpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Do1-NC4-2Nj-FaX-SBb-cGx-heW-VyX-SBh-dHR-hY2-sgd-2l0-aCB-0aG-Ugd-HJ1-ZSB-0YX-J0Y-XJp-YW5-zIH-Njc-mFw-LXd-lbG-RlZ-CBj-dWR-nZW-wKW-zIw-MjY-tMD-ktM-jRU-MjI-6Mj-A6N-TQu-NTg-3Wl-0gW-2Rl-YnV-nXS-B1a-Tog-dGF-wIC-Lwn-5Sl-IHN-jcm-FwL-Xdl-bGR-lZC-Bjd-WRn-ZWw-g4p-qUI-go=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTM-uNj-k0W-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iA2-IG1-pbg-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o1M-y42-OTN-aXS-Bbd-29y-bGR-dIF-lvd-XIg-cmV-hZC-Bpc-yBh-IGJ-lYX-Qgb-2Zm-IOK-AlC-Bub-yBv-cGV-uaW-5nI-HRo-aXM-gdG-ltZ-SDi-gJQ-gYn-V0I-HRo-ZSB-zd2-luZ-yBn-b2V-zIH-dpZ-GUg-b24-gaX-RzI-G93-bi4-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6NT-MuN-jkz-Wl0-gW2-Nvb-WJh-dF0-gRG-9kZ-2Ug-4oC-UIG-QyM-CDi-hpI-gMS-ArI-ERF-WCA-xMi-A9I-DEz-IHZ-zIE-FUS-yAx-MS4-g4p-yXI-Flv-dSB-taX-NyZ-WFk-IGl-0IO-KAl-CBu-byB-vcG-Vua-W5n-LCB-hbm-Qgd-Ghl-IGJ-sb3-cgb-GFu-ZHM-gYX-Mga-XQg-bm9-ybW-Fsb-Hkg-d29-1bG-QgK-GFy-bW9-yIH-N0a-Wxs-IGN-vdW-50c-yku-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTM-uNj-kzW-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-4oC-UIG-QyM-CDi-hpI-gNi-ArI-EFU-SyA-1ID-0gM-TEg-dnM-geW-91c-iBB-QyA-xOS-Dig-JQg-4py-XIE-1JU-1MK-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTM-uNj-g0W-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-Ymx-pc3-Rlc-nMg-4oC-UIG-Nsa-W5n-aW5-nIG-Zpc-mUg-c2V-hcn-MgM-i4g-KDI-vMj-AgS-FAs-IDE-gdH-Vyb-iBs-ZWZ-0KQ-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o1M-y42-ODR-aXS-Bbd-29y-bGR-dIF-lvd-SBj-b21-taX-Qgd-G8g-dGh-lIG-RvZ-Gdl-LiB-TbG-lwI-E11-ZCB-Cb2-FyJ-3Mg-c3d-pbm-cgY-W5k-IHl-vdX-Igb-mV4-dCB-zdH-Jpa-2Ug-bGF-uZH-MgZ-G91-Ymx-lIO-KAl-CBy-ZWF-kIG-l0I-Hdy-b25-nIG-FuZ-CB5-b3U-gc2-ltc-Gx5-IHR-ha2-Ugd-Ghl-IGh-pdC-Bsa-Wtl-IGF-ueS-Bvd-Ghl-ciw-gbm-8gb-3Bl-bml-uZy-4K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTM-uNj-gwW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1kb-2Rn-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1k-b2R-nZS-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MSB-ob2-9rc-z0y-Cls-yMD-I2L-TA5-LTI-0VD-IyO-jIw-OjU-zLj-Y4M-Fpd-IFt-wbG-F5Z-XJd-IGR-vZG-dlC-lsy-MDI-2LT-A5L-TI0-VDI-yOj-IwO-jUz-LjY-1M1-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-AiZ-G9k-Z2U-iCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-UxL-jc2-MVp-dIF-tjb-21i-YXR-dIE-11Z-CBC-b2F-yIH-Rha-2Vz-IDM-gd2-l0a-CB0-aGU-gYW-V0a-GVy-aWM-gdG-91Y-2gg-d2F-uZC-4gS-XQg-cmV-lbH-M6I-DQg-bGV-mdC-4gV-Ghl-biB-pdC-Bma-Wdo-dHM-gYm-Fja-y4K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTE-uNz-U5W-l0g-W2N-vbW-Jhd-F0g-VGh-lIE-Fld-Ghl-cml-jIF-Rvd-WNo-IFd-hbm-Qga-25p-dHM-geW-91I-GJh-Y2s-gdG-9nZ-XRo-ZXI-g4o-CUI-Csz-IEh-QLg-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o1M-S43-NTh-aXS-BbY-29t-YmF-0XS-BZb-3Ug-4oC-UIG-QyM-CDi-hpI-gMT-YgK-yBJ-TlQ-gNS-ArI-DIg-KHB-vaW-50I-GJs-YW5-rKS-A9I-DIz-IHZ-zIE-11Z-CBC-b2F-yIE-FDI-Dkg-4oC-UIO-Kck-yBI-SVQ-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6NT-EuN-zU4-Wl0-gW2-FyY-ml0-ZXJ-dIF-Nhb-HQg-ZHJ-vcH-Mgd-W5k-ZXI-gdG-hlI-E11-ZCB-Cb2-FyI-GFu-ZCB-kcm-Fnc-yBo-aW1-zZW-xmI-GNs-ZWF-yIG-9mI-HRo-ZSB-maW-dod-C4g-SGU-gaX-MgZ-G93-biD-igJ-Qgd-GVu-ZCB-oaW-0gd-2l0-aGl-uIG-EgZ-GF5-IG9-yIG-hlI-Hdv-bid-0IG-dld-CBi-YWN-rIH-VwL-go=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTE-uNz-U3W-l0g-W2N-vbW-Jhd-F0g-U2F-sdC-B0Y-Wtl-cyA-xMS-4gK-DAv-MTc-gSF-Agb-GVm-dCk-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6NT-EuN-zU2-Wl0-gW2-Nvb-WJh-dF0-gTX-VkI-EJv-YXI-gdH-Vyb-nMg-b24-gU2-Fsd-CDi-gJQ-gZD-IwI-Dkg-KyB-BVE-sgN-SA9-IDE-0IH-ZzI-FNh-bHQ-ncy-BBQ-yAx-MCD-igJ-Qg4-pyT-IEh-JVA-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o1M-S43-NTZ-aXS-Bbd-29y-bGR-dIE-11Z-CBC-b2F-yIG-1vd-mVz-IGZ-pcn-N0L-iBU-aGU-gcH-Jlc-3N1-cmU-gaX-Mga-W1t-ZWR-pYX-RlL-gpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Do1-MS4-2OT-FaX-SBb-ZGV-idW-ddI-GRp-Y2X-ij7-EgZ-GFt-YWd-lOi-Bza-G93-biA-rNT-Vtc-ywg-dGF-wcG-VkI-Cs0-NTd-tcy-wgc-2V0-dGx-lZC-ArO-DIw-bXM-gPS-AxM-zMy-bXM-K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NTA-uOD-cwW-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJy-b2x-sIg-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o1M-C4z-NTd-aXS-BbZ-GVi-dWd-dIG-RpY-2Xi-j7E-gYX-R0Y-WNr-OiB-zaG-93b-iAr-NTV-tcy-wgd-GFw-cGV-kIC-s1M-Dht-cyw-gc2-V0d-Gxl-ZCA-rOD-Iwb-XMg-PSA-xMz-gzb-XMK-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDk-uNT-M3W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJy-b2x-sIg-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-o0O-C45-NzN-aXS-BbZ-GVi-dWd-dIG-RpY-2Xi-j7E-gaW-5pd-Glh-dGl-2ZT-ogc-2hv-d24-gKz-I4b-XMs-IHR-hcH-BlZ-CAr-ODY-ybX-MsI-HNl-dHR-sZW-QgK-zgy-MG1-zID-0gM-Tcx-MG1-zCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-Q4L-jE1-M1p-dIF-tkZ-WJ1-Z10-gdW-k6I-HRh-cCA-icm-9sb-CIK",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDc-uMz-UxW-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-Tk5-IHB-sYX-llc-j00-MSB-3bT-02N-lty-b29-tcz-0yO-CBl-dmV-udH-M9M-iBt-ZW1-vcz-0wI-G5w-Y3M-9My-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MS-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-04O-CBz-Y2V-uZT-00C-lsy-MDI-2LT-A5L-TI0-VDI-yOj-IwO-jQ3-LjI-2NF-pdI-Ftz-eXN-0ZW-1dI-OKP-syB-UaW-1lI-HBh-c3N-lZD-ogN-iBt-aW4-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6ND-cuM-jY0-Wl0-gW3-dvc-mxk-XSB-Zb3-UgY-nJp-bmc-gdG-hlI-GFl-dGh-lcm-ljI-HRv-dWN-oIH-dhb-mQg-dG8-gYm-Vhc-iBv-biB-NdW-QgQ-m9h-ci4-K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDc-uMj-U5W-l0g-W2R-lYn-VnX-SBh-dHR-hY2-s6I-HRh-cmd-ldD-1Nd-WQg-Qm9-hci-ByY-W5n-ZT1-jbG-9zZ-SBy-ZWF-jaC-5iY-W5k-cz1-bZm-FyL-G1p-ZCx-jbG-9zZ-V0g-cmV-hY2-gub-GFi-ZWw-9QW-V0a-GVy-aWM-gVG-91Y-2gg-V2F-uZC-BiY-XJl-SGF-uZD-1mY-Wxz-ZQp-bMj-AyN-i0w-OS0-yNF-QyM-joy-MDo-0Ny-4yN-Tda-XSB-bY2-9tY-mF0-XSB-NdW-QgQ-m9h-ciB-ibG-lzd-GVy-cyD-igJ-QgY-2xp-bmd-pbm-cgZ-mly-ZSB-zZW-Fyc-yAy-LiA-oNy-8yM-CBI-UCw-gMi-B0d-XJu-cyB-sZW-Z0K-Qo=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDc-uMj-U1W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-1oY-W5k-IGF-ldG-hlc-mlj-IHR-vdW-NoI-Hdh-bmQ-gcm-Vzb-2x2-ZWQ-9QW-V0a-GVy-aWM-gVG-91Y-2gg-V2F-uZC-ByY-W5n-ZT1-jbG-9zZ-SBl-bmV-taW-VzP-TEg-aG9-va3-M9M-gpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Do0-Ny4-yNT-VaX-SBb-cGx-heW-VyX-SBh-dHR-hY2-sgd-2l0-aCB-0aG-Ugb-2Zm-LWh-hbm-QgY-WV0-aGV-yaW-Mgd-G91-Y2g-gd2-FuZ-Apb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Do0-Ny4-xOD-ZaX-SBb-ZGV-idW-ddI-HVp-OiB-0YX-AgI-nRv-dWN-oIH-dhb-mQg-4py-mIg-o=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDQ-uOD-Q4W-l0g-W2N-vbW-Jhd-F0g-U2V-hcm-luZ-yBU-cnV-lIF-Rhc-nRh-cml-hbn-MgU-2Ny-YXA-tV2-VsZ-GVk-IEN-1ZG-dlb-CDi-gJQ-gMi-Bid-XJu-IGJ-pdG-VzI-Glu-IGF-uZC-BmZ-XN0-ZXJ-zIC-gzI-HR1-cm5-zKS-4KW-zIw-MjY-tMD-ktM-jRU-MjI-6Mj-A6N-DQu-ODQ-3Wl-0gW-2Nv-bWJ-hdF-0gW-W91-ciB-zdH-Jpa-2Ug-d2l-0aC-B0a-GUg-c2V-hcm-luZ-yB0-cnV-lIH-Rhc-nRh-cml-hbn-Mgc-2Ny-YXA-td2-VsZ-GVk-IGN-1ZG-dlb-CBs-YW5-kcy-Bmb-3Ig-MTE-uIE-11Z-CBC-b2F-yIH-N0Y-Wdn-ZXJ-zIO-KAl-CA5-IEh-QIH-Jlb-WFp-bml-uZy-4gS-XQg-YW5-zd2-Vyc-y4K-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDQ-uOD-Q1W-l0g-W2N-vbW-Jhd-F0g-WW9-1IO-KAl-CBk-MjA-g4o-aSI-DEy-ICs-gU1-RSI-DE3-IHB-lcm-ZlY-3Qg-b3B-lbm-luZ-yAo-MsO-XIG-RpY-2Up-ID0-gMj-kgd-nMg-TXV-kIE-JvY-XIg-QUM-gOS-Dig-JQg-4py-TIE-hJV-Ao=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDQ-uOD-Q1W-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-4oC-UIG-QyM-CDi-hpI-gMy-ArI-EFU-SyA-1ID-0gO-CB2-cyB-5b3-VyI-EFD-IDE-5IO-KAl-CDi-nJc-gTU-lTU-wpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Do0-NC4-4ND-RaX-SBb-d29-ybG-RdI-E11-ZCB-Cb2-FyI-G1v-dmV-zIG-Zpc-nN0-LiB-UaG-Ugc-HJl-c3N-1cm-Uga-XMg-aW1-tZW-RpY-XRl-Lgp-bMj-AyN-i0w-OS0-yNF-QyM-joy-MDo-0NC-43N-zNa-XSB-bZG-Vid-Wdd-IGR-pY2-Xij-7Eg-Y29-hdG-luZ-zog-c2h-vd2-4gK-zUz-bXM-sIH-Rhc-HBl-ZCA-rND-kzb-XMs-IHN-ldH-RsZ-WQg-Kzg-yMG-1zI-D0g-MTM-2Nm-1zC-lsy-MDI-2LT-A5L-TI0-VDI-yOj-IwO-jQz-Ljk-1M1-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Aic-m9s-bCI-K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDM-uND-A2W-l0g-W2R-lYn-VnX-SBk-aWN-l4o-+xI-GRh-bWF-nZT-ogc-2hv-d24-gKz-U3b-XMs-IHR-hcH-BlZ-CAr-NDg-4bX-MsI-HNl-dHR-sZW-QgK-zgz-Nm1-zID-0gM-TM4-MW1-zCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-QyL-jU3-MFp-dIF-tkZ-WJ1-Z10-gdW-k6I-HRh-cCA-icm-9sb-CIK-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDI-uMD-IzW-l0g-W2R-lYn-VnX-SBk-aWN-l4o-+xI-GF0-dGF-jaz-ogc-2hv-d24-gKz-U0b-XMs-IHR-hcH-BlZ-CAr-NjI-1bX-MsI-HNl-dHR-sZW-QgK-zgy-MG1-zID-0gM-TQ5-OW1-zCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-QxL-jIw-M1p-dIF-tkZ-WJ1-Z10-gdW-k6I-HRh-cCA-icm-9sb-CIK",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-NDA-uNT-IzW-l0g-W2R-lYn-VnX-SBk-aWN-l4o-+xI-Glu-aXR-pYX-Rpd-mU6-IHN-ob3-duI-Csy-NW1-zLC-B0Y-XBw-ZWQ-gKz-kyO-G1z-LCB-zZX-R0b-GVk-ICs-4Mz-dtc-yA9-IDE-3OT-Btc-wpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Doz-OS4-2OD-ZaX-SBb-ZGV-idW-ddI-HVp-OiB-0YX-AgI-nJv-bGw-iCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-M4L-jcz-NVp-dIF-tze-XN0-ZW1-dIO-KPs-yBU-aW1-lIH-Bhc-3Nl-ZDo-gNi-Bta-W4K-WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzg-uNz-M1W-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-Jpb-mcg-dGh-lIH-NlY-XJp-bmc-gdH-J1Z-SB0-YXJ-0YX-JpY-W5z-IHN-jcm-FwL-Xdl-bGR-lZC-Bjd-WRn-ZWw-gdG-8gY-mVh-ciB-vbi-BNd-WQg-Qm9-hci-4K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzg-uNz-MyW-l0g-W2R-lYn-VnX-SBh-dHR-hY2-s6I-HN0-YXR-1cy-Btb-2Rz-IHB-lcm-ZlY-3Qg-b3B-lbm-luZ-yAo-MsO-XIG-RpY-2Up-Cls-yMD-I2L-TA5-LTI-0VD-IyO-jIw-OjM-4Lj-czM-Fpd-IFt-kZW-J1Z-10g-YXR-0YW-NrO-iB0-YXJ-nZX-Q9T-XVk-IEJ-vYX-Igc-mFu-Z2U-9Y2-xvc-2Ug-cmV-hY2-guY-mFu-ZHM-9W2-Nsb-3Nl-XSB-yZW-Fja-C5s-YWJ-lbD-1Uc-nVl-IFR-hcn-Rhc-mlh-bnM-gU2-NyY-XAt-V2V-sZG-VkI-EN1-ZGd-lbC-BiY-XJl-SGF-uZD-1mY-Wxz-ZQo-=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzg-uNz-I4W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-10c-nVl-IHR-hcn-Rhc-mlh-bnM-gc2-NyY-XAg-d2V-sZG-VkI-GN1-ZGd-lbC-ByZ-XNv-bHZ-lZD-1Uc-nVl-IFR-hcn-Rhc-mlh-bnM-gU2-NyY-XAt-V2V-sZG-VkI-EN1-ZGd-lbC-ByY-W5n-ZT1-jbG-9zZ-SBl-bmV-taW-VzP-TEg-aG9-va3-M9M-gpb-MjA-yNi-0wO-S0y-NFQ-yMj-oyM-Doz-OC4-3Mj-haX-SBb-cGx-heW-VyX-SBh-dHR-hY2-sgd-2l0-aCB-0aG-Ugd-HJ1-ZSB-0YX-J0Y-XJp-YW5-zIH-Njc-mFw-LXd-lbG-RlZ-CBj-dWR-nZW-wKW-zIw-MjY-tMD-ktM-jRU-MjI-6Mj-A6M-zgu-NjU-zWl-0gW-2Rl-YnV-nXS-B1a-Tog-dGF-wIC-Lwn-5Sl-IHN-jcm-FwL-Xdl-bGR-lZC-Bjd-WRn-ZWw-g4p-qUI-go=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzc-uOT-E5W-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iA2-IG1-pbg-pbM-jAy-Ni0-wOS-0yN-FQy-Mjo-yMD-ozN-y45-MTl-aXS-BbY-XJi-aXR-lcl-0gI-llv-dSB-oaX-Qgd-2hh-dCB-5b3-UgY-29t-bWl-0IH-RvL-CIg-dGh-lIE-FyY-ml0-ZXI-gc2-F5c-y4g-IlR-oZS-Btd-WQg-Ym9-hci-BoZ-WFy-cyB-0aG-UgZ-Glm-ZmV-yZW-5jZ-S4i-Cls-yMD-I2L-TA5-LTI-0VD-IyO-jIw-OjM-3Lj-kxO-Vpd-IFt-kZW-J1Z-10g-YXJ-iaX-Rlc-jog-dGV-tcG-xhd-GUg-KHJ-lYX-Nvb-j1j-b21-iYX-QpC-lsy-MDI-2LT-A5L-TI0-VDI-yOj-IwO-jM3-Ljk-xMF-pdI-Ftj-b21-iYX-RdI-ERv-ZGd-lIO-KAl-CBk-MjA-g4o-aSI-Dkg-KyB-ERV-ggM-TIg-PSA-yMS-B2c-yBB-VEs-gMj-AuI-OKc-kyB-Zb3-Ugc-2xp-cCB-0aG-UgY-XJj-IOK-AlC-BQR-VJG-RUN-UIE-9QR-U5J-Tkc-gKG-5le-HQg-c3R-yaW-tlI-MOX-MiB-kaW-NlK-S4K",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzc-uOT-EwW-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-4oC-UIG-QyM-CDi-hpI-gMT-MgK-yBB-VEs-gNy-A9I-DIw-IHZ-zIH-lvd-XIg-QUM-gMT-kg4-oCU-IOK-cly-BFV-kFE-RUQ-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6Mz-cuO-TAy-Wl0-gW3-dvc-mxk-XSB-Zb3-UgY-29t-bWl-0IH-RvI-HRo-ZSB-kb2-RnZ-S4g-U2x-pcC-BNd-WQg-Qm9-hci-dzI-HN3-aW5-nIG-FuZ-CB5-b3V-yIG-5le-HQg-c3R-yaW-tlI-Gxh-bmR-zIG-Rvd-WJs-ZSD-igJ-Qgc-mVh-ZCB-pdC-B3c-m9u-ZyB-hbm-Qge-W91-IHN-pbX-Bse-SB0-YWt-lIH-RoZ-SBo-aXQ-gbG-lrZ-SBh-bnk-gb3-RoZ-XIs-IG5-vIG-9wZ-W5p-bmc-uCg-==",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-Mzc-uOD-k3W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1kb-2Rn-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1k-b2R-nZS-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MSB-ob2-9rc-z0y-Cls-yMD-I2L-TA5-LTI-0VD-IyO-jIw-OjM-3Lj-g5N-1pd-IFt-wbG-F5Z-XJd-IGR-vZG-dlC-lsy-MDI-2LT-A5L-TI0-VDI-yOj-IwO-jM3-Ljg-2OV-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-AiZ-G9k-Z2U-iCl-syM-DI2-LTA-5LT-I0V-DIy-OjI-wOj-M1L-jg3-MFp-dIF-t3b-3Js-ZF0-gVG-hlI-Gxv-b3N-lIG-VuZ-CBp-cyB-leG-Fjd-Gx5-IGF-zIG-xvb-3Nl-IGF-zIH-lvd-SBs-ZWZ-0IG-l0L-go=",
+      "WzI-wMj-YtM-Dkt-MjR-UMj-I6M-jA6-MzU-uOD-cwW-l0g-W2N-vbW-Jhd-F0g-TXV-kIE-JvY-XIg-Y2x-vc2-VzI-OKA-lCB-UdX-NrI-ENo-YXJ-nZS-ByZ-WFk-eSw-gMk-Q2I-GRh-bWF-nZS-Bvb-iBh-IGh-pdC-4gK-HJh-bmd-lOi-Bjb-G9z-ZSk-KWz-IwM-jYt-MDk-tMj-RUM-jI6-MjA-6Mz-UuO-DY0-Wl0-gW3-dvc-mxk-XSB-UaG-UgZ-3Jv-dW5-kIH-Jvb-Gxz-IGJ-lZm-9yZ-SB5-b3U-gaG-Vhc-iB0-aGV-tLi-BBI-Ghl-cmQ-gb2-YgT-XVk-IEJ-vYX-JzI-GJy-ZWF-rcy-B0a-GUg-cml-zZS-Bhd-CBm-dWx-sIH-Bhb-mlj-IOK-AlC-Bzb-21l-dGh-pbm-cgY-mVo-aW5-kIH-RoZ-W0s-IHB-yb2-JhY-mx5-IGF-uIE-Fld-Ghl-ci1-zdG-9yb-SBj-ZWx-sLC-BoY-XMg-ZHJ-pdm-VuI-HRo-ZW0-gcG-Fzd-CB0-aGU-gdG-hyZ-XNo-b2x-kIG-EgQ-m9h-ciB-1c3-Vhb-Gx5-IGt-lZX-BzL-iBU-aGV-5IG-RvI-G5v-dCB-zZW-Uge-W91-LiB-UaG-V5I-GRv-IG5-vdC-BuZ-WVk-IHR-vLg-o="
+    ],
+    "chunkChars": 7304,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mley8okb [inline 18/41]"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mug3mley8okb"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1879-the-roll-leaves-room-to-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "41"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T22:23:59.112804Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-24T22:23:52.123000Z",
+  "fingerprints": [
+    "eaaa27f91e4ab2ad0110cb5a436f3010"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1990947564,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-24T16:01:20.605455Z",
+    "dateReleased": "2026-09-24T16:41:24.436767Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "be3dc3bc0ba539475e3c9f8478ef554c9d835abb",
+      "message": "OTA-1879 \u2014 the roll leaves room to read\n\nThe owner played a fight on a Pixel 10 Pro XL \u2014 a large, tall phone \u2014 and the\ncombat-roll surface still pressed the transcript off the screen. His ruling was a\nconservation order, not a brief for a redesign: SAME LOOK, SAME INFORMATION, SAME\nINTERACTION, SMALLER FOOTPRINT. The composition is approved and is not touched.\n\nTHE FORENSICS FOUND NO GROWTH TO REMOVE, AND THAT IS THE FINDING. DiceRoller\ncontains no `Dimensions`, no `useWindowDimensions`, no `useUiScale`, no\npercentage height and no aspect ratio, and `useUiScale` clamps to 1 at width\n\u2265 390 \u2014 so a wide phone earns neither capping nor vertical relief and the panel\nis the SAME height on a 4.7\" screen and a 6.8\" one. It was simply ~368pt at the\npost-roll peak, of which ~112pt (30%) was AIR: the container's 14pt padding\nnested inside the card's own 14pt padding, five 8pt gaps, and four small margins\ndoubling gaps they already sat beside. The transcript is the only flexible region\non that screen (OTA-179), so it paid for every one of those pixels.\n\nSO THIS IS SPACING AND NOTHING ELSE. Every font size, weight, letter-spacing,\ncolour, border, radius, word, element, handler and timing is what shipped. No row\nwas merged, nothing was removed, no type shrank, there is no reduced variant and\nno device branch. Option B \u2014 pairing Total with the verdict and the header with\nthe roll label \u2014 was offered in the forensics and the owner declined it; it is\nnot here.\n\nTHE NUMBERS COME FROM ONE MODEL WITH THE LIVE FONT SIZES ON BOTH SIDES, so what\nthey compare is spacing and can be nothing else:\n\n  attack post-roll \u2014 the peak    366.6 \u2192 326.6    \u221240.0pt   \u221210.9%\n  attack pre-roll                277.3 \u2192 240.3    \u221237.0pt\n  damage pre-roll                275.8 \u2192 231.8    \u221244.0pt\n  damage post-roll               343.7 \u2192 306.7    \u221237.0pt\n\n\u26a0 They are DERIVED, not device-measured: nothing in this component sets a\n`lineHeight`, so a text row is the font's own line box and the absolute values\ncarry a metric assumption. The DIFFERENCE is what the package promised, and the\nsuite brackets it rather than pinning a decimal.\n\nTHE BUTTON'S NUMBER IS SET BY THE LANDING JUMP, NOT BY TASTE. OTA-255 added\n`advancingHint` so the panel would not move when a roll auto-resolves, and its\ncomment says it takes the ROLL button's footprint. It never did \u2014 39.6 against\n48.8, a ~9pt jump every time dice landed. Matching by RAISING the hint would have\ngrown the post-roll state, which is the peak this package exists to reduce, so\nthe button came down to the hint instead: 40.8, within 1.2pt. That leaves the\nROLL face ~41pt where the guidance wants ~44 for a finger, so the TOUCH target is\nrestored with a hitSlop \u2014 52.8pt to the finger, 40.8 to the eye. The press\ncontract is untouched, and the slop is capped in test so it cannot become a way\nof smuggling the visible height back.\n\nAND THE CARD'S FLOOR IS DERIVED FROM THE STATE THAT NEEDS IT. `minHeight: 80`\nexisted so a thin pre-roll card would not read as cramped, but the state it\nserves is the DAMAGE step, which carries no target and shows the dice notation\nalone: 22 \u00d7 1.30 = 28.6 of content inside 22 of chrome, a natural 50.6 \u2014 so 80\nreserved ~29pt of blank. It is now 64, which keeps ~13pt of clearance beyond the\npadding. The attack prompt is content-driven at ~72pt and never touches the\nfloor, and no post-roll state comes near it.\n\nTHE SUITE'S JOB IS THE CONSERVATION HALF, not the reduction. Anyone can make a\npanel shorter by deleting something, and that is exactly what the owner refused,\nso \u00a7A proves every piece of information is still rendered \u2014 including the\nadvantage shadow die, the SKILL CHECK header, and the next-roll/resolving\nwording \u2014 and \u00a7B pins every protected size, weight, letter-spacing, colour,\nborder and radius by name. Only then does \u00a7E ask whether it got smaller. \u00a7D\nrestates the forensic finding as a rule: this component may never acquire a\nviewport, scale or device-name dependency, because a fix keyed to a phone would\nbe a different defect.\n\n  ota1879TheRollLeavesRoomToRead   28/28 \u2014 composition, information, protected\n                                   typography and palette, ROLL + auto-resolve +\n                                   cancel, hitSlop arithmetic, device\n                                   independence, per-phase derived totals,\n                                   spacing bands, peak reduction, landing-jump\n                                   match, sparse reservation, neighbour contracts\n  related + named contracts        12 suites, 222/222 (1694, 1695, 1379, 1803,\n                                   1878, 1564, 1643, 1441, 1246, 1255, 1799)\n  fast surface                     1378/1378 suites \u00b7 16,078 passed \u00b7 3 skipped\n  typecheck:ci                     exit 0\n  typecheck:tests                  OK \u2014 at baseline (196), no growth\n  lint                             clean\n  check gates                      22/22\n\nTHE SUITE'S OWN FIRST DRAFT GREW THE TEST-TYPECHECK RATCHET to 199, on three\nstrict null checks in its helpers. They were fixed IN THE SUITE \u2014 a named guard\nfor the ROLL control and one for the cancel link \u2014 and the baseline was not\ntouched. It is still 196 and this package contributes zero to it.\n\nONE STRUCTURAL ADDITION, AND IT RENDERS NOTHING. `DICE_ROLLER_STYLES` exports the\nStyleSheet so the geometry assertions can read the live values instead of parsing\nthis file's text \u2014 a regex can be satisfied by a comment, and a suite whose whole\nclaim is arithmetic should not be one of those. No code path reads it.\n\nTHREE NEGATIVE CONTROLS, none committed, each restored byte-identical. NC1\nrestore the old loose spacing \u2014 5 red, all of them the proportionality section.\nNC2 give the container a window-derived minimum \u2014 red on the device-independence\nrule and nothing else, which is the point: the reduction tests would have stayed\ngreen while the defect class came back. NC3 change one protected font size \u2014 red\non the typography pin; and remove the verdict line \u2014 red on the information pin.\n\nRECORDED, NOT FIXED. `diceResults` is a row with no `flexWrap`, so a high-count\ndamage roll (repeater \u00d7 crit \u00d7 shots-per-round) can overflow the card's width \u2014\na different axis and a different package. The structural reason the transcript\nabsorbs all of this is still OTA-179's sacrificial-feed ruling, which OTA-1878's\nreader exists to survive; this reduces the pressure before that safety net is\nneeded and does not touch it.\n\n\u26a0 AND ONE PROCESS ERROR, RECORDED BECAUSE THE RECEIPT WOULD OTHERWISE READ ODDLY.\nThe first authoritative run was launched as a bare `jest`, which runs the HEAVY\nsimulations too \u2014 1388 suites in 2,501s rather than the fast surface's 1378 in\n608s. It came back with one red, `playerWalkerSim`, which the repo's own\nheavy-suites list names as heavy: non-required and non-gating by standing policy,\nnot diagnosed here, and not used as a gate. The run above is the correct surface,\n`test:ci:fast`, with heavy excluded.\n\nNOT CLAIMED: PHYSICAL VISUAL ACCEPTANCE. The geometry contract is proven by test.\nWhether the tightened card LOOKS right on the owner's hardware is his call and\nhas not happened.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T15:52:22Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T16:41:24.436767Z",
+          "dateCreated": "2026-09-24T16:01:20.605455Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161665881",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T16:41:24.702827Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1879-the-roll-leaves-room-to-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1879-the-roll-leaves-room-to-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9290e6a951264ccc83401daca415a10d",
+  "previousEventID": "74cca381c0954b73b82fd1ea3a145fee"
+}

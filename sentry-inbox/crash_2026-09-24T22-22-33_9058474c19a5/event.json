@@ -1,0 +1,314 @@
+{
+  "id": "9058474c19a544cfb9ddf70100e82ca3",
+  "groupID": "7753392219",
+  "eventID": "9058474c19a544cfb9ddf70100e82ca3",
+  "projectID": "4511945117532160",
+  "size": 6520,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Rendered more hooks than during the previous render."
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-24-1881-the-crucible-keeps-its-hooks",
+  "message": "Rendered more hooks than during the previous render.",
+  "title": "Rendered more hooks than during the previous render.",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T20:09:00Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 635437056,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 90.0,
+      "orientation": "portrait",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 624197632,
+      "usable_memory": 3471294464,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 37.773208,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d571-d27a-7402-a8b4-59ff48ff97a3"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "22b9129e270948a6aae2a88e4d2584fe",
+      "span_id": "b9b2ba427a49e293",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "id": "1790288553058_js-boundary",
+    "nativeSdkSawCrash": "unknown",
+    "stack": "\n    at FusionPickerModal (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:4238921)\n    at RCTView (<anonymous>)\n    at View (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:235609)\n    at KeyboardAvoidingView (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:731862)\n    at ExplorationScreen (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:4082664)\n    at RCTView (<anonymous>)\n    at View (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:235609)\n    at RCTView (<anonymous>)\n    at View (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:235609)\n    at RCTView (<anonymous>)\n    at View (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:235609)\n    at AppShell (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:823144)\n    at ScreenErrorBoundary (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:826562)\n    at RNCSafeAreaProvider (<anonymous>)\n    at SafeAreaProvider (address "
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Rendered more hooks than during the previous render."
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "build",
+      "value": "2026-09-24-1879-the-roll-leaves-room-to-read"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1881-the-crucible-keeps-its-hooks"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "js-boundary"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1881-the-crucible-keeps-its-hooks"
+    },
+    {
+      "key": "stage",
+      "value": "screen-render"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T22:24:24.798111Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-24T22:22:33.058000Z",
+  "fingerprints": [
+    "18174abff7b896f4f560c10d3016c18c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1991653237,
+    "commitCount": 4,
+    "data": {},
+    "dateCreated": "2026-09-24T21:42:23.227224Z",
+    "dateReleased": "2026-09-24T22:03:27.284174Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2c4ec702104136ac5f2ca8c605517cac2fe6f2ca",
+      "message": "OTA-1881 \u2014 the Crucible keeps its hooks\n\nThe owner tapped FUSE in asgardar and the game broke. On a Pixel 10 Pro XL,\nAndroid 17, release 2026-09-24-1880, at 20:36:11.483Z, the screen went to\nSOMETHING BROKE carrying React's own sentence:\n\n    Rendered more hooks than during the previous render.\n        at FusionPickerModal\n\nThe error boundary caught it, so the process survived and the ledger calls it a\n\"screen crash (recovered)\" \u2014 but the Crucible never opened.\n\nTHE CAUSE WAS TOPOLOGY, AND IT WAS UNCONDITIONAL. FusionPickerModal stays MOUNTED\nwhile shut and renders null through `if (!visible) return null`. Three hooks \u2014 a\nuseRef and the two `pres` useEffects \u2014 sat BELOW that line, so a closed render ran\n15 hooks and an open one ran 18. The extra three arrive on the very render where\n`visible` flips, which is the render the FUSE tap causes. This was not a race and\nnot a device: every opening of this card broke the rule, and Android is only where\nit was caught. (My own brief to myself said 6 above the return and 2 below; the\nmeasured truth is 15 and 3, because a generic-typed `useMemo<\u2026>(` or `useState<\u2026>(`\ndoes not match a naive `use[A-Z]\\w*\\(` scan. Count them with the generics.)\n\nTHE REPAIR IS THE HOOKS MOVING, AND NOTHING ELSE. All three were lifted above the\nguard and their bodies keyed to `visible`, which reproduces their old behaviour\nhonestly: living below a conditional return, they behaved as though they mounted\nwhen the card opened and unmounted when it shut, and that is exactly what their\nreact-mount / react-unmount rows mean. Keyed to `visible`, the pair still brackets\nthe span the card is actually on screen, the stage ref still clears while shut so\nthe next opening announces its stage, and nothing writes a diagnostic row while\nthe surface is down. No fusion rule, permit, cost, navigation or OTA-1875\nresponder topology moved.\n\n  app/components/FusionPickerModal.tsx   three hooks above the guard, keyed to\n                                         `visible`; guard still a plain early\n                                         return at line 221\n\nAND NOTHING HERE IS PLATFORM-SHAPED. A hook-ordering rule that held on one\nplatform and not another would not be a rule. There is no device, OS or version\ntest in this repair, and \u00a7C fails if one ever appears \u2014 it reads the file with\ncomments STRIPPED first, because the unstripped census failed on my own comment\nnaming the device, which is the OTA-1721 class: an instrument acting on a comment\nthat names what it hunts for.\n\nTHE SUITE COUNTS RENDERS, NOT STRINGS. A regex would have been satisfied by moving\nthe lines and would say nothing about whether React accepts the result, so every\ncase drives the real component through real `visible` transitions and fails if\nReact throws \u2014 which is what the owner saw.\n\n  ota1881TheCrucibleKeepsItsHooks   15/15 \u2014 the four crash transitions incl. the\n                                    exact mounted-shut-then-opened FUSE case; no\n                                    hook below the guard; no device branch and no\n                                    suppression; the presentation rows still\n                                    bracket the open card; card contents,\n                                    transaction path, OTA-1875 topology and zero\n                                    resource spend\n  related contracts                 ota1875, ota1878, ota1880 + this suite:\n                                    4 suites, 81/81\n  fast surface                      1380/1380 suites \u00b7 16,122 passed \u00b7 3 skipped\n  typecheck:ci                      exit 0\n  typecheck:tests                   OK \u2014 at baseline (196), no growth\n  lint                              clean\n  check gates                       22/22\n\nONE NEGATIVE CONTROL, not committed, production restored byte-identically (md5\n618988f3d000037e905a054cb19cb303 before and after). Putting ONE of the three hooks\nback below the guard turns 9 of 15 red and reproduces React's exact sentence at\nthe moved line.\n\nTWO HARNESS FACTS, both mine, both worth the next reader's time. Teardown must\nflush inside act(): React defers a passive effect's destroy past unmount(), so an\nunwrapped afterEach let this card's own react-unmount row land during the NEXT\ntest's mount and be counted against it \u2014 the row was right, only its timing was\nthe harness's fault. And NO `{ virtual: true }` on a module that genuinely exists:\na virtual mock on the real onnxruntime held only while this suite ran ALONE, and in\na shared run the real binding loaded and died on \"Cannot read properties of\nundefined (reading 'install')\" \u2014 failing a NEIGHBOUR suite, not this one. OTA-1246\nalready wrote that lesson down; matching its house pattern is what survives a\nwhole-suite run.\n\n#206 \u2014 the earlier Fusing-Crucible investigation closed as INSUFFICIENT EVIDENCE.\nThat was the right disposition for the evidence it had: the surface emitted no\n`pres` row and nothing named a mechanism. It did not know this mechanism. This\ncrash supplied it.\n\nSEPARATE / UNRESOLVED NON-BLOCKING OBSERVATION. 13.45s after the render throw the\nprocess died with no signal while the in-flight marker still read action \"fuse\".\nNothing in this evidence proves the throw caused that death: the same no-signal\nshape appears twice earlier in the same ledger under unrelated taps (\"missions\",\n\"LORE\"), memory warnings were none, heap ran 12->28MB, the native queue was idle\nat 0 jobs past 3s and there were 0 model contexts. The shared word \"fuse\" is a\nstale in-flight marker, not a causal link. Not closed here, and not widened here.\n\nNOT CLAIMED: physical verification on the owner's hardware.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T21:34:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1881-the-crucible-keeps-its-hooks",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1881-the-crucible-keeps-its-hooks",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T22:03:27.284174Z",
+          "dateCreated": "2026-09-24T21:42:23.227224Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161788498",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T22:03:27.567291Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1881-the-crucible-keeps-its-hooks",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1881-the-crucible-keeps-its-hooks",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1881-the-crucible-keeps-its-hooks",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1881-the-crucible-keeps-its-hooks)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "92f93017be1140fdaf8ee157c7e3c337"
+}

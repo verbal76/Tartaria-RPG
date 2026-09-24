@@ -1,0 +1,306 @@
+{
+  "id": "ec197d1da1fc465aac95279cc9a3f777",
+  "groupID": "7753358685",
+  "eventID": "ec197d1da1fc465aac95279cc9a3f777",
+  "projectID": "4511945117532160",
+  "size": 4347,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mh221wj4"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-24-1879-the-roll-leaves-room-to-read",
+  "message": "player-log-beacon 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mh221wj4",
+  "title": "player-log-beacon 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mh221wj4",
+  "location": null,
+  "user": {
+    "id": "9943F21D-01AB-4722-800D-77CA32B14782",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T20:09:00Z",
+      "device_app_hash": "7af67691e564d22a5e0e77c03501ed4816fe57e5",
+      "build_type": "test",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "TartariaRealms",
+      "app_version": "2.5.0",
+      "app_build": "208",
+      "app_memory": 1518354432,
+      "in_foreground": true,
+      "app_id": "4127F3BC-F476-3E2C-9E4E-EF303D6275F0",
+      "type": "app"
+    },
+    "device": {
+      "family": "iOS",
+      "model": "iPhone14,6",
+      "model_id": "D49AP",
+      "arch": "arm64",
+      "battery_level": 90.0,
+      "orientation": "landscape",
+      "screen_width_pixels": 375,
+      "screen_height_pixels": 667,
+      "charging": false,
+      "simulator": false,
+      "memory_size": 4073684992,
+      "free_memory": 43302912,
+      "usable_memory": 3471294464,
+      "locale": "en_US",
+      "processor_count": 6,
+      "thermal_state": "nominal",
+      "type": "device"
+    },
+    "os": {
+      "os": "iOS 26.5.2",
+      "name": "iOS",
+      "version": "26.5.2",
+      "build": "23F84",
+      "kernel_version": "Darwin Kernel Version 25.5.0: Tue Jun  9 22:22:13 PDT 2026; root:xnu-12377.122.8~1/RELEASE_ARM64_T8110",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "preview",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 37.773208,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d44a-fa73-7669-8f5a-deee8b477823"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4fbcde15c4784a63bfb92ad3152d9819",
+      "span_id": "b38bf8e1732a4e5d",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-24-1879-the-roll-leaves-room-to-read #mug3mh221wj4"
+  },
+  "tags": [
+    {
+      "key": "app.device",
+      "value": "7af67691e564d22a5e0e77c03501ed4816fe57e5"
+    },
+    {
+      "key": "bundleId",
+      "value": "mug3mh221wj4"
+    },
+    {
+      "key": "device",
+      "value": "iPhone14,6"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "iOS"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1879-the-roll-leaves-room-to-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "iOS 26.5.2"
+    },
+    {
+      "key": "os.build",
+      "value": "23F84"
+    },
+    {
+      "key": "os.name",
+      "value": "iOS"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "parts",
+      "value": "19"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read"
+    },
+    {
+      "key": "user",
+      "value": "id:9943F21D-01AB-4722-800D-77CA32B14782",
+      "query": "user.id:\"9943F21D-01AB-4722-800D-77CA32B14782\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T22:23:47.589992Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-24T22:23:46.437000Z",
+  "fingerprints": [
+    "173f530a8f1e688b2fde85f25a92ddda"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1990947564,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-24T16:01:20.605455Z",
+    "dateReleased": "2026-09-24T16:41:24.436767Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "be3dc3bc0ba539475e3c9f8478ef554c9d835abb",
+      "message": "OTA-1879 \u2014 the roll leaves room to read\n\nThe owner played a fight on a Pixel 10 Pro XL \u2014 a large, tall phone \u2014 and the\ncombat-roll surface still pressed the transcript off the screen. His ruling was a\nconservation order, not a brief for a redesign: SAME LOOK, SAME INFORMATION, SAME\nINTERACTION, SMALLER FOOTPRINT. The composition is approved and is not touched.\n\nTHE FORENSICS FOUND NO GROWTH TO REMOVE, AND THAT IS THE FINDING. DiceRoller\ncontains no `Dimensions`, no `useWindowDimensions`, no `useUiScale`, no\npercentage height and no aspect ratio, and `useUiScale` clamps to 1 at width\n\u2265 390 \u2014 so a wide phone earns neither capping nor vertical relief and the panel\nis the SAME height on a 4.7\" screen and a 6.8\" one. It was simply ~368pt at the\npost-roll peak, of which ~112pt (30%) was AIR: the container's 14pt padding\nnested inside the card's own 14pt padding, five 8pt gaps, and four small margins\ndoubling gaps they already sat beside. The transcript is the only flexible region\non that screen (OTA-179), so it paid for every one of those pixels.\n\nSO THIS IS SPACING AND NOTHING ELSE. Every font size, weight, letter-spacing,\ncolour, border, radius, word, element, handler and timing is what shipped. No row\nwas merged, nothing was removed, no type shrank, there is no reduced variant and\nno device branch. Option B \u2014 pairing Total with the verdict and the header with\nthe roll label \u2014 was offered in the forensics and the owner declined it; it is\nnot here.\n\nTHE NUMBERS COME FROM ONE MODEL WITH THE LIVE FONT SIZES ON BOTH SIDES, so what\nthey compare is spacing and can be nothing else:\n\n  attack post-roll \u2014 the peak    366.6 \u2192 326.6    \u221240.0pt   \u221210.9%\n  attack pre-roll                277.3 \u2192 240.3    \u221237.0pt\n  damage pre-roll                275.8 \u2192 231.8    \u221244.0pt\n  damage post-roll               343.7 \u2192 306.7    \u221237.0pt\n\n\u26a0 They are DERIVED, not device-measured: nothing in this component sets a\n`lineHeight`, so a text row is the font's own line box and the absolute values\ncarry a metric assumption. The DIFFERENCE is what the package promised, and the\nsuite brackets it rather than pinning a decimal.\n\nTHE BUTTON'S NUMBER IS SET BY THE LANDING JUMP, NOT BY TASTE. OTA-255 added\n`advancingHint` so the panel would not move when a roll auto-resolves, and its\ncomment says it takes the ROLL button's footprint. It never did \u2014 39.6 against\n48.8, a ~9pt jump every time dice landed. Matching by RAISING the hint would have\ngrown the post-roll state, which is the peak this package exists to reduce, so\nthe button came down to the hint instead: 40.8, within 1.2pt. That leaves the\nROLL face ~41pt where the guidance wants ~44 for a finger, so the TOUCH target is\nrestored with a hitSlop \u2014 52.8pt to the finger, 40.8 to the eye. The press\ncontract is untouched, and the slop is capped in test so it cannot become a way\nof smuggling the visible height back.\n\nAND THE CARD'S FLOOR IS DERIVED FROM THE STATE THAT NEEDS IT. `minHeight: 80`\nexisted so a thin pre-roll card would not read as cramped, but the state it\nserves is the DAMAGE step, which carries no target and shows the dice notation\nalone: 22 \u00d7 1.30 = 28.6 of content inside 22 of chrome, a natural 50.6 \u2014 so 80\nreserved ~29pt of blank. It is now 64, which keeps ~13pt of clearance beyond the\npadding. The attack prompt is content-driven at ~72pt and never touches the\nfloor, and no post-roll state comes near it.\n\nTHE SUITE'S JOB IS THE CONSERVATION HALF, not the reduction. Anyone can make a\npanel shorter by deleting something, and that is exactly what the owner refused,\nso \u00a7A proves every piece of information is still rendered \u2014 including the\nadvantage shadow die, the SKILL CHECK header, and the next-roll/resolving\nwording \u2014 and \u00a7B pins every protected size, weight, letter-spacing, colour,\nborder and radius by name. Only then does \u00a7E ask whether it got smaller. \u00a7D\nrestates the forensic finding as a rule: this component may never acquire a\nviewport, scale or device-name dependency, because a fix keyed to a phone would\nbe a different defect.\n\n  ota1879TheRollLeavesRoomToRead   28/28 \u2014 composition, information, protected\n                                   typography and palette, ROLL + auto-resolve +\n                                   cancel, hitSlop arithmetic, device\n                                   independence, per-phase derived totals,\n                                   spacing bands, peak reduction, landing-jump\n                                   match, sparse reservation, neighbour contracts\n  related + named contracts        12 suites, 222/222 (1694, 1695, 1379, 1803,\n                                   1878, 1564, 1643, 1441, 1246, 1255, 1799)\n  fast surface                     1378/1378 suites \u00b7 16,078 passed \u00b7 3 skipped\n  typecheck:ci                     exit 0\n  typecheck:tests                  OK \u2014 at baseline (196), no growth\n  lint                             clean\n  check gates                      22/22\n\nTHE SUITE'S OWN FIRST DRAFT GREW THE TEST-TYPECHECK RATCHET to 199, on three\nstrict null checks in its helpers. They were fixed IN THE SUITE \u2014 a named guard\nfor the ROLL control and one for the cancel link \u2014 and the baseline was not\ntouched. It is still 196 and this package contributes zero to it.\n\nONE STRUCTURAL ADDITION, AND IT RENDERS NOTHING. `DICE_ROLLER_STYLES` exports the\nStyleSheet so the geometry assertions can read the live values instead of parsing\nthis file's text \u2014 a regex can be satisfied by a comment, and a suite whose whole\nclaim is arithmetic should not be one of those. No code path reads it.\n\nTHREE NEGATIVE CONTROLS, none committed, each restored byte-identical. NC1\nrestore the old loose spacing \u2014 5 red, all of them the proportionality section.\nNC2 give the container a window-derived minimum \u2014 red on the device-independence\nrule and nothing else, which is the point: the reduction tests would have stayed\ngreen while the defect class came back. NC3 change one protected font size \u2014 red\non the typography pin; and remove the verdict line \u2014 red on the information pin.\n\nRECORDED, NOT FIXED. `diceResults` is a row with no `flexWrap`, so a high-count\ndamage roll (repeater \u00d7 crit \u00d7 shots-per-round) can overflow the card's width \u2014\na different axis and a different package. The structural reason the transcript\nabsorbs all of this is still OTA-179's sacrificial-feed ruling, which OTA-1878's\nreader exists to survive; this reduces the pressure before that safety net is\nneeded and does not touch it.\n\n\u26a0 AND ONE PROCESS ERROR, RECORDED BECAUSE THE RECEIPT WOULD OTHERWISE READ ODDLY.\nThe first authoritative run was launched as a bare `jest`, which runs the HEAVY\nsimulations too \u2014 1388 suites in 2,501s rather than the fast surface's 1378 in\n608s. It came back with one red, `playerWalkerSim`, which the repo's own\nheavy-suites list names as heavy: non-required and non-gating by standing policy,\nnot diagnosed here, and not used as a gate. The run above is the correct surface,\n`test:ci:fast`, with heavy excluded.\n\nNOT CLAIMED: PHYSICAL VISUAL ACCEPTANCE. The geometry contract is proven by test.\nWhether the tightened card LOOKS right on the owner's hardware is his call and\nhas not happened.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T15:52:22Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T16:41:24.436767Z",
+          "dateCreated": "2026-09-24T16:01:20.605455Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161665881",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T16:41:24.702827Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1879-the-roll-leaves-room-to-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1879-the-roll-leaves-room-to-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1879-the-roll-leaves-room-to-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "47290e6e6c444f7e945128de5c523dc2"
+}

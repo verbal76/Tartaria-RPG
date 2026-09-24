@@ -1,0 +1,480 @@
+Bug Report — Permannu · (2026-09-24-1879-the-roll-leaves-room-to-read) · Crash
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-24T22:23:46.394Z
+Character: Permannu
+Slot ID: slot_mu9z9l9q_ip9bpv
+Race: Tartarian Giants
+Location: Drakova
+HP: 35/59
+
+--- DESCRIPTION ---
+Crash
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.5.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 375×667 / screen 375×667 @ 2x density
+  Captured at: 2026-09-24T22:23:46.303Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 208
+  AAB: (build 208)
+  OTA: (2026-09-24-1879-the-roll-leaves-room-to-read)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-24T20:10:01.853Z
+  Last init success: 2026-09-24T20:10:03.483Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmufyt683ue · started 2026-09-24T20:09:00.867Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 8 fatal (newest last)
+  ⚠⚠ 4 of 8 process kills landed on an OTA-apply boot
+  • 2026-09-19T20:45:42.388Z (7298m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1851-one-press-language · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room monarch_waystation · screen exploration
+      last checkpoint: appstate:inactive→background · 26178ms into the action · alive 0ms after it
+      launch: died 86355ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-20T01:42:10.103Z (7002m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-19-1853-the-ring-learns-who · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet) — begun 4m before the last sign of life; treat the action label as stale, not as the killer
+      doing: (no action yet) · room ? · screen about
+      last checkpoint: appstate:inactive→background · 262490ms into the action · alive 0ms after it
+      launch: died 803123ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 147ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o2/r2/l0/p1/dn0
+  • 2026-09-21T21:31:59.422Z (4372m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "roll"
+      doing: tap "roll" · room iskan_veil · screen exploration
+      last checkpoint: appstate:inactive→background · 28194ms into the action · alive 0ms after it
+      launch: died 196203ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o3/r3/l0/p1/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:34:21.255Z (4369m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: action "craft Mudstone"
+      doing: action "craft Mudstone" · room iskan_veil · screen crafting
+      last checkpoint: appstate:inactive→background · 17512ms into the action · alive 0ms after it
+      launch: died 140411ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-21T21:35:12.282Z (4369m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-21-1862-the-beat-keeps-its-way-out · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: appstate:inactive→background · 49867ms into the action · alive 0ms after it
+      launch: died 49901ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-22T21:42:49.444Z (2921m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-22-1870-the-road-belongs-to-the-next-task · stage appstate:inactive→background
+      Process died with no orderly exit while: action "investigate Gale Binder Wand"
+      doing: action "investigate Gale Binder Wand" · room cradle_of_dusk · screen exploration
+      last checkpoint: appstate:inactive→background · 52501ms into the action · alive 0ms after it
+      launch: died 1860846ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 120ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o2/r2/l0/p1/dn0)
+      its own model ledger at the last stamp: o4/r3/l1/p1/dn0
+  • 2026-09-22T21:43:42.737Z (2920m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-22-1870-the-road-belongs-to-the-next-task · stage appstate:inactive→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen character
+      last checkpoint: appstate:inactive→background · 50664ms into the action · alive 0ms after it
+      launch: died 50706ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-24T12:01:06.635Z (623m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-24-1877-the-hunt-reads-its-last-beat · stage appstate:inactive→background
+      Process died with no orderly exit while: tap "🚪 ENTER"
+      doing: tap "🚪 ENTER" · room hidden_market · screen exploration
+      last checkpoint: appstate:inactive→background · 38661ms into the action · alive 0ms after it
+      launch: died 120547ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 163ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o2/r2/l0/p1/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-24T19:37:26.809Z (166m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-24-1879-the-roll-leaves-room-to-read · stage appstate:inactive→background
+      Previous process disappeared while idle on the title screen — no game was in progress (9s after boot, app inactive, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:inactive→background · 9213ms into the action · alive 0ms after it
+      launch: died 9243ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 125ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-24T22:22:33.058Z (1m ago) — screen crash (recovered)
+      build 4.32.11 · 2026-09-24-1879-the-roll-leaves-room-to-read · stage screen-render
+      Rendered more hooks than during the previous render.
+      
+          at FusionPickerModal (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:4238921)
+          at RCTView (<anonymous>)
+          at View (address at /var/mobile/Containers/Data/Application/A9DC0B4F-67A0-40BE-8273-71E46D210A03/Library/Application Support/.expo-internal/4547cba6bb99f792a0f7447ab53ac54d.bundle:1:235609)
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: (no action yet)
+     Where: (unknown) on title screen
+     Last seen alive: 2026-09-24T19:37:26.809Z (166 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: appstate:inactive→background (+9213ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 5.3s · 1 job kind queued >3s · worst 14.1ms/prompt-token · 7 generations thrown away (43.0s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 106 jobs · worst wait 5.3s (investigate_lore) · 6 past 3s · queued now q7, oldest 99.3s (homework+cognition+llm+voice) · running voice for 111.0s
+  App state trail: background → active → inactive → active → inactive → active
+Model contexts
+  Live now: 1
+  Opened: 2 · Released: 1 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 128MB · last 128MB · net +116MB over 59 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=inactive · native idle q0 · warns 0
+     +0.1s appstate [inactive→active] — heap 12MB gc 0ms/4 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/16 · ctx 0 · app=active · native cognition running q0 · warns 0
+    +25.1s heap-move — heap 28MB gc 0ms/61 · ctx 0 · app=active · native idle q0 · warns 0
+    +62.6s ctx-event — heap 36MB gc 0ms/81 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+    +62.6s watch-start — heap 36MB gc 0ms/82 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +72.6s heap-move — heap 44MB gc 0ms/107 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +92.7s heap-move — heap 56MB gc 0ms/148 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +193.3s gen-settled [narration:scene_intro_fi] — heap 60MB gc 0ms/307 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +203.0s heap-move — heap 68MB gc 0ms/318 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +227.5s gen-settled [narration:scene_intro_fi] — heap 68MB gc 0ms/326 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +233.1s heap-move — heap 76MB gc 0ms/361 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +258.1s heap-move — heap 84MB gc 0ms/370 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +559.2s appstate [active→inactive] — heap 84MB gc 0ms/387 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+   +559.2s appstate [inactive→background] — heap 84MB gc 0ms/388 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +1860.8s ctx-event — heap 84MB gc 0ms/390 · ctx 0 · app=background · native teardown running q0 · warns 0
+  +7478.9s appstate [background→active] — heap 84MB gc 0ms/392 · ctx 0 · app=active · native idle q0 · warns 0
+  +7488.4s ctx-event — heap 84MB gc 0ms/408 · ctx 1 ≈425MB est · app=active · native llm running q0 · warns 0
+  +7488.4s watch-start — heap 84MB gc 0ms/409 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +7615.1s gen-settled [item_synthesis_hw ok] — heap 84MB gc 0ms/496 · ctx 1 ≈425MB est · app=active · native item_synthesis_hw running q0 · warns 0
+  +7641.6s gen-settled [item_synthesis_hw ok] — heap 84MB gc 0ms/500 · ctx 1 ≈425MB est · app=active · native item_synthesis_hw running q0 · warns 0
+  +7654.8s gen-settled [investigate_lore ok] — heap 84MB gc 0ms/532 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +7656.0s gen-settled [investigate_lore ok] — heap 84MB gc 0ms/543 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7665.5s gen-settled [ambient preempted] — heap 84MB gc 0ms/578 · ctx 1 ≈425MB est · app=active · native ambient running q6 · warns 0
+  +7667.9s gen-settled [investigate_lore ok] — heap 88MB gc 0ms/589 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +7668.9s gen-settled [investigate_lore ok] — heap 88MB gc 0ms/591 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+  +7669.8s gen-settled [investigate_lore ok] — heap 88MB gc 0ms/593 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7685.7s gen-settled [narration:scene_intro_fi] — heap 92MB gc 0ms/605 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q1 · warns 0
+  +7688.2s gen-settled [investigate_lore ok] — heap 96MB gc 0ms/615 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +7689.0s gen-settled [investigate_lore ok] — heap 100MB gc 0ms/618 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7708.6s gen-settled [investigate_lore ok] — heap 108MB gc 0ms/645 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7709.8s gen-settled [investigate_lore ok] — heap 112MB gc 1ms/654 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7716.6s gen-settled [investigate_lore ok] — heap 112MB gc 1ms/672 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7717.6s gen-settled [investigate_lore ok] — heap 112MB gc 1ms/682 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7724.4s gen-settled [investigate_lore ok] — heap 112MB gc 1ms/703 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7725.7s gen-settled [investigate_lore ok] — heap 112MB gc 1ms/722 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7734.4s gen-settled [flourish ok] — heap 112MB gc 1ms/733 · ctx 1 ≈425MB est · app=active · native flourish running q0 · warns 0
+  +7766.6s gen-settled [narration:scene_intro_fi] — heap 112MB gc 1ms/816 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +7808.5s gen-settled [flourish ok] — heap 112MB gc 1ms/865 · ctx 1 ≈425MB est · app=active · native flourish running q0 · warns 0
+  +7831.9s gen-settled [narration:scene_intro_fi] — heap 112MB gc 1ms/884 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +7839.9s appstate [active→inactive] — heap 112MB gc 1ms/888 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+  +7840.7s appstate [inactive→background] — heap 112MB gc 1ms/890 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +7841.7s appstate [background→active] — heap 112MB gc 1ms/892 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +7845.6s appstate [active→inactive] — heap 112MB gc 1ms/893 · ctx 1 ≈425MB est · app=inactive · native idle q0 · warns 0
+  +7865.4s appstate [inactive→active] — heap 112MB gc 1ms/899 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +7868.2s gen-settled [narration:scene_intro_fi] — heap 112MB gc 1ms/901 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +7914.8s heap-move — heap 120MB gc 1ms/972 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +7919.5s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/995 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +7920.4s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1000 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7927.3s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1024 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7934.6s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1043 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7935.9s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1050 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7946.5s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1078 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7948.1s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1085 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7961.8s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1114 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7967.6s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1125 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +7969.0s gen-settled [investigate_lore ok] — heap 128MB gc 1ms/1132 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +8022.3s appstate [active→inactive] — heap 128MB gc 1ms/1257 · ctx 1 ≈425MB est · app=inactive · native voice running q5 · warns 0
+  +8044.3s appstate [inactive→active] — heap 128MB gc 1ms/1258 · ctx 1 ≈425MB est · app=active · native voice running q5 · warns 0
+Native memory flight recorder (Build 190)
+  ⚠ footprint = task_vm_info.phys_footprint (the number Jetsam judges).
+    NOT a heap. available = os_proc_available_memory(), an OS advisory —
+    NOT the exact Jetsam threshold. Bands below are diagnostic hypotheses,
+    not established universal iPhone danger thresholds.
+  Process start: 1294MB (earliest sample — EVIDENCE, not a baseline)
+  Footprint: analysis baseline 1296MB · peak 1494MB · last 1421MB · high water 1494MB  [HIGH]
+  Shape: SPIKE-RETAINED — retained +125MB vs analysis baseline · recovery 37% · floor rose 1 time(s), +68MB travelled (churn, NOT memory still held)
+  OS said available: min 604MB
+  Sampler: samples 1863 · evicted 1351 · events 775 · warnings 0 · bursts 24+13ext · cadence 1000ms
+  ⚠⚠ PREVIOUS LIFE — the last checkpoint written by a process that did not
+     come back. This is the only trace a Jetsam kill can ever leave us.
+     WILL_TERMINATE at 962MB (high water 999MB, baseline 958MB) after 9s · 0 warning(s) · terminating · build 2026-09-24-1879-the-roll-leaves-room-to-read
+  MetricKit: no payload delivered yet (iOS delivers ~daily) — undelivered, NOT healthy
+  Retained steps: 5 (floor window 10, rise ≥48MB held 8 samples)
+    STEP 1:   +354.2s →   +379.9s · floor 1294 → 1381MB (+87 retained) · peak 1392MB · recovered 11%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 2:   +423.0s →   +430.9s · floor 1381 → 1451MB (+70 retained) · peak 1494MB · recovered 38%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 3:   +468.8s →   +473.8s · floor 1284 → 1320MB (+36 retained) · peak 1343MB · recovered 39%
+      (no annotated events inside this step — the subsystem that allocated it does not report, or was not instrumented)
+    STEP 4:   +508.7s →   +516.7s · floor 1320 → 1379MB (+59 retained) · peak 1440MB · recovered 51%
+      inside: T5_DONE×2 · HERMES_HEAP×2 · ROUTE_UNMOUNT×1 · ROUTE_MOUNT×1
+        +504.1s T5_DONE/332 — 1346MB
+        +505.0s T5_DONE/334 — 1347MB
+        +506.6s HERMES_HEAP/128 — 1357MB
+        +511.7s HERMES_HEAP/128 — 1397MB
+        +512.3s ROUTE_UNMOUNT/36426 — 1397MB
+        +512.3s ROUTE_MOUNT/65428 — 1397MB
+    STEP 5:   +531.8s →   +557.9s · floor 1379 → 1417MB (+38 retained) · peak 1440MB · recovered 38%
+      inside: HERMES_HEAP×7 · WILL_RESIGN_ACTIVE×1 · DID_BECOME_ACTIVE×1
+        +526.8s HERMES_HEAP/128 — 1382MB
+        +531.8s HERMES_HEAP/128 — 1440MB
+        +533.8s WILL_RESIGN_ACTIVE/2 — 1426MB
+        +536.8s HERMES_HEAP/128 — 1417MB
+        +541.8s HERMES_HEAP/128 — 1417MB
+        +546.8s HERMES_HEAP/128 — 1419MB
+      … 3 more inside this step
+  Events (last 64):
+      +474.7s ROSTER_DISPOSE — 1322MB · active
+      +474.7s ROSTER_CREATE — 1322MB · active
+      +474.7s T5_DONE/319 — 1322MB · active
+      +476.5s HERMES_HEAP/128 — 1322MB · active
+      +477.0s T5_DONE/320 — 1322MB · active
+      +477.9s T5_DONE/322 — 1322MB · active
+      +479.1s QWEN_GEN_SETTLED/24 — 1339MB · active
+      +479.7s SCENE_DISPOSE/48427 — 1323MB · active
+      +479.7s SCENE_CREATE/48427 — 1323MB · active
+      +479.7s ROSTER_DISPOSE — 1323MB · active
+      +479.7s ROSTER_CREATE — 1323MB · active
+      +479.7s T5_DONE/323 — 1323MB · active
+      +480.5s QWEN_GEN_SETTLED/27 — 1323MB · active
+      +481.6s HERMES_HEAP/128 — 1325MB · active
+      +483.4s SCENE_DISPOSE/48427 — 1327MB · active
+      +483.4s SCENE_CREATE/48427 — 1327MB · active
+      +483.4s SCENE_DISPOSE/48427 — 1327MB · active
+      +483.4s SCENE_CREATE/48427 — 1327MB · active
+      +483.4s ROOM_EXIT/48427 — 1327MB · active
+      +483.4s ROOM_ENTER/49613 — 1327MB · active
+      +483.5s SCENE_DISPOSE/49613 — 1326MB · active
+      +483.5s SCENE_CREATE/49613 — 1326MB · active
+      +483.5s ROSTER_DISPOSE — 1326MB · active
+      +483.5s ROSTER_CREATE — 1326MB · active
+      +483.5s SCENE_DISPOSE/49613 — 1326MB · active
+      +483.5s SCENE_CREATE/49613 — 1326MB · active
+      +483.5s T5_DONE/324 — 1326MB · active
+      +486.6s HERMES_HEAP/128 — 1330MB · active
+      +491.6s HERMES_HEAP/128 — 1333MB · active
+      +496.6s HERMES_HEAP/128 — 1333MB · active
+      +500.6s T5_DONE/327 — 1336MB · active
+      +501.3s T5_DONE/329 — 1340MB · active
+      +501.6s HERMES_HEAP/128 — 1345MB · active
+      +501.6s REPORT_COMPOSE_START — 1345MB · active
+      +501.6s REPORT_COMPOSE_END — 1345MB · active
+      +502.9s T5_DONE/330 — 1343MB · active
+      +504.1s T5_DONE/332 — 1346MB · active
+      +505.0s T5_DONE/334 — 1347MB · active
+      +506.6s HERMES_HEAP/128 — 1357MB · active
+      +511.7s HERMES_HEAP/128 — 1397MB · active
+      +512.3s ROUTE_UNMOUNT/36426 — 1397MB · active
+      +512.3s ROUTE_MOUNT/65428 — 1397MB · active
+      +516.7s HERMES_HEAP/128 — 1379MB · active
+      +518.6s SCENE_DISPOSE/49613 — 1379MB · active
+      +518.6s SCENE_CREATE/49613 — 1379MB · active
+      +518.6s SCENE_DISPOSE/49613 — 1379MB · active
+      +518.6s SCENE_CREATE/49613 — 1379MB · active
+      +521.8s HERMES_HEAP/128 — 1380MB · active
+      +522.2s ROUTE_UNMOUNT/65428 — 1380MB · active
+      +522.2s ROUTE_MOUNT/36426 — 1380MB · active
+      +526.8s HERMES_HEAP/128 — 1382MB · active
+      +531.8s HERMES_HEAP/128 — 1440MB · active
+      +533.8s WILL_RESIGN_ACTIVE/2 — 1426MB · inactive
+      +536.8s HERMES_HEAP/128 — 1417MB · inactive
+      +541.8s HERMES_HEAP/128 — 1417MB · inactive
+      +546.8s HERMES_HEAP/128 — 1419MB · inactive
+      +551.8s HERMES_HEAP/128 — 1419MB · inactive
+      +555.9s DID_BECOME_ACTIVE/1 — 1419MB · active
+      +556.8s HERMES_HEAP/128 — 1421MB · active
+      +561.5s ROUTE_UNMOUNT/36426 — 1421MB · active
+      +561.5s ROUTE_MOUNT/29919 — 1421MB · active
+      +561.6s AUDIO_PLAYER_CREATE/58003 — 1421MB · active
+      +561.8s HERMES_HEAP/128 — 1421MB · active
+      +561.8s REPORT_COMPOSE_START — 1421MB · active
+  Samples (last 512 of 512):
+      +295.2s 1294MB rss 912MB avail 804MB · unknown · nominal
+      +296.2s 1294MB rss 910MB avail 804MB malloc 1313MB/2796283blk · unknown · nominal
+      +297.2s 1296MB rss 904MB avail 802MB malloc 1313MB/2796347blk · unknown · nominal
+      +298.2s 1296MB rss 904MB avail 802MB malloc 1313MB/2796879blk · unknown · nominal
+      +299.2s 1296MB rss 904MB avail 802MB malloc 1313MB/2796828blk · unknown · nominal
+      +300.2s 1296MB rss 904MB avail 802MB malloc 1313MB/2797006blk · unknown · nominal
+      +301.2s 1295MB rss 911MB avail 803MB malloc 1318MB/2805090blk · unknown · nominal
+      +302.2s 1295MB rss 911MB avail 803MB malloc 1318MB/2805302blk · unknown · nominal
+      +303.2s 1297MB rss 912MB avail 801MB malloc 1318MB/2809074blk · unknown · nominal
+      +304.2s 1297MB rss 912MB avail 801MB malloc 1318MB/2809090blk · unknown · nominal
+      +305.2s 1317MB rss 932MB avail 781MB · unknown · nominal
+      +306.2s 1315MB rss 935MB avail 783MB malloc 1326MB/2814121blk · unknown · nominal
+      +307.2s 1319MB rss 941MB avail 779MB malloc 1335MB/2816475blk · unknown · nominal
+      +308.2s 1321MB rss 945MB avail 777MB malloc 1341MB/2820258blk · unknown · nominal
+      +309.2s 1326MB rss 953MB avail 772MB malloc 1349MB/2822349blk · unknown · nominal
+      +310.2s 1312MB rss 956MB avail 786MB malloc 1355MB/2826261blk · unknown · nominal
+      +311.2s 1331MB rss 962MB avail 767MB malloc 1360MB/2827339blk · unknown · nominal
+      +312.2s 1321MB rss 946MB avail 777MB malloc 1358MB/2828009blk · unknown · nominal
+      +313.2s 1316MB rss 946MB avail 782MB malloc 1358MB/2827997blk · unknown · nominal
+      +314.2s 1316MB rss 946MB avail 782MB malloc 1358MB/2828060blk · unknown · nominal
+      +315.2s 1316MB rss 946MB avail 782MB malloc 1358MB/2828132blk · unknown · nominal
+      +316.2s 1316MB rss 946MB avail 782MB malloc 1358MB/2828199blk · unknown · nominal
+      +317.2s 1316MB rss 946MB avail 782MB malloc 1358MB/2828378blk · unknown · nominal
+      +318.2s 1316MB rss 946MB avail 782MB malloc 1356MB/2828791blk · unknown · nominal
+      +319.2s 1316MB rss 946MB avail 782MB malloc 1356MB/2828804blk · unknown · nominal
+      +320.2s 1318MB rss 949MB avail 780MB · unknown · nominal · burst
+      +320.3s 1318MB rss 949MB avail 780MB malloc 1364MB/2831203blk · unknown · nominal · burst
+      +320.4s 1318MB rss 949MB avail 780MB · unknown · nominal · burst
+      +320.5s 1318MB rss 949MB avail 780MB · unknown · nominal · burst
+      +320.6s 1319MB rss 950MB avail 779MB · unknown · nominal · burst
+      +320.7s 1314MB rss 944MB avail 784MB · unknown · nominal · burst
+      +320.8s 1315MB rss 945MB avail 783MB · unknown · nominal · burst
+      +320.9s 1315MB rss 945MB avail 783MB · unknown · nominal · burst
+      +321.0s 1315MB rss 945MB avail 783MB · unknown · nominal · burst
+      +321.1s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.2s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.3s 1305MB rss 945MB avail 793MB malloc 1368MB/2833738blk · unknown · nominal · burst
+      +321.4s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.5s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.6s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.7s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.8s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +321.9s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +322.0s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +322.1s 1305MB rss 945MB avail 793MB · unknown · nominal · burst
+      +322.2s 1306MB rss 946MB avail 792MB · unknown · nominal · burst
+      +322.3s 1324MB rss 950MB avail 774MB malloc 1375MB/2847135blk · unknown · nominal · burst
+      +322.4s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +322.5s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +322.6s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +322.7s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +322.8s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +322.9s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +323.0s 1324MB rss 949MB avail 774MB · unknown · nominal · burst
+      +323.1s 1324MB rss 949MB avail 774MB · unknown · nominal
+      +324.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847187blk · unknown · nominal
+      +325.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847249blk · unknown · nominal
+      +326.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847132blk · unknown · nominal
+      +327.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847323blk · unknown · nominal
+      +328.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847286blk · unknown · nominal
+      +329.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2847413blk · unknown · nominal
+      +330.2s 1324MB rss 949MB avail 774MB malloc 1375MB/2848375blk · unknown · nominal
+      +331.2s 1324MB rss 939MB avail 774MB malloc 1375MB/2848478blk · unknown · nominal
+      +332.2s 1324MB rss 939MB avail 774MB · unknown · nominal
+      +333.2s 1321MB rss 936MB avail 777MB malloc 1375MB/2847542blk · unknown · nominal
+      +334.2s 1321MB rss 935MB avail 777MB malloc 1375MB/2847509blk · unknown · nominal
+      +335.2s 1321MB rss 935MB avail 777MB malloc 1373MB/2847503blk · unknown · nominal
+      +336.2s 1321MB rss 935MB avail 777MB malloc 1373MB/2848010blk · unknown · nominal
+      +337.2s 1321MB rss 935MB avail 777MB malloc 1373MB/2848148blk · unknown · nominal
+      +338.2s 1321MB rss 935MB avail 777MB malloc 1373MB/2848413blk · unknown · nominal
+      +339.2s 1340MB rss 945MB avail 758MB malloc 1378MB/2857255blk · unknown · nominal
+      +340.2s 1340MB rss 945MB avail 758MB malloc 1378MB/2857278blk · unknown · nominal
+      +341.3s 1339MB rss 945MB avail 759MB malloc 1375MB/2857247blk · unknown · nominal
+      +342.1s 1339MB rss 945MB avail 759MB · unknown · nominal
+      +343.2s 1340MB rss 946MB avail 758MB malloc 1377MB/2857802blk · unknown · nominal
+      +343.6s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +343.7s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +343.8s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +343.9s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.0s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.1s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.2s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.3s 1340MB rss 947MB avail 758MB malloc 1380MB/2857772blk · unknown · nominal · burst
+      +344.4s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.5s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.6s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.7s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.8s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +344.9s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +345.0s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +345.1s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +345.2s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +345.3s 1340MB rss 947MB avail 758MB malloc 1380MB/2858314blk · unknown · nominal · burst
+      +345.4s 1340MB rss 947MB avail 758MB · unknown · nominal · burst
+      +345.5s 1336MB rss 947MB avail 762MB · unknown · nominal · burst
+      +345.6s 1336MB rss 947MB avail 762MB · unknown · nominal · burst
+      +345.7s 1336MB rss 947MB avail 762MB · unknown · nominal · burst
+      +345.8s 1336MB rss 947MB avail 762MB · unknown · nominal · burst
+      +345.9s 1336MB rss 947MB avail 762MB · unknown · nominal · burst
+      +346.0s 1324MB rss 947MB avail 774MB · unknown · nominal · burst
+      +346.1s 1324MB rss 947MB avail 774MB · unknown · nominal · burst
+      +346.2s 1324MB rss 947MB avail 774MB · unknown · nominal · burst
+      +346.3s 1324MB rss 947MB avail 774MB malloc 1380MB/2858762blk · unknown · nominal · burst
+      +346.4s 1324MB rss 947MB avail 774MB · unknown · nominal · burst
+      +346.5s 1324MB rss 947MB avail 774MB · unknown · nominal
+      +347.7s 1324MB rss 947MB avail 774MB malloc 1381MB/2857686blk · unknown · nominal
+      +348.7s 1324MB rss 947MB avail 774MB malloc 1381MB/2857737blk · unknown · nominal
+      +349.7s 1324MB rss 947MB avail 774MB · unknown · nominal
+      +350.7s 1324MB rss 947MB avail 774MB malloc 1381MB/2857837blk · unknown · nominal
+      +354.2s 1381MB rss 678MB avail 717MB malloc 1360MB/2827619blk · active · nominal
+      +355.2s 1382MB rss 667MB avail 716MB malloc 1360MB/2827685blk · active · nominal
+      +356.2s 1383MB rss 597MB avail 715MB malloc 1360MB/2827717blk · active · nominal
+      +362.4s 1386MB rss 316MB avail 712MB malloc 1362MB/2827279blk · inactive · nominal
+      +368.4s 1387MB rss 202MB avail 711MB malloc 1363MB/2829018blk · inactive · nominal
+      +373.1s 1387MB rss 197MB avail 711MB malloc 1364MB/2830864blk · inactive · nominal
+      +378.0s 1387MB rss 338MB avail 711MB malloc 1365MB/2831255blk · active · nominal
+      +379.0s 1390MB rss 496MB avail 708MB malloc 1367MB/2831322blk · active · nominal
+      +379.9s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.0s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.0s 1392MB rss 514MB avail 706MB malloc 1369MB/2831595blk · active · nominal · burst
+      +380.2s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.3s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.4s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.5s 1392MB rss 514MB avail 706MB · active · nominal · burst
+      +380.6s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +380.7s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +380.8s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +380.9s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +381.0s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +381.0s 1392MB rss 513MB avail 706MB malloc 1369MB/2831661blk · active · nominal · burst
+      +381.2s 1392MB rss 513MB avail 706MB · active · nominal · burst
+      +381.3s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.4s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.5s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.6s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.7s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.8s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +381.9s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.0s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.0s 1392MB rss 516MB avail 706MB malloc 1369MB/2831751blk · active · nominal · burst
+      +382.2s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.3s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.4s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.5s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.6s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.7s 1392MB rss 516MB avail 706MB · active · nominal · burst
+      +382.8s 1392MB rss 516MB avail 706MB · active · nominal
+      +384.0s 1392MB rss 516MB avail 706MB malloc 1369MB/2831914blk · active · nominal
+      +385.0s 1415MB rss 542MB avail 683MB malloc 1393MB/2841228blk · active · nominal
+      +386.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2860746blk · active · nominal
+      +387.0s 1404MB rss 553MB avail 694MB · active · nominal
+      +388.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2860882blk · active · nominal
+      +389.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2860954blk · active · nominal
+      +390.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2861060blk · active · nominal
+      +391.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2861062blk · active · nominal
+      +392.0s 1404MB rss 553MB avail 694MB malloc 1393MB/2861283blk · active · nominal
