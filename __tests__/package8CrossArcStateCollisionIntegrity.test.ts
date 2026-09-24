@@ -233,7 +233,8 @@ const varakushArcs = () =>
 describe('Package 8 §A — the collision corpus, and the four zeroes that bound it', () => {
   it('⚠⚠⚠ the grounds are shared: 39 of 54 carry more than one arc, the widest carries nine', () => {
     expect(ARCS.length).toBe(50);
-    expect(ROWS.length).toBe(281);
+    // ⚠ ENDING batch 1 added six trailing `checkKind: null` epilogue beats.
+    expect(ROWS.length).toBe(287);
     const byGround = groupArcs(ROWS, (r) => r.ground);
     expect(byGround.size).toBe(54);
     const shared = sharedOnly(byGround);

@@ -159,7 +159,8 @@ describe('Package 6 §A — the authored fight corpus', () => {
     const fam = { hunt: listOf(hunts), storyline: listOf(stories), mystery: listOf(mysteries) };
     const arcs = [...fam.hunt, ...fam.storyline, ...fam.mystery];
     const stages = arcs.flatMap((a) => a.stages);
-    expect([arcs.length, stages.length]).toEqual([50, 281]);
+    // ⚠ ENDING batch 1 added six trailing `checkKind: null` epilogue beats.
+    expect([arcs.length, stages.length]).toEqual([50, 287]);
     const fights = arcs.flatMap((a) => a.stages.map((s, i) => ({ s, i, last: i === a.stages.length - 1 })))
       .filter((x) => x.s.spawn);
     expect(fights.length).toBe(29);

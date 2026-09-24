@@ -31512,7 +31512,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * post-repair verification has happened. CrucibleGuardModal carries the same shape
  * and is deliberately NOT repaired here (owner scope); it is allowlisted by name in
  * the new suite so it stays visible. */
-export const OTA_BUILD_ID = '2026-09-24-1875-the-list-gets-its-scroll-back';
+/* OTA-1876 — THE ENDING IS NOT A RECEIPT (Play-Quality Phase 2A, first batch).
+ *
+ * Six arcs that reached their climax and then stopped on the completion receipt
+ * now carry a post-climax authored beat: mystery_red_tower, mystery_temporal_watch,
+ * mystery_hollow_crown, story_reclaimer_relic_run, story_monarch_silence and
+ * story_tartarian_ascension. Each is a trailing `checkKind: null` stage read out
+ * by the family's own advance loop — the SAME mechanism the 14 already-shipped
+ * epilogues use. DATA AND TESTS ONLY: no engine file changed.
+ *
+ * MECHANICALLY INERT, AND PROVEN SO PER ARC: no grant, no requirement, no spawn,
+ * no stinger, arbiter null; and across the run the player's ground, cell, room,
+ * scene, TC, item count and faction standing are byte-for-byte what the climax
+ * left behind. The rewards still belong to the turn-in at a posting agent, which
+ * the epilogue neither performs nor anticipates.
+ *
+ * ⚠⚠⚠ THE RED TOWER CASE IS THE ONE THAT NEEDED PROVING, AND IT IS PROVEN
+ * AGAINST THE SHIPPED ENGINE. Its climax is at the Red Tower of Nimari and its
+ * aftermath names Varakush, where the scholar has stood since stage 0 — the only
+ * one of the six that changes ground. An earlier pass of this work is what
+ * EXPOSED the stale-travel defect there, and that defect was split out and
+ * shipped on its own as OTA-1870: progression routes by `nextActionableStage`,
+ * the first stage that will still exist once the consume loop has run. So the
+ * data is not doctored to suppress travel and no workaround was carried forward:
+ * the epilogue still says Varakush, and the engine correctly declines to arm a
+ * course toward a beat it is about to eat. Removing OTA-1870's two call sites
+ * turns exactly the two Red Tower assertions red and leaves the other five green.
+ *
+ * ⚠ NOT CLAIMED: the other 12 actionable Phase 2A candidates are untouched, the
+ * 18 hunts are untouched and still pinned epilogue-free (their kill path assigns
+ * `stage: stages.length` outright and would swallow one — an engine question, and
+ * the owner's call), no existing epilogue changed, and the roadmap's verbless
+ * stand-in wording ("it moves on its own") is recorded as pre-existing debt
+ * rather than repaired here. No physical-device verification. */
+export const OTA_BUILD_ID = '2026-09-24-1876-the-ending-is-not-a-receipt';
+// SUPERSEDED: '2026-09-24-1875-the-list-gets-its-scroll-back'
 // SUPERSEDED: '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get'
 // SUPERSEDED: '2026-09-23-1873-the-sale-is-read-before-it-is-made'
 // SUPERSEDED: '2026-09-23-1872-the-keyboard-leaves-the-card-a-room'

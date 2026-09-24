@@ -220,6 +220,13 @@
           },
           "locationName": "The Sunken Enclave",
           "npcName": "Korash of the Deep"
+        },
+        {
+          "narration": "In the morning nobody makes anything of it. The young Tartarian you fought hands you a bowl on their way past and keeps walking. At the enclave mouth the night-watch roster has your name on it in the same hand as everyone else's, third from the bottom, for the week after next. Korash stops beside you while you are reading it. \"That is what the oath was for,\" they say. \"Not the words. The roster.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "The Sunken Enclave",
+          "npcName": "Korash of the Deep"
         }
       ]
     },
@@ -311,6 +318,13 @@
           "requires": {
             "item": "Fifth Haul"
           },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
+        },
+        {
+          "narration": "The five hauls go into Guild crates and out of your hands, as agreed. At the gate two Reclaimers you have never met stand aside to let you through. The Speaker catches you before the road. \"Samarran,\" they say. \"I did not know the ceiling had gone. I have written that down where it can be read.\" Then the nod again.",
+          "arbiter": null,
+          "checkKind": null,
           "locationName": "Reclaimer's Stake",
           "npcName": "the Reclaimers Guild Speaker"
         }
@@ -420,6 +434,13 @@
           "requires": {
             "item": "The Assistant's Effects"
           },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "Dr. Lucius Kincaid"
+        },
+        {
+          "narration": "Kincaid files the six items in a drawer with a great many drawers beside it. The Reclaimer's note goes in on top, still insisting in ink that he was reasonable. \"Quiet keeps,\" he says, turning the key. \"It does not keep forever.\" Then he slides the drawer shut on all six of them.",
+          "arbiter": null,
+          "checkKind": null,
           "locationName": "The Monarch's Waystation",
           "npcName": "Dr. Lucius Kincaid"
         }

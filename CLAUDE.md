@@ -157,6 +157,50 @@ same place: a write to `pendingDogOnboarding`.
   while owner-device verification is required, or while a scoped item or a
   required decision is still open.
 
+## "PULL THE LOG" — standing authorization, and the one way it actually works
+
+**⚠⚠⚠ "PULL THE LOG" IS ALWAYS AUTHORIZATION FOR AN EARLY PULL. NEVER ASK.**
+Owner directive, 2026-09-24, in as many words: *"If I say pull the log, it is
+always authorization to do an early pull, commit that to memory."* Any phrasing
+of it — pull the log, I pushed a log, the log is in, get the log — is a standing
+GO. Do not wait for the hourly clock, do not ask whether an early pull is
+permitted, and do not report `PROMPT WAITING` on a tick that has not fired yet
+when this sentence has been said. Waiting an hour on a clock the owner has
+already told you to skip is the failure, not the caution.
+
+**⚠⚠ THE PROCEDURE, IN ORDER.** Two doors exist. Try them in this order and
+stop at the first that produces a RUN (not just a push):
+
+  1. **`workflow_dispatch` on `main`** — `sentry-inbox.yml` carries it there
+     because the dispatch endpoint is surfaced only for a definition on the
+     DEFAULT branch. A dispatched run checks out `golem-line` regardless of what
+     fired it, so it is the hourly run, early — not a weaker second path.
+     ⚠ A cloud session's GitHub App token may lack `actions: write`; the REST
+     call then returns **403 "Resource not accessible by integration"**. That is
+     a permission fact, not a broken relay. Go to door 2.
+  2. **Push a request line to `sentry-inbox/request.txt` on `golem-line`** —
+     the workflow's own `push:` trigger watches exactly that path. Append the
+     ask; never rewrite the file.
+
+Then VERIFY A RUN EXISTS — `actions_list` on `sentry-inbox.yml`, `event: push`,
+and read `run_number` / `head_sha`. A push that landed is not a pull that ran.
+
+**⚠⚠⚠ THE TRAP THAT ATE FOUR REQUESTS: NEVER LET THE SUPPRESSION TOKEN APPEAR
+ANYWHERE IN THE COMMIT MESSAGE — NOT EVEN TO WARN ABOUT IT.** GitHub matches its
+skip-run marker (the bracketed ci-skip family) ANYWHERE in the message, subject
+line or body. `6945819b` used it deliberately and was suppressed. `6ca9ffd5` and
+`6ec8d49c` were recorded as "clean and dead" and almost certainly carried it in
+prose while explaining it. `c26e11bd` (2026-09-24) proved the mechanism: its body
+contained the literal token inside the sentence saying not to use it, and it
+fired NOTHING — not the relay, not even CI. `2e5eaf1d`, identical in substance
+with the token spelled nowhere, fired run 468 within two seconds.
+
+This is the same shape as the **OTA-1721 self-reporting trap** already documented
+for source scanners: quoting the string an instrument hunts for makes the
+instrument act on the quote. Before pushing a request commit, grep your own
+message for the bracketed token and expect zero hits. Refer to it in prose as
+"the suppression token" and never spell it.
+
 ## Playtest-log triage
 
 **⚠⚠⚠ READ THE OWNER'S OWN COMMENTS FIRST — BEFORE ANY OTHER PASS.** Owner

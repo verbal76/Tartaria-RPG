@@ -59,7 +59,8 @@ describe('OTA-1584 — a verbless person is an epilogue, and only at the end', (
       const st = m.stages ?? [];
       return st.map((s, i) => ({ m, s, i })).filter((x) => x.s.checkKind === null && x.s.npcName);
     });
-    expect(epilogues.length).toBe(14);
+    // ⚠ ENDING batch 1 added six trailing `checkKind: null` epilogue beats.
+    expect(epilogues.length).toBe(20);
     for (const { m, s, i } of epilogues) {
       expect({ at: `${m.id}#${i}`, last: i === (m.stages ?? []).length - 1 })
         .toEqual({ at: `${m.id}#${i}`, last: true });

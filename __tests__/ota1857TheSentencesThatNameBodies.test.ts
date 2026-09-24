@@ -344,7 +344,10 @@ describe('Package A §B — legitimate abstraction is still legal', () => {
     const all = [...HUNTS, ...MYSTERIES, ...STORIES];
     const stages = all.reduce((n, m) => n + (m.stages ?? []).length, 0);
     const withSpawn = all.reduce((n, m) => n + (m.stages ?? []).filter((s) => s.spawn).length, 0);
-    expect({ stages, withSpawn }).toEqual({ stages: 281, withSpawn: 29 });
+    // ⚠ 281 -> 287: ENDING batch 1 added six trailing `checkKind: null` epilogue
+    // beats (3 mysteries, 3 storylines). `withSpawn` is what this assertion actually
+    // guards and it is UNCHANGED — no ending stands a body up.
+    expect({ stages, withSpawn }).toEqual({ stages: 287, withSpawn: 29 });
   });
 });
 

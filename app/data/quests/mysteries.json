@@ -54,6 +54,13 @@
             "item": "Fragment of the Red Tower"
           },
           "locationName": "the Red Tower of Nimari"
+        },
+        {
+          "narration": "You set the casing on the scholar's bench and he lays his own sketch beside it. The two agree, line for line. \"I wrote that the ring shed this when it cooled,\" he says, turning the plate to the light. \"Cooling cracks a thing. It does not cut it square.\" He turns it again, and does not write anything down.",
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Varakush",
+          "npcName": "the Order scholar"
         }
       ]
     },
@@ -213,6 +220,13 @@
           "requires": {
             "item": "Temporal Distortion Watch"
           },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
+        },
+        {
+          "narration": "The Speaker winds the watch once and listens to it keep honest time. Then they ask where the body lay, and write the bearing into the margin of the contract in a small hand. \"He is still in there,\" they say. \"By his own clock he has not finished the afternoon.\" They close the book over the bearing and pay you for the watch.",
+          "arbiter": null,
+          "checkKind": null,
           "locationName": "Reclaimer's Stake",
           "npcName": "the Reclaimers Guild Speaker"
         }
@@ -850,6 +864,13 @@
           "requires": {
             "item": "Hollow Crown"
           },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Monarch factor"
+        },
+        {
+          "narration": "The factor has the Crown under glass before you are out of the room, and down the corridor someone is already being told the line is proved. Your copy of the assay is still in your pack, in your own hand, and no one has asked for it. The Waystation gate shuts behind you and the voice in the corridor keeps going.",
+          "arbiter": null,
+          "checkKind": null,
           "locationName": "The Monarch's Waystation",
           "npcName": "the Monarch factor"
         }

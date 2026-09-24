@@ -144,7 +144,9 @@ describe('OTA-1858 §A — the chain is a chain (whole corpus)', () => {
       stages: ARCS.reduce((n, a) => n + a.stages.length, 0),
       grants: GRANTS.length,
       requires: REQUIRES.length,
-    }).toEqual({ arcs: 50, stages: 281, grants: 219, requires: 213 });
+      // ⚠ 281 -> 287: ENDING batch 1's six epilogue beats. They grant and require
+      // nothing, so `grants` and `requires` — the counts this pins — do not move.
+    }).toEqual({ arcs: 50, stages: 287, grants: 219, requires: 213 });
   });
 
   it('⚠⚠⚠ EVERY REQUIREMENT HAS AN EARLIER GRANT IN ITS OWN ARC — nothing is unobtainable', () => {
@@ -195,8 +197,14 @@ describe('OTA-1858 §B — one name, two objects', () => {
       const arc = ARCS.find((a) => a.id === c.arc)!;
       expect({ arc: c.arc, grants: norm(arc.stages[c.grantAt]?.grants?.item) }).toEqual({ arc: c.arc, grants: norm(c.item) });
       expect({ arc: c.arc, requires: norm(arc.stages[c.reqAt]?.requires?.item) }).toEqual({ arc: c.arc, requires: norm(c.item) });
-      // the requirement is the arc's LAST beat in every one of the five
-      expect({ arc: c.arc, last: c.reqAt === arc.stages.length - 1 }).toEqual({ arc: c.arc, last: true });
+      // The requirement is the arc's last GATED beat in every one of the five.
+      // ⚠ Was `stages.length - 1`. mystery_hollow_crown now carries a trailing
+      // epilogue behind its climax, so the last INDEX is a verbless beat. What the
+      // collision test means is that nothing payable follows the requirement, which
+      // is exactly the last-gated index — and that still holds for all five.
+      let lastGated = arc.stages.length - 1;
+      while (lastGated > 0 && arc.stages[lastGated]?.checkKind == null) lastGated -= 1;
+      expect({ arc: c.arc, last: c.reqAt === lastGated }).toEqual({ arc: c.arc, last: true });
     }
   });
 

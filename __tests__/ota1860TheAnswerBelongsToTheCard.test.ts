@@ -107,7 +107,9 @@ const flush = async () => { for (let i = 0; i < 10; i++) await Promise.resolve()
 describe('OTA-1860 §A — the authored NPC corpus the card machinery has to serve', () => {
   it('⚠ the census the repair was measured against', () => {
     expect({ npcStages: npcRows.length, uniqueNames: new Set(npcRows.map((r) => r.npc)).size })
-      .toEqual({ npcStages: 114, uniqueNames: 61 });
+    // ⚠ 114 -> 120: ENDING batch 1's six epilogues each name a person. `uniqueNames`
+    // is UNCHANGED at 61 — every one of them is someone the arc already established.
+      .toEqual({ npcStages: 120, uniqueNames: 61 });
   });
 
   it('⚠⚠⚠ EVERY authored npcName resolves to a person — no card can name nobody', () => {

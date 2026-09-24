@@ -124,7 +124,8 @@ const settleRolls = async () => {
 describe('OTA-1859 §A — the corpus every door has to serve', () => {
   it('⚠ the census is what the repair was measured against', () => {
     const stages = ARCS.reduce((n, a) => n + a.def.stages.length, 0);
-    expect({ arcs: ARCS.length, stages }).toEqual({ arcs: 50, stages: 281 });
+    // ⚠ 281 -> 287: ENDING batch 1's six epilogue beats.
+    expect({ arcs: ARCS.length, stages }).toEqual({ arcs: 50, stages: 287 });
   });
 
   it('⚠⚠⚠ EVERY authored stage has at least one supported closing door', () => {
@@ -152,7 +153,9 @@ describe('OTA-1859 §A — the corpus every door has to serve', () => {
         .map((r) => `${r.a.fam} ${r.a.def.id}#${r.i}`));
     expect(midChainNulls).toEqual([]);
     // …and there really are some, so the assertion above is not vacuous.
-    expect(ARCS.flatMap((a) => a.def.stages.filter((s) => s.checkKind === null)).length).toBe(14);
+    // ⚠ 14 -> 20: the invariant above (NO mid-chain null) is untouched; this line
+    // only proves it is not vacuous. ENDING batch 1 took the trailing count to 20.
+    expect(ARCS.flatMap((a) => a.def.stages.filter((s) => s.checkKind === null)).length).toBe(20);
   });
 
   it('⚠ the ENCOUNTER CARD still cannot arm on a stage that stands bodies up (OTA-1590 holds)', () => {
@@ -363,7 +366,13 @@ describe('OTA-1859 §E — one action, one stage; one arc, one ending', () => {
 
   it('⚠⚠⚠ THE FINAL TRANSITION IS EXACTLY ONCE — repeated input cannot re-complete the arc', async () => {
     const d = findMysteryById(ID)!;
-    const last = d.stages.length - 1;
+    // ⚠ The LAST GATED beat, not the last index. mystery_red_tower now carries a
+    // trailing epilogue (ENDING batch 1); seating the record ON that verbless beat
+    // is a state real play never reaches — the climax's own advance consumes it in
+    // the same tick, and repairMissionRecords normalises it to READY on load. The
+    // claim under test is the final PAYABLE transition, so seat the payable stage.
+    let last = d.stages.length - 1;
+    while (last > 0 && d.stages[last]?.checkKind == null) last -= 1;
     seatMystery(last);
     await get().submitPlayerAction('investigate');
     await settleRolls();

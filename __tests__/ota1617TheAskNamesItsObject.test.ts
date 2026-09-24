@@ -53,6 +53,9 @@ describe('OTA-1617 — the ask names its object', () => {
       'search this ground — come away with the Eddy-Zone Reading',
       'sneak — come away with the Temporal Distortion Watch',
       'search this ground with the Reclaimers Guild Speaker',
+      // ⚠ ENDING batch 1. A verbless beat has no ask, so the roadmap prints the
+      // engine's stand-in — exactly as it already does for the 14 shipped epilogues.
+      'it moves on its own',
     ]);
   });
 

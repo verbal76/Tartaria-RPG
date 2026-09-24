@@ -114,7 +114,9 @@ const MENTION = 'mention_a_salt_cart';
 describe('OTA-1861 §A — authored geography resolves, once, to real cells', () => {
   it('⚠ the census the repair was measured against', () => {
     expect({ arcs: ARCS.length, stages: ARCS.reduce((n, a) => n + a.def.stages.length, 0), grounds: GROUNDS.length })
-      .toEqual({ arcs: 50, stages: 281, grounds: 54 });
+    // ⚠ 281 -> 287: ENDING batch 1. `grounds` is what this pins and it does not
+    // move — every ending reuses a ground its own arc already visits.
+      .toEqual({ arcs: 50, stages: 287, grounds: 54 });
   });
 
   it('⚠⚠ EVERY stage names its own place, and every name resolves — nothing falls back to the arc anchor', () => {

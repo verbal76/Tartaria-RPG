@@ -150,20 +150,41 @@ describe('OTA-1870 — the shipped aftermath corpus', () => {
         }
       });
     }
-    expect({ total, trailing, mid, mech }).toEqual({ total: 14, trailing: 14, mid: [], mech: [] });
+    // ⚠ 14 -> 20: OTA-1875 (Play-Quality Phase 2A, first ending batch) added six
+    // trailing aftermath beats. What this assertion actually guards is UNTOUCHED —
+    // `mid` and `mech` are still empty, so every null stage in the game is still
+    // trailing and still mechanically inert, which is the premise OTA-1870's
+    // `nextActionableStage` skip rule rests on.
+    expect({ total, trailing, mid, mech }).toEqual({ total: 20, trailing: 20, mid: [], mech: [] });
   });
 
   // ⚠ This is the number that makes OTA-1870 a repair of LIVE behaviour rather
   // than groundwork for unreleased content. If it ever drops, the claim in the
   // commit message has stopped being true.
   it('⚠⚠ 12 of the 14 shipped epilogues are CROSS-GROUND — this defect was live', () => {
-    const ending = ALL.filter((x) => trailingNull(x.arc));
-    const cross = ending.filter(({ arc }) => {
+    // ⚠⚠ MEASURED OVER THE FOURTEEN THAT WERE ALREADY LIVE WHEN OTA-1870 SHIPPED,
+    // because that is the claim: the defect was reproducing on released content.
+    // OTA-1875's six later beats are counted separately rather than folded in —
+    // averaging them together would quietly retire the historical number instead
+    // of keeping it true.
+    const BATCH_1875 = new Set([
+      'mystery_red_tower', 'mystery_temporal_watch', 'mystery_hollow_crown',
+      'story_reclaimer_relic_run', 'story_monarch_silence', 'story_tartarian_ascension',
+    ]);
+    const isCross = ({ arc }: { arc: Arc }) => {
       const epi = arc.stages[arc.stages.length - 1]!;
       const prev = arc.stages[arc.stages.length - 2]!;
       return epi.locationName !== prev.locationName;
-    });
-    expect({ ending: ending.length, cross: cross.length }).toEqual({ ending: 14, cross: 12 });
+    };
+    const ending = ALL.filter((x) => trailingNull(x.arc));
+    const shipped = ending.filter((x) => !BATCH_1875.has(x.arc.id));
+    const batch = ending.filter((x) => BATCH_1875.has(x.arc.id));
+    expect({ ending: shipped.length, cross: shipped.filter(isCross).length })
+      .toEqual({ ending: 14, cross: 12 });
+    // …and the batch that came later: six beats, of which exactly one — Red Tower,
+    // whose scholar never left Varakush — names a different ground than its climax.
+    expect({ ending: batch.length, cross: batch.filter(isCross).map((x) => x.arc.id) })
+      .toEqual({ ending: 6, cross: ['mystery_red_tower'] });
   });
 
   it('no hunt carries a trailing aftermath — the hunt kill path is a separate question', () => {

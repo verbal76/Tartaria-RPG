@@ -172,7 +172,8 @@ describe('Package 7 §A — the authored ending corpus', () => {
     expect(MYSTERIES.length).toBe(18);
     expect(STORYLINES.length).toBe(14);
     const tails = ALL.filter(({ def }) => def.stages[def.stages.length - 1]!.checkKind === null);
-    expect(tails.length).toBe(14);
+    // ⚠ ENDING batch 1 added six trailing `checkKind: null` epilogue beats.
+    expect(tails.length).toBe(20);
     // Every verbless ending is exactly ONE beat long. A longer tail would mean
     // the auto-consume loops (OTA-871 / OTA-1219) had to walk further than the
     // single step §C measures, so the claim is pinned rather than assumed.
@@ -311,7 +312,8 @@ describe('Package 7 §C — the verbless ending is never a stranded stage', () =
     // 50 arcs would be walked to their end and then be unturn-in-able forever —
     // the "stranded stage" this package exists to rule out.
     const tails = ALL.filter(({ def }) => def.stages[def.stages.length - 1]!.checkKind === null);
-    expect(tails.length).toBe(14);
+    // ⚠ ENDING batch 1 added six trailing `checkKind: null` epilogue beats.
+    expect(tails.length).toBe(20);
     for (const { fam, def } of tails) {
       const parked = { activeHunts: [], activeMysteries: [], activeStorylines: [] } as Record<string, Array<{ id: string; stage: number }>>;
       parked[ACTIVE[fam]] = [{ id: def.id, stage: def.stages.length - 1 }];
