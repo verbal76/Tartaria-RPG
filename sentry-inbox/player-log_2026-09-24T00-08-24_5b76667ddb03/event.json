@@ -1,0 +1,335 @@
+{
+  "id": "5b76667ddb0345f2ae48b572310cf5d8",
+  "groupID": "7751694649",
+  "eventID": "5b76667ddb0345f2ae48b572310cf5d8",
+  "projectID": "4511945117532160",
+  "size": 5152,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get #muerx6olk9ie"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+  "message": "player-log-beacon 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get #muerx6olk9ie",
+  "title": "player-log-beacon 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get #muerx6olk9ie",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Brockton",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-24T00:07:36.457Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 24.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 3399966720,
+      "storage_size": 245292421120,
+      "free_storage": 58153820160,
+      "boot_time": "2026-09-23T01:48:54.540Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "29.200000762939453",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 24,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0cf6a-2e9f-79c8-b8a3-f21c139b646e"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9cb6e9498bb145519059e1dd73bc7efb",
+      "span_id": "a01d27551a65f1a4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get #muerx6olk9ie"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "muerx6olk9ie"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "parts",
+      "value": "10"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-24T00:08:24.823775Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-24T00:08:24.630000Z",
+  "fingerprints": [
+    "44051d00d28f8d0e6743379b082aadda"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1988791385,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-23T17:44:11.910745Z",
+    "dateReleased": "2026-09-23T17:58:57.584245Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ea923fb44168b94d2cf06889f6578f5c44cc8d3a",
+      "message": "OTA-1874 (2/2) \u2014 the new tests typecheck, and the ratchet stays where it is\n\nCI 2266 at 69fefc9c failed the REQUIRED gate `typecheck (tests \u00b7 ratchet)`:\n\n  [ci-typecheck-tests] FAIL \u2014 test typecheck errors grew: 207 > baseline 196.\n\nAll eleven were mine, both files new in this package:\n\n  ota1874TheDogYouChooseIsTheDogYouGet.test.ts   4\n  ota1874TheTradeIsReadBeforeItIsMade.test.tsx   7\n\nThe gap was in my validation, not in the gate. I ran `typecheck:ci` \u2014 shipped\nsource, strict \u2014 and reported it clean, which it was. I never ran\n`typecheck:tests`, which is a different gate over a different tsconfig, and it\nis the one that had something to say.\n\nTHE BASELINE IS NOT MOVED. `ci-typecheck-tests.mjs --update-baseline` exists and\nwould have turned this green in one command. That is raising a ratchet to buy a\nconvenience, which is what the ratchet is there to refuse. 207 -> 196: at\nbaseline, not past it, with the debt of the other 196 left exactly as found.\n\nWHAT THE ELEVEN WERE:\n\n`react-test-renderer` ships no bundled types in this tree (7 of the 11, directly\nor downstream). Four suites already solved this \u2014 ota1233, ota1236, ota1243,\nota1836 \u2014 by typing the require locally, narrowly, to the surface each one\ntouches, and ota1233's comment says why in as many words: so the ratchet stays\nat baseline rather than growing by one. This suite now does the same, declaring\nonly `act`, `create`, `root`, `unmount`, `findAll`, `props` and `children`.\n\n`InventoryItem` requires `tags` (3). The fixtures had none. Not ceremony: OTA-1737's\nstackCompatible keys the merge on every behaviour-bearing row property, so an\nuntagged row is one the engine could never actually hold.\n\nA `Record<string, unknown>` widened to `PlayerCharacter` needed `as unknown as`\n(1), the deliberate two-step the codebase uses to say a cast is intended.\n\nAND ONE WAS A TEST THAT COULD NOT FAIL. `expect(s.worldMemory.fallenDogs ?? []).toEqual([])`\n\u2014 there is no `fallenDogs` on WorldMemory. The optional chain made it vacuously\ntrue against a field that does not exist, so it asserted nothing at all. The\nclaim it was reaching for is real and is now asked of the record that exists:\na release writes exactly one entry to `releasedDogs`, and the player's dog is\ncleared. That is the third test this package has had to widen for being weaker\nthan the sentence above it, and the type gate is what found this one.\n\nNo production file is touched by this commit \u2014 the diff is two test files. The\nsource behaviour validated at 69fefc9c is unchanged; both suites re-run green,\n40/40 (24 + 16).\n\n  typecheck:tests   OK \u2014 at baseline (196), no growth\n  lint              clean (whole tree)\n  check gates       lines \u00b7 quotedpins \u00b7 otastamp \u00b7 storeceiling \u00b7 testsplit \u00b7\n                    shardcoverage \u00b7 requiredjobs all OK\n\n69fefc9c is spent as a release candidate: a required gate failed on it and the\npublisher reads required-jobs.json from the checked-out SHA. This commit\nsupersedes it.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-23T17:37:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+          "shortVersion": "tartaria@4.32.11+2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-23T17:58:57.584245Z",
+          "dateCreated": "2026-09-23T17:44:11.910745Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161266398",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-23T17:58:57.896851Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.27.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

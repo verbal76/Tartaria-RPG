@@ -1,0 +1,877 @@
+Bug Report — Cheddar Bob · (2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get) · Scroll froze on fuze upgrades
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-24T00:08:24.594Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Asgardar
+HP: 35/47
+
+--- DESCRIPTION ---
+Scroll froze on fuze upgrades
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 3
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-24T00:08:24.442Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 476
+  AAB: (build 476)
+  OTA: (2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get)
+  Boot stage: tts:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-24T00:07:37.097Z
+  Last init success: 2026-09-24T00:07:37.692Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmuerw5qvhz · started 2026-09-24T00:07:36.727Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded, 4 fatal (newest last)
+  ⚠⚠ 3 of 4 process kills landed on an OTA-apply boot
+  • 2026-09-07T03:23:14.327Z (24285m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1731-sorted-by-where-it-goes · stage rendered
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room monarch_waystation · screen exploration
+      last checkpoint: rendered · 49147ms into the action · alive 1883ms after it
+      launch: died 59661ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 189ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-07T18:41:33.227Z (23367m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-07-1738-the-game-teaches-what-it-runs · stage appstate:active→background
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: appstate:active→background · 9204ms into the action · alive 0ms after it
+      launch: died 9294ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-09T02:29:08.695Z (21459m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-09-1764-storm-and-shut-drawers · stage native:cognition:start
+      Process reclaimed while idle on the title screen — no game was in progress (0s after boot, app active, stage hydrate:start)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: native:cognition:start [q0] · 422ms into the action · alive 0ms after it
+      launch: died 479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 127ms earlier via mid-session
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-13T23:38:11.705Z (14430m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage boot:idle:awaiting-first-action
+      Process reclaimed while idle on the title screen — no game was in progress (9s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: boot:idle:awaiting-first-action · 807ms into the action · alive 8005ms after it
+      launch: died 8893ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-14T00:23:34.481Z (14385m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-14-1814-the-report-screen-joins-the-trace · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (23s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 2949ms into the action · alive 0ms after it
+      launch: died 22707ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-16T21:08:23.255Z (10260m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-16-1829-the-top-plane-stops-going-black · stage native:cognition:done
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room iskan_veil · screen exploration
+      last checkpoint: native:cognition:done [q0] · 7526ms into the action · alive 2504ms after it
+      launch: died 43179ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 137ms earlier via mid-session
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-18T16:41:13.847Z (7647m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1840-the-house-keeps-its-key · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4958ms into the action · alive 0ms after it
+      launch: died 5002ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T20:16:45.657Z (7432m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room samarran · screen lore
+      last checkpoint: appstate:active→background · 70239ms into the action · alive 0ms after it
+      launch: died 94479ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 416ms earlier via boot-front
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-18T21:11:04.127Z (7377m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-18-1843-who-the-fallen-was · stage appstate:active→background
+      Process reclaimed while idle on the title screen — no game was in progress (5s after boot, app background, stage qwen:deferred)
+      doing: (no action yet) · room ? · screen title
+      last checkpoint: appstate:active→background · 4984ms into the action · alive 0ms after it
+      launch: died 5069ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-19T13:06:45.292Z (6422m ago) — PROCESS RECLAIMED — not a crash (no JS ran)
+      build 4.32.11 · 2026-09-19-1847-the-process-says-where-it-was · stage boot:idle:awaiting-first-action
+      Previous process disappeared while backgrounded during play — last: (no action yet)
+      doing: (no action yet) · room ? · screen exploration
+      last checkpoint: boot:idle:awaiting-first-action · 795ms into the action · alive 12383ms after it
+      launch: died 13276ms into the process · not an OTA-apply boot
+      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: appstate:active→background at 2026-09-24T00:04:57.919Z (3 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  Native queue admission: 27 jobs · worst wait 0.0s · 0 past 3s
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 12MB · peak 20MB · last 20MB · net +8MB over 2 marks
+     +0.0s watch-start — heap 12MB gc 0ms/3 · ctx 0 · app=active · native idle q0 · warns 0
+     +5.0s heap-move — heap 20MB gc 0ms/11 · ctx 0 · app=active · native idle q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot:
+  2026-09-24T00:03:07.138Z #1 root p=none exploration
+  2026-09-24T00:03:07.140Z #1 content controls p=none exploration
+  2026-09-24T00:03:07.141Z #1 in travel:→ ASGARDAR ⏱+20ms p=none exploration
+  2026-09-24T00:03:07.238Z #1 enter travel:→ ASGARDAR p=none exploration
+  2026-09-24T00:03:07.238Z #1 admit travel:→ ASGARDAR (navigation) p=none exploration
+  2026-09-24T00:03:07.238Z #1 dispatch travel:→ ASGARDAR (navigation) p=none exploration
+  2026-09-24T00:03:07.302Z #1 done travel:→ ASGARDAR (navigation) p=none exploration
+  2026-09-24T00:03:07.369Z #0 pres fork:calling_price (mount:native) p=none exploration
+  2026-09-24T00:03:09.476Z #0 pres fork:calling_price (unmount:native) p=none exploration
+  2026-09-24T00:03:10.703Z #2 root p=none exploration
+  2026-09-24T00:03:10.704Z #2 content controls p=none exploration
+  2026-09-24T00:03:10.704Z #2 in quick:take / salvage ⏱+17ms p=none exploration
+  2026-09-24T00:03:10.803Z #2 enter quick:take / salvage p=none exploration
+  2026-09-24T00:03:10.803Z #2 admit quick:take / salvage (callback) p=none exploration
+  2026-09-24T00:03:10.803Z #2 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-24T00:03:10.804Z #2 done quick:take / salvage (callback) p=none exploration
+  2026-09-24T00:03:12.120Z #3 root p=G exploration
+  2026-09-24T00:03:12.121Z #4 modal p=G exploration
+  2026-09-24T00:03:12.121Z #4 in gather:all:gear ⏱+8ms p=G exploration
+  2026-09-24T00:03:12.238Z #4 enter gather:all:gear p=G exploration
+  2026-09-24T00:03:12.239Z #4 admit gather:all:gear (bulk) p=G exploration
+  2026-09-24T00:03:12.239Z #4 dispatch gather:all:gear (bulk) p=G exploration
+  2026-09-24T00:03:12.261Z #4 done gather:all:gear (bulk) p=G exploration
+  2026-09-24T00:03:13.070Z #5 root p=G exploration
+  2026-09-24T00:03:13.070Z #6 modal p=G exploration
+  2026-09-24T00:03:13.070Z #6 in gather:all:items ⏱+21ms p=G exploration
+  2026-09-24T00:03:13.188Z #6 enter gather:all:items p=G exploration
+  2026-09-24T00:03:13.189Z #6 admit gather:all:items (bulk) p=G exploration
+  2026-09-24T00:03:13.189Z #6 dispatch gather:all:items (bulk) p=G exploration
+  2026-09-24T00:03:13.195Z #6 done gather:all:items (bulk) p=G exploration
+  2026-09-24T00:03:13.787Z #7 root p=G exploration
+  2026-09-24T00:03:13.787Z #8 modal p=G exploration
+  2026-09-24T00:03:13.788Z #8 in gather:all:scrap ⏱+17ms p=G exploration
+  2026-09-24T00:03:13.887Z #8 enter gather:all:scrap p=G exploration
+  2026-09-24T00:03:13.888Z #8 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-24T00:03:13.888Z #8 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-24T00:03:13.916Z #8 done gather:all:scrap (bulk) p=G exploration
+  2026-09-24T00:03:15.121Z #9 root p=none exploration
+  2026-09-24T00:03:15.122Z #9 content controls p=none exploration
+  2026-09-24T00:03:15.122Z #9 in quick:investigate ⏱+21ms p=none exploration
+  2026-09-24T00:03:15.259Z #9 enter quick:investigate p=none exploration
+  2026-09-24T00:03:15.260Z #9 admit quick:investigate (callback) p=none exploration
+  2026-09-24T00:03:15.260Z #9 dispatch quick:investigate (callback) p=none exploration
+  2026-09-24T00:03:15.260Z #9 done quick:investigate (callback) p=none exploration
+  2026-09-24T00:03:17.557Z #10 root p=S exploration
+  2026-09-24T00:03:17.558Z #11 modal p=S exploration
+  2026-09-24T00:03:17.559Z #11 in search:the ground ⏱+16ms p=S exploration
+  2026-09-24T00:03:17.723Z #11 enter search:the ground p=S exploration
+  2026-09-24T00:03:17.724Z #11 admit search:the ground (chip) p=S exploration
+  2026-09-24T00:03:17.724Z #11 dispatch search:the ground (chip) p=S exploration
+  2026-09-24T00:03:17.724Z #11 dispatch sheet:deferred (dismiss-wait-armed) ⏱+400ms p=S exploration
+  2026-09-24T00:03:17.724Z #11 done search:the ground (chip) p=S exploration
+  2026-09-24T00:03:18.139Z #11 dispatch sheet:deferred (fallback-release) p=none exploration
+  2026-09-24T00:03:20.875Z #12 root p=none exploration
+  2026-09-24T00:03:37.194Z #13 root p=none exploration
+  2026-09-24T00:03:39.179Z #14 root p=none exploration
+  2026-09-24T00:03:39.496Z #15 root p=none exploration
+  2026-09-24T00:03:40.132Z #16 root p=none exploration
+  2026-09-24T00:03:40.638Z #17 root p=none exploration
+  2026-09-24T00:03:41.119Z #18 root p=none exploration
+  2026-09-24T00:03:41.804Z #19 root p=none exploration
+  2026-09-24T00:03:42.187Z #20 root p=none exploration
+  2026-09-24T00:03:43.537Z #21 root p=none exploration
+  2026-09-24T00:03:44.523Z #22 root p=none exploration
+  2026-09-24T00:03:45.305Z #23 root p=none exploration
+  2026-09-24T00:03:55.956Z #24 root p=none inventory
+  2026-09-24T00:04:00.024Z #25 root p=none inventory
+  2026-09-24T00:04:02.626Z #26 root p=none inventory
+  2026-09-24T00:04:03.177Z #27 root p=none inventory
+  2026-09-24T00:04:03.843Z #28 root p=none inventory
+  2026-09-24T00:04:04.493Z #29 root p=none inventory
+  2026-09-24T00:04:05.810Z #30 root p=none inventory
+  2026-09-24T00:04:09.164Z #31 root p=none exploration
+  2026-09-24T00:04:10.444Z #32 root p=none exploration
+  2026-09-24T00:04:10.445Z #32 content controls p=none exploration
+  2026-09-24T00:04:10.715Z #33 root p=none exploration
+  2026-09-24T00:04:10.717Z #33 content controls p=none exploration
+  2026-09-24T00:04:10.895Z #34 root p=none exploration
+  2026-09-24T00:04:10.897Z #34 content controls p=none exploration
+  2026-09-24T00:04:11.101Z #35 root p=none exploration
+  2026-09-24T00:04:11.102Z #35 content controls p=none exploration
+  2026-09-24T00:04:11.760Z #36 root p=none exploration
+  2026-09-24T00:04:11.760Z #36 content controls p=none exploration
+  2026-09-24T00:04:12.598Z #37 root p=none exploration
+  2026-09-24T00:04:12.601Z #37 content controls p=none exploration
+  2026-09-24T00:04:13.562Z #38 root p=none exploration
+  2026-09-24T00:04:13.563Z #38 content controls p=none exploration
+  2026-09-24T00:04:14.562Z #39 root p=none exploration
+  2026-09-24T00:04:14.562Z #39 content controls p=none exploration
+  2026-09-24T00:04:16.095Z #40 root p=none exploration
+  2026-09-24T00:04:16.095Z #40 content controls p=none exploration
+  2026-09-24T00:04:23.715Z #41 root p=none exploration
+  2026-09-24T00:04:25.212Z #42 root p=none exploration
+  2026-09-24T00:04:25.549Z #43 root p=none exploration
+  2026-09-24T00:04:26.016Z #44 root p=none exploration
+  2026-09-24T00:04:26.750Z #45 root p=none exploration
+  2026-09-24T00:04:27.401Z #46 root p=none exploration
+  2026-09-24T00:04:27.917Z #47 root p=none exploration
+  2026-09-24T00:04:28.833Z #48 root p=none exploration
+  2026-09-24T00:04:29.568Z #49 root p=none exploration
+  2026-09-24T00:04:31.235Z #50 root p=none exploration
+  2026-09-24T00:04:34.961Z #51 root p=none exploration
+  2026-09-24T00:04:37.751Z #52 root p=none exploration
+  2026-09-24T00:04:39.973Z #53 root p=none exploration
+  2026-09-24T00:04:40.607Z #54 root p=none exploration
+  2026-09-24T00:04:41.405Z #55 root p=none exploration
+  2026-09-24T00:04:42.124Z #56 root p=none exploration
+  2026-09-24T00:04:42.922Z #57 root p=none exploration
+  2026-09-24T00:04:43.839Z #58 root p=none exploration
+  2026-09-24T00:04:44.389Z #59 root p=none exploration
+  2026-09-24T00:04:44.974Z #60 root p=none exploration
+  2026-09-24T00:04:45.490Z #61 root p=none exploration
+  2026-09-24T00:04:45.942Z #62 root p=none exploration
+  2026-09-24T00:04:46.815Z #63 root p=none exploration
+  2026-09-24T00:04:47.284Z #64 root p=none exploration
+  2026-09-24T00:04:48.300Z #65 root p=none exploration
+  2026-09-24T00:04:49.816Z #66 root p=none exploration
+  2026-09-24T00:04:51.000Z #67 root p=none exploration
+  2026-09-24T00:04:51.653Z #68 root p=none exploration
+  2026-09-24T00:04:55.220Z #69 root p=none exploration
+  2026-09-24T00:04:55.844Z #70 root p=none exploration
+  2026-09-24T00:04:55.845Z #70 content controls p=none exploration
+  this boot:
+  2026-09-24T00:07:43.585Z #1 root p=none exploration
+  2026-09-24T00:07:45.304Z #2 root p=none exploration
+  2026-09-24T00:07:48.173Z #3 root p=none exploration
+  2026-09-24T00:07:48.174Z #4 modal p=none exploration
+  2026-09-24T00:07:49.422Z #5 root p=none exploration
+  2026-09-24T00:07:49.423Z #6 modal p=none exploration
+  2026-09-24T00:08:24.355Z #7 root p=none exploration
+  2026-09-24T00:08:24.356Z #8 modal p=none exploration
+  2026-09-24T00:08:24.357Z #8 in report:send ⏱+26ms p=none exploration
+  2026-09-24T00:08:24.439Z #8 enter report:send p=none exploration
+  2026-09-24T00:08:24.440Z #8 admit report:send (described) p=none exploration
+  2026-09-24T00:08:24.440Z #8 dispatch report:send (described) p=none exploration
+  2026-09-24T00:08:24.440Z #8 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cheddar Bob)
+  HP: 35/47  Stamina: 14/23  TC: 159  Corruption: 7
+  Pack: 231 distinct rows / 1630 total
+  Dog: Rust (Mutt) loyalty 98 HP 3/17
+
+Weapons (39)
+  Aether Axe ×3 (Legendary, 2d8 aetheric, dur 59/59, [weapon,melee,two_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Crystal Blade (Uncommon, 1d8 slashing, dur 25/25, [weapon,blade,melee,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, +1d6 cold coat, dur 40/41, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Aetheric Touch Wand (1d6 aetheric, dur 38/38, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 37/42, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 3/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Charged Bone Siege Crossbow (Uncommon, 2d6 piercing, +1d6 electrical coat, dur 23/26, [weapon,ranged,two_handed,crossbow,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cantor's Tuning Fork (Legendary, dur 50/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Laser Pistol (Ranged) (1d6 burn, dur 43/43, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 29/29, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 44/44, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 25/26, ♥reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Golem Sledge (Rare, 2d8 bludgeoning, dur 32/32, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 39/39, stolen, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud-Iron Greatblade (Rare, 2d8 slashing, dur 30/30, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Dagger (1d4 burn, dur 21/21, [weapon,melee,dual_wield,knife,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Plasma Thrower (1d6 burn, dur 23/25, equipped:main, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:off, unequip:main, use(off), repair
+  Pulse-Woven Edge (Legendary, dur 45/45, ♥reserved, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop
+  Pyric Wand (1d6 burn, dur 23/24, equipped:off, [weapon,runecaster])
+    actions: equip:main, unequip:off, use, repair
+  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 33/35, ♥reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Sealwarden Chain (Legendary, dur 60/60, 1d8+3 bludgeoning, unique, [core_guardian_set,aether_born,exotic,reach,bind_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 20/34, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Frost-Rimed Sentinel Cleaver (Rare, 2d8 slashing, +1d6 cold coat, dur 18/25, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Spark-Riven Bolt-Rig (Uncommon, dur 25/25, 1d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Sparkstrike Wand (1d6 electrical, dur 44/44, [weapon,runecaster,rune_power,aetheric,electrical])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tooth-Set Warstaff (Uncommon, dur 25/25, 1d8 bludgeoning, resist:poison, unique, [fused,unique,poison])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (21)
+  Aether-Walker's Boots (Uncommon, dur 26/27, equipped:feet, AC +4 · Resists: aetheric, acid (coated), cold (coated) · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet, repair
+  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 · Resists: aetheric · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Anvil-Struck Bulwark (Rare, dur 25/25, ♥reserved, AC+2, resist:degradation, unique, [fused,unique,faction_gear,reclaimers_guild,degradation])
+    actions: equip:head, use, scrap, release-from-fusion, drop
+  Architect's Sight Enhancer (Uncommon, dur 32/35, equipped:head, AC +3 · Resists: cold, cold (coated) · Regen: +1 HP per action · WIS +3 · INT +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: unequip:head, repair
+  Auralite Greaves (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:legs, use, scrap, drop
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Aegis (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Bulwark (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Forge-Black Bulwark (Rare, dur 35/35, AC+3, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 · Resists: slashing, aetheric · INT +3 · INT +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 64/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: unequip:legs, repair
+  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 · Resists: aetheric · CHA +5 · DEX +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Matriarch's Aegis (Legendary, dur 60/60, AC+2, resist:aetheric, unique, [core_guardian_set,aether_born,ac:2,head,will_save])
+    actions: equip:head, use, scrap, drop
+  Mud-glass Scales (Uncommon, dur 47/49, equipped:chest, AC +4 · Resists: piercing, burn (coated) · HP +1 · Regen: +2 stamina per action · Bites back: 1 damage to whatever hits you, in its own element, [armor,chest,scale,mud_glass,true_tartarians])
+    actions: unequip:chest, repair
+  Mudstone Bulwark (Rare, dur 61/61, AC +4 · Resists: bludgeoning, piercing · HP +30 · Bites back: 2 damage to whatever hits you, in its own element, [armor,chest,heavy,stone,mud])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Cloak (dur 11/13, AC +2 · Resists: cold, burn (coated), acid (coated) · DEX +2 · STE +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Relic Hunter's Gauntlets (Uncommon, dur 24/27, AC +4 · Resists: slashing, cold (coated), burn (coated) · DEX +4 · STR +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, repair, drop
+  Sealwarden Vest (Legendary, dur 70/70, AC+3, resist:aetheric, unique, [core_guardian_set,aether_born,ac:3,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Seer's Veil of the Aether (dur 17/17, AC +2 · Resists: aetheric · WIS +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Singing Hood (Uncommon, dur 25/25, AC+2, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:head, use, scrap, drop
+
+Shields (1)
+  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (1)
+  ◆ Aetheric Padded Vest (Rare, dur 25/28, ♥reserved, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, repair, release-from-fusion, drop
+
+Amulets & Rings (13)
+  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 · Resists aetheric: −10% incoming damage of each, on top of armour, [ring,aether,crafted])
+    actions: equip:ring, use, scrap, drop
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Amulet of the Silt Warden ×2 (Rare, dur 40/40, equipped:amulet, WIS +2 · Resists poison, corruption: −20% incoming damage of each, on top of armour, [amulet,mud,crafted])
+    actions: unequip:amulet
+  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])
+    actions: equip:ring, use, scrap, drop
+  Minor Aetheric Amulet (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,aether])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,cr
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 409 of 3712 entries; older trimmed to fit a single email paste)
+
+[2026-09-24T00:07:42.630Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T00:07:42.630Z] [debug] boot: life bmuerw5qvhz started 2026-09-24T00:07:36.727Z · not an OTA apply (no handoff on disk)
+[2026-09-24T00:07:42.629Z] [debug] missions: · at=asgardar
+[2026-09-24T00:07:42.629Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T00:07:42.629Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T00:07:42.628Z] [debug] ═══ SESSION 2026-09-24T00:07:42.624Z · build 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get · previous entry moments earlier ═══
+[2026-09-24T00:07:42.342Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Cheddar Bob. I wondered when you'd take up the thread again."
+[2026-09-24T00:07:42.342Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-09-24T00:07:42.341Z] [debug] OTA session start: 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get.
+[2026-09-24T00:07:38.025Z] [debug] voice: bundled idle
+[2026-09-24T00:07:38.025Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-24T00:07:37.079Z] [debug] ota: boot check result = noUpdate
+[2026-09-24T00:07:37.079Z] [debug] ota: Already up to date
+[2026-09-24T00:07:36.834Z] [debug] ota: Checking…
+[2026-09-24T00:07:36.834Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0cf6a-2e9f-79c8-b8a3-f21c139b646e
+[2026-09-24T00:04:56.098Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-09-24T00:04:56.020Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-
+[2026-09-24T00:04:55.866Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-
+[2026-09-24T00:04:25.161Z] [debug] homework: scene_intro "Asgardar" ∅ 10757ms
+[2026-09-24T00:04:25.160Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10598ms — intro-fill:near-dup
+[2026-09-24T00:04:25.066Z] [debug] qwen⏱ narration:scene_intro_fill ok 10598ms read 9419ms/write 1154ms in 818t→out 33t thr1 11.5ms/t HIT-CAP (163ch)
+[2026-09-24T00:04:23.865Z] [reward] Halem the Trader fires up a portable Crucible for you. (−25 TC)
+[2026-09-24T00:04:16.230Z] [world] You let the conversation go and Halem the Trader gets back to it.
+[2026-09-24T00:04:14.406Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-24T00:04:11.725Z] [debug] flourish: ✓ 2477ms
+[2026-09-24T00:04:11.667Z] [debug] qwen⏱ flourish ok 2352ms read 1953ms/write 354ms in 178t→out 12t thr2 11.0ms/t (43ch)
+[2026-09-24T00:03:59.069Z] [debug] homework: item_desc "Reaver's Spiral-Mark Stone" ✓ 4674ms
+[2026-09-24T00:03:58.932Z] [debug] qwen⏱ item_synthesis_hw ok 4526ms read 3691ms/write 806ms in 327t→out 24t thr1 11.3ms/t (96ch)
+[2026-09-24T00:03:49.193Z] [reward] ✦ The forging finishes — the Aether names it Spark-Riven Bolt-Rig (Uncommon).
+[2026-09-24T00:03:49.128Z] [debug] qwen⏱ forge_name ok 3474ms read 2246ms/write 1199ms in 211t→out 36t thr2 10.6ms/t (150ch)
+[2026-09-24T00:03:45.552Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-24T00:03:45.552Z] [reward] ✦ The Crucible forges an Uncommon RANGED weapon from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-24T00:03:45.549Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-24T00:03:37.309Z] [reward] Halem the Trader fires up a portable Crucible for you. (−25 TC)
+[2026-09-24T00:03:34.833Z] [debug] homework: scene_intro "Asgardar" ✓ 10447ms
+[2026-09-24T00:03:34.759Z] [debug] qwen⏱ narration:scene_intro_fill ok 10365ms read 9565ms/write 762ms in 818t→out 21t thr1 11.7ms/t (86ch)
+[2026-09-24T00:03:34.312Z] [debug] persist sizes(KB): total=410 player=88 wm=224[rooms=132 events=7 memos=1 npcs=8 defeated=1 tags=1 discovered=1] log=92 scene=5
+[2026-09-24T00:03:27.786Z] [reward] They don't charge a friend full price — 3 TC stayed in your pouch.
+[2026-09-24T00:03:27.785Z] [reward] Bought First Aid Kit from Halem the Trader for 32 TC. (209 TC left)
+[2026-09-24T00:03:25.819Z] [reward] They don't charge a friend full price — 5 TC stayed in your pouch.
+[2026-09-24T00:03:25.819Z] [reward] Bought 5× Trail Rations from Halem the Trader for 35 TC. (241 TC left)
+[2026-09-24T00:03:24.388Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-24T00:03:19.340Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-24T00:03:18.317Z] [cognitive] CLIMB  (109ms)
+[2026-09-24T00:03:18.207Z] [system] ⏳ Time passed: 24 min
+[2026-09-24T00:03:18.206Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Scrap Metal (Common).
+[2026-09-24T00:03:18.198Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-09-24T00:03:18.198Z] [player] investigate the ground
+[2026-09-24T00:03:18.162Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-09-24T00:03:18.156Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-24T00:03:15.258Z] [debug] ui: tap "investigate" ⏱+21ms
+[2026-09-24T00:03:13.916Z] [reward]     • Smooth Stone x3 (Common)
+[2026-09-24T00:03:13.916Z] [reward]     • Mud Fragment x3 (Common)
+[2026-09-24T00:03:13.915Z] [reward]     • Worn Tartarian Coin x9 (Common)
+[2026-09-24T00:03:13.915Z] [reward]     • Scrap Metal (Common)
+[2026-09-24T00:03:13.915Z] [reward]     • Oil-Stained Sash x2 (Common)
+[2026-09-24T00:03:13.914Z] [reward]     • Aether Dust (Common)
+[2026-09-24T00:03:13.914Z] [reward] ✦ Salvage haul:
+[2026-09-24T00:03:13.914Z] [world] You break the weathered submerged giant statue apart. Among the pieces, something worth keeping.
+[2026-09-24T00:03:13.913Z] [world] You break the throne apart. Among the pieces, something worth keeping.
+[2026-09-24T00:03:13.913Z] [world] You strip the root cluster carefully. Something usable comes free in your hand.
+[2026-09-24T00:03:13.912Z] [world] You work the hanging chain over. A part of it comes loose, intact.
+[2026-09-24T00:03:13.912Z] [world] You salvage the core. The take is small but real.
+[2026-09-24T00:03:13.911Z] [world] You work the cold spring apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-09-24T00:03:13.911Z] [world] Tucked inside the ceremonial blade: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-24T00:03:13.910Z] [world] You salvage the capacitor. The take is small but real.
+[2026-09-24T00:03:13.195Z] [reward] ✦ Aether Dust (Common).
+[2026-09-24T00:03:13.195Z] [world] You pick up the Aether Dust.
+[2026-09-24T00:03:12.261Z] [reward] ✦ Seer's Veil of the Aether (Common).
+[2026-09-24T00:03:12.259Z] [world] You take the Seer's Veil of the Aether from where it lay.
+[2026-09-24T00:03:10.803Z] [debug] ui: tap "take / salvage" ⏱+17ms
+[2026-09-24T00:03:09.381Z] [reward] +240 TC.
+[2026-09-24T00:03:09.379Z] [arbiter] You pick the thing you will miss least and you push it out deliberately, like paying a toll, and the hum takes it. Then it goes on taking, unhurried, for as long as the door is open, and by the time you get it shut you have been standing in the same six inches of water long enough for your feet to go numb. It is satisfied. You are the one who does not know the figure.
+[2026-09-24T00:03:07.301Z] [debug] story: calling resolution 'choir' fired at asgardar
+[2026-09-24T00:03:07.301Z] [reward] ✦ Vigil Token — A blank disc of Aetherstone, ground smooth by eleven years of thumbs. Everybody in that chamber carries one. Now so do you.
+[2026-09-24T00:03:07.301Z] [arbiter] The Arbiter says nothing for a moment. "I have carried a great many people who believed the hum meant they were singular," it says. "You are the first I have ever brought into a room full of them." A pause. "The roll marks the calling: SHARED. That is a demotion and a homecoming in the same breath, walker. Take whichever half you need tonight."
+[2026-09-24T00:03:07.301Z] [world] They came for the hum. Every one of them, from nine different directions, across eleven years. Tarn does the talking because Tarn has been here longest: they have never agreed on what it is, they gave up trying some time ago, and the vigil they keep is mostly just company for whoever walks in next. "We do not know," Tarn says, without a scrap of apology. "We know it is real, and we know it is not only you, and after a while it turns out that second part is the one that helps."
+[2026-09-24T00:03:07.300Z] [world] There are lamps ahead where the maps promise nothing, and under the lamps there are people — nine of them, in a chamber they have swept and shored and made very nearly warm. They stand when they see you. Not startled. The way a household stands when somebody expected finally arrives.
+[2026-09-24T00:03:07.300Z] [arbiter] (Reclaimer route — to recover the Asgardar Core, SALVAGE something here. The Aetheric housing comes loose under the right trowel.)
+[2026-09-24T00:03:07.300Z] [world] Asgardar announces itself before you crest the rise: the Grand Spire of Asgardar out past the last streets, snapped a third of the way up, still humming a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.
+[2026-09-24T00:03:07.300Z] [world] Halem the Trader nods you closer. "Still chewing on ‘Ask about the cart that never arrived’, or is it something new today?"
+[2026-09-24T00:03:07.299Z] [world] "Cheddar Bob." Halem the Trader says it like setting down something heavy. "You've been gone. I kept your usual back anyway."
+[2026-09-24T00:03:07.299Z] [world] Halem the Trader pushes the good stock to the front without being asked. "Cheddar Bob. You know where everything is."
+[2026-09-24T00:03:07.299Z] [world] [Asgardar] north: Reclaimer's Stake (13 tiles, 1 day, 9 hours) · east: Varakush (9 tiles, 23 hours) · south: Grand Spire of Asgardar (1 tile, 3 hours) · west: open ground
+[2026-09-24T00:03:07.296Z] [system] Weather effect — Ash Storm: -1 STR
+[2026-09-24T00:03:07.295Z] [world] The gate of Asgardar stands before you — their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)
+[2026-09-24T00:03:07.292Z] [world] You've left Karok-Sa and entered Asgardar. The capital sleeps under Aetherstone, breathing through cracks no shovel can widen. It's night. Halem the Trader is the only soul in sight. south leads to Grand Spire of Asgardar. Nothing named to the north or east or west.
+[2026-09-24T00:03:07.284Z] [world] Rust noses at the faint ozone and snorts. There's something there.
+[2026-09-24T00:03:07.283Z] [arbiter] The Arbiter takes you in. "Asgardar is lethal country. The things that wake here pull above your weight. 47 HP carries you through Varakush (danger 1). 4/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you."
+[2026-09-24T00:03:07.278Z] [debug] spawn: gear=[Seer's Veil of the Aether] window=10 roster=new
+[2026-09-24T00:03:07.262Z] [world] ▸ The Mud Titan of the Endless Stair: Master Karin is a later step — not yet. First: find the True Tartarian agent at The Sunken Enclave — talk it through.
+[2026-09-24T00:03:07.261Z] [debug] missions: unchanged since 2026-09-24T00:03:04.644Z — 10 contracts (dumped in full then) · at=asgardar travelTo=asgardar here=none
+[2026-09-24T00:03:07.260Z] [debug] scene: loc=asgardar hub=- arrival=y opening=n passing=n
+[2026-09-24T00:03:07.260Z] [world] You walk north. You arrive at Asgardar.
+[2026-09-24T00:03:07.237Z] [debug] ui: tap "→ ASGARDAR" ⏱+20ms
+[2026-09-24T00:03:04.645Z] [debug] boot: life bmuerq7n6mg started 2026-09-24T00:02:59.250Z · not an OTA apply (no handoff on disk)
+[2026-09-24T00:03:04.645Z] [debug] missions: · at=karok_sa travelTo=asgardar
+[2026-09-24T00:03:04.645Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-24T00:03:04.645Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-24T00:03:04.645Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-24T00:03:04.645Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-24T00:03:04.645Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-24T00:03:04.644Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-24T00:03:04.644Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-24T00:03:04.644Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-24T00:03:04.644Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-24T00:03:04.644Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-24T00:03:04.643Z] [debug] ═══ SESSION 2026-09-24T00:03:04.641Z · build 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get · previous entry moments earlier ═══
+[2026-09-24T00:03:04.465Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-24T00:03:04.458Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.
+[2026-09-24T00:03:04.458Z] [world] You step back into Karok-Sa. The world waits for your move.
+[2026-09-24T00:03:04.458Z] [debug] OTA session start: 2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get.
+[2026-09-22T04:02:41.209Z] [debug] voice: bundled idle
+[2026-09-22T04:02:41.209Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T04:02:41.086Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T04:02:41.086Z] [debug] ota: Already up to date
+[2026-09-22T04:02:40.721Z] [debug] ota: Checking…
+[2026-09-22T04:02:40.721Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c708-15d7-717d-b307-66960de3f40b
+[2026-09-22T03:02:35.270Z] [debug] voice: bundled idle
+[2026-09-22T03:02:35.270Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T03:02:35.153Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T03:02:35.153Z] [debug] ota: Already up to date
+[2026-09-22T03:02:34.997Z] [debug] ota: Checking…
+[2026-09-22T03:02:34.997Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c708-15d7-717d-b307-66960de3f40b
+[2026-09-22T03:02:34.688Z] [debug] ota: Restarting to apply…
+[2026-09-22T03:02:34.687Z] [debug] ota: Saving progress…
+[2026-09-22T03:02:34.557Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T03:02:33.472Z] [debug] ota: Checking…
+[2026-09-22T03:02:33.472Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c670-445f-783d-8ea5-7e12d2bb10ae
+[2026-09-22T02:49:15.614Z] [debug] voice: bundled idle
+[2026-09-22T02:49:15.614Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T02:49:15.476Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T02:49:15.476Z] [debug] ota: Already up to date
+[2026-09-22T02:49:15.411Z] [debug] ota: Checking…
+[2026-09-22T02:49:15.411Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c670-445f-783d-8ea5-7e12d2bb10ae
+[2026-09-22T00:33:27.095Z] [debug] appstate: background → active (was background for 23022ms)
+[2026-09-22T00:33:04.074Z] [debug] appstate: active → background (was active for 13805ms)
+[2026-09-22T00:32:50.636Z] [debug] voice: bundled idle
+[2026-09-22T00:32:50.635Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T00:32:50.542Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T00:32:50.542Z] [debug] ota: Already up to date
+[2026-09-22T00:32:50.301Z] [debug] ota: Checking…
+[2026-09-22T00:32:50.301Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c670-445f-783d-8ea5-7e12d2bb10ae
+[2026-09-22T00:13:25.473Z] [debug] voice: bundled idle
+[2026-09-22T00:13:25.473Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-22T00:13:25.366Z] [debug] ota: boot check result = noUpdate
+[2026-09-22T00:13:25.366Z] [debug] ota: Already up to date
+[2026-09-22T00:13:25.114Z] [debug] ota: Checking…
+[2026-09-22T00:13:25.114Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c670-445f-783d-8ea5-7e12d2bb10ae
+[2026-09-22T00:13:24.706Z] [debug] ota: Restarting to apply…
+[2026-09-22T00:13:24.705Z] [debug] ota: Saving progress…
+[2026-09-22T00:13:24.283Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-22T00:13:21.978Z] [debug] ota: Checking…
+[2026-09-22T00:13:21.978Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c466-4ef0-71fc-96ec-06c25896e73a
+[2026-09-21T18:11:28.418Z] [debug] appstate: active → background (was active for 6986ms)
+[2026-09-21T18:11:22.204Z] [debug] voice: bundled idle
+[2026-09-21T18:11:22.203Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T18:11:22.098Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T18:11:22.097Z] [debug] ota: Already up to date
+[2026-09-21T18:11:21.477Z] [debug] ota: Checking…
+[2026-09-21T18:11:21.476Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c466-4ef0-71fc-96ec-06c25896e73a
+[2026-09-21T16:56:07.709Z] [debug] voice: bundled idle
+[2026-09-21T16:56:07.708Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T16:56:07.614Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T16:56:07.613Z] [debug] ota: Already up to date
+[2026-09-21T16:56:07.248Z] [debug] ota: Checking…
+[2026-09-21T16:56:07.248Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c466-4ef0-71fc-96ec-06c25896e73a
+[2026-09-21T16:56:06.759Z] [debug] ota: Restarting to apply…
+[2026-09-21T16:56:06.758Z] [debug] ota: Saving progress…
+[2026-09-21T16:56:06.325Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T16:56:04.771Z] [debug] ota: Checking…
+[2026-09-21T16:56:04.771Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c324-9197-7775-8a8a-7dad9a489549
+[2026-09-21T14:30:37.222Z] [debug] appstate: active → background (was active for 4950ms)
+[2026-09-21T14:30:32.851Z] [debug] voice: bundled idle
+[2026-09-21T14:30:32.850Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T14:30:32.704Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T14:30:32.704Z] [debug] ota: Already up to date
+[2026-09-21T14:30:32.331Z] [debug] ota: Checking…
+[2026-09-21T14:30:32.331Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c324-9197-7775-8a8a-7dad9a489549
+[2026-09-21T09:05:14.525Z] [debug] voice: bundled idle
+[2026-09-21T09:05:14.525Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T09:05:14.398Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T09:05:14.398Z] [debug] ota: Already up to date
+[2026-09-21T09:05:14.040Z] [debug] ota: Checking…
+[2026-09-21T09:05:14.040Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c324-9197-7775-8a8a-7dad9a489549
+[2026-09-21T09:05:13.581Z] [debug] ota: Restarting to apply…
+[2026-09-21T09:05:13.580Z] [debug] ota: Saving progress…
+[2026-09-21T09:05:13.096Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T09:05:11.156Z] [debug] ota: Checking…
+[2026-09-21T09:05:11.156Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c21c-9474-7883-88cf-df2693beebd5
+[2026-09-21T03:58:43.747Z] [debug] appstate: active → background (was active for 4668ms)
+[2026-09-21T03:58:39.576Z] [debug] voice: bundled idle
+[2026-09-21T03:58:39.575Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T03:58:39.459Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T03:58:39.459Z] [debug] ota: Already up to date
+[2026-09-21T03:58:39.108Z] [debug] ota: Checking…
+[2026-09-21T03:58:39.108Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c21c-9474-7883-88cf-df2693beebd5
+[2026-09-21T03:58:38.891Z] [debug] ota: boot check result = applied
+[2026-09-21T03:58:38.339Z] [debug] ota: Restarting to apply…
+[2026-09-21T03:58:38.338Z] [debug] ota: Saving progress…
+[2026-09-21T03:58:37.496Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T03:58:33.537Z] [debug] ota: Checking…
+[2026-09-21T03:58:33.537Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c1d9-9f5c-7751-beb0-2b09deb183ad
+[2026-09-21T03:16:33.678Z] [debug] appstate: background → active (was background for 2763ms)
+[2026-09-21T03:16:30.941Z] [debug] appstate: active → background (was active for 17259ms)
+[2026-09-21T03:16:14.076Z] [debug] voice: bundled idle
+[2026-09-21T03:16:14.076Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T03:16:13.964Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T03:16:13.964Z] [debug] ota: Already up to date
+[2026-09-21T03:16:13.691Z] [debug] ota: Checking…
+[2026-09-21T03:16:13.690Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c1d9-9f5c-7751-beb0-2b09deb183ad
+[2026-09-21T02:47:23.914Z] [debug] appstate: active → background (was active for 7556ms)
+[2026-09-21T02:47:16.803Z] [debug] voice: bundled idle
+[2026-09-21T02:47:16.802Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T02:47:16.673Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T02:47:16.673Z] [debug] ota: Already up to date
+[2026-09-21T02:47:16.386Z] [debug] ota: Checking…
+[2026-09-21T02:47:16.385Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c1d9-9f5c-7751-beb0-2b09deb183ad
+[2026-09-21T02:47:15.645Z] [debug] ota: Restarting to apply…
+[2026-09-21T02:47:15.644Z] [debug] ota: Saving progress…
+[2026-09-21T02:47:15.100Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T02:47:12.241Z] [debug] ota: Checking…
+[2026-09-21T02:47:12.241Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c14a-4af3-7632-bac8-04ce9ab466db
+[2026-09-21T00:59:47.881Z] [debug] appstate: background → active (was background for 2897598ms)
+[2026-09-21T00:11:30.281Z] [debug] appstate: active → background (was active for 13869ms)
+[2026-09-21T00:11:16.412Z] [debug] appstate: background → active (was background for 10520ms)
+[2026-09-21T00:11:05.893Z] [debug] appstate: active → background (was active for 4948ms)
+[2026-09-21T00:11:01.471Z] [debug] voice: bundled idle
+[2026-09-21T00:11:01.471Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-21T00:11:01.379Z] [debug] ota: boot check result = noUpdate
+[2026-09-21T00:11:01.377Z] [debug] ota: Already up to date
+[2026-09-21T00:11:00.976Z] [debug] ota: Checking…
+[2026-09-21T00:11:00.975Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c14a-4af3-7632-bac8-04ce9ab466db
+[2026-09-21T00:11:00.535Z] [debug] ota: Restarting to apply…
+[2026-09-21T00:11:00.533Z] [debug] ota: Saving progress…
+[2026-09-21T00:11:00.039Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-21T00:10:57.665Z] [debug] ota: Checking…
+[2026-09-21T00:10:57.665Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c10f-4308-78bc-b855-fcdc542b9180
+[2026-09-20T23:05:26.841Z] [debug] appstate: active → background (was active for 5451ms)
+[2026-09-20T23:05:21.819Z] [debug] voice: bundled idle
+[2026-09-20T23:05:21.819Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T23:05:21.731Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T23:05:21.730Z] [debug] ota: Already up to date
+[2026-09-20T23:05:21.427Z] [debug] ota: Checking…
+[2026-09-20T23:05:21.427Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c10f-4308-78bc-b855-fcdc542b9180
+[2026-09-20T23:05:14.668Z] [debug] appstate: background → active (was background for 310257ms)
+[2026-09-20T23:00:04.410Z] [debug] appstate: active → background (was active for 4355ms)
+[2026-09-20T23:00:00.672Z] [debug] voice: bundled idle
+[2026-09-20T23:00:00.672Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T23:00:00.512Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T23:00:00.512Z] [debug] ota: Already up to date
+[2026-09-20T23:00:00.134Z] [debug] ota: Checking…
+[2026-09-20T23:00:00.134Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c004-f2a0-70a4-ba5f-6d8c91b255ff
+[2026-09-20T22:06:51.992Z] [debug] voice: bundled idle
+[2026-09-20T22:06:51.992Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T22:06:51.844Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T22:06:51.843Z] [debug] ota: Already up to date
+[2026-09-20T22:06:51.279Z] [debug] ota: Checking…
+[2026-09-20T22:06:51.279Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c004-f2a0-70a4-ba5f-6d8c91b255ff
+[2026-09-20T18:53:49.675Z] [debug] appstate: active → background (was active for 4302ms)
+[2026-09-20T18:53:45.860Z] [debug] voice: bundled idle
+[2026-09-20T18:53:45.860Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T18:53:45.758Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T18:53:45.757Z] [debug] ota: Already up to date
+[2026-09-20T18:53:45.444Z] [debug] ota: Checking…
+[2026-09-20T18:53:45.444Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0c004-f2a0-70a4-ba5f-6d8c91b255ff
+[2026-09-20T18:53:44.818Z] [debug] ota: Restarting to apply…
+[2026-09-20T18:53:44.817Z] [debug] ota: Saving progress…
+[2026-09-20T18:53:44.426Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T18:53:41.781Z] [debug] ota: Checking…
+[2026-09-20T18:53:41.781Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bceb-8971-793d-b5be-e805f77af345
+[2026-09-20T16:44:35.709Z] [debug] voice: bundled idle
+[2026-09-20T16:44:35.709Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T16:44:35.589Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T16:44:35.589Z] [debug] ota: Already up to date
+[2026-09-20T16:44:34.932Z] [debug] ota: Checking…
+[2026-09-20T16:44:34.932Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bceb-8971-793d-b5be-e805f77af345
+[2026-09-20T12:23:09.499Z] [debug] voice: bundled idle
+[2026-09-20T12:23:09.499Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T12:23:09.371Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T12:23:09.371Z] [debug] ota: Already up to date
+[2026-09-20T12:23:09.093Z] [debug] ota: Checking…
+[2026-09-20T12:23:09.092Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bceb-8971-793d-b5be-e805f77af345
+[2026-09-20T12:23:08.237Z] [debug] ota: Restarting to apply…
+[2026-09-20T12:23:08.237Z] [debug] ota: Saving progress…
+[2026-09-20T12:23:07.358Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T12:23:03.140Z] [debug] ota: Checking…
+[2026-09-20T12:23:03.140Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bcbf-b04f-76a1-ab52-51e0be01326a
+[2026-09-20T03:39:11.935Z] [debug] voice: bundled idle
+[2026-09-20T03:39:11.935Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T03:39:11.790Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T03:39:11.788Z] [debug] ota: Already up to date
+[2026-09-20T03:39:10.909Z] [debug] ota: Checking…
+[2026-09-20T03:39:10.909Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bcbf-b04f-76a1-ab52-51e0be01326a
+[2026-09-20T02:58:08.777Z] [debug] appstate: active → background (was active for 4319ms)
+[2026-09-20T02:58:05.037Z] [debug] voice: bundled idle
+[2026-09-20T02:58:05.036Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:58:04.930Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:58:04.930Z] [debug] ota: Already up to date
+[2026-09-20T02:58:04.505Z] [debug] ota: Checking…
+[2026-09-20T02:58:04.505Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bcbf-b04f-76a1-ab52-51e0be01326a
+[2026-09-20T02:56:46.169Z] [debug] voice: bundled idle
+[2026-09-20T02:56:46.169Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:56:46.063Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:56:46.063Z] [debug] ota: Already up to date
+[2026-09-20T02:56:45.847Z] [debug] ota: Checking…
+[2026-09-20T02:56:45.847Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T02:56:38.336Z] [debug] appstate: background → active (was background for 42615ms)
+[2026-09-20T02:55:55.721Z] [debug] appstate: active → background (was active for 4735ms)
+[2026-09-20T02:55:51.376Z] [debug] voice: bundled idle
+[2026-09-20T02:55:51.375Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:55:51.290Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:55:51.290Z] [debug] ota: Already up to date
+[2026-09-20T02:55:51.083Z] [debug] ota: Checking…
+[2026-09-20T02:55:51.083Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T02:55:22.003Z] [debug] appstate: background → active (was background for 71856ms)
+[2026-09-20T02:54:10.148Z] [debug] appstate: active → background (was active for 5563ms)
+[2026-09-20T02:54:04.916Z] [debug] voice: bundled idle
+[2026-09-20T02:54:04.916Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:54:04.875Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:54:04.875Z] [debug] ota: Already up to date
+[2026-09-20T02:54:04.614Z] [debug] ota: Checking…
+[2026-09-20T02:54:04.614Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T02:53:46.092Z] [debug] appstate: active → background (was active for 6449ms)
+[2026-09-20T02:53:39.645Z] [debug] appstate: background → active (was background for 1673828ms)
+[2026-09-20T02:25:45.815Z] [debug] appstate: active → background (was active for 13937ms)
+[2026-09-20T02:25:32.235Z] [debug] voice: bundled idle
+[2026-09-20T02:25:32.235Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:25:32.153Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:25:32.152Z] [debug] ota: Already up to date
+[2026-09-20T02:25:31.908Z] [debug] ota: Checking…
+[2026-09-20T02:25:31.908Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T02:24:30.460Z] [debug] voice: bundled idle
+[2026-09-20T02:24:30.460Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T02:24:30.338Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T02:24:30.338Z] [debug] ota: Already up to date
+[2026-09-20T02:24:29.908Z] [debug] ota: Checking…
+[2026-09-20T02:24:29.908Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T00:55:09.214Z] [debug] voice: bundled idle
+[2026-09-20T00:55:09.213Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T00:55:09.123Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T00:55:09.122Z] [debug] ota: Already up to date
+[2026-09-20T00:55:08.892Z] [debug] ota: Checking…
+[2026-09-20T00:55:08.892Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T00:55:01.972Z] [debug] voice: bundled idle
+[2026-09-20T00:55:01.972Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T00:55:01.845Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T00:55:01.845Z] [debug] ota: Already up to date
+[2026-09-20T00:55:01.599Z] [debug] ota: Checking…
+[2026-09-20T00:55:01.599Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T00:54:42.530Z] [debug] voice: bundled idle
+[2026-09-20T00:54:42.530Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T00:54:42.411Z] [debug] ota: boot check result = noUpdate
+[2026-09-20T00:54:42.411Z] [debug] ota: Already up to date
+[2026-09-20T00:54:42.138Z] [debug] ota: Checking…
+[2026-09-20T00:54:42.138Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0bc47-5509-7509-8468-d7c6385f58f3
+[2026-09-20T00:54:41.782Z] [debug] ota: Restarting to apply…
+[2026-09-20T00:54:41.780Z] [debug] ota: Saving progress…
+[2026-09-20T00:54:41.400Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-20T00:54:39.288Z] [debug] ota: Checking…
+[2026-09-20T00:54:39.288Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0ba3a-8755-7b43-ada2-344a25898222
+[2026-09-20T00:45:14.565Z] [debug] appstate: active → background (was active for 13510ms)
+[2026-09-20T00:45:11.233Z] [debug] voice: bundled idle
+[2026-09-20T00:45:11.233Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T00:45:11.131Z] [debug] ota: boot check result = errored
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/2a81c947f012f41f9196b8f4007f780a:1:4028519)
+[2026-09-20T00:45:11.130Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+[2026-09-20T00:45:11.126Z] [debug] ota: Error
+[2026-09-20T00:45:01.098Z] [debug] ota: Checking…
+[2026-09-20T00:45:01.098Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0ba3a-8755-7b43-ada2-344a25898222
+[2026-09-20T00:44:41.549Z] [debug] voice: bundled idle
+[2026-09-20T00:44:41.549Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-20T00:44:41.395Z] [debug] ota: boot check result = errored
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/2a81c947f012f41f9196b8f4007f780a:1:4028519)
+[2026-09-20T00:44:41.395Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+[2026-09-20T00:44:41.394Z] [debug] ota: Error
+[2026-09-20T00:44:31.378Z] [debug] ota: Checking…
+[2026-09-20T00:44:31.378Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.5.0 updateId=01a0ba3a-8755-7b43-ada2-344a25898222
+[2026-09-19T23:53:58.482Z] [debug] voice: bundled idle
+[2026-09-19T23:53:58.482Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-19T23:53:58.378Z] [debug] ota: boot check result = errored
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/2a81c947f012f41f9196b8f4007f780a:1:4028519)
+[2026-09-19T23:53:58.375Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+[2026-09-19T23:53:58.372Z] [debug] ota: Error
+[2026-09-19T23:53:56.999Z] [debug] boot: life bmu91mzsstr started 2026-09-19T23:53:48.220Z · not an OTA apply (no handoff on disk)
+[2026-09-19T23:53:56.999Z] [debug] missions: · at=karok_sa travelTo=asgardar
+[2026-09-19T23:53:56.999Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-19T23:53:56.999Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 0/5 [diplomacy] @yuldra_tul npc="the Yuldra-Tul reeve" gives=Reeve's Road-Writ PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 0/7 [diplomacy] @reclaimer_stake npc="the salvage-boss" gives=Coil of Tartarian Filament PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_mud_siren_queen stage 0/5 [diplomacy] @hidden_market npc="the wandering drifter" gives=Drifter's South-Spire Poster PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-19T23:53:56.998Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-19T23:53:56.997Z] [debug] ═══ SESSION 2026-09-19T23:53:56.994Z · build 2026-09-19-1850-gems-belong-to-the-character · previous entry moments earlier ═══
+[2026-09-19T23:53:56.844Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Cheddar Bob. The road kept your place. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-19T23:53:56.838Z] [world] Reclaimers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the silt.
+[2026-09-19T23:53:56.838Z] [world] You step back into Karok-Sa. The world waits for your move.
+[2026-09-19T23:53:56.837Z] [debug] OTA session start: 2026-09-19-1850-gems-belong-to-the-character.
+
+=== END REPORT ===
