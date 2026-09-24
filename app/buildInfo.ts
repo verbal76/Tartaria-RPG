@@ -31600,7 +31600,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * PERSISTENCE IS NOT CLAIMED AT ALL, and cannot be: `gameLog` appears zero times in
  * the save system, so a read-out beat is transient by construction. That is the
  * existing contract; this OTA neither changes it nor pretends otherwise. */
-export const OTA_BUILD_ID = '2026-09-24-1877-the-hunt-reads-its-last-beat';
+/* OTA-1878 — THE TRANSCRIPT KEEPS A DOOR (small-screen narrative reader).
+ *
+ * The owner played a fight on a 4.7" screen and the narrative panel was not
+ * cramped — it was GONE. Between the MAIN QUEST chip and the PUNCH button there
+ * was no transcript at all, and no way to reach one.
+ *
+ * ⚠⚠⚠ THE FEED IS NOT THE BUG, AND ITS SIZING IS UNCHANGED. `styles.feed` is
+ * `flex:1, flexShrink:1, minHeight:0` because OTA-179 deliberately made the
+ * transcript the sacrificial region so the bottom action row would stop clipping
+ * off the screen. Every other region there is natural-height and unshrinkable,
+ * so the feed absorbs 100% of any deficit — including all of it. That trade is
+ * still correct and is preserved to the character: NO `minHeight` was added.
+ * Forcing four lines to fit would take those pixels straight back out of the
+ * controls and re-open the exact defect OTA-179 closed.
+ *
+ * ⚠⚠ WHAT IS NEW IS THAT SOMEBODY NOTICES. `narrativeReadability` asks one
+ * question — has the panel become too small to be the PRIMARY reading surface —
+ * and the answer arms an alternate reader. The threshold is DERIVED, not chosen:
+ * four body lines at the feed's own `lineHeight` (22) plus the feed's own frame
+ * chrome (2 × (1 panelFrame + 8 padding + 1 rim)) = 108. AdventureFeed imports
+ * those same three metrics into its StyleSheet, so the rule tracks the type
+ * instead of copying numbers out of it. Tags and paragraph margins are excluded
+ * on purpose — they are CONTENT and they scroll; only chrome that permanently
+ * costs viewport is counted.
+ *
+ * ⚠ THE TRIGGER IS A MEASURED HEIGHT, NEVER A DEVICE. `onLayout` on the panel
+ * the player actually looks at. No model name, no platform branch, no window
+ * comparison — and nothing enumerates combat, the keyboard, rotation, safe areas
+ * or a vendor chip, because those are pressure SOURCES and the feed's height is
+ * downstream of every one of them at once.
+ *
+ * ⚠⚠ THE KEY LIVES IN THE SCENE RAIL, AND THAT PLACEMENT IS THE DESIGN. It
+ * belongs to the transcript, so the obvious home is the transcript's frame — and
+ * that is exactly where it must not go, because anything parented to a panel that
+ * reaches zero reaches zero with it. A new ROW was equally wrong: with the feed
+ * already at zero, any added height pushes straight through the bottom of the
+ * screen. The rail is a `flexDirection: 'row'` already sized by the settings gear
+ * (VIS-3: "the gear was the tallest object in the rail"), so a key of the same
+ * construction costs width and NO vertical space at all.
+ *
+ * THE READER RENDERS `AdventureFeed` ITSELF over the same in-memory `gameLog` —
+ * not a second interpretation of `GameLogEntry`, which is how a transcript starts
+ * disagreeing with itself. It inherits the feed's scroll-to-end, so it opens where
+ * the player was looking. Its action chips are deliberately NOT passed: they
+ * dispatch, and two live copies of one offer is the OTA-1860 class of defect.
+ * Scrim is a SIBLING behind the card, never an ancestor of the ScrollView —
+ * OTA-1875's rule, stated positively.
+ *
+ * PRESENTATION ONLY: expand and close append no log line, consume no narrative,
+ * dispatch nothing, and never touch `currentScreen`. No on-disk history, no route
+ * to LogScreen. Fonts, topRow, controls, composer and quick actions are untouched,
+ * and the control stack was not made to scroll. An open reader is NOT auto-closed
+ * when the layout grows back — the commonest way height returns is the keyboard
+ * dismissing, and being thrown out of the page mid-sentence is worse than staying.
+ * No physical-device verification. */
+export const OTA_BUILD_ID = '2026-09-24-1878-the-transcript-keeps-a-door';
+// SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'
 // SUPERSEDED: '2026-09-24-1876-the-ending-is-not-a-receipt'
 // SUPERSEDED: '2026-09-24-1875-the-list-gets-its-scroll-back'
 // SUPERSEDED: '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get'

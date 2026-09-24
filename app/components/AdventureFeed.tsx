@@ -18,6 +18,15 @@ import type { GameLogEntry, LogChannel } from '../engine/types';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
 import { tartariaKitStyles as kit } from '../ui/tartariaKit';
+/* ⚠ The three metrics below are the SINGLE OWNER of this feed's body line box
+ * and its frame chrome. The constrained-reader threshold is derived from them
+ * (narrativeReadability), so the "four readable lines" rule tracks this
+ * StyleSheet instead of copying numbers out of it. Values are unchanged. */
+import {
+  NARRATIVE_BODY_LINE_HEIGHT,
+  NARRATIVE_FEED_BORDER,
+  NARRATIVE_FEED_PADDING,
+} from '../ui/narrativeReadability';
 interface Props {
   entries: GameLogEntry[];
   /** Names of enemies currently on the field, used to highlight enemy
@@ -455,12 +464,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgba(6,7,8,0.94)',
-    borderWidth: 1,
+    borderWidth: NARRATIVE_FEED_BORDER,
     borderColor: '#242829',
     borderTopColor: 'rgba(0,0,0,0.80)',
     borderBottomColor: 'rgba(180,186,190,0.16)',
     borderRadius: 2,
-    padding: 8,
+    padding: NARRATIVE_FEED_PADDING,
   },
   // Each entry gets its own "paragraph" — a generous bottom margin
   // plus an explicit empty-line gap above the next entry's body so a
@@ -480,7 +489,7 @@ const styles = StyleSheet.create({
    * and seeing several. */
   combatEntry: { marginBottom: STRIP_METRICS.entry },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
-  body: { fontSize: 14, lineHeight: 22 },
+  body: { fontSize: 14, lineHeight: NARRATIVE_BODY_LINE_HEIGHT },
   // OTA-1051 — story beats. Extra air above and below so the beat sits in its
   // own space rather than in the column of loot lines, a gold rule to stop the
   // eye, and slightly larger, looser type. Gold (#c9a86a) is the house accent

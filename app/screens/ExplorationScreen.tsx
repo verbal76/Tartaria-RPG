@@ -25,6 +25,8 @@ import { useFirstTimeHint, useTeachingSlot } from '../components/useFirstTimeHin
 import { TEACHINGS as TEACH, type TeachingId } from '../components/teachingRegistry';
 import { spareThrowingSpear } from '../engine/bandolierEligibility'; // OTA-1738 — the THROW SPEAR rule, shared with InputBox
 import { AdventureFeed } from '../components/AdventureFeed';
+import { ExpandedNarrativeReader } from '../components/ExpandedNarrativeReader';
+import { isNarrativeConstrained } from '../ui/narrativeReadability';
 /* ⚠⚠⚠ VIS-3 — EXPLORATION JOINS THE KIT. This screen was the last one still
  * built entirely out of `backgroundColor + borderColor + borderRadius: 4`, and
  * it is the screen the player spends the game on. What it takes from the kit is
@@ -455,6 +457,18 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
+  /* ⚠⚠⚠ OTA — HOW MUCH ROOM DOES THE TRANSCRIPT ACTUALLY HAVE?
+     `null` until the first real layout: an unmeasured frame must NOT read as
+     constrained, or every phone flashes the expand key for one frame before the
+     true height arrives. `isNarrativeConstrained` enforces that.
+
+     ⚠⚠ THIS MEASURES A RESULT, NOT A CAUSE. Deliberately nothing here knows
+     about combat, the keyboard, rotation, safe areas, a vendor chip or a wrapped
+     place-chip row. Those are all pressure SOURCES, and enumerating them is how
+     a rule ends up true for the five cases somebody thought of. The feed's own
+     height is downstream of every one of them at once. */
+  const [feedH, setFeedH] = useState<number | null>(null);
+  const [narrativeReaderOpen, setNarrativeReaderOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   // OTA-1483 — true while the paced INVESTIGATE ALL sweep (OTA-1263) is live;
   // unlights the INVESTIGATE chip so it stops inviting a tap that would talk
@@ -633,6 +647,12 @@ export function ExplorationScreen() {
   // picker open the click closes the picker, and only once nothing is open does
   // the click fall through to "leave this sub-screen".
   useBackAction(true, () => {
+    /* ⚠ OTA — THE EXPANDED READER ANSWERS BEFORE ANYTHING ELSE, because it is the
+       thing the player most recently opened and it covers the screen. Closing it
+       is pure presentation: no dispatch, no log line, no screen change — Back
+       here must never be the thing that walks someone out of a fight they only
+       wanted to read about. */
+    if (narrativeReaderOpen) { setNarrativeReaderOpen(false); return true; }
     // OTA-1321 — the primer sits on top of everything when it is up, so it answers
     // first. Unlike the door beat it is safe to dismiss: closing it IS having seen
     // it, and the fight underneath is fully playable. It must latch the milestone
@@ -1487,6 +1507,11 @@ export function ExplorationScreen() {
   // it happened. Cheap, bounded, and it wakes no subscriber.
   setTouchPathContext({ screen: 'exploration', presentation: presentationToken });
 
+  /* ⚠⚠ OTA — IS THE TRANSCRIPT STILL THE PRIMARY READER? One boolean, derived
+     from one measured height. Nothing downstream of this branches on a device,
+     a platform or a window size. */
+  const narrativeConstrained = isNarrativeConstrained(feedH);
+
   return (
     <KeyboardAvoidingView
       /* ⚠⚠⚠ OTA-1813 — T0: THE EARLIEST APP-OWNED EVIDENCE THAT A FINGER LANDED.
@@ -1774,6 +1799,50 @@ export function ExplorationScreen() {
                   element among six. See TitleScreen for the rule's stated
                   exception. */}
               <View style={styles.sceneBarBtns}>
+                {/* ⚠⚠⚠ OTA — THE ESCAPE HATCH, AND WHY IT LIVES *HERE* OF ALL PLACES.
+                    It belongs to the transcript, so the obvious home is the transcript's
+                    own frame — and that is exactly where it must not go. The feed is
+                    `flex:1, flexShrink:1, minHeight:0` by OTA-179's deliberate design, so
+                    it is allowed to reach ZERO, and anything parented to it reaches zero
+                    with it. A control that disappears precisely when it becomes necessary
+                    is not a control.
+
+                    ⚠⚠ AND IT COULD NOT SIMPLY BE A NEW ROW. Every other region on this
+                    screen is natural-height and unshrinkable; the feed is the only sink.
+                    At the moment the feed is already at zero, a new row of any height
+                    pushes that height straight through the bottom of the screen — which
+                    is the clipped action row OTA-179 existed to fix. So the affordance
+                    costs NO vertical space at all: this rail is a `flexDirection: 'row'`
+                    already sized by the gear key beside it (VIS-3: "the gear was the
+                    tallest object in the rail and was therefore setting the whole
+                    header's height"), and a key of the same construction adds width, not
+                    height. The scene bar renders in combat and never collapses.
+
+                    ⚠ IT IS ALSO NOWHERE NEAR THE FEED'S ScrollView in the tree, which is
+                    the OTA-1875 requirement stated positively: a sibling, never an
+                    ancestor. Wrapping the transcript to make it tappable would have cost
+                    it its scroll. */}
+                {narrativeConstrained && (
+                  <Pressable
+                    onPress={() => {
+                      // Same ordering rule as every other control on this screen
+                      // (OTA-1172/1276/1485): the tap is logged BEFORE any work, so a
+                      // frozen-screen report can still say the touch arrived.
+                      logUiTap(NARRATIVE_EXPAND_LABEL);
+                      setNarrativeReaderOpen(true);
+                    }}
+                    hitSlop={8}
+                    style={({ pressed }) => [tartariaKitStyles.ctl, styles.sceneBarBtn, pressed && tartariaKitStyles.controlPressed]}
+                    accessibilityRole="button"
+                    accessibilityLabel="Expand the narrative to a full reader"
+                    testID="narrative-expand"
+                  >
+{({ pressed }) => (<>
+                    <Text style={styles.expandKeyText}>{NARRATIVE_EXPAND_LABEL}</Text>
+                    {ctlPlanes(pressed)}
+                  </>)}
+                  </Pressable>
+                )}
                 <Pressable
                   onPress={() => setScreen('about')}
                   hitSlop={8}
@@ -2402,7 +2471,15 @@ export function ExplorationScreen() {
           Both are `pointerEvents="none"`. */}
       <TutorialTarget
         area="feed"
+        // ⚠ OTA-1803 pins `area="feed"` as IMMEDIATELY followed by this style
+        // pair — it is how "the text/log window carries the frame" is proven —
+        // so nothing may be inserted between the two. The testID below sits
+        // after them for that reason.
         style={[styles.feed, tartariaKitStyles.panelFrame]}
+        // ⚠ The regression drives this panel's REAL `onLayout` through this id —
+        // jest computes no layout, so the measurement has to be injected at the
+        // exact seam production reads it from, not simulated beside it.
+        testID="narrative-feed-panel"
         /* ⚠⚠⚠ OTA-1818 — AND THE FEED, BECAUSE THE CONTROLS MARKER ALONE WOULD
            LIE. A healthy tap on the transcript produces a root touch and no
            press-in: MEASURED in the freeze corpus itself (bundle mu0m8svi4x46,
@@ -2421,6 +2498,18 @@ export function ExplorationScreen() {
            observer is live whether or not the tutorial is pointing at the feed.
            Capture, returns false, claims nothing, reuses the in-flight id. */
         onStartShouldSetResponderCapture={() => { noteContentTouch('feed'); return false; }}
+        /* ⚠⚠⚠ OTA — THE ONLY RUNTIME SIGNAL THE CONSTRAINED READER USES.
+           `onLayout` on the panel the player actually looks at. The guard is the
+           same shape `statsColH` has used since the enemy panel was capped: only
+           store a CHANGED height, and only past a half-point of noise, so a
+           measurement can never drive a re-render that re-measures the same box
+           and loops. A zero height is a real, meaningful answer here — it is
+           precisely the owner's screenshot — so unlike `statsColH` this does NOT
+           filter on `h > 0`. */
+        onLayout={(e) => {
+          const h = e.nativeEvent.layout.height;
+          setFeedH((prev) => (prev !== null && Math.abs(h - prev) <= 0.5 ? prev : h));
+        }}
       >
         <FactionWatermark factionId={player?.factionId} />
         <AdventureFeed
@@ -3787,6 +3876,24 @@ export function ExplorationScreen() {
         ]}
         onRequestClose={() => declineMissionOffer()}
       />
+      {/* ⚠⚠ OTA — THE EXPANDED TRANSCRIPT, LAST SO IT PAINTS OVER EVERYTHING.
+          It is mounted BESIDE the screen, not instead of it: the exploration tree
+          above stays mounted and untouched, which is what makes closing it a
+          no-op rather than a restoration. Nothing here dispatches.
+
+          ⚠ IT DOES NOT AUTO-CLOSE WHEN THE LAYOUT GROWS BACK. Chosen deliberately
+          over the alternative: the player opened this to read something, and the
+          thing that most commonly returns height is the keyboard dismissing —
+          which is not a request to be thrown out of the page mid-sentence. The
+          reader closes when the player closes it. `narrativeConstrained` governs
+          the AFFORDANCE only, never the open reader. */}
+      {narrativeReaderOpen && (
+        <ExpandedNarrativeReader
+          entries={gameLog}
+          enemyNames={currentScene?.enemies.map((e) => e.name)}
+          onClose={() => setNarrativeReaderOpen(false)}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -3799,6 +3906,18 @@ export function ExplorationScreen() {
  * move. The touch target never depended on either: it is the socket plus
  * `hitSlop={8}`. */
 const SCENE_GEAR_SIZE = 14;
+/** ⚠⚠ OTA-1485 — ONE DERIVATION, NOT A TWIN STRING. The tap ledger must name
+ *  what the player actually SAW, so the key's rendered face and its ledger line
+ *  read this same constant. A hand-written label beside a hand-written quoted
+ *  tap call drifts apart the first time the wording moves, and a freeze report
+ *  naming a control nobody can find on screen is worse than no line at all.
+ *
+ *  ⚠ AND THE RULE IS SPELLED WITHOUT QUOTING ITS OWN TRIGGER (the OTA-1721
+ *  lesson, which this comment learned the hard way): the gate scans this file
+ *  for a quote opening straight after the ledger call, so a comment that shows
+ *  the forbidden shape IS the forbidden shape as far as the scanner is
+ *  concerned. Describe it; never quote it. */
+const NARRATIVE_EXPAND_LABEL = 'EXPAND';
 
 /* ⚠⚠⚠ VISUAL LANGUAGE PHASE 1 — THE INTERACTIVE-CHASSIS PLANES, DECLARED ONCE.
  *
@@ -3935,7 +4054,16 @@ const styles = StyleSheet.create({
   // InputBox claims its natural (taller) height. Player ask: "can
   // we have the rows put up and shrink the exploration box a touch
   // and not push the action buttons down?"
+  // ⚠⚠ OTA — THIS STAYS EXACTLY AS OTA-179 LEFT IT, AND THAT IS THE POINT. The
+  // constrained-narrative reader deliberately adds NO `minHeight` here. Giving
+  // the feed a floor would take its pixels back from the bottom action row,
+  // which is the precise clipping OTA-179 existed to fix. The feed is still
+  // allowed to collapse to nothing; what changed is that when it does, the
+  // scene-bar EXPAND key appears and the transcript is still reachable.
   feed: { flex: 1, flexShrink: 1, minHeight: 0 },
+  // ⚠ Sized to sit in the scene rail beside the gear without setting the rail's
+  // height — the gear key is taller, so this costs no vertical space at all.
+  expandKeyText: { color: T.gold, fontSize: 9, fontWeight: '700', letterSpacing: 1.2 },
   streamingTail: {
     paddingHorizontal: 10,
     paddingVertical: 8,
