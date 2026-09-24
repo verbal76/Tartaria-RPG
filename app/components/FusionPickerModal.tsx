@@ -3,8 +3,8 @@
 // pieces, optionally add a reserved faction catalyst (separate theme slot), pick
 // whether to forge a WEAPON or ARMOR, then fuse — spending only what you selected.
 
-import React, { useMemo, useState } from 'react';
-import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Modal, View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1836 — this presentation surface reaches real gameplay mutations.
 import { useHumanAction } from '../state/humanActivity';
@@ -15,6 +15,13 @@ import { wornInstanceIds, equippedInstanceIds } from '../engine/equipment';
 import { itemIsDogArmor } from '../engine/dogCompanion';
 import type { InventoryItem } from '../engine/types';
 import { tartariaKitStyles as kit, tRowStyle } from '../ui/tartariaKit';
+/* ⚠⚠⚠ OTA-1875 — THE SAME FOUR CALLS CrucibleGuardModal ALREADY MAKES. No second
+ * diagnostics framework, no new vocabulary: `root`/`modal`, `in`, `enter`,
+ * `dispatch`, `done` and the `pres` stage are the established touch-path ring
+ * (OTA-1864 / OTA-1865). This surface carried NONE of them, which is why the
+ * incident log could show a finger arriving and then say nothing at all about
+ * what the finger reached. */
+import { noteRootTouch, notePressIn, noteHandlerEnter, noteStage } from '../diagnostics/touchPath';
 
 /* ⚠⚠⚠ PHASE 3 — FUSIBLE LINK HAD ITS OWN DIALECT, AND IT USED TWO FAMILIES AT
  * ONCE. The four kind buttons (WEAPON / ARMOR / DOG ARMOR / UPGRADE) are KEYS —
@@ -195,6 +202,50 @@ export function FusionPickerModal() {
 
   const reset = () => { setPicked([]); setCatalystId(null); setKind('weapon'); setStage('pick'); };
 
+  /* ⚠⚠⚠ OTA-1875 — THE LADDER, IN THE WORDS THAT ALREADY EXIST (OTA-1864):
+   *   root/modal — a finger reached this surface at all (the capture below)
+   *   in         — onPressIn: it reached THIS control
+   *   enter      — the control's own callback began
+   *   dispatch   — execution reached the store action
+   *   done       — the SYNCHRONOUS action returned
+   * A MISSING RUNG IS THE FINDING. Production never interprets it; the reader does.
+   * The incident had `root` and then silence, so it could not separate "the list
+   * never got the touch" from "the handler ran and did nothing" — which is exactly
+   * the distinction that turned out to matter.
+   *
+   * ⚠⚠ NO try/catch, DELIBERATELY, same as the guard modal: if `run` throws, `done`
+   * is simply never written — which IS the signal — and the exception propagates
+   * exactly as it does today. `run` is called inline: no promise, no scheduler, no
+   * new async boundary, so the gameplay mutation is untouched. */
+  const answered = (control: string, run: () => void) => () => {
+    const tp = noteHandlerEnter(control);
+    noteStage(tp, 'dispatch', { control });
+    run();
+    noteStage(tp, 'done', { control });
+  };
+
+  /* ⚠⚠ STAGE, NOT SCROLL. The picker has two stages — choose pieces, then choose
+   * the upgrade target — and the incident could not tell which one was on screen.
+   * This writes ONE line when the stage changes. It is deliberately NOT wired to
+   * scroll or move events: a per-frame diagnostic would drown the 256-entry ring
+   * in exactly the recurrence it exists to capture. */
+  const stageSeen = useRef<string | null>(null);
+  useEffect(() => {
+    if (stageSeen.current === stage) return;
+    stageSeen.current = stage;
+    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: `stage:${stage}` });
+  }, [stage]);
+
+  /* ⚠⚠⚠ OTA-1875 — PRESENTATION MOUNT/UNMOUNT, the `#0` non-interaction id
+   * (OTA-1814) exactly as CrucibleGuardModal writes it. This is the rung that
+   * answers "was the card even up?" — the question the Android incident could not
+   * answer, because this surface emitted no `pres` row at all while the owner's
+   * screenshot showed it plainly rendered. */
+  useEffect(() => {
+    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-mount' });
+    return () => { noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-unmount' }); };
+  }, []);
+
   const onFuse = () => {
     if (!canFuse) return;
     if (isUpgrade) {
@@ -214,11 +265,58 @@ export function FusionPickerModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
-        <View style={styles.backdrop} accessibilityViewIsModal={true}>
-          <TouchableWithoutFeedback onPress={() => { /* swallow inner taps */ }}>
-            <View style={styles.card}>
-              <Text style={styles.title} accessibilityRole="header">Fusing Crucible</Text>
+      {/* ⚠⚠⚠ OTA-1875 — THE SCRIM IS A SIBLING NOW, NOT AN ANCESTOR.
+       *
+       * WHAT WAS HERE, AND WHY THE LIST FROZE. The card sat inside a second
+       * `TouchableWithoutFeedback` whose only job was `onPress={() => {}}` — a
+       * swallow, so a tap on the card would not reach the outer scrim's dismiss.
+       * A Touchable attaches its responder handlers to its ONE CHILD, so that
+       * swallow put `onStartShouldSetResponder` on `styles.card` — an ANCESTOR of
+       * the ScrollView below. The card took the responder at touch-start, and a
+       * descendant cannot take it back from an ancestor. So:
+       *   · the list would not SCROLL — the pan never reached the ScrollView;
+       *   · a tap on a BLOCKED row did nothing — those rows are `<View>`, not
+       *     controls, so nothing deeper claimed the touch and it died on the
+       *     swallow's empty handler;
+       *   · Cancel/Back kept working — a `Pressable` DOES win first claim, and it
+       *     sits outside the list.
+       * The owner reported exactly that set: "even the scroll froze. Nothing on
+       * the screen except the cancel reacted." Three symptoms and one non-symptom,
+       * all predicted by this one structure.
+       *
+       * ⚠⚠ THE OUTER TOUCHABLE WAS THE SAME HAZARD. It wrapped `styles.backdrop`,
+       * which is ALSO an ancestor of the card. Removing only the inner one would
+       * have left the claim one level up. So the scrim is now a PRESSABLE SIBLING
+       * rendered BEHIND the card: taps outside the card land on it and dismiss,
+       * taps on the card reach the card's own subtree, and NOTHING that can claim
+       * the responder sits above the ScrollView any more.
+       *
+       * ⚠ THE BLOCKED ROWS ARE UNCHANGED, BY OWNER RULING — still non-actionable
+       * `<View>`s carrying their existing explanatory copy. This repair gives the
+       * list its scroll back; it does not make a refusal interactive.
+       *
+       * ⚠ `accessibilityViewIsModal` stays on the backdrop, where it was, and the
+       * scrim keeps the Close role/label the outer Touchable carried. */}
+      <View style={styles.backdrop} accessibilityViewIsModal={true}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={onClose}
+          onPressIn={(e) => { notePressIn('fuse:scrim', e); }}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+        />
+        {/* ⚠⚠⚠ OTA-1875 — MODAL_TOUCH, the same spelling CrucibleGuardModal /
+         * ClimbModal / GatherModal / SearchModal already carry. CAPTURE PHASE,
+         * RETURNS FALSE: this view observes that a finger reached the card and
+         * never becomes the responder, so every control below keeps exactly the
+         * negotiation it has today. This is the rung the incident was missing —
+         * the ring showed `root` and nothing after it, and could not say whether
+         * the modal was even up. */}
+        <View
+          style={styles.card}
+          onStartShouldSetResponderCapture={() => { noteRootTouch('modal'); return false; }}
+        >
+          <Text style={styles.title} accessibilityRole="header">Fusing Crucible</Text>
 
               {stage === 'weapon' ? (
                 // OTA-873 — upgrade stage 2: choose which piece gains the coating channel.
@@ -260,7 +358,7 @@ export function FusionPickerModal() {
                               ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
                               : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
                             return (
-                              <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[tRowStyle(), styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
+                              <Pressable key={w.id} onPressIn={(e) => { notePressIn('fuse:target', e); }} onPress={answered('fuse:target', () => onPickPiece(w.id))} style={[tRowStyle(), styles.row, styles.rowOn]} accessibilityRole="button" accessibilityLabel={`${w.name}${worn ? ', equipped' : ''}`}>
                                 <View style={styles.rowNameWrap}>
                                   <Text style={[styles.rowName, styles.rowNameTight]} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
                                   {worn ? (
@@ -290,7 +388,7 @@ export function FusionPickerModal() {
                     </ScrollView>
                   )}
                   <View style={styles.actions}>
-                    <Pressable onPress={() => setStage('pick')} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
+                    <Pressable onPressIn={(e) => { notePressIn('fuse:back', e); }} onPress={answered('fuse:back', () => setStage('pick'))} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
                       <Text style={styles.actNeutralTxt}>← Back</Text>
                     </Pressable>
                   </View>
@@ -323,7 +421,7 @@ export function FusionPickerModal() {
                         // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
                         // type is the info the player actually picks on; rarity is secondary.
                         return (
-                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[tRowStyle(), styles.row, on && styles.rowOn, dim && styles.rowDim]} accessibilityRole="button" accessibilityState={{ selected: on, disabled: dim }}>
+                          <Pressable key={it.id} onPressIn={(e) => { notePressIn('fuse:piece', e); }} onPress={answered('fuse:piece', () => toggle(it.id))} style={[tRowStyle(), styles.row, on && styles.rowOn, dim && styles.rowDim]} accessibilityRole="button" accessibilityState={{ selected: on, disabled: dim }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
@@ -342,7 +440,7 @@ export function FusionPickerModal() {
                       {catalysts.map((c) => {
                         const on = catalystId === c.id;
                         return (
-                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[tRowStyle(), styles.row, on && styles.rowOn]} accessibilityRole="button" accessibilityState={{ selected: on }}>
+                          <Pressable key={c.id} onPressIn={(e) => { notePressIn('fuse:catalyst', e); }} onPress={answered('fuse:catalyst', () => setCatalystId(on ? null : c.id))} style={[tRowStyle(), styles.row, on && styles.rowOn]} accessibilityRole="button" accessibilityState={{ selected: on }}>
                             <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
                             <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
                             <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
@@ -384,10 +482,10 @@ export function FusionPickerModal() {
                   </View>
 
                   <View style={styles.actions}>
-                    <Pressable onPress={onClose} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
+                    <Pressable onPressIn={(e) => { notePressIn('fuse:cancel', e); }} onPress={answered('fuse:cancel', onClose)} style={[styles.actBtn, styles.actNeutral]} accessibilityRole="button">
                       <Text style={styles.actNeutralTxt}>Cancel</Text>
                     </Pressable>
-                    <Pressable onPress={onFuse} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]} accessibilityRole="button" accessibilityState={{ disabled: !canFuse }}>
+                    <Pressable onPressIn={(e) => { notePressIn('fuse:confirm', e); }} onPress={answered('fuse:confirm', onFuse)} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]} accessibilityRole="button" accessibilityState={{ disabled: !canFuse }}>
                       <Text style={styles.actPrimaryTxt}>
                         {isUpgrade ? `Choose piece → ${picked.length}/${UPGRADE_PICK}` : `Fuse ${picked.length > 0 ? `(${picked.length})` : ''}`}
                       </Text>
@@ -395,10 +493,8 @@ export function FusionPickerModal() {
                   </View>
                 </>
               )}
-            </View>
-          </TouchableWithoutFeedback>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 }

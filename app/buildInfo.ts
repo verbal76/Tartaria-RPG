@@ -31473,7 +31473,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * that arrives is the animal that was inspected. Legacy dogs migrate to
  * max(profileCeiling, currentStat) — deterministic, and no earned development
  * is ever reduced. */
-export const OTA_BUILD_ID = '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get';
+/* OTA-1875 — THE LIST GETS ITS SCROLL BACK.
+ *
+ * The Fusing Crucible's picker froze on the owner's Pixel 10 Pro XL: the list
+ * would not scroll, taps on rows did nothing, and only Cancel answered. Bundle
+ * muerx6olk9ie (Android 37, OTA-1874, 10/10 parts) plus his own screenshot and
+ * four words that made it findable: *"nothing except the cancel reacted."*
+ *
+ * ⚠⚠⚠ THE STRUCTURE, WHICH IS WHAT IS PROVEN. The card sat inside a second
+ * `TouchableWithoutFeedback` whose only job was `onPress={() => {}}` — a swallow
+ * so card taps would not reach the scrim's dismiss. A Touchable puts its responder
+ * handlers on its ONE CHILD, so the swallow put `onStartShouldSetResponder` on the
+ * card — an ANCESTOR of the ScrollView — and a descendant cannot take the responder
+ * back from an ancestor. Scroll dead, blocked rows dead (they are Views, not
+ * controls, so nothing deeper claimed the touch), Cancel alive (a Pressable wins
+ * first claim and sits outside the list). Three symptoms and one non-symptom, all
+ * from one structure. The OUTER Touchable was the same hazard one level up, so the
+ * scrim is now a Pressable SIBLING behind the card and nothing that can claim the
+ * responder sits above the list any more.
+ *
+ * ⚠⚠ AND THE SURFACE CAN NOW BE READ. FusionPickerModal carried NONE of the
+ * touch/presentation instrument — it was the one modal outside the seam, which is
+ * why the incident ring showed a finger arriving and then said nothing at all. It
+ * now speaks the same ladder CrucibleGuardModal does: pres mount/unmount, a
+ * capture-phase `modal` observer that returns false and never claims, and
+ * in → enter → dispatch → done on the scrim, rows, catalyst, Back, Cancel and
+ * confirm. No per-scroll diagnostic: the ring has to survive the recurrence.
+ *
+ * ⚠ TRANSACTION: NO CHANGE, BY RULING C. The logged −25 TC buys a PERMIT
+ * (`fusionPending`), which survives saves and is cleared only inside the same
+ * atomic `set()` that delivers the fused item or the upgrade. No resource-loss
+ * path was proven, so the economics are untouched. Blocked rows are likewise
+ * untouched by owner ruling — they stay non-actionable, with their existing copy.
+ *
+ * ⚠ NOT CLAIMED: that the freeze is cured on hardware. The structural defect is
+ * proven in the component and it explains every discriminator the owner reported,
+ * and the physical incident is strongly consistent with it — but no physical
+ * post-repair verification has happened. CrucibleGuardModal carries the same shape
+ * and is deliberately NOT repaired here (owner scope); it is allowlisted by name in
+ * the new suite so it stays visible. */
+export const OTA_BUILD_ID = '2026-09-24-1875-the-list-gets-its-scroll-back';
+// SUPERSEDED: '2026-09-23-1874-the-dog-you-choose-is-the-dog-you-get'
 // SUPERSEDED: '2026-09-23-1873-the-sale-is-read-before-it-is-made'
 // SUPERSEDED: '2026-09-23-1872-the-keyboard-leaves-the-card-a-room'
 // SUPERSEDED: '2026-09-22-1871-the-coin-sits-where-you-can-reach-it'
