@@ -1,3 +1,54 @@
+sync 2026-09-24 20:5x — FRESH ANDROID JS CRASH, hook-order invariant.
+
+The owner hit an error-boundary screen on Android minutes ago and the evidence is
+in Sentry but not in this tree: the hourly tick last ran 20:13:10Z, before the
+crash, and the workflow_dispatch route is not available to this session's token.
+This request is the third door.
+
+THE SCREEN HE PHOTOGRAPHED SAYS:
+
+    SOMETHING BROKE
+    Rendered more hooks than during the previous render.
+    Your progress is saved. Tap RESTART for a fresh process, or BACK TO TITLE
+    to keep playing without a restart.
+
+That is React's hook-order invariant — a JS exception caught by the app's own
+boundary, NOT a native abort, NOT an OOM, NOT a model failure. The process
+survived. So the decisive evidence is the JS side, and what matters is WHICH
+SCREEN was rendering and WHAT CHANGED between the two renders.
+
+Five reads, in order:
+
+1. THE EXCEPTION ITSELF. The newest event whose message contains "Rendered more
+   hooks" — its full stack, the component frames in it, the release/OTA stamp,
+   the platform and Android version, and the boot id. The component name in the
+   stack is the whole question: this session has three `useTeachingSlot` call
+   sites (ExplorationScreen, InventoryScreen, VendorScreen), and that helper
+   calls a hook PER CANDIDATE inside a `.map()`.
+
+2. WHAT THE PLAYER DID IMMEDIATELY BEFORE IT. The `ui: tap` ledger and the touch
+   path for the final seconds, plus the last `[player]` action and the last
+   completed one. Specifically whether he was IN COMBAT, and whether the dog or
+   heal chip was pressed in that window — #212 is parked on exactly those two
+   controls and the relationship is currently unresolved.
+
+3. THE BUILD. Which OTA stamp was live on that device. OTA-1880
+   (2026-09-24-1880-the-constraint-teaches-its-door) reached the Golem line at
+   20:12Z and added one candidate to ExplorationScreen's teaching slot. That is a
+   PERMANENT +5 hooks, constant on every render, so it should not be able to
+   produce a per-render variation — but it shipped an hour before this crash and
+   must be either convicted or cleared by the stack, not by argument.
+
+4. SCREEN AND PRESENTATION STATE at the failure: current screen, any open modal
+   or overlay, and whether a first-time teaching card was up or had just been
+   dismissed.
+
+5. WHETHER IT RECURRED. Any second occurrence of the same message in the same
+   session or a later one, and whether RESTART or BACK TO TITLE was taken.
+
+Memory, ML and native-death sections are NOT the question this time — record them
+if present, but do not spend the pull on them.
+
 sync 2026-08-28 — a log pushed after OTA-1528, and the first real crash forensic.
 
 The 21:42:59 record on build 1528 is the first native-death in the corpus that
