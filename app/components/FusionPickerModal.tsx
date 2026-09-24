@@ -163,6 +163,61 @@ export function FusionPickerModal() {
   // OTA-873 — two-stage flow for the upgrade: pick 5 materials, then pick the weapon.
   const [stage, setStage] = useState<'pick' | 'weapon'>('pick');
 
+  /* ⚠⚠⚠ OTA-1881 — EVERY HOOK ON THIS COMPONENT RUNS ON EVERY RENDER, OPEN OR
+   * SHUT, AND THAT IS THE WHOLE REPAIR.
+   *
+   * The owner tapped FUSE in asgardar on a Pixel 10 Pro XL and the screen went to
+   * SOMETHING BROKE with React's own words: "Rendered more hooks than during the
+   * previous render." He was right to call it a crash — the error boundary caught
+   * it, but the picker never opened.
+   *
+   * THE CAUSE WAS TOPOLOGY, NOT LOGIC. These three hooks — the stage ref and the
+   * two `pres` effects below — used to sit BELOW `if (!visible) return null`. This
+   * component stays MOUNTED while shut, so a closed render ran 15 hooks and an
+   * open one ran 18. The extra three appear on the render where `visible` flips,
+   * which is exactly the render the FUSE tap causes, so opening the Crucible threw
+   * every time rather than occasionally.
+   *
+   * ⚠⚠ THE EFFECTS KEEP THEIR OLD BEHAVIOUR, and `visible` is how. Living below a
+   * conditional return, they behaved as though they mounted when the card opened
+   * and unmounted when it shut — which is what their `react-mount` /
+   * `react-unmount` rows mean. Keying them to `visible` reproduces that pairing
+   * honestly: the rows still bracket the time the card is actually on screen, and
+   * nothing writes a diagnostic row while the surface is shut.
+   *
+   * ⚠ NOTHING HERE IS PLATFORM-SHAPED. The invariant broke on every platform that
+   * opened this modal; Android is only where it was caught. There is no device,
+   * OS or version test in this repair, and there must never be one — a hook
+   * ordering rule that held on one platform and not another would not be a rule. */
+  const stageSeen = useRef<string | null>(null);
+  /* ⚠⚠ STAGE, NOT SCROLL. The picker has two stages — choose pieces, then choose
+   * the upgrade target — and the incident could not tell which one was on screen.
+   * This writes ONE line when the stage changes. It is deliberately NOT wired to
+   * scroll or move events: a per-frame diagnostic would drown the 256-entry ring
+   * in exactly the recurrence it exists to capture.
+   * ⚠ OTA-1881 — the ref is cleared while the card is shut so the next opening
+   * announces its stage again, which is what the old below-the-return placement
+   * did by being torn down. */
+  useEffect(() => {
+    if (!visible) { stageSeen.current = null; return; }
+    if (stageSeen.current === stage) return;
+    stageSeen.current = stage;
+    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: `stage:${stage}` });
+  }, [stage, visible]);
+
+  /* ⚠⚠⚠ OTA-1875 — PRESENTATION MOUNT/UNMOUNT, the `#0` non-interaction id
+   * (OTA-1814) exactly as CrucibleGuardModal writes it. This is the rung that
+   * answers "was the card even up?" — the question the Android incident could not
+   * answer, because this surface emitted no `pres` row at all while the owner's
+   * screenshot showed it plainly rendered.
+   * ⚠ OTA-1881 — keyed to `visible`, so the pair still brackets exactly the span
+   * the card is on screen. The cleanup also runs on a real unmount, as before. */
+  useEffect(() => {
+    if (!visible) return;
+    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-mount' });
+    return () => { noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-unmount' }); };
+  }, [visible]);
+
   if (!visible) return null;
 
   const isUpgrade = kind === 'upgrade';
@@ -223,28 +278,6 @@ export function FusionPickerModal() {
     run();
     noteStage(tp, 'done', { control });
   };
-
-  /* ⚠⚠ STAGE, NOT SCROLL. The picker has two stages — choose pieces, then choose
-   * the upgrade target — and the incident could not tell which one was on screen.
-   * This writes ONE line when the stage changes. It is deliberately NOT wired to
-   * scroll or move events: a per-frame diagnostic would drown the 256-entry ring
-   * in exactly the recurrence it exists to capture. */
-  const stageSeen = useRef<string | null>(null);
-  useEffect(() => {
-    if (stageSeen.current === stage) return;
-    stageSeen.current = stage;
-    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: `stage:${stage}` });
-  }, [stage]);
-
-  /* ⚠⚠⚠ OTA-1875 — PRESENTATION MOUNT/UNMOUNT, the `#0` non-interaction id
-   * (OTA-1814) exactly as CrucibleGuardModal writes it. This is the rung that
-   * answers "was the card even up?" — the question the Android incident could not
-   * answer, because this surface emitted no `pres` row at all while the owner's
-   * screenshot showed it plainly rendered. */
-  useEffect(() => {
-    noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-mount' });
-    return () => { noteStage(0, 'pres', { control: 'craft:fusion-picker', reason: 'react-unmount' }); };
-  }, []);
 
   const onFuse = () => {
     if (!canFuse) return;

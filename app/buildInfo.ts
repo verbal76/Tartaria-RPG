@@ -31730,7 +31730,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * reader's content and architecture are untouched.
  *
  * NOT CLAIMED: physical verification on the owner's hardware. */
-export const OTA_BUILD_ID = '2026-09-24-1880-the-constraint-teaches-its-door';
+/* ── OTA-1881 — THE CRUCIBLE KEEPS ITS HOOKS (#206, #213) ──────────────────────
+ *
+ * The owner tapped FUSE in asgardar on 2026-09-24 at 20:36:11Z and the screen
+ * went to SOMETHING BROKE carrying React's own sentence: "Rendered more hooks
+ * than during the previous render. at FusionPickerModal". The error boundary
+ * caught it, so the process survived and the ledger calls it a screen crash
+ * (recovered) — but the Crucible never opened.
+ *
+ * THE CAUSE WAS TOPOLOGY, AND IT WAS UNCONDITIONAL. `FusionPickerModal` stays
+ * MOUNTED while shut and renders null through `if (!visible) return null`. Three
+ * hooks — a `useRef` and the two `pres` `useEffect`s added for this surface — sat
+ * BELOW that line, so a closed render ran 15 hooks and an open one ran 18. The
+ * extra three arrive on the very render where `visible` flips, which is the
+ * render the FUSE tap causes. Every opening of this card broke the rule.
+ *
+ * THE REPAIR IS THE HOOKS MOVING, AND NOTHING ELSE. All three were lifted above
+ * the guard and their bodies keyed to `visible`, which reproduces their old
+ * behaviour honestly: the `react-mount` / `react-unmount` pair still brackets
+ * exactly the span the card is on screen, the stage ref still clears while shut
+ * so the next opening announces its stage, and nothing writes a diagnostic row
+ * while the surface is down. No fusion rule, permit, cost or navigation moved.
+ *
+ * ⚠ AND NOTHING HERE IS PLATFORM-SHAPED. A hook-ordering rule that held on one
+ * platform and not another would not be a rule. Android is only where this was
+ * caught; there is no device, OS or version test in the repair, and the suite
+ * fails if one ever appears.
+ *
+ * #206 — the earlier Fusing-Crucible investigation closed as INSUFFICIENT
+ * EVIDENCE, which was the right disposition for the evidence it had: the surface
+ * emitted no `pres` row and nothing named a mechanism. This crash supplied the
+ * mechanism. The original investigation did not know it.
+ *
+ * SEPARATE / UNRESOLVED NON-BLOCKING OBSERVATION: 13.45s after the render throw,
+ * the process died with no signal while the in-flight marker still read action
+ * "fuse". Nothing in this evidence proves the throw caused that death — the same
+ * no-signal shape appears twice earlier in the same ledger under unrelated taps
+ * ("missions", "LORE"), and the shared word "fuse" is a stale in-flight marker,
+ * not a causal link. Not closed here, and not widened here. */
+export const OTA_BUILD_ID = '2026-09-24-1881-the-crucible-keeps-its-hooks';
 // SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'
 // SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
 // SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'
