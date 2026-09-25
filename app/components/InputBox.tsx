@@ -412,6 +412,33 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const medkitGolem = useGameStore((s) => ((s.player?.golem?.hp ?? 0) > 0 ? s.player!.golem! : null));
   const medkitPlayer = useGameStore((s) => s.player);
   const medkitRoleOf = (it: InventoryItem): MedkitRole | null => medkitRole(it, medkitPlayer);
+  /* ⚠⚠⚠ OTA-1884 — WHO OWNS THE QUICK-ACTION REGION RIGHT NOW.
+   *
+   * The owner fought on a 375×667 screen and reported the DOG and HEAL keys "do
+   * not work". They worked. The touch ledger shows every press completing
+   * `in → enter → admit → dispatch → done`, and both pickers RENDERED — they
+   * rendered where he could not reach them. Each picker was APPENDED BELOW the
+   * quick rows, and in that fight the control stack had ~23.6pt of slack left
+   * while the dog picker needs ~63.2 and the heal picker ~55.0. So the rows he
+   * had just tapped stayed on screen and the answer went off the bottom edge.
+   * His tall Android phone carries ~263pt of slack, which is the only reason the
+   * identical topology looked healthy there.
+   *
+   * ⚠⚠ SO THE PICKER REPLACES THE ROWS INSTEAD OF EXTENDING THEM, and this value
+   * is how. It names the single owner of the region; the rows render only when
+   * nothing owns it; and opening either picker closes the other. The state
+   * relationship is NORMAL → PICKER → (BACK) → NORMAL, and the rendered tree
+   * says which of the three it is in. Zero added vertical demand on every
+   * viewport, decided by TOPOLOGY — there is no device, platform, window or
+   * height test here, so a constrained phone and a tall one get the SAME
+   * interaction rather than two different ones.
+   *
+   * ⚠ Each picker keeps its own shipped gate untouched. This decides who owns
+   * the ROWS, never whether a picker may draw. */
+  const dogPickerOwnsQuickRegion = !!dog && dog.hp > 0 && dogPickerOpen;
+  const medkitPickerOwnsQuickRegion = medkitOpen && medkitItems.length > 0;
+  const quickRegionOwner: 'dog' | 'heal' | null =
+    dogPickerOwnsQuickRegion ? 'dog' : medkitPickerOwnsQuickRegion ? 'heal' : null;
   // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
   // KeyboardInputBar. Two private useState copies were how "act doesn't see
   // any text" happened: the player typed into one field and tapped the other
@@ -946,7 +973,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         </TutorialTarget>
       )}
       <TutorialTarget area="quick-row" style={inCombat ? styles.quickRowColumn : styles.quickRow}>
-        {inCombat ? (
+        {/* ⚠⚠⚠ OTA-1884 — THE ROWS STAND DOWN WHILE A PICKER OWNS THIS REGION.
+            This is the whole repair: the picker below REPLACES these rows rather
+            than being appended under them, so opening one adds no net height to
+            a control stack that on a short viewport has none left to give. The
+            condition is the region's owner and nothing else — no viewport, no
+            device, no breakpoint — so the topology is identical on every screen.
+            ⚠ Each picker carries its own BACK, because the chip that would have
+            toggled it shut is one of the rows this hides. */}
+        {quickRegionOwner !== null ? null : inCombat ? (
           <>
             <View style={styles.quickRowLine}>
               {/* OTA-932 — hide the bare-hand PUNCH/KICK buttons when a HAND weapon (gauntlets,
@@ -1076,6 +1111,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                       );
                       return;
                     }
+                    // ⚠ OTA-1884 — one owner: opening this closes the others,
+                    // so the region can never be claimed twice.
+                    setMedkitOpen(false);
+                    setMedkitPick(null);
+                    setBandolierOpen(false);
                     setDogPickerOpen((v) => !v);
                   }}
                 />
@@ -1122,11 +1162,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) : null}
               {/* arb110 — bandolier: opens a popup of racked throwables to hurl. */}
               {bandolierItems.length > 0 ? (
-                <QuickBtn label={`✦ bandolier (${bandolierItems.length})`} tone="ready" onPress={() => setBandolierOpen((v) => !v)} />
+                <QuickBtn label={`✦ bandolier (${bandolierItems.length})`} tone="ready" onPress={() => { setDogPickerOpen(false); setMedkitOpen(false); setMedkitPick(null); setBandolierOpen((v) => !v); }} />
               ) : null}
               {/* OTA-1657 — the healing pouch, in the fight it was built for. */}
               {medkitItems.length > 0 ? (
-                <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setMedkitPick(null); setMedkitOpen((v) => !v); }} />
+                <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setDogPickerOpen(false); setBandolierOpen(false); setMedkitPick(null); setMedkitOpen((v) => !v); }} />
               ) : null}
             </View>
 
@@ -1199,7 +1239,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 effect — patching up after a fight is the same walk through the
                 pack that the pouch exists to delete. */}
             {medkitItems.length > 0 ? (
-              <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setMedkitPick(null); setMedkitOpen((v) => !v); }} />
+              <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setDogPickerOpen(false); setBandolierOpen(false); setMedkitPick(null); setMedkitOpen((v) => !v); }} />
             ) : null}
             <QuickBtn
               label={investigateSweeping ? 'investigating…' : 'investigate'}
@@ -1306,6 +1346,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {ctlPlanes(pressed)}
           </>)}
 </Pressable>
+          {/* ⚠⚠ OTA-1884 — THE WAY BACK. The dog chip used to be the way out of
+              this picker, and it is one of the rows now standing down, so
+              leaving needs its own key. It is a third sibling in the SAME row at
+              the same flex, so the way out costs no height at all. It submits
+              nothing: the dog acts on BITE or DISTRACT and on nothing else. */}
+          <Pressable accessibilityRole="button" onPress={() => setDogPickerOpen(false)} style={({ pressed }) => [tartariaKitStyles.ctl, styles.dogPickerBtn, pressed && tartariaKitStyles.controlPressed]}>
+{({ pressed }) => (<>
+            <Text style={styles.dogPickerLabel}>BACK</Text>
+            <Text style={styles.dogPickerHint}>{dog.name} holds</Text>
+            {ctlPlanes(pressed)}
+          </>)}
+</Pressable>
         </View>
       ) : null}
       {/* arb110 — bandolier throw popup: one button per racked throwable; tap to hurl. */}
@@ -1375,7 +1427,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           forty lines away and made the same mistake anyway. */}
       {medkitOpen && medkitItems.length > 0 ? (
         <View style={styles.bandolierPicker}>
-          {medkitPick === null ? medkitItems.map((it) => (
+          {medkitPick === null ? (<>{medkitItems.map((it) => (
             <Pressable
               key={it.id}
               onPress={() => {
@@ -1406,7 +1458,26 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {ctlPlanes(pressed)}
             </>)}
 </Pressable>
-          )) : (() => {
+          ))}
+            {/* ⚠⚠ OTA-1884 — THE WAY BACK OUT OF THE STACK LIST. The second
+                stage already had a BACK (it returns here to pick another); this
+                first stage had none, because the ✚ heals chip was the way out —
+                and that chip is one of the rows now standing down. Same tile
+                shape as its siblings, so on a one- or two-stack pouch it joins
+                their line and costs nothing. It consumes nothing and heals
+                nobody: it only gives the region back to the quick rows. */}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => { setMedkitPick(null); setMedkitOpen(false); }}
+              style={({ pressed }) => [tartariaKitStyles.ctl, styles.bandolierPickerBtn, styles.medkitPickerBtn, pressed && tartariaKitStyles.controlPressed]}
+            >
+{({ pressed }) => (<>
+              <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>BACK</Text>
+              <Text style={styles.bandolierPickerHint}>keep it</Text>
+              {ctlPlanes(pressed)}
+            </>)}
+</Pressable>
+          </>) : (() => {
             const it = medkitItems.find((m) => m.id === medkitPick);
             // The stack can empty between the two taps (a cure fired, a batch
             // spent it) — resolve live and fall back rather than heal a ghost.

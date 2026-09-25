@@ -31768,6 +31768,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * no-signal shape appears twice earlier in the same ledger under unrelated taps
  * ("missions", "LORE"), and the shared word "fuse" is a stale in-flight marker,
  * not a causal link. Not closed here, and not widened here. */
+/* ── OTA-1884 — THE PICKER TAKES THE REGION ────────────────────────────────────
+ *
+ * #212. The owner, fighting on a 375×667 iPhone: the DOG and HEAL keys "do not
+ * work". THEY WORKED. Two submitted reports show every press completing the whole
+ * touch ledger — in → enter → admit → dispatch → done, p=none — 22 heal presses
+ * and 8 dog presses in one, 5 and 5 in the other, with no [player] line after any
+ * of them, and none to expect: neither chip submits an action, both toggle an
+ * inline picker. DOG/HEAL ACTION DELIVERY WAS NEVER THE DEFECT.
+ *
+ * ⚠⚠⚠ THE PICKERS OPENED WHERE HE COULD NOT REACH THEM. Each was APPENDED BELOW
+ * the quick rows, and that fight had ~23.6pt of feed slack left while the dog
+ * picker needs ~63.2 (deficit ~39.6) and the heal picker ~55.0 (deficit ~31.4).
+ * So the rows he had just tapped stayed on screen and the answer went off the
+ * bottom edge. His tall Android phone carries ~263pt of slack, which is the only
+ * reason the identical topology looked healthy there. NOT AN iPHONE DEFECT.
+ *
+ * ⚠⚠ THE DEFICITS ARE NOT MADE TO FIT — THEY ARE STRUCTURALLY ELIMINATED. The
+ * picker REPLACES the already-budgeted quick-action region instead of extending
+ * it. One derived value names the region's owner; the rows render only when
+ * nothing owns it; opening either picker closes the other. NORMAL → PICKER →
+ * (BACK) → NORMAL, and the rendered tree says which of the three it is in. The
+ * quick-row container carries no padding, no minHeight and no margin — only a
+ * gap, which needs two children to mean anything — so with its children stood
+ * down it measures 0pt. At most ONE of {rows, picker} ever has height; the old
+ * topology had BOTH. On a constrained viewport the open DOG picker is one row
+ * where the rows it replaces were several, so the net demand FALLS.
+ *
+ * ⚠ AND IT IS DECIDED BY TOPOLOGY, NOT BY A PHONE. There is no device, platform,
+ * window or breakpoint test anywhere in the owner derivation, so a short screen
+ * and a tall one get the SAME interaction rather than two different ones. Each
+ * picker keeps its own shipped gate untouched: this decides who owns the ROWS,
+ * never whether a picker may draw. BITE and DISTRACT still submit exactly what
+ * they always submitted; the heal choices still route through the shipped store
+ * action; BACK submits nothing and consumes nothing.
+ *
+ * Each picker carries its own BACK because the chip that used to close it is one
+ * of the rows now standing down. DOG's BACK is a third sibling in the SAME row at
+ * the same flex, so leaving costs no height either. The heal list's first stage
+ * had no BACK at all — its second stage already did — and now does.
+ *
+ * NOT CLAIMED: physical verification of DOG and HEAL on the owner's hardware. */
 /* ── OTA-1883 — THE CARD FITS THE SCREEN ───────────────────────────────────────
  *
  * The owner, on Android, at the golem naming beat: the right-side ROLL control
@@ -31872,7 +31913,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * retained artifact and stays a separate concept from the paste budget.
  *
  * NOT CLAIMED: physical clipboard/paste verification on the owner's hardware. */
-export const OTA_BUILD_ID = '2026-09-25-1883-the-card-fits-the-screen';
+export const OTA_BUILD_ID = '2026-09-25-1884-the-picker-takes-the-region';
+// SUPERSEDED: '2026-09-25-1883-the-card-fits-the-screen'
 // SUPERSEDED: '2026-09-24-1882-the-paste-fits-in-the-window'
 // SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'
 // SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
