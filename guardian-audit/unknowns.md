@@ -57,26 +57,31 @@ consolidated register those references point to.
 
 ## UNK-004 — Whether a straight Guardian-to-Guardian run (skipping ALL optional content) is achievable across all 9 capitals
 
-- **Question:** Beyond the architectural fact that Guardian order is free and `canRecoverCore` is
-  confirmed dead as a summon gate (see UNK-005, RESOLVED), is there any PER-CAPITAL hidden requirement —
+- **Question (original):** Beyond the architectural fact that Guardian order is free and `canRecoverCore`
+  is confirmed dead as a summon gate (see UNK-005, RESOLVED), is there any PER-CAPITAL hidden requirement —
   faction standing threshold, story-phase flag, or world-state condition reachable only through optional
   content (a hunt, mystery, or faction-quest chain) — that would force a player to touch excluded content
   just to physically REACH or SUMMON a specific Guardian?
-- **Why it matters:** This is the single most consequential open question for the audit's stated end goal.
-  If even one of the 9 capitals has such a gate, "pure Guardian-to-Guardian, skip everything optional" is
-  not literally achievable as stated, and the future Walker/architecture needs to account for that.
-- **Evidence inspected:** `coreGuardians.ts` (read in full/large ranges) — no per-capital gate found in the
-  Guardian-spawn path itself; `mainQuest.ts` lines 1-120 and 920-1070 (partial — the `FACTION_CORE_GATES`
-  section and file header) — found faction-*intent* gates for Core recovery (see `core-guardian-map.md` §3)
-  but did not verify whether those intents are satisfiable without playing faction-quest/hunt/mystery
-  content, and did not read the ~800 lines of `mainQuest.ts` between the header and `FACTION_CORE_GATES`.
-- **Competing interpretations:** (a) the faction *intents* are satisfiable through baseline story
-  progression alone, making a pure run genuinely possible; (b) at least one intent requires optional-content
-  participation, making "skip everything" strictly false for at least one capital.
-- **What would resolve it:** Full-body read of `mainQuest.ts` (currently read ~20% of 1000+ lines), cross-
-  referenced against every capital's specific `FACTION_CORE_GATES` entry, PLUS either a live playthrough or
-  a new Walker capability that can attempt exactly this path and report where it stalls.
-- **Status:** OPEN — classified STRONGLY IMPLIED, NOT PROVEN in `core-guardian-map.md` §4.
+- **UPDATE (addendum pass) — mission/quest-gate sub-question RESOLVED, narrowed to one remaining part:**
+  `mainQuest.ts` was read in full this pass (previously ~20%, now 100% — lines 834-1096 newly read:
+  `remainingCapitals`, the 3-Core/4-Core twist functions, `advanceMainQuest`). Findings:
+  1. `advanceMainQuest`'s `core_recovered` case (mainQuest.ts:1073-1085) has **no mission/hunt/quest
+     prerequisite check at all** — only phase-state guards. This is the entire gate.
+  2. `FACTION_CORE_GATES`'s own header comment (mainQuest.ts:932-943) states the per-faction `intents`
+     are a **"simple intent-match check"** (a parser-verb match), not a hunt/mystery/quest completion.
+  Both points are read directly from source, not inferred. **This closes the "does Core recovery secretly
+  require optional content" question: it does not, by the gate's own documented design.**
+- **Remaining open sub-question (bounded, not pursued further this pass per addendum §10):** whether
+  *physically reaching* a Lost Capital's map tile is itself gated by any world-map/travel lock (as opposed
+  to a mission-state gate). One targeted grep (`LOST_CAPITAL_LOCATIONS` usage in `worldMap.ts`,
+  `travelTime.ts`, `gameStore.ts`) found only reactive checks (code that runs after arrival), no
+  travel-blocking logic — evidence toward "no lock," not proof, since `worldMap.ts`'s full routing body
+  was not read start-to-end.
+- **What would resolve the remainder:** A full-body read of `worldMap.ts`'s routing/movement-gate logic
+  (or a live/Walker-driven attempt to route directly to each of the 9 capitals from a fresh start).
+- **Status:** OPEN, narrowed. Mission/quest-gate layer: **PROVEN no optional-content requirement.**
+  Physical-travel layer: **UNPROVEN, UNCONTRADICTED** (no evidence of a lock found, not exhaustively ruled
+  out). See `core-guardian-map.md` §4 (updated) and `critical-path-map.md` §A for the full restatement.
 
 ## UNK-005 — `canRecoverCore`'s actual role — RESOLVED during this pass
 

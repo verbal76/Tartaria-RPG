@@ -111,14 +111,22 @@ Based only on what is read above:
   that WOULD otherwise trigger other capital-city events** — meaning a player using the dedicated SUMMON
   button specifically avoids tripping the side content the audit wants to skip.
 
-**Classification: STRONGLY IMPLIED, not fully PROVEN**, for one honest reason: this pass read
-`coreGuardians.ts` and the relevant sections of `mainQuest.ts` in full, but did **not** trace every one of
-the ~9 individual per-capital "other quests" (faction storylines, hunts, mysteries anchored at those exact
-locations) to confirm none of THEM independently gates map access, faction standing, or world state needed
-to reach a capital in the first place. That is a plausible but unverified assumption. Recorded as
-**UNK-004** in `unknowns.md` — the next pass should walk a fresh character straight to Asgardar (the
-"first Guardian most players meet," per the Guardian's own flavor text) and confirm no faction-standing or
-story-phase gate blocks arrival or the SUMMON control before generalizing this to all nine.
+**Classification, UPDATED (addendum pass) — mission/quest-gate layer: PROVEN. Physical-travel layer:
+UNPROVEN, UNCONTRADICTED.** `mainQuest.ts` has now been read in full (previously ~20%, now 100%,
+including `advanceMainQuest` and `remainingCapitals`). Two direct findings close most of the prior
+uncertainty:
+
+1. `advanceMainQuest`'s `core_recovered` case (mainQuest.ts:1073-1085) — the ONLY code that advances
+   Guardian progress — has **no mission/hunt/quest prerequisite check whatsoever**, only phase-state
+   guards.
+2. `FACTION_CORE_GATES`'s own header (mainQuest.ts:932-943) states its per-faction `intents` are a
+   **"simple intent-match check"** — a typed-verb match at the capital, not a quest-chain completion.
+
+What remains genuinely open (not further pursued this pass, per the addendum's context-guardrail
+instruction — see `unknowns.md` UNK-004, updated) is narrower than before: whether *physically reaching*
+a Lost Capital tile is gated by `worldMap.ts` routing logic, which was not read start-to-end. A targeted
+grep found no travel-blocking code referencing `LOST_CAPITAL_LOCATIONS`, only reactive (post-arrival)
+checks — evidence toward "no lock," not proof. Full restatement: `critical-path-map.md` §A.
 
 ## 5. What a Guardian fight scales on — for the record, not for repair
 
@@ -148,4 +156,8 @@ removed.
 - The exact mission/quest content local to each of the 9 capitals (what "other events" the owner's ruling
   in §3.4 is protecting) was NOT catalogued file-by-file in this pass. `excluded-content-map.md` records
   what general categories of side content exist system-wide, but does not yet map them capital-by-capital.
-  This is the one substantive gap behind §4's STRONGLY IMPLIED (not PROVEN) rating — see UNK-004.
+  This is no longer load-bearing for §4's verdict (that verdict is now sourced directly from
+  `advanceMainQuest`'s trigger logic, which proves no such content is required), but remains uncatalogued
+  for its own sake.
+- `app/engine/worldMap.ts`'s full routing/movement-gate logic was not read start-to-end — the one
+  remaining open piece of §4, narrowed by the addendum pass. See `unknowns.md` UNK-004 (updated).

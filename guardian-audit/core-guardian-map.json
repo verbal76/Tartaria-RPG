@@ -1,42 +1,158 @@
 {
- "source_files_read_in_full": ["app/engine/coreGuardians.ts", "app/engine/mainQuest.ts (spine + LOST_CAPITAL_LOCATIONS + FACTION_CORE_GATES + canRecoverCore + advanceMainQuest header)"],
- "guardian_count": 9,
- "order_status": "PROVEN_NOT_FIXED",
- "order_status_evidence": "mainQuest.ts header: 'Order is free.' coreGuardians.ts header: 'Difficulty scales by your kill-count, NOT by the Capital... the player's choice of order is preserved but the curve is fixed.' tierForKills() derives tier from coresRecovered.length, never from capitalId.",
- "straight_guardian_to_guardian_skip_side_content_possible": "STRONGLY_IMPLIED_NOT_FULLY_PROVEN",
- "straight_skip_evidence_for": [
-   "Arrival at any capital requires only world travel (no quest-state gate found in coreGuardians.ts/mainQuest.ts)",
-   "Guardian summon requires only: capital membership, an 8-in-game-hour settle window (satisfied by one rest, absent for the first Guardian), and no other living hostiles in-scene",
-   "Explicit owner ruling quoted in source: the Guardian summon was DELIBERATELY separated from the investigate/examine verb specifically so it does not consume other capital-city quest content",
-   "canRecoverCore (the only function that ties Core recovery to faction-gate intents) no longer gates the summon at all per its own header comment; it only affects the Core-taking narration/intent-match"
- ],
- "straight_skip_evidence_against_or_unverified": [
-   "This pass did not individually verify all 9 capitals' local side-quest content for hidden gates on faction standing, story phase, or world state needed merely to REACH the capital (see unknowns.md UNK-004)"
- ],
- "guardians": [
-   {"capitalId":"asgardar","capitalName":"Asgardar","guardianName":"Sentinel-Priest Vaelka","baseType":"aether_construct","baseHpTier1Flavor":30,"signatureTrait":"aether_pulse","vulnerable":"bludgeoning","resist":"aetheric"},
-   {"capitalId":"samarran","capitalName":"Samarran","guardianName":"Heir Atalan-Drowned","baseType":"mud_revenant","baseHpTier1Flavor":35,"signatureTrait":"silt_grip","vulnerable":"burn","resist":"piercing"},
-   {"capitalId":"nimari","capitalName":"Nimari","guardianName":"Iron Litany Brother Konrad","baseType":"aether_construct","baseHpTier1Flavor":40,"signatureTrait":"litany_chant","vulnerable":"electrical","resist":"slashing"},
-   {"capitalId":"drakova","capitalName":"Drakova","guardianName":"Mother Drakovna","baseType":"aether_construct","baseHpTier1Flavor":45,"signatureTrait":"rosary_curse","vulnerable":"radiation","resist":"aetheric"},
-   {"capitalId":"voronov","capitalName":"Voronov","guardianName":"Voronov-Beneath High Cantor","baseType":"aether_construct","baseHpTier1Flavor":50,"signatureTrait":"chord_break","vulnerable":"cold","resist":"aetheric","note":"documented as hardest fight in the run per header comment"},
-   {"capitalId":"karok_sa","capitalName":"Karok-Sa","guardianName":"Sealwarden Tobiel","baseType":"aether_construct","baseHpTier1Flavor":36,"signatureTrait":"sealcraft","vulnerable":"slashing","resist":"aetheric"},
-   {"capitalId":"yuldra_tul","capitalName":"Yuldra-Tul","guardianName":"Hierophant Mara-of-Yuldra","baseType":"aether_construct","baseHpTier1Flavor":42,"signatureTrait":"giant_vigil","vulnerable":"burn","resist":"cold"},
-   {"capitalId":"ostragar","capitalName":"Ostragar","guardianName":"Riverbinder Ostros","baseType":"mud_revenant","baseHpTier1Flavor":44,"signatureTrait":"river_bind","vulnerable":"electrical","resist":"slashing"},
-   {"capitalId":"iskan_veil","capitalName":"Iskan-Veil","guardianName":"Veilkeeper Inarra","baseType":"aether_construct","baseHpTier1Flavor":46,"signatureTrait":"veil_step","vulnerable":"radiation","resist":"piercing","note":"documented as hardest to FIND, not hardest to beat"}
- ],
- "difficulty_model": {
-   "keyed_on": "coresRecovered.length (kill count), NOT capitalId",
-   "tier_range": "1..9",
-   "final_guardian_rule": "tier 9 = whichever capital's Core is the player's LAST of the 9; overrides HP to fixed FINAL_GUARDIAN_HP=660 regardless of capital",
-   "player_power_scaling": "guardianPlayerPower() = best(STR,DEX,INT) + hpMax slice + gear term via powerRating.playerPowerGear; over-level multiplier capped at x1.9, upward-only (never reduces a fresh arrival's authored difficulty)",
-   "monotonicity_guarantee": "monotoneTierHp/ApDelta/DmgBonus run a running-max over tiers 1..N at the SAME player power so no later Guardian can stage weaker than an earlier one at a fixed power (OTA-931 fix for a measured 134-cell inversion)"
- },
- "prerequisites_chain": [
-   {"step":1,"name":"physical presence","gate":"LOST_CAPITAL_LOCATIONS.includes(capitalId)","source":"coreGuardians.ts:280"},
-   {"step":2,"name":"settle window","gate":"coreSettleState() — CORE_SETTLE_HOURS=8 in-game hours since player's last Core, absent for first Core","source":"coreGuardians.ts:1254-1288","clock_class":"WORLD CLOCK (player-action-driven), not wall clock"},
-   {"step":3,"name":"no hostiles present","gate":"summonHostiles() — refuses if any other living, non-knocked-out enemy is in-scene","source":"coreGuardians.ts:1358"},
-   {"step":4,"name":"SUMMON control, decoupled from other capital content","gate":"summonCoreGuardian() (owner ruling quoted in mainQuest.ts) — deliberately NOT the investigate/examine verb","source":"mainQuest.ts:1015-1028"},
-   {"step":5,"name":"faction gate verb, for the Core grant itself (separate from the fight)","gate":"FACTION_CORE_GATES[player.factionId].intents — a typed-intent match at the capital","source":"mainQuest.ts:965-1011", "note":"canRecoverCore itself is now DEAD as a summon gate; kept only for flavor text + a pinning test suite"}
- ],
- "confidence": "PROVEN for guardian roster/order/prerequisites-as-coded; STRONGLY_IMPLIED (not PROVEN) for 'skip all side content in practice' generalization across all 9 capitals"
+  "source_files_read_in_full": [
+    "app/engine/coreGuardians.ts",
+    "app/engine/mainQuest.ts (spine + LOST_CAPITAL_LOCATIONS + FACTION_CORE_GATES + canRecoverCore + advanceMainQuest header)"
+  ],
+  "guardian_count": 9,
+  "order_status": "PROVEN_NOT_FIXED",
+  "order_status_evidence": "mainQuest.ts header: 'Order is free.' coreGuardians.ts header: 'Difficulty scales by your kill-count, NOT by the Capital... the player's choice of order is preserved but the curve is fixed.' tierForKills() derives tier from coresRecovered.length, never from capitalId.",
+  "straight_guardian_to_guardian_skip_side_content_possible": "MISSION_QUEST_GATE_LAYER_PROVEN__PHYSICAL_TRAVEL_LAYER_UNPROVEN_UNCONTRADICTED",
+  "straight_skip_evidence_for": [
+    "Arrival at any capital requires only world travel (no quest-state gate found in coreGuardians.ts/mainQuest.ts)",
+    "Guardian summon requires only: capital membership, an 8-in-game-hour settle window (satisfied by one rest, absent for the first Guardian), and no other living hostiles in-scene",
+    "Explicit owner ruling quoted in source: the Guardian summon was DELIBERATELY separated from the investigate/examine verb specifically so it does not consume other capital-city quest content",
+    "canRecoverCore (the only function that ties Core recovery to faction-gate intents) no longer gates the summon at all per its own header comment; it only affects the Core-taking narration/intent-match",
+    "ADDENDUM PASS: mainQuest.ts read in full. advanceMainQuest core_recovered case (mainQuest.ts:1073-1085) has no mission/hunt/quest prerequisite check at all, only phase-state guards.",
+    "ADDENDUM PASS: FACTION_CORE_GATES header (mainQuest.ts:932-943) states its intents are a \"simple intent-match check\" (typed verb), not a quest-completion requirement.",
+    "ADDENDUM PASS: targeted grep of LOST_CAPITAL_LOCATIONS usage in worldMap.ts/travelTime.ts/gameStore.ts found only reactive (post-arrival) checks, no travel-blocking code found."
+  ],
+  "straight_skip_evidence_against_or_unverified": [
+    "app/engine/worldMap.ts full routing/movement-gate logic was not read start-to-end this pass (or the prior one) \u2014 the one remaining unproven layer. See unknowns.md UNK-004 (updated)."
+  ],
+  "guardians": [
+    {
+      "capitalId": "asgardar",
+      "capitalName": "Asgardar",
+      "guardianName": "Sentinel-Priest Vaelka",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 30,
+      "signatureTrait": "aether_pulse",
+      "vulnerable": "bludgeoning",
+      "resist": "aetheric"
+    },
+    {
+      "capitalId": "samarran",
+      "capitalName": "Samarran",
+      "guardianName": "Heir Atalan-Drowned",
+      "baseType": "mud_revenant",
+      "baseHpTier1Flavor": 35,
+      "signatureTrait": "silt_grip",
+      "vulnerable": "burn",
+      "resist": "piercing"
+    },
+    {
+      "capitalId": "nimari",
+      "capitalName": "Nimari",
+      "guardianName": "Iron Litany Brother Konrad",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 40,
+      "signatureTrait": "litany_chant",
+      "vulnerable": "electrical",
+      "resist": "slashing"
+    },
+    {
+      "capitalId": "drakova",
+      "capitalName": "Drakova",
+      "guardianName": "Mother Drakovna",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 45,
+      "signatureTrait": "rosary_curse",
+      "vulnerable": "radiation",
+      "resist": "aetheric"
+    },
+    {
+      "capitalId": "voronov",
+      "capitalName": "Voronov",
+      "guardianName": "Voronov-Beneath High Cantor",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 50,
+      "signatureTrait": "chord_break",
+      "vulnerable": "cold",
+      "resist": "aetheric",
+      "note": "documented as hardest fight in the run per header comment"
+    },
+    {
+      "capitalId": "karok_sa",
+      "capitalName": "Karok-Sa",
+      "guardianName": "Sealwarden Tobiel",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 36,
+      "signatureTrait": "sealcraft",
+      "vulnerable": "slashing",
+      "resist": "aetheric"
+    },
+    {
+      "capitalId": "yuldra_tul",
+      "capitalName": "Yuldra-Tul",
+      "guardianName": "Hierophant Mara-of-Yuldra",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 42,
+      "signatureTrait": "giant_vigil",
+      "vulnerable": "burn",
+      "resist": "cold"
+    },
+    {
+      "capitalId": "ostragar",
+      "capitalName": "Ostragar",
+      "guardianName": "Riverbinder Ostros",
+      "baseType": "mud_revenant",
+      "baseHpTier1Flavor": 44,
+      "signatureTrait": "river_bind",
+      "vulnerable": "electrical",
+      "resist": "slashing"
+    },
+    {
+      "capitalId": "iskan_veil",
+      "capitalName": "Iskan-Veil",
+      "guardianName": "Veilkeeper Inarra",
+      "baseType": "aether_construct",
+      "baseHpTier1Flavor": 46,
+      "signatureTrait": "veil_step",
+      "vulnerable": "radiation",
+      "resist": "piercing",
+      "note": "documented as hardest to FIND, not hardest to beat"
+    }
+  ],
+  "difficulty_model": {
+    "keyed_on": "coresRecovered.length (kill count), NOT capitalId",
+    "tier_range": "1..9",
+    "final_guardian_rule": "tier 9 = whichever capital's Core is the player's LAST of the 9; overrides HP to fixed FINAL_GUARDIAN_HP=660 regardless of capital",
+    "player_power_scaling": "guardianPlayerPower() = best(STR,DEX,INT) + hpMax slice + gear term via powerRating.playerPowerGear; over-level multiplier capped at x1.9, upward-only (never reduces a fresh arrival's authored difficulty)",
+    "monotonicity_guarantee": "monotoneTierHp/ApDelta/DmgBonus run a running-max over tiers 1..N at the SAME player power so no later Guardian can stage weaker than an earlier one at a fixed power (OTA-931 fix for a measured 134-cell inversion)"
+  },
+  "prerequisites_chain": [
+    {
+      "step": 1,
+      "name": "physical presence",
+      "gate": "LOST_CAPITAL_LOCATIONS.includes(capitalId)",
+      "source": "coreGuardians.ts:280"
+    },
+    {
+      "step": 2,
+      "name": "settle window",
+      "gate": "coreSettleState() \u2014 CORE_SETTLE_HOURS=8 in-game hours since player's last Core, absent for first Core",
+      "source": "coreGuardians.ts:1254-1288",
+      "clock_class": "WORLD CLOCK (player-action-driven), not wall clock"
+    },
+    {
+      "step": 3,
+      "name": "no hostiles present",
+      "gate": "summonHostiles() \u2014 refuses if any other living, non-knocked-out enemy is in-scene",
+      "source": "coreGuardians.ts:1358"
+    },
+    {
+      "step": 4,
+      "name": "SUMMON control, decoupled from other capital content",
+      "gate": "summonCoreGuardian() (owner ruling quoted in mainQuest.ts) \u2014 deliberately NOT the investigate/examine verb",
+      "source": "mainQuest.ts:1015-1028"
+    },
+    {
+      "step": 5,
+      "name": "faction gate verb, for the Core grant itself (separate from the fight)",
+      "gate": "FACTION_CORE_GATES[player.factionId].intents \u2014 a typed-intent match at the capital",
+      "source": "mainQuest.ts:965-1011",
+      "note": "canRecoverCore itself is now DEAD as a summon gate; kept only for flavor text + a pinning test suite"
+    }
+  ],
+  "confidence": "PROVEN for guardian roster/order/prerequisites-as-coded and for the mission/quest-gate layer of the skip question (advanceMainQuest has no such gate); UNPROVEN, UNCONTRADICTED for the physical-travel-lock sub-question (worldMap.ts routing not fully read)"
 }
