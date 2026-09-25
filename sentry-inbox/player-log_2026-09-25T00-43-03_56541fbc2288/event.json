@@ -1,0 +1,365 @@
+{
+  "id": "56541fbc22884db7904ca7499e6d3d0b",
+  "groupID": "7753692441",
+  "eventID": "56541fbc22884db7904ca7499e6d3d0b",
+  "projectID": "4511945117532160",
+  "size": 18215,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-24-1882-the-paste-fits-in-the-window #mug8ll77l6st [inline 41/56]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-24-1882-the-paste-fits-in-the-window",
+  "message": "player-log 2026-09-24-1882-the-paste-fits-in-the-window #mug8ll77l6st [inline 41/56]",
+  "title": "player-log 2026-09-24-1882-the-paste-fits-in-the-window #mug8ll77l6st [inline 41/56]",
+  "location": null,
+  "user": {
+    "id": "c79a9572bee04338a586386efd9ae360",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-25T00:42:50.883Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "SM-S942U",
+      "model": "SM-S942U",
+      "model_id": "BP4A.251205.006",
+      "battery_level": 44.0,
+      "orientation": "portrait",
+      "manufacturer": "samsung",
+      "brand": "samsung",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2340,
+      "screen_density": 3.0,
+      "screen_dpi": 480,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 11663110144,
+      "free_memory": 3700482048,
+      "storage_size": 236783140864,
+      "free_storage": 161172742144,
+      "boot_time": "2026-09-05T13:35:37.099Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 4742,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "32.70000076293945",
+      "chipset": "QTI SM8850",
+      "connection_type": "wifi",
+      "id": "c79a9572bee04338a586386efd9ae360",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 16",
+      "name": "Android",
+      "version": "16",
+      "build": "BP4A.251205.006.S942USQS4AZH5",
+      "kernel_version": "6.12.30-android16-5-pd30ff70-abogkiS942USQS4AZH5-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 57,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0d5c7-eef8-7f25-8ee5-73933e4a9eb5"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a8cadb1dbe544b6f8ce7e6a5f7e9fade",
+      "span_id": "b7381b80e1294b9e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tg6-MDQ-uMz-AwW-l0g-W2R-lYn-VnX-SBo-b21-ld2-9ya-zog-aXR-lbV-9kZ-XNj-ICJ-SdX-N0Z-WQg-Qmx-hZG-UiI-OKc-kyA-0OT-I3b-XMK-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tg6-MDU-uNj-cyW-l0g-W3B-sYX-llc-l0g-ZmV-lZC-Bkb-2cg-Rm9-yYW-dlc-idz-IFN-0ZX-cKW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-g6M-DUu-Njc-zWl-0gW-3dv-cmx-kXS-BZb-3Ug-ZmV-lZC-BFb-Gxh-IHR-oZS-BGb-3Jh-Z2V-yJ3-MgU-3Rl-dy4-gU2-hlI-GVh-dHM-sIH-Nsb-3cg-YW5-kIH-Nlc-mlv-dXM-uIC-grN-CBI-UCw-gKz-IwI-Gxv-eWF-sdH-kpC-lsy-MDI-2LT-A5L-TA0-VDA-xOj-E4O-jEy-LjE-xMl-pdI-Ft3-b3J-sZF-0gW-W91-IHV-zZS-Ayw-5cg-VHJ-haW-wgU-mF0-aW9-ucy-4gK-zEy-IEh-QIC-gzO-S8z-OSk-sIC-s2I-HN0-YW1-pbm-EuC-g==",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tg6-MjU-uOD-EyW-l0g-W3B-sYX-llc-l0g-ZmV-lZC-Bnb-2xl-bSB-BZX-RoZ-XIg-Q3J-5c3-Rhb-Apb-MjA-yNi-0wO-S0w-NFQ-wMT-oxO-Doy-NS4-4MT-NaX-SBb-d29-ybG-RdI-Flv-dSB-3b3-JrI-HRo-ZSB-BZX-RoZ-XIg-Q3J-5c3-Rhb-CBp-bnR-vIE-tld-mlu-J3M-gZn-Jhb-WUu-IEl-0IG-Z1c-2Vz-IGl-udG-8gd-Ghl-IEF-ldG-hlc-nN0-b25-lIG-FuZ-CB0-aGU-gY3-JhY-2tz-IHN-lYW-wgb-3Zl-ci4-gKC-s1I-EhQ-LCA-yNC-8yN-CkK-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tg6-MzQ-uND-E1W-l0g-W2R-lYn-VnX-SBo-b21-ld2-9ya-zog-aW5-0cm-8tZ-mls-bCB-hcm-1lZ-CBh-ZnR-lci-A2M-DAw-bXM-gaW-RsZ-SAo-c3R-yaW-tlI-DIv-Myk-K",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tg6-NDE-uNj-U0W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-G5h-cnJ-hdG-lvb-jpz-Y2V-uZV-9pb-nRy-b19-maW-xsI-G9r-IDc-wOD-Vtc-yBy-ZWF-kID-YzM-Dlt-cy9-3cm-l0Z-SA3-NTN-tcy-Bpb-iA3-NDl-04o-aSb-3V0-IDM-zdC-A4L-jRt-cy9-0IE-hJV-C1D-QVA-gKD-E2N-2No-KQp-bMj-AyN-i0w-OS0-wNF-QwM-Tox-ODo-0MS-44N-TZa-XSB-bZG-Vid-Wdd-IGh-vbW-V3b-3Jr-OiB-zY2-VuZ-V9p-bnR-yby-AiV-GFy-dGF-yaW-FuI-E91-dHN-raX-J0c-yIg-4py-TID-c0N-DNt-cwp-bMj-AyN-i0w-OS0-wNF-QwM-Tox-OTo-wMi-43M-TVa-XSB-bZG-Vid-Wdd-IHV-pOi-B0Y-XAg-IuK-Gki-BUS-EUg-QVJ-DSE-lUR-UNU-J1M-gQk-xJT-kQi-Cls-yMD-I2L-TA5-LTA-0VD-AxO-jE5-OjA-yLj-czM-lpd-IFt-3b3-JsZ-F0g-WW9-1IH-dhb-Gsg-c29-1dG-guI-Flv-dSB-hcn-Jpd-mUg-YXQ-gVG-hlI-EFy-Y2h-pdG-Vjd-Cdz-IEJ-saW-5kL-go=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-MzW-l0g-W2R-lYn-VnX-SBz-Y2V-uZT-ogb-G9j-PWF-yY2-hpd-GVj-dF9-ibG-luZ-CBo-dWI-9LS-Bhc-nJp-dmF-sPX-kgb-3Bl-bml-uZz-1uI-HBh-c3N-pbm-c9b-gpb-MjA-yNi-0wO-S0w-NFQ-wMT-oxO-Tow-Mi4-3Mz-NaX-SBb-ZGV-idW-ddI-G1p-c3N-pb2-5zO-iBo-dW5-0Om-h1b-nRf-c2x-1ZG-dlX-2Jl-aGV-tb3-RoI-HN0-YWd-lID-EvN-yBb-Ym9-zc+-KGk-mF0-dGF-ja1-0gQ-G11-ZF9-zZW-FzI-G5l-ZWR-zPV-NlY-Wxl-ZCB-Db2-9yZ-Glu-YXR-lIF-R1Y-mXi-nJd-NSV-NTS-U5H-IGd-pdm-VzP-URp-dmU-tQ2-Ftc-CBU-YWx-seS-Bzc-GF3-bj1-Td2-Ftc-CBD-cmF-iw5-cxC-g==",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-MzW-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-29i-c2l-kaW-FuX-29y-YiB-zdG-FnZ-SAx-LzQ-gW2-lud-mVz-dGl-nYX-RlX-SBA-b2J-zaW-RpY-W5f-cGl-sbG-Fyc-yBu-ZWV-kcz-1Nb-25h-cmN-oIE-Nvd-XJp-ZXI-gV3-Jpd-OKc-l01-JU1-NJT-kcg-Z2l-2ZX-M9U-3Rv-cm0-tU2-Nvc-mVk-IFN-oYX-JkI-FBB-VVN-FRA-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owM-i43-MzR-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-Bte-XN0-ZXJ-5Om-15c-3Rl-cnl-fdG-Vtc-G9y-YWx-fd2-F0Y-2gg-c3R-hZ2-UgM-S80-IFt-pbn-Zlc-3Rp-Z2F-0ZV-0gQ-GJ1-cml-lZF-9ja-XRp-ZXM-gbm-VlZ-HM9-R3V-pbG-QgR-WRk-eS1-HYX-VnZ-eKc-l01-JU1-NJT-kcg-Z2l-2ZX-M9R-WRk-eS1-ab2-5lI-FJl-YWR-pbm-cK",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-M0W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-3Jl-ZF9-0b3-dlc-iBz-dGF-nZS-AxL-zQg-W2l-udm-Vzd-Gln-YXR-lXS-BAY-3Jh-ZGx-lX2-9mX-2R1-c2s-gbm-VlZ-HM9-U2N-ob2-xhc-idz-IFN-1cn-Zle-SBD-aGl-04p-yXT-UlT-U0l-ORy-Bna-XZl-cz1-XYX-JtI-Ehl-eGF-nb2-5hb-CBQ-bGF-0ZQ-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owM-i43-MzR-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-BmY-WN0-aW9-uOm-ZxX-3Rh-cnR-hcm-lhb-nNf-c3R-hcn-Rlc-iBb-ZmV-0Y2-g9T-XVk-IEZ-yYW-dtZ-W50-w5c-1XS-BQQ-VVT-RUQ-KWz-IwM-jYt-MDk-tMD-RUM-DE6-MTk-6MD-IuN-zM0-Wl0-gW2-RlY-nVn-XSB-taX-Nza-W9u-czo-gwr-cgY-XQ9-YXJ-jaG-l0Z-WN0-X2J-saW-5kI-HRy-YXZ-lbF-RvP-WFy-Y2h-pdG-Vjd-F9i-bGl-uZA-o=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-UxW-l0g-W2R-lYn-VnX-SBz-cGF-3bj-ogZ-2Vh-cj1-bUm-V2a-XZh-bGl-zdC-BGa-WVs-ZCB-DYX-Jia-W5l-XSB-3aW-5kb-3c9-MTA-gcm-9zd-GVy-PW5-ldw-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owM-i43-Njh-aXS-Bbd-29y-bGR-dIE-Vsb-GEg-bm9-zZX-MgY-XQg-dGh-lIG-xpb-mdl-cml-uZy-BzY-2Vu-dCB-hbm-Qgc-25v-cnR-zLi-BUa-GVy-ZSd-zIH-Nvb-WV0-aGl-uZy-B0a-GVy-ZS4-K",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-cwW-l0g-W3d-vcm-xkX-SBZ-b3U-ndm-Ugb-GVm-dCB-UYX-J0Y-XJp-YW4-gT3-V0c-2tp-cnR-zIG-FuZ-CBl-bnR-lcm-VkI-FRo-ZSB-Bcm-Noa-XRl-Y3Q-ncy-BCb-Glu-ZC4-gRn-Jvb-SB0-aGU-gcm-9hZ-Dog-YSB-jb2-xsY-XBz-ZWQ-gd2-F5c-3Rh-dGl-vbi-wgb-m90-IHd-vcn-RoI-GEg-c2V-jb2-5kI-Gxv-b2s-uIF-RoZ-SBz-ZWN-vbm-Qgb-G9v-ayB-pcy-B0a-GUg-dGV-zdC-4gS-XQn-cyB-taW-RkY-Xku-IE5-vYm-9ke-SBl-bHN-lIG-lzI-Glu-IHN-pZ2-h0L-iBu-b3J-0aC-BsZ-WFk-cyB-0by-BUY-XJ0-YXJ-pYW-4gT-3V0-c2t-pcn-RzO-yBl-YXN-0IG-xlY-WRz-IHR-vIF-RoZ-SBC-dXJ-pZW-QgQ-2l0-aWV-zLi-BOb-3Ro-aW5-nIG-5hb-WVk-IHR-vIH-RoZ-SBz-b3V-0aC-Bvc-iB3-ZXN-0Lg-o=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-cwW-l0g-W3d-vcm-xkX-SBU-aGU-gZ2-F0Z-SBv-ZiB-Bcm-Noa-XRl-Y3Q-ncy-BDZ-Wxs-IHN-0YW-5kc-yBi-ZWZ-vcm-Uge-W91-IOK-AlC-B0a-GVp-ciB-ncm-91b-mQs-IG5-vdC-B5Z-XQg-dGh-laX-Iga-GFs-bHM-uIC-hUY-XAg-RU5-URV-IgT-1VU-UE9-TVC-B0b-yBz-dGV-wIG-luc-2lk-ZS4-pCl-syM-DI2-LTA-5LT-A0V-DAx-OjE-5Oj-AyL-jc3-MFp-dIF-tta-XNz-aW9-uXS-BCc-m9r-ZXI-gYW-4gQ-Wxs-aWF-uY2-Ug4-oCU-IDA-vMi-ByZ-Wxp-Y3M-uIE-5le-HQ6-IE1-1ZC-BGb-G9v-ZCB-OZX-h1c-yBQ-dWx-zZS-1LZ-Xkg-YXQ-gTX-VkI-EZs-b29-kIE-5le-HVz-ICg-rMS-Btb-3Jl-KS4-KWz-IwM-jYt-MDk-tMD-RUM-DE6-MTk-6MD-IuN-zcx-Wl0-gW3-dvc-mxk-XSB-Zb3-Uga-25v-dyB-0aG-lzI-HBs-YWN-lLi-BOb-3Qg-d2V-sbC-wgY-nV0-IHl-vdS-Brb-m93-IGl-0Lg-o=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uNz-cxW-l0g-W3N-5c3-Rlb-V0g-V2V-hdG-hlc-iBl-ZmZ-lY3-Qg4-oCU-IEd-sYX-NzI-Ehh-aWw-6IC-0xI-ERF-WAp-bMj-AyN-i0w-OS0-wNF-QwM-Tox-OTo-wMi-43N-zNa-XSB-bd2-9yb-GRd-IFt-UaG-UgQ-XJj-aGl-0ZW-N0J-3Mg-Qmx-pbm-RdI-G5v-cnR-oOi-BUY-XJ0-YXJ-pYW-4gT-3V0-c2t-pcn-RzI-Cgy-IHR-pbG-VzL-CA1-IGh-vdX-JzK-SDC-tyB-lYX-N0O-iBU-aGU-gUm-Vhd-mVy-J3M-gQ3-Jlc-3Qg-KDQ-gdG-lsZ-XMs-IDE-wIG-hvd-XJz-KSD-Cty-Bzb-3V0-aDo-gQX-NnY-XJk-YXI-gKD-E0I-HRp-bGV-zLC-AxI-GRh-eSw-gMT-Ega-G91-cnM-pIM-K3I-Hdl-c3Q-6IF-JlY-2xh-aW1-lci-dzI-FN0-YWt-lIC-gzI-HRp-bGV-zLC-A4I-Ghv-dXJ-zKQ-o=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDI-uOT-g3W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-jEw-IHB-sYX-llc-j02-MCB-3bT-02N-Vty-b29-tcz-00M-iBl-dmV-udH-M9M-SBt-ZW1-vcz-0wI-G5w-Y3M-9MS-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MS-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-04M-yBz-Y2V-uZT-0yC-lsy-MDI-2LT-A5L-TA0-VDA-xOj-E5O-jA0-LjE-0OF-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Aid-GFr-ZSA-vIH-Nhb-HZh-Z2U-iCl-syM-DI2-LTA-5LT-A0V-DAx-OjE-5Oj-A1L-jg5-M1p-dIF-t3b-3Js-ZF0-gWW-91I-HR1-cm4-gdG-hlI-FJl-dml-2YW-xpc-3Qg-Rml-lbG-QgQ-2Fy-Yml-uZS-Bvd-mVy-IG9-uY2-UsI-HRo-ZW4-ga2-Vlc-CBp-dC4-KWz-IwM-jYt-MDk-tMD-RUM-DE6-MTk-6MD-UuO-Dkz-Wl0-gW3-Jld-2Fy-ZF0-g4p-ymI-FJl-dml-2YW-xpc-3Qg-Rml-lbG-QgQ-2Fy-Yml-uZS-AoV-W5j-b21-tb2-4pL-go=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDc-uNT-c2W-l0g-W3d-vcm-xkX-SBZ-b3U-gd2-9ya-yB0-aGU-gZm-lyZ-XBp-dCB-vdm-VyL-iBB-IHB-hcn-Qgb-2Yg-aXQ-gY2-9tZ-XMg-bG9-vc2-UsI-Glu-dGF-jdC-4KW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-Dcu-NTc-2Wl-0gW-3dv-cmx-kXS-BZb-3Ug-YnJ-lYW-sgd-Ghl-IGh-hbG-YtY-nVy-aWV-kIH-dhZ-29u-IGF-wYX-J0L-iBB-bW9-uZy-B0a-GUg-cGl-lY2-VzL-CBz-b21-ldG-hpb-mcg-d29-ydG-gga-2Vl-cGl-uZy-4KW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-Dcu-NTc-2Wl-0gW-3dv-cmx-kXS-BZb-3Ug-c3R-yaX-Agd-Ghl-IGx-hbn-Rlc-m4g-Y2F-yZW-Z1b-Gx5-LiB-Tb2-1ld-Ghp-bmc-gdX-NhY-mxl-IGN-vbW-VzI-GZy-ZWU-gaW-4ge-W91-ciB-oYW-5kL-go=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDc-uNT-c2W-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-Fsd-mFn-ZSB-0aG-Ugb-Glu-Z2V-yaW-5nI-HNj-ZW5-0Li-BUa-GUg-dGF-rZS-Bpc-yBz-bWF-sbC-Bid-XQg-cmV-hbC-4KW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-Dcu-NTc-2Wl-0gW-3dv-cmx-kXS-BZb-3Ug-d29-yay-B0a-GUg-cnV-zdG-VkI-GZh-bGx-lbi-BzZ-W50-aW5-lbC-Bod-XNr-IG9-2ZX-IuI-EEg-cGF-ydC-BvZ-iBp-dCB-jb2-1lc-yBs-b29-zZS-wga-W50-YWN-0Lg-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owN-y41-NzZ-aXS-Bbd-29y-bGR-dIF-lvd-SBz-Y2F-2ZW-5nZ-SB0-aGU-gc2-lnb-nBv-c3Q-gdG-hvc-m91-Z2h-seS-4gT-25l-IFN-0aW-NrI-HN1-cnZ-pdm-VzI-HRo-ZSB-zb3-J0a-W5n-Lgo-=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDc-uNT-c3W-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-JlY-Wsg-dGh-lIH-N0Y-W5k-aW5-nIH-dhd-GVy-IGF-wYX-J0L-iBB-bW9-uZy-B0a-GUg-cGl-lY2-VzL-CBz-b21-ldG-hpb-mcg-d29-ydG-gga-2Vl-cGl-uZy-4KW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-Dcu-NTc-3Wl-0gW-3Jl-d2F-yZF-0g4-pym-IFN-hbH-ZhZ-2Ug-aGF-1bD-oKW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-Dcu-NTc-3Wl-0gW-3Jl-d2F-yZF-0gI-CAg-IOK-Aoi-BTb-W9v-dGg-gU3-Rvb-mUg-KEN-vbW-1vb-ikK-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDc-uNT-c3W-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBT-Y3J-hcC-BNZ-XRh-bCB-4NC-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owN-y41-Nzd-aXS-Bbc-mV3-YXJ-kXS-AgI-CAg-4oC-iIE-Fld-Ghl-ciB-EdX-N0I-Hgy-ICh-Db2-1tb-24p-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MDc-uNT-c3W-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBT-dGl-jay-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-owN-y41-Nzd-aXS-Bbc-mV3-YXJ-kXS-AgI-CAg-4oC-iIF-dvc-m4g-VGF-ydG-Fya-WFu-IEN-vaW-4ge-DIg-KEN-vbW-1vb-ikK-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uMz-I4W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJF-TlR-FUi-BPV-VRQ-T1N-UIg-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-oxN-i4z-MzB-aXS-Bbc-Gxh-eWV-yXS-Blb-nRl-ciB-vdX-Rwb-3N0-Cls-yMD-I2L-TA5-LTA-0VD-AxO-jE5-OjE-2Lj-MzM-Vpd-IFt-3b3-JsZ-F0g-WW9-1IG-Nyb-3Nz-IHR-vIH-RoZ-SBn-YXR-lIG-FuZ-CBz-dGV-wIH-Roc-m91-Z2g-uCg-==",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uMz-MyW-l0g-W2R-lYn-VnX-SBz-Y2V-uZT-ogb-G9j-PWF-yY2-hpd-GVj-dF9-ibG-luZ-CBo-dWI-9b3-V0c-G9z-dF9-nYX-RlI-GFy-cml-2YW-w9b-iBv-cGV-uaW-5nP-W4g-cGF-zc2-luZ-z1u-Cls-yMD-I2L-TA5-LTA-0VD-AxO-jE5-OjE-2Lj-MzN-Vpd-IFt-kZW-J1Z-10g-bWl-zc2-lvb-nM6-IGh-1bn-Q6a-HVu-dF9-zbH-VkZ-2Vf-YmV-oZW-1vd-Ggg-c3R-hZ2-UgM-S83-IFt-ib3-Nz4-oaS-YXR-0YW-NrX-SBA-bXV-kX3-NlY-XMg-bmV-lZH-M9U-2Vh-bGV-kIE-Nvb-3Jk-aW5-hdG-UgV-HVi-ZeK-cl0-1JU-1NJ-Tkc-gZ2-l2Z-XM9-RGl-2ZS-1DY-W1w-IFR-hbG-x5I-HNw-YXd-uPV-N3Y-W1w-IEN-yYW-LDl-zEK",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uMz-M1W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-29i-c2l-kaW-FuX-29y-YiB-zdG-FnZ-SAx-LzQ-gW2-lud-mVz-dGl-nYX-RlX-SBA-b2J-zaW-RpY-W5f-cGl-sbG-Fyc-yBu-ZWV-kcz-1Nb-25h-cmN-oIE-Nvd-XJp-ZXI-gV3-Jpd-OKc-l01-JU1-NJT-kcg-Z2l-2ZX-M9U-3Rv-cm0-tU2-Nvc-mVk-IFN-oYX-JkI-FBB-VVN-FRA-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-oxN-i4z-MzZ-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-Bte-XN0-ZXJ-5Om-15c-3Rl-cnl-fdG-Vtc-G9y-YWx-fd2-F0Y-2gg-c3R-hZ2-UgM-S80-IFt-pbn-Zlc-3Rp-Z2F-0ZV-0gQ-GJ1-cml-lZF-9ja-XRp-ZXM-gbm-VlZ-HM9-R3V-pbG-QgR-WRk-eS1-HYX-VnZ-eKc-l01-JU1-NJT-kcg-Z2l-2ZX-M9R-WRk-eS1-ab2-5lI-FJl-YWR-pbm-cK",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uMz-M3W-l0g-W2R-lYn-VnX-SBt-aXN-zaW-9uc-zog-bXl-zdG-Vye-Tpt-eXN-0ZX-J5X-3Jl-ZF9-0b3-dlc-iBz-dGF-nZS-AxL-zQg-W2l-udm-Vzd-Gln-YXR-lXS-BAY-3Jh-ZGx-lX2-9mX-2R1-c2s-gbm-VlZ-HM9-U2N-ob2-xhc-idz-IFN-1cn-Zle-SBD-aGl-04p-yXT-UlT-U0l-ORy-Bna-XZl-cz1-XYX-JtI-Ehl-eGF-nb2-5hb-CBQ-bGF-0ZQ-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-oxN-i4z-Mzh-aXS-BbZ-GVi-dWd-dIG-1pc-3Np-b25-zOi-BmY-WN0-aW9-uOm-ZxX-3Rh-cnR-hcm-lhb-nNf-c3R-hcn-Rlc-iBb-ZmV-0Y2-g9T-XVk-IEZ-yYW-dtZ-W50-w5c-1XS-BQQ-VVT-RUQ-KWz-IwM-jYt-MDk-tMD-RUM-DE6-MTk-6MT-YuM-zM4-Wl0-gW2-RlY-nVn-XSB-taX-Nza-W9u-czo-gwr-cgY-XQ9-YXJ-jaG-l0Z-WN0-X2J-saW-5kC-g==",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uND-IxW-l0g-W2R-lYn-VnX-SBz-cGF-3bj-ogZ-2Vh-cj1-bRW-5lc-md5-IFR-ocm-93Z-XIs-IE1-1ZC-BIZ-WF0-ZXI-gU2-hpZ-Wxk-XSB-3aW-5kb-3c9-MTA-gcm-9zd-GVy-PW5-ldw-pbM-jAy-Ni0-wOS-0wN-FQw-MTo-xOT-oxN-i40-MjJ-aXS-Bbd-29y-bGR-dIE-Vsb-GEg-bm9-zZX-MgY-XQg-dGh-lIG-J1c-mll-ZCB-ib2-5lI-GFu-ZCB-zbm-9yd-HMu-IFR-oZX-JlJ-3Mg-c29-tZX-Roa-W5n-IHR-oZX-JlL-go=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uND-IyW-l0g-W3d-vcm-xkX-SBB-cmN-oaX-RlY-3Qn-cyB-DZW-xsI-OKA-lCB-UaG-UgU-mVj-ZXB-0aW-9uL-iBB-IGN-sZX-JpY-2Fs-IG9-mZm-ljZ-SB3-aXR-oIG-Zpb-Glu-ZyB-jYW-Jpb-mV0-cyB-hbm-QgY-SBj-b2Z-mZW-Ugb-WFr-ZXI-uIF-RoZ-SBt-YW4-gYX-Qgd-Ghl-IGR-lc2-sgZ-G9l-c24-ndC-Bsb-29r-IHV-wIG-Zyb-20g-aGl-zIH-Bhc-GVy-IOK-AlC-B5b-3Vy-IHZ-pc2-l0I-Glz-IG5-vdC-BvZ-mZp-Y2l-hbG-x5I-Ghh-cHB-lbm-luZ-y4K-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uND-IyW-l0g-W21-pc3-Npb-25d-IEJ-yb2-tlc-iBh-biB-BbG-xpY-W5j-ZSD-igJ-QgM-C8y-IHJ-lbG-ljc-y4g-TmV-4dD-ogT-XVk-IEZ-sb2-9kI-E5l-eHV-zIF-B1b-HNl-LUt-leS-Bhd-CBN-dWQ-gRm-xvb-2Qg-TmV-4dX-MgK-Csx-IG1-vcm-UpL-go=",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MTY-uND-IzW-l0g-W3d-vcm-xkX-SBQ-YXR-ocz-ogb-m9y-dGg-gdG-8gT-3Bl-cmF-0aW-9uc-yDC-tyB-zb3-V0a-CB0-byB-GaX-Jzd-CBM-YW5-kaW-5nL-iAo-VHl-wZS-Anb-GVh-dmU-gb3-V0c-G9z-dCc-gdG-8ga-GVh-ZCB-pbn-RvI-HRo-ZSB-3aW-xkc-y4p-Cls-yMD-I2L-TA5-LTA-0VD-AxO-jE5-OjE-2Lj-QyM-1pd-IFt-3b3-JsZ-F0g-SGF-sZW-0gd-Ghl-IFR-yYW-Rlc-iBn-bGF-uY2-VzI-HVw-LiA-iWW-91I-GFn-YWl-uLi-IgT-m90-IHd-hcm-0sI-G5v-dCB-jb2-xkI-OKA-lCB-ub3-RlZ-C4K-WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MjA-uOT-MzW-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJ0-YWt-lIC-8gc-2Fs-dmF-nZS-IKW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-jMu-Mzk-0Wl-0gW-3dv-cmx-kXS-BUa-GUg-RW5-lcm-d5I-FRo-cm9-3ZX-IgY-29t-ZXM-gYX-dhe-SBj-bGV-hbi-4K",
+      "WzI-wMj-YtM-Dkt-MDR-UMD-E6M-Tk6-MjM-uMz-k1W-l0g-W3J-ld2-FyZ-F0g-4py-mIE-VuZ-XJn-eSB-UaH-Jvd-2Vy-ICh-Vbm-Nvb-W1v-bik-uCl-syM-DI2-LTA-5LT-A0V-DAx-OjE-5Oj-IzL-jQx-M1p-dIF-t3b-3Js-ZF0-gSX-Qgd-GFr-ZXM-gdH-dvI-HB1-bGx-zLi-BUa-GUg-TXV-kIE-hlY-XRl-ciB-TaG-llb-GQg-aXM-geW-91c-nMg-b24-gdG-hlI-HNl-Y29-uZC-4KW-zIw-MjY-tMD-ktM-DRU-MDE-6MT-k6M-jMu-NDE-zWl-0gW-3Jl-d2F-yZF-0g4-pym-IE1-1ZC-BIZ-WF0-ZXI-gU2-hpZ-Wxk-ICh-Db2-1tb-24p-Lgp-bMj-AyN-i0w-OS0-wNF-QwM-Tox-OTo-yNC-40N-zRa-XSB-bZG-Vid-Wdd-IGh-vbW-V3b-3Jr-OiB-pbn-Ryb-y1m-aWx-sIG-Fyb-WVk-IGF-mdG-VyI-DYw-MDB-tcy-BpZ-Gxl-Cg=-="
+    ],
+    "chunkChars": 7213,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-24-1882-the-paste-fits-in-the-window #mug8ll77l6st [inline 41/56]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mug8ll77l6st"
+    },
+    {
+      "key": "device",
+      "value": "SM-S942U"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "SM-S942U"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-24-1882-the-paste-fits-in-the-window"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 16"
+    },
+    {
+      "key": "os.build",
+      "value": "BP4A.251205.006.S942USQS4AZH5"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "part",
+      "value": "41"
+    },
+    {
+      "key": "parts",
+      "value": "56"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-24-1882-the-paste-fits-in-the-window"
+    },
+    {
+      "key": "user",
+      "value": "id:c79a9572bee04338a586386efd9ae360",
+      "query": "user.id:\"c79a9572bee04338a586386efd9ae360\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-25T00:43:07.043788Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-25T00:43:03.285000Z",
+  "fingerprints": [
+    "3d9fd9ec830eb4e192c7febc0b6f673e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1991823421,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-24T23:30:06.642409Z",
+    "dateReleased": "2026-09-24T23:38:57.444435Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "19fe28e202e29129e3e488e0ac87ba4275e50ecf",
+      "message": "OTA-1882 \u2014 the paste fits in the window\n\nThe owner's title screen offered `CRASHED SAVE CAPTURED \u00b7 screen-render \u00b7 60m ago \u00b7\n420072 bytes` with a COPY CRASHED SAVE button. He pressed it and could not paste the\nresult anywhere. A diagnostic nobody can deliver is not a diagnostic.\n\nTHE 420,072 WAS NOT THE CLIPBOARD, AND THE CLIPBOARD WAS WORSE. That number is\n`capture.raw.length` \u2014 UTF-16 code units of the RETAINED save, printed beside the\nword \"bytes\" while counting something else. The clipboard is a different object\nentirely: on the normal parse-OK path it is `JSON.stringify({ player, worldMemory })`\nwith the gameLog excluded. Measured on a real 607,188-byte save, the old export was\n405,288 bytes; the new one is 10,091. And measured against the owner's own ingested\nCOPY evidence (player-log_2026-08-25T02-07-26, 59,818 UTF-8 bytes), 95.9% of an\nexport is that one blob, with the growth all legitimate play:\n\n  player.inventory          21,372 B   37.3%   71 items\n  worldMemory.visitedRooms  10,598 B   18.5%   18 rooms\n  worldMemory.worldEvents    8,629 B   15.0%   50 events\n  worldMemory.recentRaids    2,614 B    4.6%   12 raids\n  worldMemory.patrols        2,076 B    3.6%   25 patrols\n\nSO THE DEFECT WAS A MISSING CEILING, NOT A LEAK. Every sibling diagnostic path here\nowns a budget \u2014 LOG_CHARS_CAP 40,000 for the email paste, FULL_LOG_CHARS_CAP 200,000\nfor the Sentry push, INVENTORY_CHARS_CAP 12,000, LOG_ATTACHMENT_MAX_CHARS 800,000,\nCRASH_LEDGER_CAP 10. The owner-facing clipboard was the only export with none. It has\none now: 40,000 UTF-8 BYTES, taken from this project's own human-paste precedent\nrather than invented, and measured in bytes because that is what the destination\ncounts. `.length` is not a byte count; one emoji is four bytes and a length of two.\n\n\u26a0\u26a0\u26a0 AND THE EVIDENCE IS UNTOUCHED, WHICH IS THE WHOLE POINT. `raw` in\n`@tartaria/lastCrashSave` is the only copy of a save that can never be loaded\n(OTA-341/343), so nothing here trims it \u2014 not at capture, not at retention. The full\nbundle already reaches us independently; the owner's own log recorded it going out by\nitself, `#mufzsk25hsud cleared from disk`. So the compact paste does not have to CARRY\nthe state. It has to NAME it.\n\n\u26a0\u26a0 WHICH IS WHY THERE IS A CORRELATION KEY, AND WHY IT IS NOT `bundleId`. The relay's\nbundle id is `${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}` \u2014\nit contains randomness, it is minted at send-staging time, and in this very incident\nit did not exist when the capture was written, because the process died first and the\npush happened on the next boot 21 seconds later. Reading \"the newest pending bundle\"\nat COPY time would bind a crashed save to whatever an adjacent crash, a manual SEND\nLOG or a retry last touched. So the key is the crash's own facts \u2014 `ts` and `kind` \u2014\nthrough one leaf helper that BOTH the ledger and the capture call, and the same two\nvalues already travel to us inside the relayed crash-ledger summary. Zero change to\nsentryTransport; no new tag, no new service, no reverse lookup.\n\nIT IS A CORRELATION KEY, NOT A UNIQUE ID, AND IT SAYS SO. Two crashes of the same\nkind in the same millisecond resolve to one key \u2014 which is exactly what `recordCrash`\nhas always deduped them to, on purpose, so a re-entered `hydrate()` cannot invent a\ncrash that never happened. The suite pins that real contract instead of a stronger\nclaim a future reader would trust wrongly.\n\nTHE OVERSIZED PATHS ARE BUILT STRUCTURALLY, NEVER BY CUTTING JSON. A chopped\n`JSON.stringify` is unparseable, says nothing about what it dropped, and is\nindistinguishable from corruption \u2014 the one thing a crash report must never fake.\nChronological collections keep their newest entries; current-state collections say so\nrather than passing a head slice off as the whole pack; every partial rendering states\nits original, retained and omitted counts. The corrupt-save path keeps a bounded\nhead-anchored excerpt with its true omitted byte count, repairs nothing, reformats\nnothing, and says the full malformed bytes are still on the device.\n\nREPORTS ALREADY UNDER BUDGET ARE NOT TOUCHED \u2014 same envelope, same HIGHLIGHTS, same\nFULL STATE JSON, plus the correlation line. The bounded assembler becomes visible only\nwhen size demands it.\n\nAND THE CARD'S LABEL IS NOW TRUE. It measures UTF-8 bytes. That number is the retained\nartifact and stays a separate concept from the paste budget; the card never mentions\nthe budget.\n\n  app/diagnostics/crashCorrelation.ts   the leaf both paths call\n  app/diagnostics/portableReport.ts     the byte budget, the assembler, the\n                                        collection semantics\n  app/diagnostics/crashSave.ts          correlationId on the capture; bounded\n                                        parse-OK and parse-fail exports\n  app/diagnostics/crashLedger.ts        calls the helper for its id (output\n                                        byte-identical)\n  App.tsx                               ONE timestamp per crash, threaded to both\n                                        writers on the boundary and fatal paths\n  app/screens/TitleScreen.tsx           the card counts the unit it prints\n\n  ota1882ThePasteFitsInTheWindow   40/40 \u2014 correlation determinism and the honest\n                                   collision contract, small-report compatibility,\n                                   oversized parse-OK, oversized parse-fail, Unicode,\n                                   budget boundaries incl. the notices' own cost,\n                                   recovery untouched, relay untouched, the card's unit\n  directly affected contracts      8 suites, 168/168 (crashSaveCapture, saveSnapshot,\n                                   crashLedger, sentryTransport, bugReport \u00d72, 1847)\n  fast surface                     1381/1381 suites \u00b7 16,162 passed \u00b7 3 skipped\n  typecheck:ci                     exit 0\n  typecheck:tests                  OK \u2014 at baseline (196), no growth\n  lint                             clean\n  check gates                      22/22\n\nFIVE NEGATIVE CONTROLS, none committed, all six production files restored\nbyte-identically (md5 verified 6/6). NC1 restore the unbounded full-state COPY \u2014 5 red.\nNC2 drop the correlation key \u2014 4 red. NC3 let capture and ledger read the clock\nseparately \u2014 1 red, the exact defect the threading exists to prevent. NC4 truncate by\ncharacters instead of bytes \u2014 2 red on multibyte content. NC5 stop protecting\nPriority 1 \u2014 6 red.\n\nFOUR ASSEMBLER DEFECTS THE SUITE CAUGHT IN MY OWN FIRST DRAFT, worth recording because\neach is a way a cap leaks. The omission notice was appended AFTER the accounting\n(measured 345 against a 300 budget). The over-budget marker's length was estimated\ninstead of measured, landing one byte over. Both are now paid for out of the same\nallowance they describe, and a final unconditional clamp guarantees the ceiling even if\nsome future path miscounts.\n\nTWO NEIGHBOUR CONTRACTS TURNED RED AND NEITHER WAS WEAKENED. ota1380CrashLedger pinned\nthe byte-exact text `captureActiveCrashSave(`fatal:${stage}`)` and the fatal handler now\nalso passes a correlation id; its own sibling assertion two lines below was already\nwritten in the open form, so the fatal pin was aligned to match and still pins the stage\nargument. ota1484APinStatesAClaim counts fixtures that set `currentLocationId` without\ncoordinates, shrink-only at 54, and this package's fixture made it 55 \u2014 so the fixture\nspread `placedAt`, which is what that pin's own instruction asks for. The baseline was\nnot moved.\n\n\u26a0 AND ONE INSTRUMENT DEFECT OF MINE, TWICE, both the OTA-1721 class: a census that\nscanned unstripped source convicted this package's own comments for naming the things\nthey exist to forbid. Comments are stripped first now \u2014 and one assertion had to stop\nforbidding the word \"repair\" altogether, because the corrupt-save report's honest\nsentence is \"NOT repaired, NOT reformatted\" and that is code, not a comment. It pins\nthe absent mechanisms instead.\n\nADJACENT, REPORTED NOT FIXED: COPY SAVE on the About screen shares the same unbounded\n`buildSaveSnapshot` blob and keeps it. #214 was scoped to the crashed-save path, and\nwidening it silently would have been a different package wearing this one's number.\n\nNOT CLAIMED: physical clipboard/paste verification on the owner's hardware.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-24T23:22:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-24-1882-the-paste-fits-in-the-window",
+          "shortVersion": "tartaria@4.32.11+2026-09-24-1882-the-paste-fits-in-the-window",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-24T23:38:57.444435Z",
+          "dateCreated": "2026-09-24T23:30:06.642409Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "161816724",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-24T23:38:57.712455Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-24-1882-the-paste-fits-in-the-window",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-24-1882-the-paste-fits-in-the-window",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-24-1882-the-paste-fits-in-the-window",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-24-1882-the-paste-fits-in-the-window)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5c2e905f855f49329791e743bae67d4f",
+  "previousEventID": "5386924405df4485b8f36bc7c9098d8a"
+}
