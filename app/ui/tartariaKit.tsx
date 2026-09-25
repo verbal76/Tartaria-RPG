@@ -1792,6 +1792,35 @@ const kit = StyleSheet.create({
     borderRadius: 6,
     padding: 20,
   },
+  /* ⚠⚠⚠ OTA-1883 — A SCROLLER CARRYING A MOMENT CARD MUST BE AS WIDE AS THE SCRIM.
+   * `momentScrim` is a COLUMN with `alignItems: 'center'`, so its cross axis is
+   * HORIZONTAL and a direct child is centred at its CONTENT size rather than
+   * stretched. The three beats that put the card inside a ScrollView made that
+   * ScrollView the unstretched child, so it handed its content container no
+   * definite width; `momentCard`'s `width: '100%'` then had no base to resolve
+   * against, collapsed to `auto`, and the card sized to its widest intrinsic
+   * descendant — the body prose, which consequently never wrapped. The owner's
+   * screenshot shows exactly that: a card whose left edge is correctly inset, a
+   * divider and two full-width controls running past the right bezel, and prose
+   * reading "… Crystal Go…" instead of breaking. `maxWidth: 440` cannot cap a
+   * percentage that never resolved, so nothing caught it.
+   *
+   * ⚠⚠ THE OTHER THREE BEATS WERE NEVER AFFECTED, AND THAT IS WHY THIS IS NOT
+   * `momentCard`'s BUG. CombatPrimer, MissionComplete and MissionStinger hang the
+   * card straight off the scrim, whose inner width IS definite (`flex: 1` of the
+   * Modal frame), so their percentage resolves and their ceiling engages. The
+   * faulty contract is the scroller's width, not the card's.
+   *
+   * ⚠ AND OTA-1862 ALREADY WROTE THIS DOWN ON THE OTHER AXIS: "a ScrollView's
+   * content container is sized by its content … so there is nothing for 85% to
+   * resolve against and the constraint is dropped." It reasoned that correctly for
+   * `maxHeight` and no one carried it across to `width`.
+   *
+   * ⚠ `alignSelf` is the exact counterpart of the `alignItems` that caused it and
+   * introduces no second percentage to resolve. It touches the CROSS axis only, so
+   * OTA-1872's keyboard work — which is main-axis height and scroller viewport —
+   * is untouched by construction. */
+  momentScroll: { alignSelf: 'stretch' },
   // ── TSheet ────────────────────────────────────────────────────────────────
   /* ⚠⚠⚠ TSHEET — AND THE MEASUREMENT FOUND TWO PATTERNS, NOT THE ONE THE PLAN
    * NAMED. Tier 0's last primitive. The rollout described it as "the

@@ -112,7 +112,13 @@ export function GolemNamingModal() {
   return (
     <Modal visible transparent animationType="fade" onRequestClose={keep}>
       <View style={kit.momentScrim}>
+        {/* ⚠ OTA-1883 — `kit.momentScroll` stretches this scroller to the scrim's
+            definite inner width. Without it the scrim's `alignItems: 'center'`
+            left the scroller content-sized, the card's `width: '100%'` had no
+            base, and the card grew to its widest descendant instead of the
+            screen. Cross axis only; the keyboard inset below is unchanged. */}
         <ScrollView
+          style={kit.momentScroll}
           contentContainerStyle={[styles.scroll, { paddingBottom: 32 + kbInset }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

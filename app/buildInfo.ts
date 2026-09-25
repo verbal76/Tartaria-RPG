@@ -31768,6 +31768,59 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * no-signal shape appears twice earlier in the same ledger under unrelated taps
  * ("missions", "LORE"), and the shared word "fuse" is a stale in-flight marker,
  * not a causal link. Not closed here, and not widened here. */
+/* ── OTA-1883 — THE CARD FITS THE SCREEN ───────────────────────────────────────
+ *
+ * The owner, on Android, at the golem naming beat: the right-side ROLL control
+ * clipped at the bezel. That reads as a row defect and it is not one. His
+ * screenshot shows the CARD ITSELF oversized — left edge correctly inset, right
+ * edge off-screen, the gold divider running through the boundary, both full-width
+ * controls overhanging, and the body prose reading "… Crystal Go…" instead of
+ * WRAPPING. A `Text` only fails to wrap when no ancestor hands it a definite
+ * width. ROLL was the most visible casualty, never the cause.
+ *
+ * THE MECHANISM IS A PERCENTAGE WITH NOTHING TO RESOLVE AGAINST. `momentScrim` is
+ * a COLUMN with `alignItems: 'center'`, so its cross axis is HORIZONTAL and a
+ * direct child is centred at its CONTENT size rather than stretched. Three of the
+ * six beats put the card inside a ScrollView; that ScrollView was the unstretched
+ * child, so it handed its content container no definite width, `momentCard`'s
+ * `width: '100%'` collapsed to `auto`, and the card sized to its widest intrinsic
+ * descendant. `maxWidth: 440` cannot cap a percentage that never resolved, which
+ * is why no existing ceiling caught it. The ScrollView's own frame stayed
+ * parent-bounded, so the excess fell off the RIGHT only — the asymmetry the
+ * screenshot shows, and the reason there is no horizontal scroll.
+ *
+ * SO THE OWNER IS THE SCROLLER, NOT THE CARD. CombatPrimer, MissionComplete and
+ * MissionStinger hang the card straight off the scrim, whose inner width IS
+ * definite, so their percentage resolves and their ceiling engages. They were
+ * never affected and are untouched. Repairing `momentCard` would have been
+ * repairing the innocent party.
+ *
+ * AND OTA-1862 HAD ALREADY REASONED THIS OUT ON THE OTHER AXIS, about its own
+ * `maxHeight: '85%'`: "a ScrollView's content container is sized by its content …
+ * so there is nothing for 85% to resolve against and the constraint is dropped."
+ * Correct, and nobody carried it across to `width`.
+ *
+ *   app/ui/tartariaKit.tsx          `momentScroll: { alignSelf: 'stretch' }` — one
+ *                                   shared contract so the three cannot drift
+ *   GolemNamingModal                adopts it
+ *   DogOnboardingModal              adopts it (byte-identical row, same defect)
+ *   WandererEncounterModal          adopts it (third caller of the topology)
+ *
+ * `alignSelf` is the exact counterpart of the `alignItems` that caused it and
+ * introduces no second percentage. It touches the CROSS axis only, so OTA-1872's
+ * keyboard work — main-axis height and scroller viewport — is untouched by
+ * construction.
+ *
+ * GEOMETRY, DERIVED FROM THE SHIPPED CONSTANTS: card outer = min(W − 48 − 40, 440).
+ * 375→287, 390→302, 414→326, 443→355 (the owner's own window), and the 440 ceiling
+ * engages at W ≥ 528. Containment is monotone, not tuned. NO SECOND ROW DEFECT
+ * REMAINED once the ancestor was definite: at the narrowest card inner (247) ROLL's
+ * chrome is 26 and its label cannot exceed 72, leaving the input ≥149 — so no
+ * flexShrink was added to ROLL, which the screenshot never justified.
+ *
+ * NOT CLAIMED: physical verification of the repaired modal on the owner's
+ * hardware. */
+
 /* ── OTA-1882 — THE PASTE FITS IN THE WINDOW (#214) ────────────────────────────
  *
  * The owner's title screen offered `CRASHED SAVE CAPTURED · screen-render · 60m
@@ -31819,7 +31872,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * retained artifact and stays a separate concept from the paste budget.
  *
  * NOT CLAIMED: physical clipboard/paste verification on the owner's hardware. */
-export const OTA_BUILD_ID = '2026-09-24-1882-the-paste-fits-in-the-window';
+export const OTA_BUILD_ID = '2026-09-25-1883-the-card-fits-the-screen';
+// SUPERSEDED: '2026-09-24-1882-the-paste-fits-in-the-window'
 // SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'
 // SUPERSEDED: '2026-09-24-1878-the-transcript-keeps-a-door'
 // SUPERSEDED: '2026-09-24-1877-the-hunt-reads-its-last-beat'

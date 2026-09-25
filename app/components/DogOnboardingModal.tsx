@@ -154,7 +154,13 @@ export function DogOnboardingModal() {
           Keyboard closed, `kbInset` is 0 and this resolves to exactly the 24 the
           scrim already had, which is why the closed layout is byte-identical. */}
       <View style={[kit.momentScrim, { paddingBottom: 24 + kbInset }]}>
+        {/* ⚠ OTA-1883 — the same scroller width contract as GolemNaming. This card
+            carries a byte-identical name row and the identical `scroll` content
+            style, so it shared the identical oversizing whether or not anyone had
+            photographed it yet. Cross axis only; the OTA-1872 keyboard inset on
+            the scrim above is untouched. */}
         <ScrollView
+          style={kit.momentScroll}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

@@ -118,7 +118,11 @@ export function WandererEncounterModal() {
   return (
     <Modal visible transparent animationType="fade" onRequestClose={dismiss}>
       <View style={kit.momentScrim}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* ⚠ OTA-1883 — the third caller of the same topology, repaired with the
+            others rather than left to be photographed later. It shares the
+            identical `scroll` content style and the identical unstretched
+            scroller, so it shared the identical oversizing. Cross axis only. */}
+        <ScrollView style={kit.momentScroll} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={CARD}>
             <Text style={styles.kicker}>SOMEONE ON THE ROAD</Text>
             <Text style={styles.title} accessibilityRole="header">
