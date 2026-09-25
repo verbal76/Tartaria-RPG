@@ -2,7 +2,7 @@
 ════ VERDICT ════
   every fetch this run succeeded
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
-    1 page(s), 28 rows — COMPLETE — ended short of a full page
+    1 page(s), 26 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7690450029/events/?full=false
     1 page(s), 22 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
