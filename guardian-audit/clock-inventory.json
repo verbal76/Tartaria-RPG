@@ -1,0 +1,928 @@
+{
+ "files_with_wallclock_or_timer_calls": [
+  {
+   "id": "CLK-001",
+   "file": "app/ai/CognitiveOrchestrator.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "performance.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-002",
+   "file": "app/ai/generation/LlamaRuntime.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-003",
+   "file": "app/ai/generation/QwenGenerativeEngine.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-004",
+   "file": "app/ai/generation/jsHeartbeat.ts",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-005",
+   "file": "app/ai/narration.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-006",
+   "file": "app/ai/nativeMlLock.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-007",
+   "file": "app/ai/qwenWatchdog.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-008",
+   "file": "app/audio/AudioManager.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-009",
+   "file": "app/buildInfo.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()",
+    "performance.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-010",
+   "file": "app/components/ArtFlash.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-011",
+   "file": "app/components/BugReportModal.tsx",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-012",
+   "file": "app/components/DeathOverlay.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-013",
+   "file": "app/components/DiceRoller.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-014",
+   "file": "app/components/DogOnboardingModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-015",
+   "file": "app/components/EnemyPanel.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-016",
+   "file": "app/components/FeedbackModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-017",
+   "file": "app/components/FusionBlockedModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-018",
+   "file": "app/components/GatherModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-019",
+   "file": "app/components/GolemNamingModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-020",
+   "file": "app/components/HookContinueModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-021",
+   "file": "app/components/KeyboardInputBar.tsx",
+   "clock_sources_present": [
+    "setTimeout()",
+    "setInterval()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-022",
+   "file": "app/components/MissionCompleteModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-023",
+   "file": "app/components/NumberStepper.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-024",
+   "file": "app/components/SearchModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-025",
+   "file": "app/components/SplashOverlay.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-026",
+   "file": "app/components/StatsPanel.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()",
+    "setInterval()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-027",
+   "file": "app/components/WandererEncounterModal.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-028",
+   "file": "app/diagnostics/aliveBeat.ts",
+   "clock_sources_present": [
+    "setInterval()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-029",
+   "file": "app/diagnostics/bootIdentity.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-030",
+   "file": "app/diagnostics/bugReport.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-031",
+   "file": "app/diagnostics/crashCorrelation.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-032",
+   "file": "app/diagnostics/crashLedger.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-033",
+   "file": "app/diagnostics/crashSave.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-034",
+   "file": "app/diagnostics/memoryTimeline.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-035",
+   "file": "app/diagnostics/nativeMemoryRecorder.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-036",
+   "file": "app/diagnostics/pendingBundle.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-037",
+   "file": "app/diagnostics/renderClock.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-038",
+   "file": "app/diagnostics/rollTiming.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-039",
+   "file": "app/diagnostics/runtimePressure.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-040",
+   "file": "app/diagnostics/runtimePressureWatch.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-041",
+   "file": "app/diagnostics/sentryTransport.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-042",
+   "file": "app/diagnostics/tapClock.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "performance.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-043",
+   "file": "app/diagnostics/touchPath.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()",
+    "performance.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-044",
+   "file": "app/engine/character.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-045",
+   "file": "app/engine/coreGuardians.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-046",
+   "file": "app/engine/deeds.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-047",
+   "file": "app/engine/dogBreeds.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-048",
+   "file": "app/engine/dogCompanion.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-049",
+   "file": "app/engine/elevatedOverlay.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-050",
+   "file": "app/engine/equipment.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-051",
+   "file": "app/engine/fallenLedger.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-052",
+   "file": "app/engine/fallenLedgerStore.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-053",
+   "file": "app/engine/fallenMailbox.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-054",
+   "file": "app/engine/fallenRevenants.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-055",
+   "file": "app/engine/gameLog.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-056",
+   "file": "app/engine/golems.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-057",
+   "file": "app/engine/hooks.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-058",
+   "file": "app/engine/investigationTable.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-059",
+   "file": "app/engine/itemSynthesisQwen.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-060",
+   "file": "app/engine/npcMemory.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-061",
+   "file": "app/engine/questGenerator.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-062",
+   "file": "app/engine/saveSystem.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-063",
+   "file": "app/engine/types.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-064",
+   "file": "app/engine/vendors.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-065",
+   "file": "app/engine/waterBottle.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-066",
+   "file": "app/engine/whispers.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-067",
+   "file": "app/engine/worldMemory.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-068",
+   "file": "app/screens/AboutScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-069",
+   "file": "app/screens/ActionReferenceScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-070",
+   "file": "app/screens/ContractsScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-071",
+   "file": "app/screens/CraftingScreen.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-072",
+   "file": "app/screens/ExplorationScreen.tsx",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-073",
+   "file": "app/screens/InventoryScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-074",
+   "file": "app/screens/LogScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()",
+    "setInterval()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-075",
+   "file": "app/screens/MapScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-076",
+   "file": "app/screens/TitleScreen.tsx",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-077",
+   "file": "app/state/combatResolution.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-078",
+   "file": "app/state/gameStore.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()",
+    "setInterval()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-079",
+   "file": "app/state/gearWear.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-080",
+   "file": "app/state/humanActivity.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-081",
+   "file": "app/state/lastWalk.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-082",
+   "file": "app/state/ledgerVisits.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-083",
+   "file": "app/state/presentationHandoff.ts",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-084",
+   "file": "app/state/slices/aiLifecycleSlice.ts",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-085",
+   "file": "app/state/slices/boardSlice.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-086",
+   "file": "app/state/slices/bootSlice.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-087",
+   "file": "app/state/slices/craftingSlice.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-088",
+   "file": "app/state/slices/inventorySlice.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-089",
+   "file": "app/state/slices/persistSlice.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-090",
+   "file": "app/state/slices/questSlice.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-091",
+   "file": "app/state/slices/slotSlice.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-092",
+   "file": "app/state/sprint.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-093",
+   "file": "app/ui/backupCharacter.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-094",
+   "file": "app/updates/apkRelease.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-095",
+   "file": "app/updates/checkAndApplyOTA.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-096",
+   "file": "app/voice/PiperTTSManager.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-097",
+   "file": "app/voice/TTSController.ts",
+   "clock_sources_present": [
+    "Date.now()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-098",
+   "file": "app/voice/TTSManager.ts",
+   "clock_sources_present": [
+    "Date.now()",
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  },
+  {
+   "id": "CLK-099",
+   "file": "app/voice/executorchAdapter.ts",
+   "clock_sources_present": [
+    "setTimeout()"
+   ],
+   "confidence": "PROVEN",
+   "evidence": "grep match in file"
+  }
+ ],
+ "total_files": 99
+}
