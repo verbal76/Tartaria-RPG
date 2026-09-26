@@ -8,8 +8,13 @@ export const PAY_TRAIN_CAP = 15;
 /** Per-point base: a training session costs PER_POINT × the stat's current value,
  *  so each point costs more than the last (10→11 = 500, 14→15 = 700). */
 export const PAY_TRAIN_PER_POINT = 50;
-/** Flat fee to revive a dead/abandoned dog — deliberately steep. */
-export const REVIVE_DOG_COST = 300;
+
+// F ruling (owner, dog death/revival adjudication) — REVIVE_DOG_COST (was
+// 300) removed here. The vendor never had a legitimate dog-revival service;
+// the only recovery door is the player's own pack within DOG_BLEED_OUT_HOURS
+// (dogStatus.ts), and death/abandonment past that window is permanent
+// (matches the pre-existing OTA-1726 canon in dogMarket.ts). See
+// gameStore.ts's tryVendorServiceVerb dog branch.
 
 export function payTrainCost(currentValue: number): number {
   return PAY_TRAIN_PER_POINT * Math.max(0, currentValue);

@@ -185,6 +185,18 @@ describe('placedAt — fixtures can no longer invent impossible coordinates', ()
     //   carries on rather than throwing into its host; placedAt cannot express
     //   that by construction. Re-baselined per the instruction above ("say
     //   which one at the site and re-baseline"), and said at both sites.
-    expect(bare).toBeLessThanOrEqual(54); // the baseline — shrink-only
+    // ⚠ Phase 8 (Life 2 postmortem, owner ruling §11) — 54 → 56. Two new sites,
+    //   canonicalAttemptMemoryPolicy.test.ts and canonicalContextualCombatPolicy
+    //   .test.ts, both minimal `PlayerView` fixtures for decide() — a pure
+    //   policy function that never reads gridX/gridY, and PlayerView.position
+    //   leaves both optional. Same class as parleyInterceptGuard/ota1853: coords
+    //   would be dead weight on a non-player read-model. Said at both sites.
+    // ⚠ I-003 (this campaign) — a THIRD new site, in
+    //   i003GuardianSettleStampSurvivesCoreThreeAndFour.test.ts, was NOT in this
+    //   class: it spreads a real, engine-created `player` and hand-overwrote
+    //   `currentLocationId` without its cell, exactly the invariant this file
+    //   exists to catch. Fixed by switching that site to `...placedAt(...)`
+    //   instead of re-baselining — so the count it leaves behind is 56, not 57.
+    expect(bare).toBeLessThanOrEqual(56); // the baseline — shrink-only
   });
 });

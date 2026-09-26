@@ -77,8 +77,13 @@ async function setupSceneWithRope() {
     },
     player: {
       ...p0,
+      // skipTutorial() grants every character a Reclaimer's Rope (the
+      // tutorial rope pickup), regardless of race/faction — and the climb
+      // handler's hasReclaimersRope check prefers it over a plain Climbing
+      // Rope by design (OTA 23-007/OTA-1016). Strip it here so this fixture
+      // is actually the "plain Climbing Rope only" case it claims to be.
       inventory: [
-        ...p0.inventory.filter((i) => i.name !== 'Climbing Rope'),
+        ...p0.inventory.filter((i) => i.name !== 'Climbing Rope' && i.name !== "Reclaimer's Rope"),
         { id: 'crope_x', name: 'Climbing Rope', kind: 'misc', quantity: 1, tags: ['gear', 'rope'] },
       ],
     },

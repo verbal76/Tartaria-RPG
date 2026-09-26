@@ -4,7 +4,6 @@
 import {
   PAY_TRAIN_CAP,
   PAY_TRAIN_PER_POINT,
-  REVIVE_DOG_COST,
   payTrainCost,
   canPayTrain,
   companionHealCost,
@@ -36,7 +35,7 @@ describe('OTA-728 — companion care scales with injury', () => {
     // golems cost a touch more to mend than dogs for the same wound
     expect(companionHealCost(30, 'golem')).toBeGreaterThan(companionHealCost(30, 'dog'));
   });
-  it('reviving a dog is a steep flat fee', () => {
-    expect(REVIVE_DOG_COST).toBeGreaterThanOrEqual(200);
-  });
+  // F ruling (owner) — the vendor no longer offers a dog-revival service at
+  // any price; REVIVE_DOG_COST was removed. See ota1844TheLastWalk.test.tsx's
+  // '37+38+39' test and gameStore.ts's tryVendorServiceVerb dog branch.
 });

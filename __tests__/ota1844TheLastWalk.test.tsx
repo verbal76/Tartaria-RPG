@@ -558,7 +558,7 @@ describe('§G — history', () => {
 
 // ---------------------------------------------------------------------------
 describe('§H — firewalls', () => {
-  test('37 + 38 + 39. ordinary living dogs are untouched: bleed-out, abandon, revive', () => {
+  test('37 + 38 + 39. ordinary living dogs are untouched: bleed-out, abandon, permanent death', () => {
     // the whole lifecycle moved FILES and nothing else; these are the sentences
     // that decide each fate, and they are where they always were.
     const ds = SRC('app/state/dogStatus.ts');
@@ -567,10 +567,16 @@ describe('§H — firewalls', () => {
     expect(ds).toMatch(/status: 'dead' as const/);
     expect(ds).toMatch(/status: 'abandoned' as const/);
     expect(ds).toMatch(/const offBench = dog\.status === 'waiting_at_base' && dog\.hp > 0/);
-    // the 300 TC revive is untouched, and it is still the reason bleed-out and
-    // abandonment are excluded from the Last Walk.
-    expect(SRC('app/engine/vendorServices.ts')).toMatch(/export const REVIVE_DOG_COST = 300;/);
-    expect(SRC('app/state/gameStore.ts')).toMatch(/const cost = vs\.REVIVE_DOG_COST;/);
+    // F ruling (owner, follow-up campaign) — the vendor's 300 TC revive was
+    // REMOVED: it contradicted the owner's explicit dog death/revival
+    // contract (bleed-out death and abandonment are BOTH permanent; only
+    // the player's own pack, inside DOG_BLEED_OUT_HOURS, can bring a downed
+    // dog back). exclusion from the Last Walk is NOT because the vendor
+    // could revive it — 'dead'/'abandoned' dogs were never `with_player`,
+    // and dogIsEligibleForLastWalk gates on that alone, untouched by this.
+    expect(SRC('app/engine/vendorServices.ts')).not.toMatch(/export const REVIVE_DOG_COST/);
+    expect(SRC('app/state/gameStore.ts')).not.toMatch(/const cost = vs\.REVIVE_DOG_COST/);
+    expect(SRC('app/engine/fallenDogs.ts')).toMatch(/return !!dog && dog\.status === 'with_player';/);
     // and nothing in this OTA writes to a living dog
     expect(SRC('app/state/lastWalk.ts')).not.toMatch(/player\.dog|loyalty|feed/);
   });

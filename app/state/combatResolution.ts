@@ -1246,12 +1246,18 @@ export function tickEnemyDotsAndMaybeEndFight(
           // OTA-362 — coating DOTs (poison/acid/corruption) tick the
           // same way as the OTA-210 infection: dmgPerTurn off the HP,
           // decrement turns, expire with a kind-flavored line.
+          // I-002 — cold_coat was missing here: coatingStatusKind('cold') mints
+          // it, applyCoatingProc seeds it with a real dmgPerTurn/turnsRemaining
+          // like any other coating DOT, but it fell to the else-branch below and
+          // was pushed back unchanged forever — no damage, no countdown, no
+          // expiry line.
           const isDot = st.kind === 'infected'
             || st.kind === 'poison_coat'
             || st.kind === 'acid_coat'
             || st.kind === 'corruption_coat'
             || st.kind === 'electrical_coat'
             || st.kind === 'burn_coat'
+            || st.kind === 'cold_coat'
             || st.kind === 'typed_dot';
           if (isDot && st.turnsRemaining > 0) {
             const dmg = st.dmgPerTurn;
@@ -1268,7 +1274,9 @@ export function tickEnemyDotsAndMaybeEndFight(
                     ? `${enemyName} convulses — arcing current bites ${dmg}.`
                     : st.kind === 'burn_coat'
                       ? `${enemyName} blisters — clinging fire sears ${dmg}.`
-                      : st.kind === 'typed_dot'
+                      : st.kind === 'cold_coat'
+                        ? `${enemyName} stiffens — clinging frost gnaws ${dmg}.`
+                        : st.kind === 'typed_dot'
                         ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
                         : `${enemyName} convulses — infection bleeds ${dmg}.`;
             get().appendLog(
@@ -1290,6 +1298,7 @@ export function tickEnemyDotsAndMaybeEndFight(
                 : st.kind === 'poison_coat' ? 'poison'
                 : st.kind === 'corruption_coat' ? 'corruption'
                 : st.kind === 'electrical_coat' ? 'current'
+                : st.kind === 'cold_coat' ? 'frost'
                 : 'coating';
               get().appendLog(
                 'combat',

@@ -53,7 +53,12 @@ describe('OTA-1118 — nothing in the running game touches hunger', () => {
   it('advanceTime no longer computes a tick or writes the field', () => {
     // It runs on every action in the game; a dead write there is the most
     // expensive kind of nothing.
-    expect(store).toContain('return { ...player, hoursElapsed: newHours, dog };');
+    // I-011 added a trailing `aetherBuff` field to this same return
+    // statement (expiry clearing, unrelated to hunger) — the pin now names
+    // the return statement itself rather than freezing its exact field
+    // list, so it still catches a resurrected hunger write without pinning
+    // fields this suite doesn't govern.
+    expect(store).toMatch(/return \{ \.\.\.player, hoursElapsed: newHours, dog(?:, \w+)* \};/);
     expect(store).not.toContain('const newHunger = 0;');
     expect(store).not.toContain('hungerStaminaPenalty: newHunger');
   });

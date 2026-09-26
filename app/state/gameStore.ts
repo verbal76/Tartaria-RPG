@@ -40,7 +40,7 @@ import {
 // ⚠ OTA-1844 — the dog's time-based fates live in their own file now; both names
 // are re-exported so every existing importer is untouched by the move.
 export { DOG_BLEED_OUT_HOURS, tickDogStatus } from './dogStatus';
-import { tickDogStatus } from './dogStatus';
+import { tickDogStatus, dogGoneForGoodLine, dogNeedsFeedingNotCoinLine } from './dogStatus';
 // ⚠ OTA-1844 — the Last Walk decides and speaks for itself. The store opens the
 // encounter and forwards the player's choice; nothing else about it is here.
 import * as lastWalk from './lastWalk';
@@ -6114,7 +6114,9 @@ export function advanceTime(player: PlayerCharacter, hours: number): PlayerChara
       dog = { ...dog, loyalty: newLoyalty };
     }
   }
-  return { ...player, hoursElapsed: newHours, dog };
+  // I-011 — aetherBuff was never cleared on expiry (open-issues.json).
+  const aetherBuff = player.aetherBuff && Date.now() >= player.aetherBuff.expiresAtMs ? undefined : player.aetherBuff;
+  return { ...player, hoursElapsed: newHours, dog, aetherBuff };
 }
 
 
@@ -12385,15 +12387,18 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       //     end of each scene; the broken plate is the demonstrator.
       if (tStep?.id === 'scrap' && /\b(scrap|salvage|break)\s+.*(chest\s+plate|plate|breastplate)\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
-        set((s) => ({
+        set((s) => (!s.player ? {} : { // I-005: grants real Scrap Metal now (was narrating a nonexistent item)
           tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
+          player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, {
+            id: `tutorial_scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, name: 'Scrap Metal', kind: 'misc', rarity: 'Common', quantity: 2, tags: ['metal'],
+          }) },
         }));
         // OTA-1075 — owner, from a device run: "way too much text for the
         // salvage button... shorter lines and less of them." One world
         // sentence, the reward, and straight on — the quip is gone; the
         // reward line already says ruins pay out.
         get().appendLog('world', 'You pop the rusted plate off its strap and it comes apart along old hammer-marks.');
-        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [salvaged]');
+        get().appendLog('reward', '✦ Scrap Metal x2 (Common). [salvaged]');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -16762,6 +16767,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             const fx = resolveItemEffect(used.name, resolvers);
             if (fx?.kind === 'consumable') {
               const messages: string[] = [];
+              let anyRealEffect = false; // J — true no-op (nothing applicable) refuses below, not spent.
               let p = { ...player };
               // OTA-776 — the Aetheric Torch is an AIMED tool, not a random
               // gamble. Using it REVEALS + takes over ONE chosen open lead and
@@ -16840,25 +16846,22 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                     : amt < fx.healHP ? `+${amt} HP (topped off)`
                     : `+${amt} HP`,
                 );
+                if (amt > 0) anyRealEffect = true;
               }
               if (fx.restoreStamina) {
                 const room = Math.max(0, effectiveStaminaMax(p) - p.stamina);
                 const amt = Math.min(room, fx.restoreStamina);
                 p = { ...p, stamina: p.stamina + amt };
                 messages.push(amt > 0 ? `+${amt} stamina` : 'stamina already full');
+                if (amt > 0) anyRealEffect = true;
               }
-              // ⚠⚠⚠ OTA-1573 — AND THE CURES, WHICH THIS PATH NEVER APPLIED. The
-              // owner's log: a Field Dressing used mid-fight healed 10 and left
-              // the bleed running for another 75 seconds until it expired on its
-              // own. `use_relic` is the route a TAPPED item takes in combat —
-              // exactly when a dressing matters — and it was the one route that
-              // dropped the flag the card and the catalog both carry. One curer
-              // now, shared with the other two paths.
+              // OTA-1573 — cures, which this path never applied before; one shared curer now (engine/consumableCures).
               {
                 const cures = applyConsumableCures(p.statusEffects, fx);
                 if (cures.cured) {
                   p = { ...p, statusEffects: cures.effects };
                   messages.push(...cures.messages);
+                  anyRealEffect = true;
                 }
               }
               if (fx.reduceCorruption) {
@@ -16866,6 +16869,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 p = { ...p, corruption: Math.max(0, before - fx.reduceCorruption) };
                 const cleared = before - p.corruption;
                 messages.push(cleared > 0 ? `-${cleared} corruption` : 'no corruption to clear');
+                if (cleared > 0) anyRealEffect = true;
                 // OTA 039 — tier-cross line on cleanse.
                 if (cleared > 0) {
                   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -16877,17 +16881,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 }
               }
               if (fx.revealScene) {
-                // Surface up to three unresolved hooks the player
-                // hasn't tripped yet — the use of the scanner /
-                // detector makes the room legible.
-                //
-                // OTA-212 — when there's nothing to reveal, REFUND
-                // the charge. The torch description promises hook
-                // detection; consuming a charge to "surface no
-                // resonance" wastes the player's stock. Setting
-                // refundCharge=true skips the inventory decrement
-                // below and the world line narrates the no-op
-                // explicitly.
+                // Surfaces unresolved hooks (OTA-212: refund when there's nothing to reveal AND no other effect fired).
                 const hooks = currentScene.hooks ?? [];
                 const visible = hooks
                   .filter((h) => !h.resolved)
@@ -16895,24 +16889,15 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                   .map((h) => h.nouns[0] ?? h.id);
                 if (visible.length > 0) {
                   messages.push(`pings: ${visible.join(', ')}`);
-                } else if (messages.length === 0) {
-                  // OTA-212 — PURE detector/torch (revealScene is its ONLY effect,
-                  // e.g. the Aetheric Torch) with nothing to surface: refund the
-                  // charge and bail, so a scan over an empty room doesn't waste the
-                  // player's stock.
+                  anyRealEffect = true;
+                } else if (!anyRealEffect) {
                   get().appendLog(
                     'arbiter',
                     `You hold the ${used.name} up. The room takes the light without resonance — nothing here to reveal. The torch goes back in your pack, unspent.`,
                   );
                   break;
                 } else {
-                  // OTA-620 — the item ALSO did something real (heal/stamina/
-                  // cleanse): it's a food-that-glows like the Bioluminescent Fungus
-                  // ({ healHP: 1, revealScene: true }), not a pure torch. Don't
-                  // refund — eat it normally and just note the room had nothing to
-                  // ping back. The OTA-212 break here was discarding the heal AND
-                  // the consume, so the fungus read as a no-op.
-                  messages.push('nothing to reveal');
+                  messages.push('nothing to reveal'); // OTA-620 — another effect already fired; consume normally.
                 }
               }
               if (fx.extendLight) {
@@ -16921,6 +16906,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 // surface the line so the player knows the item
                 // fired. Cheap deliverable until the buff system
                 // lands.
+                anyRealEffect = true;
               }
               if (fx.coating) {
                 // OTA-746 — drinkable only if its element has a player-side counter.
@@ -16933,12 +16919,18 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
                 const remedy = coatingDrinkRemedy(p, fx.coating.kind, canonicalItemRarity(used));
                 p = remedy.player;
                 messages.push(...remedy.messages);
+                anyRealEffect = true;
                 if (remedy.corruptionAfter < remedy.corruptionBefore) {
                   // eslint-disable-next-line @typescript-eslint/no-require-imports
                   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
                   const crossLine = tierCrossLine(corruptionTierOf(remedy.corruptionBefore), corruptionTierOf(remedy.corruptionAfter));
                   if (crossLine) void Promise.resolve().then(() => get().appendLog('reward', crossLine));
                 }
+              }
+              // J — true no-op: nothing above changed anything; refuse and preserve (OTA-212/620, generalized).
+              if (!anyRealEffect) {
+                get().appendLog('arbiter', `You ready the ${used.name}, but there's nothing left for it to do right now. It goes back in your pack, unspent.`);
+                break;
               }
               const newInventory = leaveEmptyWaterBottle(
                 p.inventory
@@ -17183,6 +17175,11 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             };
             newStatusEffects = applyEffect(newStatusEffects, buff);
             buffLine = ` Boost: +${fx.buffBonus} ${fx.buffStat.toUpperCase().slice(0, 3)} for ${fx.buffDuration} turns.`;
+          }
+          // J — true no-op: nothing here would change anything; refuse and preserve (OTA-212/620).
+          if (heal <= 0 && stamGain <= 0 && !bleedCured && !poisonCured && buffLine === '') {
+            get().appendLog('world', `You go for the ${consumable.name}, but there's nothing left for it to do right now — you put it back.`);
+            break;
           }
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
@@ -24876,9 +24873,11 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             (inv, lootName, i) => {
               // OTA-938 — resolveLootItem: catalog-canonical when known, TROPHY at the
               // enemy's own rarity when not (never a 2-TC tagless Common again).
+              // I-009 — `i` alone collided across kills in the same ms; freshInstanceId (OTA-434) fixes it deterministically, drawing no RNG (owner ruling I).
+              const lootId = freshInstanceId('loot');
               const revPiece = revKit.find((g) => g.name === lootName);
               if (revPiece) {
-                return mergeOrPushItem(inv, revMod.reconstructFallenPiece(revPiece, `loot_${Date.now()}_${i}`));
+                return mergeOrPushItem(inv, revMod.reconstructFallenPiece(revPiece, lootId));
               }
               const lootLookup = resolveLootItem(lootName, enemy.rarity);
               // OTA-363 — a dropped coatable weapon occasionally arrives
@@ -24888,7 +24887,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
               const lootCoat = lootLookup.kind === 'weapon' ? rollLootCoating(lootName) : null;
               const baseDur = lootCoat ? (findWeaponByName(lootName)?.baseDurability ?? 10) : undefined;
               return mergeOrPushItem(inv, {
-                id: `loot_${Date.now()}_${i}`,
+                id: lootId,
                 name: lootName,
                 kind: lootLookup.kind,
                 rarity: lootLookup.rarity,
@@ -28572,7 +28571,8 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         tutorialDemoVendor: null,
         awaitingTutorialName: false,
         tutorialExploreChosen: false,
-        tutorialPropsConsumed: { cudgel: true, rope: true, chestPlate: true, note: true },
+        // I-001/I-004 — merge onto live flags (was clobbering vest/cap and pre-stamping cudgel/rope; open-issues.json).
+        tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true, note: true },
         // Land back in the world when the tutorial ends. The final beat
         // (pick_city) runs on the 'contracts' / MAIN QUEST screen, and the
         // skip button can fire from any beat — without this, finishing or
@@ -31761,20 +31761,12 @@ function tryVendorServiceVerb(
 
     // dog
     const dog = player.dog;
-    if (!dog || dog.status === 'abandoned' || dog.status === 'dead') {
-      // revive path
-      if (dog && (verb === 'revive' || verb === 'restore') && (dog.status === 'dead' || dog.status === 'abandoned')) {
-        const cost = vs.REVIVE_DOG_COST;
-        if (player.tc < cost) {
-          get().appendLog('arbiter', `${vendor.name} looks at the still form. "Bringing ${dog.name} back is grim work — ${cost} TC. You haven't got it."`);
-          return true;
-        }
-        set((s) => (s.player && s.player.dog ? { player: { ...s.player, tc: s.player.tc - cost, dog: { ...s.player.dog, status: 'with_player', hp: s.player.dog.hpMax } } } : s));
-        get().appendLog('reward', `${vendor.name}'s healer coaxes ${dog.name} back from the edge. ${cost} TC. ${dog.name} is with you again, restored.`);
-        void get().persist();
-        return true;
-      }
-      get().appendLog('arbiter', `${vendor.name} looks around. "You've no dog with you to tend."`);
+    if (!dog || dog.status === 'abandoned' || dog.status === 'dead') { // F ruling: permanent, open-issues.json (F)
+      get().appendLog('arbiter', dogGoneForGoodLine(vendor.name, dog));
+      return true;
+    }
+    if (dog.hp <= 0) { // F ruling: downed inside the window still isn't vendor-healable
+      get().appendLog('arbiter', dogNeedsFeedingNotCoinLine(vendor.name, dog));
       return true;
     }
     const missing = Math.max(0, dog.hpMax - dog.hp);
@@ -32781,18 +32773,17 @@ function triggerMainQuest(
   if (mq.shouldFireThreeCoreTwist(nextState)) {
     const twistLine = mq.threeCoreTwistLine(player.factionId);
     if (twistLine) get().appendLog('arbiter', twistLine, { ...STORY_BEAT_META });
-    const flagged = mq.markTwistFired(nextState, 'three_core_pressure');
+    // I-003 fix: base on live state, not the stale pre-stamp nextState.
     const cur = get().player;
-    if (cur) set({ player: { ...cur, mainQuest: flagged } });
+    if (cur) set({ player: { ...cur, mainQuest: mq.markTwistFired(cur.mainQuest, 'three_core_pressure') } });
   }
   // OTA-495 — Core-4 golem-forge unlock beat (one-shot, mirrors the 3-core
   // twist). Fires the moment coresRecovered hits 4 and opens the golem-armament
   // recipes (gated in the craft handler on recipe.coresRequired).
   if (mq.shouldFireFourCoreForge(nextState)) {
     get().appendLog('arbiter', mq.fourCoreForgeLine(), { ...STORY_BEAT_META });
-    const flagged = mq.markTwistFired(nextState, 'four_core_forge');
-    const cur = get().player;
-    if (cur) set({ player: { ...cur, mainQuest: flagged } });
+    const cur = get().player; // I-003 fix, same as Core-3 above
+    if (cur) set({ player: { ...cur, mainQuest: mq.markTwistFired(cur.mainQuest, 'four_core_forge') } });
   }
   // v2.4.1 (OTA 038 — Phase 5) — the Nexus interior cinematic.
   // When reached_nexus advances 'descent' -> 'choice', emit the
@@ -35624,6 +35615,14 @@ function applyItemToDog(
     const isFoodish = isConsumable || canonicalItemTags(item).includes('food');
     return isFoodish ? Math.min(hpRoom, rollDie(6) + rollDie(6)) : 0;
   })();
+  // J — true no-op: full HP and already-max loyalty; refuse and preserve (mirrors the player rule).
+  if (healAmount <= 0 && Math.min(100, dog.loyalty + loyaltyGain) <= dog.loyalty) {
+    get().appendLog(
+      'arbiter',
+      applyDogPronouns(`${dog.name} sniffs at the ${item.name} and looks away — nothing {pronoun} need{verbS} right now. You put it back.`, dog.sex.pronoun),
+    );
+    return false;
+  }
   // Consume 1 of the item.
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
@@ -35697,18 +35696,19 @@ function applyItemToGolem(
   // repair-part gate below — a core isn't fuel, it's transferred memory.
   if (item.golemCore) {
     const c = item.golemCore;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- I-007: clamp moved to graftInertCoreStats (engine/golems.ts)
+    const { graftInertCoreStats } = require('../engine/golems') as typeof import('../engine/golems');
+    let grantedPower = 0; let grantedResilience = 0;
     set((s) => {
       if (!s.player || !s.player.golem) return s;
       const g = s.player.golem;
-      const stats = g.stats ?? { power: 0, resilience: 0 };
-      const inv = s.player.inventory
-        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
-        .filter((i) => i.quantity > 0);
+      const grafted = graftInertCoreStats(g.stats ?? { power: 0, resilience: 0 }, c);
+      grantedPower = grafted.grantedPower; grantedResilience = grafted.grantedResilience;
+      const inv = s.player.inventory.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i)).filter((i) => i.quantity > 0);
       return { player: { ...s.player, inventory: inv, golem: { ...g,
-        stats: { power: stats.power + c.power, resilience: stats.resilience + c.resilience },
-        hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
+        stats: { power: grafted.power, resilience: grafted.resilience }, hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
     });
-    get().appendLog('reward', `✦ You seat the Inert Golem Core into ${golem.name}'s frame. It remembers old fights — +${c.power} power, +${c.resilience} resilience, +${c.bonusHp} max HP.`);
+    get().appendLog('reward', `✦ You seat the Inert Golem Core into ${golem.name}'s frame. It remembers old fights — +${grantedPower} power, +${grantedResilience} resilience, +${c.bonusHp} max HP.`);
     return true;
   }
   // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.

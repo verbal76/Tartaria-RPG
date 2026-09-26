@@ -95,11 +95,18 @@ describe('OTA 23-010 — consumable narration picks the right verb', () => {
     expect(logs).toMatch(/You eat the Trail Rations/);
   });
 
-  it('"eat purification vial" reads as "you drink"', async () => {
-    const store = await setupConsumable('Purification Vial');
-    store.getState().submitPlayerAction('eat purification vial');
+  it('"eat blue cap draught" reads as "you drink"', async () => {
+    // J — swapped from Purification Vial: its ONLY catalog effect is
+    // reduceCorruption, which the 'eat' dispatch never reads at all (only
+    // healHP/restoreStamina/cures/buffs) — so "eat purification vial" is now
+    // correctly refused as a true no-op regardless of corruption level, a
+    // separate pre-existing routing gap out of scope for this fix. Blue Cap
+    // Draught carries healHP+restoreStamina, so setupConsumable's damaged-HP
+    // baseline gives it a real, applicable effect.
+    const store = await setupConsumable('Blue Cap Draught');
+    store.getState().submitPlayerAction('eat blue cap draught');
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-    expect(logs).toMatch(/You drink the Purification Vial/);
+    expect(logs).toMatch(/You drink the Blue Cap Draught/);
   });
 
   it('"use first aid kit" (use_relic path) still narrates "you use one"', async () => {

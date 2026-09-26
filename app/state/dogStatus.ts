@@ -15,9 +15,23 @@
  * line of narration and the OTA-1715 off-bench invariant are byte-identical, so
  * the dog suites that guard them are the proof that nothing shifted. */
 import { applyDogPronouns, DOG_LOYALTY_BANDS } from '../engine/dogCompanion';
+import type { DogCompanion } from '../engine/types';
 import type { GameStore } from './gameStore';
 
 export const DOG_BLEED_OUT_HOURS = 24;
+
+/** F ruling (owner) — dead/abandoned is permanent (OTA-1726 canon); the
+ *  vendor never revives either state. See open-issues.json (F). */
+export function dogGoneForGoodLine(vendorName: string, dog: DogCompanion | null | undefined): string {
+  if (!dog) return `${vendorName} looks around. "You've no dog with you to tend."`;
+  return applyDogPronouns(`${vendorName} looks at the still form and shakes their head. "That's past my mending — ${dog.name}'s gone for good. {Pronoun} won't be coming back."`, dog.sex.pronoun);
+}
+
+/** F ruling (owner) — a downed dog inside the bleed-out window can't be
+ *  vendor-healed either: same banned revival, reached by a different verb. */
+export function dogNeedsFeedingNotCoinLine(vendorName: string, dog: DogCompanion): string {
+  return applyDogPronouns(`${vendorName} kneels by ${dog.name} and pulls back. "This is past coin — {pronoun} need{verbS} feeding, not physicking. Get food in {object}, quick."`, dog.sex.pronoun);
+}
 
 /** Poplar Anvil — per-action reconciliation of the dog's time-based fates.
  *  Scheduled as a microtask off submitPlayerAction so it runs AFTER the

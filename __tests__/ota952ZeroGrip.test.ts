@@ -64,8 +64,14 @@ async function bootOnWall(stamina: number) {
       ...s.player!,
       hp: 100, hpMax: 100,
       stamina, staminaMax: 20,
+      // skipTutorial() grants every character a Reclaimer's Rope (the
+      // tutorial rope pickup), and hasReclaimersRope halves climbStaminaCost
+      // to 1/tier — which silently turns "PARTIAL stamina (1), under the
+      // haul cost" into "exactly enough," skipping the low-stamina branch
+      // this suite means to exercise. Strip it so the fixture's plain
+      // Climbing Rope (full cost) is the only rope in play.
       inventory: [
-        ...s.player!.inventory,
+        ...s.player!.inventory.filter((i) => i.name !== "Reclaimer's Rope"),
         { id: 'rope1', name: 'Climbing Rope', kind: 'misc' as const, rarity: 'Common' as const, quantity: 1, tags: ['gear'], durability: { current: 10, max: 10 } },
       ],
     },

@@ -205,11 +205,24 @@ const GOLEM_LEVEL_UP_THRESHOLD = 100;
 // without bound. The resist cap kept its DEFENSE mortal, but nothing bounded its
 // OFFENSE or HP; this does. Reaching 30 is still an extreme grind (~1000 uses/
 // point at the top tier).
-const GOLEM_MAX_TRAINED_STAT = 30;
+export const GOLEM_MAX_TRAINED_STAT = 30;
 
 /** Read a trained golem stat, tolerating golems summoned before OTA-467. */
 export function golemStatBonus(golem: Companion, key: GolemStatKey): number {
   return golem.stats?.[key] ?? 0;
+}
+
+/** I-007 — grafting an Inert Golem Core added its power/resilience with no
+ *  clamp, unlike every other stat-gain path (GOLEM_MAX_TRAINED_STAT); cores
+ *  chain, so a golem built from one grafted core could exceed the ceiling
+ *  freely. Clamps to the ceiling and reports the amount actually granted. */
+export function graftInertCoreStats(
+  stats: { power: number; resilience: number },
+  core: { power: number; resilience: number },
+): { power: number; resilience: number; grantedPower: number; grantedResilience: number } {
+  const power = Math.min(GOLEM_MAX_TRAINED_STAT, stats.power + core.power);
+  const resilience = Math.min(GOLEM_MAX_TRAINED_STAT, stats.resilience + core.resilience);
+  return { power, resilience, grantedPower: power - stats.power, grantedResilience: resilience - stats.resilience };
 }
 
 /** arb170 — effective % damage resistance (0..1): the kind's innate floor plus a
