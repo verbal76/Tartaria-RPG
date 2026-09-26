@@ -28,6 +28,10 @@ import { buildSaveSnapshot, stampSaveExport } from '../diagnostics/saveSnapshot'
 // OTA-1885 — the read-only save probe (see that file's header for why it has
 // no import from saveSystem.ts and no reachable mutation path).
 import { buildSaveSlotProbeReport, formatSaveSlotProbeReport } from '../diagnostics/saveSlotProbe';
+// OTA-1886 — GOLEM ONLY. The legacy-database preservation probe (see that
+// file's header for why it has no reachable path that can modify an
+// original file, and why it needed no new native module).
+import { runLegacyStoragePreservation, formatLegacyStorageReport } from '../diagnostics/legacyStoragePreserve';
 import { NumberStepper } from '../components/NumberStepper';
 import { ColorWheel } from '../components/ColorWheel';
 import {
@@ -304,6 +308,10 @@ export function AboutScreen() {
   const [probeCopied, setProbeCopied] = useState(false);
   const [probeCharCount, setProbeCharCount] = useState(0);
   const [probeBusy, setProbeBusy] = useState(false);
+  // OTA-1886 — legacy-database preservation flash state, same pattern.
+  const [legacyProbeCopied, setLegacyProbeCopied] = useState(false);
+  const [legacyProbeCharCount, setLegacyProbeCharCount] = useState(0);
+  const [legacyProbeBusy, setLegacyProbeBusy] = useState(false);
   // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
   // Tartaria save into the Golem build) and load it as a new playable slot.
   const [importBusy, setImportBusy] = useState(false);
@@ -518,6 +526,25 @@ export function AboutScreen() {
       setTimeout(() => setProbeCopied(false), 4000);
     } catch { /* clipboard rarely fails on Android */ }
     finally { setProbeBusy(false); }
+  }
+  // OTA-1886 — PRESERVE LEGACY SAVE DATABASE. GOLEM ONLY. Checks whether the
+  // pre-upgrade save database (RKStorage, from before this device's AsyncStorage
+  // library moved to its newer storage engine) still physically exists, and if
+  // so makes a verified, byte-for-byte copy — never opening it as a database,
+  // never touching the current save system. See legacyStoragePreserve.ts.
+  async function handlePreserveLegacyStorage() {
+    if (legacyProbeBusy) return;
+    setLegacyProbeBusy(true);
+    try {
+      const report = await runLegacyStoragePreservation();
+      const formatted = formatLegacyStorageReport(report);
+      const stamped = `${formatted}\n\n${buildBasicDeviceSummary()}\n`;
+      await Clipboard.setStringAsync(stamped);
+      setLegacyProbeCharCount(stamped.length);
+      setLegacyProbeCopied(true);
+      setTimeout(() => setLegacyProbeCopied(false), 4000);
+    } catch { /* clipboard rarely fails on Android */ }
+    finally { setLegacyProbeBusy(false); }
   }
   // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
   // parse it, write it to a new slot, and drop into the game. Lets a save from
@@ -1410,6 +1437,31 @@ export function AboutScreen() {
                     : probeCopied
                       ? `✓ COPIED — ${probeCharCount.toLocaleString()} CHARS`
                       : 'SCAN STORAGE FOR SAVED CHARACTERS'}
+                </Text>
+              </Pressable>
+              {/* OTA-1886 — PRESERVE LEGACY SAVE DATABASE. GOLEM ONLY. Checks for
+                  the pre-upgrade save database and, if found, makes a verified
+                  byte-for-byte copy — never opens it as a database, never writes
+                  to it, never touches the current save system. See
+                  legacyStoragePreserve.ts. */}
+              <Text style={styles.sessionHint}>
+                Checks for an older save database from before a technical update,
+                and makes a verified safety copy if one is found. This only reads
+                and copies — it cannot repair, restore, or change anything.
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed), legacyProbeBusy && kit.ctlDead]}
+                onPress={() => { void handlePreserveLegacyStorage(); }}
+                disabled={legacyProbeBusy}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {legacyProbeBusy
+                    ? 'CHECKING…'
+                    : legacyProbeCopied
+                      ? `✓ COPIED — ${legacyProbeCharCount.toLocaleString()} CHARS`
+                      : 'PRESERVE LEGACY SAVE DATABASE'}
                 </Text>
               </Pressable>
               <Pressable

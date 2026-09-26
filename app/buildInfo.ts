@@ -31948,7 +31948,55 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * This is forensics, not a repair: it changes nothing about how saves are
  * written, read, indexed, or migrated. NOT PUBLISHED TO HAL — this build is
  * scoped to Golem only, to answer one owner's device question. */
-export const OTA_BUILD_ID = '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds';
+/** ⚠⚠ OTA-1886 — THE RKSTORAGE PRESERVATION PROBE. GOLEM ONLY — NOT PROMOTED TO HAL.
+ *
+ * Direct continuation of OTA-1885: that probe proved AsyncStorage itself holds
+ * no slot blob behind the empty index. This turn asks the one question ahead
+ * of it — does the pre-migration legacy database still physically exist on
+ * disk, in a place AsyncStorage's own JS surface never looks? The installed
+ * @react-native-async-storage/async-storage engine keeps two on-disk stores
+ * across the New Architecture line: the legacy SQLite file `RKStorage` (table
+ * catalystLocalStorage), and the Room database `AsyncStorage` (table Storage)
+ * that a one-time, single-file `createFromFile(oldDbFile)` migration copies it
+ * into — with no visible handling of SQLite's `-wal`/`-shm` companions. That
+ * gap is a real, documented class of AsyncStorage data loss, not proof of what
+ * happened on this device — this build exists to find out.
+ *
+ * ADDED: app/diagnostics/legacyStoragePreserve.ts
+ * (runLegacyStoragePreservation / formatLegacyStorageReport) — a new
+ * "PRESERVE LEGACY SAVE DATABASE" button beside OTA-1885's probe in the About
+ * screen's DIAGNOSTIC TOOLS drawer. It existence-checks RKStorage and its
+ * -wal/-shm/-journal companions in the app's own private databases directory
+ * (no root, no ADB, no new native module — expo-file-system's legacy API
+ * already has full read/write access to the app's own sandbox); if any exist,
+ * it byte-for-byte copies the whole discovered set into a preservation
+ * subdirectory inside the sandbox and proves each copy hash-identical to its
+ * original before saying so. It also existence-checks (never copies) the
+ * current AsyncStorage database and companions, for comparison only.
+ *
+ * ⚠ PRESERVATION, NOT ANALYSIS, NOT REPAIR. Originals are only ever
+ * existence-checked, raw-read, hashed, and raw-copied — never opened as a
+ * database. The module calls exactly three expo-file-system methods
+ * (getInfoAsync, readAsStringAsync, copyAsync) plus makeDirectoryAsync for the
+ * destination; it never calls deleteAsync, moveAsync, or writeAsStringAsync,
+ * has no import of saveSystem.ts or @react-native-async-storage/async-storage,
+ * and cannot reach setItem, loadSlot, or any Tartaria save-repair path. Hashing
+ * is a from-scratch pure-JS SHA-256 (no expo-crypto dependency, so no new
+ * native module is needed). ota1886LegacyStoragePreserveIsReadOnly proves both
+ * halves: statically, that none of the forbidden identifiers appear in the
+ * module's executable source; behaviorally, across every discovered-file-set
+ * scenario (absent, RKStorage alone, +WAL+SHM, +journal, hash mismatch, copy
+ * failure, read failure, stat failure), that the ORIGINAL files are left
+ * byte-identical before and after every run, and that only a verified,
+ * hash-matched copy is ever reported preserved.
+ *
+ * This turn does not read what is inside RKStorage even if found, and does
+ * not attempt any restoration, migration, or new-character creation — the
+ * owner's saves are never intentionally discarded to make an update work, and
+ * nothing here decides how a preserved copy is used. NOT PUBLISHED TO HAL —
+ * Golem only, to answer one owner's device question. */
+export const OTA_BUILD_ID = '2026-09-26-1886-the-copy-proves-itself-before-it-speaks';
+// SUPERSEDED: '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds'
 // SUPERSEDED: '2026-09-25-1884-the-picker-takes-the-region'
 // SUPERSEDED: '2026-09-25-1883-the-card-fits-the-screen'
 // SUPERSEDED: '2026-09-24-1882-the-paste-fits-in-the-window'
