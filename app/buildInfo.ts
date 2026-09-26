@@ -31913,7 +31913,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * retained artifact and stays a separate concept from the paste budget.
  *
  * NOT CLAIMED: physical clipboard/paste verification on the owner's hardware. */
-export const OTA_BUILD_ID = '2026-09-25-1884-the-picker-takes-the-region';
+/** ⚠⚠ OTA-1885 — THE READ-ONLY SAVE PROBE. GOLEM ONLY — NOT PROMOTED TO HAL.
+ *
+ * Save-preservation incident: a Golem title screen reported no characters
+ * while the owner's permanent rule stands — an existing save is never
+ * discarded to make anything work. Before any repair could even be
+ * proposed, the narrower question had to be answerable: does a slot BLOB
+ * (tartaria.slot.<id>.v2[.bak]) still exist in AsyncStorage even though the
+ * INDEX (tartaria.slots.index.v2) that is supposed to list it is empty or
+ * corrupt? listSlots() only ever reads the index; it has never looked
+ * behind it.
+ *
+ * ADDED: app/diagnostics/saveSlotProbe.ts (buildSaveSlotProbeReport /
+ * formatSaveSlotProbeReport) — a new "SCAN STORAGE FOR SAVED CHARACTERS"
+ * button in the About screen's DIAGNOSTIC TOOLS drawer, reachable from the
+ * title screen with no character loaded. It enumerates AsyncStorage
+ * directly via getAllKeys/getItem, classifies what it finds (orphaned save
+ * behind an empty/corrupt index, live-vs-backup health, or nothing found),
+ * and copies a plain report to the clipboard.
+ *
+ * ⚠ READ-ONLY BY CONSTRUCTION, NOT BY CONVENTION. The probe module has no
+ * import from saveSystem.ts and calls exactly two AsyncStorage methods —
+ * getAllKeys and getItem — both reads. It cannot reach setItem, removeItem,
+ * multiRemove, saveSlot, deleteSlot, mutateSlot, writeIndex,
+ * upsertIndexEntry, setActiveSlot, or loadSlot (which can itself WRITE the
+ * live key from .bak as a self-heal — exactly the kind of mutation this
+ * probe must never risk). ota1885SaveProbeIsReadOnly proves both halves:
+ * statically, that the module's own source contains none of those names in
+ * executable code; behaviorally, that running it against every
+ * classification scenario leaves AsyncStorage's keys and values completely
+ * unchanged. It does not dump full save JSON — only enough (name, race,
+ * savedAt) to let the owner recognize a character.
+ *
+ * This is forensics, not a repair: it changes nothing about how saves are
+ * written, read, indexed, or migrated. NOT PUBLISHED TO HAL — this build is
+ * scoped to Golem only, to answer one owner's device question. */
+export const OTA_BUILD_ID = '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds';
+// SUPERSEDED: '2026-09-25-1884-the-picker-takes-the-region'
 // SUPERSEDED: '2026-09-25-1883-the-card-fits-the-screen'
 // SUPERSEDED: '2026-09-24-1882-the-paste-fits-in-the-window'
 // SUPERSEDED: '2026-09-24-1879-the-roll-leaves-room-to-read'

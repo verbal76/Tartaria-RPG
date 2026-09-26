@@ -25,6 +25,9 @@ import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSum
 // OTA-1666 — inventorySnapshot import dropped with COPY INVENTORY. Its new (and
 // only) caller is diagnostics/bugReport.ts, which folds the pack into the report.
 import { buildSaveSnapshot, stampSaveExport } from '../diagnostics/saveSnapshot';
+// OTA-1885 — the read-only save probe (see that file's header for why it has
+// no import from saveSystem.ts and no reachable mutation path).
+import { buildSaveSlotProbeReport, formatSaveSlotProbeReport } from '../diagnostics/saveSlotProbe';
 import { NumberStepper } from '../components/NumberStepper';
 import { ColorWheel } from '../components/ColorWheel';
 import {
@@ -297,6 +300,10 @@ export function AboutScreen() {
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
+  // OTA-1885 — read-only save probe flash state, same pattern as COPY SAVE.
+  const [probeCopied, setProbeCopied] = useState(false);
+  const [probeCharCount, setProbeCharCount] = useState(0);
+  const [probeBusy, setProbeBusy] = useState(false);
   // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
   // Tartaria save into the Golem build) and load it as a new playable slot.
   const [importBusy, setImportBusy] = useState(false);
@@ -490,6 +497,27 @@ export function AboutScreen() {
       setSaveCopied(true);
       setTimeout(() => setSaveCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
+  }
+  // OTA-1885 — SCAN STORAGE FOR SAVED CHARACTERS. Read-only by construction
+  // (see diagnostics/saveSlotProbe.ts): enumerates AsyncStorage directly for
+  // slot blobs, whether or not the visible slot index currently lists them,
+  // and reports what it finds without writing, repairing, or migrating
+  // anything. Available even with no active player, because the whole point
+  // is to answer the question a title screen with no visible characters
+  // cannot answer on its own.
+  async function handleScanForSaves() {
+    if (probeBusy) return;
+    setProbeBusy(true);
+    try {
+      const report = await buildSaveSlotProbeReport();
+      const formatted = formatSaveSlotProbeReport(report);
+      const stamped = `${formatted}\n\n${buildBasicDeviceSummary()}\n`;
+      await Clipboard.setStringAsync(stamped);
+      setProbeCharCount(stamped.length);
+      setProbeCopied(true);
+      setTimeout(() => setProbeCopied(false), 4000);
+    } catch { /* clipboard rarely fails on Android */ }
+    finally { setProbeBusy(false); }
   }
   // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
   // parse it, write it to a new slot, and drop into the game. Lets a save from
@@ -1358,6 +1386,30 @@ export function AboutScreen() {
               >
                 <Text style={styles.sessionBtnSecondaryText}>
                   {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (for IMPORT SAVE below)'}
+                </Text>
+              </Pressable>
+              {/* OTA-1885 — SCAN STORAGE FOR SAVED CHARACTERS. Looks directly at
+                  device storage for a save that still exists even if the title
+                  screen's list is empty or wrong. Read-only: it cannot save,
+                  delete, repair, or create anything — see saveSlotProbe.ts. */}
+              <Text style={styles.sessionHint}>
+                Looks for saved characters directly in storage, even if the title
+                screen shows none. This only reads — it cannot change or delete
+                anything.
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed), probeBusy && kit.ctlDead]}
+                onPress={() => { void handleScanForSaves(); }}
+                disabled={probeBusy}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {probeBusy
+                    ? 'SCANNING…'
+                    : probeCopied
+                      ? `✓ COPIED — ${probeCharCount.toLocaleString()} CHARS`
+                      : 'SCAN STORAGE FOR SAVED CHARACTERS'}
                 </Text>
               </Pressable>
               <Pressable
