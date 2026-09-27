@@ -407,6 +407,27 @@ export function whisperRouteTarget(
   return null;
 }
 
+// ⚠⚠ ISSUE #222 — RE-ENTERING AN ARMED COURSE IS NOT A FRESH DEPARTURE.
+// Tolvek's own bar (WhisperTalkSheet) and the Contracts panel both keep their
+// SET COURSE / AUTO ROUTE button live for the whole fetch leg BY DESIGN
+// (OTA-1549 — it re-aims itself across every stage transition without the
+// sheet closing). Pressing it while `player.whisperCourse` already points at
+// this exact tile is a continue, not a start: `setWhisperCourse` used to
+// re-print "You set out toward X" and overwrite the course unconditionally,
+// so a player who had never lost progress saw the game announce a fresh
+// departure for a mission already under way — read, reasonably, as being
+// forced to accept/start it again. Route targets are stamped once at
+// plant/fetch time (whisperThiefGrid / whisperTargetGrid), so two calls for
+// the SAME stage return the SAME absolute cell: comparing coordinates is
+// exact, not a heuristic.
+export function isSameWhisperCourse(
+  course: { gridX?: number; gridY?: number } | null | undefined,
+  gridX: number,
+  gridY: number,
+): boolean {
+  return !!course && course.gridX === gridX && course.gridY === gridY;
+}
+
 /** Helper used by the spawn step — clones an enemy proto with a
  *  fresh HP and the requested name. Throws if the name doesn't
  *  resolve so chain authors find their typos fast. */

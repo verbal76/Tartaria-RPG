@@ -754,6 +754,7 @@ import {
   pronounForms,
   describeWhisperStage,
   withTalkTurn,
+  isSameWhisperCourse,
 } from '../engine/whispers';
 // ⚠ OTA-1581 — the mission conversation card. `armedEncounter` is a pure
 // selector over the save (see its file note: a selector, not a hook into
@@ -26707,16 +26708,15 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     );
   },
 
-  // OTA-465 — intra-area whisper/lead course. Whisper objectives live on map
-  // TILES (mapX/mapY) within the current area, not named locations, so the
-  // location-based travel system can't reach them. This walks the player
-  // cardinally toward the coordinate, one step per continue, reusing the same
-  // travel-row UX. Reaching the tile lets the chain's own beat fire (e.g. the
-  // Silt-Thief spawn). Players kept losing the objective; this gives them a
-  // "set course" from the Contracts screen.
+  // OTA-465 — intra-area whisper/lead course. Whisper objectives live on map TILES (mapX/mapY) within the
+  // current area, not named locations, so the location-based travel system can't reach them. This walks the
+  // player cardinally toward the coordinate, one step per continue, reusing the same travel-row UX. Reaching
+  // the tile lets the chain's own beat fire (e.g. the Silt-Thief spawn); players kept losing the objective, so this gives them a "set course" from the Contracts screen.
   setWhisperCourse(gridX, gridY, label) {
     const player = get().player;
     if (!player) return;
+    // ⚠ #222 — already armed at this exact tile: continue it, don't re-announce a departure.
+    if (!player.travelTarget && isSameWhisperCourse(player.whisperCourse, gridX, gridY)) return get().continueWhisperCourse();
     // ⚠⚠ OTA-1595 — A COURSE BEGINS OUTSIDE, this door too. OTA-993 put that rule
     // at setTravelCourse's choke point, but the WHISPER course never learned it:
     // the owner set out toward Hollis's salt cart from inside the Gate, walked
