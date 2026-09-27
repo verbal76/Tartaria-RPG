@@ -1068,53 +1068,73 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           ]}
         />
       </View>
-      {/* Portrait stat grid: two rows of two so it fits the narrow column. */}
-      <View style={styles.statGrid}>
-        <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
-        <Stat label="AC" value={String(ac)} />
-        <Stat label="ATK" value={atkLabel} />
-        <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
-      </View>
-      {/* ⚠⚠⚠ QOL #220 FINAL — THE DEVELOPED-GLYPH ACTIVE-EFFECT UNIT. Owner:
-          *"the owner developed specific glyphs for the individual damage/
-          effect families... [and] the glyph by itself is NOT enough — the
-          owner also needs to see WHAT THAT EFFECT IS CURRENTLY DOING directly
-          underneath its glyph."* One vertical unit per qualifying effect —
-          real artwork on top (`glyphArt`, the same asset Lore ▸ Glyphs and
-          the combat weapon buttons already paint), its LIVE magnitude and
-          remaining duration centered directly beneath, in the coating's own
-          accent color. Sits just under the stat grid — associated with the
-          AC-area presentation #220 established — without living INSIDE the
-          AC cell, since a stacked glyph+status unit needs more vertical room
-          than a single inline character ever did.
-          ⚠ CORRECTION, preserved — the old `ACID 3t left · 4/turn` text chip
-          below (`nonCoatingStatuses`) still does not repeat a qualifying
-          effect this unit already covers; a qualifying coating's presence is
-          spoken for exactly once, here.
-          ⚠ Bounded by construction, same as before: a `_coat` status exists
-          at most once per kind, six kinds total, so this row can never grow
-          past the coating vocabulary itself — it wraps, it does not balloon. */}
-      {effectBadges.length > 0 && (
-        <View style={styles.effectGlyphRow}>
-          {effectBadges.map((b) => (
-            <View key={b.kind} style={styles.effectGlyphUnit}>
-              <Image
-                source={b.art}
-                style={styles.effectGlyphArt}
-                resizeMode="contain"
-                testID={`enemy-effect-glyph-${b.coatingKind}`}
-              />
-              <Text style={[styles.effectGlyphMagnitude, { color: b.color }]} numberOfLines={1}>
-                {b.dmgPerTurn}/turn
-              </Text>
-              <Text style={[styles.effectGlyphDuration, { color: b.color }]} numberOfLines={1}>
-                {b.turnsRemaining}T
-              </Text>
-            </View>
-          ))}
+      {/* ⚠⚠⚠ QOL #220 FINAL PHYSICAL LAYOUT CORRECTION. Owner, from the live
+          Golem screenshot: the developed-glyph unit was landing as its OWN
+          row beneath the whole HP/AC/ATK/DMG grid, so it pushed WEAK/DEALS/
+          STRIKES downward every time an effect was active — exactly the
+          growth the compact-card contract (OTA-1651) forbids. The owner's
+          own diagram put it beside AC, in the horizontal whitespace the
+          grid's short values never use, not underneath it.
+
+          `statRow` now holds the stat grid and the effect column as TWO
+          SIBLINGS in one row (`alignItems:'flex-start'`), not two stacked
+          blocks — `defs` (WEAK/DEALS/STRIKES) sits immediately after this
+          ONE row exactly as it did when no effect was active. `statGrid`
+          keeps `flex:1` so it fills the row alone when there is nothing
+          beside it (the "no effect" case is byte-for-byte the old layout).
+          The effect column's own height (glyph + two status lines) is kept
+          at or under the grid's own two-row height by construction, so the
+          row's total height — and therefore where `defs` lands — does not
+          change when one qualifying effect appears. Multiple effects wrap
+          horizontally inside that same column before they ever add a line. */}
+      <View style={styles.statRow} testID="enemy-stat-row">
+        <View style={styles.statGrid} testID="enemy-stat-grid">
+          <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
+          <Stat label="AC" value={String(ac)} />
+          <Stat label="ATK" value={atkLabel} />
+          <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
         </View>
-      )}
-      <View style={styles.defs}>
+        {/* ⚠⚠⚠ QOL #220 FINAL — THE DEVELOPED-GLYPH ACTIVE-EFFECT UNIT. Owner:
+            *"the owner developed specific glyphs for the individual damage/
+            effect families... [and] the glyph by itself is NOT enough — the
+            owner also needs to see WHAT THAT EFFECT IS CURRENTLY DOING
+            directly underneath its glyph."* One vertical unit per qualifying
+            effect — real artwork on top (`glyphArt`, the same asset Lore ▸
+            Glyphs and the combat weapon buttons already paint, enlarged from
+            16dp to 22dp here so it reads as the illustrated artwork at
+            normal phone viewing distance, not a smear), its LIVE magnitude
+            and remaining duration centered directly beneath, in the
+            coating's own accent color.
+            ⚠ CORRECTION, preserved — the old `ACID 3t left · 4/turn` text chip
+            below (`nonCoatingStatuses`) still does not repeat a qualifying
+            effect this unit already covers; a qualifying coating's presence
+            is spoken for exactly once, here.
+            ⚠ Bounded by construction, same as before: a `_coat` status exists
+            at most once per kind, six kinds total, so this column can never
+            grow past the coating vocabulary itself — it wraps, it does not
+            balloon. */}
+        {effectBadges.length > 0 && (
+          <View style={styles.effectGlyphRow}>
+            {effectBadges.map((b) => (
+              <View key={b.kind} style={styles.effectGlyphUnit}>
+                <Image
+                  source={b.art}
+                  style={styles.effectGlyphArt}
+                  resizeMode="contain"
+                  testID={`enemy-effect-glyph-${b.coatingKind}`}
+                />
+                <Text style={[styles.effectGlyphMagnitude, { color: b.color }]} numberOfLines={1}>
+                  {b.dmgPerTurn}/turn
+                </Text>
+                <Text style={[styles.effectGlyphDuration, { color: b.color }]} numberOfLines={1}>
+                  {b.turnsRemaining}T
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+      <View style={styles.defs} testID="enemy-defs">
         {/* OTA-798 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
             required); a boss always shows. Below the threshold you learn by hitting. */}
         {(view.enemy.boss || canRead) ? (
@@ -1289,25 +1309,40 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   hpBarFill: { height: '100%' },
+  // ⚠⚠⚠ QOL #220 FINAL PHYSICAL LAYOUT CORRECTION — `statGrid` and the
+  // developed-glyph effect column are two SIBLINGS inside this one row, not
+  // two stacked blocks. `marginTop` moved here (off `statGrid`) so the row's
+  // top edge — not just the grid's — sits the same distance under the HP
+  // bar whether or not an effect column is present.
+  statRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 4 },
   // Two-up grid (HP / AC then ATK / DMG) so the stats stack portrait-style in
   // the narrow column rather than spreading into a wide single row.
-  statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
+  // `flex:1` lets it share `statRow` with the effect column when one is
+  // present, and fill the row alone — byte-identical to before this
+  // correction — when it is not.
+  statGrid: { flexDirection: 'row', flexWrap: 'wrap', flex: 1 },
   stat: { width: '50%', paddingVertical: 1 },
   statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
   statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
-  // ⚠⚠⚠ QOL #220 FINAL — the developed-glyph active-effect row: one vertical
-  // GLYPH-over-STATUS unit per qualifying effect, wrapping rather than
-  // growing the card. `effectGlyphArt` is deliberately smaller than
-  // `GLYPH_ART_SIZE.combat` (28dp) — the compact card's whole stat grid is a
-  // fraction of that button's width, and the owner's own priority order for
-  // this pack ("glyph readable, name readable, comfortable padding, THEN
-  // compact height") was written for a screen with room to grow; the corner
-  // portrait has none, so it keeps the mark identifiable at the smallest size
-  // that still reads as the illustrated artwork rather than a smear.
-  effectGlyphRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
-  effectGlyphUnit: { alignItems: 'center', width: 30 },
-  effectGlyphArt: { width: 16, height: 16 },
+  // ⚠⚠⚠ QOL #220 FINAL PHYSICAL LAYOUT CORRECTION — the developed-glyph
+  // active-effect column, now a SIBLING of `statGrid` inside `statRow`
+  // rather than a row underneath it (see the comment at its call site for
+  // why). Each unit's height — art + two status lines — is kept at or under
+  // the stat grid's own two-row height (`stat` × 2 ≈ 54dp) by construction,
+  // so one qualifying effect changes `statRow`'s total height by nothing:
+  // `defs` (WEAK/DEALS/STRIKES) lands exactly where it would with no effect
+  // active. `effectGlyphArt` grew from 16dp to 22dp on the owner's report
+  // that the artwork read too small on a physical Pixel 10 Pro XL at normal
+  // viewing distance — still well under `GLYPH_ART_SIZE.combat` (28dp, the
+  // full-width weapon-button context this corner card has no room for), but
+  // large enough to read as the illustrated glyph rather than a smear.
+  // Multiple qualifying effects wrap horizontally inside this same column
+  // before they ever add a line — bounded by the coating vocabulary itself
+  // (six kinds, one status per kind), so it wraps, it does not balloon.
+  effectGlyphRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginLeft: 6, alignItems: 'flex-start' },
+  effectGlyphUnit: { alignItems: 'center', width: 32 },
+  effectGlyphArt: { width: 22, height: 22 },
   effectGlyphMagnitude: { fontSize: 8, fontWeight: '700', lineHeight: 9, textAlign: 'center' },
   effectGlyphDuration: { fontSize: 8, fontWeight: '600', lineHeight: 9, textAlign: 'center' },
   defs: { marginTop: 4, gap: 1 },

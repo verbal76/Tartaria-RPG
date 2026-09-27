@@ -417,3 +417,112 @@ describe('QOL #220 FINAL — expand/close is presentation only', () => {
     tree.unmount();
   });
 });
+
+// ⚠⚠⚠ QOL #220 FINAL PHYSICAL LAYOUT CORRECTION. Owner, from the live Golem
+// physical screenshot: content/behavior above were already correct, but the
+// developed-glyph unit was landing as its OWN row underneath the whole
+// HP/AC/ATK/DMG grid, pushing WEAK/DEALS/STRIKES downward whenever an effect
+// was active. react-test-renderer has no real layout engine — there is no
+// pixel height or on-screen position to read — so what these cases prove
+// instead is the one structural fact that actually DETERMINES that height:
+// whether the stat grid and the effect column are two SIBLINGS inside one
+// shared row (`enemy-stat-row`), with `defs` (WEAK/DEF/RESIST/DEALS/STRIKES,
+// `enemy-defs`) landing as that ONE row's very next sibling — or whether the
+// effect column is instead a standalone row wedged between them, which is
+// exactly the defect the owner's screenshot showed.
+describe('QOL #220 FINAL PHYSICAL LAYOUT CORRECTION — the effect unit sits beside AC, not below the whole stat block', () => {
+  function defsOf(root: TestInstanceLike): TestInstanceLike {
+    const found = root.findAllByProps({ testID: 'enemy-defs' })[0];
+    expect(found).toBeDefined();
+    return found!;
+  }
+  /** Walks `.parent` all the way to the root asking whether ANY ancestor
+   *  carries the given testID — deliberately hop-count-agnostic. React
+   *  Native's host components add composite/host wrapper instances per JSX
+   *  element that a fixed number of `.parent` hops silently miscounts (a
+   *  `<View>` is not always exactly one hop); membership in a region is
+   *  what the owner's contract actually asks about, not a specific fiber
+   *  depth. Booleans in, boolean out — never a bare `expect(TestInstance
+   *  A).toBe(TestInstance B)`, whose failure diff would otherwise force
+   *  Jest to pretty-print two large fiber-backed object graphs. */
+  function isDescendantOf(node: TestInstanceLike | null | undefined, testID: string): boolean {
+    let n: TestInstanceLike | null = node ?? null;
+    while (n) {
+      if ((n.props as { testID?: unknown } | undefined)?.testID === testID) return true;
+      n = n.parent;
+    }
+    return false;
+  }
+
+  it('A — NO EFFECT: no phantom effect region, no governed glyph anywhere', async () => {
+    const tree = await mount([view([], { enemy: foe() })]);
+    expect(tree.root.findAllByProps({ testID: 'enemy-stat-row' }).length).toBeGreaterThan(0);
+    for (const k of GOVERNED_KINDS) expect(compactGlyph(tree.root, k)).toBeUndefined();
+    tree.unmount();
+  });
+
+  it('B — ONE ACID EFFECT: the developed glyph unit lives INSIDE the AC-side stat row — not in a standalone row of its own between the stat block and defs', async () => {
+    const tree = await mount([view([status('acid', 4, 3)], { enemy: foe() })]);
+    const img = compactGlyph(tree.root, 'acid')!;
+    expect(img).toBeDefined();
+    // This is the exact fact the owner's screenshot showed as broken: the
+    // glyph was a SIBLING after the stat row, not a part of it.
+    expect(isDescendantOf(img, 'enemy-stat-row')).toBe(true);
+    // `defs` (WEAK/DEF/RESIST/DEALS/STRIKES) is never itself swallowed into
+    // that same stat region — it stays the next block, not part of it.
+    expect(isDescendantOf(defsOf(tree.root), 'enemy-stat-row')).toBe(false);
+    tree.unmount();
+  });
+
+  it('C — ONE OTHER EFFECT: the same geometry, its own developed glyph', async () => {
+    const tree = await mount([view([status('cold', 3, 2)], { enemy: foe() })]);
+    const img = compactGlyph(tree.root, 'cold')!;
+    expect(img).toBeDefined();
+    expect(isDescendantOf(img, 'enemy-stat-row')).toBe(true);
+    tree.unmount();
+  });
+
+  it('D — MULTIPLE EFFECTS: both units live in the AC-side region together, correctly associated, no redundant lower chip', async () => {
+    const tree = await mount([view([status('acid', 4, 3), status('poison', 7, 5)], { enemy: foe() })]);
+    const acidImg = compactGlyph(tree.root, 'acid')!;
+    const poisonImg = compactGlyph(tree.root, 'poison')!;
+    expect(isDescendantOf(acidImg, 'enemy-stat-row')).toBe(true);
+    expect(isDescendantOf(poisonImg, 'enemy-stat-row')).toBe(true);
+    const full = textOf(tree.root);
+    expect(full).not.toContain('ACID');
+    expect(full).not.toContain('POISON');
+    tree.unmount();
+  });
+
+  it('E — EXPIRATION: the unit disappears; no leftover effect region remains', async () => {
+    const enemy = foe();
+    const before = await mount([view([status('acid', 4, 1)], { enemy })]);
+    expect(isDescendantOf(compactGlyph(before.root, 'acid'), 'enemy-stat-row')).toBe(true);
+    before.unmount();
+
+    const after = await mount([view([], { enemy })]);
+    for (const k of GOVERNED_KINDS) expect(compactGlyph(after.root, k)).toBeUndefined();
+    expect(isDescendantOf(defsOf(after.root), 'enemy-stat-row')).toBe(false);
+    after.unmount();
+  });
+
+  it('F — HEIGHT/POSITION CONTRACT: one qualifying effect places its unit inside the AC-side stat region, and never pulls defs into that region — with or without the effect present, the shape is the same', async () => {
+    const enemy = foe();
+    const noEffect = await mount([view([], { enemy })]);
+    const withEffect = await mount([view([status('burn', 2, 4)], { enemy })]);
+
+    // `defs` never becomes part of the stat region, whether or not an
+    // effect is active — the primary acceptance invariant, stated
+    // structurally: adding one qualifying effect changes what the stat
+    // region CONTAINS, never how many regions sit between the stats and
+    // the defenses.
+    expect(isDescendantOf(defsOf(noEffect.root), 'enemy-stat-row')).toBe(false);
+    expect(isDescendantOf(defsOf(withEffect.root), 'enemy-stat-row')).toBe(false);
+    // And the one effect that IS present lands inside that region, not
+    // wedged between it and `defs` as its own row.
+    expect(isDescendantOf(compactGlyph(withEffect.root, 'burn'), 'enemy-stat-row')).toBe(true);
+
+    noEffect.unmount();
+    withEffect.unmount();
+  });
+});
