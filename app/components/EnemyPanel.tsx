@@ -79,6 +79,24 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   typed_dot: { label: 'DOT', color: '#e0c05f' },
 };
 
+// ⚠⚠ QOL #220 FOLLOW-UP — THE OWNER MEASURED IT ON THE ACTUAL GOLEM DEVICE.
+// The #220 regression only proved this lower status row; his card showed
+// `ACID 3t left · 4/turn` down here with no emblem beside `AC 13` up top,
+// which is the thing he'd actually asked for. This is that indicator, and it
+// is not acid-specific: any `_coat` status that already has a weapon-coating
+// glyph (COATING_GLYPH/COATING_GLYPH_COLOR — the same map that already draws
+// the enemy's OWN coated weapon on the type line below) qualifies. `infected`
+// and `typed_dot` are not player-applied coatings (contagion / built-in
+// typed-damage procs — see their STATUS_META comments above) and don't end in
+// `_coat`, so they're excluded by construction, not by a name check.
+function coatingGlyphForStatus(kind: EnemyStatusView['kind']): { ch: string; color: string } | null {
+  const suffix = '_coat';
+  if (!kind.endsWith(suffix)) return null;
+  const coatingKind = kind.slice(0, -suffix.length) as keyof typeof COATING_GLYPH;
+  const ch = COATING_GLYPH[coatingKind];
+  return ch ? { ch, color: COATING_GLYPH_COLOR[coatingKind] } : null;
+}
+
 interface Props {
   enemies: EnemyView[];
   activeIndex: number;
@@ -629,6 +647,17 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   // 8 like combat, and bosses get the same +6 wall.
   // ⚠ OTA-1608 — the roll's own resolver, not a hand copy (see enemyDetailBody).
   const ac = enemyAC(view.enemy);
+  // ⚠⚠ QOL #220 FOLLOW-UP — generalized from view.statuses, not hard-coded to
+  // acid: any active status whose kind maps through coatingGlyphForStatus
+  // (the six weapon-coating DOT families) earns a glyph beside AC. A future
+  // coating family picks this up automatically the day it gets a
+  // COATING_GLYPH entry — nothing here names a specific element.
+  const acCoatingBadges = (view.statuses ?? [])
+    .map((st) => {
+      const g = coatingGlyphForStatus(st.kind);
+      return g ? { ...g, kind: st.kind } : null;
+    })
+    .filter((b): b is { ch: string; color: string; kind: EnemyStatusView['kind'] } => b !== null);
   // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
   // condition as the RESIST/WEAK block below, because the row sits directly
   // under it and was answering what that block declined to say.
@@ -748,10 +777,27 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           ]}
         />
       </View>
-      {/* Portrait stat grid: two rows of two so it fits the narrow column. */}
+      {/* Portrait stat grid: two rows of two so it fits the narrow column.
+          ⚠⚠ QOL #220 FOLLOW-UP — the AC-adjacent coating indicator. Compact
+          on purpose: one glyph per qualifying active status, no label, no
+          second line — the lower `ACID 3t left · 4/turn` row (styles.statusCol
+          below) still carries the accurate detail. Bounded by construction:
+          a `_coat` status only exists per kind (applyCoatingProc refreshes,
+          never duplicates, a kind already active), and there are six kinds
+          total, so this can never grow past the coating vocabulary itself. */}
       <View style={styles.statGrid}>
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
-        <Stat label="AC" value={String(ac)} />
+        <Stat
+          label="AC"
+          value={String(ac)}
+          accessory={acCoatingBadges.length > 0 ? (
+            <View style={styles.acCoatingRow}>
+              {acCoatingBadges.map((b) => (
+                <Text key={b.kind} style={[styles.acCoatingGlyph, { color: b.color }]}>{b.ch}</Text>
+              ))}
+            </View>
+          ) : null}
+        />
         <Stat label="ATK" value={atkLabel} />
         <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
       </View>
@@ -847,11 +893,14 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, accessory }: { label: string; value: string; accessory?: React.ReactNode }) {
   return (
     <View style={styles.stat}>
       <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
+      <View style={styles.statValueRow}>
+        <Text style={styles.statValue}>{value}</Text>
+        {accessory}
+      </View>
     </View>
   );
 }
@@ -929,7 +978,13 @@ const styles = StyleSheet.create({
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
   stat: { width: '50%', paddingVertical: 1 },
   statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
+  statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  // ⚠⚠ QOL #220 FOLLOW-UP — the AC-adjacent coating indicator row. Same glyph
+  // vocabulary as the type-line coated-weapon glyph (COATING_GLYPH_COLOR), so
+  // fire beside AC is the same colour as fire beside the enemy's own blade.
+  acCoatingRow: { flexDirection: 'row', alignItems: 'center', gap: 1 },
+  acCoatingGlyph: { fontSize: 11, lineHeight: 13 },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
