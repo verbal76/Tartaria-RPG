@@ -31995,7 +31995,51 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * owner's saves are never intentionally discarded to make an update work, and
  * nothing here decides how a preserved copy is used. NOT PUBLISHED TO HAL —
  * Golem only, to answer one owner's device question. */
-export const OTA_BUILD_ID = '2026-09-26-1886-the-copy-proves-itself-before-it-speaks';
+/** ⚠⚠ OTA-1887 — THE COPY SPEAKS FOR ITSELF. GOLEM ONLY — NOT PROMOTED TO HAL.
+ *
+ * Direct continuation of OTA-1886: the owner ran PRESERVE LEGACY SAVE
+ * DATABASE on the actual Golem device and it found RKStorage (20,480 bytes)
+ * plus a 0-byte RKStorage-journal, both preserved with a verified
+ * byte-identical copy — no -wal/-shm present. This turn answers what is
+ * actually inside that preserved copy, without ever touching the original
+ * again: neither expo-sqlite nor any other SQLite-capable module is a
+ * dependency of this project (checked — not in package.json, node_modules,
+ * or any app.json config plugin), and the only SQLite engine compiled into
+ * this build lives entirely inside @react-native-async-storage/async-
+ * storage's own Java code, with no JS-exposed way to open an arbitrary file
+ * as a database. So there is no already-linked native path to cross this
+ * boundary; the alternative that stays inside OTA JS is to decode the
+ * documented SQLite file format by hand, the same way OTA-1886 wrote its
+ * own SHA-256 rather than add expo-crypto.
+ *
+ * ADDED: app/diagnostics/legacyStorageInspect.ts
+ * (runLegacyStorageInspection / formatLegacyStorageInspectReport) and a
+ * "READ PRESERVED LEGACY SAVE" button beside OTA-1886's in the About
+ * screen's DIAGNOSTIC TOOLS drawer. It never references the original
+ * database's location at all — it only reads OTA-1886's own pristine
+ * preservation copy, copies THAT into a second, disposable working copy,
+ * hash-verifies the working copy against the pristine one, and only then
+ * decodes the working copy's bytes as SQLite (file header, one table
+ * b-tree walk with interior/leaf/overflow-page support, record decoding) —
+ * a minimal reader whose correctness is checked in
+ * ota1887LegacyStorageInspectIsReadOnly against bytes a REAL SQLite engine
+ * produced (empty table, a small realistic key set, a value large enough to
+ * force SQLite's own overflow pages, a database with no save table, and 400
+ * rows forced across a multi-leaf b-tree), not against hand-guessed
+ * fixtures.
+ *
+ * ⚠ BOUNDED DISCLOSURE, NOT A FULL DUMP. Every key name found is reported,
+ * but only recognized Tartaria save keys (tartaria.slot.<id>.v2[.bak]) have
+ * their values parsed, and even then only into the same short identity
+ * fields OTA-1885's probe and saveSnapshot.ts's HIGHLIGHTS line already use
+ * (name, race, faction, hp, dead, hours elapsed, location, main-quest
+ * phase, Guardians defeated, saved-at) — never the full save JSON. This
+ * module has no import of AsyncStorage or saveSystem.ts, never calls
+ * setItem/loadSlot/importSave or any save-repair path, and does not
+ * restore, migrate, or construct a character. NOT PUBLISHED TO HAL — Golem
+ * only, to answer one owner's device question. */
+export const OTA_BUILD_ID = '2026-09-27-1887-the-copy-speaks-for-itself';
+// SUPERSEDED: '2026-09-26-1886-the-copy-proves-itself-before-it-speaks'
 // SUPERSEDED: '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds'
 // SUPERSEDED: '2026-09-25-1884-the-picker-takes-the-region'
 // SUPERSEDED: '2026-09-25-1883-the-card-fits-the-screen'

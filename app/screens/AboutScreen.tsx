@@ -32,6 +32,7 @@ import { buildSaveSlotProbeReport, formatSaveSlotProbeReport } from '../diagnost
 // file's header for why it has no reachable path that can modify an
 // original file, and why it needed no new native module).
 import { runLegacyStoragePreservation, formatLegacyStorageReport } from '../diagnostics/legacyStoragePreserve';
+import { runLegacyStorageInspection, formatLegacyStorageInspectReport } from '../diagnostics/legacyStorageInspect';
 import { NumberStepper } from '../components/NumberStepper';
 import { ColorWheel } from '../components/ColorWheel';
 import {
@@ -312,6 +313,9 @@ export function AboutScreen() {
   const [legacyProbeCopied, setLegacyProbeCopied] = useState(false);
   const [legacyProbeCharCount, setLegacyProbeCharCount] = useState(0);
   const [legacyProbeBusy, setLegacyProbeBusy] = useState(false);
+  const [legacyInspectCopied, setLegacyInspectCopied] = useState(false);
+  const [legacyInspectCharCount, setLegacyInspectCharCount] = useState(0);
+  const [legacyInspectBusy, setLegacyInspectBusy] = useState(false);
   // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
   // Tartaria save into the Golem build) and load it as a new playable slot.
   const [importBusy, setImportBusy] = useState(false);
@@ -545,6 +549,28 @@ export function AboutScreen() {
       setTimeout(() => setLegacyProbeCopied(false), 4000);
     } catch { /* clipboard rarely fails on Android */ }
     finally { setLegacyProbeBusy(false); }
+  }
+  // OTA-1887 — READ WHAT'S INSIDE THE PRESERVED LEGACY DATABASE. GOLEM ONLY.
+  // Runs only after PRESERVE LEGACY SAVE DATABASE has already made a verified
+  // copy. Makes a SECOND, disposable working copy of that copy, hash-checks
+  // it, and only then decodes it — the pristine preservation copy is never
+  // touched, the original is never referenced at all. Reports whether a
+  // readable character record was found, with bounded identity fields only —
+  // it does not restore, migrate, or import anything. See
+  // legacyStorageInspect.ts.
+  async function handleInspectLegacyStorage() {
+    if (legacyInspectBusy) return;
+    setLegacyInspectBusy(true);
+    try {
+      const report = await runLegacyStorageInspection();
+      const formatted = formatLegacyStorageInspectReport(report);
+      const stamped = `${formatted}\n\n${buildBasicDeviceSummary()}\n`;
+      await Clipboard.setStringAsync(stamped);
+      setLegacyInspectCharCount(stamped.length);
+      setLegacyInspectCopied(true);
+      setTimeout(() => setLegacyInspectCopied(false), 4000);
+    } catch { /* clipboard rarely fails on Android */ }
+    finally { setLegacyInspectBusy(false); }
   }
   // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
   // parse it, write it to a new slot, and drop into the game. Lets a save from
@@ -1462,6 +1488,32 @@ export function AboutScreen() {
                     : legacyProbeCopied
                       ? `✓ COPIED — ${legacyProbeCharCount.toLocaleString()} CHARS`
                       : 'PRESERVE LEGACY SAVE DATABASE'}
+                </Text>
+              </Pressable>
+              {/* OTA-1887 — READ THE PRESERVED LEGACY DATABASE. GOLEM ONLY. Only
+                  useful after the button above has already made a preservation
+                  copy. Reads a disposable working copy of that copy — never the
+                  original, never the pristine copy — and reports whether a
+                  readable character is inside it. See legacyStorageInspect.ts. */}
+              <Text style={styles.sessionHint}>
+                After a safety copy has been made above, checks what is actually
+                inside it and tells you whether a readable character was found.
+                This only reads a copy of the copy — it cannot restore, import,
+                or change your current game.
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 },
+              tControlDepth(pressed), legacyInspectBusy && kit.ctlDead]}
+                onPress={() => { void handleInspectLegacyStorage(); }}
+                disabled={legacyInspectBusy}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {legacyInspectBusy
+                    ? 'READING…'
+                    : legacyInspectCopied
+                      ? `✓ COPIED — ${legacyInspectCharCount.toLocaleString()} CHARS`
+                      : 'READ PRESERVED LEGACY SAVE'}
                 </Text>
               </Pressable>
               <Pressable
