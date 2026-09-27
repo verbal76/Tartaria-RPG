@@ -2744,10 +2744,14 @@ function applyEnemyCounter(
         ? applyEffect(nextPlayer.statusEffects ?? [], landedEffect.effect)
         : nextPlayer.statusEffects;
       if (landedTraitHit) {
+        // ⚠ Owner-directed repair: a Bleeder proc's status now carries the
+        // DOT `perRoundDamage` traitOnHitStatus rolls for it (enemyTraits.ts)
+        // — previously dropped here, which is why Bleed never ticked damage.
         effects = applyEffect(effects ?? [], {
           kind: landedTraitHit.kind,
           remainingRounds: landedTraitHit.rounds,
           label: landedTraitHit.label,
+          perRoundDamage: landedTraitHit.perRoundDamage,
         });
       }
       // OTA-1089 — the incapacitation that just took hold opens the braced

@@ -8,6 +8,7 @@
 // so the catalog can drift ahead of code without breaking saves.
 
 import { canonicalDamageType } from './damageTypes';
+import { rollDie } from './rng';
 
 // arb-fix — flying / hovering enemies the dog can't reach (it can't jump
 // that high), and that ranged "+Nd6 against airborne enemies" weapons get a
@@ -179,15 +180,33 @@ export function combineDamageTypeMatch(
 }
 
 /** True if the enemy has a trait that should fire status-effect on its
- *  successful melee hits. Returns the effect kind to apply, or null. */
+ *  successful melee hits. Returns the effect kind to apply, or null.
+ *
+ *  ⚠⚠⚠ Owner-directed repair, physical Golem screenshot session: `bleeder`'s
+ *  50% proc was real (this function, the RNG check above) and reached the
+ *  player's `statusEffects` (combatResolution.ts's `landedTraitHit` wiring),
+ *  but the status it built carried no `perRoundDamage` — `tickEffects` only
+ *  ever sums that field into its DOT total, so a Bleeder proc sat on the
+ *  player for 3 rounds doing nothing. Owner's instruction: find the
+ *  authoritative existing value rather than invent one. There is exactly one
+ *  place `perRoundDamage` is ever assigned in this codebase —
+ *  `statusEffects.ts`'s TYPE_TO_EFFECT.piercing rule, for the SAME status
+ *  kind (`'bleed'`, label `'bleeding'`) triggered by a piercing hit instead
+ *  of this trait. Reusing that formula here is not a new balance number —
+ *  it is the one already governing what "bleed" deals everywhere else.
+ *  `stun` and `poisoned` are untouched: `stun` already works end-to-end
+ *  (isIncapacitated), and `poisoned`'s intended consequence is the attack
+ *  penalty in combatRules.ts, not a damage tick — it has never carried
+ *  `perRoundDamage` for ANY trigger, trait or type-based alike, so leaving
+ *  it out here matches the existing design rather than deviating from it. */
 export function traitOnHitStatus(
   traits: readonly string[] | undefined,
   rng: () => number = Math.random,
-): { kind: 'bleed' | 'poisoned' | 'stun'; rounds: number; label: string } | null {
+): { kind: 'bleed' | 'poisoned' | 'stun'; rounds: number; label: string; perRoundDamage?: number } | null {
   if (!traits) return null;
   for (const t of traits) {
     if (t === 'bleeder' && rng() < 0.5) {
-      return { kind: 'bleed', rounds: 3, label: 'bleeding' };
+      return { kind: 'bleed', rounds: 3, label: 'bleeding', perRoundDamage: Math.max(1, rollDie(6) - 2) };
     }
     if (t === 'venomous' && rng() < 0.35) {
       return { kind: 'poisoned', rounds: 3, label: 'poisoned' };
