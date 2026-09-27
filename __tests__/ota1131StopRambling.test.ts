@@ -169,7 +169,10 @@ describe('OTA-1131 — ⚠ one unsolicited aside per tile, on a shared clock', (
     // The five lines in the log came from one code path called five times. A
     // rule applied at two of the three sites would have left the third to
     // ramble, so the count is the assertion.
-    expect((STORE.match(/speakArbiterFlavor\(get, trimmed\);/g) ?? []).length).toBe(3);
+    // ⚠⚠ QOL #218 added a `set` param and a `deferArbiter` pass-through to
+    // every one of these three call sites uniformly — the door is still the
+    // door, only its signature grew (see speakArbiterFlavor in narration.ts).
+    expect((STORE.match(/speakArbiterFlavor\(get, set, trimmed, opts\?\.deferArbiter\);/g) ?? []).length).toBe(3);
     // …and the old unconditional append is gone from every one of them.
     expect(STORE).not.toContain("if (trimmed) get().appendLog('arbiter', trimmed, chance(30)");
   });

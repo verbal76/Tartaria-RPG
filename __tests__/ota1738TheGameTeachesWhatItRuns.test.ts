@@ -388,6 +388,20 @@ describe('OTA-1738 — the counter', () => {
     expect(repairCost(worn)).toBeGreaterThan(0);
   });
 
+  // ⚠⚠ QOL #217 — the trader-mend card used to describe a service with no
+  // button here to take it: VendorScreen has no text input, and
+  // repairWithVendor only fires off the typed REPAIR/MEND command. The card
+  // now says so instead of implying a counter action that doesn't exist.
+  it('⚠⚠ QOL #217 — the trader-mend card teaches the real (typed) invocation', () => {
+    const trader = TEACHINGS.repair_vendor_first.body;
+    expect(trader).toMatch(/type REPAIR|type.*MEND/i);
+    // The card's corrected claim ("no button here") is exactly what the
+    // screen's own source proves: no text input, and the counter never
+    // calls repairWithVendor itself.
+    expect(VENDOR).not.toMatch(/<TextInput/);
+    expect(codeOnly(VENDOR)).not.toMatch(/repairWithVendor\(/);
+  });
+
   it('⚠ reinforcement and dog prices are quoted from their constants', () => {
     expect(TEACHINGS.reinforce_first.body).toContain(`+${REINFORCE_MAX_LEVEL}`);
     expect(TEACHINGS.reinforce_first.body).toMatch(/ceiling only|stays worn/i);

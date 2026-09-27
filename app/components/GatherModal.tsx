@@ -222,6 +222,27 @@ export function GatherModal({
   // be rendered by whatever is on top, not by whatever raised it.**
   const [refusal, setRefusal] = useState<string | null>(null);
   const refuseSeq = useRef(0);
+  // ⚠⚠ QOL #215 — TARGET STABILITY. A lane's sweep button used to unmount the
+  // instant its lane emptied (`renderSweep` returned null), so clearing GEAR
+  // with TAKE ALL GEAR reflowed SALVAGE ALL upward under the player's thumb —
+  // exactly the retarget the owner is refusing here. Once a lane has shown its
+  // sweep button THIS OPEN, that slot stays in the action column for the rest
+  // of the interaction — `renderSweep` now dims/disables it instead of
+  // removing it (same `sweepLocked` idiom OTA-1250 already uses for the
+  // tutorial lock).
+  // ⚠⚠⚠ THE RESET HAS TO FIRE ON CLOSE, NOT ON OPEN. This card stays mounted
+  // for the whole exploration screen (`<GatherModal visible={takeOpen} .../>`
+  // is never conditionally rendered) — only its `visible` prop toggles — so
+  // resetting `if (visible)` runs this effect exactly once per open, AFTER
+  // the very render that populated it for the room the player is looking at.
+  // Effects commit strictly after paint: a player who sweeps GEAR as their
+  // first tap causes the very next render to see `everSwept.current` already
+  // wiped back to `{}`, and the button vanishes — the bug this fix exists to
+  // remove, reintroduced one tick later. Resetting on CLOSE instead leaves the
+  // ref pre-cleared and ready before the NEXT open's first render, so nothing
+  // set during a visible session is ever wiped while it is still in view.
+  const everSwept = useRef<Partial<Record<GatherLane, true>>>({});
+  useEffect(() => { if (!visible) everSwept.current = {}; }, [visible]);
   const refuse = (): void => {
     onBlocked?.();
     // The card's own copy of the answer, in the card. Deliberately the SAME
@@ -540,13 +561,19 @@ export function GatherModal({
     buttonLabel: (n: number) => string,
     onSweep: (nouns: string[]) => void,
   ) => {
-    if (laneRows.length === 0) return null;
-    const nouns = sweepable(laneRows);
-    if (nouns.length === 0) return null;
+    const nouns = laneRows.length === 0 ? [] : sweepable(laneRows);
+    // ⚠⚠ QOL #215 — once this lane's sweep button has been shown THIS OPEN, it
+    // keeps its slot in the action column even after the lane empties — see
+    // the `everSwept` note above `refuseSeq`. A lane that was NEVER actionable
+    // this open (including one that started empty) still renders nothing.
+    if (nouns.length > 0) everSwept.current[lane] = true;
+    if (!everSwept.current[lane]) return null;
+    const emptied = nouns.length === 0;
+    const disabled = lockKey !== null || emptied;
     return (
       <React.Fragment key={`sweep-${lane}`}>
           <Pressable
-            style={({ pressed }) => [kit.ctl, 
+            style={({ pressed }) => [kit.ctl,
               styles.sweep,
               lane === 'gear' && styles.sweepGear,
               lane === 'items' && styles.sweepItems,
@@ -555,7 +582,9 @@ export function GatherModal({
               // whose only row IS the locked noun: the beat teaches a single tap
               // on a single line, and letting the bulk button stand in for it
               // teaches the opposite. All three dim under a lock.
-              lockKey !== null && styles.sweepLocked,
+              // ⚠ QOL #215 — an EMPTIED lane's button dims the same way, rather
+              // than unmounting, so the remaining buttons never move.
+              disabled && styles.sweepLocked,
               pressed && styles.rowPressed,
               tControlDepth(pressed),
             ]}
@@ -565,6 +594,11 @@ export function GatherModal({
             onPressIn={(e) => { notePressIn(`gather:all:${lane}`, e); }}
             onPress={() => {
               const tp = noteHandlerEnter(`gather:all:${lane}`);
+              if (emptied) {
+                // Already swept this open — no lock refusal buzz, just inert.
+                noteStage(tp, 'reject', { control: `gather:all:${lane}`, reason: 'already-swept' });
+                return;
+              }
               if (lockKey !== null) {
                 noteStage(tp, 'reject', { control: `gather:all:${lane}`, reason: 'tutorial-locked' });
                 refuse(); return;
@@ -575,7 +609,7 @@ export function GatherModal({
               noteStage(tp, 'done', { control: `gather:all:${lane}`, reason: 'bulk' });
             }}
             accessibilityRole="button"
-            accessibilityState={{ disabled: lockKey !== null }}
+            accessibilityState={{ disabled }}
             accessibilityLabel={buttonLabel(nouns.length)}
           >
 {({ pressed }) => (<>

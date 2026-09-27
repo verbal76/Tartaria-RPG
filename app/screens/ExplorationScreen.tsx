@@ -3412,7 +3412,16 @@ export function ExplorationScreen() {
           // ⚠ ONE exit door for the sweep, so no abort path can forget to unlight
           // the chip — a "running" flag that survives its run is a lit button
           // lying in the other direction.
-          const endSweep = (): void => setInvestigateSweepRunning(false);
+          // ⚠⚠ QOL #218 — this is also the one door every deferred Arbiter line
+          // drains through. Each step below submits with `deferArbiter: true` so
+          // a mid-batch remark queues instead of printing between two investigate
+          // results; whichever way the sweep ends (finished, combat abort, player
+          // acted), flushPendingArbiterLines() here prints anything it queued —
+          // after every result the sweep managed, never inside them.
+          const endSweep = (): void => {
+            setInvestigateSweepRunning(false);
+            useGameStore.getState().flushPendingArbiterLines();
+          };
           const step = (): void => {
             if (i >= ordered.length) { endSweep(); return; }
             const s = useGameStore.getState();
@@ -3420,7 +3429,7 @@ export function ExplorationScreen() {
             // ⚠ The player did something of their own — stop rather than queue
             // lines behind whatever they just asked for.
             if (s.lastPlayerActionAt !== watermark) { endSweep(); return; }
-            submit(`investigate ${ordered[i]!}`);
+            submit(`investigate ${ordered[i]!}`, { deferArbiter: true });
             watermark = useGameStore.getState().lastPlayerActionAt;
             i += 1;
             if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);

@@ -356,6 +356,11 @@ const NOT_HUMAN_GAMEPLAY: Record<string, string> = {
   markUiIdle: 'the idle authority itself',
   maybeAdvanceTutorial: 'engine-driven progression check',
   hasUnspokenTalk: 'predicate, not a mutation',
+  // QOL #218 — the INVESTIGATE ALL sweep's own exit door, not a press. It
+  // drains lines `narrateViaArbiter` already queued (deferArbiter) into the
+  // log; the player never calls this, and it stamps no gameplay clock of
+  // its own — the sweep's `submit(...)` calls already did that.
+  flushPendingArbiterLines: 'logging — drains a queue narrateViaArbiter filled, not a gameplay turn',
 
   // ALREADY ACCOUNTED THROUGH ANOTHER SEAM — these reach the clock via
   // noteHumanInteraction at their call site (OTA-1807), so they are correctly

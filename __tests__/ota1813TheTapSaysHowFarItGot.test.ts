@@ -258,7 +258,11 @@ describe('OTA-1813 §5 — `reject` is only written where source proves one', ()
    * anywhere fails here. */
   const REJECTS: ReadonlyArray<readonly [string, string, readonly string[]]> = [
     ['InputBox', INPUT_BOX, ['tutorial-blocked', 'stamina-spent']],
-    ['GatherModal', GATHER, ['tutorial-locked']],
+    // ⚠ QOL #215 — 'already-swept' joined the tutorial lock: a lane's sweep
+    // button now stays mounted after it empties (dimmed, inert) rather than
+    // unmounting, and its onPress returns via this same real refusal branch
+    // rather than firing onSweep again or buzzing like the lock does.
+    ['GatherModal', GATHER, ['tutorial-locked', 'already-swept']],
     ['SearchModal', SEARCH, ['empty-text']],
   ];
 

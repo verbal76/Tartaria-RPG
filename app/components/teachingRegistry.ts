@@ -170,7 +170,14 @@ export const TEACHINGS = {
   repair_vendor_first: {
     id: 'repair_vendor_first', group: 'trade', when: 'the first trader while something you carry is worn',
     title: 'Two ways to mend',
-    body: 'A trader mends for TC — the bill climbs with the points missing. Your own bench (CRAFT → REPAIR) mends the same piece for materials instead: twice what it would salvage into. Either way it is back to full.',
+    // ⚠⚠ QOL #217 — this card used to describe the trader's mend as a service
+    // with no button here to take it: `repairWithVendor` only fires off the
+    // typed REPAIR/MEND command (parser.ts's `repair` verb table), and there
+    // is no counter control that calls it — VendorScreen has no text input at
+    // all. Traced and confirmed reachable: back out to the road while this
+    // trader is still on your tile and type it there. Corrected to teach the
+    // real invocation instead of implying a tap-to-mend that doesn't exist.
+    body: 'A trader mends for TC — the bill climbs with the points missing — but there\'s no button for it here: step back out and type REPAIR (or MEND) plus the piece\'s name while this trader is still on your tile. Your own bench (CRAFT → REPAIR) mends the same piece for materials instead: twice what it would salvage into. Either way it is back to full.',
   },
   dog_replacement_first: {
     id: 'dog_replacement_first', group: 'companions', when: 'the first trader with a dog on the counter',

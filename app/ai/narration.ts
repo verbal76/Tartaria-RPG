@@ -877,11 +877,23 @@ export function takeArbiterFlavorBudget(get: () => GameStore): boolean {
  *  choke point is the whole reason the budget can be trusted: the five lines in
  *  the log came from one code path called five times, and a rule applied at
  *  three of the four call sites would have left the fifth to ramble. */
-function speakArbiterFlavor(get: () => GameStore, text: string): void {
+function speakArbiterFlavor(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  text: string,
+  // QOL #218 — same budget gate, same odds; only the destination changes. A
+  // caller mid-batch (INVESTIGATE ALL's sweep) queues the line instead of
+  // printing it between two results — see gameStore's pendingArbiterLines.
+  deferArbiter?: boolean,
+): void {
   const trimmed = (text ?? '').trim();
   if (!trimmed) return;
   if (!takeArbiterFlavorBudget(get)) {
     get().appendLog('debug', 'arbiter: flavor held (budget — one per tile, 25s apart)');
+    return;
+  }
+  if (deferArbiter) {
+    set((s) => ({ pendingArbiterLines: [...s.pendingArbiterLines, trimmed] }));
     return;
   }
   // arb166 — the line always SHOWS; `silent` only thins how many are voiced.
@@ -906,7 +918,12 @@ export async function narrateViaArbiter(
    *  standing in yet. Everything between — model readiness, prompt assembly,
    *  streaming, and the whole vetting chain — is shared, because a banked line
    *  that skipped the filters would be a second, quietly different narrator. */
-  opts?: { bankOnly?: boolean; forLocation?: Location },
+  // QOL #218 — `deferArbiter` queues this call's eventual line (whichever
+  // path produces it: canned template or Qwen-generated) onto the store's
+  // pendingArbiterLines instead of appending it now. Every gate, cooldown,
+  // budget check and generation decision below runs exactly as it always
+  // has; only the final destination of the text changes.
+  opts?: { bankOnly?: boolean; forLocation?: Location; deferArbiter?: boolean },
 ): Promise<void> {
   const trimmed = (templateFallback ?? '').trim();
   const scene = get().currentScene;
@@ -1007,7 +1024,7 @@ export async function narrateViaArbiter(
     // so nearly every 60% roll actually spoke and Kokoro "wouldn't shut up", ~20
     // lines/min.) The line still appears on-screen every time; this only thins
     // how many are SPOKEN. `silent` → TTSController skips voicing it.
-    speakArbiterFlavor(get, trimmed);
+    speakArbiterFlavor(get, set, trimmed, opts?.deferArbiter);
     return;
   }
   const state = get();
@@ -1015,7 +1032,7 @@ export async function narrateViaArbiter(
   if (!player || !scene) {
     if (opts?.bankOnly) return;
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    speakArbiterFlavor(get, trimmed);
+    speakArbiterFlavor(get, set, trimmed, opts?.deferArbiter);
     return;
   }
   // ⚠ OTA-1129 — NARRATING A PLACE THE PLAYER HAS NOT REACHED YET. The slice
@@ -1269,7 +1286,9 @@ export async function narrateViaArbiter(
         + ` ${usedFallback || repDup ? '∅' : '✓'} ${Date.now() - t0}ms`);
       return;
     }
-    get().appendLog('arbiter', finalText);
+    // QOL #218 — same generation, same text; only the destination differs.
+    if (opts?.deferArbiter) set((s) => ({ pendingArbiterLines: [...s.pendingArbiterLines, finalText] }));
+    else get().appendLog('arbiter', finalText);
     // OTA-1131 — a generated line is still the Arbiter talking; it starts the
     // quiet period the same as an aside does.
     noteArbiterSpoke();
@@ -1284,7 +1303,7 @@ export async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
-      speakArbiterFlavor(get, trimmed);
+      speakArbiterFlavor(get, set, trimmed, opts?.deferArbiter);
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the

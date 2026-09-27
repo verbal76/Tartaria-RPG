@@ -354,8 +354,11 @@ export function InventoryScreen() {
   // inventory categories to save space."* Keyed by rack so folding one leaves
   // the others where he put them.
   const [racksOpen, setRacksOpen] = useState<Record<string, boolean>>({});
-  const rackOpen = (k: string) => racksOpen[k] ?? true;
-  const toggleRack = (k: string) => setRacksOpen((r) => ({ ...r, [k]: !(r[k] ?? true) }));
+  // ⚠⚠ QOL #216 — racks now default COLLAPSED (was `?? true`; see the
+  // OTA-1657 header comment above for the reversed ruling). Same per-mount,
+  // non-persisted state; only the fallback each key starts from changed.
+  const rackOpen = (k: string) => racksOpen[k] ?? false;
+  const toggleRack = (k: string) => setRacksOpen((r) => ({ ...r, [k]: !(r[k] ?? false) }));
   // OTA-1100 — inventory GROUP mode. Owner, after OTA-1099's group sell: "yes
   // wire drop, fusable select and scrap the same way." Same contract as the
   // vendor list, which is the whole point — one gesture, one meaning, wherever
@@ -2456,9 +2459,11 @@ export function InventoryScreen() {
  *  costs him no information he was reading the banner for. A rack you have to
  *  unfold to trust is a rack you stop folding.
  *
- *  ⚠ Defaults OPEN, unlike categories (which default closed). A category is one
- *  of a dozen above a long pack; a rack is one of three whose whole job is to be
- *  glanceable. Folding is something he does, not a state he inherits. */
+ *  ⚠⚠ QOL #216 REVERSES THE DEFAULT ABOVE — owner ruling, not a bug: all three
+ *  racks now default COLLAPSED, same as categories, so the top of Inventory
+ *  doesn't cost three banners' worth of space before he's touched anything.
+ *  Per-mount local state exactly as before (see racksOpen below) — nothing
+ *  about scope/persistence changed, only the fallback each key starts from. */
 function RackFrame({
   title, hint, summary, open, onToggle, style, titleStyle, hintStyle, children,
 }: {

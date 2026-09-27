@@ -238,11 +238,19 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
 }
 
 // ASCII die face based on value and sides
+//
+// ⚠⚠ QOL #219 — the d10/d20 branch used to return '◈' (U+25C8, a diamond —
+// visually a square rotated 45°), rendered under the exact same style as the
+// d6 pip faces above (U+2680-2685, upright squares). Same roll panel, same
+// text style, two different apparent orientations depending on which die
+// just posted — that's the "sideways between panels" the owner is seeing.
+// '▣' (U+25A3, an upright square) reads as the same orientation as the pip
+// faces with no rotation transform involved anywhere in this file.
 function dieFace(value: number, sides: number): string {
   if (sides === 6) {
     return ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][value - 1] ?? '⚀';
   }
-  return '◈'; // generic for d10, d20
+  return '▣'; // generic for d10, d20 — upright, matches the pip faces' orientation
 }
 
 const styles = StyleSheet.create({

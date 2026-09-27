@@ -258,7 +258,10 @@ describe('OTA-1183 — INVESTIGATE ALL', () => {
     // ⚠ OTA-1268 grew it again (the self-abort fix carries its incident note in
     // the source). Window widened once more; the pinned RULE has not moved.
     const block = blockAt(src, 'onInvestigateAll={(nouns) => {');
-    expect(block).toContain('submit(`investigate ${ordered[i]!}`)');
+    // ⚠⚠ QOL #218 — the call grew a `{ deferArbiter: true }` second argument
+    // (see gameStore's pendingArbiterLines): still exactly one submit per
+    // noun, still the real investigate path, only the trailing paren moved.
+    expect(block).toContain('submit(`investigate ${ordered[i]!}`, { deferArbiter: true })');
     // Still one submit per noun, walked in order, and still no bulk resolver.
     expect(block).toContain('const ordered = orderByStoryTier(');
     expect(block).toContain('i += 1;');

@@ -7000,7 +7000,7 @@ export interface GameStore {
    * lets the outer submit own the bookkeeping while the inner
    * submit performs the actual state change.
    */
-  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number; castCount?: number }) => void;
+  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number; castCount?: number; deferArbiter?: boolean /* QOL #218 — see pendingArbiterLines */ }) => void;
   resolveRollStep: (values: number[], timing?: RollTapTiming) => void; // OTA-1694 — the modal's shown/tapped stamps
   cancelPendingRolls: () => void;
   // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
@@ -7008,7 +7008,7 @@ export interface GameStore {
   // spend-exactly-one snapshot) until the roll RESOLVES or CANCELS.
   throwSettlement: { itemId: string; qtyAtThrow: number; prevOff?: string; prevOffId?: string } | null;
   settleThrowRestore: (outcome: 'resolved' | 'cancelled') => void;
-  concludeRolls: (steps: RollStep[], actionText: string) => void;
+  pendingArbiterLines: string[]; flushPendingArbiterLines: () => void; concludeRolls: (steps: RollStep[], actionText: string) => void; // QOL #218
   /** OTA-259 — advance a multi-stage investigation hook to its next
    *  step without re-opening the investigate menu. Called by the
    *  HookContinueModal's CONTINUE button. Resolves the next stage
@@ -7987,7 +7987,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
-  throwSettlement: null,
+  throwSettlement: null, pendingArbiterLines: [],
   parseSuggestions: [],
   pendingHookContinue: null,
   pendingWhisperComplete: null,
@@ -21995,7 +21995,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           hasFirstAidKit,
           hasFood,
         });
-        void narrateViaArbiter(get, set, template, parsed.intent);
+        void narrateViaArbiter(get, set, template, parsed.intent, { deferArbiter: _opts?.deferArbiter }); // QOL #218
       }
       // arb163 — independently of the reactive line above, occasionally kick off
       // an AMBIENT companion aside. It's decoupled from this action, runs in the
@@ -22346,7 +22346,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     });
     void get().persist();
   },
-
+  flushPendingArbiterLines() { const lines = get().pendingArbiterLines; if (!lines.length) return; set({ pendingArbiterLines: [] }); for (const line of lines) get().appendLog('arbiter', line); void get().persist(); }, // QOL #218
   concludeRolls(steps: RollStep[], actionText: string) {
     const { player, currentScene } = get();
     if (!player || !currentScene) return;

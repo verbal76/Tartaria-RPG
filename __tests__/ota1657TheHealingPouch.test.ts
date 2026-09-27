@@ -241,8 +241,10 @@ describe('OTA-1657 — three racks that fold', () => {
     expect(screen).toContain('summary={`${filled}/${MEDKIT_MAX} loaded`}');
   });
 
-  it('racks default OPEN and fold independently', () => {
-    expect(screen).toContain("const rackOpen = (k: string) => racksOpen[k] ?? true;");
+  // ⚠⚠ QOL #216 reversed this default — owner ruling, not a bug: all three
+  // racks now start collapsed (was `?? true`), same as inventory categories.
+  it('racks default COLLAPSED and fold independently', () => {
+    expect(screen).toContain("const rackOpen = (k: string) => racksOpen[k] ?? false;");
     expect(screen).toContain("open={rackOpen('pouch')}");
     expect(screen).toContain("open={rackOpen('bandolier')}");
     expect(screen).toContain("open={rackOpen('medkit')}");

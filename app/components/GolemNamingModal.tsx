@@ -111,15 +111,22 @@ export function GolemNamingModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={keep}>
-      <View style={kit.momentScrim}>
+      <View style={[kit.momentScrim, { paddingBottom: 24 + kbInset }]}>
         {/* ⚠ OTA-1883 — `kit.momentScroll` stretches this scroller to the scrim's
             definite inner width. Without it the scrim's `alignItems: 'center'`
             left the scroller content-sized, the card's `width: '100%'` had no
             base, and the card grew to its widest descendant instead of the
-            screen. Cross axis only; the keyboard inset below is unchanged. */}
+            screen. Cross axis only.
+            ⚠⚠ QOL #221 — the keyboard inset moved from here (content padding,
+            which only bought scroll DISTANCE inside a scroller still laid out
+            against the whole window) to the scrim's own `paddingBottom` above —
+            the same OTA-1872 fix already proven on DogOnboardingModal. Content
+            padding is back to the plain 32 below; KEEP ITS MAKING now stays
+            inside the card instead of drawing past the visible area once the
+            keyboard is up. */}
         <ScrollView
           style={kit.momentScroll}
-          contentContainerStyle={[styles.scroll, { paddingBottom: 32 + kbInset }]}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 32 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
