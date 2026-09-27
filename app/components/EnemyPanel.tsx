@@ -949,10 +949,6 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   // (infected, typed_dot — not player-applied coatings) still need the chip's
   // words, because nothing else on the compact card says them.
   const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingKindForStatus(st.kind) === null);
-  // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
-  // condition as the RESIST/WEAK block below, because the row sits directly
-  // under it and was answering what that block declined to say.
-  const chips = portraitTraitChips(view.enemy.traits, view.enemy.boss || canRead);
   const atkLabel = `+${enemyAttackBonus(view.enemy)}`; // OTA-1608 — what the d20 line will say
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
@@ -1211,20 +1207,11 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           })}
         </View>
       )}
-      {/* ⚠⚠⚠ OTA-1527 — THE CHIP ROW USED TO DEFEAT THE INTEL GATE. It mapped
-          `view.enemy.traits` unconditionally while the RESIST/WEAK block a few
-          lines above is gated on `view.enemy.boss || canRead`, so a card reading
-          `DEF ? — strike to learn` could still be answered by reading two lines
-          down. It also printed `inured:slashing` and `profiled` as raw ids. */}
-      {chips.length > 0 && (
-        <View style={styles.traitRow}>
-          {chips.map((t) => (
-            <Text key={t} style={styles.traitBadge}>
-              {describeTrait(t)}
-            </Text>
-          ))}
-        </View>
-      )}
+      {/* Owner ruling (physical Golem screenshot, Mud Monarch): the trait/tag
+          chip row (Savage, Fast Regen, Concussive, Bleeder, …) clutters the
+          collapsed compact portrait and belongs only on the expanded detail
+          popup, which has the room for it. Its gate/filter is unchanged —
+          it now applies to a single reader instead of two. */}
     </View>
   );
 }

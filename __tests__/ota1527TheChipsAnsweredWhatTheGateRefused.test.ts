@@ -132,28 +132,48 @@ describe('OTA-1527 — `inured` is a cancellation and the label must not say oth
 });
 
 describe('OTA-1527 — BOTH readers were saying it, so both were fixed', () => {
-  it('⚠⚠⚠ the card chip row is filtered', () => {
-    expect(PANEL).toContain('const chips = portraitTraitChips(view.enemy.traits, view.enemy.boss || canRead);');
-    expect(PANEL).toContain('{chips.map((t) => (');
-    // …and the unfiltered map is gone.
+  // ⚠ QUICK VISUAL TUNING (owner ruling, physical Golem screenshot, Mud
+  // Monarch): the chip row is no longer a SECOND reader on the compact
+  // card at all — the owner asked for it to live only on the expanded
+  // detail popup, which has the room for it. `portraitTraitChips` is still
+  // the single filter/gate both readers that remain (the popup, and the
+  // plain-text `enemyDetailBody`) go through — see the isolation below.
+  const codeOf = (startMarker: string, endMarker: string): string => {
+    const start = PANEL.indexOf(startMarker);
+    expect(start).toBeGreaterThan(-1);
+    const end = PANEL.indexOf(endMarker, start + startMarker.length);
+    expect(end).toBeGreaterThan(start);
+    return PANEL.slice(start, end);
+  };
+
+  it('⚠⚠⚠ the compact card no longer renders a chip row at all', () => {
+    const enemyCard = codeOf('function EnemyCard(', '\nfunction Stat(');
+    expect(enemyCard).not.toContain('traitRow');
+    expect(enemyCard).not.toContain('portraitTraitChips');
+    expect(enemyCard).not.toContain('describeTrait');
+    // …and the pre-1527 unfiltered map never crept back in either.
     const code = PANEL.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
     expect(code).not.toContain('view.enemy.traits.map((t) => (');
   });
 
-  it('⚠⚠⚠ …and so is the detail popup, which read the same field', () => {
-    // The many-doors mistake, avoided: fixing the card alone would have left the
-    // popup listing `Vuln Piercing` directly under "You can't read its
-    // weaknesses at a glance".
-    expect(PANEL).toContain('const traits = portraitTraitChips(e.traits, e.boss || canRead);');
-    const code = PANEL.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-    expect(code).not.toContain('const traits = e.traits ?? [];');
+  it('⚠⚠⚠ …the expanded popup is the one place it still reads, filtered', () => {
+    // The many-doors mistake, avoided the other way this time: moving the row
+    // off the compact card must not leave it unfiltered on the popup, nor
+    // duplicate it back onto both.
+    const detail = codeOf('function EnemyDetailContent(', '\nfunction EnemyCard(');
+    expect(detail).toContain('const chips = portraitTraitChips(e.traits, e.boss || canRead);');
+    expect(detail).toContain('{chips.map((t) => (');
+    expect(detail).not.toContain('e.traits.map((t) => (');
   });
 
-  it('⚠⚠ both doors take the SAME gate expression the RESIST/WEAK block uses', () => {
+  it('⚠⚠ every remaining reader takes the SAME gate expression the RESIST/WEAK block uses', () => {
     // A row gated on something subtly different from the block above it is the
-    // bug again with an extra step.
+    // bug again with an extra step. enemyDetailBody (the plain-text twin of
+    // the popup) still reads the same field under the same gate.
     const code = PANEL.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-    expect(code).toContain('view.enemy.boss || canRead');
     expect(code).toContain('e.boss || canRead');
+    // The compact card's own RESIST/WEAK block keeps its gate too — only the
+    // chip row moved, not the intel gate itself.
+    expect(code).toContain('view.enemy.boss || canRead');
   });
 });
