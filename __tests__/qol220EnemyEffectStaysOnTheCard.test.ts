@@ -47,12 +47,22 @@ describe('QOL #220 — the status model already covers every applied effect, not
   });
 });
 
-describe('QOL #220 — the card renders every active status persistently, not only in narration', () => {
-  it('statusCol renders one badge per status with label, turns-left and damage/turn — generalized, not switched on kind', () => {
-    const i = PANEL.indexOf('view.statuses && view.statuses.length > 0');
+// ⚠⚠ QOL #220 CORRECTION (physical acceptance) — this describe block's claim
+// narrowed on 2026-09-27. The owner's physical screenshot showed the AC-
+// adjacent glyph AND this lower chip printing the SAME acid effect at once;
+// the fix retires this chip for any status the glyph vocabulary already
+// covers (coatingGlyphForStatus non-null), so `statusCol` is no longer EVERY
+// active status — it is every status the AC glyph does NOT already speak
+// for. The union coverage and persistence claims below still hold; only
+// "every status" narrowed to "every non-coating status", which is exactly
+// what qol220AcAdjacentEffectIndicator.test.tsx's cases D/G prove is not an
+// information-loss regression (infected/typed_dot are still shown here).
+describe('QOL #220 — the card renders every NON-COATING active status persistently, not only in narration', () => {
+  it('statusCol renders one badge per non-qualifying status with label, turns-left and damage/turn — generalized, not switched on kind', () => {
+    const i = PANEL.indexOf('nonCoatingStatuses.length > 0');
     expect(i).toBeGreaterThan(-1);
     const body = PANEL.slice(i, PANEL.indexOf(')}', PANEL.indexOf('</View>', i)));
-    expect(body).toContain('view.statuses.map((st, i) =>');
+    expect(body).toContain('nonCoatingStatuses.map((st, i) =>');
     // Looked up by st.kind, not written per-kind — the badge is generic over
     // the whole EnemyStatusView union, so a new coating family needs no new
     // branch here.
@@ -63,11 +73,19 @@ describe('QOL #220 — the card renders every active status persistently, not on
   });
 
   it('the badge column persists across renders (conditional on data present, not on any one-shot flag)', () => {
-    // No "just fired" / "seen" gate — as long as the model still lists the
-    // status, the card keeps showing it, which is the "persistent" the owner
-    // asked for as opposed to a narration line that scrolls away.
-    expect(PANEL).toContain('{view.statuses && view.statuses.length > 0 && (');
+    // No "just fired" / "seen" gate — as long as the model still lists a
+    // non-qualifying status, the card keeps showing it, which is the
+    // "persistent" the owner asked for as opposed to a narration line that
+    // scrolls away.
+    expect(PANEL).toContain('{nonCoatingStatuses.length > 0 && (');
     expect(PANEL).not.toMatch(/statusCol[\s\S]{0,120}useState/);
+  });
+
+  it('a qualifying coating (already covered by the AC glyph) is excluded from this row by construction, not a name list', () => {
+    const i = PANEL.indexOf('const nonCoatingStatuses =');
+    expect(i).toBeGreaterThan(-1);
+    const line = PANEL.slice(i, PANEL.indexOf('\n', i));
+    expect(line).toContain('coatingGlyphForStatus(st.kind) === null');
   });
 });
 

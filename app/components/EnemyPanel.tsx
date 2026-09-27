@@ -97,6 +97,25 @@ function coatingGlyphForStatus(kind: EnemyStatusView['kind']): { ch: string; col
   return ch ? { ch, color: COATING_GLYPH_COLOR[coatingKind] } : null;
 }
 
+// ⚠⚠ QOL #220 CORRECTION — THE OWNER'S PHYSICAL SCREENSHOT SHOWED BOTH
+// REPRESENTATIONS AT ONCE. The AC glyph above was correct, but the old
+// `ACID 3t left · 4/turn` chip below it never went away — the follow-up added
+// the new language without retiring the old one for the effects it now
+// covers. One function decides which statuses qualify, and both the compact
+// card (badges only) and the expanded popup (badges + full detail) ask IT
+// rather than filtering `view.statuses` twice and risking the two answers
+// drifting apart.
+function qualifyingCoatingBadges(
+  statuses: EnemyStatusView[] | undefined,
+): Array<{ ch: string; color: string; kind: EnemyStatusView['kind'] }> {
+  return (statuses ?? [])
+    .map((st) => {
+      const g = coatingGlyphForStatus(st.kind);
+      return g ? { ...g, kind: st.kind } : null;
+    })
+    .filter((b): b is { ch: string; color: string; kind: EnemyStatusView['kind'] } => b !== null);
+}
+
 interface Props {
   enemies: EnemyView[];
   activeIndex: number;
@@ -569,7 +588,12 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
     lines.push(e.flavor);
     lines.push('');
   }
-  lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
+  // ⚠⚠ QOL #220 CORRECTION — THE EXPANDED CARD NOW USES THE SAME GLYPH
+  // VOCABULARY AS AC ON THE COMPACT CARD, not a second, independent AC line.
+  // Same `qualifyingCoatingBadges` call the compact card uses.
+  const coatingBadges = qualifyingCoatingBadges(view.statuses);
+  const acGlyphs = coatingBadges.length > 0 ? ` ${coatingBadges.map((b) => b.ch).join('')}` : '';
+  lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}${acGlyphs}`);
   // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-1609 — the move name rides along in the roomy popup too.
@@ -632,9 +656,16 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
   if (statuses.length) {
     lines.push('');
     lines.push('Active effects:');
+    // ⚠⚠ QOL #220 CORRECTION — a qualifying coating leads with its OWN glyph
+    // (COATING_GLYPH — the real, colour-presentation emoji, not a beige bullet)
+    // instead of the generic "· " every status used to share; a status that
+    // doesn't qualify (infected, typed_dot) keeps the plain marker, because it
+    // has no glyph identity to lead with.
     for (const s of statuses) {
       const meta = STATUS_META[s.kind];
-      lines.push(`· ${meta?.label ?? s.kind} — ${s.dmgPerTurn}/turn, ${s.turnsRemaining} turn(s) left`);
+      const g = coatingGlyphForStatus(s.kind);
+      const marker = g ? g.ch : '·';
+      lines.push(`${marker} ${meta?.label ?? s.kind} — ${s.dmgPerTurn}/turn, ${s.turnsRemaining} turn(s) left`);
     }
   }
   return lines.join('\n');
@@ -652,12 +683,13 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   // (the six weapon-coating DOT families) earns a glyph beside AC. A future
   // coating family picks this up automatically the day it gets a
   // COATING_GLYPH entry — nothing here names a specific element.
-  const acCoatingBadges = (view.statuses ?? [])
-    .map((st) => {
-      const g = coatingGlyphForStatus(st.kind);
-      return g ? { ...g, kind: st.kind } : null;
-    })
-    .filter((b): b is { ch: string; color: string; kind: EnemyStatusView['kind'] } => b !== null);
+  const acCoatingBadges = qualifyingCoatingBadges(view.statuses);
+  // ⚠⚠ QOL #220 CORRECTION — a status the AC glyph already speaks for does not
+  // ALSO get the old text chip below; that was the duplication the owner's
+  // screenshot caught. Only statuses coatingGlyphForStatus returns null for
+  // (infected, typed_dot — not player-applied coatings) still need the chip's
+  // words, because nothing else on the compact card says them.
+  const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingGlyphForStatus(st.kind) === null);
   // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
   // condition as the RESIST/WEAK block below, because the row sits directly
   // under it and was answering what that block declined to say.
@@ -778,11 +810,16 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
         />
       </View>
       {/* Portrait stat grid: two rows of two so it fits the narrow column.
-          ⚠⚠ QOL #220 FOLLOW-UP — the AC-adjacent coating indicator. Compact
-          on purpose: one glyph per qualifying active status, no label, no
-          second line — the lower `ACID 3t left · 4/turn` row (styles.statusCol
-          below) still carries the accurate detail. Bounded by construction:
-          a `_coat` status only exists per kind (applyCoatingProc refreshes,
+          ⚠⚠ QOL #220 FOLLOW-UP, CORRECTED — the AC-adjacent coating indicator.
+          Compact on purpose: one glyph per qualifying active status, no label,
+          no second line. ⚠ CORRECTION — the owner's physical screenshot caught
+          the first pass printing THIS glyph and the old `ACID 3t left ·
+          4/turn` text chip below, at the same time, for the same effect. The
+          lower `statusCol` row (below) no longer repeats a status this glyph
+          already speaks for — see `nonCoatingStatuses`. Detailed duration/
+          damage for a qualifying coating now lives in the expanded popup
+          (enemyDetailBody), not duplicated here. Bounded by construction: a
+          `_coat` status only exists once per kind (applyCoatingProc refreshes,
           never duplicates, a kind already active), and there are six kinds
           total, so this can never grow past the coating vocabulary itself. */}
       <View style={styles.statGrid}>
@@ -859,10 +896,13 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
       </View>
       {/* OTA-401 — active coating/DOT statuses on this enemy + turns left.
           One badge per status: "POISON · 3t · 4/turn". Lets the player
-          confirm a coating actually landed and track how long it ticks. */}
-      {view.statuses && view.statuses.length > 0 && (
+          confirm a coating actually landed and track how long it ticks.
+          ⚠⚠ QOL #220 CORRECTION — a qualifying coating (see acCoatingBadges
+          above) no longer prints here too; this row is now the presentation
+          for statuses the AC glyph doesn't cover, not every active status. */}
+      {nonCoatingStatuses.length > 0 && (
         <View style={styles.statusCol}>
-          {view.statuses.map((st, i) => {
+          {nonCoatingStatuses.map((st, i) => {
             const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#c9a86a' };
             const turns = `${st.turnsRemaining}t left`;
             const dmg = st.dmgPerTurn > 0 ? ` · ${st.dmgPerTurn}/turn` : '';
