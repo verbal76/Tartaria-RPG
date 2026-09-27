@@ -1424,6 +1424,10 @@ export function ExplorationScreen() {
         threat: (currentScene.enemyHps[i] ?? e.hp) <= 0 ? ('green' as const) : enemyThreatAt(e, band),
         // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
         statuses: currentScene.enemyStatuses?.[i] ?? [],
+        // ⚠ Owner-directed presentation repair (enemy conditional-effect class
+        // audit): CURRENT player-inflicted control on this enemy — read straight
+        // off the one existing typed authority, never a second state.
+        control: currentScene.enemyControl?.[i] ?? null,
       };
     });
   }, [

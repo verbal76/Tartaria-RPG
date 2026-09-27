@@ -326,3 +326,27 @@ export function corruptionFromCoating(kind: EnemyCoatingKind, rolled: number): n
 export function coatingWord(kind: EnemyCoatingKind): string {
   return kind;
 }
+
+/**
+ * ⚠⚠⚠ Owner-directed presentation repair (enemy conditional-effect class
+ * audit): the mechanic already applies these ailments via `ailmentForCoating`
+ * above — this states each one's ALREADY-EXISTING numeric consequence in one
+ * place, so the combat line and the portrait's capability description read
+ * the same fact instead of drifting apart. No number here is new:
+ *   poisoned's −2       — combatRules.ts's rollMods attack penalty
+ *   armor_severed's −2  — statusEffects.ts's statusAcAdjustment
+ *   chilled's −2        — equipment.ts's effectiveStats DEX penalty
+ *   burn_scar's +50%    — statusEffects.ts's aethericVulnerabilityMultiplier
+ * `corruption` and `electrical` return null on purpose: corruption raises the
+ * meter (a number, not a status — the caller already has it) and electrical
+ * "arcs and is gone" (no lingering consequence to describe).
+ */
+export function ailmentConsequenceLabel(kind: StatusEffectKind): string | null {
+  switch (kind) {
+    case 'poisoned': return 'poisoned — −2 to your attack rolls';
+    case 'armor_severed': return 'armor severed — −2 AC';
+    case 'chilled': return 'chilled — −2 DEX';
+    case 'burn_scar': return 'scarred — +50% aetheric damage taken';
+    default: return null;
+  }
+}

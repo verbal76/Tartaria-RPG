@@ -35,6 +35,13 @@ import { enemyDamageType } from '../engine/damageTypes';
 // task does not touch — see the "CRITICAL DISTINCTION" note on
 // `coatingKindForStatus` below.
 import { glyphArt } from '../engine/combatGlyphArt';
+import { ailmentForCoating, ailmentConsequenceLabel } from '../engine/enemyCoating';
+// ⚠ Owner-directed presentation repair (enemy conditional-effect class audit):
+// player-inflicted enemy control (stunned/held/etc.) is CURRENT STATE on the
+// enemy, so it reads here beside the coating DOTs in ACTIVE EFFECTS — never
+// as a trait/capability chip. `EnemyControlState` is the one existing typed
+// authority (enemyControl.ts); nothing here invents a second one.
+import { controlLabel, isSkipControl, controlAttackPenalty, type EnemyControlState } from '../engine/enemyControl';
 /* ⚠ VISUAL LANGUAGE PHASE 1 — chassis planes as kit STYLESHEET entries; no new
    kit export is spent during the physical-specimen phase (owner ruling). */
 import { tartariaKitStyles } from '../ui/tartariaKit';
@@ -74,6 +81,13 @@ export interface EnemyView {
   threat?: 'red' | 'yellow' | 'green';
   /** OTA-401 — active coating/DOT statuses on this enemy + turns left. */
   statuses?: EnemyStatusView[];
+  /** ⚠ Owner-directed presentation repair (enemy conditional-effect class
+   *  audit): player-inflicted control CURRENTLY held on this enemy
+   *  (stunned/paralyzed/restrained/prone/slowed/blinded/knockback/pull), read
+   *  straight from `currentScene.enemyControl[idx]` — the one existing typed
+   *  authority. This is current state, not a capability, so it renders in
+   *  ACTIVE EFFECTS, never the trait/capability chip row. */
+  control?: EnemyControlState | null;
 }
 
 // OTA-401 — short label + accent color per status kind. The coating
@@ -91,6 +105,13 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   // from the coating families so a typed-DOT stack reads clearly on the enemy panel.
   typed_dot: { label: 'DOT', color: '#e0c05f' },
 };
+
+// ⚠ Owner-directed presentation repair (enemy conditional-effect class
+// audit): player-inflicted control has no developed glyph and no dedicated
+// color of its own — reused, not invented: the same fallback accent
+// STATUS_META's own callers already use for an unmapped status kind (see
+// `nonCoatingStatuses.map`'s `meta` default below).
+const CONTROL_ACCENT = '#c9a86a';
 
 // ⚠⚠⚠ QOL #220 FINAL — WHICH STATUSES ARE A DEVELOPED-GLYPH COATING, AND
 // WHICH COATING. Pure suffix-strip, same partition #220 has always used
@@ -661,9 +682,22 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
   // the kind, what the blade adds, and — the part that makes it actionable —
   // that armour resisting that type halves it where it lands.
   if (e.coating) {
+    // ⚠ Owner-directed presentation repair (enemy conditional-effect class
+    // audit): this sentence explained the bonus damage but never the
+    // lingering consequence a landed hit also leaves — the player had to
+    // notice the Effects list change on their own. `ailmentConsequenceLabel`
+    // is the same one fact the combat line now states; electrical stays
+    // silent here too (immediate damage only, by design).
+    const ailmentKind = ailmentForCoating(e.coating.kind);
+    const ailment = ailmentKind ? ailmentConsequenceLabel(ailmentKind) : null;
+    const consequenceClause = ailment
+      ? `; a landed hit also leaves you ${ailment}`
+      : e.coating.kind === 'corruption'
+        ? '; a landed hit also raises your corruption'
+        : '';
     lines.push(
       `Coated blade: ${COATING_GLYPH[e.coating.kind]} ${cap(e.coating.kind)} `
-      + `(+${e.coating.dice} on a landed hit; armour that resists ${e.coating.kind} halves it)`,
+      + `(+${e.coating.dice} on a landed hit; armour that resists ${e.coating.kind} halves it${consequenceClause})`,
     );
   }
   // ⚠⚠ OTA-1651 — AND YOUR OWN HANDS, spelled out. On the combat card this was
@@ -747,6 +781,10 @@ function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canR
   const chips = portraitTraitChips(e.traits, e.boss || canRead);
   const effectBadges = qualifyingEffectBadges(view.statuses);
   const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingKindForStatus(st.kind) === null);
+  // ⚠ Owner-directed presentation repair: current control state, gated on a
+  // real remaining duration — an expired/cleared control (0 rounds) shows
+  // nothing, exactly like every other status here.
+  const hasControl = !!view.control && view.control.roundsRemaining > 0;
 
   return (
     <View style={detailStyles.wrap}>
@@ -795,14 +833,28 @@ function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canR
           (a separate, already-accepted OTA-1656 presentation) still reads
           COATING_GLYPH directly and is never confused with a player-applied
           active effect below. */}
-      {!!e.coating && (
-        <Text style={detailStyles.coatingLine} numberOfLines={2}>
-          <Text style={{ color: COATING_GLYPH_COLOR[e.coating.kind] }}>{COATING_GLYPH[e.coating.kind]} </Text>
-          <Text style={detailStyles.coatingText}>
-            Coated blade: {cap(e.coating.kind)} (+{e.coating.dice} on a landed hit; armour that resists {e.coating.kind} halves it)
+      {!!e.coating && (() => {
+        // ⚠ Owner-directed presentation repair (enemy conditional-effect
+        // class audit): same fact as the plain-text `enemyDetailBody` above
+        // — the capability sentence explained the bonus damage but never the
+        // lingering consequence. Electrical stays silent (immediate damage
+        // only, by design).
+        const ailmentKind = ailmentForCoating(e.coating!.kind);
+        const ailment = ailmentKind ? ailmentConsequenceLabel(ailmentKind) : null;
+        const consequenceClause = ailment
+          ? `; a landed hit also leaves you ${ailment}`
+          : e.coating!.kind === 'corruption'
+            ? '; a landed hit also raises your corruption'
+            : '';
+        return (
+          <Text style={detailStyles.coatingLine} numberOfLines={3}>
+            <Text style={{ color: COATING_GLYPH_COLOR[e.coating!.kind] }}>{COATING_GLYPH[e.coating!.kind]} </Text>
+            <Text style={detailStyles.coatingText}>
+              Coated blade: {cap(e.coating!.kind)} (+{e.coating!.dice} on a landed hit; armour that resists {e.coating!.kind} halves it{consequenceClause})
+            </Text>
           </Text>
-        </Text>
-      )}
+        );
+      })()}
 
       {!!view.hands?.length && (
         <View style={detailStyles.handsBlock}>
@@ -876,11 +928,33 @@ function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canR
           with the label spelled out instead of abbreviated. A non-qualifying
           status (infected, typed_dot) has no glyph identity, so it keeps its
           existing accent-dot presentation — an information-loss regression
-          would be showing LESS here than the compact card already does. */}
-      {(view.statuses ?? []).length > 0 && (
+          would be showing LESS here than the compact card already does.
+          ⚠ Owner-directed presentation repair (enemy conditional-effect class
+          audit): CURRENT player-inflicted control (stunned/held/etc.) joins
+          this section for the same reason — it is happening TO the enemy
+          right now, not a capability, so it belongs beside the coating DOTs,
+          never in the trait/capability chip row above. No developed glyph
+          exists for a control state, so it keeps the same plain accent-dot
+          treatment the non-coating statuses already use — no new iconography
+          invented for this repair. */}
+      {((view.statuses ?? []).length > 0 || hasControl) && (
         <View style={detailStyles.effectsSection}>
           <Text style={detailStyles.effectsHeading}>ACTIVE EFFECTS</Text>
           <View style={detailStyles.effectsRow}>
+            {hasControl && (
+              <View style={detailStyles.effectUnit}>
+                <Text style={[detailStyles.effectDot, { color: CONTROL_ACCENT }]}>●</Text>
+                <Text style={[detailStyles.effectName, { color: CONTROL_ACCENT }]} numberOfLines={1}>
+                  {controlLabel(view.control!.kind).toUpperCase()}
+                </Text>
+                <Text style={detailStyles.effectDetail} numberOfLines={1}>
+                  {isSkipControl(view.control) ? 'skips its turn' : `${controlAttackPenalty(view.control)} to its attack`}
+                </Text>
+                <Text style={detailStyles.effectDetail}>
+                  {view.control!.roundsRemaining} round{view.control!.roundsRemaining === 1 ? '' : 's'} remaining
+                </Text>
+              </View>
+            )}
             {effectBadges.map((b) => (
               <View key={b.kind} style={detailStyles.effectUnit}>
                 <Image

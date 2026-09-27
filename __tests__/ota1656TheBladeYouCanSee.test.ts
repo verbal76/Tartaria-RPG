@@ -278,3 +278,56 @@ describe('OTA-1656 — the coated blade is on the card', () => {
     expect(src.slice(i, j)).toContain('COATING_GLYPH[view.enemy.coating.kind]');
   });
 });
+
+describe('enemy conditional-effect class — Repair 1: the popup says what a landed hit leaves behind', () => {
+  const view = (over: Partial<EnemyView> = {}): EnemyView =>
+    ({ enemy: foe(), currentHp: 22, ...over } as EnemyView);
+
+  // Owner ruling: reuse the ALREADY-EXISTING consequence from production state
+  // (statusEffects.ts / combatRules.ts / equipment.ts), never invent a number.
+  // These four are the same figures the mechanic itself already applies.
+  const EXPECT: Record<string, string[]> = {
+    poison: ['poisoned', '−2 to your attack rolls'],
+    acid: ['armor severed', '−2 AC'],
+    cold: ['chilled', '−2 DEX'],
+    burn: ['scarred', '+50% aetheric damage taken'],
+  };
+
+  it.each(Object.entries(EXPECT))('%s: the popup names the lingering consequence it actually leaves', (kind, phrases) => {
+    const body = enemyDetailBody(
+      view({ enemy: foe({ coating: { kind, dice: '1d6' } } as Partial<Enemy>) }),
+      false,
+    );
+    for (const phrase of phrases) expect(body).toContain(phrase);
+  });
+
+  it('corruption: the popup says it raises corruption, not a fabricated ailment', () => {
+    const body = enemyDetailBody(
+      view({ enemy: foe({ coating: { kind: 'corruption', dice: '1d6' } } as Partial<Enemy>) }),
+      false,
+    );
+    expect(body).toContain('raises your corruption');
+  });
+
+  it('⚠ electrical is NEVER described as leaving a lingering consequence — it arcs and is gone', () => {
+    const body = enemyDetailBody(
+      view({ enemy: foe({ coating: { kind: 'electrical', dice: '1d6' } } as Partial<Enemy>) }),
+      false,
+    );
+    expect(body).toContain('Coated blade');
+    expect(body).not.toContain('also leaves you');
+    expect(body).not.toContain('also raises your corruption');
+  });
+
+  it('the expanded popup JSX carries the same consequence wording as the plain-text contract', () => {
+    // Production-door check: the JSX component reads the exact same
+    // ailmentForCoating/ailmentConsequenceLabel pair as enemyDetailBody,
+    // rather than a second, independently-maintained copy of the wording.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const src = require('fs').readFileSync(
+      require('path').join(__dirname, '..', 'app', 'components', 'EnemyPanel.tsx'), 'utf8',
+    ) as string;
+    expect(src).toContain('ailmentForCoating(e.coating!.kind)');
+    expect(src).toContain('ailmentConsequenceLabel(ailmentKind)');
+  });
+});

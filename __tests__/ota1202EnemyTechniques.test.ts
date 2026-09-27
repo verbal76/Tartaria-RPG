@@ -237,3 +237,33 @@ describe('OTA-1202 / P16 — LIVE, each technique in a real volley', () => {
     }
   });
 });
+
+describe('enemy conditional-effect class — Repair 2: Resonance Cascade explains itself', () => {
+  it('⚠ the expanded description states the tactical facts the mechanic actually has', () => {
+    const text = describeTechniqueTrait('technique:resonance_cascade')!;
+    expect(text).toContain('Channels: Resonance Cascade');
+    expect(text).toContain('35%');
+    expect(text).toContain('5d10');
+    expect(text).toContain('halved');
+    expect(text).toMatch(/aetheric/i);
+    expect(text).toContain('1d10');
+    expect(text).toContain('once');
+  });
+
+  it('does NOT expose internal implementation language', () => {
+    const text = describeTechniqueTrait('technique:resonance_cascade')!;
+    for (const leak of ['technique_spent', 'spawn', 'swapEnemyTrait', 'rollDie', 'technique:resonance_cascade']) {
+      expect(text).not.toContain(leak);
+    }
+  });
+
+  it('the other three technique traits are untouched — bare "Channels: X" form, out of this repair\'s scope', () => {
+    expect(describeTechniqueTrait('technique:aether_shield')).toBe('Channels: Aether Shield');
+    expect(describeTechniqueTrait('technique:temporal_slip')).toBe('Channels: Temporal Slip');
+    expect(describeTechniqueTrait('technique:veil_of_ether')).toBe('Channels: Veil of Ether');
+  });
+
+  it('a spent Resonance Cascade still reads as spent, not re-explained', () => {
+    expect(describeTechniqueTrait('technique_spent:resonance_cascade')).toBe('Spent: Resonance Cascade');
+  });
+});

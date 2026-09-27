@@ -202,6 +202,18 @@ export function rollEnemyTechnique(
 export function describeTechniqueTrait(t: string): string | null {
   const [key, arg] = t.split(':');
   const name = (id: string) => findTechnique(id)?.name ?? id;
+  // ⚠⚠⚠ Owner-directed presentation repair (enemy conditional-effect class
+  // audit): "Channels: Resonance Cascade" named the capability but not what
+  // it does — every fact below is read from combatResolution.ts's
+  // `enemyChannelsTechnique` (the cornered 0.35 HP threshold, the 5d10/1d10
+  // dice, the aetheric-resist halving, the once-only guard), stated as
+  // tactical information rather than the implementation terms that produce
+  // it. The other three technique traits (aether_shield/temporal_slip/
+  // veil_of_ether) are the enemy's own defense/dodge — out of scope for this
+  // repair, per the owner's ruling — so they keep the bare "Channels: X" form.
+  if (key === 'technique' && arg === 'resonance_cascade') {
+    return 'Channels: Resonance Cascade — if driven below 35% HP, it stops attacking normally and unleashes 5d10 aetheric damage at you once (halved if your armor resists aetheric), taking 1d10 damage back through itself';
+  }
   if (key === 'technique' && arg) return `Channels: ${name(arg)}`;
   if (key === 'technique_spent' && arg) return `Spent: ${name(arg)}`;
   if (t === 'field:aether_shield') return 'Aether Shield raised (+3 AC)';

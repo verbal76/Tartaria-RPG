@@ -2631,6 +2631,20 @@ function applyEnemyCounter(
       // he drinks subtracts from the same number. Symmetry is the whole point
       // of the three-uses loop: the right answer has to answer.
       coatingCorruption = ec.corruptionFromCoating(enemy.coating.kind, coatDmg);
+      // ⚠⚠⚠ Owner-directed presentation repair: the ailment/meter consequence
+      // already lands (below, where `coatingAilment`/`coatingCorruption` are
+      // applied) but the combat line never SAID so — the player saw the extra
+      // damage and had to notice the Effects list changing on their own.
+      // Folded into this same clause rather than a second log line, per the
+      // owner's "don't duplicate noisy messages" instruction. Electrical is
+      // deliberately silent here too: `ailmentConsequenceLabel` returns null
+      // for it, matching that it "arcs and is gone."
+      if (coatingAilment) {
+        const consequence = ec.ailmentConsequenceLabel(coatingAilment as StatusEffect['kind']);
+        if (consequence) coatingClause += ` — ${consequence} (${COATING_DOT_TURNS} rounds)`;
+      } else if (coatingCorruption > 0) {
+        coatingClause += ` — +${coatingCorruption} corruption`;
+      }
     }
     // OTA-959 — armor wear: a landed blow chips ONE worn piece, not the whole
     // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
