@@ -1,0 +1,998 @@
+Bug Report — Jaffar · (2026-09-27-1887-the-copy-speaks-for-itself) · Why did I have to accept.tolvars quest?
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-27T02:10:00.937Z
+Character: Jaffar
+Slot ID: slot_muj4gzkf_pl0zus
+Race: Tartarian Giants
+Location: Tartarian Pilgrim Camp
+HP: 26/52
+
+--- DESCRIPTION ---
+Why did I have to accept.tolvars quest?
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 1
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-27T02:10:00.829Z
+
+Install
+  App ID: com.hotatticgames.tartarprim.golem
+  App version: 4.32.11
+  APK build version: 2.5.0
+  APK build: 474
+  AAB: (build 474)
+  OTA: (2026-09-27-1887-the-copy-speaks-for-itself)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-27T01:11:29.337Z
+  Last init success: 2026-09-27T01:11:32.056Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmuj3651c0r · started 2026-09-27T00:34:22.848Z
+  Followed an OTA apply 1247ms ago (mid-session)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 28.1s · 4 job kinds queued >3s · worst 838.7ms/prompt-token · 17 generations thrown away (467.8s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  ⚠ Native queue admission: 133 jobs · worst wait 28.1s (investigate_lore) · 28 past 3s · 1 refused before prefill · 4 cut as obsolete · 1 yielded to live work
+  App state trail: background → active → background → active → background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+Memory timeline
+  ⚠ heap = HERMES JS HEAP, not process memory. ctx ≈ count × 425MB est.
+  Heap: first 104MB · peak 164MB · last 144MB · net +40MB over 64 marks
+     +0.0s heap-move — heap 104MB gc 1ms/208 · ctx 1 ≈425MB est · app=active · native narration:travel running q1 · warns 0
+     +3.3s gen-settled [narration:travel ok] — heap 108MB gc 1ms/214 · ctx 1 ≈425MB est · app=active · native narration:travel running q1 · warns 0
+    +10.1s heap-move — heap 120MB gc 1ms/237 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+    +15.1s heap-move — heap 132MB gc 1ms/247 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+    +20.1s heap-move — heap 140MB gc 1ms/264 · ctx 1 ≈425MB est · app=active · native voice running q2 · warns 0
+    +42.7s gen-settled [investigate_lore ok] — heap 144MB gc 1ms/286 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+    +59.8s gen-settled [flourish ok] — heap 144MB gc 1ms/317 · ctx 1 ≈425MB est · app=active · native flourish running q0 · warns 0
+   +130.1s gen-settled [narration:travel preempt] — heap 144MB gc 1ms/465 · ctx 1 ≈425MB est · app=active · native narration:travel running q3 · warns 0
+   +142.2s gen-settled [ambient preempted] — heap 144MB gc 1ms/493 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+   +151.0s gen-settled [investigate_lore ok] — heap 144MB gc 2ms/525 · ctx 1 ≈425MB est · app=active · native investigate_lore running q4 · warns 0
+   +165.3s gen-settled [investigate_lore ok] — heap 144MB gc 2ms/570 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +165.3s gen-settled [narration:travel preempt] — heap 144MB gc 2ms/571 · ctx 1 ≈425MB est · app=active · native narration:travel running q0 · warns 0
+   +167.2s gen-settled [investigate_lore ok] — heap 144MB gc 2ms/578 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +195.9s heap-move — heap 152MB gc 2ms/611 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+   +207.8s gen-settled [narration:travel preempt] — heap 156MB gc 2ms/620 · ctx 1 ≈425MB est · app=active · native narration:travel running q1 · warns 0
+   +220.3s gen-settled [investigate_lore ok] — heap 164MB gc 2ms/639 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +220.8s appstate [active→background] — heap 164MB gc 2ms/640 · ctx 1 ≈425MB est · app=background · native ambient running q0 · warns 0
+   +530.6s appstate [background→active] — heap 160MB gc 306ms/646 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+   +530.8s gen-settled [ambient preempted] — heap 160MB gc 306ms/649 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+   +541.3s gen-settled [investigate_lore ok] — heap 160MB gc 306ms/675 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +561.7s gen-settled [narration:travel preempt] — heap 160MB gc 306ms/724 · ctx 1 ≈425MB est · app=active · native narration:travel running q0 · warns 0
+   +565.0s gen-settled [ambient preempted] — heap 160MB gc 306ms/734 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+   +569.3s gen-settled [investigate_lore ok] — heap 160MB gc 306ms/746 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+   +570.9s gen-settled [investigate_lore ok] — heap 160MB gc 306ms/747 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +584.1s gen-settled [narration:travel ok] — heap 160MB gc 306ms/752 · ctx 1 ≈425MB est · app=active · native narration:travel running q1 · warns 0
+   +681.6s gen-settled [narration:travel preempt] — heap 160MB gc 306ms/791 · ctx 1 ≈425MB est · app=active · native narration:travel running q2 · warns 0
+   +687.1s gen-settled [investigate_lore ok] — heap 160MB gc 306ms/804 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +717.8s gen-settled [ambient_fill preempted] — heap 160MB gc 307ms/861 · ctx 1 ≈425MB est · app=active · native ambient_fill running q2 · warns 0
+   +721.8s gen-settled [investigate_lore ok] — heap 160MB gc 307ms/866 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +769.1s gen-settled [narration:scene_intro_fi] — heap 160MB gc 307ms/933 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +789.8s gen-settled [investigate_lore ok] — heap 160MB gc 307ms/955 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+   +806.7s gen-settled [ambient preempted] — heap 160MB gc 307ms/975 · ctx 1 ≈425MB est · app=active · native ambient running q0 · warns 0
+   +823.5s gen-settled [narration:scene_intro_fi] — heap 160MB gc 307ms/992 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +886.2s gen-settled [narration:scene_intro_fi] — heap 160MB gc 307ms/1046 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+   +910.9s gen-settled [flourish ok] — heap 160MB gc 307ms/1060 · ctx 1 ≈425MB est · app=active · native flourish running q0 · warns 0
+   +937.8s gen-settled [narration:scene_intro_fi] — heap 160MB gc 307ms/1135 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +1034.4s appstate [active→background] — heap 160MB gc 308ms/1303 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +2520.5s appstate [background→active] — heap 156MB gc 311ms/1308 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +2660.7s gen-settled [ambient_fill preempted] — heap 156MB gc 312ms/1440 · ctx 1 ≈425MB est · app=active · native ambient_fill running q5 · warns 0
+  +2667.3s gen-settled [investigate_lore ok] — heap 156MB gc 312ms/1447 · ctx 1 ≈425MB est · app=active · native investigate_lore running q4 · warns 0
+  +2672.9s gen-settled [investigate_lore ok] — heap 156MB gc 312ms/1455 · ctx 1 ≈425MB est · app=active · native investigate_lore running q3 · warns 0
+  +2677.8s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1456 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +2684.6s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1462 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +2688.4s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1470 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+  +2708.4s gen-settled [narration:scene_intro_fi] — heap 156MB gc 313ms/1479 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +2726.1s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1514 · ctx 1 ≈425MB est · app=active · native investigate_lore running q4 · warns 0
+  +2731.8s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1516 · ctx 1 ≈425MB est · app=active · native investigate_lore running q3 · warns 0
+  +2735.2s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1517 · ctx 1 ≈425MB est · app=active · native investigate_lore running q2 · warns 0
+  +2738.1s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1519 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+  +2740.8s gen-settled [investigate_lore ok] — heap 156MB gc 313ms/1521 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+  +2741.6s appstate [active→background] — heap 156MB gc 313ms/1522 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +2858.9s appstate [background→active] — heap 152MB gc 314ms/1528 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +2889.1s gen-settled [narration:scene_intro_fi] — heap 152MB gc 314ms/1545 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +2925.8s gen-settled [narration:scene_intro_fi] — heap 152MB gc 314ms/1550 · ctx 1 ≈425MB est · app=active · native narration:scene_intro_fill running q0 · warns 0
+  +3036.7s appstate [active→background] — heap 152MB gc 315ms/1744 · ctx 1 ≈425MB est · app=background · native ambient_fill running q0 · warns 0
+  +3054.0s gen-settled [ambient_fill preempted] — heap 152MB gc 315ms/1746 · ctx 1 ≈425MB est · app=background · native ambient_fill running q1 · warns 0
+  +3091.6s appstate [background→active] — heap 152MB gc 315ms/1749 · ctx 1 ≈425MB est · app=active · native voice running q0 · warns 0
+  +3098.9s appstate [active→background] — heap 152MB gc 315ms/1793 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +3252.0s appstate [background→active] — heap 148MB gc 316ms/1799 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +3340.1s gen-settled [ambient_fill preempted] — heap 148MB gc 317ms/2047 · ctx 1 ≈425MB est · app=active · native ambient_fill running q1 · warns 0
+  +3391.7s appstate [active→background] — heap 148MB gc 317ms/2097 · ctx 1 ≈425MB est · app=background · native idle q0 · warns 0
+  +3408.8s appstate [background→active] — heap 144MB gc 318ms/2102 · ctx 1 ≈425MB est · app=active · native idle q0 · warns 0
+  +3414.1s gen-settled [investigate_lore ok] — heap 144MB gc 318ms/2113 · ctx 1 ≈425MB est · app=active · native investigate_lore running q1 · warns 0
+  +3415.4s gen-settled [investigate_lore ok] — heap 144MB gc 318ms/2115 · ctx 1 ≈425MB est · app=active · native investigate_lore running q0 · warns 0
+Native memory flight recorder (Build 190)
+  NOT AVAILABLE on this runtime (Android, web, Expo Go, or a JS-only build).
+  ⚠ This is an absence of the instrument, NOT a clean bill of health.
+Touch path
+  prior boot: (trace present, no stages)
+  this boot:
+  2026-09-27T02:06:41.278Z #529 content controls p=none exploration
+  2026-09-27T02:06:43.225Z #530 root p=none exploration
+  2026-09-27T02:06:43.232Z #530 content controls p=none exploration
+  2026-09-27T02:06:43.233Z #530 in quick:dodge ⏱+31ms p=none exploration
+  2026-09-27T02:06:43.326Z #530 enter quick:dodge p=none exploration
+  2026-09-27T02:06:43.329Z #530 admit quick:dodge (callback) p=none exploration
+  2026-09-27T02:06:43.329Z #530 dispatch quick:dodge (callback) p=none exploration
+  2026-09-27T02:06:43.386Z #530 done quick:dodge (callback) p=none exploration
+  2026-09-27T02:06:43.909Z #531 root p=none exploration
+  2026-09-27T02:06:43.914Z #531 content controls p=none exploration
+  2026-09-27T02:06:43.915Z #531 in quick:⚗ bolt-caster ▲ ⏱+29ms p=none exploration
+  2026-09-27T02:06:44.011Z #531 enter quick:⚗ bolt-caster ▲ p=none exploration
+  2026-09-27T02:06:44.014Z #531 admit quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:06:44.014Z #531 dispatch quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:06:44.083Z #531 done quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:06:44.727Z #532 root p=none exploration
+  2026-09-27T02:06:44.742Z #532 content controls p=none exploration
+  2026-09-27T02:06:46.144Z #533 root p=none exploration
+  2026-09-27T02:06:46.152Z #533 content controls p=none exploration
+  2026-09-27T02:06:47.579Z #534 root p=none exploration
+  2026-09-27T02:06:47.580Z #534 content controls p=none exploration
+  2026-09-27T02:06:49.112Z #535 root p=none exploration
+  2026-09-27T02:06:49.114Z #535 content controls p=none exploration
+  2026-09-27T02:06:52.685Z #536 root p=none exploration
+  2026-09-27T02:06:52.691Z #536 content controls p=none exploration
+  2026-09-27T02:06:52.692Z #536 in quick:stealth ⏱+24ms p=none exploration
+  2026-09-27T02:06:52.832Z #536 enter quick:stealth p=none exploration
+  2026-09-27T02:06:52.835Z #536 admit quick:stealth (callback) p=none exploration
+  2026-09-27T02:06:52.836Z #536 dispatch quick:stealth (callback) p=none exploration
+  2026-09-27T02:06:52.863Z #536 done quick:stealth (callback) p=none exploration
+  2026-09-27T02:06:53.412Z #537 root p=none exploration
+  2026-09-27T02:06:53.413Z #537 content controls p=none exploration
+  2026-09-27T02:06:55.680Z #538 root p=none exploration
+  2026-09-27T02:06:55.687Z #538 content controls p=none exploration
+  2026-09-27T02:06:55.688Z #538 in quick:⚗ bolt-caster ▲ ★ ⏱+31ms p=none exploration
+  2026-09-27T02:06:55.798Z #538 enter quick:⚗ bolt-caster ▲ ★ p=none exploration
+  2026-09-27T02:06:55.803Z #538 admit quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:06:55.803Z #538 dispatch quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:06:55.872Z #538 done quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:06:56.513Z #539 root p=none exploration
+  2026-09-27T02:06:56.514Z #539 content controls p=none exploration
+  2026-09-27T02:06:57.966Z #540 root p=none exploration
+  2026-09-27T02:06:57.969Z #540 content controls p=none exploration
+  2026-09-27T02:07:00.064Z #541 root p=none exploration
+  2026-09-27T02:07:00.065Z #541 content controls p=none exploration
+  2026-09-27T02:07:00.065Z #541 in quick:⚗ bolt-caster ▲ ★ ⏱+23ms p=none exploration
+  2026-09-27T02:07:00.200Z #541 enter quick:⚗ bolt-caster ▲ ★ p=none exploration
+  2026-09-27T02:07:00.207Z #541 admit quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:00.207Z #541 dispatch quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:00.272Z #541 done quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:00.782Z #542 root p=none exploration
+  2026-09-27T02:07:00.786Z #542 content controls p=none exploration
+  2026-09-27T02:07:02.148Z #543 root p=none exploration
+  2026-09-27T02:07:02.149Z #543 content controls p=none exploration
+  2026-09-27T02:07:03.515Z #544 root p=none exploration
+  2026-09-27T02:07:03.517Z #544 content controls p=none exploration
+  2026-09-27T02:07:04.899Z #545 root p=none exploration
+  2026-09-27T02:07:04.901Z #545 content controls p=none exploration
+  2026-09-27T02:07:07.869Z #546 root p=none exploration
+  2026-09-27T02:07:07.876Z #546 content controls p=none exploration
+  2026-09-27T02:07:07.877Z #546 in quick:dodge ⏱+32ms p=none exploration
+  2026-09-27T02:07:08.019Z #546 enter quick:dodge p=none exploration
+  2026-09-27T02:07:08.023Z #546 admit quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:08.023Z #546 dispatch quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:08.070Z #546 done quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:09.586Z #547 root p=none exploration
+  2026-09-27T02:07:09.594Z #547 content controls p=none exploration
+  2026-09-27T02:07:09.594Z #547 in quick:⚗ bolt-caster ▲ ⏱+32ms p=none exploration
+  2026-09-27T02:07:09.720Z #547 enter quick:⚗ bolt-caster ▲ p=none exploration
+  2026-09-27T02:07:09.724Z #547 admit quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:09.724Z #547 dispatch quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:09.790Z #547 done quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:10.302Z #548 root p=none exploration
+  2026-09-27T02:07:10.302Z #548 content controls p=none exploration
+  2026-09-27T02:07:11.635Z #549 root p=none exploration
+  2026-09-27T02:07:11.637Z #549 content controls p=none exploration
+  2026-09-27T02:07:12.921Z #550 root p=none exploration
+  2026-09-27T02:07:12.922Z #550 content controls p=none exploration
+  2026-09-27T02:07:14.437Z #551 root p=none exploration
+  2026-09-27T02:07:14.441Z #551 content controls p=none exploration
+  2026-09-27T02:07:17.671Z #552 root p=none exploration
+  2026-09-27T02:07:17.674Z #552 content controls p=none exploration
+  2026-09-27T02:07:17.675Z #552 in quick:✦ ability ⏱+19ms p=none exploration
+  2026-09-27T02:07:17.789Z #552 enter quick:✦ ability p=none exploration
+  2026-09-27T02:07:17.794Z #552 admit quick:✦ ability (callback) p=none exploration
+  2026-09-27T02:07:17.794Z #552 dispatch quick:✦ ability (callback) p=none exploration
+  2026-09-27T02:07:17.802Z #552 done quick:✦ ability (callback) p=none exploration
+  2026-09-27T02:07:18.855Z #553 root p=none exploration
+  2026-09-27T02:07:22.106Z #554 root p=none exploration
+  2026-09-27T02:07:22.116Z #554 content controls p=none exploration
+  2026-09-27T02:07:22.116Z #554 in quick:⚗ bolt-caster ▲ ★ ⏱+25ms p=none exploration
+  2026-09-27T02:07:22.261Z #554 enter quick:⚗ bolt-caster ▲ ★ p=none exploration
+  2026-09-27T02:07:22.265Z #554 admit quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:22.265Z #554 dispatch quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:22.331Z #554 done quick:⚗ bolt-caster ▲ ★ (callback) p=none exploration
+  2026-09-27T02:07:22.889Z #555 root p=none exploration
+  2026-09-27T02:07:22.891Z #555 content controls p=none exploration
+  2026-09-27T02:07:24.257Z #556 root p=none exploration
+  2026-09-27T02:07:24.260Z #556 content controls p=none exploration
+  2026-09-27T02:07:25.674Z #557 root p=none exploration
+  2026-09-27T02:07:25.679Z #557 content controls p=none exploration
+  2026-09-27T02:07:27.688Z #558 root p=none exploration
+  2026-09-27T02:07:27.693Z #558 content controls p=none exploration
+  2026-09-27T02:07:31.947Z #559 root p=none exploration
+  2026-09-27T02:07:31.954Z #559 content controls p=none exploration
+  2026-09-27T02:07:31.954Z #559 in quick:✚ heals (2) ⏱+21ms p=none exploration
+  2026-09-27T02:07:32.096Z #559 enter quick:✚ heals (2) p=none exploration
+  2026-09-27T02:07:32.099Z #559 admit quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:32.099Z #559 dispatch quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:32.099Z #559 done quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:32.637Z #560 root p=none exploration
+  2026-09-27T02:07:32.644Z #560 content controls p=none exploration
+  2026-09-27T02:07:33.962Z #561 root p=none exploration
+  2026-09-27T02:07:33.968Z #561 content controls p=none exploration
+  2026-09-27T02:07:36.347Z #562 root p=none exploration
+  2026-09-27T02:07:36.351Z #562 content controls p=none exploration
+  2026-09-27T02:07:36.352Z #562 in quick:✚ heals (2) ⏱+21ms p=none exploration
+  2026-09-27T02:07:36.481Z #562 enter quick:✚ heals (2) p=none exploration
+  2026-09-27T02:07:36.485Z #562 admit quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:36.486Z #562 dispatch quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:36.486Z #562 done quick:✚ heals (2) (callback) p=none exploration
+  2026-09-27T02:07:37.644Z #563 root p=none exploration
+  2026-09-27T02:07:37.655Z #563 content controls p=none exploration
+  2026-09-27T02:07:39.116Z #564 root p=none exploration
+  2026-09-27T02:07:39.130Z #564 content controls p=none exploration
+  2026-09-27T02:07:42.264Z #565 root p=none exploration
+  2026-09-27T02:07:42.271Z #565 content controls p=none exploration
+  2026-09-27T02:07:42.272Z #565 in quick:⚗ bolt-caster ▲ ⏱+31ms p=none exploration
+  2026-09-27T02:07:42.434Z #565 enter quick:⚗ bolt-caster ▲ p=none exploration
+  2026-09-27T02:07:42.439Z #565 admit quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:42.439Z #565 dispatch quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:42.502Z #565 done quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:43.134Z #566 root p=none exploration
+  2026-09-27T02:07:43.138Z #566 content controls p=none exploration
+  2026-09-27T02:07:44.316Z #567 root p=none exploration
+  2026-09-27T02:07:44.317Z #567 content controls p=none exploration
+  2026-09-27T02:07:45.748Z #568 root p=none exploration
+  2026-09-27T02:07:45.749Z #568 content controls p=none exploration
+  2026-09-27T02:07:45.749Z #568 in quick:approach ⏱+19ms p=none exploration
+  2026-09-27T02:07:45.884Z #568 enter quick:approach p=none exploration
+  2026-09-27T02:07:45.890Z #568 admit quick:approach (callback) p=none exploration
+  2026-09-27T02:07:45.890Z #568 dispatch quick:approach (callback) p=none exploration
+  2026-09-27T02:07:45.954Z #568 done quick:approach (callback) p=none exploration
+  2026-09-27T02:07:48.201Z #569 root p=none exploration
+  2026-09-27T02:07:48.209Z #569 content controls p=none exploration
+  2026-09-27T02:07:48.210Z #569 in quick:dodge ⏱+24ms p=none exploration
+  2026-09-27T02:07:48.335Z #569 enter quick:dodge p=none exploration
+  2026-09-27T02:07:48.338Z #569 admit quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:48.339Z #569 dispatch quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:48.373Z #569 done quick:dodge (callback) p=none exploration
+  2026-09-27T02:07:48.886Z #570 root p=none exploration
+  2026-09-27T02:07:48.887Z #570 content controls p=none exploration
+  2026-09-27T02:07:48.887Z #570 in quick:⚗ bolt-caster ▲ ⏱+10ms p=none exploration
+  2026-09-27T02:07:49.019Z #570 enter quick:⚗ bolt-caster ▲ p=none exploration
+  2026-09-27T02:07:49.021Z #570 admit quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:49.021Z #570 dispatch quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:49.086Z #570 done quick:⚗ bolt-caster ▲ (callback) p=none exploration
+  2026-09-27T02:07:50.034Z #571 root p=none exploration
+  2026-09-27T02:07:50.036Z #571 content controls p=none exploration
+  2026-09-27T02:07:51.417Z #572 root p=none exploration
+  2026-09-27T02:07:51.421Z #572 content controls p=none exploration
+  2026-09-27T02:07:52.785Z #573 root p=none exploration
+  2026-09-27T02:07:52.786Z #573 content controls p=none exploration
+  2026-09-27T02:07:54.152Z #574 root p=none exploration
+  2026-09-27T02:07:54.155Z #574 content controls p=none exploration
+  2026-09-27T02:07:59.736Z #575 root p=none exploration
+  2026-09-27T02:07:59.738Z #575 content controls p=none exploration
+  2026-09-27T02:07:59.738Z #575 in quick:take / salvage ⏱+18ms p=none exploration
+  2026-09-27T02:07:59.887Z #575 enter quick:take / salvage p=none exploration
+  2026-09-27T02:07:59.888Z #575 admit quick:take / salvage (callback) p=none exploration
+  2026-09-27T02:07:59.888Z #575 dispatch quick:take / salvage (callback) p=none exploration
+  2026-09-27T02:07:59.888Z #575 done quick:take / salvage (callback) p=none exploration
+  2026-09-27T02:08:01.528Z #576 root p=G exploration
+  2026-09-27T02:08:01.538Z #577 modal p=G exploration
+  2026-09-27T02:08:01.538Z #577 in gather:all:gear ⏱+21ms p=G exploration
+  2026-09-27T02:08:01.707Z #577 enter gather:all:gear p=G exploration
+  2026-09-27T02:08:01.718Z #577 admit gather:all:gear (bulk) p=G exploration
+  2026-09-27T02:08:01.718Z #577 dispatch gather:all:gear (bulk) p=G exploration
+  2026-09-27T02:08:01.722Z #577 done gather:all:gear (bulk) p=G exploration
+  2026-09-27T02:08:02.389Z #578 root p=G exploration
+  2026-09-27T02:08:02.390Z #579 modal p=G exploration
+  2026-09-27T02:08:02.390Z #579 in gather:all:scrap ⏱+19ms p=G exploration
+  2026-09-27T02:08:02.522Z #579 enter gather:all:scrap p=G exploration
+  2026-09-27T02:08:02.523Z #579 admit gather:all:scrap (bulk) p=G exploration
+  2026-09-27T02:08:02.523Z #579 dispatch gather:all:scrap (bulk) p=G exploration
+  2026-09-27T02:08:02.529Z #579 done gather:all:scrap (bulk) p=G exploration
+  2026-09-27T02:08:03.808Z #580 root p=none exploration
+  2026-09-27T02:08:03.816Z #580 content controls p=none exploration
+  2026-09-27T02:08:03.817Z #580 in quick:more ▸ ⏱+24ms p=none exploration
+  2026-09-27T02:08:03.925Z #580 enter quick:more ▸ p=none exploration
+  2026-09-27T02:08:03.925Z #580 admit quick:more ▸ (callback) p=none exploration
+  2026-09-27T02:08:03.925Z #580 dispatch quick:more ▸ (callback) p=none exploration
+  2026-09-27T02:08:03.925Z #580 done quick:more ▸ (callback) p=none exploration
+  2026-09-27T02:08:04.892Z #581 root p=none exploration
+  2026-09-27T02:08:04.894Z #581 content controls p=none exploration
+  2026-09-27T02:08:04.894Z #581 in quick:craft ⏱+14ms p=none exploration
+  2026-09-27T02:08:05.007Z #581 enter quick:craft p=none exploration
+  2026-09-27T02:08:05.008Z #581 admit quick:craft (callback) p=none exploration
+  2026-09-27T02:08:05.008Z #581 dispatch quick:craft (callback) p=none exploration
+  2026-09-27T02:08:05.009Z #581 done quick:craft (callback) p=none exploration
+  2026-09-27T02:08:05.943Z #582 root p=none crafting
+  2026-09-27T02:08:07.340Z #583 root p=none crafting
+  2026-09-27T02:08:09.708Z #584 root p=none crafting
+  2026-09-27T02:08:10.675Z #585 root p=none crafting
+  2026-09-27T02:08:15.010Z #586 root p=none crafting
+  2026-09-27T02:08:16.061Z #587 root p=none crafting
+  2026-09-27T02:08:17.641Z #588 root p=none crafting
+  2026-09-27T02:08:18.645Z #589 root p=none crafting
+  2026-09-27T02:08:19.689Z #590 root p=none crafting
+  2026-09-27T02:08:20.981Z #591 root p=none crafting
+  2026-09-27T02:08:21.949Z #592 root p=none crafting
+  2026-09-27T02:08:23.997Z #593 root p=none crafting
+  2026-09-27T02:08:26.946Z #594 root p=none crafting
+  2026-09-27T02:08:27.831Z #595 root p=none crafting
+  2026-09-27T02:08:31.000Z #596 root p=none crafting
+  2026-09-27T02:08:32.092Z #597 root p=none crafting
+  2026-09-27T02:08:34.135Z #598 root p=none exploration
+  2026-09-27T02:09:12.354Z #599 root p=none exploration
+  2026-09-27T02:09:12.358Z #599 content controls p=none exploration
+  2026-09-27T02:09:12.359Z #599 in quick:investigate ⏱+20ms p=none exploration
+  2026-09-27T02:09:12.474Z #599 enter quick:investigate p=none exploration
+  2026-09-27T02:09:12.477Z #599 admit quick:investigate (callback) p=none exploration
+  2026-09-27T02:09:12.477Z #599 dispatch quick:investigate (callback) p=none exploration
+  2026-09-27T02:09:12.477Z #599 done quick:investigate (callback) p=none exploration
+  2026-09-27T02:09:13.471Z #600 root p=S exploration
+  2026-09-27T02:09:13.476Z #601 modal p=S exploration
+  2026-09-27T02:09:13.477Z #601 in search:all ⏱+25ms p=S exploration
+  2026-09-27T02:09:13.643Z #601 enter search:all p=S exploration
+  2026-09-27T02:09:13.650Z #601 admit search:all (bulk) p=S exploration
+  2026-09-27T02:09:13.650Z #601 dispatch search:all (bulk) p=S exploration
+  2026-09-27T02:09:13.650Z #601 done search:all (bulk) p=S exploration
+  2026-09-27T02:09:21.115Z #602 root p=none exploration
+  2026-09-27T02:09:23.442Z #603 root p=none exploration
+  2026-09-27T02:09:26.595Z #604 root p=none exploration
+  2026-09-27T02:09:26.603Z #604 content feed p=none exploration
+  2026-09-27T02:09:27.942Z #605 root p=none exploration
+  2026-09-27T02:09:27.944Z #605 content feed p=none exploration
+  2026-09-27T02:09:28.509Z #606 root p=none exploration
+  2026-09-27T02:09:28.514Z #606 content feed p=none exploration
+  2026-09-27T02:09:29.343Z #607 root p=none exploration
+  2026-09-27T02:09:29.350Z #607 content feed p=none exploration
+  2026-09-27T02:09:33.676Z #608 root p=none exploration
+  2026-09-27T02:09:35.329Z #609 root p=none exploration
+  2026-09-27T02:09:36.763Z #610 root p=none exploration
+  2026-09-27T02:09:36.768Z #611 modal p=none exploration
+  2026-09-27T02:09:37.835Z #612 root p=none exploration
+  2026-09-27T02:09:37.843Z #613 modal p=none exploration
+  2026-09-27T02:09:49.941Z #614 root p=none exploration
+  2026-09-27T02:09:49.949Z #615 modal p=none exploration
+  2026-09-27T02:10:00.704Z #616 root p=none exploration
+  2026-09-27T02:10:00.706Z #617 modal p=none exploration
+  2026-09-27T02:10:00.708Z #617 in report:send ⏱+23ms p=none exploration
+  2026-09-27T02:10:00.821Z #617 enter report:send p=none exploration
+  2026-09-27T02:10:00.823Z #617 admit report:send (described) p=none exploration
+  2026-09-27T02:10:00.823Z #617 dispatch report:send (described) p=none exploration
+  2026-09-27T02:10:00.823Z #617 dispatch report:send (compose) p=none exploration
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "You've traversed the bustling borders, y"
+    • route=bundled-kokoro · kokoro=ready · "You, my companion, have traveled a long "
+    • route=bundled-kokoro · kokoro=ready · "You found the trail rations, x3 in your "
+    • route=bundled-kokoro · kokoro=ready · "Good ink, this. From Quill, they boil it"
+    • route=bundled-kokoro · kokoro=ready · "Halem the Trader, General Goods. Friendl"
+    • route=bundled-kokoro · kokoro=ready · "Long-form work, The Path of the True Tar"
+
+--- INVENTORY ---
+Inventory (Jaffar)
+  HP: 26/52  Stamina: 0/14  TC: 581  Corruption: 9
+  Pack: 87 distinct rows / 177 total
+  Dog: Harrow (Mutt) loyalty 99 HP 6/13
+
+Weapons (19)
+  Acid-Etched Bolt-Caster (Uncommon, 2d6 piercing, +1d4 acid coat, dur 36/36, equipped:off, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, unequip:off, use
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Ember Storm Stave (Rare, 2d8 burn, dur 25/25, [weapon,runecaster,rune_power,aetheric,fire])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Energy Saber (Uncommon, 1d8 electrical, dur 35/35, [weapon,melee,single_handed,blade,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Long Axe (1d8 slashing, dur 12/12, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spray Wand (1d6 bludgeoning, dur 28/28, [runecaster,rune_power,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Mud-fist Wraps (1d10 bludgeoning, +1d4 acid coat, dur 30/30, equipped:main, [weapon,starter])
+    actions: equip:off, unequip:main, use(off)
+  Repeater Rifle (1d8 piercing, dur 40/40, [weapon,ranged,two_handed,firearm,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Vine Grasp Wand (1d6 piercing, dur 18/18, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (23)
+  Aetheric Strider Boots (dur 31/31, AC +1 · Regen: +1 stamina per action · DEX +1, [armor,feet,boots,feet,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Aether Gloves (dur 32/32, AC +1 · Resists: slashing · Regen: +1 HP per action · INT +1, [armor,hands,gauntlets,hands,architectural_sentinels])
+    actions: equip:hands, use, scrap, drop
+  Hardened Titan's Chestplate (dur 23/23, AC +1 · Resists: slashing · HP +11, [armor,chest,plate,chest,tartarian_giants])
+    actions: equip:chest, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,cloak,outer,mud_dwellers])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,cloak,outer,mud_dwellers])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 13/13, equipped:chest, AC +2 · Resists: slashing · WIS +2, [armor])
+    actions: unequip:chest
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Reclaimer's Boots (dur 12/12, equipped:feet, AC +2 · DEX +2 · STE +2, [armor,feet,boots,feet,reclaimers])
+    actions: unequip:feet
+  Reclaimer's Salvage Cap (dur 27/27, equipped:head, AC +1 · INT +1, [armor])
+    actions: unequip:head
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,chest,reclaimers])
+    actions: equip:chest, use, scrap, repair, drop
+  Reclaimer's Trousers (dur 9/9, equipped:legs, AC +2 · DEX +2, [armor,legs,greaves,legs,reclaimers])
+    actions: unequip:legs
+  Rough Hewn Mask (dur 35/35, AC +1 · STE +1, [armor,head,mask,face,mud_golems])
+    actions: equip:head, use, scrap, drop
+  Salvager's Trench Coat (dur 23/23, AC +1 · Resists: cold · INT +1, [armor,cloak,cloak,outer,reclaimers])
+    actions: equip:cloak, use, scrap, drop
+  Sentinel's Mobile Greaves (dur 27/27, AC +1 · DEX +1, [armor,legs,greaves,legs,architectural_sentinels])
+    actions: equip:legs, use, scrap, drop
+  Shaman's Mud Helm (dur 13/13, AC +2 · Resists: cold · WIS +2, [armor,head,cloth,helmet,mud_dwellers])
+    actions: equip:head, use, scrap, drop
+  Shaman's Warden Gloves (dur 32/32, AC +1 · WIS +1, [armor,hands,gauntlets,hands,mud_dwellers])
+    actions: equip:hands, use, scrap, drop
+  Titan's Gauntlets (dur 28/28, AC +1 · HP +5 · STR +1, [armor,hands,gauntlets,hands,tartarian_giants])
+    actions: equip:hands, use, scrap, drop
+
+Amulets & Rings (6)
+  Aetheric Locket (WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection])
+    actions: equip:amulet, use, scrap, drop
+  Minor Aetheric Amulet (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,aether])
+    actions: equip:amulet, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, equipped:ring, INT +1, [ring,scholarly])
+    actions: unequip:ring
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Whisperer's Charm (dur 30/30, equipped:amulet, CHA +1, [amulet,charm])
+    actions: unequip:amulet
+
+Consumables (4)
+  First Aid Kit ×2 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Trail Rations ([food])
+    actions: use(eat), drop
+  Water Bottle ([drink,water,container])
+    actions: use(drink), drop
+  Wild Oats ×2 ([food,foraged,grain])
+    actions: use(eat), drop
+
+Coatings (2)
+  Acid Flask ×8 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Incendiary Paste ×3 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (4)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+
+Materials (16)
+  Aether Crystal ([aether,crystal])
+    actions: drop
+  Aether Residue ×5 ([aether,loot])
+    actions: drop
+  Aetheric Shard ×4 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetherstone Heart (Legendary, [aether,crystal,boss,legendary,loot])
+    actions: scrap, drop
+  Automaton Circuit ×5 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×5 ([metal,junk,scrap])
+    actions: scrap, drop
+  Bent Nail ×2
+    actions: scrap, drop
+  Bone Sliver ×2 ([bone,junk,scrap])
+    actions: drop
+  ◆ Bone-Handled Rivet (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  Mud Fragment ×4 ([mud])
+    actions: drop
+  Small Rock ×2 ([thrown,stone,improvised])
+    actions: drop
+  Smooth Stone ×6 ([stone,junk,scrap])
+    actions: scrap, drop
+  Spider Silk ×2 ([organic,fiber])
+    actions: drop
+  Stick ×3 ([wood,improvised,kindling])
+    actions: drop
+  Stick
+    actions: drop
+  Worn Tartarian Coin ×48 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (12)
+  ◆ Amber Droplet (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  ◆ Brass Cog Cluster ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Coiled Snare Thread ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Copper-Threaded Veil (Uncommon, [trophy])
+    actions: save-for-fusion, drop
+  ◆ Driftwood Sliver ×2 ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Frayed Rigging Twine ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Moth-Eaten Felt Scrap ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Mud Cloth (Uncommon, [trophy,loot])
+    actions: save-for-fusion, drop
+  Mud Monarch Sigil ×3 ([sigil,mud_monarchs,keepsake,loot])
+    actions: drop
+  ◆ Smoked Glass Chip ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Tar-Black Lashing ([trophy])
+    actions: save-for-fusion, drop
+  ◆ Warped Plank Offcut ([trophy])
+    actions: save-for-fusion, drop
+
+Quest Items (1)
+  Folded Note ([note,quest,lore])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 382 of 2166 entries; older trimmed to fit a single email paste)
+
+[2026-09-27T02:09:23.606Z] [arbiter] The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."
+[2026-09-27T02:09:23.604Z] [world] You set out toward the Quiver Rat. Tap the travel row to press on; STOP to halt.
+[2026-09-27T02:09:17.634Z] [debug] qwen⏱ investigate_lore ok 2200ms wait 934ms read 293ms/write 953ms in 127t→out 28t thr2 2.3ms/t (139ch)
+[2026-09-27T02:09:16.361Z] [debug] qwen⏱ investigate_lore ok 2173ms read/write unusable (native mis-reported 73340ms/756ms — llama.rn split bug, not this call) in 128t→out 22t thr2 (105ch)
+[2026-09-27T02:09:15.344Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-27T02:09:15.343Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=2
+[2026-09-27T02:09:15.342Z] [player] investigate ladder
+[2026-09-27T02:09:14.102Z] [world] The still pond resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-27T02:09:14.098Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=2
+[2026-09-27T02:09:14.098Z] [player] investigate still pond
+[2026-09-27T02:09:12.473Z] [debug] ui: tap "investigate" ⏱+20ms
+[2026-09-27T02:09:11.066Z] [debug] appstate: background → active (was background for 17150ms)
+[2026-09-27T02:08:53.925Z] [debug] appstate: active → background (was active for 139682ms)
+[2026-09-27T02:08:49.826Z] [arbiter] The Arbiter nods. "Obol, then."
+[2026-09-27T02:08:49.825Z] [world] Obol. The name takes hold in the Aetherstone.
+[2026-09-27T02:08:32.383Z] [system] ⏳ Time passed: 30 min
+[2026-09-27T02:08:32.377Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-27T02:08:32.377Z] [debug] arbiter: template (reason=intent-not-allowed:cast)
+[2026-09-27T02:08:32.376Z] [arbiter] The Arbiter studies the standing shape. "You gave it life. You might as well give it a name."
+[2026-09-27T02:08:32.376Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Aether Golem stands ready beside you. (HP 34/34, 1d10 aetheric)
+[2026-09-27T02:08:32.375Z] [world] (2× Aether Crystal + 1× Aetheric Shard consumed.)
+[2026-09-27T02:08:32.375Z] [reward] Aether Golem Constructor — d20 19 + INT 8 = 27 vs DC 20 — ✓ SUMMONED
+[2026-09-27T02:08:32.369Z] [debug] parser: intent=cast conf=1.00 verb=summon target=aether golem resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:08:32.369Z] [player] summon aether golem
+[2026-09-27T02:08:24.227Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:08:24.227Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-27T02:08:24.227Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-27T02:08:24.227Z] [reward] ✦ Crafted First Aid Kit ×2. The Arbiter watches you set the last piece.
+[2026-09-27T02:08:24.224Z] [arbiter] The Arbiter nods. "Stripped for parts: 2× Mud Poison → Patched Cloth."
+[2026-09-27T02:08:24.219Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:08:24.218Z] [player] craft First Aid Kit
+[2026-09-27T02:08:22.301Z] [debug] persist sizes(KB): total=160 player=27 wm=30[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=100 scene=3
+[2026-09-27T02:08:22.191Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:08:22.190Z] [arbiter] "Crafting 2× First Aid Kit would strip 2× Mud Poison → Patched Cloth from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-27T02:08:22.184Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:08:22.183Z] [player] craft First Aid Kit
+[2026-09-27T02:08:10.831Z] [world] You repair the Salvager's Trench Coat. Back to full. (spent: Patched Cloth x4)
+[2026-09-27T02:08:10.831Z] [arbiter] The Arbiter nods. "Patched in: Cloth Scrap → Patched Cloth, 3× Spider Silk → Patched Cloth."
+[2026-09-27T02:08:10.828Z] [world] You repair the Reclaimer's Trousers. Back to full. (spent: Patched Cloth x4)
+[2026-09-27T02:08:10.827Z] [arbiter] The Arbiter nods. "Patched in: Reclaimer's Rope → Patched Cloth, 2× Cloth Scrap → Patched Cloth."
+[2026-09-27T02:08:10.818Z] [world] You repair the Reclaimer's Salvage Cap. Back to full. (spent: Patched Cloth x4)
+[2026-09-27T02:08:10.816Z] [world] You repair the Reclaimer's Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-27T02:08:10.813Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-09-27T02:08:10.811Z] [arbiter] The Arbiter nods. "Patched in: 2× Worn Tartarian Coin → Scrap Metal."
+[2026-09-27T02:08:10.808Z] [world] You repair the Acid-Etched Bolt-Caster. Back to full. (spent: Scrap Metal x6, Stick x2)
+[2026-09-27T02:08:10.800Z] [world] You repair the Architect's Aether Gloves. Back to full. (spent: Patched Cloth x4)
+[2026-09-27T02:08:05.007Z] [debug] ui: tap "craft" ⏱+14ms
+[2026-09-27T02:08:04.799Z] [debug] voice⏱ gap 2552ms (wait 26ms + synth 2520ms, live) "You've traversed the bustling borders, y…"
+[2026-09-27T02:08:03.924Z] [debug] ui: tap "more ▸" ⏱+24ms
+[2026-09-27T02:08:02.529Z] [reward]     • Scrap Metal x3 (Common)
+[2026-09-27T02:08:02.529Z] [reward]     • Spider Silk x2 (Common)
+[2026-09-27T02:08:02.528Z] [reward] ✦ Salvage haul:
+[2026-09-27T02:08:02.528Z] [world] You strip the crate carefully. Something usable comes free in your hand.
+[2026-09-27T02:08:02.528Z] [world] You strip the cage carefully. Something usable comes free in your hand.
+[2026-09-27T02:08:02.528Z] [world] You strip the bedroll carefully. Something usable comes free in your hand.
+[2026-09-27T02:08:02.345Z] [debug] arbiter: ambient-fill banked (1/3) 3047ms
+[2026-09-27T02:08:02.277Z] [debug] qwen⏱ ambient_fill preempted 2919ms read/write unusable (native mis-reported 285756ms/490ms — llama.rn split bug, not this call) in 361t→out 14t thr1 (69ch)
+[2026-09-27T02:08:01.721Z] [reward] ✦ Aetheric Strider Boots (Common).
+[2026-09-27T02:08:01.721Z] [world] You work the Aetheric Strider Boots loose from where the mud had it.
+[2026-09-27T02:07:59.887Z] [debug] ui: tap "take / salvage" ⏱+18ms
+[2026-09-27T02:07:55.293Z] [combat] Mud Monarchs Raider 5 deals 3 bludgeoning damage [edge of reach — halved]. You have 26 HP remaining.
+[2026-09-27T02:07:55.208Z] [reward] +14 TC pried from the dust.
+[2026-09-27T02:07:55.208Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-27T02:07:55.207Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-27T02:07:55.204Z] [reward] Mud Monarchs Raider 5 defeated. You recover Patched Cloth ×2, Aether Residue.
+[2026-09-27T02:07:55.203Z] [combat] Your blow with the acid-etched bolt-caster lands clean — 22 damage. Mud Monarchs Raider 5 crumples in the dust. The Aetherstone settles.
+[2026-09-27T02:07:55.202Z] [combat] Piercing flares — +4 on hit.
+[2026-09-27T02:07:55.200Z] [combat] You — d20 → 15 + DEX 6 − 2 (Iron Fog) perfect opening (2× dice) = 19 vs Mud Monarchs Raider 5 AC 9 — ✓ HIT
+[2026-09-27T02:07:55.199Z] [combat] Mud Monarchs Raider 5 — d20 → 17 + ATK 5 = 22 vs your AC 19 — ✓ HIT
+[2026-09-27T02:07:55.198Z] [world] Mud Monarchs Raider 5 moves first. The pressure is immediate.
+[2026-09-27T02:07:55.146Z] [debug] dice⏱ coating: shown +61ms, tapped +444ms, settled +859ms = 1364ms
+[2026-09-27T02:07:54.287Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-27T02:07:53.781Z] [debug] dice⏱ damage: shown +71ms, tapped +440ms, settled +859ms = 1370ms
+[2026-09-27T02:07:52.921Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-27T02:07:52.407Z] [debug] dice⏱ attack: shown +66ms, tapped +471ms, settled +853ms = 1390ms
+[2026-09-27T02:07:51.553Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-27T02:07:51.014Z] [debug] dice⏱ initiative: shown +46ms, tapped +1025ms, settled +857ms = 1928ms
+[2026-09-27T02:07:50.154Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-27T02:07:49.085Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:49.085Z] [world] You commit forward with the acid-etched bolt-caster. Mud Monarchs Raider 5 watches your hands.
+[2026-09-27T02:07:49.081Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-27T02:07:49.081Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:07:49.079Z] [debug] attack: target=Mud Monarchs Raider 5 range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:07:49.075Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=1 hooks=2
+[2026-09-27T02:07:49.074Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:07:49.018Z] [debug] ui: tap "⚗ bolt-caster ▲" ⏱+10ms
+[2026-09-27T02:07:48.371Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:48.368Z] [combat] Dodge — d20 → 17 + DEX 7 = 24 vs ATK 21. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-27T02:07:48.368Z] [combat] Mud Monarchs Raider 5 — d20 → 16 + ATK 5 = 21 vs your AC 19 — ✗ EVADED
+[2026-09-27T02:07:48.360Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 5's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-27T02:07:48.356Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=2
+[2026-09-27T02:07:48.355Z] [player] dodge
+[2026-09-27T02:07:48.334Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-27T02:07:45.954Z] [debug] move: slow weather progress 1/2
+[2026-09-27T02:07:45.953Z] [world] Iron Fog slows you down. You push toward Mud Monarchs Raider 5 but the compass spins and your footing drags. (1/2 — type 'advance' again to close)
+[2026-09-27T02:07:45.952Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=0
+[2026-09-27T02:07:45.949Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 5 resolved=Mud Monarchs Raider 5 range=mid enemies=1 hooks=2
+[2026-09-27T02:07:45.948Z] [player] approach Mud Monarchs Raider 5
+[2026-09-27T02:07:45.903Z] [system] Legacy of Power fades.
+[2026-09-27T02:07:45.883Z] [debug] ui: tap "approach" ⏱+19ms
+[2026-09-27T02:07:45.504Z] [debug] persist sizes(KB): total=160 player=26 wm=30[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=100 scene=4
+[2026-09-27T02:07:45.359Z] [combat] Mud Monarchs Raider 5 — d20 → 8 + ATK 5 = 13 vs your AC 19 — ✗ MISS
+[2026-09-27T02:07:45.357Z] [combat] Your strike with the acid-etched bolt-caster glances off. Mud Monarchs Raider 5 seizes the opening.
+[2026-09-27T02:07:45.354Z] [combat] You — d20 → 4 + DEX 6 − 2 (Iron Fog) = 8 vs Mud Monarchs Raider 5 AC 9 — ✗ MISS
+[2026-09-27T02:07:45.353Z] [world] You seize the initiative. Mud Monarchs Raider 5 has no time to react.
+[2026-09-27T02:07:45.305Z] [debug] dice⏱ attack: shown +66ms, tapped +260ms, settled +855ms = 1181ms
+[2026-09-27T02:07:44.450Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-27T02:07:44.122Z] [debug] dice⏱ initiative: shown +49ms, tapped +719ms, settled +855ms = 1623ms
+[2026-09-27T02:07:43.267Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-27T02:07:42.548Z] [world] Harrow shakes off the worst of it and falls back in beside you.
+[2026-09-27T02:07:42.501Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:42.500Z] [world] You bring the acid-etched bolt-caster to bear on Mud Monarchs Raider 5.
+[2026-09-27T02:07:42.496Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:07:42.494Z] [debug] attack: target=Mud Monarchs Raider 5 range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:07:42.490Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=1 hooks=2
+[2026-09-27T02:07:42.489Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:07:42.433Z] [debug] ui: tap "⚗ bolt-caster ▲" ⏱+31ms
+[2026-09-27T02:07:39.279Z] [world] You feed Harrow 1× Trail Rations. +6 HP (6/13), +loyalty.
+[2026-09-27T02:07:36.480Z] [debug] ui: tap "✚ heals (2)" ⏱+21ms
+[2026-09-27T02:07:34.112Z] [world] You use 1× Trail Rations. +6 HP (29/52), +3 stamina.
+[2026-09-27T02:07:32.095Z] [debug] ui: tap "✚ heals (2)" ⏱+21ms
+[2026-09-27T02:07:28.754Z] [combat] Mud Monarchs Raider 5 — d20 → 7 + ATK 5 = 12 vs your AC 19 — ✗ MISS
+[2026-09-27T02:07:28.738Z] [reward] +10 TC pried from the dust.
+[2026-09-27T02:07:28.738Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-27T02:07:28.738Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 52). [9 enemies defeated]
+[2026-09-27T02:07:28.737Z] [combat] 1 attacker remains. Mud Monarchs Raider 5 now in your sights.
+[2026-09-27T02:07:28.737Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-09-27T02:07:28.736Z] [reward] Mud Monarchs Raider 4 defeated. You recover Patched Cloth ×3.
+[2026-09-27T02:07:28.735Z] [combat] Your blow with the acid-etched bolt-caster lands clean — 20 damage. Mud Monarchs Raider 4 crumples in the dust. The Aetherstone settles.
+[2026-09-27T02:07:28.733Z] [combat] Weakness exposed — Mud Monarchs Raider 4 flinches. (piercing ×2.25 for 20)
+[2026-09-27T02:07:28.733Z] [combat] Piercing flares — +3 on hit (weak — bites deep!).
+[2026-09-27T02:07:28.731Z] [combat] You — d20 → 15 + DEX 6 − 2 (Iron Fog) = 19 vs Mud Monarchs Raider 4 AC 11 — ✓ HIT
+[2026-09-27T02:07:28.731Z] [world] You seize the initiative. Mud Monarchs Raider 4 has no time to react.
+[2026-09-27T02:07:28.680Z] [debug] dice⏱ coating: shown +63ms, tapped +1098ms, settled +853ms = 2014ms
+[2026-09-27T02:07:27.827Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-27T02:07:26.664Z] [debug] dice⏱ damage: shown +65ms, tapped +493ms, settled +853ms = 1411ms
+[2026-09-27T02:07:25.810Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-27T02:07:25.249Z] [debug] dice⏱ attack: shown +66ms, tapped +443ms, settled +857ms = 1366ms
+[2026-09-27T02:07:24.392Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-27T02:07:23.882Z] [debug] dice⏱ initiative: shown +49ms, tapped +665ms, settled +841ms = 1555ms
+[2026-09-27T02:07:23.041Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-27T02:07:22.329Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:22.329Z] [world] You commit forward with the acid-etched bolt-caster. Mud Monarchs Raider 4 watches your hands.
+[2026-09-27T02:07:22.322Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:07:22.320Z] [debug] attack: target=Mud Monarchs Raider 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:07:22.315Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=2 hooks=2
+[2026-09-27T02:07:22.315Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:07:22.258Z] [debug] ui: tap "⚗ bolt-caster ▲ ★" ⏱+25ms
+[2026-09-27T02:07:19.023Z] [reward] ✦ Legacy of Power — Aether floods your limbs. +2 STR for 3 rounds.
+[2026-09-27T02:07:17.788Z] [debug] ui: tap "✦ ability" ⏱+19ms
+[2026-09-27T02:07:15.582Z] [combat] Mud Monarchs Raider 4 deals 2 slashing damage [armor −43%] [edge of reach — halved]. You have 22 HP remaining.
+[2026-09-27T02:07:15.504Z] [arbiter] "You can fight, hide, or speak," the Arbiter says low. "The Mud Monarchs Raider 4 is already deciding for itself."
+[2026-09-27T02:07:15.504Z] [combat] Mud Monarchs Raider 5 — d20 → 3 + ATK 5 = 8 vs your AC 19 — ✗ MISS
+[2026-09-27T02:07:15.501Z] [combat] Mud Monarchs Raider 4 — d20 → 13 + ATK 7 = 20 vs your AC 19 — ✓ HIT
+[2026-09-27T02:07:15.501Z] [debug] ac-shift 22→19: race/base 12 + gear 9 + title 0 → trimmed 19 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Architect's Aether Gloves legs=Reclaimer's Trousers feet=Reclaimer's Boots cloak=Salvager's Trench Coat
+[2026-09-27T02:07:15.485Z] [reward] +14 TC pried from the dust.
+[2026-09-27T02:07:15.485Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-27T02:07:15.484Z] [combat] 2 attackers remain. Mud Monarchs Raider 4 now in your sights.
+[2026-09-27T02:07:15.484Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-27T02:07:15.483Z] [reward] Mud Monarchs Raider 3 defeated. You recover Scrap Metal ×2, Patched Cloth.
+[2026-09-27T02:07:15.481Z] [combat] The killing blow with the acid-etched bolt-caster: 13. Mud Monarchs Raider 3 drops where it stood.
+[2026-09-27T02:07:15.481Z] [reward] ✦ The work hones you. +1 DEX (base 2, 7 as you stand).
+[2026-09-27T02:07:15.478Z] [combat] You — d20 → 18 + DEX 5 − 2 (Iron Fog) perfect opening (2× dice) = 21 vs Mud Monarchs Raider 3 AC 10 — ✓ HIT
+[2026-09-27T02:07:15.477Z] [world] You seize the initiative. Mud Monarchs Raider 3 has no time to react.
+[2026-09-27T02:07:15.428Z] [debug] dice⏱ coating: shown +63ms, tapped +615ms, settled +838ms = 1516ms
+[2026-09-27T02:07:14.589Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-27T02:07:13.909Z] [debug] dice⏱ damage: shown +67ms, tapped +395ms, settled +835ms = 1297ms
+[2026-09-27T02:07:13.074Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-27T02:07:12.609Z] [debug] dice⏱ attack: shown +67ms, tapped +447ms, settled +833ms = 1347ms
+[2026-09-27T02:07:11.776Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-27T02:07:11.260Z] [debug] dice⏱ initiative: shown +50ms, tapped +582ms, settled +841ms = 1473ms
+[2026-09-27T02:07:10.419Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-27T02:07:09.788Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:09.788Z] [world] You commit forward with the acid-etched bolt-caster. Mud Monarchs Raider 3 watches your hands.
+[2026-09-27T02:07:09.784Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-27T02:07:09.784Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:07:09.781Z] [debug] attack: target=Mud Monarchs Raider 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:07:09.777Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=3 hooks=2
+[2026-09-27T02:07:09.777Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:07:09.738Z] [system] evasive — harder to hit fades.
+[2026-09-27T02:07:09.720Z] [debug] ui: tap "⚗ bolt-caster ▲" ⏱+32ms
+[2026-09-27T02:07:08.068Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:08.068Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-27T02:07:08.063Z] [debug] arbiter: template (reason=combat)
+[2026-09-27T02:07:08.062Z] [combat] Mud Monarchs Raider 3 — d20 → 2 + ATK 6 = 8 vs your AC 22 — ✗ MISS
+[2026-09-27T02:07:08.060Z] [combat] Mud Monarchs Raider 5 — d20 → 10 + ATK 5 = 15 vs your AC 22 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-27T02:07:08.060Z] [debug] ac-shift 19→22: race/base 12 + gear 9 + title 0 → trimmed 19 + status 3 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Architect's Aether Gloves legs=Reclaimer's Trousers feet=Reclaimer's Boots cloak=Salvager's Trench Coat
+[2026-09-27T02:07:08.056Z] [world] You slip Mud Monarchs Raider 4's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-27T02:07:08.054Z] [combat] Dodge — Mud Monarchs Raider 4 overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-09-27T02:07:08.054Z] [combat] Mud Monarchs Raider 4 — d20 → 1 + ATK 7 = 8 vs your AC 19 — ✗ EVADED
+[2026-09-27T02:07:08.045Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 3's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-27T02:07:08.040Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=3 hooks=2
+[2026-09-27T02:07:08.040Z] [player] dodge
+[2026-09-27T02:07:08.019Z] [debug] ui: tap "dodge" ⏱+32ms
+[2026-09-27T02:07:06.163Z] [debug] persist sizes(KB): total=159 player=26 wm=30[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=98 scene=5
+[2026-09-27T02:07:05.955Z] [arbiter] "Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."
+[2026-09-27T02:07:05.955Z] [combat] Mud Monarchs Raider 5 — d20 → 3 + ATK 5 = 8 vs your AC 19 — ✗ MISS
+[2026-09-27T02:07:05.953Z] [combat] Mud Monarchs Raider 4 — d20 → 1 + ATK 7 = 8 vs your AC 19 — ✗ FUMBLE
+[2026-09-27T02:07:05.951Z] [combat] Mud Monarchs Raider 3 — d20 → 2 + ATK 6 = 8 vs your AC 19 — ✗ MISS
+[2026-09-27T02:07:05.936Z] [reward] +12 TC pried from the dust.
+[2026-09-27T02:07:05.936Z] [system] ▼ Mud Monarchs turns HOSTILE — their patrols hunt you on their own ground now, and their counters mark you up.
+[2026-09-27T02:07:05.933Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-27T02:07:05.933Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.
+[2026-09-27T02:07:05.933Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.
+[2026-09-27T02:07:05.929Z] [reward] Mud Monarchs Raider 2 defeated. You recover Patched Cloth, Aether Residue ×2.
+[2026-09-27T02:07:05.928Z] [combat] Final strike with the acid-etched bolt-caster for 18. Mud Monarchs Raider 2 is still. The Aetherstone hums on, indifferent.
+[2026-09-27T02:07:05.927Z] [combat] Weakness exposed — Mud Monarchs Raider 2 flinches. (piercing ×2.25 for 18)
+[2026-09-27T02:07:05.926Z] [combat] Piercing flares — +1 on hit (weak — bites deep!).
+[2026-09-27T02:07:05.924Z] [combat] You — d20 → 10 + DEX 5 − 2 (Iron Fog) + 2 (point blank) = 15 vs Mud Monarchs Raider 2 AC 9 — ✓ HIT
+[2026-09-27T02:07:05.924Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.
+[2026-09-27T02:07:05.876Z] [debug] dice⏱ coating: shown +76ms, tapped +457ms, settled +855ms = 1388ms
+[2026-09-27T02:07:05.021Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-27T02:07:04.487Z] [debug] dice⏱ damage: shown +67ms, tapped +444ms, settled +853ms = 1364ms
+[2026-09-27T02:07:03.634Z] [debug] ui: tap "roll" ⏱+26ms
+[2026-09-27T02:07:03.122Z] [debug] dice⏱ attack: shown +68ms, tapped +440ms, settled +855ms = 1363ms
+[2026-09-27T02:07:02.267Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-27T02:07:01.757Z] [debug] dice⏱ initiative: shown +51ms, tapped +580ms, settled +857ms = 1488ms
+[2026-09-27T02:07:00.900Z] [debug] ui: tap "roll" ⏱+21ms
+[2026-09-27T02:07:00.271Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:07:00.271Z] [world] You bring the acid-etched bolt-caster to bear on Mud Monarchs Raider 2.
+[2026-09-27T02:07:00.264Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:07:00.261Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:07:00.257Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=close enemies=4 hooks=2
+[2026-09-27T02:07:00.256Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:07:00.199Z] [debug] ui: tap "⚗ bolt-caster ▲ ★" ⏱+23ms
+[2026-09-27T02:06:59.077Z] [combat] Mud Monarchs Raider 3 deals 4 bludgeoning damage [edge of reach — halved]. You have 24 HP remaining.
+[2026-09-27T02:06:59.019Z] [combat] Mud Monarchs Raider 2 reads the motion and slips it — the acid-etched bolt-caster carves only air. The counter is already coming.
+[2026-09-27T02:06:59.015Z] [combat] You — d20 → 1 + DEX 5 − 2 (Iron Fog) + 2 (point blank) stealthed +5 = 11 vs Mud Monarchs Raider 2 AC 9 — ✗ FUMBLE
+[2026-09-27T02:06:59.015Z] [combat] Mud Monarchs Raider 5 presses in behind the others, waiting for an opening.
+[2026-09-27T02:06:59.015Z] [combat] Mud Monarchs Raider 4 — d20 → 7 + ATK 7 = 14 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:59.012Z] [combat] Mud Monarchs Raider 3 — d20 → 18 + ATK 6 = 24 vs your AC 19 — ✓ HIT
+[2026-09-27T02:06:59.011Z] [combat] Mud Monarchs Raider 2 — d20 → 3 + ATK 5 = 8 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:59.009Z] [world] Mud Monarchs Raider 2 moves first. The pressure is immediate.
+[2026-09-27T02:06:58.962Z] [debug] dice⏱ attack: shown +75ms, tapped +517ms, settled +863ms = 1455ms
+[2026-09-27T02:06:58.099Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-27T02:06:57.506Z] [debug] dice⏱ initiative: shown +55ms, tapped +726ms, settled +856ms = 1637ms
+[2026-09-27T02:06:56.649Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-27T02:06:55.870Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:06:55.870Z] [world] You commit forward with the acid-etched bolt-caster. Mud Monarchs Raider 2 watches your hands.
+[2026-09-27T02:06:55.866Z] [debug] attack: status mods stealthed +5
+[2026-09-27T02:06:55.866Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:06:55.864Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:06:55.856Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=close enemies=4 hooks=2
+[2026-09-27T02:06:55.855Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:06:55.815Z] [system] unseen — next strike +5 fades.
+[2026-09-27T02:06:55.797Z] [debug] ui: tap "⚗ bolt-caster ▲ ★" ⏱+31ms
+[2026-09-27T02:06:54.460Z] [combat] Mud Monarchs Raider 2 deals 3 slashing damage [armor −43%]. You have 28 HP remaining.
+[2026-09-27T02:06:54.381Z] [combat] Mud Monarchs Raider 3 presses in behind the others, waiting for an opening.
+[2026-09-27T02:06:54.379Z] [combat] Mud Monarchs Raider 2 — d20 → 18 + ATK 5 = 23 vs your AC 19 — ✓ HIT
+[2026-09-27T02:06:54.377Z] [combat] Mud Monarchs Raider 5 — d20 → 3 + ATK 5 = 8 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:54.374Z] [combat] Mud Monarchs Raider 4 — d20 → 8 + ATK 7 = 15 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:54.369Z] [debug] stealth: reset WIN init 18 vs 10 (dust, +5 1r)
+[2026-09-27T02:06:54.369Z] [world] You fling a fistful of grit into Mud Monarchs Raider 2's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)
+[2026-09-27T02:06:54.368Z] [world] Dusk is with you — the silt eats sound after dark. (stealth +1, night)
+[2026-09-27T02:06:54.363Z] [debug] train: stealth (stealth check) → progress 42/100
+[2026-09-27T02:06:54.363Z] [debug] stats: STR8 DEX6 INT8 WIS5 CHA5 STE2 | gear: INT+6,WIS+2,DEX+5,STE+2,STR+1,CHA+1 | worn: main=Mud-fist Wraps off=Bolt-Caster head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Architect's Aether Gloves legs=Reclaimer's Trousers feet=Reclaimer's Boots cloak=Salvager's Trench Coat amulet=Whisperer's Charm ring=Rusted Band of Knowledge ring2=Rusted Band of Knowledge ring3=Rusted Band of Knowledge
+[2026-09-27T02:06:54.357Z] [debug] skillcheck: stealth d20=13 STE 2 = 15 vs DC 12 — Hard → (resolved below)
+[2026-09-27T02:06:54.353Z] [debug] dice⏱ skill_check: shown +67ms, tapped +572ms, settled +856ms = 1495ms
+[2026-09-27T02:06:53.497Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-27T02:06:52.861Z] [system] ⏳ Time passed: 15 min
+[2026-09-27T02:06:52.853Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=4 hooks=2
+[2026-09-27T02:06:52.852Z] [player] sneak
+[2026-09-27T02:06:52.848Z] [system] bleeding fades.
+[2026-09-27T02:06:52.831Z] [debug] ui: tap "stealth" ⏱+24ms
+[2026-09-27T02:06:50.282Z] [combat] Mud Monarchs Raider 1 deals 2 slashing damage [armor −43%]. You have 31 HP remaining.
+[2026-09-27T02:06:50.281Z] [combat] Mud Monarchs Raider 5 deals 5 bludgeoning damage [edge of reach — halved]. You have 33 HP remaining.
+[2026-09-27T02:06:50.280Z] [combat] Mud Monarchs Raider 4 deals 3 slashing damage [armor −43%] [edge of reach — halved]. You have 38 HP remaining.
+[2026-09-27T02:06:50.200Z] [arbiter] "That one bleeds slow," the Arbiter says. "Make the hit count."
+[2026-09-27T02:06:50.179Z] [reward] +14 TC pried from the dust.
+[2026-09-27T02:06:50.179Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-27T02:06:50.178Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.
+[2026-09-27T02:06:50.178Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-09-27T02:06:50.177Z] [reward] Mud Monarchs Raider 1 defeated. You recover Patched Cloth ×2, Mud Monarch Sigil.
+[2026-09-27T02:06:50.176Z] [combat] Mud Monarchs Raider 1 folds under the acid-etched bolt-caster. 27 damage was enough. The room exhales.
+[2026-09-27T02:06:50.176Z] [combat] Piercing flares — +1 on hit.
+[2026-09-27T02:06:50.174Z] [combat] You — d20 → 20 + DEX 5 − 2 (Iron Fog) + 2 (point blank) perfect opening (2× dice) = 25 vs Mud Monarchs Raider 1 AC 10 — ✓ CRITICAL HIT
+[2026-09-27T02:06:50.174Z] [combat] Mud Monarchs Raider 2 and 1 other press in behind their own pack, waiting for an opening.
+[2026-09-27T02:06:50.173Z] [combat] Mud Monarchs Raider 1 — d20 → 16 + ATK 6 = 22 vs your AC 19 — ✓ HIT
+[2026-09-27T02:06:50.171Z] [combat] Mud Monarchs Raider 5 — d20 → 20 + ATK 5 = 25 vs your AC 19 — ✓ CRITICAL HIT
+[2026-09-27T02:06:50.168Z] [combat] Mud Monarchs Raider 4 — d20 → 20 + ATK 7 = 27 vs your AC 19 — ✓ CRITICAL HIT
+[2026-09-27T02:06:50.168Z] [debug] ac-shift 22→19: race/base 12 + gear 9 + title 0 → trimmed 19 + status 0 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Architect's Aether Gloves legs=Reclaimer's Trousers feet=Reclaimer's Boots cloak=Salvager's Trench Coat
+[2026-09-27T02:06:50.166Z] [world] Mud Monarchs Raider 1 moves first. The pressure is immediate.
+[2026-09-27T02:06:50.104Z] [debug] dice⏱ coating: shown +62ms, tapped +651ms, settled +856ms = 1569ms
+[2026-09-27T02:06:49.247Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-27T02:06:48.516Z] [debug] dice⏱ damage: shown +74ms, tapped +515ms, settled +839ms = 1428ms
+[2026-09-27T02:06:47.677Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-27T02:06:47.083Z] [debug] dice⏱ attack: shown +67ms, tapped +537ms, settled +828ms = 1432ms
+[2026-09-27T02:06:46.254Z] [debug] ui: tap "roll" ⏱+29ms
+[2026-09-27T02:06:45.648Z] [debug] dice⏱ initiative: shown +53ms, tapped +681ms, settled +834ms = 1568ms
+[2026-09-27T02:06:44.813Z] [debug] ui: tap "roll" ⏱+43ms
+[2026-09-27T02:06:44.081Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:06:44.081Z] [world] You bring the acid-etched bolt-caster to bear on Mud Monarchs Raider 1.
+[2026-09-27T02:06:44.077Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-27T02:06:44.076Z] [debug] attack: visibility penalty −2 (Iron Fog)
+[2026-09-27T02:06:44.074Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-09-27T02:06:44.069Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=close enemies=5 hooks=2
+[2026-09-27T02:06:44.068Z] [player] attack with the off-hand bolt-caster
+[2026-09-27T02:06:44.029Z] [system] evasive — harder to hit fades.
+[2026-09-27T02:06:44.010Z] [debug] ui: tap "⚗ bolt-caster ▲" ⏱+29ms
+[2026-09-27T02:06:43.384Z] [system] ⏳ Time passed: 6 min
+[2026-09-27T02:06:43.383Z] [combat] Mud Monarchs Raider 2 and 1 other press in behind their own pack, waiting for an opening.
+[2026-09-27T02:06:43.383Z] [combat] Mud Monarchs Raider 1 — d20 → 7 + ATK 6 = 13 vs your AC 22 — ✗ MISS
+[2026-09-27T02:06:43.382Z] [combat] Mud Monarchs Raider 5 — d20 → 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-27T02:06:43.382Z] [debug] ac-shift 19→22: race/base 12 + gear 9 + title 0 → trimmed 19 + status 3 | worn: head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Architect's Aether Gloves legs=Reclaimer's Trousers feet=Reclaimer's Boots cloak=Salvager's Trench Coat
+[2026-09-27T02:06:43.368Z] [world] You slip Mud Monarchs Raider 4's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-27T02:06:43.367Z] [combat] Dodge — d20 → 13 + DEX 6 = 19 vs ATK 11. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-27T02:06:43.366Z] [combat] Mud Monarchs Raider 4 — d20 → 2 + ATK 9 = 11 vs your AC 19 — ✗ EVADED
+[2026-09-27T02:06:43.357Z] [combat] Mud Monarchs Raider 2 shakes off the last of the acid — the Bolt-Caster has run its course.
+[2026-09-27T02:06:43.357Z] [combat] Mud Monarchs Raider 2 smokes — acid eats 3. (2/11 HP, 0 turns left)
+[2026-09-27T02:06:43.356Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-27T02:06:43.352Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-09-27T02:06:43.351Z] [player] dodge
+[2026-09-27T02:06:43.325Z] [debug] ui: tap "dodge" ⏱+31ms
+[2026-09-27T02:06:41.486Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.
+[2026-09-27T02:06:41.483Z] [combat] Mud Monarchs Raider 3 — d20 → 12 + ATK 6 = 18 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:41.481Z] [debug] dedup: suppressed arbiter repeat — "Harrow drops under the Mud Monarchs Raider 2 and drags himse…"
+[2026-09-27T02:06:41.481Z] [arbiter] Harrow drops under the Mud Monarchs Raider 2 and drags himself clear of the fight. He is down — tend him within a day or he won't get back up.
+[2026-09-27T02:06:41.481Z] [combat] Harrow takes 15. (0/13 HP left)
+[2026-09-27T02:06:41.478Z] [combat] Mud Monarchs Raider 2 turns on Harrow — d20 20 + ATK 5 = 25 vs Harrow's AC 11 (vest +1) — ✓ CRIT
+[2026-09-27T02:06:41.478Z] [combat] Mud Monarchs Raider 1 — d20 → 12 + ATK 6 = 18 vs your AC 19 — ✗ MISS
+[2026-09-27T02:06:41.465Z] [combat] Mud Monarchs Raider 2 smokes — acid eats 3. (5/11 HP, 1 turn left)
+[2026-09-27T02:06:41.464Z] [reward] You hurl the Incendiary Paste. It bursts across Mud Monarchs Raider 1 — 12 burn (4/turn × 3). (1 HP left)
+[2026-09-27T02:06:39.258Z] [debug] ui: tap "✦ bandolier (2)" ⏱+21ms
+[2026-09-27T02:06:36.113Z] [debug] persist sizes(KB): total=155 player=25 wm=30[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=94 scene=6
+[2026-09-27T02:06:35.960Z] [combat] Mud Monarchs Raider 2 deals 5 slashing damage [armor −43%]. You have 41 HP remaining.
+[2026-09-27T02:06:35.959Z] [combat] Mud Monarchs Raider 1's strike leaves you bleeding.
+[2026-09-27T02:06:35.959Z] [combat] Mud Monarchs Raider 1 deals 5 slashing damage [armor −43%]. You have 46 HP remaining.
+[2026-09-27T02:06:35.883Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.
+[2026-09-27T02:06:35.879Z] [combat] Mud Monarchs Raider 2 — d20 → 15 + ATK 5 = 20 vs your AC 19 — ✓ HIT
+[2026-09-27T02:06:35.875Z] [combat] Mud Monarchs Raider 1 — d20 → 19 + ATK 6 = 25 vs your AC 19 — ✓ HIT
+[2026-09-27T02:06:35.870Z] [combat] Harrow takes 6. (7/13 HP left)
+[2026-09-27T02:06:35.867Z] [combat] Mud Monarchs Raider 3 turns on Harrow — d20 19 + ATK 6 = 25 vs Harrow's AC 11 (vest +1) — ✓ HIT
+[2026-09-27T02:06:35.866Z] [combat] Mud Monarchs Raider 2 smokes — acid eats 3. (8/11 HP, 2 turns left)
+[2026-09-27T02:06:35.865Z] [world] The field shifts around you — Mud Monarchs Raider 2 now close / arm's reach; Mud Monarchs Raider 3 now mid-range.
+[2026-09-27T02:06:35.865Z] [world] You close the gap with the Mud Monarchs Raider 1 and 4 others. (range: close / arm's reach)
+[2026-09-27T02:06:35.865Z] [debug] move: field advance target=Mud Monarchs Raider 1 d 0.67->0.35 band close->close
+[2026-09-27T02:06:35.863Z] [debug] move: advance from range=close enemies=5 weather=Iron Fog cost=2 partial=1
+[2026-09-27T02:06:35.859Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 1 resolved=Mud Monarchs Raider 1 range=close enemies=5 hooks=2
+[2026-09-27T02:06:35.858Z] [player] approach Mud Monarchs Raider 1
+[2026-09-27T02:06:35.814Z] [world] Iron fog disorients you. Compasses spin; intent costs more.
+[2026-09-27T02:06:35.795Z] [debug] ui: tap "approach" ⏱+35ms
+[2026-09-27T02:06:34.234Z] [debug] appstate: background → active (was background for 153085ms)
+[2026-09-27T02:04:01.152Z] [debug] appstate: active → background (was active for 7280ms)
+[2026-09-27T02:03:57.551Z] [debug] dedup: suppressed arbiter repeat — ""The Mud Monarchs do not forgive a friend of the True Tartar…"
+[2026-09-27T02:03:57.551Z] [arbiter] "The Mud Monarchs do not forgive a friend of the True Tartarians," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-27T02:03:57.551Z] [world] A Mud Monarchs war party crests the rise — 5 of them, blades already out. They've marked you for standing with the True Tartarians.
+[2026-09-27T02:03:57.536Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-09-27T02:03:57.535Z] [system] ⏳ Time passed: 8h
+[2026-09-27T02:03:57.534Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:03:57.534Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 5, night)
+[2026-09-27T02:03:57.534Z] [world] You listen for his breathing and lose it in the wind, which means he is asleep.
+[2026-09-27T02:03:57.532Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:03:57.532Z] [player] rest
+[2026-09-27T02:03:57.525Z] [debug] ui: tap "rest" ⏱+14ms
+[2026-09-27T02:03:57.014Z] [debug] voice⏱ gap 41024ms (wait 218ms + synth 40776ms, live) "You, my companion, have traveled a long …"
+[2026-09-27T02:03:56.893Z] [system] ⏳ Time passed: 8h
+[2026-09-27T02:03:56.892Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-27T02:03:56.892Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-09-27T02:03:56.892Z] [reward] ✦ Wild Oats x2 (Common).
+[2026-09-27T02:03:56.891Z] [world] Brushing yourself off, you find something tucked into the seam of your pack. Yours now, however it got there.
+[2026-09-27T02:03:56.891Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:03:56.891Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 4, afternoon)
+[2026-09-27T02:03:56.890Z] [world] His ribs rise and fall and slow until you cannot hear them.
+[2026-09-27T02:03:56.889Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:03:56.888Z] [player] rest
+[2026-09-27T02:03:56.876Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-27T02:03:56.242Z] [system] ⏳ Time passed: 8h
+[2026-09-27T02:03:56.242Z] [world] Pre-dawn light catches a glint near your boots. The silt offered you something while you weren't looking.
+[2026-09-27T02:03:56.242Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:03:56.242Z] [world] You rest for 8 hours. Whole already — the Aetherstone hums steady. (Day 4, morning)
+[2026-09-27T02:03:56.241Z] [world] Harrow does the old circle — some instinct about grass that has not been grass in a thousand years.
+[2026-09-27T02:03:56.240Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:03:56.239Z] [player] rest
+[2026-09-27T02:03:56.227Z] [debug] ui: tap "rest" ⏱+20ms
+[2026-09-27T02:03:55.542Z] [system] ⏳ Time passed: 8h
+[2026-09-27T02:03:55.542Z] [debug] arbiter: ambient held (action settling — armed for the next quiet tick)
+[2026-09-27T02:03:55.541Z] [world] You rest for 8 hours. +7 HP, +6 stamina recovered. (Day 4, night)
+[2026-09-27T02:03:55.541Z] [world] Harrow tests three spots and settles on the one nearest your boot.
+[2026-09-27T02:03:55.539Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-09-27T02:03:55.539Z] [player] rest
+[2026-09-27T02:03:55.526Z] [debug] ui: tap "rest" ⏱+19ms
+[2026-09-27T02:03:54.832Z] [system] ⏳ Time passed: 8h
+
+=== END REPORT ===
