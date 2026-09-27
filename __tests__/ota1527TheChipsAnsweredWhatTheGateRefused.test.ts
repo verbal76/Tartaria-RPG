@@ -51,7 +51,10 @@ describe('OTA-1527 — the chip row respects the gate that guards the line above
   it('⚠⚠⚠ GATE CLOSED: nothing in the row names a damage type', () => {
     const chips = portraitTraitChips(RAIDER, false).map(describeTrait);
     // Behavioural traits stay — you can see how a thing fights by watching it.
-    expect(chips).toEqual(['Armored', 'Savage', 'Quick', 'Ambusher', 'Bleeder', 'Concussive']);
+    expect(chips).toEqual([
+      'Armored (+2 AC)', 'Savage (+1 ATK)', 'Quick (+1 ATK, 12% dodge)',
+      'Ambusher (+2 first strike)', 'Bleeder (50% bleed)', 'Concussive (20% stun)',
+    ]);
     // ⚠ THE CLAIM THAT MATTERS: with the gate shut, the row cannot be read as a
     // defence sheet. Pre-1527 it printed Vuln Piercing and Resist Aetheric here.
     for (const c of chips) {
@@ -62,7 +65,8 @@ describe('OTA-1527 — the chip row respects the gate that guards the line above
   it('⚠⚠⚠ GATE OPEN: the inured chips come back, and only those', () => {
     const chips = portraitTraitChips(RAIDER, true).map(describeTrait);
     expect(chips).toEqual([
-      'Armored', 'Savage', 'Quick', 'Ambusher', 'Bleeder', 'Concussive',
+      'Armored (+2 AC)', 'Savage (+1 ATK)', 'Quick (+1 ATK, 12% dodge)',
+      'Ambusher (+2 first strike)', 'Bleeder (50% bleed)', 'Concussive (20% stun)',
       'Not Weak: Slashing', 'Not Weak: Poison', 'Not Weak: Corruption',
     ]);
   });
@@ -123,7 +127,7 @@ describe('OTA-1527 — `inured` is a cancellation and the label must not say oth
   it('⚠ the sibling labels are untouched', () => {
     expect(describeTrait('resist:aetheric')).toBe('Resist Aetheric');
     expect(describeTrait('vulnerable:piercing')).toBe('Vuln Piercing');
-    expect(describeTrait('ambush_strike')).toBe('Ambusher');
+    expect(describeTrait('ambush_strike')).toBe('Ambusher (+2 first strike)');
   });
 });
 

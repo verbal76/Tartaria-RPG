@@ -114,14 +114,14 @@ describe('describeTrait / describeTraits', () => {
     expect(describeTrait('vulnerable:burn')).toBe('Vuln Burn');
   });
   it('uses readable labels for known plain traits', () => {
-    expect(describeTrait('armored')).toBe('Armored');
-    expect(describeTrait('bleeder')).toBe('Bleeder');
+    expect(describeTrait('armored')).toBe('Armored (+2 AC)');
+    expect(describeTrait('bleeder')).toBe('Bleeder (50% bleed)');
   });
   it('passes unknown traits through verbatim', () => {
     expect(describeTrait('time_thief')).toBe('time_thief');
   });
   it('joins with bullet separator', () => {
-    expect(describeTraits(['armored', 'quick'])).toBe('Armored · Quick');
+    expect(describeTraits(['armored', 'quick'])).toBe('Armored (+2 AC) · Quick (+1 ATK, 12% dodge)');
     expect(describeTraits([])).toBe('');
   });
 });

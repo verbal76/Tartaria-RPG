@@ -256,20 +256,28 @@ export function enemyDodgesHit(
 
 /** Human-readable trait summary for the EnemyPanel. Shortens to badges
  *  the UI can chip-list. Unknown ids passed through verbatim so the data
- *  team can experiment without code changes. */
+ *  team can experiment without code changes.
+ *
+ *  ⚠ Owner archaeology (read-only investigation, this session): every one of
+ *  these labels is a real, currently-consumed combat mechanic (see
+ *  traitACBonus/traitAttackBonus/traitDodgeChance/traitOnHitStatus/traitRegen/
+ *  traitAmbushBonus above, and __tests__/enemyTraits.test.ts) — the previous
+ *  bare names told the player THAT something happened but not HOW MUCH, so
+ *  the magnitude each trait actually applies is appended. Presentation only:
+ *  no function above changed, no number a trait applies changed. */
 const TRAIT_LABEL: Record<string, string> = {
-  armored: 'Armored',
-  weak_armor: 'Weak Armor',
-  agile: 'Agile',
-  quick: 'Quick',
-  slow: 'Slow',
-  savage: 'Savage',
-  bleeder: 'Bleeder',
-  venomous: 'Venomous',
-  concussive: 'Concussive',
-  regenerate: 'Regen',
-  fast_regen: 'Fast Regen',
-  ambush_strike: 'Ambusher',
+  armored: 'Armored (+2 AC)',
+  weak_armor: 'Weak Armor (−2 AC)',
+  agile: 'Agile (+1 AC, 18% dodge)',
+  quick: 'Quick (+1 ATK, 12% dodge)',
+  slow: 'Slow (−1 ATK)',
+  savage: 'Savage (+1 ATK)',
+  bleeder: 'Bleeder (50% bleed)',
+  venomous: 'Venomous (35% poison)',
+  concussive: 'Concussive (20% stun)',
+  regenerate: 'Regen (+1 HP/rd)',
+  fast_regen: 'Fast Regen (+2 HP/rd)',
+  ambush_strike: 'Ambusher (+2 first strike)',
 };
 
 export function describeTrait(t: string): string {
@@ -348,6 +356,11 @@ export function portraitTraitChips(
   const out: string[] = [];
   for (const t of traits ?? []) {
     if (t === 'profiled') continue;
+    // OTA-896's idempotence stamp on a rescaled apex enemy (coreGuardians.ts
+    // STATIC_SCALED_TRAIT) — the scaling it guards already happened before this
+    // enemy ever reached the portrait; the raw internal id taught the player
+    // nothing, so it's dropped the same way 'profiled' is.
+    if (t === 'static_power_scaled') continue;
     const [key, arg] = t.split(':');
     if (arg && (key === 'resist' || key === 'vulnerable')) continue;
     if (arg && key === 'inured') {
