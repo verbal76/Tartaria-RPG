@@ -1100,11 +1100,11 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
             owner also needs to see WHAT THAT EFFECT IS CURRENTLY DOING
             directly underneath its glyph."* One vertical unit per qualifying
             effect — real artwork on top (`glyphArt`, the same asset Lore ▸
-            Glyphs and the combat weapon buttons already paint, enlarged from
-            16dp to 22dp here so it reads as the illustrated artwork at
-            normal phone viewing distance, not a smear), its LIVE magnitude
-            and remaining duration centered directly beneath, in the
-            coating's own accent color.
+            Glyphs and the combat weapon buttons already paint; see the
+            `effectGlyphArt`/`effectGlyphMagnitude`/`effectGlyphDuration`
+            style comment for the current sizing history), its LIVE
+            magnitude and remaining duration centered directly beneath, in
+            the coating's own accent color.
             ⚠ CORRECTION, preserved — the old `ACID 3t left · 4/turn` text chip
             below (`nonCoatingStatuses`) still does not repeat a qualifying
             effect this unit already covers; a qualifying coating's presence
@@ -1325,26 +1325,27 @@ const styles = StyleSheet.create({
   statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
   statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
-  // ⚠⚠⚠ QOL #220 FINAL PHYSICAL LAYOUT CORRECTION — the developed-glyph
-  // active-effect column, now a SIBLING of `statGrid` inside `statRow`
-  // rather than a row underneath it (see the comment at its call site for
-  // why). Each unit's height — art + two status lines — is kept at or under
-  // the stat grid's own two-row height (`stat` × 2 ≈ 54dp) by construction,
-  // so one qualifying effect changes `statRow`'s total height by nothing:
-  // `defs` (WEAK/DEALS/STRIKES) lands exactly where it would with no effect
-  // active. `effectGlyphArt` grew from 16dp to 22dp on the owner's report
-  // that the artwork read too small on a physical Pixel 10 Pro XL at normal
-  // viewing distance — still well under `GLYPH_ART_SIZE.combat` (28dp, the
-  // full-width weapon-button context this corner card has no room for), but
-  // large enough to read as the illustrated glyph rather than a smear.
-  // Multiple qualifying effects wrap horizontally inside this same column
-  // before they ever add a line — bounded by the coating vocabulary itself
-  // (six kinds, one status per kind), so it wraps, it does not balloon.
-  effectGlyphRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginLeft: 6, alignItems: 'flex-start' },
-  effectGlyphUnit: { alignItems: 'center', width: 32 },
-  effectGlyphArt: { width: 22, height: 22 },
-  effectGlyphMagnitude: { fontSize: 8, fontWeight: '700', lineHeight: 9, textAlign: 'center' },
-  effectGlyphDuration: { fontSize: 8, fontWeight: '600', lineHeight: 9, textAlign: 'center' },
+  // ⚠⚠⚠ QOL #220 — the developed-glyph active-effect column, a SIBLING of
+  // `statGrid` inside `statRow` rather than a row underneath it (see the
+  // comment at its call site for why; that structure is unchanged here).
+  // QUICK VISUAL TUNING, owner ruling from a further physical Golem
+  // screenshot: the container/position was correct, but the artwork and its
+  // status text still read too small at normal viewing distance.
+  // `effectGlyphArt` doubles 22dp -> 44dp (same developed asset, aspect
+  // ratio preserved, no Unicode/generic fallback). The two status lines
+  // grow ~75% (fontSize 8 -> 14, lineHeight 9 -> 16). `effectGlyphUnit`
+  // widens 32 -> 56 so `3/turn` doesn't clip at the larger font, and the
+  // column is nudged left (`marginLeft` 6 -> 2, `gap` 6 -> 4) so the bigger
+  // unit stays inside the existing whitespace to AC's right rather than
+  // drifting toward the card's edge. Multiple qualifying effects still wrap
+  // horizontally inside this same column before they ever add a line —
+  // bounded by the coating vocabulary itself (six kinds, one status per
+  // kind), so it wraps, it does not balloon.
+  effectGlyphRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginLeft: 2, alignItems: 'flex-start' },
+  effectGlyphUnit: { alignItems: 'center', width: 56 },
+  effectGlyphArt: { width: 44, height: 44 },
+  effectGlyphMagnitude: { fontSize: 14, fontWeight: '700', lineHeight: 16, textAlign: 'center' },
+  effectGlyphDuration: { fontSize: 14, fontWeight: '600', lineHeight: 16, textAlign: 'center' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
