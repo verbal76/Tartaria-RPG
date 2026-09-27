@@ -1,34 +1,29 @@
-// QOL #220 PHYSICAL ACCEPTANCE FAILURE / FOLLOW-UP REPAIR + CORRECTION.
+// QOL #220 — FINAL OWNER CONTRACT: DEVELOPED TARTARIA GLYPHS + COMPACT EFFECT
+// STATUS + EXPANDED ENEMY PRESENTATION.
 //
-// Owner, on the actual Golem device (Pixel 10 Pro XL, com.hotatticgames.
-// tartarprim.golem, runtime 2.5.0, native build 474, OTA 2026-09-27-1889):
-// live combat, an enemy with an active player-applied ACID effect showed
-// `ACID 3t left · 4/turn` in the existing lower status row, and `AC 13` in
-// the upper stat row with NO emblem beside it. The original #220 regression
-// (qol220EnemyEffectStaysOnTheCard.test.ts) never asserted that — it proved
-// EnemyStatusView's kind union is complete and that `statusCol` renders a
-// generic badge per status, both true and both irrelevant to the AC-adjacent
-// indicator the owner actually asked for, entirely by string-matching the
-// source file. It never rendered the card at all.
-//
-// ⚠⚠ CORRECTION — the first follow-up pass drew the AC glyph correctly but
-// left the old lower `ACID 3t left · 4/turn` chip rendering for the SAME
-// status at the same time, which the owner caught in a second physical
-// screenshot: both representations on screen together. Cases B/C/F below now
-// assert the redundant chip's ABSENCE for a qualifying coating, not merely
-// the glyph's presence; case D still requires the chip for a status the
-// glyph doesn't cover (infected/typed_dot); case H covers the expanded
-// popup's own correction — it now leads each qualifying line with the same
-// glyph and keeps the AC line's own badges, instead of a bare bullet.
-//
-// This suite renders the real production door — the exported `EnemyPanel`
-// component (and its exported `enemyDetailBody` builder for the expanded
-// popup), the same ones ExplorationScreen mounts in combat — with a
-// controlled `EnemyView[]`, and inspects the actual host-node tree
-// react-test-renderer produces, the way ota1756TheCardIsMeasured.test.tsx
-// already does for a different card. No component here is mocked.
+// History, briefly (each earlier pass is superseded by this one where they
+// conflict — see the file headers of the commits that introduced them):
+//   1. The original #220 regression (qol220EnemyEffectStaysOnTheCard.test.ts)
+//      string-matched source and never rendered the card.
+//   2. The first follow-up added a small Unicode/emoji glyph beside AC
+//      (qualifyingCoatingBadges → COATING_GLYPH), but left the old
+//      `ACID 3t left · 4/turn` text chip rendering underneath it too.
+//   3. The correction retired that redundant chip for qualifying statuses —
+//      but the glyph itself was STILL the wrong thing: a generic Unicode
+//      character, not the developed Tartaria artwork already live elsewhere
+//      in the game (Lore ▸ Glyphs, the combat weapon buttons), and nothing
+//      showed the effect's CURRENT magnitude/duration under the glyph.
+//   4. THIS FILE — the final contract. The compact card's AC-adjacent area
+//      now renders the real `glyphArt()` PNG for each of the six governed
+//      coating families, with its LIVE magnitude+duration centered directly
+//      beneath, and the expanded popup renders the same identity with full
+//      detail. Every case below renders the REAL production door
+//      (`EnemyPanel`, `EnemyCard`, `EnemyDetailContent`) via
+//      react-test-renderer — nothing here string-matches source for a
+//      behavioral claim.
 import React from 'react';
-import { EnemyPanel, enemyDetailBody, type EnemyView, type EnemyStatusView } from '../app/components/EnemyPanel';
+import { EnemyPanel, type EnemyView, type EnemyStatusView } from '../app/components/EnemyPanel';
+import { glyphArt } from '../app/engine/combatGlyphArt';
 import { COATING_GLYPH, COATING_GLYPH_COLOR } from '../app/engine/weaponGlyphs';
 import { enemyAC } from '../app/engine/combatRules';
 import type { Enemy } from '../app/engine/types';
@@ -43,6 +38,7 @@ interface TestInstanceLike {
   children: unknown[];
   parent: TestInstanceLike | null;
   findAll(p: (n: TestInstanceLike) => boolean): TestInstanceLike[];
+  findAllByProps(props: Record<string, unknown>): TestInstanceLike[];
 }
 
 const hosts = (root: TestInstanceLike, p: (n: TestInstanceLike) => boolean) =>
@@ -65,6 +61,20 @@ const textOf = (n: TestInstanceLike): string => {
   return walk(n.children);
 };
 
+// The six damage/coating families the owner's final contract governs. No
+// generic fallback is permitted for any of these — see the permanent
+// invariant test below.
+const GOVERNED_KINDS = ['acid', 'burn', 'cold', 'poison', 'corruption', 'electrical'] as const;
+type GovernedKind = typeof GOVERNED_KINDS[number];
+const STATUS_KIND_FOR: Record<GovernedKind, EnemyStatusView['kind']> = {
+  acid: 'acid_coat', burn: 'burn_coat', cold: 'cold_coat',
+  poison: 'poison_coat', corruption: 'corruption_coat', electrical: 'electrical_coat',
+};
+const LABEL_FOR: Record<GovernedKind, string> = {
+  acid: 'ACID', burn: 'BURN', cold: 'FROST', poison: 'POISON',
+  corruption: 'CORRUPTION', electrical: 'SHOCK',
+};
+
 function foe(over: Partial<Enemy> = {}): Enemy {
   return {
     name: 'Quiver Rat', type: 'Vermin', rarity: 'Common', hp: 14,
@@ -75,20 +85,8 @@ function foe(over: Partial<Enemy> = {}): Enemy {
 function view(statuses: EnemyStatusView[], over: Partial<EnemyView> = {}): EnemyView {
   return { enemy: foe(), currentHp: 10, statuses, ...over } as EnemyView;
 }
-
-/** The row that pairs the AC value's own Text with whatever accessory rides
- *  beside it — `styles.statValueRow` on every Stat, but only AC's copy is
- *  ever asked to carry a coating glyph. Located by CONTENT (the AC value
- *  react actually computed), never by assuming a position in the grid. */
-function acValueRow(root: TestInstanceLike, enemy: Enemy): TestInstanceLike {
-  const ac = String(enemyAC(enemy));
-  const rows = hosts(root, (n) => {
-    const s = flat(n.props.style);
-    return s.flexDirection === 'row' && s.alignItems === 'center' && s.gap === 3;
-  });
-  const row = rows.find((r) => textOf(r) === ac || textOf(r).startsWith(ac));
-  expect(row).toBeDefined();
-  return row!;
+function status(kind: GovernedKind, dmgPerTurn: number, turnsRemaining: number): EnemyStatusView {
+  return { kind: STATUS_KIND_FOR[kind], dmgPerTurn, turnsRemaining, sourceName: `${kind} source` };
 }
 
 async function mount(views: EnemyView[]) {
@@ -101,65 +99,86 @@ async function mount(views: EnemyView[]) {
   return tree;
 }
 
-describe('QOL #220 FOLLOW-UP — the AC-adjacent effect indicator, on the real card', () => {
-  it('A. no qualifying active effect: AC renders plainly, no glyph anywhere on the card', async () => {
+/** Taps the real card (the same TouchableOpacity a player's finger hits) to
+ *  open the expanded popup — never a synthetic "open the modal" shortcut. */
+async function open(tree: { root: TestInstanceLike }) {
+  // `TouchableOpacity` is a composite component, not a host element, so the
+  // host-only `hosts()` scan never sees it — `findAllByProps` searches every
+  // instance, composite or host, the way react-test-renderer's own docs use
+  // it for exactly this purpose.
+  const card = tree.root.findAllByProps({ accessibilityRole: 'button' })
+    .filter((n) => typeof n.props.onPress === 'function');
+  expect(card.length).toBeGreaterThan(0);
+  await renderer.act(() => { (card[0]!.props.onPress as () => void)(); });
+}
+
+/** The compact card's developed-glyph unit for a given governed kind, or
+ *  undefined if it isn't rendered. Located by the real testID the production
+ *  component stamps on the Image — the same discovery mechanism the Lore ▸
+ *  Glyphs suite (ota1766) already uses for this same asset family. */
+function compactGlyph(root: TestInstanceLike, kind: GovernedKind): TestInstanceLike | undefined {
+  return root.findAllByProps({ testID: `enemy-effect-glyph-${kind}` })[0];
+}
+function detailGlyph(root: TestInstanceLike, kind: GovernedKind): TestInstanceLike | undefined {
+  return root.findAllByProps({ testID: `enemy-effect-glyph-detail-${kind}` })[0];
+}
+
+describe('QOL #220 FINAL — the permanent no-generic-fallback invariant', () => {
+  it('every governed family resolves to real, distinct developed artwork — none silently fall back', () => {
+    const arts = GOVERNED_KINDS.map((k) => glyphArt(k));
+    for (const art of arts) {
+      expect(art).toBeTruthy();
+    }
+    // No two governed families silently share one asset — a real, distinct
+    // developed glyph per family, not one recolored generic mark.
+    expect(new Set(arts).size).toBe(GOVERNED_KINDS.length);
+  });
+});
+
+describe('QOL #220 FINAL — compact card, no active effect', () => {
+  it('no phantom glyph, no phantom status, for any governed family', async () => {
     const enemy = foe();
     const tree = await mount([view([], { enemy })]);
-    const row = acValueRow(tree.root, enemy);
-    expect(textOf(row)).toBe(String(enemyAC(enemy)));
-    // Not merely "not beside AC" — the glyph vocabulary doesn't appear on the
-    // whole card at all, since enemy.coating (a different field) is also unset.
-    for (const ch of Object.values(COATING_GLYPH)) {
-      expect(textOf(tree.root)).not.toContain(ch);
+    for (const k of GOVERNED_KINDS) {
+      expect(compactGlyph(tree.root, k)).toBeUndefined();
     }
+    // AC renders plainly.
+    expect(textOf(tree.root)).toContain(String(enemyAC(enemy)));
     tree.unmount();
   });
+});
 
-  it('B. active acid: AC keeps its number, the acid glyph rides beside it, and the redundant old lower chip is GONE (the physical-acceptance correction)', async () => {
+describe.each(GOVERNED_KINDS)('QOL #220 FINAL — compact card, active %s', (kind) => {
+  it('renders the CORRECT developed glyph, no other governed glyph, and its live status underneath', async () => {
     const enemy = foe();
-    const st: EnemyStatusView = { kind: 'acid_coat', turnsRemaining: 3, dmgPerTurn: 4, sourceName: 'Acid-Etched Bolt-Caster' };
+    const st = status(kind, 4, 3);
     const tree = await mount([view([st], { enemy })]);
-    const ac = String(enemyAC(enemy));
-    const row = acValueRow(tree.root, enemy);
-    // ⚠ the exact live-report shape: "AC 13" with the acid emblem beside it,
-    // not a rewritten AC number and not a second copy of "ACID" as text here —
-    // this door draws a GLYPH.
-    expect(textOf(row)).toContain(ac);
-    expect(textOf(row)).toContain(COATING_GLYPH.acid);
-    expect(textOf(row)).not.toContain('ACID');
-    // The row is still a two-child affair (value + accessory) — proves the
-    // indicator didn't fork the AC number into something else.
-    const acidColorNode = hosts(tree.root, (n) => flat(n.props.style).color === COATING_GLYPH_COLOR.acid);
-    expect(acidColorNode.length).toBeGreaterThan(0);
-    // ⚠⚠ THE CORRECTION ITSELF — the owner's physical screenshot caught the old
-    // lower chip STILL printing `ACID 3t left · 4/turn` beside the new glyph.
-    // A qualifying coating's presence is now spoken for ONCE, by the AC glyph
-    // alone; the compact card carries none of "ACID", "3t left", or "4/turn"
-    // anywhere once acid_coat has a glyph.
+
+    const img = compactGlyph(tree.root, kind);
+    expect(img).toBeDefined();
+    expect(img!.props.source).toBe(glyphArt(kind));
+    // No other governed family's glyph rides along.
+    for (const other of GOVERNED_KINDS) {
+      if (other === kind) continue;
+      expect(compactGlyph(tree.root, other)).toBeUndefined();
+    }
+    // The live magnitude + duration sit directly under the glyph, in the
+    // same unit (the glyph's own View parent).
+    const unit = img!.parent!;
+    expect(textOf(unit)).toContain('4/turn');
+    expect(textOf(unit)).toContain('3T');
+
+    // The old redundant lower chip is gone for a qualifying coating, and no
+    // generic Unicode/emoji stand-in rides beside the developed artwork.
     const full = textOf(tree.root);
-    expect(full).not.toContain('ACID');
-    expect(full).not.toContain('3t left');
-    expect(full).not.toContain('4/turn');
+    expect(full).not.toContain(LABEL_FOR[kind]);
+    expect(full).not.toContain(COATING_GLYPH[kind]);
     tree.unmount();
   });
+});
 
-  it('C. a different qualifying coating (electrical, not acid) also earns the indicator, and also loses its redundant lower chip — generalized, not acid-only', async () => {
-    const enemy = foe();
-    const st: EnemyStatusView = { kind: 'electrical_coat', turnsRemaining: 2, dmgPerTurn: 3, sourceName: 'Storm Lance' };
-    const tree = await mount([view([st], { enemy })]);
-    const row = acValueRow(tree.root, enemy);
-    expect(textOf(row)).toContain(COATING_GLYPH.electrical);
-    expect(textOf(row)).not.toContain(COATING_GLYPH.acid);
-    // SHOCK is electrical_coat's STATUS_META label — the redundant lower chip
-    // for THIS qualifying coating is gone too, same as acid in case B.
-    const full = textOf(tree.root);
-    expect(full).not.toContain('SHOCK');
-    expect(full).not.toContain('2t left');
-    expect(full).not.toContain('3/turn');
-    tree.unmount();
-  });
-
-  it('D. infected / typed_dot are not player-applied coatings — no AC glyph for either, AND the lower row STILL shows them (not an information-loss regression)', async () => {
+describe('QOL #220 FINAL — non-coating statuses are untouched', () => {
+  it('infected / typed_dot get no developed glyph, and remain visible through the existing lower chip', async () => {
     for (const st of [
       { kind: 'infected', turnsRemaining: 10, dmgPerTurn: 1, sourceName: 'bite' },
       { kind: 'typed_dot', turnsRemaining: 4, dmgPerTurn: 2, sourceName: 'radiation' },
@@ -167,131 +186,234 @@ describe('QOL #220 FOLLOW-UP — the AC-adjacent effect indicator, on the real c
       const enemy = foe();
       // eslint-disable-next-line no-await-in-loop
       const tree = await mount([view([st], { enemy })]);
-      // eslint-disable-next-line no-await-in-loop
-      const row = acValueRow(tree.root, enemy);
-      for (const ch of Object.values(COATING_GLYPH)) expect(textOf(row)).not.toContain(ch);
+      for (const k of GOVERNED_KINDS) {
+        // eslint-disable-next-line no-await-in-loop
+        expect(compactGlyph(tree.root, k)).toBeUndefined();
+      }
       expect(textOf(tree.root)).toContain(st.kind === 'infected' ? 'INFECTED' : 'DOT');
       tree.unmount();
     }
   });
+});
 
-  it('E. expiration/removal: the same enemy, re-rendered with the status gone, drops the glyph AND leaves no stale lower chip', async () => {
+describe('QOL #220 FINAL — multiple qualifying effects at once', () => {
+  it('each renders its own correct glyph with its OWN status underneath — values do not cross-associate', async () => {
     const enemy = foe();
-    const st: EnemyStatusView = { kind: 'poison_coat', turnsRemaining: 1, dmgPerTurn: 2, sourceName: 'blade' };
-    let tree!: { unmount(): void; root: TestInstanceLike };
-    await renderer.act(() => {
-      tree = renderer.create(
-        <EnemyPanel enemies={[view([st], { enemy })]} activeIndex={0} onSelectActive={() => {}} />,
-      ) as unknown as { unmount(): void; root: TestInstanceLike };
-    });
-    expect(textOf(acValueRow(tree.root, enemy))).toContain(COATING_GLYPH.poison);
-    // No redundant lower chip while the coating is active either.
-    expect(textOf(tree.root)).not.toContain('POISON');
-    // The status ticked to zero and dropped off the array — the same
-    // mechanical removal the existing lower row already relied on.
-    await renderer.act(() => {
-      tree.unmount();
-      tree = renderer.create(
-        <EnemyPanel enemies={[view([], { enemy })]} activeIndex={0} onSelectActive={() => {}} />,
-      ) as unknown as { unmount(): void; root: TestInstanceLike };
-    });
-    for (const ch of Object.values(COATING_GLYPH)) {
-      expect(textOf(acValueRow(tree.root, enemy))).not.toContain(ch);
-    }
-    // No stale "POISON" chip left behind by the expiration either.
-    expect(textOf(tree.root)).not.toContain('POISON');
-    tree.unmount();
-  });
-
-  it('F. multiple qualifying effects at once: both glyphs render, compactly, in the SAME AC row, and NEITHER reappears as a redundant lower chip', async () => {
-    const enemy = foe();
-    const statuses: EnemyStatusView[] = [
-      { kind: 'acid_coat', turnsRemaining: 3, dmgPerTurn: 4, sourceName: 'a' },
-      { kind: 'poison_coat', turnsRemaining: 2, dmgPerTurn: 2, sourceName: 'b' },
-    ];
+    // Deliberately distinct values per effect so a cross-association would
+    // be caught: acid's numbers must never appear under poison's glyph.
+    const statuses = [status('acid', 4, 3), status('poison', 7, 5)];
     const tree = await mount([view(statuses, { enemy })]);
-    const row = acValueRow(tree.root, enemy);
-    expect(textOf(row)).toContain(COATING_GLYPH.acid);
-    expect(textOf(row)).toContain(COATING_GLYPH.poison);
-    // Still exactly one AC value row — two enemies' worth of coatings did not
-    // produce two AC stats or a second grid.
-    const acRows = hosts(tree.root, (n) => {
-      const s = flat(n.props.style);
-      return s.flexDirection === 'row' && s.alignItems === 'center' && s.gap === 3
-        && textOf(n).includes(String(enemyAC(enemy)));
-    });
-    expect(acRows).toHaveLength(1);
-    // ⚠⚠ Neither qualifying effect prints its old lower text chip alongside
-    // the two glyphs — the duplication the owner caught does not partially
-    // survive when more than one coating is active at once.
+
+    const acidImg = compactGlyph(tree.root, 'acid');
+    const poisonImg = compactGlyph(tree.root, 'poison');
+    expect(acidImg).toBeDefined();
+    expect(poisonImg).toBeDefined();
+    expect(acidImg!.props.source).toBe(glyphArt('acid'));
+    expect(poisonImg!.props.source).toBe(glyphArt('poison'));
+
+    const acidUnit = textOf(acidImg!.parent!);
+    const poisonUnit = textOf(poisonImg!.parent!);
+    expect(acidUnit).toContain('4/turn');
+    expect(acidUnit).toContain('3T');
+    expect(acidUnit).not.toContain('7/turn');
+    expect(acidUnit).not.toContain('5T');
+    expect(poisonUnit).toContain('7/turn');
+    expect(poisonUnit).toContain('5T');
+    expect(poisonUnit).not.toContain('4/turn');
+    expect(poisonUnit).not.toContain('3T');
+
+    // Redundant lower chips stay gone for BOTH, even together.
     const full = textOf(tree.root);
     expect(full).not.toContain('ACID');
     expect(full).not.toContain('POISON');
+
+    // Deterministic order: acid (declared first) precedes poison in the tree.
+    const row = hosts(tree.root, (n) => (flat(n.props.style) as { flexWrap?: string }).flexWrap === 'wrap'
+      && Array.isArray(n.children) && n.children.length === 2 && textOf(n).includes('4/turn') && textOf(n).includes('7/turn'));
+    expect(row.length).toBeGreaterThan(0);
     tree.unmount();
   });
 
-  it('G. a qualifying coating AND a non-qualifying status together: the glyph covers the coating, the lower chip covers ONLY what the glyph does not', async () => {
+  it('a qualifying coating and a non-qualifying status partition correctly on the same card', async () => {
     const enemy = foe();
     const statuses: EnemyStatusView[] = [
-      { kind: 'acid_coat', turnsRemaining: 3, dmgPerTurn: 4, sourceName: 'a' },
+      status('acid', 4, 3),
       { kind: 'infected', turnsRemaining: 10, dmgPerTurn: 1, sourceName: 'bite' },
     ];
     const tree = await mount([view(statuses, { enemy })]);
-    const row = acValueRow(tree.root, enemy);
-    expect(textOf(row)).toContain(COATING_GLYPH.acid);
+    expect(compactGlyph(tree.root, 'acid')).toBeDefined();
     const full = textOf(tree.root);
-    // The coating's own words are gone from the compact card...
     expect(full).not.toContain('ACID');
-    // ...but the status the glyph vocabulary doesn't cover is untouched.
     expect(full).toContain('INFECTED');
     tree.unmount();
   });
+});
 
-  describe('H. the expanded popup (enemyDetailBody) uses the same glyph vocabulary, not generic bullet prose', () => {
-    it('a qualifying coating leads its "Active effects" line with the real coating glyph, and the AC line carries the same badge', () => {
-      const enemy = foe();
-      const v = view(
-        [{ kind: 'acid_coat', turnsRemaining: 3, dmgPerTurn: 4, sourceName: 'x' }],
-        { enemy },
-      );
-      const body = enemyDetailBody(v, true);
-      // AC line carries the same glyph identity as the compact card.
-      const acLine = body.split('\n').find((l) => l.includes('AC '));
-      expect(acLine).toBeDefined();
-      expect(acLine).toContain(COATING_GLYPH.acid);
-      // The "Active effects" line uses the coating glyph as its marker, not a
-      // generic bullet — this is the "not beige bullet prose" requirement.
-      const effectLine = body.split('\n').find((l) => l.includes('ACID'));
-      expect(effectLine).toBeDefined();
-      expect(effectLine).toMatch(new RegExp(`^${COATING_GLYPH.acid} ACID`));
-      expect(effectLine).not.toMatch(/^· ACID/);
-      // The detail the compact card no longer carries is still available HERE.
-      expect(effectLine).toContain('4/turn');
-      expect(effectLine).toContain('3 turn(s) left');
+describe('QOL #220 FINAL — effect progression and expiration', () => {
+  it('the live status updates as the turns count down, then the glyph AND status vanish together on expiration — other effects remain', async () => {
+    const enemy = foe();
+    let tree!: { unmount(): void; root: TestInstanceLike };
+    await renderer.act(() => {
+      tree = renderer.create(
+        <EnemyPanel
+          enemies={[view([status('acid', 4, 3), status('burn', 2, 6)], { enemy })]}
+          activeIndex={0}
+          onSelectActive={() => {}}
+        />,
+      ) as unknown as { unmount(): void; root: TestInstanceLike };
     });
+    expect(textOf(compactGlyph(tree.root, 'acid')!.parent!)).toContain('3T');
 
-    it('a non-qualifying status (infected) keeps the plain bullet — it has no glyph identity to lead with', () => {
-      const enemy = foe();
-      const v = view(
-        [{ kind: 'infected', turnsRemaining: 10, dmgPerTurn: 1, sourceName: 'bite' }],
-        { enemy },
-      );
-      const body = enemyDetailBody(v, true);
-      const acLine = body.split('\n').find((l) => l.includes('AC '));
-      expect(acLine).toBeDefined();
-      for (const ch of Object.values(COATING_GLYPH)) expect(acLine).not.toContain(ch);
-      const effectLine = body.split('\n').find((l) => l.includes('INFECTED'));
-      expect(effectLine).toMatch(/^· INFECTED/);
+    // One tick: 3T → 2T, magnitude unchanged.
+    await renderer.act(() => {
+      tree.unmount();
+      tree = renderer.create(
+        <EnemyPanel
+          enemies={[view([status('acid', 4, 2), status('burn', 2, 6)], { enemy })]}
+          activeIndex={0}
+          onSelectActive={() => {}}
+        />,
+      ) as unknown as { unmount(): void; root: TestInstanceLike };
     });
+    expect(textOf(compactGlyph(tree.root, 'acid')!.parent!)).toContain('2T');
+    expect(textOf(compactGlyph(tree.root, 'acid')!.parent!)).not.toContain('3T');
 
-    it('no active statuses: AC line carries no glyph, no "Active effects" section at all', () => {
-      const enemy = foe();
-      const v = view([], { enemy });
-      const body = enemyDetailBody(v, true);
-      const acLine = body.split('\n').find((l) => l.includes('AC '));
-      expect(acLine).toBeDefined();
-      for (const ch of Object.values(COATING_GLYPH)) expect(acLine).not.toContain(ch);
-      expect(body).not.toContain('Active effects:');
+    // Expiration: acid drops off the array entirely (the real mechanical
+    // removal, same one the lower chip has always relied on).
+    await renderer.act(() => {
+      tree.unmount();
+      tree = renderer.create(
+        <EnemyPanel
+          enemies={[view([status('burn', 2, 6)], { enemy })]}
+          activeIndex={0}
+          onSelectActive={() => {}}
+        />,
+      ) as unknown as { unmount(): void; root: TestInstanceLike };
     });
+    expect(compactGlyph(tree.root, 'acid')).toBeUndefined();
+    expect(textOf(tree.root)).not.toContain('3T');
+    expect(textOf(tree.root)).not.toContain('2T');
+    // Burn, never expired, is still there — expiring one effect does not
+    // disturb another.
+    const burnImg = compactGlyph(tree.root, 'burn');
+    expect(burnImg).toBeDefined();
+    expect(textOf(burnImg!.parent!)).toContain('6T');
+    tree.unmount();
+  });
+});
+
+describe.each(GOVERNED_KINDS)('QOL #220 FINAL — expanded popup, active %s', (kind) => {
+  it('shows the same developed glyph identity, the spelled-out name, and the FULL magnitude/duration — no generic substitute', async () => {
+    const enemy = foe();
+    const st = status(kind, 5, 4);
+    const tree = await mount([view([st], { enemy })]);
+    await open(tree);
+
+    const img = detailGlyph(tree.root, kind);
+    expect(img).toBeDefined();
+    expect(img!.props.source).toBe(glyphArt(kind));
+
+    const unit = img!.parent!;
+    expect(textOf(unit)).toContain(LABEL_FOR[kind]);
+    expect(textOf(unit)).toContain('5 dmg/turn');
+    expect(textOf(unit)).toContain('4 turns remaining');
+    // No Unicode/emoji stand-in anywhere inside this effect's own unit.
+    expect(textOf(unit)).not.toContain(COATING_GLYPH[kind]);
+    tree.unmount();
+  });
+});
+
+describe('QOL #220 FINAL — expanded popup, non-coating and no-effect cases', () => {
+  it('a non-qualifying status keeps its plain accent presentation — no glyph identity to lead with', async () => {
+    const enemy = foe();
+    const tree = await mount([view(
+      [{ kind: 'infected', turnsRemaining: 10, dmgPerTurn: 1, sourceName: 'bite' }],
+      { enemy },
+    )]);
+    await open(tree);
+    expect(textOf(tree.root)).toContain('INFECTED');
+    expect(textOf(tree.root)).toContain('1 dmg/turn');
+    expect(textOf(tree.root)).toContain('10 turns remaining');
+    for (const k of GOVERNED_KINDS) expect(detailGlyph(tree.root, k)).toBeUndefined();
+    tree.unmount();
+  });
+
+  it('no active statuses: no "ACTIVE EFFECTS" section at all', async () => {
+    const enemy = foe();
+    const tree = await mount([view([], { enemy })]);
+    await open(tree);
+    expect(textOf(tree.root)).not.toContain('ACTIVE EFFECTS');
+    tree.unmount();
+  });
+});
+
+describe('QOL #220 FINAL — the enemy\'s own weapon coating stays a separate presentation', () => {
+  it('a player-applied active effect and the enemy\'s OWN coated weapon never get confused, on either card', async () => {
+    const enemy = foe({ coating: { kind: 'poison', dice: '1d4' } } as Partial<Enemy>);
+    // Deliberately a DIFFERENT family (acid) as the active effect, so any
+    // accidental conflation between "enemy's own coating" and "active
+    // effect" would be caught immediately.
+    const tree = await mount([view([status('acid', 4, 3)], { enemy })]);
+
+    // The active-effect unit is the developed acid artwork.
+    expect(compactGlyph(tree.root, 'acid')).toBeDefined();
+    // The enemy's own weapon coating still uses its existing, separate,
+    // already-accepted OTA-1656 presentation (the Unicode glyph on the
+    // subhead type line) — untouched by this contract.
+    const subheadColor = hosts(tree.root, (n) => flat(n.props.style).color === COATING_GLYPH_COLOR.poison);
+    expect(subheadColor.length).toBeGreaterThan(0);
+    expect(textOf(tree.root)).toContain(COATING_GLYPH.poison);
+
+    await open(tree);
+    expect(textOf(tree.root)).toContain('Coated blade');
+    expect(detailGlyph(tree.root, 'acid')).toBeDefined();
+    tree.unmount();
+  });
+});
+
+describe('QOL #220 FINAL — unknown information stays undisclosed in the expanded card', () => {
+  it('a non-boss, unread enemy does not reveal RESIST/WEAK just because the card expanded', async () => {
+    // arb220 raider — a type/trait combination that carries a real
+    // resistance/weakness per `defensesFor`, per the existing WIS-gate suite
+    // (ota1655) convention, so the gate has something to actually withhold.
+    const enemy = foe({ type: 'Undead', traits: ['resist:slashing'] } as Partial<Enemy>);
+    const tree = await mount([view([], { enemy, currentHp: 10 })]);
+    await open(tree);
+    const full = textOf(tree.root);
+    // The expanded card's defence block deliberately mirrors the COMPACT
+    // card's own gated phrasing ("DEF ? — strike to learn"), not
+    // `enemyDetailBody`'s longer diegetic sentence — that string function is
+    // no longer what renders (see EnemyPanel.tsx's own header note on it),
+    // so the real, gated, on-screen refusal is this one.
+    expect(full).toContain('DEF ?');
+    expect(full).toContain('strike to learn');
+    expect(full).not.toMatch(/RESIST[A-Z ]*Slashing/i);
+    tree.unmount();
+  });
+});
+
+describe('QOL #220 FINAL — expand/close is presentation only', () => {
+  it('closing the popup and reopening it never mutates the statuses it reads', async () => {
+    const enemy = foe();
+    const statuses = [status('acid', 4, 3)];
+    const tree = await mount([view(statuses, { enemy })]);
+    await open(tree);
+    expect(detailGlyph(tree.root, 'acid')).toBeDefined();
+
+    const closeBtn = tree.root.findAllByProps({ accessibilityRole: 'button' })
+      .filter((n) => typeof n.props.onPress === 'function' && textOf(n).toUpperCase().includes('CLOSE'));
+    expect(closeBtn.length).toBeGreaterThan(0);
+    await renderer.act(() => { (closeBtn[0]!.props.onPress as () => void)(); });
+    expect(detailGlyph(tree.root, 'acid')).toBeUndefined();
+    // The underlying status array (the only thing this component reads) is
+    // the exact same object — untouched by opening/closing the popup.
+    expect(statuses).toEqual([status('acid', 4, 3)]);
+
+    await open(tree);
+    expect(detailGlyph(tree.root, 'acid')).toBeDefined();
+    const unitText = textOf(detailGlyph(tree.root, 'acid')!.parent!);
+    expect(unitText).toContain('4 dmg/turn');
+    expect(unitText).toContain('3 turns remaining');
+    tree.unmount();
   });
 });

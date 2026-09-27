@@ -197,9 +197,20 @@ describe('OTA-1512 — the threat dot can actually be seen', () => {
   });
 
   it('⚠⚠ ROUTE ONE — it rides the head row, on the card’s first line', () => {
-    const headAt = PANEL.indexOf('<View style={styles.head}>');
-    const dotAt = PANEL.indexOf('styles[`threat_${view.threat}`]');
-    const subheadAt = PANEL.indexOf('<View style={styles.subhead}>');
+    // ⚠⚠⚠ QOL #220 FINAL scoped this to the compact card's own function body.
+    // The expanded popup (EnemyDetailContent) now ALSO draws a threat dot,
+    // legitimately — part of the same colored presentation the compact card
+    // uses, matching the owner's own ask that the popup read like the
+    // compact card opened up. A whole-file `indexOf` would find THAT
+    // (correct) occurrence first, since it is declared above EnemyCard in
+    // the file; slicing to EnemyCard's own body keeps this pin's actual
+    // claim — where the dot sits WITHIN THE COMPACT CARD — proven unchanged.
+    const cardAt = PANEL.indexOf('function EnemyCard(');
+    expect(cardAt).toBeGreaterThan(-1);
+    const card = PANEL.slice(cardAt);
+    const headAt = card.indexOf('<View style={styles.head}>');
+    const dotAt = card.indexOf('styles[`threat_${view.threat}`]');
+    const subheadAt = card.indexOf('<View style={styles.subhead}>');
     expect(headAt).toBeGreaterThan(-1);
     expect(dotAt).toBeGreaterThan(headAt);      // inside the head…
     expect(dotAt).toBeLessThan(subheadAt);      // …and above everything below it.

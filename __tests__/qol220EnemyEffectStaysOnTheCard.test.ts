@@ -81,11 +81,16 @@ describe('QOL #220 — the card renders every NON-COATING active status persiste
     expect(PANEL).not.toMatch(/statusCol[\s\S]{0,120}useState/);
   });
 
-  it('a qualifying coating (already covered by the AC glyph) is excluded from this row by construction, not a name list', () => {
+  it('a qualifying coating (already covered by the developed-glyph unit) is excluded from this row by construction, not a name list', () => {
+    // ⚠⚠⚠ QOL #220 FINAL renamed the partition function — it now resolves a
+    // real artwork asset (`glyphArt`), not a Unicode character, so
+    // `coatingGlyphForStatus` became `coatingKindForStatus`. The claim under
+    // test — that the lower row's exclusion is CONSTRUCTED (suffix-strip),
+    // not a hand-written name list — is unchanged.
     const i = PANEL.indexOf('const nonCoatingStatuses =');
     expect(i).toBeGreaterThan(-1);
     const line = PANEL.slice(i, PANEL.indexOf('\n', i));
-    expect(line).toContain('coatingGlyphForStatus(st.kind) === null');
+    expect(line).toContain('coatingKindForStatus(st.kind) === null');
   });
 });
 

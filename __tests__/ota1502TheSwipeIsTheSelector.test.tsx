@@ -122,15 +122,24 @@ describe('OTA-1502 — the card speaks the marks without stealing a taught one',
     expect(code).not.toMatch(/[▲▼]/);
   });
 
-  it('⚠⚠ the styles went with the row they styled', () => {
-    // ⚠ THE GREEN IS GONE BECAUSE THE ROW IS. A style block that outlives its
-    // component is how "still styled, therefore still shown" survives a
-    // refactor — and this test would have kept passing on dead code, which is
-    // worse than failing. The popup is plain text: the reach lines carry their
-    // meaning in WORDS now, which the test below pins.
-    expect(PANEL).not.toMatch(/handIn: \{ color:/);
-    expect(PANEL).not.toMatch(/handOut: \{ color:/);
-    expect(PANEL).not.toMatch(/flavorLine: \{ color:/);
+  it('⚠⚠ the styles went with the row they styled — off the COMPACT card', () => {
+    // ⚠ THE GREEN IS GONE BECAUSE THE ROW IS — off the compact card. A style
+    // block that outlives ITS component is how "still styled, therefore
+    // still shown" survives a refactor.
+    // ⚠⚠⚠ QOL #220 FINAL — `handIn`/`handOut` exist again, legitimately, as
+    // `detailStyles` keys for the EXPANDED popup (EnemyDetailContent), which
+    // now colors the same hand-reach rows the owner asked the popup to
+    // present like the compact card does. This test's real claim was always
+    // about the compact card's own StyleSheet (`styles`) never regaining
+    // them — scoped to that object so a legitimate, separate `detailStyles`
+    // addition doesn't false-fail it.
+    const stylesAt = PANEL.indexOf('const styles = StyleSheet.create({');
+    const stylesEnd = PANEL.indexOf('\n});', stylesAt);
+    expect(stylesAt).toBeGreaterThan(-1);
+    const compactStyles = PANEL.slice(stylesAt, stylesEnd);
+    expect(compactStyles).not.toMatch(/handIn: \{ color:/);
+    expect(compactStyles).not.toMatch(/handOut: \{ color:/);
+    expect(compactStyles).not.toMatch(/flavorLine: \{ color:/);
   });
 
   it('⚠ the screen reader is told which hand and whether it reaches', () => {
@@ -143,10 +152,16 @@ describe('OTA-1502 — the card speaks the marks without stealing a taught one',
     expect(body).toContain("h.inRange ? 'reaches this one' : 'cannot reach from here'");
   });
 
-  it('⚠ and the combat card no longer draws either of them', () => {
+  it('⚠ and the COMPACT card no longer draws either of them', () => {
     // The owner's actual ask: shorter cards, more room for the narration block.
-    expect(PANEL).not.toContain('{!!view.hands?.length && (');
-    expect(PANEL).not.toContain('style={styles.flavorLine}');
+    // ⚠⚠⚠ QOL #220 FINAL — the EXPANDED popup (EnemyDetailContent, declared
+    // above EnemyCard) now legitimately draws both, so this scopes to
+    // EnemyCard's own function body rather than the whole file.
+    const cardAt = PANEL.indexOf('function EnemyCard(');
+    expect(cardAt).toBeGreaterThan(-1);
+    const card = PANEL.slice(cardAt);
+    expect(card).not.toContain('{!!view.hands?.length && (');
+    expect(card).not.toContain('style={styles.flavorLine}');
   });
 
   it('⚠ the view model carries the hands per enemy, ready for per-enemy range', () => {

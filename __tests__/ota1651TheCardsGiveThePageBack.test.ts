@@ -107,14 +107,31 @@ describe('OTA-1651 — the cards give the page back', () => {
     });
 
     it('the two hand rows are off the combat card', () => {
-      expect(code(PANEL)).not.toContain('{!!view.hands?.length && (');
-      expect(code(PANEL)).not.toContain('styles.handsRow');
+      // ⚠⚠⚠ QOL #220 FINAL — scoped to EnemyCard's own function body. The
+      // expanded popup (EnemyDetailContent, declared above EnemyCard in the
+      // file) now legitimately draws the hand rows too, colored to match the
+      // compact card — the owner's own ask for the popup. This test's real
+      // claim, unchanged, is about the COMPACT combat card specifically.
+      const cardAt = PANEL.indexOf('function EnemyCard(');
+      expect(cardAt).toBeGreaterThan(-1);
+      const card = code(PANEL.slice(cardAt));
+      expect(card).not.toContain('{!!view.hands?.length && (');
+      expect(card).not.toContain('styles.handsRow');
     });
 
     it('⚠ the styles went with the rows — no dead block to mislead a refactor', () => {
-      expect(code(PANEL)).not.toMatch(/handsRow: \{/);
-      expect(code(PANEL)).not.toMatch(/handIn: \{/);
-      expect(code(PANEL)).not.toMatch(/flavorLine: \{/);
+      // ⚠⚠⚠ QOL #220 FINAL — scoped to the compact card's own StyleSheet
+      // (`styles`, declared once, before `detailStyles`). `handIn`/`flavorLine`-
+      // shaped keys now legitimately exist again in `detailStyles`, for the
+      // expanded popup only; this pin's claim was always about the compact
+      // card never regaining a dead style block for a row it doesn't draw.
+      const stylesAt = PANEL.indexOf('const styles = StyleSheet.create({');
+      const stylesEnd = PANEL.indexOf('\n});', stylesAt);
+      expect(stylesAt).toBeGreaterThan(-1);
+      const compactStyles = code(PANEL.slice(stylesAt, stylesEnd));
+      expect(compactStyles).not.toMatch(/handsRow: \{/);
+      expect(compactStyles).not.toMatch(/handIn: \{/);
+      expect(compactStyles).not.toMatch(/flavorLine: \{/);
     });
 
     it('⚠⚠ WHAT STAYS: everything a swing is decided by', () => {

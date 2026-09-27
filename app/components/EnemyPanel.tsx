@@ -3,6 +3,7 @@ import { enemyDamageCompact, enemyAC, enemyAttackBonus } from '../engine/combatR
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   FlatList,
   ScrollView,
@@ -22,6 +23,18 @@ import { enemyTypeDefenses } from '../engine/crafting';
 // `defensesFor` below.
 import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS, COATING_GLYPH, COATING_GLYPH_COLOR } from '../engine/weaponGlyphs';
 import { enemyDamageType } from '../engine/damageTypes';
+// ⚠⚠⚠ QOL #220 FINAL — THE DEVELOPED TARTARIA GLYPHS, NOT UNICODE. Owner:
+// *"the game is using the WRONG visual... the owner wants the actual
+// DEVELOPED TARTARIA GLYPH."* `combatGlyphArt.glyphArt()` is the OTA-1766
+// illustrated-artwork table — already the production source for these same
+// six damage/coating families on the Lore ▸ Glyphs legend (WeaponGlyphKey.tsx)
+// and the live combat weapon buttons (InputBox.tsx). This card had simply
+// never been moved onto it; `COATING_GLYPH` (the emoji table) stays imported
+// above ONLY because the enemy's OWN weapon coating (the type-line glyph,
+// OTA-1656) is a deliberately separate, already-accepted presentation this
+// task does not touch — see the "CRITICAL DISTINCTION" note on
+// `coatingKindForStatus` below.
+import { glyphArt } from '../engine/combatGlyphArt';
 /* ⚠ VISUAL LANGUAGE PHASE 1 — chassis planes as kit STYLESHEET entries; no new
    kit export is spent during the physical-specimen phase (owner ruling). */
 import { tartariaKitStyles } from '../ui/tartariaKit';
@@ -79,41 +92,72 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   typed_dot: { label: 'DOT', color: '#e0c05f' },
 };
 
-// ⚠⚠ QOL #220 FOLLOW-UP — THE OWNER MEASURED IT ON THE ACTUAL GOLEM DEVICE.
-// The #220 regression only proved this lower status row; his card showed
-// `ACID 3t left · 4/turn` down here with no emblem beside `AC 13` up top,
-// which is the thing he'd actually asked for. This is that indicator, and it
-// is not acid-specific: any `_coat` status that already has a weapon-coating
-// glyph (COATING_GLYPH/COATING_GLYPH_COLOR — the same map that already draws
-// the enemy's OWN coated weapon on the type line below) qualifies. `infected`
-// and `typed_dot` are not player-applied coatings (contagion / built-in
-// typed-damage procs — see their STATUS_META comments above) and don't end in
-// `_coat`, so they're excluded by construction, not by a name check.
-function coatingGlyphForStatus(kind: EnemyStatusView['kind']): { ch: string; color: string } | null {
+// ⚠⚠⚠ QOL #220 FINAL — WHICH STATUSES ARE A DEVELOPED-GLYPH COATING, AND
+// WHICH COATING. Pure suffix-strip, same partition #220 has always used
+// (`infected`/`typed_dot` don't end in `_coat`, so they're excluded by
+// construction, never by a name list) — but this no longer resolves a
+// Unicode character. It resolves the coating's canonical key, which the
+// caller hands to `glyphArt()` (the real artwork) for the AC-area unit and
+// the expanded popup, and to `COATING_GLYPH_COLOR` only for the small
+// accent color under that artwork (a color value, not a symbol — the
+// no-generic-fallback rule is about the MARK, not the palette).
+//
+// ⚠⚠ CRITICAL DISTINCTION, preserved: this is the partition for a
+// PLAYER-APPLIED active effect on the enemy. The enemy's OWN weapon coating
+// (`view.enemy.coating`, drawn on the subhead type line and in
+// `enemyDetailBody`'s "Coated blade:" line) is a separate, already-accepted
+// presentation (OTA-1656) that still reads `COATING_GLYPH` directly and is
+// not touched by this function or by anything downstream of it.
+function coatingKindForStatus(kind: EnemyStatusView['kind']): keyof typeof COATING_GLYPH_COLOR | null {
   const suffix = '_coat';
   if (!kind.endsWith(suffix)) return null;
-  const coatingKind = kind.slice(0, -suffix.length) as keyof typeof COATING_GLYPH;
-  const ch = COATING_GLYPH[coatingKind];
-  return ch ? { ch, color: COATING_GLYPH_COLOR[coatingKind] } : null;
+  return kind.slice(0, -suffix.length) as keyof typeof COATING_GLYPH_COLOR;
 }
 
-// ⚠⚠ QOL #220 CORRECTION — THE OWNER'S PHYSICAL SCREENSHOT SHOWED BOTH
-// REPRESENTATIONS AT ONCE. The AC glyph above was correct, but the old
-// `ACID 3t left · 4/turn` chip below it never went away — the follow-up added
-// the new language without retiring the old one for the effects it now
-// covers. One function decides which statuses qualify, and both the compact
-// card (badges only) and the expanded popup (badges + full detail) ask IT
-// rather than filtering `view.statuses` twice and risking the two answers
-// drifting apart.
-function qualifyingCoatingBadges(
-  statuses: EnemyStatusView[] | undefined,
-): Array<{ ch: string; color: string; kind: EnemyStatusView['kind'] }> {
+/** One qualifying player-applied coating effect, resolved to its real
+ *  developed-artwork asset plus the CURRENT mechanical state #220 has always
+ *  had available (`dmgPerTurn`/`turnsRemaining` — the same fields the lower
+ *  status row and `enemyDetailBody` already read; nothing new is invented
+ *  here, this is presentation over the existing structured effect state). */
+export interface QualifyingEffectBadge {
+  kind: EnemyStatusView['kind'];
+  coatingKind: keyof typeof COATING_GLYPH_COLOR;
+  /** The developed Tartaria PNG (a `require()`'d module id), never undefined
+   *  for the six governed families — see the governed regression that walks
+   *  every one of them and fails if `glyphArt` ever returns nothing for one. */
+  art: number;
+  color: string;
+  dmgPerTurn: number;
+  turnsRemaining: number;
+}
+
+// ⚠⚠ ONE FUNCTION DECIDES WHICH STATUSES QUALIFY, so the compact card (glyph
+// + status unit), the lower non-coating row, and the expanded popup all ask
+// IT rather than filtering `view.statuses` three times and risking three
+// answers drifting apart (the exact failure mode the owner's first two
+// screenshots both caught, from two different causes).
+function qualifyingEffectBadges(statuses: EnemyStatusView[] | undefined): QualifyingEffectBadge[] {
   return (statuses ?? [])
-    .map((st) => {
-      const g = coatingGlyphForStatus(st.kind);
-      return g ? { ...g, kind: st.kind } : null;
+    .map((st): QualifyingEffectBadge | null => {
+      const coatingKind = coatingKindForStatus(st.kind);
+      if (!coatingKind) return null;
+      const art = glyphArt(coatingKind);
+      // ⚠ HARD STOP, NOT A SILENT SUBSTITUTE. All six governed families ship
+      // real art (assets/combat-glyphs/*.png, wired via combatGlyphArt.ts) —
+      // this can only be null for a family the pack does not cover, and the
+      // governed regression fails loudly on that gap rather than this
+      // function quietly drawing something else in its place.
+      if (!art) return null;
+      return {
+        kind: st.kind,
+        coatingKind,
+        art,
+        color: COATING_GLYPH_COLOR[coatingKind],
+        dmgPerTurn: st.dmgPerTurn,
+        turnsRemaining: st.turnsRemaining,
+      };
     })
-    .filter((b): b is { ch: string; color: string; kind: EnemyStatusView['kind'] } => b !== null);
+    .filter((b): b is QualifyingEffectBadge => b !== null);
 }
 
 interface Props {
@@ -530,7 +574,14 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
     <BrandedModal
       visible={!!detailView}
       title={detailView?.enemy.name ?? ''}
-      body={detailView ? enemyDetailBody(detailView, canReadDefenses, intelFor(detailView.enemy)) : undefined}
+      // ⚠⚠⚠ QOL #220 FINAL — the popup's visible content is this JSX now, not
+      // the plain-text `body`. `enemyDetailBody` stays exported/tested as a
+      // pure text contract (see its own header), but a plain string cannot
+      // carry the developed-glyph artwork or the compact card's colour
+      // language, which is exactly what the owner's screenshot flagged.
+      scrollContent={detailView ? (
+        <EnemyDetailContent view={detailView} canRead={canReadDefenses} observed={intelFor(detailView.enemy)} />
+      ) : undefined}
       buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
       onRequestClose={() => setDetailView(null)}
     />
@@ -588,12 +639,18 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
     lines.push(e.flavor);
     lines.push('');
   }
-  // ⚠⚠ QOL #220 CORRECTION — THE EXPANDED CARD NOW USES THE SAME GLYPH
-  // VOCABULARY AS AC ON THE COMPACT CARD, not a second, independent AC line.
-  // Same `qualifyingCoatingBadges` call the compact card uses.
-  const coatingBadges = qualifyingCoatingBadges(view.statuses);
-  const acGlyphs = coatingBadges.length > 0 ? ` ${coatingBadges.map((b) => b.ch).join('')}` : '';
-  lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}${acGlyphs}`);
+  // ⚠⚠⚠ QOL #220 FINAL — THIS STRING NO LONGER CARRIES THE AC-AREA GLYPH OR
+  // THE ACTIVE-EFFECTS LIST. `enemyDetailBody` stays a plain-text CONTRACT
+  // (still exported, still pure, still covers everything a screen reader or
+  // a text-only test needs — flavour, range, threat, HP/AC/ATK/DMG, coated
+  // blade, hands, defences, traits), but a plain string cannot carry the
+  // developed Tartaria artwork the owner asked for, and re-adding a Unicode
+  // stand-in here would recreate the exact defect this correction exists to
+  // remove. The real glyph + live magnitude/duration presentation is JSX —
+  // `EnemyDetailContent` below — rendered in the popup's `scrollContent`,
+  // built from the SAME pure state (`qualifyingEffectBadges`) rather than a
+  // second, independent read of `view.statuses`.
+  lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-1609 — the move name rides along in the roomy popup too.
@@ -652,23 +709,224 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
     lines.push('Traits:');
     for (const t of traits) lines.push(`· ${describeTrait(t)}`);
   }
-  const statuses = view.statuses ?? [];
-  if (statuses.length) {
-    lines.push('');
-    lines.push('Active effects:');
-    // ⚠⚠ QOL #220 CORRECTION — a qualifying coating leads with its OWN glyph
-    // (COATING_GLYPH — the real, colour-presentation emoji, not a beige bullet)
-    // instead of the generic "· " every status used to share; a status that
-    // doesn't qualify (infected, typed_dot) keeps the plain marker, because it
-    // has no glyph identity to lead with.
-    for (const s of statuses) {
-      const meta = STATUS_META[s.kind];
-      const g = coatingGlyphForStatus(s.kind);
-      const marker = g ? g.ch : '·';
-      lines.push(`${marker} ${meta?.label ?? s.kind} — ${s.dmgPerTurn}/turn, ${s.turnsRemaining} turn(s) left`);
-    }
-  }
+  // ⚠⚠⚠ QOL #220 FINAL — active effects are no longer listed in this string
+  // at all (see the note above the AC line): the popup's `scrollContent`
+  // (`EnemyDetailContent`) is their one presentation now, in real developed
+  // artwork with live magnitude/duration, so this text never becomes a
+  // second, drifting copy of the same information.
   return lines.join('\n');
+}
+
+// ⚠⚠⚠ QOL #220 FINAL — THE EXPANDED CARD, OPENED UP FROM THE COMPACT ONE.
+// Live owner correction, on a screenshot of the popup: *"this is still just
+// monochromatic and dull... he needs to keep the same style format coloring
+// and arrangement as the miniature enemy portrait, but it needs to have all
+// of the information that's not able to be seen in the enemy portrait."*
+//
+// `enemyDetailBody` above is a plain string — the one presentation a plain
+// string can never carry is COLOR, so the popup's stat-like sections (HP/AC/
+// ATK/DMG, RESIST/WEAK/DEALS/STRIKES, range, threat, traits, active effects)
+// render here instead, as JSX built from the exact same pure computations
+// `EnemyCard` already calls (`enemyAC`, `defensesFor`, `portraitTraitChips`,
+// `qualifyingEffectBadges`, …) — not a re-implementation of the compact
+// card's arithmetic, the SAME calls, so the two views can never disagree
+// about what the numbers are, only how roomy the layout gets to be.
+// `enemyDetailBody` stays exported and unchanged for its own information
+// (flavour, hands, coated-blade wording, the WIS-gated defence PROSE) —
+// prose the compact card never shows at all, so it stays prose here too;
+// nothing about it needed color to answer the owner's ask.
+function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canRead: boolean; observed?: { weak: string[]; resist: string[] } }) {
+  const e = view.enemy;
+  const ac = enemyAC(e);
+  const atkLabel = `+${enemyAttackBonus(e)}`;
+  const defenses = defensesFor(e);
+  const dealsType = enemyDamageType(e);
+  const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, e.hp)));
+  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
+  const inRange = view.inRange ?? true;
+  const chips = portraitTraitChips(e.traits, e.boss || canRead);
+  const effectBadges = qualifyingEffectBadges(view.statuses);
+  const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingKindForStatus(st.kind) === null);
+
+  return (
+    <View style={detailStyles.wrap}>
+      <View style={detailStyles.identityRow}>
+        <Text style={detailStyles.identityText}>
+          {e.type}{e.boss ? ' · BOSS' : ''} · {e.rarity}
+        </Text>
+        {!!view.threat && (
+          <View style={detailStyles.threatRow}>
+            <View style={[styles.threatDot, styles[`threat_${view.threat}`]]} accessibilityLabel={`threat ${view.threat}`} />
+            <Text style={detailStyles.threatText}>
+              {view.threat === 'red' ? 'RED' : view.threat === 'yellow' ? 'YELLOW' : 'GREEN'}
+            </Text>
+          </View>
+        )}
+      </View>
+      {!!view.rangeLabel && (
+        <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut, detailStyles.rangeChip]}>
+          {view.rangeLabel.toUpperCase()}{inRange ? '' : ' · OUT'}
+        </Text>
+      )}
+      {!!e.flavor && <Text style={detailStyles.flavor}>{e.flavor}</Text>}
+
+      <View style={[styles.hpBarBg, detailStyles.hpBar]}>
+        <View style={[styles.hpBarFill, { width: `${Math.round(hpPct * 100)}%`, backgroundColor: hpColor }]} />
+      </View>
+
+      <View style={detailStyles.statGrid}>
+        <DetailStat label="HP" value={`${view.currentHp}/${e.hp}`} />
+        <DetailStat label="AC" value={String(ac)} />
+        <DetailStat label="ATK" value={atkLabel} />
+        <DetailStat
+          label="DMG"
+          value={`${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`}
+        />
+      </View>
+
+      {!!enemyAttackName(e) && (
+        <Text style={detailStyles.strikesLine} numberOfLines={1}>
+          <Text style={styles.defStrikes}>STRIKES </Text>
+          <Text style={styles.defVal}>{enemyAttackName(e)}</Text>
+        </Text>
+      )}
+
+      {/* ⚠⚠ CRITICAL DISTINCTION, preserved — the enemy's OWN weapon coating
+          (a separate, already-accepted OTA-1656 presentation) still reads
+          COATING_GLYPH directly and is never confused with a player-applied
+          active effect below. */}
+      {!!e.coating && (
+        <Text style={detailStyles.coatingLine} numberOfLines={2}>
+          <Text style={{ color: COATING_GLYPH_COLOR[e.coating.kind] }}>{COATING_GLYPH[e.coating.kind]} </Text>
+          <Text style={detailStyles.coatingText}>
+            Coated blade: {cap(e.coating.kind)} (+{e.coating.dice} on a landed hit; armour that resists {e.coating.kind} halves it)
+          </Text>
+        </Text>
+      )}
+
+      {!!view.hands?.length && (
+        <View style={detailStyles.handsBlock}>
+          {view.hands.map((h) => (
+            <Text key={h.slot} style={detailStyles.handLine} numberOfLines={2}>
+              <Text style={h.inRange ? detailStyles.handIn : detailStyles.handOut}>{h.inRange ? '● ' : '○ '}</Text>
+              {h.slot === 'main' ? 'Main hand' : 'Off hand'}: {h.label} — {h.inRange ? 'reaches this one' : 'cannot reach from here'}
+            </Text>
+          ))}
+        </View>
+      )}
+
+      <View style={styles.defs}>
+        {(e.boss || canRead) ? (
+          <>
+            {defenses.resists.length > 0 && (
+              <Text style={styles.defLine} numberOfLines={2}>
+                <Text style={styles.defResist}>RESIST </Text>
+                <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
+              </Text>
+            )}
+            {defenses.weaknesses.length > 0 && (
+              <Text style={styles.defLine} numberOfLines={2}>
+                <Text style={styles.defWeak}>WEAK </Text>
+                <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
+              </Text>
+            )}
+          </>
+        ) : (defenses.resists.length > 0 || defenses.weaknesses.length > 0) ? (
+          (observed && (observed.weak.length > 0 || observed.resist.length > 0)) ? (
+            <>
+              {observed.resist.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defResist}>RESIST </Text>
+                  <Text style={styles.defVal}>{observed.resist.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+              {observed.weak.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defWeak}>WEAK </Text>
+                  <Text style={styles.defVal}>{observed.weak.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defResist}>DEF </Text>
+              <Text style={styles.defVal}>? — strike to learn</Text>
+            </Text>
+          )
+        ) : null}
+        <Text style={styles.defLine} numberOfLines={1}>
+          <Text style={styles.defDeals}>DEALS </Text>
+          <Text style={styles.defVal}>{cap(dealsType)}</Text>
+        </Text>
+      </View>
+
+      {chips.length > 0 && (
+        <View style={styles.traitRow}>
+          {chips.map((t) => (
+            <Text key={t} style={styles.traitBadge}>{describeTrait(t)}</Text>
+          ))}
+        </View>
+      )}
+
+      {/* ⚠⚠⚠ QOL #220 FINAL — THE EXPANDED "ACTIVE EFFECTS" SECTION. Owner:
+          *"the expanded view has more room, so clarity takes priority over
+          abbreviation... developed corresponding glyph, effect name, full
+          current magnitude/detail, full remaining duration/time."* Same real
+          artwork as the compact unit, at a size clarity actually calls for,
+          with the label spelled out instead of abbreviated. A non-qualifying
+          status (infected, typed_dot) has no glyph identity, so it keeps its
+          existing accent-dot presentation — an information-loss regression
+          would be showing LESS here than the compact card already does. */}
+      {(view.statuses ?? []).length > 0 && (
+        <View style={detailStyles.effectsSection}>
+          <Text style={detailStyles.effectsHeading}>ACTIVE EFFECTS</Text>
+          <View style={detailStyles.effectsRow}>
+            {effectBadges.map((b) => (
+              <View key={b.kind} style={detailStyles.effectUnit}>
+                <Image
+                  source={b.art}
+                  style={detailStyles.effectArt}
+                  resizeMode="contain"
+                  testID={`enemy-effect-glyph-detail-${b.coatingKind}`}
+                />
+                <Text style={[detailStyles.effectName, { color: b.color }]} numberOfLines={1}>
+                  {STATUS_META[b.kind]?.label ?? b.coatingKind.toUpperCase()}
+                </Text>
+                <Text style={detailStyles.effectDetail} numberOfLines={1}>{b.dmgPerTurn} dmg/turn</Text>
+                <Text style={detailStyles.effectDetail} numberOfLines={1}>
+                  {b.turnsRemaining} turn{b.turnsRemaining === 1 ? '' : 's'} remaining
+                </Text>
+              </View>
+            ))}
+            {nonCoatingStatuses.map((st, i) => {
+              const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#c9a86a' };
+              return (
+                <View key={`${st.kind}-${i}`} style={detailStyles.effectUnit}>
+                  <Text style={[detailStyles.effectDot, { color: meta.color }]}>●</Text>
+                  <Text style={[detailStyles.effectName, { color: meta.color }]} numberOfLines={1}>{meta.label}</Text>
+                  <Text style={detailStyles.effectDetail} numberOfLines={1}>{st.dmgPerTurn} dmg/turn</Text>
+                  <Text style={detailStyles.effectDetail} numberOfLines={1}>
+                    {st.turnsRemaining} turn{st.turnsRemaining === 1 ? '' : 's'} remaining
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+/** A larger, roomier restatement of the compact card's `Stat` cell — same
+ *  label/value color tokens, sized for the popup rather than the corner. */
+function DetailStat({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={detailStyles.stat}>
+      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={detailStyles.statValue}>{value}</Text>
+    </View>
+  );
 }
 
 function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower }: { view: EnemyView; cardWidth: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] }; playerPower?: number }) {
@@ -678,18 +936,19 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   // 8 like combat, and bosses get the same +6 wall.
   // ⚠ OTA-1608 — the roll's own resolver, not a hand copy (see enemyDetailBody).
   const ac = enemyAC(view.enemy);
-  // ⚠⚠ QOL #220 FOLLOW-UP — generalized from view.statuses, not hard-coded to
-  // acid: any active status whose kind maps through coatingGlyphForStatus
-  // (the six weapon-coating DOT families) earns a glyph beside AC. A future
-  // coating family picks this up automatically the day it gets a
-  // COATING_GLYPH entry — nothing here names a specific element.
-  const acCoatingBadges = qualifyingCoatingBadges(view.statuses);
-  // ⚠⚠ QOL #220 CORRECTION — a status the AC glyph already speaks for does not
-  // ALSO get the old text chip below; that was the duplication the owner's
-  // screenshot caught. Only statuses coatingGlyphForStatus returns null for
+  // ⚠⚠⚠ QOL #220 FINAL — generalized from view.statuses, not hard-coded to
+  // acid: any active status whose kind maps through coatingKindForStatus (the
+  // six weapon-coating DOT families) earns its developed glyph + live status
+  // unit. A future coating family picks this up automatically the day it gets
+  // both a COATING_GLYPH_COLOR entry and a combat-glyphs asset — nothing here
+  // names a specific element.
+  const effectBadges = qualifyingEffectBadges(view.statuses);
+  // ⚠⚠ a status the effect unit already speaks for does not ALSO get the old
+  // text chip below; that was the duplication the owner's first correction
+  // screenshot caught. Only statuses coatingKindForStatus returns null for
   // (infected, typed_dot — not player-applied coatings) still need the chip's
   // words, because nothing else on the compact card says them.
-  const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingGlyphForStatus(st.kind) === null);
+  const nonCoatingStatuses = (view.statuses ?? []).filter((st) => coatingKindForStatus(st.kind) === null);
   // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
   // condition as the RESIST/WEAK block below, because the row sits directly
   // under it and was answering what that block declined to say.
@@ -809,35 +1068,52 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           ]}
         />
       </View>
-      {/* Portrait stat grid: two rows of two so it fits the narrow column.
-          ⚠⚠ QOL #220 FOLLOW-UP, CORRECTED — the AC-adjacent coating indicator.
-          Compact on purpose: one glyph per qualifying active status, no label,
-          no second line. ⚠ CORRECTION — the owner's physical screenshot caught
-          the first pass printing THIS glyph and the old `ACID 3t left ·
-          4/turn` text chip below, at the same time, for the same effect. The
-          lower `statusCol` row (below) no longer repeats a status this glyph
-          already speaks for — see `nonCoatingStatuses`. Detailed duration/
-          damage for a qualifying coating now lives in the expanded popup
-          (enemyDetailBody), not duplicated here. Bounded by construction: a
-          `_coat` status only exists once per kind (applyCoatingProc refreshes,
-          never duplicates, a kind already active), and there are six kinds
-          total, so this can never grow past the coating vocabulary itself. */}
+      {/* Portrait stat grid: two rows of two so it fits the narrow column. */}
       <View style={styles.statGrid}>
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
-        <Stat
-          label="AC"
-          value={String(ac)}
-          accessory={acCoatingBadges.length > 0 ? (
-            <View style={styles.acCoatingRow}>
-              {acCoatingBadges.map((b) => (
-                <Text key={b.kind} style={[styles.acCoatingGlyph, { color: b.color }]}>{b.ch}</Text>
-              ))}
-            </View>
-          ) : null}
-        />
+        <Stat label="AC" value={String(ac)} />
         <Stat label="ATK" value={atkLabel} />
         <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
       </View>
+      {/* ⚠⚠⚠ QOL #220 FINAL — THE DEVELOPED-GLYPH ACTIVE-EFFECT UNIT. Owner:
+          *"the owner developed specific glyphs for the individual damage/
+          effect families... [and] the glyph by itself is NOT enough — the
+          owner also needs to see WHAT THAT EFFECT IS CURRENTLY DOING directly
+          underneath its glyph."* One vertical unit per qualifying effect —
+          real artwork on top (`glyphArt`, the same asset Lore ▸ Glyphs and
+          the combat weapon buttons already paint), its LIVE magnitude and
+          remaining duration centered directly beneath, in the coating's own
+          accent color. Sits just under the stat grid — associated with the
+          AC-area presentation #220 established — without living INSIDE the
+          AC cell, since a stacked glyph+status unit needs more vertical room
+          than a single inline character ever did.
+          ⚠ CORRECTION, preserved — the old `ACID 3t left · 4/turn` text chip
+          below (`nonCoatingStatuses`) still does not repeat a qualifying
+          effect this unit already covers; a qualifying coating's presence is
+          spoken for exactly once, here.
+          ⚠ Bounded by construction, same as before: a `_coat` status exists
+          at most once per kind, six kinds total, so this row can never grow
+          past the coating vocabulary itself — it wraps, it does not balloon. */}
+      {effectBadges.length > 0 && (
+        <View style={styles.effectGlyphRow}>
+          {effectBadges.map((b) => (
+            <View key={b.kind} style={styles.effectGlyphUnit}>
+              <Image
+                source={b.art}
+                style={styles.effectGlyphArt}
+                resizeMode="contain"
+                testID={`enemy-effect-glyph-${b.coatingKind}`}
+              />
+              <Text style={[styles.effectGlyphMagnitude, { color: b.color }]} numberOfLines={1}>
+                {b.dmgPerTurn}/turn
+              </Text>
+              <Text style={[styles.effectGlyphDuration, { color: b.color }]} numberOfLines={1}>
+                {b.turnsRemaining}T
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
       <View style={styles.defs}>
         {/* OTA-798 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
             required); a boss always shows. Below the threshold you learn by hitting. */}
@@ -897,9 +1173,9 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
       {/* OTA-401 — active coating/DOT statuses on this enemy + turns left.
           One badge per status: "POISON · 3t · 4/turn". Lets the player
           confirm a coating actually landed and track how long it ticks.
-          ⚠⚠ QOL #220 CORRECTION — a qualifying coating (see acCoatingBadges
-          above) no longer prints here too; this row is now the presentation
-          for statuses the AC glyph doesn't cover, not every active status. */}
+          ⚠⚠ QOL #220 — a qualifying coating (see `effectBadges` above) no
+          longer prints here too; this row is now the presentation for
+          statuses the developed-glyph unit doesn't cover, not every status. */}
       {nonCoatingStatuses.length > 0 && (
         <View style={styles.statusCol}>
           {nonCoatingStatuses.map((st, i) => {
@@ -1020,11 +1296,20 @@ const styles = StyleSheet.create({
   statLabel: { color: '#a2977b', fontSize: 9, letterSpacing: 1 },
   statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
-  // ⚠⚠ QOL #220 FOLLOW-UP — the AC-adjacent coating indicator row. Same glyph
-  // vocabulary as the type-line coated-weapon glyph (COATING_GLYPH_COLOR), so
-  // fire beside AC is the same colour as fire beside the enemy's own blade.
-  acCoatingRow: { flexDirection: 'row', alignItems: 'center', gap: 1 },
-  acCoatingGlyph: { fontSize: 11, lineHeight: 13 },
+  // ⚠⚠⚠ QOL #220 FINAL — the developed-glyph active-effect row: one vertical
+  // GLYPH-over-STATUS unit per qualifying effect, wrapping rather than
+  // growing the card. `effectGlyphArt` is deliberately smaller than
+  // `GLYPH_ART_SIZE.combat` (28dp) — the compact card's whole stat grid is a
+  // fraction of that button's width, and the owner's own priority order for
+  // this pack ("glyph readable, name readable, comfortable padding, THEN
+  // compact height") was written for a screen with room to grow; the corner
+  // portrait has none, so it keeps the mark identifiable at the smallest size
+  // that still reads as the illustrated artwork rather than a smear.
+  effectGlyphRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
+  effectGlyphUnit: { alignItems: 'center', width: 30 },
+  effectGlyphArt: { width: 16, height: 16 },
+  effectGlyphMagnitude: { fontSize: 8, fontWeight: '700', lineHeight: 9, textAlign: 'center' },
+  effectGlyphDuration: { fontSize: 8, fontWeight: '600', lineHeight: 9, textAlign: 'center' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
@@ -1070,4 +1355,45 @@ const styles = StyleSheet.create({
   // OTA — playtest: the multi-enemy gesture hint read too long and too small.
   // Shorter copy ("swipe to aim · tap for info") + a larger, tighter-tracked font.
   hint: { color: '#8a7f68', fontSize: 12, letterSpacing: 0.3, marginLeft: 8 },
+});
+
+// ⚠⚠⚠ QOL #220 FINAL — THE EXPANDED CARD'S OWN TOKENS. Layout and spacing
+// only; every COLOR here is either a literal already used on the compact
+// card above (kept in sync by eye, not by import, since `styles` is a
+// module-local StyleSheet object) or one of the compact card's own shared
+// style keys (`styles.defResist`, `styles.range`, `styles.traitBadge`, …),
+// reused directly rather than re-declared — the "same style format" the
+// owner asked for is the SAME style objects, not a repainted copy of them.
+const detailStyles = StyleSheet.create({
+  wrap: { gap: 2 },
+  identityRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  identityText: { color: '#a2977b', fontSize: 12, letterSpacing: 0.5 },
+  threatRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  threatText: { color: '#c9b89a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  rangeChip: { alignSelf: 'flex-start', marginTop: 4 },
+  flavor: { color: '#c9b89a', fontSize: 13, fontStyle: 'italic', lineHeight: 18, marginTop: 6 },
+  hpBar: { width: '100%', marginTop: 10 },
+  statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
+  stat: { width: '50%', paddingVertical: 2 },
+  statValue: { color: '#e6d8b3', fontSize: 15, fontWeight: '700' },
+  strikesLine: { fontSize: 11, letterSpacing: 0.5, marginTop: 4 },
+  coatingLine: { fontSize: 12, marginTop: 6 },
+  coatingText: { color: '#c9b89a', fontSize: 12 },
+  handsBlock: { marginTop: 8, gap: 2 },
+  handLine: { color: '#c9b89a', fontSize: 12, lineHeight: 17 },
+  handIn: { color: '#9ec96a' },
+  handOut: { color: '#8a7f68' },
+  effectsSection: { marginTop: 10, gap: 6 },
+  effectsHeading: { color: '#a2977b', fontSize: 10, fontWeight: '700', letterSpacing: 1.5 },
+  effectsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  // ⚠ Bigger than the compact card's 16dp — the owner: "the expanded view has
+  // more room, so clarity takes priority over abbreviation." `GLYPH_ART_SIZE`
+  // itself (28) is a fine ceiling here too, since Lore ▸ Glyphs already proves
+  // it reads well at that size; 24 keeps three effects on a row on a normal
+  // phone width without crowding.
+  effectUnit: { alignItems: 'center', width: 78 },
+  effectArt: { width: 24, height: 24 },
+  effectDot: { fontSize: 20, lineHeight: 24 },
+  effectName: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginTop: 3, textAlign: 'center' },
+  effectDetail: { color: '#c9b89a', fontSize: 10, textAlign: 'center', lineHeight: 13 },
 });
