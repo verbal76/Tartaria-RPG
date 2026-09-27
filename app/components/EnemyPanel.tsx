@@ -499,7 +499,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => scrollWrap(
-    <EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy)} playerPower={playerPower} />,
+    <EnemyCard view={item} cardWidth={cardWidth} cardHeight={capH} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy)} playerPower={playerPower} />,
     () => setDetailView(item),
   );
 
@@ -513,7 +513,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         scrollWrap(
-          <EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy)} playerPower={playerPower} />,
+          <EnemyCard view={enemies[0]!} cardWidth={cardWidth} cardHeight={capH} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy)} playerPower={playerPower} />,
           () => setDetailView(enemies[0]!),
         )
       ) : (
@@ -893,7 +893,7 @@ function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canR
                   {STATUS_META[b.kind]?.label ?? b.coatingKind.toUpperCase()}
                 </Text>
                 <Text style={detailStyles.effectDetail} numberOfLines={1}>{b.dmgPerTurn} dmg/turn</Text>
-                <Text style={detailStyles.effectDetail} numberOfLines={1}>
+                <Text style={detailStyles.effectDetail}>
                   {b.turnsRemaining} turn{b.turnsRemaining === 1 ? '' : 's'} remaining
                 </Text>
               </View>
@@ -905,7 +905,7 @@ function EnemyDetailContent({ view, canRead, observed }: { view: EnemyView; canR
                   <Text style={[detailStyles.effectDot, { color: meta.color }]}>●</Text>
                   <Text style={[detailStyles.effectName, { color: meta.color }]} numberOfLines={1}>{meta.label}</Text>
                   <Text style={detailStyles.effectDetail} numberOfLines={1}>{st.dmgPerTurn} dmg/turn</Text>
-                  <Text style={detailStyles.effectDetail} numberOfLines={1}>
+                  <Text style={detailStyles.effectDetail}>
                     {st.turnsRemaining} turn{st.turnsRemaining === 1 ? '' : 's'} remaining
                   </Text>
                 </View>
@@ -929,7 +929,7 @@ function DetailStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower }: { view: EnemyView; cardWidth: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] }; playerPower?: number }) {
+function EnemyCard({ view, cardWidth, cardHeight, hpBarWidth, canRead, observed, playerPower }: { view: EnemyView; cardWidth: number; cardHeight?: number; hpBarWidth: number; canRead: boolean; observed?: { weak: string[]; resist: string[] }; playerPower?: number }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -967,7 +967,15 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
 
   return (
     <View
-      style={[styles.card, { width: cardWidth }]}
+      // Owner ruling (physical Golem screenshot): the dark card fills its
+      // reserved frame (matched to the player-stats column's own measured
+      // height) whether or not there's enough content to reach it — a short
+      // card (fewer active effects, no trait row) must not leave a gap of
+      // the surrounding panel frame showing through underneath it. `minHeight`
+      // rather than `height` so a genuinely tall card (many effects) still
+      // grows past the frame and scrolls, exactly as `capH`'s own ScrollView
+      // cap already allows.
+      style={[styles.card, { width: cardWidth, minHeight: cardHeight }]}
       accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}${
         view.threat ? `. Threat: ${view.threat === 'red' ? 'can hit you' : view.threat === 'yellow' ? 'can reach you weakly' : 'cannot reach you'}` : ''
       }`}
@@ -1414,7 +1422,12 @@ const detailStyles = StyleSheet.create({
   // itself (28) is a fine ceiling here too, since Lore ▸ Glyphs already proves
   // it reads well at that size; 24 keeps three effects on a row on a normal
   // phone width without crowding.
-  effectUnit: { alignItems: 'center', width: 78 },
+  // ⚠ Owner correction (physical Golem screenshot): "2 turns remaining" was
+  // truncating to "2 turns remai..." at 78dp with the line held to one row.
+  // Widened to 92dp and the duration line's `numberOfLines={1}` cap is gone
+  // (see the two `effectDetail` Texts below) — it wraps onto a second line
+  // instead of clipping, in keeping with "clarity over abbreviation" here.
+  effectUnit: { alignItems: 'center', width: 92 },
   effectArt: { width: 24, height: 24 },
   effectDot: { fontSize: 20, lineHeight: 24 },
   effectName: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginTop: 3, textAlign: 'center' },

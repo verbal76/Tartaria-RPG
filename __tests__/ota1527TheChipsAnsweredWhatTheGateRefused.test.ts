@@ -52,8 +52,12 @@ describe('OTA-1527 — the chip row respects the gate that guards the line above
     const chips = portraitTraitChips(RAIDER, false).map(describeTrait);
     // Behavioural traits stay — you can see how a thing fights by watching it.
     expect(chips).toEqual([
-      'Armored (+2 AC)', 'Savage (+1 ATK)', 'Quick (+1 ATK, 12% dodge)',
-      'Ambusher (+2 first strike)', 'Bleeder (50% bleed)', 'Concussive (20% stun)',
+      'Armored — +2 to its own Armor Class',
+      'Savage — +1 to its own attack rolls',
+      'Quick — +1 to its own attack rolls; 12% chance to dodge your attacks',
+      'Ambusher — +2 to its attack roll on the first successful strike it lands on you',
+      'Bleeder — each successful hit has a 50% chance to inflict Bleed on you for 3 rounds',
+      'Concussive — each successful hit has a 20% chance to Stun you for 1 round',
     ]);
     // ⚠ THE CLAIM THAT MATTERS: with the gate shut, the row cannot be read as a
     // defence sheet. Pre-1527 it printed Vuln Piercing and Resist Aetheric here.
@@ -65,8 +69,12 @@ describe('OTA-1527 — the chip row respects the gate that guards the line above
   it('⚠⚠⚠ GATE OPEN: the inured chips come back, and only those', () => {
     const chips = portraitTraitChips(RAIDER, true).map(describeTrait);
     expect(chips).toEqual([
-      'Armored (+2 AC)', 'Savage (+1 ATK)', 'Quick (+1 ATK, 12% dodge)',
-      'Ambusher (+2 first strike)', 'Bleeder (50% bleed)', 'Concussive (20% stun)',
+      'Armored — +2 to its own Armor Class',
+      'Savage — +1 to its own attack rolls',
+      'Quick — +1 to its own attack rolls; 12% chance to dodge your attacks',
+      'Ambusher — +2 to its attack roll on the first successful strike it lands on you',
+      'Bleeder — each successful hit has a 50% chance to inflict Bleed on you for 3 rounds',
+      'Concussive — each successful hit has a 20% chance to Stun you for 1 round',
       'Not Weak: Slashing', 'Not Weak: Poison', 'Not Weak: Corruption',
     ]);
   });
@@ -127,7 +135,9 @@ describe('OTA-1527 — `inured` is a cancellation and the label must not say oth
   it('⚠ the sibling labels are untouched', () => {
     expect(describeTrait('resist:aetheric')).toBe('Resist Aetheric');
     expect(describeTrait('vulnerable:piercing')).toBe('Vuln Piercing');
-    expect(describeTrait('ambush_strike')).toBe('Ambusher (+2 first strike)');
+    expect(describeTrait('ambush_strike')).toBe(
+      'Ambusher — +2 to its attack roll on the first successful strike it lands on you',
+    );
   });
 });
 

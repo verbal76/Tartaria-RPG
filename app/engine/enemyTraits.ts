@@ -263,21 +263,39 @@ export function enemyDodgesHit(
  *  traitACBonus/traitAttackBonus/traitDodgeChance/traitOnHitStatus/traitRegen/
  *  traitAmbushBonus above, and __tests__/enemyTraits.test.ts) — the previous
  *  bare names told the player THAT something happened but not HOW MUCH, so
- *  the magnitude each trait actually applies is appended. Presentation only:
- *  no function above changed, no number a trait applies changed. */
+ *  the magnitude each trait actually applies is stated. Presentation only:
+ *  no function above changed, no number a trait applies changed.
+ *
+ *  ⚠⚠ Owner correction, physical Golem screenshot: the first pass's
+ *  "Savage (+1 ATK)"-style shorthand was "still a little bit too
+ *  abbreviated" — these chips now live ONLY on the expanded popup (a
+ *  separate ruling, same session), which has the room the compact card
+ *  never did, so the wording is spelled out in full rather than crammed
+ *  into a parenthetical.
+ *
+ *  ⚠⚠⚠ Owner's second correction, same session: these chips sit on the
+ *  ENEMY's own portrait, so a bare percentage ("Bleed 50%") reads as
+ *  ambiguous about who it happens to and when it fires. `bleeder` /
+ *  `venomous` / `concussive` are on-hit procs that land a status ON THE
+ *  PLAYER (see traitOnHitStatus above) — the label now states the trigger
+ *  ("each successful hit"), the direction ("on you"), and the duration,
+ *  the same shape as the owner's own worked example. The remaining traits
+ *  are the enemy's own stat modifiers (its own AC / attack rolls / dodge /
+ *  regen), so "its own" makes that direction explicit too instead of
+ *  leaving it to be inferred. */
 const TRAIT_LABEL: Record<string, string> = {
-  armored: 'Armored (+2 AC)',
-  weak_armor: 'Weak Armor (−2 AC)',
-  agile: 'Agile (+1 AC, 18% dodge)',
-  quick: 'Quick (+1 ATK, 12% dodge)',
-  slow: 'Slow (−1 ATK)',
-  savage: 'Savage (+1 ATK)',
-  bleeder: 'Bleeder (50% bleed)',
-  venomous: 'Venomous (35% poison)',
-  concussive: 'Concussive (20% stun)',
-  regenerate: 'Regen (+1 HP/rd)',
-  fast_regen: 'Fast Regen (+2 HP/rd)',
-  ambush_strike: 'Ambusher (+2 first strike)',
+  armored: 'Armored — +2 to its own Armor Class',
+  weak_armor: 'Weak Armor — −2 to its own Armor Class',
+  agile: 'Agile — +1 to its own Armor Class; 18% chance to dodge your attacks',
+  quick: 'Quick — +1 to its own attack rolls; 12% chance to dodge your attacks',
+  slow: 'Slow — −1 to its own attack rolls',
+  savage: 'Savage — +1 to its own attack rolls',
+  bleeder: 'Bleeder — each successful hit has a 50% chance to inflict Bleed on you for 3 rounds',
+  venomous: 'Venomous — each successful hit has a 35% chance to Poison you for 3 rounds',
+  concussive: 'Concussive — each successful hit has a 20% chance to Stun you for 1 round',
+  regenerate: 'Regenerate — heals itself 1 HP each round',
+  fast_regen: 'Fast Regen — heals itself 2 HP each round',
+  ambush_strike: 'Ambusher — +2 to its attack roll on the first successful strike it lands on you',
 };
 
 export function describeTrait(t: string): string {
