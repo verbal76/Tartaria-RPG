@@ -59,6 +59,8 @@ import { noteMemoryMark } from '../../diagnostics/memoryTimeline';
 // ⚠ BUILD 190 — annotation only. Safe no-ops when the native recorder is absent.
 import { MEM_KIND, annotateMemory, beginMemoryBurst } from '../../diagnostics/nativeMemoryRecorder';
 import { getCrashedSlotIds, loadSaveLoadHealth } from '../../diagnostics/saveLoadHealth';
+import { runBootSavePreservation } from '../../engine/savePreservationBoot';
+import { runLegacyStoragePreservation } from '../../diagnostics/legacyStoragePreserve';
 import { createCharacter, type CreateCharacterInput } from '../../engine/character';
 import { buildArbiterSceneIntro, buildOpening } from '../../engine/narrativeGenerator';
 import { profileOf } from '../../engine/pressure';
@@ -633,6 +635,25 @@ export const createBootSlice = (
       // it ever IS reached, the next boot can say so instead of guessing.
       try { get().appendLog('debug', `boot: parallel read group failed — ${String(e)}`); } catch { /* never block boot */ }
     }
+    // ⚠⚠⚠ OTA-1888 — THE PERMANENT SAVE-PRESERVATION CONTRACT. Runs BEFORE
+    // anything below can touch a slot (the legacy-gem handover a few lines
+    // down mutates one). Copies every currently-readable save-relevant key
+    // into a bounded, verified, rotating recovery snapshot — additive only,
+    // never touches a live/.bak/index/stash key. See
+    // app/engine/savePreservationBoot.ts for the full evidence and design.
+    try {
+      await runBootSavePreservation(slots);
+    } catch (e) {
+      try { get().appendLog('debug', `boot: save preservation snapshot failed — ${String(e)}`); } catch { /* never block boot */ }
+    }
+    // ⚠ OTA-1888 — Android's legacy SQLite engine (RKStorage) sits one layer
+    // below anything the AsyncStorage JS surface can see (see OTA-1886); this
+    // is the same preservation probe, now run automatically every boot
+    // instead of only on a manual tap. No-ops immediately on non-Android
+    // platforms (checked inside the function) and on Android whenever
+    // RKStorage no longer exists. Fire-and-forget: file-existence checks on a
+    // legacy path must never delay the title screen.
+    void runLegacyStoragePreservation().catch(() => { /* best-effort — the manual button remains available */ });
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
     // fires once per install.
     // ⚠ OTA-1850 — the seed still lands in the global pool here, because at

@@ -32038,7 +32038,65 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * setItem/loadSlot/importSave or any save-repair path, and does not
  * restore, migrate, or construct a character. NOT PUBLISHED TO HAL — Golem
  * only, to answer one owner's device question. */
-export const OTA_BUILD_ID = '2026-09-27-1887-the-copy-speaks-for-itself';
+/** ⚠⚠⚠ OTA-1888 — THE PERMANENT SAVE-PRESERVATION CONTRACT. GOLEM + HAL.
+ *
+ * Owner's permanent rule, closing the Golem save-loss investigation with a
+ * standing safeguard rather than a one-off recovery attempt: Tartaria must
+ * never intentionally delete an existing player save as part of an update
+ * or migration. A save the current version cannot understand is not
+ * garbage and is not permission to delete it.
+ *
+ * FORENSICS FIRST (see app/engine/savePreservationBoot.ts's own header for
+ * the full evidence trail). Reading saveSystem.ts and slotSlice.ts end to
+ * end found the JS-level slot system ALREADY non-destructive: `saveSlot` is
+ * atomic (temp → verify → `.bak` snapshot → swap) and never deletes on a
+ * failed write (OTA-344); `loadSlot` falls back to `.bak`; `loadSlotIntoGame`
+ * treats a parse/hydrate failure as "surface an error, never persist over
+ * the slot"; `deleteSlot` is reached ONLY from an explicit player action.
+ * No version check anywhere deletes a save for being unrecognized.
+ *
+ * The evidenced gap is one layer down, in the NATIVE storage engine, and it
+ * is the same shape on both platforms though the mechanism differs:
+ *   · Android: @react-native-async-storage/async-storage's own
+ *     next/StorageSupplier.kt runs a one-time SQLite→Room migration
+ *     (`createFromFile`) with no visible handling of the legacy engine's
+ *     `-wal`/`-shm` companion files (the OTA-1886/1887 finding).
+ *   · iOS: RNCAsyncStorage.mm can `removeItemAtPath:` one storage directory
+ *     and overwrite it from another, decided by comparing manifest.json
+ *     modification timestamps — a heuristic, not a correctness proof.
+ * Both run inside native module init, before any JS — including this
+ * app's — ever executes, so nothing at the JS layer can intercept either
+ * one directly.
+ *
+ * THE SMALLEST DURABLE ARCHITECTURE THE EVIDENCE JUSTIFIES: every boot,
+ * BEFORE anything else can touch a slot, every currently-readable
+ * save-relevant key (index, active-slot pointer, global stash, every live
+ * + `.bak` slot blob — including one an index has lost track of) is copied
+ * into a bounded, rotating, verified recovery namespace
+ * (`tartaria.preserveBoot.*`). Additive only: it never deletes/overwrites a
+ * live/.bak/index/stash key, and it is invisible to the emergency
+ * disk-space purge (checked directly — the purge's own allowlist never
+ * names this namespace). Cross-platform and pure JS, so it runs identically
+ * on Golem and HAL. Android additionally gets OTA-1886's RKStorage
+ * preservation probe run automatically every boot (previously a manual
+ * diagnostic button only), since that native-engine risk is Android-only.
+ *
+ * ota1888SavePreservationContract: 11/11 — the normal case, a genuinely
+ * orphaned slot, a setItem failure mid-pass, a readback mismatch (both
+ * proven to leave the original AND every other key untouched), bounded
+ * rotation that never drops the last surviving snapshot, the
+ * emergency-reclaim purge proven blind to this namespace, and an
+ * old-format save (missing every field added since OTA-1311) proven to
+ * survive a boot preservation pass, still load through the UNCHANGED
+ * `loadSlot`, and remain independently recoverable from its snapshot even
+ * after the live key is deleted.
+ *
+ * NOT CLAIMED: a native rebuild to physically reproduce the SQLite→Room or
+ * iOS directory-migration transition end-to-end on real hardware — that
+ * requires a native build this diagnostic-and-safeguard turn does not
+ * initiate. See the SAVE PRESERVATION REPORT for what that would require. */
+export const OTA_BUILD_ID = '2026-09-27-1888-the-save-is-never-the-price-of-an-update';
+// SUPERSEDED: '2026-09-27-1887-the-copy-speaks-for-itself'
 // SUPERSEDED: '2026-09-26-1886-the-copy-proves-itself-before-it-speaks'
 // SUPERSEDED: '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds'
 // SUPERSEDED: '2026-09-25-1884-the-picker-takes-the-region'
