@@ -1,0 +1,247 @@
+diff --git a/node_modules/@react-native-async-storage/async-storage/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java b/node_modules/@react-native-async-storage/async-storage/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
+index c7c59b0..fe713d5 100644
+--- a/node_modules/@react-native-async-storage/async-storage/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
++++ b/node_modules/@react-native-async-storage/async-storage/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
+@@ -13,11 +13,44 @@ import android.database.sqlite.SQLiteException;
+ import android.database.sqlite.SQLiteOpenHelper;
+ import com.facebook.common.logging.FLog;
+ import com.facebook.react.common.ReactConstants;
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.util.Arrays;
++import java.util.Comparator;
++import java.util.zip.CRC32;
+ import javax.annotation.Nullable;
+ 
+ /**
+  * Database supplier of the database used by react native. This creates, opens and deletes the
+  * database as necessary.
++ *
++ * ⚠ TARTARIA OWNER PATCH (patches/@react-native-async-storage+async-storage+2.2.0.patch) —
++ * PERMANENT SAVE-PRESERVATION CONTRACT, applies below JavaScript too:
++ * NEVER DESTROY THE LAST RECOVERABLE COPY OF A PLAYER SAVE TO MAKE THE APPLICATION BOOT.
++ *
++ * Forensics (OTA-1888/1889): Tartaria's Android build never enables this library's opt-in
++ * Room ("next") storage engine (AsyncStorage_useNextStorage defaults to false and nothing in
++ * this repo sets it), so RKStorage/catalystLocalStorage — the class this file supplies — is
++ * the ONLY Android save store that has ever existed on a Tartaria device. There is no
++ * SQLite-to-Room migration to protect here.
++ *
++ * The upstream {@link #ensureDatabase()} retried a failed open exactly once more, and on that
++ * SECOND failure called {@link #deleteDatabase()} unconditionally before recreating an empty
++ * database — silently destroying the player's only save the moment SQLite could not open the
++ * file (corruption, a disk-full write, a killed process mid-write). That call happens inside
++ * native module init, before any JS in this app — including OTA-1888's own boot-time
++ * preservation snapshot — ever runs, so nothing at the JS layer could see or prevent it.
++ *
++ * This patch removes that delete-on-open-failure path entirely. On the FIRST open failure we
++ * now copy RKStorage and any present -wal/-shm/-journal companions into a bounded, verified
++ * quarantine directory (see {@link #preserveBeforeRecoveryAttempt()}) — additive only, never
++ * touching the original — then retry the open exactly as before, with NO deletion at any
++ * point. If the database still cannot be opened, {@link #ensureDatabase()} now returns false
++ * (its own pre-existing, already-handled contract — see AsyncStorageModule's own
++ * `if (!ensureDatabase())` call sites) instead of deleting anything: the application being
++ * unable to load a save is the accepted outcome, never destroying it to force a boot.
+  */
+ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+ 
+@@ -37,6 +70,13 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+           VALUE_COLUMN + " TEXT NOT NULL" +
+           ")";
+ 
++  // ⚠ TARTARIA OWNER PATCH — bounded quarantine for a database that failed to open. Kept
++  // small on purpose (owner rule: "no unlimited uncontrolled backup growth"), same shape as
++  // OTA-1888's JS-level MAX_SNAPSHOTS.
++  static final String PRESERVE_DIR_NAME = "rkstorage_preserve";
++  static final int MAX_PRESERVED_INCIDENTS = 3;
++  private static final String[] PRESERVABLE_SUFFIXES = {"", "-wal", "-shm", "-journal"};
++
+   private static @Nullable ReactDatabaseSupplier sReactDatabaseSupplierInstance;
+ 
+   private Context mContext;
+@@ -70,23 +110,31 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+ 
+   /**
+    * Verify the database exists and is open.
++   *
++   * ⚠ TARTARIA OWNER PATCH — see the class-level note. A failed open no longer deletes
++   * anything: the first failure triggers a best-effort, verified quarantine copy of the
++   * original files, then every retry is a plain re-open attempt with no deletion. If the
++   * database still cannot be opened, this returns false (a contract every caller in
++   * AsyncStorageModule already handles) instead of destroying the only copy to recreate one.
+    */
+   /* package */ synchronized boolean ensureDatabase() {
+     if (mDb != null && mDb.isOpen()) {
+       return true;
+     }
+-    // Sometimes retrieving the database fails. We do 2 retries: first without database deletion
+-    // and then with deletion.
+     SQLiteException lastSQLiteException = null;
++    boolean preserved = false;
+     for (int tries = 0; tries < 2; tries++) {
+       try {
+-        if (tries > 0) {
+-          deleteDatabase();
+-        }
+         mDb = getWritableDatabase();
+         break;
+       } catch (SQLiteException e) {
+         lastSQLiteException = e;
++        if (!preserved) {
++          // Preserve BEFORE the retry, not after — the retry itself must never be the thing
++          // that first sees a corrupted file with no copy of it anywhere yet.
++          preserveBeforeRecoveryAttempt();
++          preserved = true;
++        }
+       }
+       // Wait before retrying.
+       try {
+@@ -96,7 +144,12 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+       }
+     }
+     if (mDb == null) {
+-      throw lastSQLiteException;
++      FLog.e(
++          ReactConstants.TAG,
++          "RKStorage could not be opened after a verified quarantine copy and a retry. "
++              + "Refusing to delete the original — failing safely instead.",
++          lastSQLiteException);
++      return false;
+     }
+     // This is a sane limit to protect the user from the app storing too much data in the database.
+     // This also protects the database from filling up the disk cache and becoming malformed
+@@ -105,11 +158,131 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+     return true;
+   }
+ 
++  /**
++   * ⚠ TARTARIA OWNER PATCH — best-effort, additive-only preservation of a database that just
++   * failed to open. Copies {@code RKStorage} and any present {@code -wal}/{@code -shm}/
++   * {@code -journal} companions into a new, timestamped incident directory under this app's
++   * files dir, verifying each copy by CRC32 before trusting it, then prunes only incidents
++   * older than {@link #MAX_PRESERVED_INCIDENTS}. Never deletes, moves, or opens the ORIGINAL
++   * files for anything beyond a read — and any failure in here is swallowed: a broken
++   * preservation attempt must never change the caller's own no-delete behavior.
++   */
++  private void preserveBeforeRecoveryAttempt() {
++    try {
++      File dbFile = mContext.getDatabasePath(DATABASE_NAME);
++      File dbDir = dbFile.getParentFile();
++      if (dbDir == null) {
++        return;
++      }
++      File preserveRoot = new File(mContext.getFilesDir(), PRESERVE_DIR_NAME);
++      if (!preserveRoot.exists() && !preserveRoot.mkdirs()) {
++        FLog.w(ReactConstants.TAG, "RKStorage preservation: could not create quarantine root — original left untouched.");
++        return;
++      }
++      File incidentDir = new File(preserveRoot, "incident_" + System.currentTimeMillis());
++      if (!incidentDir.mkdirs()) {
++        FLog.w(ReactConstants.TAG, "RKStorage preservation: could not create incident dir — original left untouched.");
++        return;
++      }
++
++      int preservedCount = 0;
++      for (String suffix : PRESERVABLE_SUFFIXES) {
++        File source = new File(dbDir, DATABASE_NAME + suffix);
++        if (!source.exists()) {
++          continue;
++        }
++        File dest = new File(incidentDir, DATABASE_NAME + suffix);
++        if (copyFileVerified(source, dest)) {
++          preservedCount++;
++        } else {
++          FLog.w(ReactConstants.TAG, "RKStorage preservation: verified copy failed for " + source.getName() + " — original itself is untouched regardless.");
++        }
++      }
++      FLog.w(ReactConstants.TAG, "RKStorage failed to open — preserved " + preservedCount
++          + " file(s) to " + incidentDir + " before any retry. The original was not modified.");
++
++      prunePreservedIncidents(preserveRoot);
++    } catch (Exception e) {
++      // Best-effort only. A failed preservation attempt changes nothing about ensureDatabase()'s
++      // own no-delete guarantee — it only means this one quarantine copy did not get made.
++      FLog.w(ReactConstants.TAG, "RKStorage preservation attempt threw (non-fatal, original untouched): " + e);
++    }
++  }
++
++  private static boolean copyFileVerified(File source, File dest) {
++    long sourceCrc;
++    try {
++      sourceCrc = crc32Of(source);
++    } catch (IOException e) {
++      return false;
++    }
++    try (FileInputStream in = new FileInputStream(source);
++         FileOutputStream out = new FileOutputStream(dest)) {
++      byte[] buffer = new byte[8192];
++      int read;
++      while ((read = in.read(buffer)) != -1) {
++        out.write(buffer, 0, read);
++      }
++    } catch (IOException e) {
++      return false;
++    }
++    long destCrc;
++    try {
++      destCrc = crc32Of(dest);
++    } catch (IOException e) {
++      return false;
++    }
++    return sourceCrc == destCrc && dest.length() == source.length();
++  }
++
++  private static long crc32Of(File file) throws IOException {
++    CRC32 crc = new CRC32();
++    try (FileInputStream in = new FileInputStream(file)) {
++      byte[] buffer = new byte[8192];
++      int read;
++      while ((read = in.read(buffer)) != -1) {
++        crc.update(buffer, 0, read);
++      }
++    }
++    return crc.getValue();
++  }
++
++  private static void prunePreservedIncidents(File preserveRoot) {
++    File[] incidents = preserveRoot.listFiles(File::isDirectory);
++    if (incidents == null || incidents.length <= MAX_PRESERVED_INCIDENTS) {
++      return;
++    }
++    Arrays.sort(incidents, Comparator.comparingLong(File::lastModified));
++    int overflow = incidents.length - MAX_PRESERVED_INCIDENTS;
++    for (int i = 0; i < overflow; i++) {
++      deleteRecursive(incidents[i]);
++    }
++  }
++
++  private static void deleteRecursive(File f) {
++    File[] children = f.listFiles();
++    if (children != null) {
++      for (File child : children) {
++        deleteRecursive(child);
++      }
++    }
++    f.delete();
++  }
++
+   /**
+    * Create and/or open the database.
++   *
++   * ⚠ TARTARIA OWNER PATCH — {@link #ensureDatabase()} now returns false instead of throwing
++   * on a failed open. Re-thrown here (rather than returning a null SQLiteDatabase) so every
++   * existing caller of {@code get()} keeps its original contract: either a valid, open
++   * database, or an exception — never a silent null.
+    */
+   public synchronized SQLiteDatabase get() {
+-    ensureDatabase();
++    if (!ensureDatabase()) {
++      throw new RuntimeException(
++          "RKStorage could not be opened; it was preserved rather than deleted. See the "
++              + "preceding log line for the quarantine location.");
++    }
+     return mDb;
+   }
+ 

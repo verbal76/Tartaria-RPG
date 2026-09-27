@@ -24,22 +24,28 @@
 //   · So the JS-level slot system already satisfies "parse failure is not
 //     delete authority" for its OWN format. The evidenced gap is NOT here.
 //
-// THE EVIDENCED GAP is one layer down, in the native storage engine itself,
-// and it is the same shape on both platforms even though the mechanisms
-// differ:
-//   · Android: @react-native-async-storage/async-storage's own
-//     `next/StorageSupplier.kt` runs a ONE-TIME `db.createFromFile(oldDbFile)`
-//     migration from the legacy SQLite engine (`RKStorage`) to the new Room
-//     engine, with no visible handling of SQLite's `-wal`/`-shm` companion
-//     files — read directly from the installed library source during the
-//     OTA-1886/1887 investigation.
+// THE EVIDENCED GAP is one layer down, in the native storage engine itself.
+// ⚠ CORRECTED BY OTA-1889 — the Android bullet below was wrong when this
+// file was first written; see OTA-1889's header in app/buildInfo.ts for the
+// full correction and the actual native fix (a patch-package patch to
+// ReactDatabaseSupplier.java):
+//   · Android: there is NO SQLite→Room migration to protect. Async-storage's
+//     Room ("next") engine is opt-in (`AsyncStorage_useNextStorage`, default
+//     false) and nothing in this repo ever turns it on — `ReactDatabaseSupplier`
+//     (RKStorage/`catalystLocalStorage`) is the ONLY Android engine Tartaria
+//     has ever compiled. The real, fixed-by-OTA-1889 defect was
+//     `ensureDatabase()`'s own unconditional `deleteDatabase()` on a second
+//     failed open — a corrupted/unopenable RKStorage was wiped and recreated
+//     empty, inside native module init, before this very file could run.
 //   · iOS: `RNCAsyncStorage.mm`'s `RCTStorageDirectoryMigrationCheck` can
 //     `removeItemAtPath:` the NEWER storage directory and overwrite it from
 //     the OLDER one, decided purely by comparing `manifest.json`
-//     modification timestamps — a heuristic, not a correctness proof.
+//     modification timestamps — a heuristic, not a correctness proof. This
+//     one is real and unconditional (confirmed: no feature flag gates it).
 //   · BOTH of these run inside native module init, BEFORE any JS in this
 //     app — including this file — ever executes. Nothing at the JS layer
-//     can intercept or prevent either one.
+//     can intercept or prevent either one directly — which is exactly why
+//     OTA-1889's Android fix had to be a native patch, not a JS one.
 //
 // So the only thing JS CAN durably do is make sure that, on every boot,
 // BEFORE anything else touches a slot, a verified copy of everything

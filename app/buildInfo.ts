@@ -32055,15 +32055,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * the slot"; `deleteSlot` is reached ONLY from an explicit player action.
  * No version check anywhere deletes a save for being unrecognized.
  *
- * The evidenced gap is one layer down, in the NATIVE storage engine, and it
- * is the same shape on both platforms though the mechanism differs:
- *   · Android: @react-native-async-storage/async-storage's own
- *     next/StorageSupplier.kt runs a one-time SQLite→Room migration
- *     (`createFromFile`) with no visible handling of the legacy engine's
- *     `-wal`/`-shm` companion files (the OTA-1886/1887 finding).
+ * The evidenced gap is one layer down, in the NATIVE storage engine. ⚠
+ * CORRECTED BY OTA-1889 (the Android bullet below was wrong in this OTA's
+ * original text — see OTA-1889's own header for the full correction and
+ * the actual native fix):
+ *   · Android: @react-native-async-storage/async-storage's opt-in Room
+ *     ("next") engine — the SQLite→Room `createFromFile` migration this
+ *     OTA originally described — is NEVER COMPILED into any Tartaria
+ *     Android build (`AsyncStorage_useNextStorage` defaults to false and
+ *     nothing in this repo ever sets it; verified against config.gradle
+ *     and every plugin/app.json in this repo). `ReactDatabaseSupplier`
+ *     (RKStorage/`catalystLocalStorage`) is the ONLY Android engine
+ *     Tartaria has ever shipped — there is no SQLite→Room migration to
+ *     protect here. The real Android risk, found and fixed by OTA-1889, is
+ *     `ReactDatabaseSupplier.ensureDatabase()`'s own unconditional
+ *     `deleteDatabase()` on a second failed open.
  *   · iOS: RNCAsyncStorage.mm can `removeItemAtPath:` one storage directory
  *     and overwrite it from another, decided by comparing manifest.json
- *     modification timestamps — a heuristic, not a correctness proof.
+ *     modification timestamps — a heuristic, not a correctness proof. This
+ *     one runs unconditionally, confirmed by reading its only call site
+ *     (`-init`, no feature flag).
  * Both run inside native module init, before any JS — including this
  * app's — ever executes, so nothing at the JS layer can intercept either
  * one directly.
@@ -32095,7 +32106,89 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * iOS directory-migration transition end-to-end on real hardware — that
  * requires a native build this diagnostic-and-safeguard turn does not
  * initiate. See the SAVE PRESERVATION REPORT for what that would require. */
-export const OTA_BUILD_ID = '2026-09-27-1888-the-save-is-never-the-price-of-an-update';
+/** ⚠⚠⚠ OTA-1889 — THE NATIVE DOOR NEVER TRADES THE SAVE FOR A BOOT.
+ *
+ * Continuing OTA-1888's physical-proof pass: forensics FIRST, per the
+ * owner's own instruction, rather than assuming the previous OTA's Android
+ * premise. Reading the real, installed async-storage@2.2.0 source (not
+ * assuming symmetry with iOS) found two things:
+ *
+ * CORRECTION — Android never runs a SQLite→Room migration. The Room
+ * ("next") engine (`android/src/main/java/.../next/StorageSupplier.kt`) is
+ * gated by `AsyncStorage_useNextStorage`, default false. Traced every
+ * config surface in this repo — app.json, eas.json, every file in
+ * plugins/, the expo-build-properties plugin block — and none of them
+ * ever sets it; there is no committed `android/` prebuild dir either. When
+ * that flag is false, `build.gradle`'s own sourceSets never even add the
+ * Kotlin/Room sourceset to the build. `ReactDatabaseSupplier`
+ * (RKStorage/`catalystLocalStorage`) is therefore the ONLY Android engine
+ * Tartaria's build has ever compiled — RKStorage is not "legacy", it is
+ * the only store. OTA-1886/1887/1888's own text describing an active
+ * SQLite→Room migration was wrong; corrected in OTA-1888's header above,
+ * and OTA-1886/1887's own module headers stay historical (they preserved
+ * and read RKStorage correctly regardless of which migration theory
+ * motivated them — that work is unaffected).
+ *
+ * THE REAL DEFECT — `ReactDatabaseSupplier.ensureDatabase()` retried a
+ * failed open exactly once, and on that second failure called
+ * `deleteDatabase()` UNCONDITIONALLY before recreating an empty database —
+ * wiping the player's only Android save the moment SQLite couldn't open
+ * the file (corruption, a disk-full write, a killed process mid-write).
+ * This runs inside native module init, before any JS in this app —
+ * including OTA-1888's own boot-time preservation snapshot — ever
+ * executes, so nothing at the JS layer could see or prevent it: OTA-1888's
+ * safeguard depends on the very native call this defect could destroy
+ * data inside of.
+ *
+ * OWNER RULING: fix it, don't document it as residual risk. Evaluated and
+ * rejected upgrading async-storage (3.x removes the `useNextStorage` flag
+ * entirely and makes an actual Room-family migration mandatory — exactly
+ * the "unrelated storage-engine transition" the owner ruled out; also a
+ * full package/namespace rewrite, `org.asyncstorage`, disqualifying on its
+ * own for a narrow repair). Chose a patch-package patch — infrastructure
+ * already established in this repo for llama.rn and onnxruntime-react-
+ * native — as the smallest durable, auditable, reinstall-resistant fix.
+ *
+ * patches/@react-native-async-storage+async-storage+2.2.0.patch removes
+ * the `deleteDatabase()` call from `ensureDatabase()` entirely. On a failed
+ * open it now preserves a CRC32-verified quarantine copy of RKStorage and
+ * any present `-wal`/`-shm`/`-journal` companions (bounded to the 3 most
+ * recent incidents — same shape as OTA-1888's own MAX_SNAPSHOTS) BEFORE
+ * retrying, then retries with no deletion at any point. If the database
+ * still cannot be opened, `ensureDatabase()` returns false — the exact
+ * contract every caller in `AsyncStorageModule.java` already handles via
+ * `if (!ensureDatabase())` — instead of destroying the only copy to force
+ * one open. `get()` still throws rather than handing back a null database,
+ * so no existing caller's contract silently changes. Deliberately does NOT
+ * add automatic row-level recovery machinery (e.g. an ATTACH-based rebuild)
+ * — untestable in this environment and broader than the evidence justifies;
+ * the owner's own words: "the application being unable to load a save is
+ * preferable to permanently destroying that save." Verified the patch
+ * reapplies cleanly from a pristine reinstall via this repo's own
+ * `postinstall: patch-package` (already proven for the two existing
+ * patches in the same run).
+ *
+ * ota1889NativeStorageNeverDeletesToBoot: 12/12 — reads the ACTUAL patched
+ * file `npm ci` leaves on disk (the one that ships), proving no call to
+ * `deleteDatabase()` survives anywhere in `ensureDatabase()`'s body,
+ * preservation happens before every retry, the terminal failure branch
+ * returns false rather than throwing, the preservation method copies and
+ * verifies every WAL/SHM/journal companion without ever calling `.delete()`
+ * or `deleteDatabase()` itself, quarantine rotation is bounded, `get()`
+ * still throws on failure, the patch file and postinstall wiring exist,
+ * and `AsyncStorage_useNextStorage` is still false everywhere in this
+ * repo's own config. Proven as a REAL gate, not a rubber stamp: swapped in
+ * the unpatched upstream file as a negative control — 8/12 tests went red
+ * — then restored the patch and confirmed 12/12 green again.
+ *
+ * NOT CLAIMED: this patch has not yet been exercised inside an actual
+ * compiled Android build (no Android SDK/JDK/emulator in this environment
+ * — verified: no /dev/kvm, no adb, no Android SDK). The Golem-only native
+ * test build authorized by the owner is the first real compile of this
+ * code; see the SAVE PRESERVATION REPORT for the exact physical-acceptance
+ * procedure prepared for the owner's own device. */
+export const OTA_BUILD_ID = '2026-09-27-1889-the-native-door-never-trades-the-save';
+// SUPERSEDED: '2026-09-27-1888-the-save-is-never-the-price-of-an-update'
 // SUPERSEDED: '2026-09-27-1887-the-copy-speaks-for-itself'
 // SUPERSEDED: '2026-09-26-1886-the-copy-proves-itself-before-it-speaks'
 // SUPERSEDED: '2026-09-26-1885-the-probe-that-cannot-change-what-it-finds'
