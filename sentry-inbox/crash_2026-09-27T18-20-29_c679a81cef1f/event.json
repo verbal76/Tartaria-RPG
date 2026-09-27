@@ -1,0 +1,352 @@
+{
+  "id": "c679a81cef1f4567a3927a93b45b2a82",
+  "groupID": "7742311625",
+  "eventID": "c679a81cef1f4567a3927a93b45b2a82",
+  "projectID": "4511945117532160",
+  "size": 5706,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Previous process disappeared while backgrounded during play \u2014 last: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-27-1889-the-native-door-never-trades-the-save",
+  "message": "Previous process disappeared while backgrounded during play \u2014 last: (no action yet)",
+  "title": "Previous process disappeared while backgrounded during play \u2014 last: (no action yet)",
+  "location": null,
+  "user": {
+    "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-09-27T18:54:24.889Z",
+      "app_identifier": "com.hotatticgames.tartarprim.golem",
+      "app_name": "Golem",
+      "app_version": "2.5.0",
+      "app_build": "474",
+      "in_foreground": true,
+      "is_split_apks": false,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP2A.260805.005",
+      "battery_level": 61.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331833344,
+      "free_memory": 3061407744,
+      "storage_size": 245292421120,
+      "free_storage": 53748785152,
+      "boot_time": "2026-09-23T01:48:52.100Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "29.799999237060547",
+      "chipset": "Google Tensor G5",
+      "connection_type": "cellular",
+      "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP2A.260805.005",
+      "kernel_version": "6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "golem-line",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 19,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0e3a0-dde8-769f-b838-7bef75a07a87"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "24126e0a1acf4a4b9ea1a9787298c107",
+      "span_id": "b0ea51fc6559da11",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "actionAgeMs": 82391,
+    "id": "1790533229506_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "appstate:background\u2192active",
+    "lastPhaseAgeMs": 2983,
+    "lastScreen": "exploration",
+    "launchAfterOta": true,
+    "launchAgeMs": 144564,
+    "launchCtx": "o1/r0/l1/p1/dn0",
+    "launchOtaGapMs": 507,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "no",
+    "sinceBootMs": 144564,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Previous process disappeared while backgrounded during play \u2014 last: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "impact",
+      "value": "background-active"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "warning"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP2A.260805.005"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "stage",
+      "value": "appstate:background\u2192active"
+    },
+    {
+      "key": "user",
+      "value": "id:9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "query": "user.id:\"9a8a8c0079ee4e8eba37ffa9f098cee1\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-27T18:54:25.006517Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-27T18:20:29.506000Z",
+  "fingerprints": [
+    "e19ceed35483d43c6d9a21abafa8e1f1"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1995104786,
+    "commitCount": 10,
+    "data": {},
+    "dateCreated": "2026-09-27T02:30:53.623699Z",
+    "dateReleased": "2026-09-27T19:01:52.659942Z",
+    "deployCount": 8,
+    "ref": null,
+    "lastCommit": {
+      "id": "50edd5ae119952360a91f30a95f27bd7a3d4c171",
+      "message": "QOL #220 FINAL PHYSICAL LAYOUT CORRECTION \u2014 the effect unit sits beside AC, not below the whole stat block\n\nRoot cause: the developed-glyph effect unit (effectGlyphRow) was a literal\nsibling <View> rendered between statGrid and defs, so any active effect\ninserted a standalone vertical row beneath HP/AC/ATK/DMG and pushed\nWEAK/DEF/RESIST/DEALS/STRIKES downward \u2014 confirmed against the owner's\nphysical Golem screenshot, which showed AC with substantial unused\nhorizontal space to its right instead.\n\nFix: wrapped statGrid and the conditional effectGlyphRow in a shared\nstatRow flex container (flexDirection: row, alignItems: flex-start).\nstatGrid now takes flex:1, so with no effect present the row renders\nbyte-identical to the old layout; with one effect present, the glyph\ncolumn sits beside the stat grid instead of below it. The glyph+status\ncolumn's own height (22dp glyph + two ~9dp status lines) stays within the\nstat grid's natural two-row height, so adding or removing one effect does\nnot change the row's total height \u2014 WEAK/DEALS/STRIKES no longer move.\nMultiple simultaneous effects wrap horizontally within effectGlyphRow,\neach keeping its own magnitude/duration centered underneath, no shared\nlower chip.\n\nAlso enlarged the compact-card glyph 16dp -> 22dp (effectGlyphArt) so it\nreads as a deliberate status emblem at normal viewing distance on device,\nstill well under the 28dp GLYPH_ART_SIZE.combat reference used elsewhere.\nMagnitude/duration text size is unchanged \u2014 only the glyph grew. No change\nto which glyph is selected, the six developed glyph mappings, effect\nmechanics/magnitude/duration, status semantics, expanded-card behavior,\nenemy weapon coating behavior, or knowledge/discovery rules.\n\nAdded testID=\"enemy-stat-row\" / \"enemy-stat-grid\" / \"enemy-defs\" (compact\ncard only) purely for structural test discoverability, matching the\nexisting enemy-effect-glyph-${coatingKind} convention.\n\nRegression: new geometry suite in\nqol220AcAdjacentEffectIndicator.test.tsx, cases A-F (no effect / one acid\neffect / one other effect / multiple effects / expiration / height-position\ncontract), using a hop-count-agnostic ancestor-membership check\n(isDescendantOf) rather than brittle fixed-depth .parent chains, because\nRN's composite-wrapper/host-node pairing for View/Image made naive\n.parent.parent.parent traversal unreliable. Negative control: temporarily\nrestored the old sibling-row structure in production code -> the 5\nstructural cases went RED; reverted -> full 29/29 suite GREEN.\n\nValidation: focused suite 29/29; governed gates (storeceiling, quotedpins,\notastamp, kitexports) green; typecheck:ci clean; typecheck:tests clean at\nbaseline; lint clean; full fast suite 1435/1435 suites, 16636/16639 tests\n(3 pre-existing skips), 0 failures.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-27T18:54:52Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+          "shortVersion": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-27T19:01:52.659942Z",
+          "dateCreated": "2026-09-27T02:30:53.623699Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "162501729",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-27T19:01:53.006035Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-27-1889-the-native-door-never-trades-the-save",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-27-1889-the-native-door-never-trades-the-save)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.28.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "df14b8106a8d4216a67a22bf1c349189"
+}
