@@ -9,7 +9,10 @@ import {
   traitDefenses,
   describeTrait,
   describeTraits,
+  portraitTraitChips,
+  enemyIsAerial,
 } from '../app/engine/enemyTraits';
+import { isAetherkin } from '../app/engine/aetherkin';
 import { enemyTypeDefenses } from '../app/engine/crafting';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -154,6 +157,58 @@ describe('describeTrait / describeTraits', () => {
       'Armored — +2 to its own Armor Class · Quick — +1 to its own attack rolls; 12% chance to dodge your attacks',
     );
     expect(describeTraits([])).toBe('');
+  });
+});
+
+describe('aerial / aetherkin — adjacent presentation finding from the enemy conditional-effect class audit', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const raw = JSON.parse(readFileSync(join(__dirname, '../app/data/enemies/enemies.json'), 'utf8'));
+  const ROSTER: Array<{ name: string; traits?: string[] }> =
+    Array.isArray(raw) ? raw : (Object.values(raw).find((v) => Array.isArray(v)) as typeof raw);
+
+  it('⚠ both traits are reachable in the real bestiary, not hypothetical', () => {
+    const aerialEnemies = ROSTER.filter((e) => (e.traits ?? []).includes('aerial')).map((e) => e.name);
+    const aetherkinEnemies = ROSTER.filter((e) => (e.traits ?? []).includes('aetherkin')).map((e) => e.name);
+    expect(aerialEnemies.length).toBeGreaterThan(0);
+    expect(aetherkinEnemies.length).toBeGreaterThan(0);
+  });
+
+  it('⚠ aerial no longer falls through to the raw id — the label states its real mechanics', () => {
+    const label = describeTrait('aerial');
+    expect(label).not.toBe('aerial');
+    // the three real production consequences (dogCanAct, escapePursuit +3,
+    // weaponEffects' 'aerial' bonus condition) — stated in plain language,
+    // not invented.
+    expect(label).toContain('dog');
+    expect(label).toContain('outrun');
+    expect(label).toContain('ranged weapons');
+  });
+
+  it('⚠ aetherkin no longer falls through to the raw id — the label states its real consequence', () => {
+    const label = describeTrait('aetherkin');
+    expect(label).not.toBe('aetherkin');
+    // AETHERKIN_KILL_REP / AETHERKIN_SPARE_REP — a real reputation swing,
+    // not lore alone.
+    expect(label).toContain('standing');
+    expect(label).toContain('talking it down');
+  });
+
+  it('portraitTraitChips still carries both through unfiltered — the repair changed the LABEL, not the filter', () => {
+    expect(portraitTraitChips(['aerial'], false)).toEqual(['aerial']);
+    expect(portraitTraitChips(['aetherkin'], false)).toEqual(['aetherkin']);
+  });
+
+  it('the trait alone (with no name/type hint) is sufficient to make enemyIsAerial / isAetherkin true — proving the label describes the same signal the mechanics read', () => {
+    expect(enemyIsAerial({ traits: ['aerial'], name: 'Unnamed Thing', type: 'Nothing Special' })).toBe(true);
+    expect(isAetherkin({ traits: ['aetherkin'], name: 'Unnamed Thing' })).toBe(true);
+  });
+
+  it('internal markers stay filtered and unrelated trait descriptions stay unchanged (no broadening)', () => {
+    expect(portraitTraitChips(['profiled', 'static_power_scaled', 'aerial'], false)).toEqual(['aerial']);
+    expect(describeTrait('armored')).toBe('Armored — +2 to its own Armor Class');
+    expect(describeTrait('bleeder')).toBe(
+      'Bleeder — each successful hit has a 50% chance to inflict Bleed on you for 3 rounds',
+    );
   });
 });
 

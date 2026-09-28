@@ -315,6 +315,19 @@ const TRAIT_LABEL: Record<string, string> = {
   regenerate: 'Regenerate — heals itself 1 HP each round',
   fast_regen: 'Fast Regen — heals itself 2 HP each round',
   ambush_strike: 'Ambusher — +2 to its attack roll on the first successful strike it lands on you',
+  // ⚠ Owner-directed presentation repair (adjacent finding from the enemy
+  // conditional-effect class audit): `aerial` had no label at all, so a
+  // portrait carrying it fell through to the raw id. It is a real mechanic
+  // (enemyIsAerial), not decoration: dogCanAct refuses the dog against it,
+  // escapePursuit gives it +3 to the contested-flee speed check, and it is
+  // the condition some ranged weapons' authored "+Nd6 vs airborne" effect
+  // reads for their bonus.
+  aerial: 'Aerial — your dog cannot reach it, it is harder to outrun, and some ranged weapons carry a bonus against it',
+  // ⚠ Same audit, same reason: `aetherkin` had no label either. isAetherkin()
+  // gates a real reputation consequence — AETHERKIN_KILL_REP docks standing
+  // with the factions that revere the Aetherkin on a kill, AETHERKIN_SPARE_REP
+  // credits it on a successful talk-down — so this is not lore alone.
+  aetherkin: 'Aetherkin — one of the flood-dead; killing it costs standing with the factions that revere them (talking it down does not)',
 };
 
 export function describeTrait(t: string): string {
