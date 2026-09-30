@@ -1,13 +1,6 @@
 
 ════ VERDICT ════
-  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
-    issue 7753692441 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7751798676 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7751694649 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7749031861 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7743237123 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7742929980 events FAILED: HTTP Error 429: Too Many Requests
-    issue 7727458587 events FAILED: HTTP Error 429: Too Many Requests
+  every fetch this run succeeded
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
     1 page(s), 5 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7690450029/events/?full=false
@@ -22,6 +15,8 @@
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7727458548/events/?full=false
     1 page(s), 7 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7727458587/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7727458621/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7727458630/events/?full=false
@@ -100,6 +95,8 @@
     1 page(s), 4 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7742929823/events/?full=false
     1 page(s), 8 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7742929980/events/?full=false
+    1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7742930043/events/?full=false
     1 page(s), 12 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7743129773/events/?full=false
@@ -108,6 +105,8 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7743237089/events/?full=false
     1 page(s), 30 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7743237123/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7743237253/events/?full=false
     1 page(s), 15 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7743237268/events/?full=false
@@ -152,6 +151,8 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7749031846/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7749031861/events/?full=false
+    1 page(s), 11 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7749413788/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7749413807/events/?full=false
@@ -162,8 +163,12 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7751694628/events/?full=false
     1 page(s), 10 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7751694649/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7751798640/events/?full=false
     1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7751798676/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7753356791/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /organizations/hot-attic-games-llc/issues/7753358685/events/?full=false
@@ -186,6 +191,8 @@
     1 page(s), 29 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7753392999/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7753692441/events/?full=false
+    1 page(s), 56 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7753692462/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7757090086/events/?full=false
