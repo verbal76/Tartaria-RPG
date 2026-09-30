@@ -1,12 +1,11 @@
 
 ════ VERDICT ════
-  every fetch this run succeeded
+  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
+    issue 7700061579 events FAILED: HTTP Error 429: Too Many Requests
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
     1 page(s), 5 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7690450029/events/?full=false
     1 page(s), 22 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
-    1 page(s), 6 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713395354/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7717706963/events/?full=false
