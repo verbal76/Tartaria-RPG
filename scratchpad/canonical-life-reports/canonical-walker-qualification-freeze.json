@@ -1,0 +1,130 @@
+{
+  "receiptType": "CANONICAL_WALKER_QUALIFICATION_FREEZE",
+  "qualificationDateTime": "2026-09-28T15:21:20Z",
+  "productionSha": "6f8110099e4ebcd8cc0adf32efd0f81bdeff8da3",
+  "branch": "golem-line",
+  "worktree": "/tmp/hunt",
+  "canonicalWalkerQualifiedId": "sha256:908ecd47ebd7ca9c7f4eddbdd33ad4bf1d1ecef836ea0b93470491cc652fda5d",
+  "manifest": [
+    {
+      "path": "test-utils/canonical/CanonicalWalker.ts",
+      "size": 18687,
+      "sha256": "dc6ac2db3a9dcf2e71be03044ff686e87a90ba83dd9d5cc0ae18dfedfa622018"
+    },
+    {
+      "path": "test-utils/canonical/actionExecutor.ts",
+      "size": 31947,
+      "sha256": "c2499b96623afaae0ecd39958ba449bd96ca01d7d60e60dcbc458bbc20b28c43"
+    },
+    {
+      "path": "test-utils/canonical/artifactIdentity.ts",
+      "size": 2832,
+      "sha256": "b1ffac3dad73045cce79eabf52ef5b9ff9f2149369a984bd567dce37848c2fdd"
+    },
+    {
+      "path": "test-utils/canonical/bootHelpers.ts",
+      "size": 4632,
+      "sha256": "ffefb9e0da913e60ef762b7d26674fece50e4d29169c6f60979056e3b74038b8"
+    },
+    {
+      "path": "test-utils/canonical/combatLoop.ts",
+      "size": 9546,
+      "sha256": "87928db7ab059e404ab4731b1fc4e5ac219ae56712a3e590b56f856ca81f7d67"
+    },
+    {
+      "path": "test-utils/canonical/decisionJournal.ts",
+      "size": 1453,
+      "sha256": "c703675606c3d1b2a43f228f5846ef8fa74c0673034ae3316699b352e87c660a"
+    },
+    {
+      "path": "test-utils/canonical/dice.ts",
+      "size": 1864,
+      "sha256": "b1ddb5f0b2580b9dac589a660834928a492cbbb82695b422a9cc6d7d937fafbd"
+    },
+    {
+      "path": "test-utils/canonical/guardianApproachOptions.ts",
+      "size": 4065,
+      "sha256": "acf9c616891c4950e15592812b0e20cb9a20ed3da43e5fab0de152519183684a"
+    },
+    {
+      "path": "test-utils/canonical/hostProfile.ts",
+      "size": 9831,
+      "sha256": "a49b7b759ee7d647b6d0de76766be2882bc2921be3b80ff182c3bff46d3a0e71"
+    },
+    {
+      "path": "test-utils/canonical/logMirror.ts",
+      "size": 1969,
+      "sha256": "8ab6165ab1eb11f6193ca92e96eff059691a995cea003bd682d22da5c64c0126"
+    },
+    {
+      "path": "test-utils/canonical/playerView.ts",
+      "size": 12798,
+      "sha256": "6c582f23fe5c44f6a09a0c79c5d097982d41a459cddaaa4201fa9b323c9300c2"
+    },
+    {
+      "path": "test-utils/canonical/policy.ts",
+      "size": 27308,
+      "sha256": "a9c90243355719dedc2ab799c5162be9c22cdcbc5b44503bc857262b19952eb4"
+    },
+    {
+      "path": "test-utils/canonical/presentation.ts",
+      "size": 2615,
+      "sha256": "df9b0a58df65201dbd9bac8ef6b01fcacd58ccba376c486412db9e4d39838aac"
+    },
+    {
+      "path": "test-utils/canonical/qualification.ts",
+      "size": 1359,
+      "sha256": "f2517aada351b386a3a2a928fa9efe946eb76b43bbb20644daa214e1baa74626"
+    },
+    {
+      "path": "test-utils/canonical/rngLedger.ts",
+      "size": 2564,
+      "sha256": "148215943e89ffe7538bf7264aa60f4888294835aed605640ca4d29d52585eca"
+    },
+    {
+      "path": "test-utils/canonical/snapshot.ts",
+      "size": 2600,
+      "sha256": "774cdff26b5f54131485d03475507966b6543f10764c894070b9fdcf79b6c43a"
+    },
+    {
+      "path": "test-utils/canonical/storeDiffer.ts",
+      "size": 4083,
+      "sha256": "fcbe40ff4bd8a3a38a2786e358a776a07d2750f34bc847ef371f1cccee715e27"
+    },
+    {
+      "path": "test-utils/canonical/virtualClock.ts",
+      "size": 3781,
+      "sha256": "bb2609712ac226777758fbfe7178ebfa6cafba5c24aece8c9b1c7f67b8678510"
+    },
+    {
+      "path": "test-utils/playerWalker.ts",
+      "size": 85790,
+      "sha256": "d5461c5952ce4a177f55e5b2d00fce18d4d30a9d0aebefefa1b0c12cfd7842db"
+    }
+  ],
+  "manifestAggregateAlgorithm": "1) For each file in the fixed 19-file manifest below, compute SHA-256 of its exact raw bytes. 2) Sort the manifest by relative repo-root path (ASCII/codepoint sort). 3) Build the aggregate input string by concatenating, in that sorted order, one line per file formatted exactly as '<relativePath>:<sha256hex>\\n' (no other separators, no trailing blank line beyond the final file's own newline). 4) CANONICAL_WALKER_QUALIFIED_ID = 'sha256:' + hex(SHA-256(aggregate input string, encoded UTF-8)). Recompute with: node scripts/canonicalWalkerQualifiedId.mjs (prints the same value as this receipt's canonicalWalkerQualifiedId when the manifest is unchanged).",
+  "verdict": "QUALIFIED FOR CANONICAL LIFE 4",
+  "qualificationSummary": {
+    "productionDoorFidelity": "Every action category the Walker uses (attack/dodge/block/advance/retreat/flee/heal, travel, rest, equip, resurrection, Guardian summon) routes through a real production door via CanonicalActionExecutor. The one historical bypass (RCH-002, travel through live enemies) is closed and regression-tested (canonicalTravelEnemyGuard.test.ts).",
+    "observabilityFirewall": "policy.ts imports nothing but playerView.ts (statically proven, canonicalFirewallStatic.test.ts). Zero privileged/hidden-state fields reach decide()/buildOptions(). The forensic-only combat-log trace (CombatRoundTrace.logDelta) is proven never read by policy. Telemetry attachment proven not to perturb gameplay (canonicalObserverNonPerturbation.test.ts, identical RNG sequence/state with telemetry on vs off).",
+    "rngDeterminism": "Single seeded Math.random() stream, reseeded once per canonical boot via the OTA-1831-corrected __TARTARIA_RESEED_RANDOM__ hook. No forced die results (canonicalDiceFidelity.test.ts). No stack-read side channel (canonicalRngNoStackReads.test.ts). Single, gapless stream per life (canonicalRngSingleStream.test.ts). Artifact-identity UUIDs (artifactIdentity.ts) use crypto.randomUUID(), a wholly separate source from gameplay RNG.",
+    "ordinaryCombatAndRangeReach": "Range/reach observability (PlayerViewEnemy.rangeLabel/mainHandReach) is built from the SAME production resolvers (enemyBandOf/playerWeaponReach) the real attack-reach gate and the real UI use \u2014 not a parallel mechanic. ADVANCE/RETREAT route through real submitPlayerAction('advance'|'retreat') -> runMoveCombatRange(), provoking real enemy counter-attacks. Proven in canonicalPlayerViewRangeReach.test.ts, canonicalActionExecutorMovement.test.ts, canonicalContextualCombatPolicy.test.ts, and demonstrated live in the Task-2 Life 3 reproduction (150-round stalemate -> 3-round ADVANCE/ADVANCE/counterattack/FLEE).",
+    "guardianCombatQualification": "Isolated qualification (this apparatus's Phase 13 experiment, not re-executed by this freeze task): a production-summoned Guardian (Sentinel-Priest Vaelka, Asgardar, tier 1) was carried through real production combat (real ADVANCE on a reach mismatch, real enemy counter-attack, real ATTACK resolution) to GUARDIAN_DEFEATED in 6 of a 300-round budget. Production's own death handler awarded the Core, marked the Guardian defeated, and advanced mainQuest.phase automatically -- no manual grant. The isolation fixture that placed the character at the summon seam was proven (canonicalGuardianCombatIsolationFixture.test.ts) to change zero combat-power fields and consume zero RNG draws.",
+    "evidenceArtifactPreservation": "Collision-safe evidence filenames (artifactIdentity.ts, crypto.randomUUID()-suffixed) prevent the virtualized-clock-driven filename collision that silently overwrote evidence before Task 2's fix. All prior life3-run and guardian-combat evidence files remain present and byte-unmodified."
+  },
+  "knownNonblockingLimitations": [
+    "1. Fresh-character natural survivability to Guardian 1 remains UNPROVEN. This is a Life 4 gameplay question, not an apparatus blocker. The one attempt under the unmodified canonical seed/creation (canonicalGuardianFightCompletion.test.ts, Phase 12) died to an ordinary wilderness encounter before reaching the summon seam; that RNG/creation identity was deliberately NOT varied to chase a friendlier journey, per owner instruction.",
+    "2. The Guardian 300-round ceiling remains UNCHANGED. One historical Guardian encounter (canonical Life 3, cycle 2) reached the 300-round cap without resolving. The current qualification (a 6-round Guardian kill) does NOT establish that 300 is universally sufficient, nor does the historical stall establish that it is insufficient -- both remain true, unreconciled facts.",
+    "3. Some executor coverage remains incomplete for player-reachable actions not required by the currently qualified canonical strategy (per docs/cartography/reachability.json: 14 of 48 rows show harnessMirrorsGate: NOT_IMPLEMENTED -- e.g. bulk sell/repair, armor coating, most companion doors). These are limitations (coverage gaps), not known bypasses -- nothing routes around production; some doors are simply not wired into the executor yet.",
+    "4. I-049 (combat heal-batch executor door) status is NOT promoted here. Per the most recent authoritative evidence (docs/cartography/harness-history.md, Phase 6), it remains FIXED_AWAITING_RETEST: the door was added and its wiring is unit-tested (canonicalHealBatchExecutorDoor.test.ts), but per the issue's own resolution field it 'has not been exercised in any real gameplay yet' and its qualification contract (QC-018) stays CONTRACT_DEFINED_NOT_REQUALIFIED.",
+    "5. The isolated Guardian fixture (test-utils/canonical/guardianCombatIsolationFixture.ts) is explicitly NOT evidence of successful natural travel to Asgardar or any capital. It is a category-A-only test-setup tool, deliberately excluded from the CANONICAL_WALKER_QUALIFIED_ID manifest above -- Life 4 must reach any Guardian through real, unshortened travel.",
+    "6. The isolated Guardian combat experiment (canonicalGuardianCombatIsolated.test.ts) was executed twice in the qualification task that produced this freeze -- once standalone, once as part of a combined validation invocation that included it after the standalone run. Both executions were fully deterministic (same seed, same fixture, same everything) and produced byte-identical qualification results (verified field-by-field: finalVerdict, terminal, roundsConsumed, startState, coreConsequence, isolationProof). This was not a rerun for a more favorable outcome, and it must not be executed again merely for confidence -- the evidence already on disk stands."
+  ],
+  "evidencePreservedNotReexecuted": [
+    "scratchpad/canonical-life-reports/life3-run-2026-01-01T09-00-07-500Z.{json,txt} (Task 1 baseline evidence)",
+    "scratchpad/canonical-life-reports/life3-run-2026-01-01T09-00-07-500Z-cdfc5f69-e286-41a1-9d98-674ece56f38b.{json,txt} (Task 2 range-repair reproduction)",
+    "scratchpad/canonical-life-reports/guardian-fight-completion-run-2026-01-01T09-00-13-500Z-{497d5dda,bb45ac7c,ebe05265}-*.{json,txt} (3 files -- canonicalGuardianFightCompletion.test.ts ran once standalone plus twice more as part of combined validation suites across two prior tasks; all 3 are byte-identical in substance -- finalVerdict/terminal/roundsConsumed/reachedCapital all equal -- a deterministic reproduction of the same wilderness-death result, not 3 different outcomes)",
+    "scratchpad/canonical-life-reports/guardian-combat-isolated-run-2026-01-01T09-00-30-000Z-{812ded28,9a8e0546}-*.{json,txt} (2 files, byte-identical -- see known limitation #6)"
+  ],
+  "governance": "The canonical apparatus remains INVESTIGATIVE/UNTRACKED, per the existing project practice confirmed in the prior requalification task (git log shows zero commits have ever touched test-utils/canonical/ or docs/cartography/ across this apparatus's entire recorded history). This freeze is cryptographic/evidentiary -- the manifest, hashes, and aggregate ID above -- not a commit. Nothing in this task was committed or pushed."
+}

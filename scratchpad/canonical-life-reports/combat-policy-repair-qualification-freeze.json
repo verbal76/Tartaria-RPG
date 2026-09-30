@@ -1,0 +1,115 @@
+{
+  "receiptName": "COMBAT POLICY REPAIR — QUALIFICATION FREEZE",
+  "phase": "Phase 14 — Life 5 Silt Thief combat-policy repair (bounded in-combat tactical reconsideration)",
+  "createdAt": "2026-09-29",
+  "authority": {
+    "productionSha": "6f8110099e4ebcd8cc0adf32efd0f81bdeff8da3",
+    "worktreeBranch": "golem-line",
+    "preRepairLifeDriverQualifiedId": "sha256:a8264ec89f94c6a8c20929362429c9e3edd45d80cc7e0f42db957e6aab9ac46d",
+    "preRepairCanonicalWalkerQualifiedId": "sha256:908ecd47ebd7ca9c7f4eddbdd33ad4bf1d1ecef836ea0b93470491cc652fda5d",
+    "life5RunId": "life5-2026-09-29T01-31-00-273Z-818d60d9-4254-49de-89a2-77e2ddd649cc"
+  },
+  "designAuthority": "Bounded repair design approved by the owner in the immediately preceding task (verdict D2 — policy + encounter-local Walker memory, implemented as a new additive sibling module, no edit to policy.ts).",
+  "repairSummary": "Life 5 died fleeing an ordinary enemy 20 times in a row because policy.ts's contextual-combat branch re-derives 'should I flee?' fresh every round with no memory of prior rounds' outcomes, while a real, RNG-free, lower-risk alternative (tactical retreat) sat unused the entire encounter. This repair adds a small, encounter-local EncounterTacticalMemory and a decideInCombat() wrapper (test-utils/canonical/tacticalReconsideration.ts, new) that calls the UNMODIFIED policy.ts decide() first and only substitutes its answer when the chosen survival-movement tactic (flee/retreat/advance) has made no observable progress for REPEATED_FAILURE_THRESHOLD (2) consecutive attempts THIS encounter and a different, not-yet-futile, currently-legal alternative exists. lifeOrchestrator.ts (already the Phase 13 reusable driver seam) gained one new export, resolveCombatEncounter(), wiring the wrapper into combatLoop.ts's resolveCombatRounds() exactly the way a future Life 6 driver would use it — combatLoop.ts itself is imported unmodified.",
+  "thresholdRuling": {
+    "value": 2,
+    "meaning": "A tactic becomes reconsiderable only after it has produced 'no-progress' TWICE in a row within the current encounter (i.e., reconsideration is possible starting on its 3rd consecutive selection). A single failure never triggers reconsideration.",
+    "sourcePrecedent": "policy.ts's own Guardian retry branch ('2a', LifeMemory.attempts) already reconsiders after exactly ONE prior failure with no material capability change — but that operates at whole-engagement granularity (a costly, deliberate commitment). An in-round tactic (one flee roll, one retreat step) is cheap by comparison and is not itself evidence of a bad tactic on a single failure. The owner's own design-task semantics ('FIRST FAILURE does not by itself prove a tactic is bad' / 'REPEATED FAILURE means the tactic has now failed again without material progress') read literally as exactly two observations before reconsideration is eligible. Not derived from Life 5's own 20-failure count, and not tuned to any specific enemy."
+  },
+  "implementationSurface": {
+    "newFiles": [
+      "test-utils/canonical/tacticalReconsideration.ts",
+      "__tests__/canonicalTacticalReconsideration.test.ts",
+      "__tests__/canonicalTacticalReconsiderationIntegration.test.ts",
+      "scripts/repairedLifeDriverQualifiedId.mjs",
+      "scratchpad/canonical-life-reports/combat-policy-repair-qualification-freeze.json"
+    ],
+    "changedFiles": [
+      {
+        "path": "test-utils/canonical/lifeOrchestrator.ts",
+        "change": "Additive only: new imports (combatLoop.ts's resolveCombatRounds/types, tacticalReconsideration.ts's exports), new exported CombatSeamDeps interface, new exported resolveCombatEncounter() function appended after the existing runVendorPass(). Every pre-existing export (runEquipmentReevaluationPass, selectAndDepartForDestination, runBetweenEncounterStep, runVendorPass) and the OrchestratorContext interface are untouched, confirmed by the full pre-existing canonicalLifeOrchestratorIntegration.test.ts suite (Tests A-F) passing unmodified."
+      }
+    ],
+    "byteIdenticalFiles": [
+      "test-utils/canonical/policy.ts",
+      "test-utils/canonical/combatLoop.ts",
+      "test-utils/canonical/guardianApproachOptions.ts",
+      "test-utils/canonical/playerView.ts",
+      "test-utils/canonical/actionExecutor.ts",
+      "test-utils/canonical/CanonicalWalker.ts",
+      "test-utils/canonical/equipmentOptions.ts",
+      "test-utils/canonical/destinationOptions.ts",
+      "test-utils/canonical/itemIntelligence.ts",
+      "test-utils/canonical/strategicPolicy.ts",
+      "test-utils/canonical/strategicEvidence.ts"
+    ],
+    "productionFilesTouched": [],
+    "frozenHistoricalFilesTouched": []
+  },
+  "manifest": "See scripts/repairedLifeDriverQualifiedId.mjs --json for the full, current, re-derivable file-by-file manifest (27 files: Life 5's own 25-file frozen manifest + lifeOrchestrator.ts's now-changed content, counted once, + the one genuinely new file tacticalReconsideration.ts).",
+  "identity": {
+    "REPAIRED_LIFE_DRIVER_QUALIFIED_ID": "sha256:0e7b377aaf963e0ed190cfac0a5a7016c57fe5d717952adf1f0f0c77d02bffea",
+    "computedBy": "node scripts/repairedLifeDriverQualifiedId.mjs --json",
+    "reproducedTwiceIdentical": true
+  },
+  "validation": {
+    "newFocusedTests": {
+      "file": "__tests__/canonicalTacticalReconsideration.test.ts",
+      "result": "22/22 passing",
+      "coverage": "encounter-memory pure logic, classifyRepositionProgress, rangeSnapshotOf, decideInCombat wrapper: first-flee preservation, one-failure-tolerated, repeated-failure reconsideration (Life-5 failure shape), skip-already-futile-alternative, no-alternative fallback, anti-cycle determinism, emergency-heal preservation, ordinary-combat preservation, RNG nonperturbation, falsifier"
+    },
+    "newIntegrationTests": {
+      "file": "__tests__/canonicalTacticalReconsiderationIntegration.test.ts",
+      "result": "2/2 passing (stable across repeated runs)",
+      "testA": "resolveCombatEncounter drives real rounds through real PlayerView -> real options -> decideInCombat -> real executor -> real ActionRecord, terminating in a valid CombatOutcome, against a bounded-fixture enemy in a real booted store",
+      "testB": "repeated-failure EncounterTacticalMemory (built via the same pure recordTacticalOutcome the unit tests prove) makes decideInCombat fire a REAL executor.combatRetreat/combatAdvance door against the real booted store; real scene.range actually changed; real ActionRecord logged"
+    },
+    "directlyAffectedExistingTests": {
+      "suites": [
+        "canonicalContextualCombatPolicy.test.ts",
+        "canonicalAttemptMemoryPolicy.test.ts",
+        "canonicalStrategicPolicy.test.ts",
+        "canonicalGuardianApproachOptions.test.ts",
+        "canonicalLifeOrchestratorIntegration.test.ts",
+        "canonicalGuardianCombatIsolated.test.ts",
+        "canonicalStrategicEvidenceNonPerturbation.test.ts",
+        "canonicalStrategicFirewallStatic.test.ts",
+        "canonicalOrchestratorFirewallStatic.test.ts"
+      ],
+      "result": "9/9 suites, 73/73 tests passing, unmodified"
+    },
+    "typecheckTests": "npm run typecheck:tests -> OK, baseline 196, no growth (after fixing 3 fixture-shape errors introduced in the new unit test file's own PlayerView fixture, none in tacticalReconsideration.ts or lifeOrchestrator.ts itself)",
+    "typecheckCi": "npm run typecheck:ci -> clean, zero errors",
+    "lint": "npx eslint on all 4 new/changed files -> clean, zero warnings/errors",
+    "heavyRun": false,
+    "canonicalLifeRun": false,
+    "knownUnrelatedPreexistingFailures": [
+      {
+        "suite": "canonicalAbsentSurfaces.test.ts",
+        "assertion": "'none of the canonical/ files call a store write (set/setState) at all'",
+        "finding": "Fails on test-utils/canonical/guardianCombatIsolationFixture.ts's own pre-existing, owner-documented store.setState() call (its header explicitly names this an 'owner-authorized, narrowly-scoped exception'). Verified pre-existing and unrelated to this repair by removing both new/changed files from the worktree and reproducing the identical failure. Not fixed here — out of scope for a Life-5 combat-policy repair; recorded, not silently waived."
+      },
+      {
+        "suite": "canonicalLife5.test.ts",
+        "assertion": "frozen-identity gate at the top of the test",
+        "finding": "Correctly and safely refused to run: its own LIFE_DRIVER_QUALIFIED_ID check detected the (expected, legitimate) apparatus drift this repair introduces and threw 'LIFE 5 NOT STARTED — FROZEN IDENTITY MISMATCH' before touching any game state or RNG. This is the frozen file's own safety mechanism working exactly as designed, not a defect. canonicalLife5.test.ts was not modified and was not intentionally invoked as part of this task's own validation ladder; it was incidentally reached by one broad ad hoc `__tests__/canonical` glob run during investigation and safely self-aborted at its very first check. Zero RNG consumed, zero game state touched."
+      }
+    ]
+  },
+  "preservationAudit": {
+    "productionFilesUnchanged": true,
+    "life1Through5ArtifactsUnchanged": true,
+    "qualificationReceiptsUnchanged": "All pre-existing receipts (canonical-walker-qualification-freeze.json, strategic-walker-qualification-freeze.json, life-driver-integration-qualification-freeze.json) untouched; this is a NEW receipt, not an overwrite.",
+    "preExistingStashesUnchanged": [
+      "stash@{0}: #212 parked: InputBox region-owner repair + ota1881 suite",
+      "stash@{1}: docs-ios: OTA-1848 WIP: gem idempotency primitives + fault probe",
+      "stash@{2}: docs-ios: OTA-1830 Rocky — parked for harness repair"
+    ],
+    "heavyRun": false,
+    "canonicalLifeRun": false,
+    "commitMade": false,
+    "pushMade": false
+  },
+  "verdict": "IMPLEMENTATION QUALIFIED — READY FOR OWNER-AUTHORIZED LIFE 6",
+  "nextBoundary": "OWNER AUTHORIZATION FOR EXACTLY ONE FRESH CANONICAL LIFE 6. Not started by this task."
+}
