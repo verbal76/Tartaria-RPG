@@ -70,6 +70,7 @@ import {
 } from '../test-utils/canonical/lifeOrchestrator';
 import { recordStrategicEvidence, getStrategicEvidence, resetStrategicEvidence } from '../test-utils/canonical/strategicEvidence';
 import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
+import { placedAt } from '../test-utils/placePlayer';
 import { buildDestinationOptions } from '../test-utils/canonical/destinationOptions';
 import { detachRngLedger } from '../test-utils/canonical/rngLedger';
 import { detachStoreDiffer } from '../test-utils/canonical/storeDiffer';
@@ -207,14 +208,22 @@ describe('Strategic repair — driver integration (lifeOrchestrator.ts is the se
       const hub = get().player!.currentLocationId;
       const realView = buildPlayerView({ player: get().player, currentScene: get().currentScene, worldMemory: get().worldMemory })!;
       // Fixture-injected position, same bounded-fixture methodology as Test
-      // C's injected HP: the real view with only `position` overridden to a
+      // C's injected HP: the real view with `position` overridden to a
       // capital away from the hub, so retreat-to-hub is a meaningful option
       // (runBetweenEncounterStep only offers it when not already at the
       // hub) without needing to actually walk there first. Execution below
       // still goes through the real travelSetCourse door against the real
-      // booted store.
+      // booted store. `placedAt` supplies the matching gridX/gridY for
+      // `away` — spreading only `currentLocationId` over the hub's real
+      // position would leave the hub's own cell attached to a different
+      // location's id, exactly the impossible state OTA-1484 exists to
+      // catch (see placePlayer.ts, and I-003's identical fix).
       const away = LOST_CAPITAL_LOCATIONS[0]!;
-      const awayView: PlayerView = { ...realView, position: { ...realView.position, currentLocationId: away } };
+      const awayPlaced = placedAt(away);
+      const awayView: PlayerView = {
+        ...realView,
+        position: { currentLocationId: awayPlaced.currentLocationId, gridX: awayPlaced.gridX, gridY: awayPlaced.gridY },
+      };
       const view = () => awayView;
 
       const severeStrategicMemory: StrategicMemory = { ...EMPTY_STRATEGIC_MEMORY, severeDangerEventsThisTrip: 2 };

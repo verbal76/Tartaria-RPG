@@ -197,6 +197,26 @@ describe('placedAt — fixtures can no longer invent impossible coordinates', ()
     //   `currentLocationId` without its cell, exactly the invariant this file
     //   exists to catch. Fixed by switching that site to `...placedAt(...)`
     //   instead of re-baselining — so the count it leaves behind is 56, not 57.
-    expect(bare).toBeLessThanOrEqual(56); // the baseline — shrink-only
+    // ⚠ Human-player simulator freeze (this campaign) — 56 → 59. Four candidate
+    //   sites landed with the canonical test-utils/canonical/ package; each was
+    //   traced individually, not assumed by similarity:
+    //     - canonicalCombatLoopClassification.test.ts and
+    //       canonicalTacticalReconsideration.test.ts: minimal PlayerView
+    //       fixtures for resolveCombatRounds()/decideInCombat(), both proven
+    //       (by reading combatLoop.ts and tacticalReconsideration.ts in full)
+    //       to never reference position/gridX/gridY anywhere in their
+    //       implementations. Same class as Phase 8's two sites.
+    //     - canonicalEquipmentOptions.test.ts: a minimal PlayerView for
+    //       equipmentScore()/buildEquipmentOptions()/decide()'s equip/buy
+    //       branches, likewise proven to never read position. Same class.
+    //     - canonicalLifeOrchestratorIntegration.test.ts's fourth candidate
+    //       (Test D) was NOT in this class, and was NOT re-baselined: it
+    //       spread a real buildPlayerView() output and hand-overwrote only
+    //       `currentLocationId`, leaving the hub's real gridX/gridY attached
+    //       to a different location's id — the exact I-003 shape. Fixed the
+    //       same way I-003 was: `placedAt(away)` now supplies the matching
+    //       cell, so three sites re-baseline and the fourth does not raise
+    //       the count at all.
+    expect(bare).toBeLessThanOrEqual(59); // the baseline — shrink-only
   });
 });
