@@ -26,6 +26,7 @@ import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; /
 import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
+import { OtaApplyingOverlay } from './app/components/OtaApplyingOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
 // that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
 // picks by platform, so mounting it here is inert on phones and makes App.tsx
@@ -1313,6 +1314,8 @@ export default function App() {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color="#c9a86a" />
+        {/* The boot-front OTA apply can fire while this pre-hydration view is up. */}
+        <OtaApplyingOverlay />
       </View>
     );
   }
@@ -1431,6 +1434,14 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />
+      </SilentBoundary>
+      {/* ⚠ "Please wait, applying update" — mounts LAST and at the root, above
+          every other overlay (zIndex 2000 > the splash's 1000), because the apply
+          can begin over any screen or over the opening splash itself. It owns the
+          touch surface for as long as the transition lasts. See
+          app/updates/otaApplyingState.ts for what raises and clears it. */}
+      <SilentBoundary tag="OtaApplyingOverlay">
+        <OtaApplyingOverlay />
       </SilentBoundary>
     </SafeAreaProvider>
   );
