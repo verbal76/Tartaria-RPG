@@ -140,13 +140,23 @@ describe('Phase 3D — vendor doors (bounded, small, human-legitimate scenarios)
       const sellCandidate = view2.inventory.find((i) => !equippedIds.has(i.instanceId) && !i.name.toLowerCase().includes('cudgel'));
       if (sellCandidate) {
         const decision = decide(view2, [{ id: 'sell', category: 'sell', label: `sell ${sellCandidate.name}` }]);
+        // I-017 fix: tc MUST be captured before the call — reading it twice
+        // at the same call site after executor.sell(...) already completed
+        // made beforeState/afterState structurally identical regardless of
+        // outcome (tautological evidence).
+        const tcBeforeSell = get().player?.tc ?? 0;
         let record: ActionRecord | null = null;
         try { record = await executor.sell(sellCandidate.name, decision, sellCandidate.instanceId); } catch { record = null; }
+        const tcAfterSell = get().player?.tc ?? 0;
         fileFromActionRecord(
           'ECONOMY-SELL', `unequipped item '${sellCandidate.name}' in inventory, at a vendor room reached via bounded hub navigation`, `sell ${sellCandidate.name}`,
-          'VendorScreen.tsx sell row', record, null, { tc: get().player?.tc }, { tc: get().player?.tc },
+          'VendorScreen.tsx sell row', record, null, { tc: tcBeforeSell }, { tc: tcAfterSell },
           'player.tc increases by displayed price; item removed/decremented', 'NPC relationship ledger (recordNpcDealing) updated',
         );
+        if (process.env.QUAL_DEBUG) {
+          // eslint-disable-next-line no-console
+          console.log('QUAL_DEBUG sell tc delta', JSON.stringify({ result: record?.result, tcBeforeSell, tcAfterSell }));
+        }
       } else {
         blocked('ECONOMY-SELL', 'an unequipped, non-cudgel sellable item', 'no unequipped non-cudgel item available to sell after the tutorial');
       }
@@ -299,13 +309,31 @@ describe('Phase 3D — vendor doors (bounded, small, human-legitimate scenarios)
     if (damaged && get().currentScene?.vendor) {
       const view4 = buildPlayerView({ player: get().player, currentScene: get().currentScene, worldMemory: get().worldMemory })!;
       const decision = decide(view4, [{ id: 'repair', category: 'repair', label: `repair ${damaged.name}` }]);
+      // I-018 fix (same bug class as I-017): tc must be captured before the
+      // call, not read a second time at the same post-call site. The
+      // after-state must also re-capture the REPAIRED item's durability by
+      // looking it up again post-call (repairItem() returns a fresh
+      // inventory/item object — the old `damaged` reference is never
+      // mutated in place, so re-reading it would silently keep reporting
+      // the pre-repair value forever).
+      const damagedItemId = damaged.id;
+      const tcBeforeRepair = get().player?.tc ?? 0;
+      const durabilityBeforeRepair = { ...damaged.durability! };
       let record: ActionRecord | null = null;
       try { record = await executor.repair(damaged.name, decision); } catch { record = null; }
+      const repairedItem = (get().player?.inventory ?? []).find((it) => it.id === damagedItemId);
       fileFromActionRecord(
-        'MAINTENANCE-VENDOR-REPAIR', `item '${damaged.name}' durability ${damaged.durability!.current}/${damaged.durability!.max} from a real, legitimately-fought controlled encounter; vendor present`, `repair ${damaged.name}`,
-        'VendorScreen.tsx repair card', record, null, { tc: get().player?.tc, durability: damaged.durability }, { tc: get().player?.tc },
+        'MAINTENANCE-VENDOR-REPAIR', `item '${damaged.name}' durability ${durabilityBeforeRepair.current}/${durabilityBeforeRepair.max} from a real, legitimately-fought controlled encounter; vendor present`, `repair ${damaged.name}`,
+        'VendorScreen.tsx repair card', record, null, { tc: tcBeforeRepair, durability: durabilityBeforeRepair }, { tc: get().player?.tc, durability: repairedItem?.durability ?? null },
         'durability restored to max, TC spent', 'combat AC/effectiveness reads restored durability',
       );
+      if (process.env.QUAL_DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('QUAL_DEBUG repair delta', JSON.stringify({
+          result: record?.result, tcBeforeRepair, tcAfterRepair: get().player?.tc,
+          durabilityBeforeRepair, durabilityAfterRepair: repairedItem?.durability ?? null,
+        }));
+      }
       const tc2 = get().player?.tc ?? 0;
       if (tc2 > 0) {
         const view5 = buildPlayerView({ player: get().player, currentScene: get().currentScene, worldMemory: get().worldMemory })!;

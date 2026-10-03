@@ -28,6 +28,7 @@ import {
   makeFuseCommitPredicate,
   makeCraftPredicate,
   ambientSalvagePredicate,
+  parseAmbientSalvageSkipSignals,
   makeStoryForkPredicate,
   guardianSummonPredicate,
   makeWeaponCoatingPredicate,
@@ -262,19 +263,41 @@ describe('QC-010 craftPredicate', () => {
 
 // ── AMBIENT SALVAGE ──────────────────────────────────────────────────────
 describe('QC-011 ambientSalvagePredicate', () => {
+  const zeroSkips = { skippedAlreadyCount: 0, skippedTakeableCount: 0, skippedLeadCount: 0, unmatchedCount: 0 };
   it('passes when nouns are processed and material is granted', () => {
-    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0 }, after: { materialTotalQty: 3, searchedNounsCount: 2 }, verdict: undefined });
+    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips }, after: { materialTotalQty: 3, searchedNounsCount: 2, ...zeroSkips }, verdict: undefined });
     expect(r.passed).toBe(true);
   });
   it('fails and classifies NO_STATE_CHANGE on a call-level refusal (activeEnemy present)', () => {
-    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0 }, after: { materialTotalQty: 0, searchedNounsCount: 0 }, verdict: undefined });
+    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips }, after: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips }, verdict: undefined });
     expect(r.passed).toBe(false);
     expect(r.classification).toBe('NO_STATE_CHANGE');
   });
-  it('fails (documented I-052 limitation) on a legitimate all-skip batch: nouns processed, no material', () => {
-    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0 }, after: { materialTotalQty: 0, searchedNounsCount: 3 }, verdict: undefined });
+  it('I-052: nouns processed, no material, and NO skip-reason line accounts for it => harness-level grant failure', () => {
+    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips }, after: { materialTotalQty: 0, searchedNounsCount: 3, ...zeroSkips }, verdict: undefined });
     expect(r.passed).toBe(false);
     expect(r.classification).toBe('SUCCESS_PREDICATE_FAILED');
+  });
+  it.each([
+    ['already-searched', { skippedAlreadyCount: 2 }],
+    ['takeable-gear', { skippedTakeableCount: 1 }],
+    ['quest-lead', { skippedLeadCount: 1 }],
+    ['unmatched-by-any-pool', { unmatchedCount: 3 }],
+  ])('I-052: a legitimate all-skip batch (%s) passes — zero yield is correct, not a failure', (_label, skip) => {
+    const r = ambientSalvagePredicate({ before: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips }, after: { materialTotalQty: 0, searchedNounsCount: 0, ...zeroSkips, ...skip }, verdict: undefined });
+    expect(r.passed).toBe(true);
+  });
+  it('I-052: parseAmbientSalvageSkipSignals reads salvageAllAmbient\'s real narration lines, including " and N more" overflow', () => {
+    const lines = [
+      { channel: 'world', text: 'Already worked over: crate, barrel and 2 more.' },
+      { channel: 'world', text: 'Left whole — worth more in your pack than in pieces: iron buckler. (TAKE them.)' },
+      { channel: 'world', text: '✦ Left untouched — there is something here worth understanding first: sealed door, strange idol. (INVESTIGATE.)' },
+      { channel: 'world', text: 'You look the stone, dust over and find nothing your tools can break down here.' },
+      { channel: 'world', text: 'an unrelated line' },
+    ];
+    expect(parseAmbientSalvageSkipSignals(lines)).toEqual({
+      skippedAlreadyCount: 4, skippedTakeableCount: 1, skippedLeadCount: 2, unmatchedCount: 2,
+    });
   });
 });
 

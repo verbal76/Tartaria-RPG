@@ -257,32 +257,121 @@ export function makeCraftPredicate(expectedIngredientsConsumed: number, expected
 }
 
 // ── AMBIENT SALVAGE (salvageAllAmbient, app/state/slices/inventorySlice.ts:1403-1730) ─
-// KNOWN LIMITATION (recorded as an open issue, not fixed here): a batch where
-// every noun is a legitimate skip (already-searched / takeable-gear /
-// quest-lead / unmatched) yields materialTotalQty unchanged even though
-// nothing is wrong — this predicate has no way to distinguish that
-// legitimate all-skip case from a harness-level failure to grant, because
-// the skip-reason breakdown is not part of the compact captured state. The
-// predicate is therefore intentionally scoped to the common case (a fixture
-// where at least one offered noun resolves to a real salvage pool) and
-// documented as SOURCE AMBIGUITY / PARTIAL in the Part 5 report — see
-// I-052-ambient-salvage-legitimate-zero-yield-not-distinguishable.
+// I-052 FIX: a batch where every noun is a legitimate skip (already-searched /
+// takeable-gear / quest-lead / unmatched-by-any-pool) correctly yields
+// materialTotalQty unchanged even though nothing is wrong. materialTotalQty
+// and searchedNounsCount alone can't tell that apart from a harness-level
+// grant failure — but salvageAllAmbient already writes a DISTINCT, real,
+// player-visible narration line per skip bucket (its own "already worked
+// over" / "left whole" / "left untouched" / "look ... over and find
+// nothing" lines — see inventorySlice.ts ~1677-1738), so the skip-reason
+// breakdown IS observable, just not through the two original fields. The
+// four counts below are recovered by parsing those exact real log lines
+// (parseAmbientSalvageSkipSignals), the same before/after log-range idea
+// actionExecutor.ts's logRange and logMirror.ts already use elsewhere in
+// this harness — captureState() sums the signal over the log captured so
+// far, and the predicate diffs before/after like every other field here.
+// No app/** change, no new telemetry hook: this is a harness-side read of
+// output the production code was already writing.
 
 export interface AmbientSalvageState {
   materialTotalQty: number;
   searchedNounsCount: number;
+  /** Cumulative count of nouns salvageAllAmbient has narrated as "already
+   *  worked over" (searchedAmbientNouns hit) across the log captured so far. */
+  skippedAlreadyCount: number;
+  /** Cumulative count of nouns narrated as "left whole" (OTA-1231 takeable-gear guard). */
+  skippedTakeableCount: number;
+  /** Cumulative count of nouns narrated as "left untouched" (OTA-1236 quest-lead guard). */
+  skippedLeadCount: number;
+  /** Cumulative count of nouns narrated as matching no salvage pool at all
+   *  (OTA-037's unmatched fallback). A floor, not necessarily exact above 3 —
+   *  the production line itself caps the named nouns at 3 with no overflow
+   *  suffix (unlike the other three buckets' "and N more") — but >0 is all
+   *  this predicate needs. */
+  unmatchedCount: number;
+}
+
+/** Pure text parsing of salvageAllAmbient's own real narration lines — no
+ *  store access, no RNG, matching this file's PURE constraint. `prefix`/
+ *  `suffix` bracket the name-list exactly as the four emit sites in
+ *  inventorySlice.ts render it; an optional " and N more" overflow tail
+ *  (present on the already/takeable/lead lines, never on the unmatched one)
+ *  is counted in addition to the comma-joined names actually printed. */
+function countAmbientSalvageSkipLines(
+  lines: readonly { channel: string; text: string }[],
+  prefix: string,
+  suffix: string,
+): number {
+  let total = 0;
+  for (const { text } of lines) {
+    if (!text.startsWith(prefix) || !text.endsWith(suffix)) continue;
+    const blob = text.slice(prefix.length, text.length - suffix.length);
+    const overflowMatch = / and (\d+) more$/.exec(blob);
+    const overflow = overflowMatch ? parseInt(overflowMatch[1]!, 10) : 0;
+    const namesBlob = overflowMatch ? blob.slice(0, overflowMatch.index) : blob;
+    const names = namesBlob.split(',').map((s) => s.trim()).filter(Boolean);
+    total += names.length + overflow;
+  }
+  return total;
+}
+
+/** Builds the four I-052 skip-reason counts from a window of real gameLog
+ *  entries (any slice/mirror exposing {channel, text} — e.g. a before/after
+ *  slice of the real store's `gameLog`, or test-utils/canonical/logMirror.ts's
+ *  getLogMirror()). Call it once against the log captured up to "before" and
+ *  once against the log captured up to "after"; the predicate diffs the two
+ *  results exactly like materialTotalQty/searchedNounsCount. */
+export function parseAmbientSalvageSkipSignals(
+  lines: readonly { channel: string; text: string }[],
+): Pick<AmbientSalvageState, 'skippedAlreadyCount' | 'skippedTakeableCount' | 'skippedLeadCount' | 'unmatchedCount'> {
+  return {
+    skippedAlreadyCount: countAmbientSalvageSkipLines(lines, 'Already worked over: ', '.'),
+    skippedTakeableCount: countAmbientSalvageSkipLines(
+      lines,
+      'Left whole — worth more in your pack than in pieces: ',
+      '. (TAKE them.)',
+    ),
+    skippedLeadCount: countAmbientSalvageSkipLines(
+      lines,
+      '✦ Left untouched — there is something here worth understanding first: ',
+      '. (INVESTIGATE.)',
+    ),
+    unmatchedCount: countAmbientSalvageSkipLines(
+      lines,
+      'You look the ',
+      ' over and find nothing your tools can break down here.',
+    ),
+  };
 }
 
 export function ambientSalvagePredicate(ctx: PredicateContext<AmbientSalvageState, void>): PredicateResult {
   const nounsProcessed = ctx.after.searchedNounsCount > ctx.before.searchedNounsCount;
   const materialGranted = ctx.after.materialTotalQty > ctx.before.materialTotalQty;
+  const skippedAlreadyDelta = ctx.after.skippedAlreadyCount - ctx.before.skippedAlreadyCount;
+  const skippedTakeableDelta = ctx.after.skippedTakeableCount - ctx.before.skippedTakeableCount;
+  const skippedLeadDelta = ctx.after.skippedLeadCount - ctx.before.skippedLeadCount;
+  const unmatchedDelta = ctx.after.unmatchedCount - ctx.before.unmatchedCount;
+  const legitimateSkipSignal =
+    skippedAlreadyDelta > 0 || skippedTakeableDelta > 0 || skippedLeadDelta > 0 || unmatchedDelta > 0;
+
   if (nounsProcessed && materialGranted) {
     return { passed: true, reason: 'at least one offered noun was processed and material was granted' };
   }
-  if (!nounsProcessed) {
-    return { passed: false, reason: 'searchedAmbientNouns did not grow — call was refused at the call level (no player/scene, or a live enemy present) or offered zero nouns', classification: 'NO_STATE_CHANGE' };
+  // I-052: every offered noun accounted for by a legitimate skip reason, and
+  // nothing else happened — that is correct zero-yield behavior, not a
+  // predicate failure, distinct from a silent harness-level grant failure.
+  if (!nounsProcessed && !materialGranted && legitimateSkipSignal) {
+    return {
+      passed: true,
+      reason: 'every offered noun resolved to a legitimate skip (already-searched / takeable-gear / quest-lead / unmatched-by-any-pool) — zero yield is the correct outcome',
+      observed: { skippedAlreadyDelta, skippedTakeableDelta, skippedLeadDelta, unmatchedDelta },
+    };
   }
-  return { passed: false, reason: 'nouns were processed but no material was granted — either a legitimate all-skip batch (see I-052) or a harness-level grant failure; this predicate cannot distinguish the two from compact state alone', classification: 'SUCCESS_PREDICATE_FAILED' };
+  if (!nounsProcessed) {
+    return { passed: false, reason: 'searchedAmbientNouns did not grow and no skip-reason line fired — call was refused at the call level (no player/scene, or a live enemy present) or offered zero nouns', classification: 'NO_STATE_CHANGE' };
+  }
+  return { passed: false, reason: 'nouns were processed but no material was granted and no legitimate skip-reason line accounts for it — harness-level grant failure', classification: 'SUCCESS_PREDICATE_FAILED' };
 }
 
 // ── STORY/FORK (answerFork, app/state/gameStore.ts:29647-29670) ───────────
