@@ -20,6 +20,10 @@
           "price": 55
         },
         {
+          "itemName": "Hardened Climbing Strap",
+          "price": 60
+        },
+        {
           "itemName": "Aetheric Torch",
           "price": 25
         },
@@ -352,6 +356,10 @@
         {
           "itemName": "Reclaimer's Rope",
           "price": 60
+        },
+        {
+          "itemName": "Hardened Climbing Strap",
+          "price": 65
         },
         {
           "itemName": "Aetheric Torch",
