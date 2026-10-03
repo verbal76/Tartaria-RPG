@@ -38,7 +38,7 @@ import { trainStat } from '../../engine/statTraining';
 import { validSlotsForItem, SLOT_LABEL, SLOT_ID_KEY, effectiveStats, gearHpBonus, resolveEquippedItem, RING_SLOTS, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap, scrapOutputFor, repairCostMaterials, scrapSuccessChance, scrapHasSecondChance, pickScrapFailureLine } from '../../engine/scrapEngine';
 import { findCompanionGearById } from '../../engine/companionGear';
-import { wornDogVestInstanceId } from '../../engine/dogCompanion';
+import { wornDogVestInstanceId, applyDogPronouns } from '../../engine/dogCompanion';
 import { stampDurability } from '../../engine/durability';
 import type { EquipSlot, PlayerEquipped } from '../../engine/types';
 import { ARMOR, findCatalogItem } from '../../engine/crafting';
@@ -548,6 +548,12 @@ export const createInventorySlice = (
           ? golemSubstituteHeal(golem.kind, canonicalItemRarity(item))
           : 0;
       if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter shakes their head. "${item.name} won't feed the Aetherstone."`); return; }
+      // I-010 — this batch door never carried applyItemToGolem's unconditional
+      // full-HP refusal (gameStore.ts, the single-item `feed golem` door): a golem
+      // repair part has no secondary effect, so a full-HP golem is ALWAYS a true
+      // no-op, same rule as the J guard below, just unconditional here since HP is
+      // the only axis this mechanic has. Mirrors applyItemToGolem's own check.
+      if (golem.hp >= golem.hpMax) { get().appendLog('world', `${golem.name} is already whole — no repair needed.`); return; }
       const gap = Math.max(0, golem.hpMax - golem.hp);
       const heal = Math.min(gap, perHP * use);
       set((s) => (s.player?.golem
@@ -580,6 +586,16 @@ export const createInventorySlice = (
       const isTreat = canonicalItemTags(item).includes('dog_treat');
       const loyPer = isTreat ? 40 : fx?.kind === 'consumable' ? 20 : 5;
       const loyalty = Math.min(100, dog.loyalty + loyPer * use);
+      // I-010 — mirror applyItemToDog's J no-op guard (gameStore.ts), which this
+      // batch door never got: a full-HP dog already at max loyalty gains nothing
+      // from either axis, so feeding it here was burning the item for zero effect.
+      if (heal <= 0 && loyalty <= dog.loyalty) {
+        get().appendLog(
+          'arbiter',
+          applyDogPronouns(`${dog.name} sniffs at the ${item.name} and looks away — nothing {pronoun} need{verbS} right now. You put it back.`, dog.sex.pronoun),
+        );
+        return;
+      }
       set((s) => (s.player?.dog
         ? { player: { ...s.player, dog: { ...s.player.dog, hp: s.player.dog.hp + heal, loyalty }, inventory: spend(s.player.inventory) } }
         : s));
@@ -596,6 +612,14 @@ export const createInventorySlice = (
     // ⚠⚠⚠ OTA-1573 — AND THE CURES, on the third and last path that was missing
     // them. See engine/consumableCures for the owner's log line that found this.
     const cures = applyConsumableCures(player.statusEffects, fx?.kind === 'consumable' ? fx : null);
+    // I-010 — mirror the single-item use_relic/eat J guard (gameStore.ts), which
+    // this batch door (the ✚ heals pouch / "Feed"/"Heal" buttons' real production
+    // door) never got: a full-HP, full-stamina, nothing-to-cure item was still
+    // spent here for zero effect.
+    if (healHP <= 0 && healStam <= 0 && !cures.cured) {
+      get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "Nothing left for it to do right now — keep it."`);
+      return;
+    }
     set((s) => {
       if (!s.player) return s;
       const healed = {

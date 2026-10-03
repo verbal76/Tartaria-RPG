@@ -141,9 +141,17 @@ describe('OTA-1658 — the pouch heals IN A FIGHT (the reported defect)', () => 
     const slice = require('fs').readFileSync(
       require('path').join(__dirname, '..', 'app', 'state', 'slices', 'inventorySlice.ts'), 'utf8',
     ) as string;
-    const body = slice.slice(slice.indexOf('useHealBatch(itemName, target, count) {'));
-    expect(body.slice(0, 6000)).toContain("get().appendLog('world', `You use ${use}× ${item.name}.");
-    expect(body.slice(0, 6000)).toContain('bits.push(`+${healHP} HP');
+    // I-010 — sliced to the NEXT sibling method rather than a fixed byte count:
+    // a fixed window (formerly 6000) is a stale literal source-pin that breaks on
+    // any unrelated growth inside this function (e.g. the I-010 true-no-op guards
+    // added above these lines, which pushed them past the old window without
+    // removing either assertion's target). Bounding on the next method name scales
+    // with the function instead of freezing its length.
+    const fnStart = slice.indexOf('useHealBatch(itemName, target, count) {');
+    const fnEnd = slice.indexOf('dropInventoryItem(itemName, itemId) {', fnStart);
+    const body = slice.slice(fnStart, fnEnd);
+    expect(body).toContain("get().appendLog('world', `You use ${use}× ${item.name}.");
+    expect(body).toContain('bits.push(`+${healHP} HP');
   });
 
   it('and it still works OUT of combat, which is the other half he asked for', async () => {
