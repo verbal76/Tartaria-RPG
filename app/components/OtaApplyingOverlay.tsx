@@ -14,12 +14,15 @@
 // purpose: dismissing mid-activation could only interfere with it. If control
 // returns to this runtime the state clears and the overlay unmounts itself.
 //
-// Palette and card geometry are the ones the original UPDATING modal and the
-// opening splash already use (#13110f card, #c9a86a gold, #e6d8b3 parchment).
+// Shell: the kit's modal scrim and card (OTA-1765's census forbids a hand-copied
+// one). Text colours are the ones the original UPDATING modal used.
 
 import React, { useSyncExternalStore } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import { isOtaApplying, subscribeOtaApplying } from '../updates/otaApplyingState';
+
+const CARD = tModalCard(360);
 
 export const OTA_APPLYING_MESSAGE = 'Please wait, applying update';
 
@@ -28,13 +31,13 @@ export function OtaApplyingOverlay() {
   if (!applying) return null;
   return (
     <View
-      style={styles.scrim}
+      style={[kit.modalScrim, styles.layer]}
       pointerEvents="auto"
       accessibilityViewIsModal={true}
       accessibilityLiveRegion="polite"
       testID="ota-applying-overlay"
     >
-      <View style={styles.card}>
+      <View style={CARD}>
         <Text style={styles.title}>UPDATING</Text>
         <View style={styles.rule} />
         <View style={styles.spinnerRow}>
@@ -50,26 +53,16 @@ export function OtaApplyingOverlay() {
 }
 
 const styles = StyleSheet.create({
-  // Above SplashOverlay (zIndex/elevation 1000) so a launch-time apply is not
-  // hidden behind the opening splash.
-  scrim: {
+  // The shell itself (scrim + card) is the kit's, shared with every other dialog;
+  // only what is specific to a root-mounted blocking layer lives here. Above
+  // SplashOverlay (zIndex/elevation 1000) so a launch-time apply is not hidden
+  // behind the opening splash, and deeper than the standard dim so the game
+  // underneath reads as paused.
+  layer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10,9,8,0.92)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
+    backgroundColor: 'rgba(0,0,0,0.85)',
     zIndex: 2000,
     elevation: 2000,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 18,
-    alignItems: 'center',
   },
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, alignSelf: 'stretch', backgroundColor: '#3a342c', marginTop: 8, marginBottom: 14 },
