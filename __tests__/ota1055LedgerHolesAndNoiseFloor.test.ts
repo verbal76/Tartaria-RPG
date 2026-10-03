@@ -528,7 +528,9 @@ describe('OTA-1055 — a granted contract does not nag the player', () => {
     const store = await boot('Granted');
     const neutral = HUNTS.filter((h) => h.factionId === null);
     _resetAcceptBurst();
-    store.setState((st) => ({ player: { ...st.player!, milestones: {
+    // hpMax: this test is about the compact-accept card, not reach — a fresh character is
+    // under the hunt's recommended HP and the road door now (I-055) refuses that, same as the board.
+    store.setState((st) => ({ player: { ...st.player!, hpMax: 999, hp: 999, milestones: {
       ...(st.player!.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
       questsAccepted: 3 } } }));
     for (let i = 0; i < 3; i++) _bumpQuestsAcceptedForTest({ granted: true });

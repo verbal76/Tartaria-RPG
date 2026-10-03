@@ -78,7 +78,7 @@ import {
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests, factionOfFactionQuest } from '../../engine/factionQuests';
 import { escortSpecForQuest, escortWasCarried } from '../../engine/escort';
-import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, scaleHuntEscort, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
+import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, scaleHuntEscort, firstActionableHuntStage, huntBlockReason, huntWithinReach, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
 import { firstActionableStage as QS_firstActionableStage } from '../../engine/questStage';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
@@ -1665,6 +1665,19 @@ export const createQuestSlice = (
         && (player.activeHunts ?? []).some((h) => h.id === neutralMatch.id);
       const alreadyDone = neutralMatch
         && (player.completedHuntIds ?? []).includes(neutralMatch.id);
+      // I-055 — the road door obeys the SAME reach rule the board and the vendor accept do
+      // (OTA-1450 "the board knows your size": offer and accept are one rule). Without this a
+      // typed `accept <title>` away from any stall took a hunt the board would have refused
+      // ("come back at N HP") and walked a fresh character into a fight it could not survive.
+      if (neutralMatch && !alreadyActive && !alreadyDone && !huntWithinReach(neutralMatch, player.hpMax)) {
+        const block = huntBlockReason(neutralMatch, null, Number.MAX_SAFE_INTEGER, [], [], player.hpMax);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter weighs ${theLower(neutralMatch.title)} against you and shakes their head. "${block?.text ?? 'not yet'}."`,
+          { skipDedup: true },
+        );
+        return;
+      }
       if (neutralMatch && !alreadyActive && !alreadyDone) {
         const neutralTracked = !deps.anyTrackedContract(player); // OTA-972 — #118
         get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
