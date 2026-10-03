@@ -48,6 +48,12 @@ jest.mock('../app/state/gameStore', () => ({
 }));
 
 import { checkAndApplyOTA } from '../app/updates/checkAndApplyOTA';
+import { resetOtaApplyingForTest } from '../app/updates/otaApplyingState';
+
+// A successful apply leaves the applying state up on purpose (a real reload
+// destroys the runtime and the flag with it); in a test the runtime survives,
+// so each case starts from the module's initial state.
+beforeEach(() => { resetOtaApplyingForTest(); });
 
 describe('OTA 047 — checkAndApplyOTA skipFetch path', () => {
   beforeEach(() => {
