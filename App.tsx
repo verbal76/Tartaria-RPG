@@ -25,7 +25,7 @@ import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; /
 // module that is not ready cannot cost us the other write.
 import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
-import { SplashOverlay } from './app/components/SplashOverlay';
+import { LaunchSplashes } from './app/components/StudioSplash';
 import { OtaApplyingOverlay } from './app/components/OtaApplyingOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
 // that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
@@ -1736,7 +1736,9 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
       {/* OTA-471 — opening splash overlay at the ROOT (outside the safe-area
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
-      <SplashOverlay />
+      {/* Hot Attic Games studio card, THEN the splash above — see StudioSplash.tsx.
+          Inert (renders only SplashOverlay) until the canonical studio asset is committed. */}
+      <LaunchSplashes />
       {/* PC / Steam Deck controller navigation. Renders nothing on phones
           (native stub); on web it drives the on-screen-button highlight. */}
       <GamepadNav />
