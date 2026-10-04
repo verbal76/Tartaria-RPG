@@ -1,0 +1,484 @@
+[
+  {
+    "family": "SNAPSHOT",
+    "playerVisiblePrecondition": "any valid player/currentScene/worldMemory state (tutorial-complete used here)",
+    "playerVisibleOption": "(observation only — no player choice)",
+    "policyDecision": "(none — pure read)",
+    "executorMethod": "takeSnapshot()",
+    "uiSurface": "n/a — test-harness-only observational mechanism",
+    "productionDoor": "takeSnapshot(boundary, state, ctx) [test-utils/canonical/snapshot.ts]",
+    "beforeState": {
+      "rngDrawCount": 67,
+      "diffLen": 98,
+      "logLen": 0
+    },
+    "rngDraws": null,
+    "clockChangeHours": 0,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {
+      "rngDrawCount": 67,
+      "diffLen": 98,
+      "logLen": 0,
+      "snap1Seq": 1,
+      "snap2Seq": 2
+    },
+    "playerVisibleConsequence": "none — snapshots are not player-visible",
+    "downstreamReaderConsequence": "a snapshot can be read back to compare structural checkpoint fields; never rehydrated into a running store",
+    "telemetryJoin": "(none — snapshot module has no actionSeq of its own)",
+    "result": "RUNTIME_PROVEN",
+    "notes": "read-only confirmed: two takeSnapshot() calls consumed zero RNG, zero store diffs, zero log lines; captured player/currentScene/worldMemory/mainQuest structurally complete for all 10 owner checkpoint concepts (see report Section R)"
+  },
+  {
+    "family": "EQUIPMENT",
+    "playerVisiblePrecondition": "cudgel present in inventory, unequipped (tutorial-granted, never worn)",
+    "playerVisibleOption": "wear Cudgel",
+    "policyDecision": "equip-cudgel",
+    "executorMethod": "EQUIPMENT",
+    "uiSurface": "InventoryScreen.tsx / tutorial take-and-equip pattern",
+    "productionDoor": "submitPlayerAction('wear Cudgel')",
+    "beforeState": {
+      "power": 28,
+      "equippedWeapon": "Cudgel"
+    },
+    "rngDraws": [
+      68,
+      70
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      1,
+      83
+    ],
+    "stateDiff": [
+      99,
+      103
+    ],
+    "afterState": {
+      "power": 28
+    },
+    "playerVisibleConsequence": "playerPowerScore 28 -> 28 (weapon equip changes standingAc/avg weapon damage inputs)",
+    "downstreamReaderConsequence": "StatsPanel.tsx reads playerPowerScore() live; downstream combat (buildCombatSteps) reads the newly-equipped weapon for damage rolls",
+    "telemetryJoin": "1",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "SEARCH",
+    "playerVisiblePrecondition": "ambient noun 'Iron Buckler' listed in currentScene.ambientNouns",
+    "playerVisibleOption": "investigate Iron Buckler",
+    "policyDecision": "investigate",
+    "executorMethod": "SEARCH",
+    "uiSurface": "SearchModal.tsx / GatherModal.tsx ambient-noun chips",
+    "productionDoor": "submitPlayerAction('investigate Iron Buckler')",
+    "beforeState": {
+      "inventoryCount": 14
+    },
+    "rngDraws": [
+      71,
+      73
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      84,
+      86
+    ],
+    "stateDiff": [
+      104,
+      106
+    ],
+    "afterState": {
+      "inventoryCount": 14
+    },
+    "playerVisibleConsequence": "possible loot/lore/ambush consequence from a real ambient-noun investigation",
+    "downstreamReaderConsequence": "worldMemory.visitedRooms[...].searchedAmbientNouns dedup mark; possible player.knownRecipes grant",
+    "telemetryJoin": "2",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "REST",
+    "playerVisiblePrecondition": "stamina 12/16 or hp 13/13 below max, no live enemies",
+    "playerVisibleOption": "rest",
+    "policyDecision": "rest",
+    "executorMethod": "REST",
+    "uiSurface": "ActionReferenceScreen.tsx documented command; universal text input",
+    "productionDoor": "submitPlayerAction('rest')",
+    "beforeState": {
+      "stamina": 12,
+      "hp": 13,
+      "hoursElapsed": 1.75
+    },
+    "rngDraws": [
+      74,
+      79
+    ],
+    "clockChangeHours": 8,
+    "productionLogs": [
+      87,
+      93
+    ],
+    "stateDiff": [
+      107,
+      116
+    ],
+    "afterState": {
+      "stamina": 16,
+      "hp": 13,
+      "hoursElapsed": 9.75
+    },
+    "playerVisibleConsequence": "stamina/hp partially restored, clock advanced 8.00h (distinct from the 'settle' gesture, which restores nothing)",
+    "downstreamReaderConsequence": "Guardian core-settle pacing window (coreSettleState) reads hoursElapsed, which rest advances — rest is not itself the settle mechanism",
+    "telemetryJoin": "3",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "LOOT",
+    "playerVisiblePrecondition": "tileGearNoun 'Iron Buckler' listed in currentScene.tileGearNouns (a real player-choice loot door, distinct from automatic kill loot)",
+    "playerVisibleOption": "take Iron Buckler",
+    "policyDecision": "take",
+    "executorMethod": "LOOT",
+    "uiSurface": "GatherModal.tsx TAKE/SALVAGE popup",
+    "productionDoor": "submitPlayerAction('take Iron Buckler')",
+    "beforeState": {},
+    "rngDraws": [
+      80,
+      84
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      94,
+      97
+    ],
+    "stateDiff": [
+      117,
+      121
+    ],
+    "afterState": {},
+    "playerVisibleConsequence": "item added to inventory via grantItem",
+    "downstreamReaderConsequence": "inventoryCount increases; distinct mechanic from resolveEnemyDefeat() automatic loot (never exercised as a player decision, by design)",
+    "telemetryJoin": "4",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "COMBAT-DODGE",
+    "playerVisiblePrecondition": "a live enemy naturally spawned during the capital leg",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "COMBAT-DODGE",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no encounter fired within 12 travel steps toward the capital"
+  },
+  {
+    "family": "ECONOMY-BUY",
+    "playerVisiblePrecondition": "a vendor scene",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "ECONOMY-BUY",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene encountered en route to the capital in this bounded run"
+  },
+  {
+    "family": "ECONOMY-SELL",
+    "playerVisiblePrecondition": "a vendor scene",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "ECONOMY-SELL",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene encountered en route to the capital in this bounded run"
+  },
+  {
+    "family": "ECONOMY-SCRAP",
+    "playerVisiblePrecondition": "a canScrap()-eligible item (scrap does not require a vendor, but none was checked without one being reached)",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "ECONOMY-SCRAP",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene reached; scrap not attempted in this run ordering"
+  },
+  {
+    "family": "MAINTENANCE-VENDOR-REPAIR",
+    "playerVisiblePrecondition": "a vendor scene",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "MAINTENANCE-VENDOR-REPAIR",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene encountered en route"
+  },
+  {
+    "family": "MAINTENANCE-REINFORCE",
+    "playerVisiblePrecondition": "a vendor scene",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "MAINTENANCE-REINFORCE",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene encountered en route"
+  },
+  {
+    "family": "MAINTENANCE-BENCH-REPAIR",
+    "playerVisiblePrecondition": "CraftingScreen materials-repair, no vendor needed but not attempted this run",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "MAINTENANCE-BENCH-REPAIR",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "not attempted in this bounded run ordering"
+  },
+  {
+    "family": "COMPANIONS",
+    "playerVisiblePrecondition": "a vendor scene",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "COMPANIONS",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "no vendor scene encountered en route"
+  },
+  {
+    "family": "CONSUMABLES",
+    "playerVisiblePrecondition": "item 'Trail Rations' kind=consumable in inventory",
+    "playerVisibleOption": "use Trail Rations",
+    "policyDecision": "use",
+    "executorMethod": "CONSUMABLES",
+    "uiSurface": "submitPlayerAction('use <item>') [case 'use_relic'] — one of 5 fragmented consumable paths, see cartography",
+    "productionDoor": "submitPlayerAction('use Trail Rations')",
+    "beforeState": {},
+    "rngDraws": [
+      219,
+      221
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      265,
+      268
+    ],
+    "stateDiff": [
+      340,
+      351
+    ],
+    "afterState": {},
+    "playerVisibleConsequence": "hp/stamina/status effect changed, item consumed",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "17",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "COATINGS",
+    "playerVisiblePrecondition": "a coatable weapon AND a coating item both in inventory",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "COATINGS",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "weapon coatable: true, coating present: false — fresh character has no coating item"
+  },
+  {
+    "family": "FUSE",
+    "playerVisiblePrecondition": ">=3 reserved inputs across >=3 distinct material tags (light, food, drink)",
+    "playerVisibleOption": "fuse",
+    "policyDecision": "fuse",
+    "executorMethod": "FUSE",
+    "uiSurface": "FusionPickerModal.tsx eligible-input preview (tags only, never the hidden output) + confirm",
+    "productionDoor": "confirmFusionSelection(itemIds, kind, catalystId) -> fuseAtCrucible()",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": [
+      269,
+      269
+    ],
+    "stateDiff": [
+      353,
+      354
+    ],
+    "afterState": {},
+    "playerVisibleConsequence": "new item minted from consumed inputs, TC fee charged; never previewed by policy ahead of commit",
+    "downstreamReaderConsequence": "inventory item count changes; recentFusedArmorSlots updated",
+    "telemetryJoin": "21",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "CRAFTING",
+    "playerVisiblePrecondition": "a known (or always-visible Common/Uncommon) recipe with sufficient owned ingredients",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "CRAFTING",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "player.knownRecipes length=0; no always-visible recipe's ingredients were confirmed present in this bounded run's starting inventory (rope/scrap from tutorial did not match a checked recipe) — SOURCE_PROVEN_ONLY, door confirmed real via case 'craft' (gameStore.ts:21668)"
+  },
+  {
+    "family": "STORY",
+    "playerVisiblePrecondition": "fork 'debt_collector' due (motive=debt, phase=revelation, dueFork() pure-function match)",
+    "playerVisibleOption": "Empty your purse into his hands",
+    "policyDecision": "pay_partial",
+    "executorMethod": "STORY",
+    "uiSurface": "StoryForkOverlay.tsx Pressable onPress={() => answer(o.id)}",
+    "productionDoor": "answerFork('pay_partial')",
+    "beforeState": {
+      "storyChoices": {}
+    },
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {
+      "storyChoices": {}
+    },
+    "playerVisibleConsequence": "authored consequence per forks.json (Costs everything you are carrying. Buys quiet above ground for people who cannot buy it themselves.); epilogue line reserved for EndingScreen",
+    "downstreamReaderConsequence": "dialogue TopicGate can match choiceKeys() `${forkId}:${optionId}`; epilogueChoiceLines() reads it at the ending",
+    "telemetryJoin": "22",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "STORY-CHAPTER-DISMISS",
+    "playerVisiblePrecondition": "a chapter card presented during tutorial/travel",
+    "playerVisibleOption": "dismiss",
+    "policyDecision": "(automatic legitimate dismissal, same door StoryForkOverlay/ChapterCard onDismiss calls)",
+    "executorMethod": "dismissPresentationIfPending / dismissChapterCard",
+    "uiSurface": "ChapterCard modal onDismiss",
+    "productionDoor": "dismissChapterCard() [gameStore.ts:29619] + notePresentationDismissed",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "card cleared, next presentation (fork) re-checked via raiseDueFork",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(folded into tutorial/travel action sequence)",
+    "result": "RUNTIME_PROVEN",
+    "notes": "exercised continuously by CanonicalWalker throughout this run (same as Phase 3B)"
+  },
+  {
+    "family": "GUARDIAN",
+    "playerVisiblePrecondition": "stationed at a Lost Capital with no live hostiles",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "GUARDIAN",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "live enemies still present after a bounded 30-round clear attempt"
+  }
+]

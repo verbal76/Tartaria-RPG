@@ -1,0 +1,189 @@
+[
+  {
+    "family": "ECONOMY-BUY",
+    "playerVisiblePrecondition": "vendor offer 'Patched Cloth' priced 2 <= player.tc 160, reached via bounded hub navigation",
+    "playerVisibleOption": "buy Patched Cloth",
+    "policyDecision": "buy",
+    "executorMethod": "ECONOMY-BUY",
+    "uiSurface": "VendorScreen.tsx buy row",
+    "productionDoor": "buyFromVendor(itemName, qty)",
+    "beforeState": {
+      "tc": 160
+    },
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": [
+      1,
+      80
+    ],
+    "stateDiff": [
+      100,
+      103
+    ],
+    "afterState": {
+      "tc": 158
+    },
+    "playerVisibleConsequence": "player.tc decreases by displayed price; item granted to inventory",
+    "downstreamReaderConsequence": "vendor.offers[].quantity decremented",
+    "telemetryJoin": "1",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "ECONOMY-SELL",
+    "playerVisiblePrecondition": "unequipped item 'Aetheric Torch' in inventory, at a vendor room reached via bounded hub navigation",
+    "playerVisibleOption": "sell Aetheric Torch",
+    "policyDecision": "sell",
+    "executorMethod": "ECONOMY-SELL",
+    "uiSurface": "VendorScreen.tsx sell row",
+    "productionDoor": "sellToVendor(itemName, itemId)",
+    "beforeState": {
+      "tc": 163
+    },
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": [
+      81,
+      81
+    ],
+    "stateDiff": [
+      104,
+      108
+    ],
+    "afterState": {
+      "tc": 163
+    },
+    "playerVisibleConsequence": "player.tc increases by displayed price; item removed/decremented",
+    "downstreamReaderConsequence": "NPC relationship ledger (recordNpcDealing) updated",
+    "telemetryJoin": "2",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "COMPANIONS",
+    "playerVisiblePrecondition": "standing in a vendor room reached via bounded hub navigation, no existing NPC companion",
+    "playerVisibleOption": "recruit",
+    "policyDecision": "recruit",
+    "executorMethod": "COMPANIONS",
+    "uiSurface": "universal text input (no cost, no roll)",
+    "productionDoor": "submitPlayerAction('recruit')",
+    "beforeState": {
+      "companion": null
+    },
+    "rngDraws": [
+      79,
+      81
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      82,
+      84
+    ],
+    "stateDiff": [
+      109,
+      111
+    ],
+    "afterState": {
+      "companion": {
+        "name": "Halda Roadsworn",
+        "title": "wandering trader",
+        "factionId": null,
+        "recruitedAt": 1.75
+      }
+    },
+    "playerVisibleConsequence": "player.companion set; companionAssist bonus now feeds investigate/maneuver/rest/escape skill checks",
+    "downstreamReaderConsequence": "buildSkillSteps reads companionAssist:!!player.companion",
+    "telemetryJoin": "3",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "MAINTENANCE-VENDOR-REPAIR",
+    "playerVisiblePrecondition": "item 'Cudgel' durability 5/6 from a real, legitimately-fought controlled encounter; vendor present",
+    "playerVisibleOption": "repair Cudgel",
+    "policyDecision": "repair",
+    "executorMethod": "MAINTENANCE-VENDOR-REPAIR",
+    "uiSurface": "VendorScreen.tsx repair card",
+    "productionDoor": "submitPlayerAction('repair Cudgel') -> repairWithVendor",
+    "beforeState": {
+      "tc": 159,
+      "durability": {
+        "current": 5,
+        "max": 6,
+        "baseMax": 6,
+        "reinforced": 0
+      }
+    },
+    "rngDraws": [
+      221,
+      223
+    ],
+    "clockChangeHours": null,
+    "productionLogs": [
+      766,
+      775
+    ],
+    "stateDiff": [
+      342,
+      346
+    ],
+    "afterState": {
+      "tc": 159
+    },
+    "playerVisibleConsequence": "durability restored to max, TC spent",
+    "downstreamReaderConsequence": "combat AC/effectiveness reads restored durability",
+    "telemetryJoin": "16",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "MAINTENANCE-REINFORCE",
+    "playerVisiblePrecondition": "item 'Rusted Blade' owned, vendor present, player.tc 159",
+    "playerVisibleOption": "reinforce Rusted Blade",
+    "policyDecision": "reinforce",
+    "executorMethod": "MAINTENANCE-REINFORCE",
+    "uiSurface": "VendorScreen.tsx reinforce row",
+    "productionDoor": "reinforceWithVendor(itemName, itemId)",
+    "beforeState": {
+      "tc": 159
+    },
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": [
+      776,
+      776
+    ],
+    "stateDiff": [
+      347,
+      347
+    ],
+    "afterState": {
+      "tc": 159
+    },
+    "playerVisibleConsequence": "durability.max permanently increased (capped at REINFORCE_MAX_LEVEL), TC+materials spent",
+    "downstreamReaderConsequence": "combat AC/effectiveness reads the new max",
+    "telemetryJoin": "17",
+    "result": "RUNTIME_PROVEN",
+    "notes": ""
+  },
+  {
+    "family": "MAINTENANCE-BENCH-REPAIR",
+    "playerVisiblePrecondition": "owns the repair materials repairCostMaterials() requires ([{\"name\":\"Small Rock\",\"quantity\":4},{\"name\":\"Stick\",\"quantity\":2}]) for the damaged 'Cudgel'",
+    "playerVisibleOption": "(none offered)",
+    "policyDecision": "(none)",
+    "executorMethod": "MAINTENANCE-BENCH-REPAIR",
+    "uiSurface": "n/a",
+    "productionDoor": "n/a",
+    "beforeState": {},
+    "rngDraws": null,
+    "clockChangeHours": null,
+    "productionLogs": null,
+    "stateDiff": null,
+    "afterState": {},
+    "playerVisibleConsequence": "n/a — not reached",
+    "downstreamReaderConsequence": "n/a",
+    "telemetryJoin": "(none)",
+    "result": "BLOCKED",
+    "notes": "could not gather all required materials within 10 bounded scrap attempts — inventory: [\"Trail Rations x3\",\"Water Bottle x1\",\"Cudgel x1\",\"Mud-Warden's Vest x1\",\"Reclaimer's Salvage Cap x1\",\"Scrap Metal x5\",\"Folded Note x1\",\"Wild Onion x1\",\"Aether Dust x2\",\"Stick x3\",\"Small Rock x2\",\"Patched Cloth x6\"]"
+  }
+]

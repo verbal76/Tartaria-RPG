@@ -185,6 +185,13 @@ export function buildAboutIdentityText(f: AboutFacts): string {
   ].join('\n');
 }
 
+/** The embedded commit, only if it is a full 40-hex SHA. */
+export function readSourceSha(): string | null {
+  const extra = safe(() => (Constants.expoConfig as { extra?: Record<string, unknown> } | null)?.extra);
+  const v = extra?.sourceSha;
+  return typeof v === 'string' && /^[0-9a-f]{40}$/i.test(v) ? v.toLowerCase() : null;
+}
+
 function safe<T>(fn: () => T): T | null {
   try {
     const x = fn();
@@ -244,12 +251,10 @@ export function collectAboutFacts(opts: { updateStaged: boolean; updateApplying:
     emergencyReason: str(safe(() => U.emergencyLaunchReason)),
     manifestId: str(safe(() => U.manifest?.id)),
     launchAssetHash: str(safe(() => U.manifest?.launchAsset?.hash)),
-    // No source SHA is embedded in the bundle today: the commit appears only in
-    // the EAS publish message ("<ref>@<sha7>"), which the runtime cannot read.
-    // Surfaced as null (and "not embedded in this bundle" in COPY ALL) rather
-    // than invented; wiring a build-time SHA is a separate, release-pipeline
-    // decision and is deliberately not made here.
-    sourceSha: null,
+    // app.config.js writes the commit into `extra` at build/publish time (resolveSourceSha),
+    // and an OTA manifest carries its own `extra`, so this is the commit of the bundle that
+    // is RUNNING. Absent or malformed → null ("not embedded in this bundle"), never invented.
+    sourceSha: readSourceSha(),
     updateStaged: opts.updateStaged,
     updateApplying: opts.updateApplying,
 

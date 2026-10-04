@@ -1,0 +1,13 @@
+{
+  "runStartedAt": "2026-01-01T09:00:13.500Z",
+  "reachedCapital": true,
+  "finalVerdict": "E_BLOCKED_PREREQUISITE",
+  "verdictNote": "character died legitimately while attempting to flee the wilderness encounter active on arrival at the capital",
+  "terminal": null,
+  "mechanism": null,
+  "startState": {},
+  "coreConsequence": null,
+  "roundsConsumed": 0,
+  "guardianRoundBudget": 300,
+  "trace": []
+}
