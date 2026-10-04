@@ -33033,7 +33033,7 @@ function shuffleSlice<T>(arr: readonly T[], n: number): T[] {
 // each (mapX, mapY) wilderness tile its own subset of the macro
 // location's ambient pool — the player sees variety as they walk
 // without re-rolls when they back-track over the same ground.
-function shuffleSliceSeeded<T>(arr: readonly T[], n: number, seed: number): T[] {
+export function shuffleSliceSeeded<T>(arr: readonly T[], n: number, seed: number): T[] {
   if (arr.length <= n) return [...arr];
   const indices = arr.map((_, i) => i);
   // Mulberry32 — small, deterministic PRNG. Good enough for shuffle
