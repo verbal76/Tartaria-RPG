@@ -32187,7 +32187,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * test build authorized by the owner is the first real compile of this
  * code; see the SAVE PRESERVATION REPORT for the exact physical-acceptance
  * procedure prepared for the owner's own device. */
-export const OTA_BUILD_ID = '2026-09-27-1889-the-native-door-never-trades-the-save';
+/* OTA-1890 — ITERATION 8: the studio card, the source it came from, and the update that paints before it restarts.
+ * Hot Attic Games studio splash (Hot_Attic_Games_Master_Logo_ALPHA_FINAL.png, ~2.5 s, once per launch);
+ * "Please wait, applying update" overlay painted before reload; About shows the public version (v<N>) and
+ * Copy All carries the full 40-hex source SHA (extra.sourceSha); the road door obeys the board's hunt reach
+ * rule (I-055); the Hardened Climbing Strap is stocked for every race (I-054); heal-batch refuses a true
+ * no-op (I-010). OTA-capable, no native change. NOT CLAIMED: nothing here has been checked on a device. */
+export const OTA_BUILD_ID = '2026-10-04-1890-the-studio-card-and-the-source-it-came-from';
+// SUPERSEDED: '2026-09-27-1889-the-native-door-never-trades-the-save'
 // SUPERSEDED: '2026-09-27-1888-the-save-is-never-the-price-of-an-update'
 // SUPERSEDED: '2026-09-27-1887-the-copy-speaks-for-itself'
 // SUPERSEDED: '2026-09-26-1886-the-copy-proves-itself-before-it-speaks'
