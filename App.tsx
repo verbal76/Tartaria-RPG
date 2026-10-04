@@ -25,7 +25,8 @@ import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; /
 // module that is not ready cannot cost us the other write.
 import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
-import { SplashOverlay } from './app/components/SplashOverlay';
+import { LaunchSplashes, StudioSplash } from './app/components/StudioSplash';
+import { OtaApplyingOverlay } from './app/components/OtaApplyingOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
 // that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
 // picks by platform, so mounting it here is inert on phones and makes App.tsx
@@ -1313,6 +1314,11 @@ export default function App() {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color="#c9a86a" />
+        {/* The boot-front OTA apply can fire while this pre-hydration view is up. */}
+        <OtaApplyingOverlay />
+        {/* The studio card opens the launch from the first JS render, over this view (see
+            StudioSplash.tsx); the main tree's <LaunchSplashes/> resumes the same card. */}
+        <StudioSplash />
       </View>
     );
   }
@@ -1431,6 +1437,14 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="KeyboardInputBar">
         <KeyboardInputBar />
+      </SilentBoundary>
+      {/* ⚠ "Please wait, applying update" — mounts LAST and at the root, above
+          every other overlay (zIndex 2000 > the splash's 1000), because the apply
+          can begin over any screen or over the opening splash itself. It owns the
+          touch surface for as long as the transition lasts. See
+          app/updates/otaApplyingState.ts for what raises and clears it. */}
+      <SilentBoundary tag="OtaApplyingOverlay">
+        <OtaApplyingOverlay />
       </SilentBoundary>
     </SafeAreaProvider>
   );
@@ -1725,7 +1739,10 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
       {/* OTA-471 — opening splash overlay at the ROOT (outside the safe-area
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
-      <SplashOverlay />
+      {/* Hot Attic Games studio card, THEN the splash above — see StudioSplash.tsx.
+          The card's clock is module-scoped, so mounting it here after hydration resumes the one
+          that opened in the pre-hydration view rather than starting a second. */}
+      <LaunchSplashes />
       {/* PC / Steam Deck controller navigation. Renders nothing on phones
           (native stub); on web it drives the on-screen-button highlight. */}
       <GamepadNav />

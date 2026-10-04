@@ -16,6 +16,7 @@ import { disposeAudio } from '../audio/AudioManager';
 import { stopTTSController } from '../voice/TTSController';
 import { stopAndClear as stopTTS } from '../voice/TTSManager';
 import { disposePiperEngine } from '../voice/PiperTTSManager';
+import { armApplyFailsafe, beginOtaApplying, endOtaApplying, presentedFrame } from './otaApplyingState';
 
 /**
  * ⚠⚠⚠ OTA-1521 — MARK THE ORDERLY EXIT BEFORE WE KILL OURSELVES.
@@ -195,6 +196,9 @@ export type CheckAndApplyResult = 'applied' | 'pending' | 'noUpdate' | 'skipped'
 
 export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise<CheckAndApplyResult> {
   const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false, checkTimeoutMs = 10_000, skipTeardown = false, fetchTimeoutMs = 240_000 } = opts;
+  // True only when THIS call raised the applying state — so a failure here can
+  // never clear a transition that a different, in-flight call owns.
+  let began = false;
   try {
     if (!Updates.isEnabled) {
       if (!silent) onStatus?.('Disabled (dev build / Expo Go)');
@@ -266,6 +270,28 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
         return 'pending';
       }
     }
+    // ⚠⚠ THE APPLY TRANSITION — THE PLAYER IS TOLD, AND THE TELLING IS PAINTED.
+    //
+    // Everything above this line is discovery: checking, downloading, verifying
+    // — the game stays usable and nothing is announced. From here on the bundle
+    // is staged and this runtime is about to be replaced, so the player has to
+    // wait and has to be told why: "Please wait, applying update".
+    //
+    // The old full-screen UPDATING modal was deleted with the manual button
+    // (ca764b28, v2.4.1/OTA-051) and nothing replaced it for the path that
+    // actually applies updates now. The boot-front apply runs `silent`, and it
+    // used to call reloadAsync in the SAME turn as its status string — a render
+    // that is requested and then destroyed before a frame is drawn is never seen.
+    // So: raise the state, wait for the frame that carries it (frame-bounded, see
+    // presentedFrame — not a sleep), and only then start the destructive part.
+    //
+    // A second call while one is in flight must not start a second activation;
+    // it reports 'applied' because the runtime IS being replaced, which tells a
+    // boot caller correctly not to start native modules under a dying context.
+    if (!beginOtaApplying()) return 'applied';
+    began = true;
+    await presentedFrame();
+
     // Flush the player's progress to disk BEFORE handing control to
     // expo-updates. If reloadAsync starts while AsyncStorage is still
     // mid-write, the slot can end up persisted with player=null —
@@ -304,9 +330,11 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
       await markOrderlyExitForReload('boot-front');
       try {
         await Updates.reloadAsync();
+        armApplyFailsafe();
         return 'applied';
       } catch (reloadErr) {
         const m = reloadErr instanceof Error ? reloadErr.message : String(reloadErr);
+        endOtaApplying();
         onStatus?.('Restart failed');
         onError?.(`reloadAsync error: ${m}. Please restart the app manually — your progress was saved.`);
         return 'errored';
@@ -412,14 +440,18 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     await markOrderlyExitForReload('mid-session');
     try {
       await Updates.reloadAsync();
+      armApplyFailsafe();
       return 'applied';
     } catch (reloadErr) {
       const m = reloadErr instanceof Error ? reloadErr.message : String(reloadErr);
+      endOtaApplying();
       onStatus?.('Restart failed');
       onError?.(`reloadAsync error: ${m}. Please restart the app manually — your progress was saved.`);
       return 'errored';
     }
   } catch (err) {
+    // Control is back in this runtime: never leave the overlay up.
+    if (began) endOtaApplying();
     // Capture as much detail as possible — name, message, stack head,
     // any wrapped code property. expo-updates' generic 'Failed to
     // check for update' isn't actionable on its own.

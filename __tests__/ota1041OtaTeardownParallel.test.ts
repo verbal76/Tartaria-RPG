@@ -52,9 +52,12 @@ jest.mock('../app/state/gameStore', () => ({
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { checkAndApplyOTA } = require('../app/updates/checkAndApplyOTA');
+const { resetOtaApplyingForTest } = require('../app/updates/otaApplyingState');
 
 describe('OTA-1041 — native teardown runs concurrently', () => {
-  beforeEach(() => { mockOrder.length = 0; jest.clearAllMocks(); });
+  // A successful apply leaves the applying state up (a real reload destroys the
+  // runtime); in a test the runtime survives, so each case starts clean.
+  beforeEach(() => { mockOrder.length = 0; jest.clearAllMocks(); resetOtaApplyingForTest(); });
 
   it('completes in about one dispose delay, not four', async () => {
     const t0 = Date.now();

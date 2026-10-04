@@ -87,14 +87,18 @@ describe('A3-1 — the Android release tag targets the exact built SHA', () => {
 describe('A3-1 — scope controls: the repair changed identity and nothing else', () => {
   const sh = executable(releaseSteps[0]!.run!);
 
-  it('⚠ release NAMING is untouched — all four tag spellings and both titles', () => {
+  it('⚠ the git TAG spellings are untouched; the public TITLE now comes from the one version number', () => {
     const meta = executable(steps.find((s) => s.name === 'Determine build profile and tag')!.run!);
     expect(meta).toContain('TAG="${GITHUB_REF#refs/tags/}"');
     expect(meta).toContain('TAG="aab-build-${{ github.run_number }}"');
     expect(meta).toContain('TAG="Hal2001-${{ github.run_number }}"');
     expect(meta).toContain('TAG="${TARTARIA_LINE}-apk-${{ github.run_number }}"');
-    expect(sh).toContain('TITLE="Tartaria Realms ${TAG}"');
-    expect(sh).toContain('TITLE="Tartaria Realms v${VERSION}-build.${{ github.run_number }}"');
+    // The owner's release-naming convention (docs/RELEASE-NAMING.md) replaced the two
+    // old titles — "Tartaria Realms ${TAG}" and "…v${VERSION}-build.${run_number}" —
+    // with "<Game> v<N>". The tag stays the engineering handle; the TITLE never carries it.
+    expect(sh).not.toContain('TITLE="Tartaria Realms ${TAG}"');
+    expect(sh).not.toContain('-build.${{ github.run_number }}"');
+    expect(sh.split('TITLE="${{ steps.public.outputs.title }}"').length - 1).toBe(2);
   });
 
   it('⚠ ARTIFACT SELECTION is untouched — the release still uploads the staged artifact', () => {

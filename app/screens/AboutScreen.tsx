@@ -18,6 +18,8 @@ import {
 import { tControlDepth, tartariaKitStyles as kit } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
+import { buildAboutIdentity, buildAboutIdentityText, collectAboutFacts } from '../diagnostics/aboutIdentity';
+import { isOtaApplying } from '../updates/otaApplyingState';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
@@ -751,6 +753,17 @@ export function AboutScreen() {
 
   // OTA 007 — checkForUpdate moved to TitleScreen.
 
+  // ⚠ ABOUT IS FOR HUMANS. What is painted on this screen is the short identity
+  // below; everything else (ML health, crash ledger, runtime pressure, memory
+  // timeline, touch path, model internals) is still gathered and is in COPY ALL.
+  const identity = useMemo(
+    () => buildAboutIdentity(collectAboutFacts({
+      updateStaged: !!useGameStore.getState().pendingOTAUpdate,
+      updateApplying: isOtaApplying(),
+    })),
+    [player],
+  );
+
   const info = useMemo(() => {
     const mb = (bytes: number | null | undefined) =>
       bytes != null ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : 'unknown';
@@ -799,8 +812,14 @@ export function AboutScreen() {
     // Hermes now live inside the Device block (used to be free-
     // floating lines below the OTA status). The OTA status block
     // stays here because it pulls live Updates.* state.
+    // ⚠ COPY ALL LEADS WITH THE FULL RELEASE IDENTITY (the same facts the visible
+    // About block shows, uncut), and then carries every block it always carried.
+    // The visible screen shows `identity` below; this string is only ever copied.
     const lines = [
-      `Tartaria Realms`,
+      buildAboutIdentityText(collectAboutFacts({
+        updateStaged: !!useGameStore.getState().pendingOTAUpdate,
+        updateApplying: isOtaApplying(),
+      })),
       ``,
       buildBasicDeviceSummary(),
       ``,
@@ -2148,7 +2167,28 @@ export function AboutScreen() {
               name-based unlock cannot reach an install whose roster carries
               ordinary names. Both the owner's phones depend on it, so it moved
               with the text it is bound to rather than being rebuilt elsewhere. */}
-          <Text style={styles.mono} onPress={handleOwnerTap}>{info}</Text>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.identityBlock}
+            onPress={handleOwnerTap}
+            accessibilityRole="summary"
+            accessibilityLabel="Release identity"
+          >
+            {identity.map((sec) => (
+              <View key={sec.title} style={styles.identitySection}>
+                <Text style={styles.identityEyebrow}>{sec.title}</Text>
+                {sec.rows.map((r) => (
+                  <View key={r.label} style={styles.identityRow}>
+                    <Text style={styles.identityLabel}>{r.label}</Text>
+                    <Text style={styles.identityValue} selectable>{r.value}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+            <Text style={styles.identityHint}>
+              COPY ALL (below) carries the full diagnostic report — device, update, crash and model details.
+            </Text>
+          </TouchableOpacity>
           {!ownerTools && ownerTaps >= 3 && (
             <Text style={styles.mono}>{`${7 - ownerTaps} more taps to unlock owner tools`}</Text>
           )}
@@ -2347,6 +2387,14 @@ const styles = StyleSheet.create({
   },
   bodyContent: { paddingBottom: 24 },
   mono: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  // Release identity — the only thing About paints from the diagnostic data.
+  identityBlock: { gap: 14, marginBottom: 8 },
+  identitySection: { gap: 4 },
+  identityEyebrow: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 3, marginBottom: 2 },
+  identityRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  identityLabel: { width: 84, color: '#9a8f78', fontSize: 13, lineHeight: 19 },
+  identityValue: { flex: 1, color: '#e6d8b3', fontSize: 13, lineHeight: 19 },
+  identityHint: { color: '#9a8f78', fontSize: 11, lineHeight: 16, fontStyle: 'italic' },
   // Tab row sits below the header. Three equal-flex chips; the active
   // one is filled (amber on dark) and the others are outlined.
   tabRow: {

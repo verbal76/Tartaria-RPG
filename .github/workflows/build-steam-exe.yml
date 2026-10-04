@@ -81,6 +81,27 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      # ⚠⚠ THE PUBLIC NAME — see docs/RELEASE-NAMING.md. The release title and the
+      # .exe filename come from the one number in release/public-version.json,
+      # not from the DISPLAY_VERSION / tag below (those stay as engineering metadata).
+      - name: Resolve the public release name
+        id: public
+        shell: bash
+        run: |
+          OUT="$(node scripts/release-naming.cjs resolve --kind windows)"
+          echo "$OUT"
+          echo "$OUT" >> "$GITHUB_OUTPUT"
+
+      # Fail before the long build if this version number was already delivered
+      # from a DIFFERENT commit (a number identifies exactly one build).
+      - name: Refuse to reuse a delivered version
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/releases?per_page=100" --paginate > "$RUNNER_TEMP/releases.json"
+          node scripts/release-naming.cjs guard --sha "$GITHUB_SHA" --releases "$RUNNER_TEMP/releases.json"
+
       - name: Install app deps (root)
         # ⚠ OTA-1387 changed this from `npm install --legacy-peer-deps`. That was
         # correct on steam_Dev, whose lockfile predated the web deps. OTA-1384
@@ -143,6 +164,15 @@ jobs:
           echo "version=${V:-0.0.0}" >> "$GITHUB_OUTPUT"
           echo "Building release for $V"
 
+      - name: Give the .exe its public name
+        shell: bash
+        run: |
+          set -e
+          COUNT=$(ls desktop/release/*.exe | wc -l)
+          if [ "$COUNT" != "1" ]; then echo "::error::expected exactly one .exe in desktop/release, found $COUNT"; exit 1; fi
+          mv desktop/release/*.exe "desktop/release/${{ steps.public.outputs.asset_name }}"
+          ls -l desktop/release/
+
       - name: Publish the PC build as a Release
         # ⚠ Only for the PC product, and only when asked. A Release is public and
         # permanent; one published from a line nobody ships on PC would be a
@@ -155,11 +185,16 @@ jobs:
           # One rolling tag per version, so a re-run of the same version
           # replaces its build rather than piling up half-tested downloads.
           tag_name: pc-v${{ steps.ver.outputs.version }}
-          name: Tartaria Realms — PC ${{ steps.ver.outputs.version }}
+          name: ${{ steps.public.outputs.title }}
           body: |
-            **Windows portable build — no installer, just run the .exe.**
+            # ${{ steps.public.outputs.title }}
 
-            Version ${{ steps.ver.outputs.version }} · commit ${{ github.sha }}
+            Windows:
+            ${{ steps.public.outputs.asset_name }}
+
+            **Portable build — no installer, just run the .exe.**
+
+            Technical provenance: source commit ${{ github.sha }} · internal JS version ${{ steps.ver.outputs.version }} (DISPLAY_VERSION) · release tag pc-v${{ steps.ver.outputs.version }}
 
             Mouse, keyboard and controller are all supported. If the window
             looks too big or too small, open **Settings → Display size (S/M/L)**.

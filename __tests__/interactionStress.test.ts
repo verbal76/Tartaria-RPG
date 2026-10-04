@@ -728,10 +728,17 @@ Top items granted:      ${[...distinctItemsGranted].slice(0, 8).join(', ') || '(
     expect({ ignored, attempted: takeableSeen.size }).toEqual({ ignored: [], attempted: takeableSeen.size });
     expect(takeGranted).toBe(distinctNounsTaken.size); // each portable noun granted exactly once
     expect(distinctNounsTaken.size).toBeGreaterThanOrEqual(3);
-    // Look-around subset rotation is real — across 700 days the sim
-    // should see plenty of different noun subsets. A weak floor of 8
-    // distinct subsets confirms rotation is firing (with ~10+ scenes
-    // visited and per-visit shuffling, this is conservative).
-    expect(lookSubsetsSeen.size).toBeGreaterThanOrEqual(8);
+    // ⚠ THIS NO LONGER ASSERTS "ROTATION IS FIRING", BECAUSE THIS SIM CANNOT OBSERVE IT.
+    // The old floor (≥ 8 distinct displayed subsets) claimed rotation. A negative control says it never
+    // measured it: with `shuffleSliceSeeded` replaced by a plain `slice(0, n)` — every rotation off —
+    // this same seeded run reports MORE distinct subsets (9, against 7 with rotation on). The count is
+    // the number of distinct windows the displayed list passed through for ANY reason (nouns taken or
+    // worked over, pins, gear), and the run is one scene because it never leaves the tile (it dies on
+    // Day 219), so it is route-dependent and deterministic: 7 on every run, on golem-line and on this
+    // branch alike. Rotation itself is pinned by ambientRotationIsReal.test.ts, whose negative control
+    // goes red. What the sim CAN truthfully say about the look verb is that every look answered with a
+    // displayed list and the player looked, which is asserted here; the count stays in the report.
+    expect(lookCount).toBeGreaterThan(0);
+    expect(lookSubsetsSeen.size).toBeGreaterThan(0);
   });
 });

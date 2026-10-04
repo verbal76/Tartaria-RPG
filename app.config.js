@@ -50,6 +50,30 @@ const CRASH_REPORT_DSN =
   'https://f8526ef7b70c49aba68c3808933ca0a8@o4511945086926848.ingest.us.sentry.io/4511945117532160';
 
 
+// ⚠ SOURCE SHA — the commit this bundle was built from, so About / Copy All can say so.
+//
+// Resolved from the CHECKED-OUT TREE first (`git rev-parse HEAD`), because that is the
+// source actually being bundled: the OTA publisher can publish an exact SHA other than
+// the dispatched ref's head, and `GITHUB_SHA` would then name the wrong commit. The
+// environment is the fallback for builders that have no .git (EAS cloud builds export
+// EAS_BUILD_GIT_COMMIT_HASH). Anything that is not exactly 40 hex characters is dropped
+// to null — an unreadable SHA must read as "not embedded", never as a guess.
+//
+// SAFE FOR NATIVE IDENTITY: it travels in `extra`, like tartariaLine and crashReportDsn,
+// and `extra` is not an input to runtimeVersion (policy: appVersion), so an OTA carrying a
+// different SHA than the installed binary is accepted and simply reports its own.
+function resolveSourceSha(env = process.env, run = null) {
+  const valid = (v) => (typeof v === 'string' && /^[0-9a-f]{40}$/i.test(v.trim()) ? v.trim().toLowerCase() : null);
+  let fromGit = null;
+  try {
+    const exec = run || ((cmd) => require('child_process').execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).toString());
+    fromGit = valid(exec('git rev-parse HEAD'));
+  } catch (e) {
+    fromGit = null;
+  }
+  return fromGit || valid(env.EAS_BUILD_GIT_COMMIT_HASH) || valid(env.GITHUB_SHA) || null;
+}
+
 /** The complete set of per-product differences. Four strings each; if this table
  *  ever needs a fifth field, that is worth a second look — it means a product
  *  difference has appeared that is not a name, an id or a channel. */
@@ -189,9 +213,11 @@ module.exports = ({ config }) => {
       tartariaLine: requested,
       fallenSharing: line.fallenSharing,
       crashReportDsn: CRASH_REPORT_DSN,
+      sourceSha: resolveSourceSha(),
     },
   };
 };
 
 module.exports.LINES = LINES;
+module.exports.resolveSourceSha = resolveSourceSha;
 module.exports.STORE_ID = STORE_ID;
