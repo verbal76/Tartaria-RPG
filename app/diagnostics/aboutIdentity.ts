@@ -23,10 +23,16 @@ import * as Updates from 'expo-updates';
 import { Platform } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename, getApkCodename } from '../buildCodename';
+// The ONE public version (docs/RELEASE-NAMING.md): "Tartaria Realms v<N>". Everything else
+// shown here — OTA id, DISPLAY_VERSION, versionCode, SHA — is engineering metadata.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const PUBLIC = require('../../release/public-version.json') as { product: string; version: number };
 
 export interface AboutFacts {
   appName: string;
-  /** DISPLAY_VERSION — the JS-side version the player sees. */
+  /** The public product version, "v283" — the only version a player or tester needs. */
+  publicVersion: string;
+  /** DISPLAY_VERSION — the INTERNAL JS revision (engineering metadata, kept for Copy All). */
   appVersion: string;
   /** The APK/IPA's own version name (expo-application). */
   nativeVersionName: string | null;
@@ -98,7 +104,7 @@ function updateStatus(f: AboutFacts): string {
 /** The short, human-readable identity shown on the About screen. */
 export function buildAboutIdentity(f: AboutFacts): IdentitySection[] {
   const update: IdentityRow[] = [
-    { label: 'Running', value: f.otaCodename },
+    { label: 'OTA revision', value: f.otaCodename },
     { label: 'Source', value: f.isEmbedded === true ? 'Built into the app' : f.isEmbedded === false ? 'Downloaded update' : MISSING },
     { label: 'Channel', value: v(f.channel) },
     { label: 'Status', value: updateStatus(f) },
@@ -112,7 +118,7 @@ export function buildAboutIdentity(f: AboutFacts): IdentitySection[] {
       title: 'APPLICATION',
       rows: [
         { label: 'Game', value: f.appName },
-        { label: 'Version', value: f.appVersion },
+        { label: 'Version', value: f.publicVersion },
       ],
     },
     {
@@ -142,7 +148,8 @@ export function buildAboutIdentityText(f: AboutFacts): string {
     `RELEASE IDENTITY`,
     `Application`,
     L('Name', f.appName),
-    L('Version (versionName shown to players)', f.appVersion),
+    L('Public version', `${f.appName} ${f.publicVersion}`),
+    L('Internal JS version (DISPLAY_VERSION)', f.appVersion),
     L('Native version name', f.nativeVersionName),
     ``,
     `Install`,
@@ -210,7 +217,8 @@ export function collectAboutFacts(opts: { updateStaged: boolean; updateApplying:
   const apkBuild = safe(() => Application.nativeBuildVersion);
 
   return {
-    appName: 'Tartaria Realms',
+    appName: PUBLIC.product,
+    publicVersion: `v${PUBLIC.version}`,
     appVersion: DISPLAY_VERSION,
     nativeVersionName: str(safe(() => Application.nativeApplicationVersion)),
     packageId: str(safe(() => Application.applicationId)),

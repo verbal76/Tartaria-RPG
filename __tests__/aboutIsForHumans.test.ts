@@ -20,6 +20,7 @@ const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8'
 const FULL_SHA = '0123456789abcdef0123456789abcdef01234567';
 const base: AboutFacts = {
   appName: 'Tartaria Realms',
+  publicVersion: 'v283',
   appVersion: '4.32.11',
   nativeVersionName: '2.5.0',
   packageId: 'com.hotatticgames.tartarprim',
@@ -59,13 +60,14 @@ describe('visible About — clean release identity', () => {
     expect(sections.map((s) => s.title)).toEqual(['APPLICATION', 'INSTALL', 'DEVICE', 'UPDATE']);
     const r = rows(base);
     expect(r['APPLICATION/Game']).toBe('Tartaria Realms');
-    expect(r['APPLICATION/Version']).toBe('4.32.11');
+    expect(r['APPLICATION/Version']).toBe('v283'); // the PUBLIC version, not DISPLAY_VERSION
+    expect(JSON.stringify(buildAboutIdentity(base))).not.toContain('4.32.11'); // internal revision is Copy-All only
     expect(r['INSTALL/Package']).toBe('com.hotatticgames.tartarprim');
     expect(r['INSTALL/Runtime']).toBe('2.5.0');
     expect(r['INSTALL/Build']).toBe('476');
     expect(r['DEVICE/Device']).toBe('Pixel 8');
     expect(r['DEVICE/System']).toBe('Android 15 (API 35)');
-    expect(r['UPDATE/Running']).toBe('Quiet Anvil');
+    expect(r['UPDATE/OTA revision']).toBe('Quiet Anvil');
     expect(r['UPDATE/Source']).toBe('Downloaded update');
     expect(r['UPDATE/Channel']).toBe('hal2001');
     expect(r['UPDATE/Status']).toBe('Up to date as of the last check');
@@ -117,7 +119,7 @@ describe('COPY ALL — the full report', () => {
 
   it('carries every identity field uncut, including the full SHA', () => {
     for (const must of [
-      'com.hotatticgames.tartarprim', '4.32.11', '2.5.0', 'versionCode', '476', 'Pixel 8',
+      'com.hotatticgames.tartarprim', 'Tartaria Realms v283', 'Internal JS version (DISPLAY_VERSION): 4.32.11', '2.5.0', 'versionCode', '476', 'Pixel 8',
       'API level: 35', 'en-US', 'America/Chicago', '2026-10-03T00:00:00.000Z',
       'Quiet Anvil', base.otaBuildId, base.updateId!, 'hal2001', base.updateCreatedAt!,
       'downloaded OTA', 'abc123hash', FULL_SHA,
@@ -172,5 +174,9 @@ describe('collector', () => {
     expect(f.otaBuildId).toMatch(/^\d{4}-\d{2}-\d{2}-/);
     expect(new Date(f.capturedAt).toString()).not.toBe('Invalid Date');
     expect(f.sourceSha).toBeNull();
+    // the public version comes from the one file the release workflows also read
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pv = require('../release/public-version.json') as { version: number };
+    expect(f.publicVersion).toBe(`v${pv.version}`);
   });
 });
