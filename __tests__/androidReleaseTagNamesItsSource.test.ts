@@ -126,11 +126,14 @@ describe('A3-1 — scope controls: the repair changed identity and nothing else'
     expect(executable(verify.run!)).toContain('Tartaria Realms Debug');
   });
 
-  it('⚠ the job gate is untouched — a trunk push still builds only when asked', () => {
+  it('⚠ the job gate is opt-in on EVERY branch — a build publishes a release, so a push alone never starts one', () => {
     const gate = job.if;
     for (const marker of ['[build-apk]', '[build-aab]', '[golem-apk]']) {
       expect(gate).toContain(`contains(github.event.head_commit.message, '${marker}')`);
     }
-    expect(gate).toContain("github.ref != 'refs/heads/golem-line'");
+    expect(gate).toContain("github.event_name == 'workflow_dispatch'");
+    expect(gate).toContain("startsWith(github.ref, 'refs/tags/')");
+    // the old exemption that let any claude/** or release/** push build AND publish
+    expect(gate).not.toContain('github.ref !=');
   });
 });
