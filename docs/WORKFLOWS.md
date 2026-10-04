@@ -744,7 +744,7 @@ exact source (actions/checkout, no ref: → the dispatched SHA)
 | **Application ID** | `com.hotatticgames.tartarprim.hal2001` *(resolved through `app.config.js`, verified 2026-09-15)* |
 | **Channel** | `hal2001` |
 | **App name** | `Tartaria Realms HAL` |
-| **Filename shape** | `tartaria-realms-Hal2001-<run_number>.apk` |
+| **Filename shape** | `Tartaria-Realms-v<N>.apk` — public version from `release/public-version.json`; the tag stays `Hal2001-<run_number>` (see `docs/RELEASE-NAMING.md`) |
 
 ### ⚠⚠ HAL PREVIEW AND GOLEM PREVIEW ARE DELIBERATELY DIFFERENT
 
