@@ -708,6 +708,24 @@ export class Walker {
       if (!(await this.fightOut(`stage ${s} after typing "${ask}"`))) return false;
       await settle(() => this.stage() > s, 2500);
     }
+    if (this.stage() <= s && this.refusedIndoors(closeMark)) {
+      // The Arbiter's refusal names the way out — "take it outside (EXIT)" in a building,
+      // "LEAVE OUTPOST" under a hub roof — because a stage that draws blades will not start
+      // a fight indoors (questSlice storyDrawsBlades). A player reads that line and does what
+      // it says, on the same canon cell, then says the same words again; so does the walk.
+      // Without this the walker typed the arrival line inside the Hidden Market (OTA-508
+      // auto-enters it) and reported the refusal as a mission that "did not pay".
+      if (get().player?.hubRoomId) { this.tap('EXIT'); await this.type('leave outpost'); }
+      if (get().activeBuildingId) { this.tap('EXIT (building)'); get().exitBuilding(); await tick(); }
+      this.tap(`type "${ask}" (again, outside)`);
+      await this.type(ask);
+      await settle(() => this.stage() > s || this.enemiesUp() > 0, 2500);
+      if (this.enemiesUp() > 0) {
+        if (!(await this.fightOut(`stage ${s} after stepping outside and typing "${ask}"`))) return false;
+        await settle(() => this.stage() > s, 2500);
+      }
+      if (this.stage() > s) return this.afterClose(s, note, closeMark, cardsBefore);
+    }
     if (this.stage() <= s) {
       // One more try with what the Contracts screen prints under "Advance by".
       const label = this.contractsLabel(s);
@@ -729,6 +747,11 @@ export class Walker {
       return false;
     }
     return this.afterClose(s, note, closeMark, cardsBefore);
+  }
+
+  /** Did the Arbiter refuse because the player is under a roof? (the two lines questSlice prints) */
+  refusedIndoors(mark: number): boolean {
+    return this.feedSince(mark).some((l) => /take it outside|Not under this roof/.test(l));
   }
 
   /** The close: what popped, what the feed said. The owner's rule is a card on every one. */
