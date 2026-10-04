@@ -311,3 +311,19 @@ The snapshot was built specifically so this triage is mechanical
 (OTA-202 → 203 → 204 → 206 → 208 progression). Treat every paste
 as a request for it, even when the user just says "here's a fresh
 one." If they don't want triage, they'll say so.
+
+## Hot Attic Games — Human Testing Gate Rule (durable, studio-wide)
+
+Do NOT recommend Kevin physically test a build when:
+
+1. the functionality to be tested is not actually present in the build/OTA available to him;
+2. confirmed, reproducible, independently repairable engineering defects remain that Claude can address first;
+3. required engineering validation or CI qualification remains incomplete;
+4. the human test would merely rediscover what engineering evidence already shows.
+
+Human testing is for what genuinely needs a human or a physical device: gameplay feel, visual
+behaviour, device performance, touch, hardware/OS integration, subjective UX, and real OTA
+activation behaviour that cannot be established otherwise. It is NOT a substitute for engineering
+completion. Before recommending "send to Kevin for testing", verify that the exact artifact/OTA
+handed over contains every change in the physical-test checklist; if it does not, Kevin should not
+test yet. Applies across Hot Attic Games projects unless Kevin explicitly overrides it.

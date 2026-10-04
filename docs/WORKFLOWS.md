@@ -769,9 +769,13 @@ tester's install refused the update.
 
 ### ⚠ ORDINARY PUSHES DO NOT BUILD ANDROID — THIS IS CORRECT
 
-The job gate makes an Android build **opt-in on the trunk**. A push to
-`golem-line` builds only when the commit title carries `[build-apk]`,
-`[build-aab]` or `[golem-apk]`; otherwise the job reports **skipped**.
+The job gate makes an Android build **opt-in on every branch** (2026-10-04: it
+used to exempt non-trunk branches, so a `claude/**` or `release/**` push that touched
+any path outside `paths-ignore` built an APK **and published a GitHub Release** marked
+latest — runs 495/496 were two topic-branch pushes about to do exactly that). A push
+builds only when the commit title carries `[build-apk]`, `[build-aab]` or
+`[golem-apk]`, when the run is a `workflow_dispatch`, or when a `v*` tag is pushed;
+otherwise the job reports **skipped**.
 
 An Android build is 30–60 minutes of runner time. The trunk takes every commit
 for all four products, so firing on every push would be a standing charge. A
