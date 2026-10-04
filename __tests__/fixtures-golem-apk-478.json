@@ -1,0 +1,44 @@
+{
+ "id": 389890392,
+ "tag_name": "golem-apk-478",
+ "name": "Tartaria Realms v2.0.1-build.478",
+ "body": "## Tartaria Realms \u2014 Playtest APK\n\nVersion: 2.0.1\nBranch: claude/ios-cxx20-llama-rn (line: golem)\nCommit: 3d43bb8\nBuild #: 478\n\n### Install\n1. Download the .apk attached below on your Android device.\n2. Open it. If prompted, enable Install unknown apps for your browser or file manager.\n3. Tap Install. Launch Tartaria Realms.\n\nRelease-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship to channel golem-line while this APK is installed.",
+ "assets": [
+  {
+   "url": "https://api.github.com/repos/verbal76/Tartaria-RPG/releases/assets/567899208",
+   "id": 567899208,
+   "node_id": "RA_kwDOSeYIpc4h2XRI",
+   "name": "tartaria-realms-golem-apk-478.apk",
+   "label": "",
+   "uploader": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+   },
+   "content_type": "application/vnd.android.package-archive",
+   "state": "uploaded",
+   "size": 238366596,
+   "digest": "sha256:29bad3bdce4ae2119806b9a7143d8114e1e61c3ffce89f24aa95b8e67a92dba3",
+   "download_count": 0,
+   "created_at": "2026-09-16T12:10:41Z",
+   "updated_at": "2026-09-16T12:10:48Z",
+   "browser_download_url": "https://github.com/verbal76/Tartaria-RPG/releases/download/golem-apk-478/tartaria-realms-golem-apk-478.apk"
+  }
+ ]
+}

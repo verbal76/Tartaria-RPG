@@ -74,6 +74,20 @@ one simply shares that release's number.
 Old releases and tags were left alone (tags are provenance). Only the newest release was
 retitled/renamed under this convention.
 
+## Converting an existing release (one-time, owner-run)
+
+`scripts/release-retitle.cjs` brings an already-published release under the convention
+without touching its tag, commit or binary: it renames the attachment in place (GitHub's web UI
+cannot), retitles the release, marks it Latest, puts the install file at the top of the notes and
+keeps every old line verbatim under a provenance block. It defaults to a dry run:
+
+    node scripts/release-retitle.cjs --tag golem-apk-478 --kind apk           # preview
+    node scripts/release-retitle.cjs --tag golem-apk-478 --kind apk --apply   # apply
+
+It needs the `gh` CLI signed in with permission to edit releases. (The Claude Code cloud session
+that wrote this is not permitted to edit releases, so the existing v283 release was prepared but
+not converted by it.)
+
 ## Not yet covered
 
 iOS/TestFlight (Apple build numbers), the web build, and the Linux/macOS desktop artifacts
