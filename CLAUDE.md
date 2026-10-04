@@ -130,6 +130,12 @@ same place: a write to `pendingDogOnboarding`.
 - **Commit titles:** `OTA-NNN — <short description>` (+ `[build-*]` markers
   first only when a native build is truly intended). The codename-first
   title convention is retired. Trailers per HANDOFF §6.
+- **PUBLIC RELEASE NAME = "Tartaria Realms v<N>" — read `docs/RELEASE-NAMING.md` before
+  delivering any playable build.** One sequential integer in `release/public-version.json`
+  becomes the GitHub Release title and the artifact filename; bump it for every new delivered
+  build and never reuse it. SHA, versionCode, tag, OTA id and `DISPLAY_VERSION` below are
+  *internal* engineering metadata — put them in release notes and diagnostics, never in a
+  title or filename.
 - **Every OTA bumps `OTA_BUILD_ID` AND `DISPLAY_VERSION`** (PATCH +1 per
   OTA; MINOR on a feature wave — scheme + ledger in VERSION.md).
 - **All gates before every push:** typecheck:ci, lint, typecheck:tests

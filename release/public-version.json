@@ -1,0 +1,6 @@
+{
+  "product": "Tartaria Realms",
+  "fileStem": "Tartaria-Realms",
+  "version": 283,
+  "basis": "Count of delivered playable Android builds (GitHub Releases carrying an installable artifact), chronological: apk-build-8 (2026-05-15) is #1 and golem-apk-478 (2026-09-16) is #283. Android versionCode / CI run numbers are NOT the public version. PC prereleases (pc-v4.x) are a separate legacy series and are not counted."
+}

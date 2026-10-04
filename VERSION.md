@@ -3,6 +3,10 @@
 `VERSION.md` is the **single source of truth for the version number.**
 Read it before every native build; advance it on every OTA.
 
+> ⚠ **This ledger is the INTERNAL version** (`DISPLAY_VERSION`, the OTA revision). The
+> owner-facing PUBLIC version is a single sequential number — "Tartaria Realms v283",
+> then v284 … — held in `release/public-version.json`. See `docs/RELEASE-NAMING.md`.
+
 ## Scheme — `MAJOR.MINOR.PATCH` (semantic versioning)
 
 - **MAJOR** — a big / milestone jump (new engine lineage, major rework).
