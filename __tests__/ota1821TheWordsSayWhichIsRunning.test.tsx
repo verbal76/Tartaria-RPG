@@ -275,6 +275,9 @@ describe('OTA-1821 §3 — the rendered control has the same body running or not
         motiveId: 'debt', pressure: 'owed',
       } as never);
     });
+    // hpMax: this suite is about the toggle's rendering, not reach — a fresh character is under the
+    // hunt's recommended HP and the road door now (I-055) refuses that, same as the board.
+    await TR.act(async () => { useGameStore.setState((st) => ({ player: { ...st.player!, hpMax: 999, hp: 999 } })); });
     // a real hunt, taken the way the game takes one — accepting it makes it active
     await TR.act(async () => { useGameStore.getState().acceptHunt('hunt_bog_dragon'); });
 

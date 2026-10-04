@@ -83,6 +83,9 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     const fac = getFactions()[0]!;
     await store.getState().startNewGame({ name: 'Hunter', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
+    // hpMax: this test is about NAME matching / de-duplication, not reach. A fresh character is
+    // under the hunt's recommended HP and the road door now (I-055) refuses that, same as the board.
+    store.setState((st) => ({ player: { ...st.player!, hpMax: 999, hp: 999 } }));
 
     const beforeIds = (store.getState().player!.activeHunts ?? []).map((h) => h.id);
     expect(beforeIds).not.toContain('hunt_bog_dragon');
@@ -160,6 +163,9 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     const fac = getFactions()[0]!;
     await store.getState().startNewGame({ name: 'NoDup', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
+    // hpMax: this test is about NAME matching / de-duplication, not reach. A fresh character is
+    // under the hunt's recommended HP and the road door now (I-055) refuses that, same as the board.
+    store.setState((st) => ({ player: { ...st.player!, hpMax: 999, hp: 999 } }));
 
     // ⚠ OTA-1193 — was `accept drakova`, which is ambiguous between two hunts and now
     // refuses, so all three calls did nothing and the test passed for the wrong reason
