@@ -25,7 +25,7 @@ import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; /
 // module that is not ready cannot cost us the other write.
 import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
-import { LaunchSplashes } from './app/components/StudioSplash';
+import { LaunchSplashes, StudioSplash } from './app/components/StudioSplash';
 import { OtaApplyingOverlay } from './app/components/OtaApplyingOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
 // that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
@@ -1316,6 +1316,9 @@ export default function App() {
         <ActivityIndicator color="#c9a86a" />
         {/* The boot-front OTA apply can fire while this pre-hydration view is up. */}
         <OtaApplyingOverlay />
+        {/* The studio card opens the launch from the first JS render, over this view (see
+            StudioSplash.tsx); the main tree's <LaunchSplashes/> resumes the same card. */}
+        <StudioSplash />
       </View>
     );
   }
@@ -1737,7 +1740,8 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
       {/* Hot Attic Games studio card, THEN the splash above — see StudioSplash.tsx.
-          Inert (renders only SplashOverlay) until the canonical studio asset is committed. */}
+          The card's clock is module-scoped, so mounting it here after hydration resumes the one
+          that opened in the pre-hydration view rather than starting a second. */}
       <LaunchSplashes />
       {/* PC / Steam Deck controller navigation. Renders nothing on phones
           (native stub); on web it drives the on-screen-button highlight. */}

@@ -333,3 +333,23 @@ activation behaviour that cannot be established otherwise. It is NOT a substitut
 completion. Before recommending "send to Kevin for testing", verify that the exact artifact/OTA
 handed over contains every change in the physical-test checklist; if it does not, Kevin should not
 test yet. Applies across Hot Attic Games projects unless Kevin explicitly overrides it.
+
+## Hot Attic Games — Studio splash (standing product requirement, studio-wide)
+
+Every Hot Attic Games application/game opens with the Hot Attic Games studio splash BEFORE its own
+title screen, menu, onboarding or primary interface:
+
+    APP START → HOT ATTIC GAMES SPLASH → PRODUCT TITLE / OPENING → NORMAL EXPERIENCE
+
+- **The canonical artwork is `Hot_Attic_Games_Master_Logo_ALPHA_FINAL.png`** (owner-supplied, 1536×1024
+  RGBA with real transparency). In this repository it lives at the repository root. The older
+  `branding/Hot_Attic_Games_Master_Logo.png` is OBSOLETE: do not look for it, wait for it, or recreate it.
+  Never redraw, substitute, crop, stretch or recolour the artwork.
+- It is a COLD-LAUNCH identification: shown once per JS process (not on background → foreground), about
+  2.5 s with a short fade in and out, on the app's own window colour, `contain`ed with its aspect
+  ratio preserved, with no extra text, buttons or effects. Startup work proceeds underneath it.
+- Tartaria Realms: `app/components/StudioSplash.tsx` (card + `LaunchSplashes` sequence),
+  `app/ui/studioSplashArt.ts` (the one-line asset leaf), mounted in `App.tsx` in both the
+  pre-hydration view and the main tree. Pinned by `__tests__/studioSplash.test.tsx` (including the
+  file's SHA-256 — replacing the artwork means updating that pin on purpose).
+- Do not remove it or add a second studio-splash system; extend the existing one.
