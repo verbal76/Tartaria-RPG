@@ -122,37 +122,41 @@ describe('cardinal movement ambient-noun variety', () => {
     snapshot('back-north');
     store.getState().stepDirection('north');
     snapshot('back-start');
+    // A return leg that lands on a tile already shown (see the determinism block below).
+    // back-start stands at south1's column + 1 (the east step), one row up: west, then south, is south1's tile.
+    store.getState().stepDirection('west');
+    store.getState().stepDirection('south');
+    snapshot('again-south1');
 
-    const sets = Object.values(tileSnapshots).map((arr) => arr.join('|'));
-    const uniqueSets = new Set(sets);
-    // At least 3 distinct displays across 6 sampled positions — way
-    // better than the pre-fix "always identical" behaviour. 5+ would
-    // be ideal but Cantor pairing on a 36-noun pool can produce
-    // overlaps within a small window.
-    expect(uniqueSets.size).toBeGreaterThanOrEqual(3);
+    // ⚠ WHAT THIS ASSERTS, AND WHY IT IS NOT A COUNT OF DISTINCT DISPLAYS.
+    // It used to count distinct FULL displays (≥ 3). Each tile also places its own gear and the
+    // cross-tile variety window hides recent picks, so the displayed list changes from tile to tile
+    // WITH EVERY ROTATION SWITCHED OFF: replacing shuffleSliceSeeded by a plain slice(0, n) left that
+    // count at 4 and the suite green. Measured on that mutation, the pool-derived part of every window
+    // was a PREFIX of the pool. So the claim that actually separates rotation from its absence is
+    // reach: across the walked tiles the windows draw on much more of the pool than one window holds.
+    const poolWindow = (arr: string[]): string[] => arr.filter((n) => bigPool.includes(n));
+    const windows = Object.entries(tileSnapshots)
+      .filter(([k]) => !k.startsWith('start@')) // 'start' is the synthetic seed, not a shuffle output
+      .map(([, arr]) => poolWindow(arr));
+    const reach = new Set(windows.flat());
+    // 8-slot window over a 36-noun pool, five stepped tiles: unrotated reach is exactly the first 8.
+    expect(reach.size).toBeGreaterThanOrEqual(16);
+    // …and it is not merely the head of the pool.
+    expect([...reach].filter((n) => !bigPool.slice(0, 8).includes(n)).length).toBeGreaterThanOrEqual(8);
 
-    // Determinism: backtracking to a tile we've visited should show
-    // the same display we saw before.
-    const startCoords = `start@${tileSnapshots.start ? Object.keys(tileSnapshots)[0]!.split('@')[1] : '?'}`;
-    const backCoords = Object.keys(tileSnapshots).find((k) => k.startsWith('back-start@'));
-    const startKey = Object.keys(tileSnapshots).find((k) => k.startsWith('start@'));
-    if (startKey && backCoords) {
-      // If the player ended up back at the start coords after two
-      // norths, the display should match. (stepDirection may bounce
-      // off map edges, so we only assert when the coords actually
-      // match.)
-      const sameCoord = startKey.split('@')[1] === backCoords.split('@')[1];
-      if (sameCoord) {
-        // ⚠ OTA-1301 — compare the POOL-derived portion. The tile's gear is
-        // seeded per tile, but the cross-tile variety window (OTA-973) can hide
-        // a pick on the return leg — deliberately, and that is not the shuffle
-        // determinism this line exists to guard.
-        const poolOnly = (k: string): string =>
-          tileSnapshots[k]!.filter((n) => bigPool.includes(n)).join('|');
-        expect(poolOnly(backCoords)).toBe(poolOnly(startKey));
-      }
-    }
-    void startCoords;
+    // Determinism: stepping back onto a tile already shown gives (nearly) the display it gave before.
+    // ⚠ This block used to run only `if (sameCoord)` — and the walk never returned to the start's
+    // coordinates (a step ARRIVES and the map cell jumps), so it asserted nothing, ever. The return leg
+    // above lands on south1's tile; the coordinates are asserted equal so it cannot silently skip, and the
+    // POOL-derived windows must overlap heavily (not equal: the OTA-973 variety window can deliberately
+    // hide a pick on a return leg, OTA-1301). A re-roll that ignored the tile would share ~2 of 8.
+    const first = Object.keys(tileSnapshots).find((k) => k.startsWith('south1@'))!;
+    const again = Object.keys(tileSnapshots).find((k) => k.startsWith('again-south1@'))!;
+    expect(again.split('@')[1]).toBe(first.split('@')[1]);
+    const w1 = poolWindow(tileSnapshots[first]!);
+    const w2 = poolWindow(tileSnapshots[again]!);
+    expect(w1.filter((n) => w2.includes(n)).length).toBeGreaterThanOrEqual(Math.min(w1.length, w2.length) - 2);
 
     // Every displayed list must be drawn FROM the pool — no rogue
     // entries snuck in.
