@@ -1,0 +1,374 @@
+{
+  "id": "49d11445b55443e3ac1fba19480246d5",
+  "groupID": "7730388490",
+  "eventID": "49d11445b55443e3ac1fba19480246d5",
+  "projectID": "4511945117532160",
+  "size": 5889,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (12s after boot, app active, stage qwen:deferred)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+  "message": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (12s after boot, app active, stage qwen:deferred)",
+  "title": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (12s after boot, app active, stage qwen:deferred)",
+  "location": null,
+  "user": {
+    "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-10-05T17:11:40.021Z",
+      "app_identifier": "com.hotatticgames.tartarprim.golem",
+      "app_name": "Golem",
+      "app_version": "2.5.0",
+      "app_build": "474",
+      "in_foreground": true,
+      "is_split_apks": false,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP3A.260905.009",
+      "battery_level": 100.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331767808,
+      "free_memory": 2575077376,
+      "storage_size": 245292421120,
+      "free_storage": 51278983168,
+      "boot_time": "2026-10-02T21:53:36.782Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "31.799999237060547",
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP3A.260905.009",
+      "kernel_version": "6.6.127-android15-8-gd00dbafe5604-ab16030312-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "golem-line",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 23,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a10954-9320-7294-97bf-522fa0744d09"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a7411626a7114e89a5e02381e1aeed02",
+      "span_id": "bfbaf32b307e9ad9",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "actionAgeMs": 12042,
+    "id": "1791220079324_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:idle:awaiting-first-action",
+    "lastPhaseAgeMs": 9041,
+    "lastScreen": "title",
+    "launchAfterOta": true,
+    "launchAgeMs": 12080,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 346,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "no",
+    "sinceBootMs": 12080,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (12s after boot, app active, stage qwen:deferred)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-10-04-1890-the-studio-card-and-the-source-it-came-from"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-10-04-1890-the-studio-card-and-the-source-it-came-from"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP3A.260905.009"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-10-04-1890-the-studio-card-and-the-source-it-came-from"
+    },
+    {
+      "key": "stage",
+      "value": "boot:idle:awaiting-first-action"
+    },
+    {
+      "key": "user",
+      "value": "id:9a8a8c0079ee4e8eba37ffa9f098cee1",
+      "query": "user.id:\"9a8a8c0079ee4e8eba37ffa9f098cee1\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-10-05T17:11:38.655205Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-10-05T17:07:59.324000Z",
+  "fingerprints": [
+    "790ab85344d78bde8ef74ee21a9c5368"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 2010292196,
+    "commitCount": 48,
+    "data": {},
+    "dateCreated": "2026-10-04T23:51:44.961001Z",
+    "dateReleased": "2026-10-04T23:51:45.655571Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "dc37a4ddc577b179f1670795ec3b76c632ec78a5",
+      "message": "OTA-1890 \u2014 the studio card, and the source it came from (GOLEM ONLY, source)\n\nIteration 8 release identity: stamps OTA_BUILD_ID 2026-10-04-1890 and adds the ota1890 suite the\nstamp gate requires. The content is the already-validated candidate 4ba03978: Hot Attic Games studio\nsplash on the canonical artwork, the painted-before-reload applying overlay, About public version and\nCopy All source SHA, the road-door hunt reach rule (I-055), the Climbing Strap for every race (I-054),\nand the heal-batch no-op guard (I-010). OTA-capable, no native change.\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-10-04T23:39:42Z",
+      "pullRequest": {
+        "id": "31",
+        "title": "Iteration 8 candidate: QA batch + PR #29 + #30 on one SHA (HELD \u2014 merging publishes an OTA)",
+        "message": "## One integration SHA: `4ba0397805d3b1fcf709367157f652b043bb5375`\n\ngolem-line (`b259542a`) + the whole candidate. **Merging publishes an OTA to Golem, so it is held for the owner.** CI on this exact SHA: all 8 required jobs and the heavy-sims job green (run 37229050813).\n\n**Contents**\n- Overlay \"Please wait, applying update\" (render-before-reload), About identity + Copy All, source SHA in `extra`, studio splash on `Hot_Attic_Games_Master_Logo_ALPHA_FINAL.png` (PRs #29, #30).\n- QA batch: heal-batch true-no-op guard (I-010), qualification-evidence fixes (I-017/18/52), road-door hunt reach rule (I-055), and the Hardened Climbing Strap for every race (I-054 \u2014 **owner decision pending; this commit can be dropped alone**).\n- `build-apk.yml`: no branch builds an APK merely on push (it publishes a Release).\n- Tests: walker follows the Arbiter's \"take it outside\"; two fixtures stop leaning on a fresh character's HP; `interactionStress` stops claiming rotation; new `ambientRotationIsReal` (red 3/6 under a rotation-off mutation).\n\n**Not verified:** nothing here has been checked on a device.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX\n\n---\n_Generated by [Claude Code](https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX)_",
+        "dateCreated": "2026-10-04T22:23:15.224984Z",
+        "mergedAt": "2026-10-04T23:44:44Z",
+        "status": "merged",
+        "repository": {
+          "id": "6929770",
+          "name": "verbal76/Tartaria-RPG",
+          "url": "https://github.com/verbal76/Tartaria-RPG",
+          "provider": {
+            "id": "integrations:github",
+            "name": "GitHub"
+          },
+          "status": "active",
+          "dateCreated": "2026-08-20T20:42:38.041550Z",
+          "integrationId": "494990",
+          "externalSlug": "verbal76/Tartaria-RPG",
+          "externalId": "1239812261"
+        },
+        "author": {
+          "name": "verbal76",
+          "email": "verbal76@localhost"
+        },
+        "externalUrl": "https://github.com/verbal76/Tartaria-RPG/pull/31"
+      },
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+          "shortVersion": "tartaria@4.32.11+2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-10-04T23:51:45.655571Z",
+          "dateCreated": "2026-10-04T23:51:44.961001Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "165004429",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-10-04T23:51:45.868288Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-10-04-1890-the-studio-card-and-the-source-it-came-from",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-10-04-1890-the-studio-card-and-the-source-it-came-from)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.29.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "3c843492faa5415a944d9109eacbd10e"
+}

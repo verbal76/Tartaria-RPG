@@ -1,0 +1,352 @@
+{
+  "id": "196d28774627470cbb6f76f95b628fcc",
+  "groupID": "7774679158",
+  "eventID": "196d28774627470cbb6f76f95b628fcc",
+  "projectID": "4511945117532160",
+  "size": 5783,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (5s after boot, app active, stage boot:complete)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-27-1889-the-native-door-never-trades-the-save",
+  "message": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (5s after boot, app active, stage boot:complete)",
+  "title": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (5s after boot, app active, stage boot:complete)",
+  "location": null,
+  "user": {
+    "id": "9ddc64c198c94176b6bc719a15bd7e81",
+    "email": null,
+    "username": null,
+    "ip_address": null,
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "app": {
+      "app_start_time": "2026-10-05T17:07:28.833Z",
+      "app_identifier": "com.hotatticgames.tartarprim",
+      "app_name": "Tartaria Realms",
+      "app_version": "2.5.0",
+      "app_build": "476",
+      "in_foreground": true,
+      "is_split_apks": true,
+      "permissions": {
+        "ACCESS_LOCAL_NETWORK": "granted",
+        "ACCESS_NETWORK_STATE": "granted",
+        "BIND_GET_INSTALL_REFERRER_SERVICE": "granted",
+        "CHECK_LICENSE": "granted",
+        "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION": "granted",
+        "INTERNET": "granted",
+        "MODIFY_AUDIO_SETTINGS": "granted",
+        "READ_EXTERNAL_STORAGE": "not_granted",
+        "RECORD_AUDIO": "not_granted",
+        "SYSTEM_ALERT_WINDOW": "not_granted",
+        "VIBRATE": "granted",
+        "WRITE_EXTERNAL_STORAGE": "not_granted"
+      },
+      "split_names": [
+        "config.arm64_v8a",
+        "config.en",
+        "config.es",
+        "config.xxhdpi"
+      ],
+      "type": "app"
+    },
+    "device": {
+      "family": "Pixel",
+      "model": "Pixel 10 Pro XL",
+      "model_id": "CP3A.260905.009",
+      "battery_level": 100.0,
+      "orientation": "portrait",
+      "manufacturer": "Google",
+      "brand": "google",
+      "screen_width_pixels": 1080,
+      "screen_height_pixels": 2404,
+      "screen_density": 2.4375,
+      "screen_dpi": 390,
+      "online": true,
+      "charging": false,
+      "low_memory": false,
+      "simulator": false,
+      "memory_size": 16331767808,
+      "free_memory": 2897809408,
+      "storage_size": 245292421120,
+      "free_storage": 51284316160,
+      "boot_time": "2026-10-02T21:53:36.782Z",
+      "timezone": "America/New_York",
+      "locale": "en_US",
+      "processor_count": 8,
+      "processor_frequency": 3782,
+      "archs": [
+        "arm64-v8a"
+      ],
+      "battery_temperature": "32.400001525878906",
+      "chipset": "Google Tensor G5",
+      "connection_type": "wifi",
+      "id": "9ddc64c198c94176b6bc719a15bd7e81",
+      "type": "device"
+    },
+    "os": {
+      "os": "Android 17",
+      "name": "Android",
+      "version": "17",
+      "build": "CP3A.260905.009",
+      "kernel_version": "6.6.127-android15-8-gd00dbafe5604-ab16030312-4k",
+      "rooted": false,
+      "type": "os"
+    },
+    "ota_updates": {
+      "channel": "hal2001",
+      "check_automatically": "always",
+      "is_embedded_launch": false,
+      "is_emergency_launch": false,
+      "is_enabled": true,
+      "is_using_embedded_assets": false,
+      "launch_duration": 46,
+      "runtime_version": "2.5.0",
+      "type": "default",
+      "update_id": "01a0e574-feeb-77c8-b08d-9f6f91431eaf"
+    },
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.81.5",
+      "js_engine": "hermes",
+      "react_native_version": "0.81.5",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "84c95283131b4a1ca435f8036f99296f",
+      "span_id": "930532a7c17cdcdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "7.2.0"
+  },
+  "context": {
+    "actionAgeMs": 5263,
+    "id": "1791147672949_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:tts:done",
+    "lastPhaseAgeMs": 0,
+    "lastScreen": "title",
+    "launchAfterOta": false,
+    "launchAgeMs": 5355,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "no",
+    "sinceBootMs": 5355,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Previous process disappeared while idle on the title screen \u2014 no game was in progress (5s after boot, app active, stage boot:complete)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "device",
+      "value": "Pixel 10 Pro XL"
+    },
+    {
+      "key": "device.class",
+      "value": "high"
+    },
+    {
+      "key": "device.family",
+      "value": "Pixel"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "True"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "os",
+      "value": "Android 17"
+    },
+    {
+      "key": "os.build",
+      "value": "CP3A.260905.009"
+    },
+    {
+      "key": "os.name",
+      "value": "Android"
+    },
+    {
+      "key": "os.rooted",
+      "value": "no"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save"
+    },
+    {
+      "key": "stage",
+      "value": "boot:tts:done"
+    },
+    {
+      "key": "user",
+      "value": "id:9ddc64c198c94176b6bc719a15bd7e81",
+      "query": "user.id:\"9ddc64c198c94176b6bc719a15bd7e81\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-10-05T17:07:27.703699Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-10-04T21:01:12.949000Z",
+  "fingerprints": [
+    "f36c6f35a623e4ae7a05a2a60e3ccdd1"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1995104786,
+    "commitCount": 19,
+    "data": {},
+    "dateCreated": "2026-09-27T02:30:53.623699Z",
+    "dateReleased": "2026-09-28T00:42:45.080488Z",
+    "deployCount": 17,
+    "ref": null,
+    "lastCommit": {
+      "id": "6f8110099e4ebcd8cc0adf32efd0f81bdeff8da3",
+      "message": "Aerial and Aetherkin trait chips no longer leak as raw identifiers\n\nAdjacent finding from the enemy conditional-effect class audit, settled\nhere: `aerial` and `aetherkin` had no entry in enemyTraits.ts's TRAIT_LABEL,\nso any enemy carrying the literal trait fell through describeTrait() to its\nraw internal id on the expanded portrait's trait-chip row and plain-text\ncontract. Both are real, reachable enemies (aerial: Aetherbat, Scrap Drone,\nAetheric Drone; aetherkin: Drowned Aetherkin, Mud-Wracked Aetherkin), not\nhypothetical.\n\nTraced both traits to their actual mechanical consumers before writing a\nlabel \u2014 neither is decoration:\n\n- `aerial` (enemyIsAerial): dogCanAct() refuses the dog companion against\n  it, escapePursuit() gives it +3 to the contested-flee speed check the\n  player must beat to escape combat, and it is the exact condition\n  weaponEffects.ts's 'aerial' bonus-condition reads for a ranged weapon's\n  authored \"+Nd6 vs airborne\" effect. Classified MEANINGFUL PLAYER-FACING\n  TRAIT.\n- `aetherkin` (isAetherkin): gates a real reputation swing \u2014 killing one\n  applies AETHERKIN_KILL_REP (-3) against the factions that revere the\n  Aetherkin, while a successful talk-down applies AETHERKIN_SPARE_REP (+2)\n  instead. Classified MEANINGFUL PLAYER-FACING TRAIT (a real consequence\n  the player can act on, not lore alone).\n\nBoth now carry a proper label in TRAIT_LABEL, in the same \"Name \u2014 what it\ndoes\" shape the existing entries use, stating only the facts above \u2014 no\ninvented numbers, no new mechanic. `portraitTraitChips()` was already\ncorrectly filtering only the true internal markers (`profiled`,\n`static_power_scaled`); it is untouched, since the defect was the missing\nlabel, not the filter.\n\nAdjacent Mud Monarch acid-interaction question (from the same task):\ntraced end-to-end and found NOT a defect. \"Mud Monarch takes it with the\nacid-etched mud-fist wraps, reels, and fights back\" is combatProse.ts's\nhitProse() \u2014 one of four generic flavor lines picked for ANY landed player\nhit on ANY enemy \u2014 with `weaponPhrase()` naming the PLAYER's own equipped\nweapon (Kevin's acid-coated \"Mud-fist Wraps\", a starter hand weapon),\nnever Mud Monarch's gear. Mud Monarch (type Aetheric Mutation) does\ngenuinely resist acid by TYPE_RESISTANCE_MAP, which gates the coating\nthrough a real 15% COATING_RESIST_LAND_CHANCE roll on a resisted type \u2014\nbut that mechanic does not produce or condition this narration line, so no\nnarration change was made; inventing a conditional deflection message here\nwould misrepresent a generic sentence as mechanic-conditioned. No repair\nmade, no files touched for this half of the task.\n\nTests: extended enemyTraits.test.ts \u2014 reachability proof against the real\nroster, label content proofs for both traits (checked against the actual\nmechanic facts, not just non-raw), portraitTraitChips passthrough proof\n(the filter didn't change), enemyIsAerial/isAetherkin trait-only proof (no\nname/type fallback needed), and a no-broadening check that profiled/\nstatic_power_scaled stay filtered and armored/bleeder labels are\nunchanged. 32/32 in the extended suite; 56/56 across the three other\ndirectly-affected trait/chip/technique suites (ota1202, ota1527, qol220).\ntsc -p tsconfig.ci.json --noEmit clean. eslint clean.\n\nGolem only \u2014 HAL stays on its just-completed catch-up state until Kevin\nphysically accepts this on Golem.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-28T00:18:21Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+          "shortVersion": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-28T00:42:45.080488Z",
+          "dateCreated": "2026-09-27T02:30:53.623699Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "162551542",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-28T00:42:45.317024Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.55.0",
+    "version": "tartaria@4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-27-1889-the-native-door-never-trades-the-save",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-27-1889-the-native-door-never-trades-the-save",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-27-1889-the-native-door-never-trades-the-save)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.29.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
