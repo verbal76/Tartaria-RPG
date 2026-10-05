@@ -32193,7 +32193,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
  * Copy All carries the full 40-hex source SHA (extra.sourceSha); the road door obeys the board's hunt reach
  * rule (I-055); the Hardened Climbing Strap is stocked for every race (I-054); heal-batch refuses a true
  * no-op (I-010). OTA-capable, no native change. NOT CLAIMED: nothing here has been checked on a device. */
-export const OTA_BUILD_ID = '2026-10-04-1890-the-studio-card-and-the-source-it-came-from';
+/* OTA-1891 — THE CARD IS SEEN FOR ITS WHOLE HOLD. Device report: the Hot Attic Games card "just flashes".
+ * Its 2.5 s clock started at first render, so boot work that holds the JS thread (hydration, bundle
+ * evaluation) spent the whole hold before the card painted. The clock now starts at the first layout and a
+ * remount resumes it; the boot update check waits for the card (capped), so the order is studio card →
+ * update check → Tartaria splash. OTA-capable, no native change. NOT CLAIMED: not yet checked on a device. */
+export const OTA_BUILD_ID = '2026-10-05-1891-the-card-is-seen-for-its-whole-hold';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-10-04-1890-the-studio-card-and-the-source-it-came-from';
 // SUPERSEDED: '2026-09-27-1889-the-native-door-never-trades-the-save'
 // SUPERSEDED: '2026-09-27-1888-the-save-is-never-the-price-of-an-update'
 // SUPERSEDED: '2026-09-27-1887-the-copy-speaks-for-itself'
