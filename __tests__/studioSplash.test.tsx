@@ -20,7 +20,7 @@ jest.mock('../app/components/SplashOverlay', () => ({
 
 import {
   StudioSplash, LaunchSplashes, STUDIO_SPLASH_MS, STUDIO_FADE_IN_MS, STUDIO_FADE_OUT_MS,
-  resetStudioSplashForTest, studioSplashWillShow,
+  resetStudioSplashForTest, studioSplashWillShow, studioCardSettled,
 } from '../app/components/StudioSplash';
 import { STUDIO_SPLASH_SOURCE, STUDIO_SPLASH_FILENAME } from '../app/ui/studioSplashArt';
 
@@ -40,6 +40,12 @@ const root = join(__dirname, '..');
 const code = (...p: string[]) => readFileSync(join(root, ...p), 'utf8')
   .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 const ART = 1 as unknown as number; // a bundler asset id, as `require()` yields on device
+// The card is "on screen" once the native side has laid it out; its clock starts there.
+const paint = (t: { root: { findAllByProps(p: Record<string, unknown>): Array<{ props: Record<string, unknown> }> } }) => {
+  const card = t.root.findAllByProps({ testID: 'studio-splash' }).find((n) => typeof n.props.onLayout === 'function');
+  if (!card) throw new Error('studio card has no onLayout');
+  renderer.act(() => { (card.props.onLayout as () => void)(); });
+};
 const advance = (ms: number) => renderer.act(() => { jest.advanceTimersByTime(ms); });
 
 beforeEach(() => { resetStudioSplashForTest(); jest.useFakeTimers(); });
@@ -120,6 +126,7 @@ describe('timing: 2–3 s with a fade in and a fade out', () => {
   it('is on screen until the fade-out has run, then calls onDone exactly once and unmounts', () => {
     const onDone = jest.fn();
     const t = mount(<StudioSplash source={ART} onDone={onDone} />);
+    paint(t);
     // Fully shown through the hold; the fade-out only starts FADE_OUT ms before the end.
     // (Jest's mocked native driver completes a fade instantly, so the hold is what is pinned here.)
     advance(STUDIO_SPLASH_MS - STUDIO_FADE_OUT_MS - 100);
@@ -136,6 +143,7 @@ describe('timing: 2–3 s with a fade in and a fade out', () => {
   it('never outlives 3 s even if the animation callback never fires', () => {
     const onDone = jest.fn();
     const t = mount(<StudioSplash source={ART} onDone={onDone} />);
+    paint(t);
     advance(3000);
     expect(onDone).toHaveBeenCalledTimes(1);
     renderer.act(() => t.unmount());
@@ -162,6 +170,7 @@ describe('it cannot strand the player', () => {
 describe('cold launch vs resume', () => {
   it('is once per launch: a remount in the same process (navigation, Settings, background → foreground) does not replay it', () => {
     const first = mount(<StudioSplash source={ART} />);
+    paint(first);
     advance(STUDIO_SPLASH_MS + 300);
     renderer.act(() => first.unmount());
     const again = mount(<StudioSplash source={ART} />);
@@ -175,6 +184,7 @@ describe('cold launch vs resume', () => {
   it('the pre-hydration → hydrated swap RESUMES the card: it ends at 2.5 s in total, not 2.5 s after the swap', () => {
     const onDoneA = jest.fn();
     const loading = mount(<StudioSplash source={ART} onDone={onDoneA} />);
+    paint(loading);
     advance(1500);
     renderer.act(() => loading.unmount()); // hydration finished: the loading view is replaced
     const onDoneB = jest.fn();
@@ -190,6 +200,7 @@ describe('cold launch vs resume', () => {
 describe('the launch sequence: studio card, THEN the existing splash, then the product', () => {
   it('the Tartaria splash is not mounted until the studio card is done', () => {
     const t = mount(<LaunchSplashes />);
+    paint(t);
     expect(json(t)).toContain('studio-splash');
     expect(json(t)).not.toContain('tartaria-splash');
     advance(STUDIO_SPLASH_MS + 300);
@@ -200,6 +211,7 @@ describe('the launch sequence: studio card, THEN the existing splash, then the p
 
   it('a card that finished in the loading view lets the Tartaria splash mount the moment the tree hydrates', () => {
     const loading = mount(<StudioSplash source={ART} />);
+    paint(loading);
     advance(STUDIO_SPLASH_MS + 300);
     renderer.act(() => loading.unmount());
     const main = mount(<LaunchSplashes />);
@@ -220,5 +232,68 @@ describe('the launch sequence: studio card, THEN the existing splash, then the p
     const z = (f: string) => Number(readFileSync(join(root, 'app', 'components', f), 'utf8').match(/zIndex: (\d+)/)?.[1]);
     expect(z('SplashOverlay.tsx')).toBeLessThan(z('StudioSplash.tsx'));
     expect(z('StudioSplash.tsx')).toBeLessThan(z('OtaApplyingOverlay.tsx'));
+  });
+});
+
+describe('the card is seen for its whole 2.5 s even when boot work blocks the JS thread', () => {
+  it('time spent BEFORE the first paint does not count: boot work blocks 4 s, the hydration swap remounts the card, and it still shows its full hold', () => {
+    const loading = mount(<StudioSplash source={ART} />);
+    // Hydration/bundle work holds the thread: wall-clock passes, no timer or layout runs.
+    jest.setSystemTime(Date.now() + 4000);
+    renderer.act(() => loading.unmount()); // hydrated: the loading view is replaced
+    const onDone = jest.fn();
+    const main = mount(<StudioSplash source={ART} onDone={onDone} />);
+    expect(json(main)).toContain('studio-splash'); // not already "spent"
+    expect(onDone).not.toHaveBeenCalled();
+    paint(main); // the first frame is laid out NOW
+    advance(STUDIO_SPLASH_MS - STUDIO_FADE_OUT_MS - 100);
+    expect(json(main)).toContain('studio-splash');
+    expect(onDone).not.toHaveBeenCalled();
+    advance(STUDIO_FADE_OUT_MS + 400);
+    expect(onDone).toHaveBeenCalledTimes(1);
+    renderer.act(() => main.unmount());
+  });
+
+  it('a layout that never reports still starts the clock, so the card cannot strand the player', () => {
+    const onDone = jest.fn();
+    const t = mount(<StudioSplash source={ART} onDone={onDone} />);
+    advance(1200 + STUDIO_SPLASH_MS + 400);
+    expect(onDone).toHaveBeenCalledTimes(1);
+    renderer.act(() => t.unmount());
+  });
+});
+
+describe('order: studio card → update check → Tartaria splash', () => {
+  it('studioCardSettled resolves only when the card has finished', async () => {
+    const t = mount(<StudioSplash source={ART} />);
+    let settled = false;
+    void studioCardSettled(ART).then(() => { settled = true; });
+    paint(t);
+    advance(1000);
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    advance(STUDIO_SPLASH_MS + 300);
+    await Promise.resolve();
+    expect(settled).toBe(true);
+    renderer.act(() => t.unmount());
+  });
+
+  it('resolves at once when the card already ran or has no artwork', async () => {
+    await expect(studioCardSettled(null)).resolves.toBeUndefined();
+    const t = mount(<StudioSplash source={ART} />);
+    paint(t);
+    advance(STUDIO_SPLASH_MS + 300);
+    await expect(studioCardSettled(ART)).resolves.toBeUndefined();
+    renderer.act(() => t.unmount());
+  });
+
+  it('App waits for the card BEFORE the boot update check, and caps the wait', () => {
+    const app = code('App.tsx');
+    const wait = app.indexOf('studioCardSettled()');
+    const check = app.indexOf("setStage('ota:check')");
+    expect(wait).toBeGreaterThan(0);
+    expect(wait).toBeLessThan(check);
+    expect(app).toMatch(/STUDIO_CARD_WAIT_CAP_MS\s*=\s*\d/);
+    expect(app).toMatch(/Promise\.race\(\[studioCardSettled\(\)/);
   });
 });

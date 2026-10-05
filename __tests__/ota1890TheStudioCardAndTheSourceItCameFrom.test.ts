@@ -12,8 +12,8 @@ import { OTA_BUILD_ID } from '../app/buildInfo';
 const root = join(__dirname, '..');
 
 describe('OTA-1890 identity', () => {
-  it('the stamp names this OTA', () => {
-    expect(OTA_BUILD_ID).toMatch(/^2026-10-04-1890-the-studio-card-and-the-source-it-came-from$/);
+  it('the stamp is this OTA or a later one (OTA-1891 superseded it)', () => {
+    expect(OTA_BUILD_ID).toMatch(/^2026-10-0[45]-189[01]-/);
   });
 
   it('ships the canonical studio artwork, byte for byte, at the repository root', () => {

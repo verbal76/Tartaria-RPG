@@ -25,7 +25,7 @@ import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; /
 // module that is not ready cannot cost us the other write.
 import { crashCorrelationId } from './app/diagnostics/crashCorrelation';
 import { TitleScreen } from './app/screens/TitleScreen';
-import { LaunchSplashes, StudioSplash } from './app/components/StudioSplash';
+import { LaunchSplashes, StudioSplash, studioCardSettled } from './app/components/StudioSplash';
 import { OtaApplyingOverlay } from './app/components/OtaApplyingOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
 // that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
@@ -300,6 +300,8 @@ function SummonRefusalGate() {
  * false; all it does is replace a spinner that says nothing with a screen that
  * says where the boot stopped and offers the update door. */
 const BOOT_WATCHDOG_MS = 25_000;
+// The most the update check waits for the studio card (2.5 s + fade slack + a late first paint).
+const STUDIO_CARD_WAIT_CAP_MS = 6_000;
 
 /* ⚠⚠⚠ OTA-1855 — THE BOOT OTA BUDGET, AND THE CAP THAT MUST LOSE TO IT.
  *
@@ -686,6 +688,11 @@ export default function App() {
         const otaLog = (m: string): void => {
           try { useGameStore.getState().appendLog('debug', m); } catch { /* never block boot */ }
         };
+        // Owner order: studio card → update check → Tartaria splash. The card is held on screen for
+        // its full 2.5 s; the check starts after it fades. Capped, so it can never hold a launch.
+        try {
+          await Promise.race([studioCardSettled(), new Promise<void>((r) => setTimeout(r, STUDIO_CARD_WAIT_CAP_MS))]);
+        } catch { /* the wait never gates the check */ }
         try {
           setStage('ota:check');
           // What expo thinks it is running RIGHT NOW, before we ask for anything. If this
