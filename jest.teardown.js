@@ -67,3 +67,81 @@ beforeEach(() => {
     globalThis.__TARTARIA_RESEED_RANDOM__();
   }
 });
+
+// ⚠⚠⚠ OTA-1891 — A TIMER MAY NOT OUTLIVE THE SUITE THAT ARMED IT.
+//
+// THE FLAKE. CI shard 2/4 on golem-line c725bd01 failed `ota952ZeroGrip › eating a field kit…`
+// with `TypeError: Cannot read properties of undefined (reading 'OS')` out of PiperTTSManager's
+// prewarmKokoro — in a suite that never touches a voice. The same code had passed that shard on the
+// PR run. The log carried the tell: "You are trying to `import` a file after the Jest environment
+// has been torn down. From __tests__/importSave.test.ts." (it prints on every importSave run; it is
+// reproducible with `jest --runInBand importSave ota952ZeroGrip`).
+//
+// ⚠⚠ THE MECHANISM, same family as the homework interval above. gameStore's vendor-warm settle timer
+// (a 2.5 s setTimeout, VENDOR_WARM_SETTLE_MS) is armed when a scene installs a vendor, and nothing in
+// a suite disarms it. It fires after the suite that armed it has been torn down, `require`s into the
+// dead environment, and gets a module whose exports are gone (`Platform` undefined). That throws from
+// a bare Node timer, outside any Jest frame, where the worker's uncaught-exception handler hands it to
+// WHICHEVER test is running next — here a perfectly healthy suite. So the red lands on an innocent test
+// and moves from run to run, which is exactly what made it look like a flake of that test.
+//
+// ⚠ THE FIX IS HERE AND NOT IN THE PRODUCT. On a device there is no environment to tear down, the timer
+// is correct, and nothing in the app changes. A suite owns the timers it armed: at the end of the file
+// every timer still pending is cleared, so nothing can fire into a dead environment. Tracked per file
+// (this file runs once per suite in its own global), real timers only — a suite that installs fake
+// timers replaces these globals and is unaffected. Handles keep the identity Node gave them, and a
+// timer that already ran or was cleared by its owner is forgotten, so this never touches a live one.
+(() => {
+  const g = globalThis;
+  if (g.__TARTARIA_TIMER_TRACKER__) return;
+  const realSetTimeout = g.setTimeout;
+  const realClearTimeout = g.clearTimeout;
+  const realSetInterval = g.setInterval;
+  const realClearInterval = g.clearInterval;
+  if (typeof realSetTimeout !== 'function' || typeof realSetInterval !== 'function') return;
+  const pendingTimeouts = new Set();
+  const pendingIntervals = new Set();
+  const carry = (wrapper, original) => {
+    // util.promisify(setTimeout) and friends hang their behaviour off properties of the original.
+    for (const k of Reflect.ownKeys(original)) {
+      if (k === 'length' || k === 'name' || k === 'prototype') continue;
+      try { Object.defineProperty(wrapper, k, Object.getOwnPropertyDescriptor(original, k)); } catch { /* skip */ }
+    }
+    return wrapper;
+  };
+  const trackedSetTimeout = carry(function setTimeout(fn, ms, ...rest) {
+    if (typeof fn !== 'function') return realSetTimeout.call(this, fn, ms, ...rest);
+    let handle;
+    handle = realSetTimeout.call(this, (...args) => { pendingTimeouts.delete(handle); return fn(...args); }, ms, ...rest);
+    pendingTimeouts.add(handle);
+    return handle;
+  }, realSetTimeout);
+  const trackedClearTimeout = carry(function clearTimeout(handle) {
+    pendingTimeouts.delete(handle);
+    return realClearTimeout.call(this, handle);
+  }, realClearTimeout);
+  const trackedSetInterval = carry(function setInterval(fn, ms, ...rest) {
+    const handle = realSetInterval.call(this, fn, ms, ...rest);
+    pendingIntervals.add(handle);
+    return handle;
+  }, realSetInterval);
+  const trackedClearInterval = carry(function clearInterval(handle) {
+    pendingIntervals.delete(handle);
+    return realClearInterval.call(this, handle);
+  }, realClearInterval);
+  g.setTimeout = trackedSetTimeout;
+  g.clearTimeout = trackedClearTimeout;
+  g.setInterval = trackedSetInterval;
+  g.clearInterval = trackedClearInterval;
+  /** Clear every timer this suite armed and has not since run or cleared. Returns how many. */
+  const clearLeaked = () => {
+    let n = 0;
+    for (const h of Array.from(pendingTimeouts)) { realClearTimeout(h); n += 1; }
+    for (const h of Array.from(pendingIntervals)) { realClearInterval(h); n += 1; }
+    pendingTimeouts.clear();
+    pendingIntervals.clear();
+    return n;
+  };
+  g.__TARTARIA_TIMER_TRACKER__ = { clearLeaked, pending: () => pendingTimeouts.size + pendingIntervals.size };
+  afterAll(() => { clearLeaked(); });
+})();
