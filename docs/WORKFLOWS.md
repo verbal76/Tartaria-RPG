@@ -889,3 +889,27 @@ not infer it from source, and do not infer it from the absence of an error.
   No Android build was started for this documentation pass, by instruction. The
   last recorded Android runs are `skipped` push runs, which prove the gate works
   and nothing about the build.
+
+## Actions budget policy (2026-10-06)
+
+Owner directive: GitHub-hosted minutes are scarce; trim anything that does not produce necessary evidence.
+Measured on the 150 most recent runs before the change: `CI` was ~94% of usage (~62 min/run; `push`
+and `pull_request` both ran the whole surface per PR commit; the 60-minute reported heavy-sims job
+was the largest single part), the Sentry relay's hourly clock ~4%, and `build-ios.yml` spent ~0.6 min
+on every topic-branch push to build nothing.
+
+| Workflow | Trigger now | Cost model |
+|---|---|---|
+| `ci.yml` | push to `golem-line`; `pull_request` (opened / synchronize / reopened / ready_for_review) — draft PRs skip every required job; `workflow_dispatch`. `paths-ignore`: `**.md`, `docs/**`, `sentry-inbox/**` | required jobs only; ~25 min, once per candidate |
+| `ci.yml` heavy sims | `workflow_dispatch`, or `[heavy-sims]` in a trunk commit message | on demand; same suites run locally via `npm run test:ci:heavy` |
+| `build-ios.yml` | dispatch, a `v*-ios` tag, or `[build-ios]` — on EVERY branch | no no-op runs |
+| `build-apk.yml`, `build-linux/mac/steam-exe.yml`, `build-ios-native.yml` | unchanged: opt-in by dispatch/tag/marker | 0 when not asked |
+| `build-web.yml` | unchanged: `golem-line` pushes touching the bundler/dependency files only | rare |
+| `eas-update-golem.yml`, `promote.yml` | unchanged: dispatch only / the `promotions` ledger | the release path |
+| `sentry-inbox.yml` | unchanged (hourly clock + `request.txt`) | owner evidence pipeline |
+
+Unchanged on purpose: `.github/required-jobs.json`, the required job names, `publish.needs`, and the
+CI receipt. A publish still needs every required job green at the exact SHA, and the receipt accepts any
+green `ci.yml` run at that SHA from any event — a green non-draft PR run is as good as a trunk run.
+Topic branches have no push trigger: prove locally, open a draft PR, mark it ready only when a
+validated run is wanted.

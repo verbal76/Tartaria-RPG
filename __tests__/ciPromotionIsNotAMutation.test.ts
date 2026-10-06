@@ -295,24 +295,52 @@ describe('2. promote.yml — wired exactly as designed', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────
-describe('3. ci.yml — the exclusion is exactly `promotions`, and cannot widen', () => {
+describe('3. ci.yml — only the trunk runs on push, and the ignore list cannot hide code', () => {
   const branches = (CI.on.push as { branches: string[] }).branches;
+  const ignore = (CI.on.push as { 'paths-ignore': string[] })['paths-ignore'];
 
-  it('NC-B11 — promotions is excluded from normal CI', () => {
-    expect(branches).toContain('!promotions');
+  it('NC-B11 — promotions never runs normal CI (it is not on the push list at all)', () => {
+    expect(branches).not.toContain('promotions');
+    expect(branches).not.toContain('**');
   });
 
-  it('NC-B12 — ordinary source branches keep normal CI: the list is EXACTLY ["**", "!promotions"] — one wildcard, one exclusion, nothing else', () => {
-    expect(branches).toEqual(['**', '!promotions']);
-    expect(branches.filter((b) => b.startsWith('!'))).toEqual(['!promotions']);
-    expect(branches.filter((b) => !b.startsWith('!'))).toEqual(['**']);
+  it('NC-B12 — ACTIONS BUDGET (2026-10-06): the push list is EXACTLY ["golem-line"] — topic branches are proved locally and validated once, as a non-draft pull_request', () => {
+    expect(branches).toEqual(['golem-line']);
+    expect(branches.some((b) => b.startsWith('!') || b.includes('*'))).toBe(false);
+  });
+
+  it('NC-B13 — the ignore list is docs-only and EXACT: nothing that ships, builds, tests or gates may ever be ignored', () => {
+    const DOCS_ONLY = ['**.md', 'docs/**', 'sentry-inbox/**'];
+    expect(ignore).toEqual(DOCS_ONLY);
+    expect((CI.on.pull_request as { 'paths-ignore': string[] })['paths-ignore']).toEqual(DOCS_ONLY);
+    // A path that carries code, tests, assets, tooling or the workflows themselves is never ignorable.
+    const MUST_RUN = ['app/x.ts', 'App.tsx', 'assets/a.png', '__tests__/a.test.ts', 'scripts/a.mjs', '.github/workflows/ci.yml',
+      'package.json', 'package-lock.json', 'app.config.js', 'jest.setup.js', 'jest.teardown.js', 'release/public-version.json',
+      'test-utils/a.ts', 'Hot_Attic_Games_Master_Logo_ALPHA_FINAL.png'];
+    const globToRe = (g: string) => new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\u0000/g, '.*') + '$');
+    for (const f of MUST_RUN) {
+      expect({ f, ignored: ignore.some((g) => globToRe(g).test(f)) }).toEqual({ f, ignored: false });
+    }
+  });
+
+  it('NC-B14 — pull requests run once per commit and DRAFTS cost nothing: every required job skips while the PR is a draft', () => {
+    expect((CI.on.pull_request as { types: string[] }).types).toEqual(['opened', 'synchronize', 'reopened', 'ready_for_review']);
+    const REQUIRED = ['typecheck-source', 'typecheck-tests', 'lint', 'gates', 'test-shard-1', 'test-shard-2', 'test-shard-3', 'test-shard-4'];
+    for (const id of REQUIRED) expect(String(CI.jobs[id]!.if)).toBe('github.event.pull_request.draft != true');
+  });
+
+  it('NC-B15 — the heavy simulations are on demand only (dispatch, or a trunk commit that says [heavy-sims]) and still never a publication gate', () => {
+    const cond = String(CI.jobs['test-heavy']!.if).replace(/\s+/g, ' ');
+    expect(cond).toContain("github.event_name == 'workflow_dispatch'");
+    expect(cond).toContain('[heavy-sims]');
+    expect(cond).not.toMatch(/pull_request|github\.ref !=/);
+    expect(CI.jobs.publish!.needs).not.toContain('test-heavy');
   });
 
   it('the rest of ci.yml\'s triggers and the trunk-only publish guard are unchanged', () => {
     expect(Object.keys(CI.on).sort()).toEqual(['pull_request', 'push', 'workflow_dispatch']);
     expect(CI.on.push as object).not.toHaveProperty('tags');
-    expect(CI.on.push as object).not.toHaveProperty('paths-ignore');
-    expect(CI.jobs.publish!.if).toBe("github.event_name == 'push' && github.ref == 'refs/heads/golem-line'");
+        expect(CI.jobs.publish!.if).toBe("github.event_name == 'push' && github.ref == 'refs/heads/golem-line'");
     // ⚠ 2026-09-11 (Change C) — the single `test` job became four required
     // shards. Change B is untouched by that: the promotion path still ends in
     // the same publisher and the same Change-A receipt.

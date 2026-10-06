@@ -353,3 +353,39 @@ title screen, menu, onboarding or primary interface:
   pre-hydration view and the main tree. Pinned by `__tests__/studioSplash.test.tsx` (including the
   file's SHA-256 — replacing the artwork means updating that pin on purpose).
 - Do not remove it or add a second studio-splash system; extend the existing one.
+
+## Hot Attic Games — GitHub Actions budget (standing owner directive, 2026-10-06)
+
+GitHub-hosted Actions minutes are shared across the owner's projects on a deliberately small monthly
+budget. They are a scarce resource, not the default way to validate a change. Before starting ANY
+hosted workflow, ask: **"Does this need GitHub Actions, or can I prove it locally?"** Use Actions only
+when hosted execution gives meaningful, necessary evidence.
+
+- **Prove it locally first.** typecheck:ci, lint, the `check:*` gates, the test-typecheck ratchet, the
+  targeted suites and the full fast surface all run locally. Heavy sims run locally too
+  (`npm run test:ci:heavy`). CI is the final confirmation of a candidate, not the debugger.
+- **What CI runs now** (`ci.yml`, measured: CI was ~94% of usage and ~62 min per run before this):
+  push to the trunk (`golem-line`) only; pull requests only when NON-DRAFT, once per commit; NO push
+  trigger on topic branches; docs / `**.md` / `sentry-inbox/**` run nothing; the 60-minute heavy-sims
+  job is on demand (`workflow_dispatch`, or `[heavy-sims]` in a trunk commit message). Open agent PRs
+  as drafts and mark them ready only when a validated run is actually wanted.
+- **Never** spend Actions on: building every platform per push; Windows/Mac/Linux exports nobody asked
+  for; Android/AAB artifacts for an OTA-only change; re-running an expensive workflow just to see
+  whether an intermittent test passes (find the root cause locally — see jest.teardown.js, OTA-1891);
+  rebuilding the same SHA when a verified result can be reused; full validation for docs, comments,
+  research or bookkeeping. A docs-only or workflow-only commit that must not run anything on the trunk
+  carries the commit-skip marker (and MUST NOT otherwise spell it — see "PULL THE LOG").
+- **Appropriate:** final CI on a candidate approaching release/OTA; tests that cannot be done locally;
+  an APK/AAB/EXE the owner actually needs; OTA publication and its safety/compat/signing checks; store
+  builds; a platform check that cannot be reproduced locally.
+- **A receipt can be reused.** The publisher accepts ANY green run of `ci.yml` at the exact SHA
+  (`scripts/verify-ci-receipt.cjs`): a green non-draft PR run is valid evidence for that SHA. Do not
+  re-run what already passed.
+- **Release safety is NOT part of the saving.** Signing verification, runtime/OTA compatibility,
+  `.github/required-jobs.json`, `publish.needs`, the receipt and rollback protections are never
+  weakened to save minutes. `ciPromotionIsNotAMutation` pins the trigger lists so a trim cannot widen
+  into a CI bypass. The Sentry relay's hourly clock (`sentry-inbox.yml`, ~2-3 min/run, scheduled from
+  `main`) is evidence the owner uses; it is left as is.
+- Pins for all of the above: `ciPromotionIsNotAMutation` (§3), `ota1390WorkflowsAudit`, and the
+  per-workflow suites. A change to a trigger that breaks one of them is a policy change — update the
+  pin deliberately and say so; never loosen a trigger silently.

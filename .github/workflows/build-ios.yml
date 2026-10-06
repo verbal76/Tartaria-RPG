@@ -124,10 +124,15 @@ jobs:
     # it every `.github/**` or `package.json` commit would spin up a runner, do a
     # full `npm ci`, and then skip the build because the profile is preview —
     # minutes spent to reach a no-op.
+    #
+    # ⚠⚠ ACTIONS BUDGET (owner directive 2026-10-06): this gate used to ALSO pass for every push to a
+    # NON-trunk branch (`github.ref != 'refs/heads/golem-line'`), so each claude/**, main or
+    # release/** push started a runner, ran `npm ci`, and then produced a preview build that
+    # publishes nothing — measured at ~0.6 min x 13 runs, pure no-op minutes. It is opt-in
+    # everywhere now, exactly like build-apk.yml: a dispatch, a version tag, or `[build-ios]`.
     if: >-
       github.event_name == 'workflow_dispatch'
       || startsWith(github.ref, 'refs/tags/')
-      || github.ref != 'refs/heads/golem-line'
       || contains(github.event.head_commit.message, '[build-ios]')
     env:
       # Job-wide so every Expo invocation agrees. A push carries no input and

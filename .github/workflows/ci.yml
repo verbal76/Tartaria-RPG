@@ -56,16 +56,43 @@ name: CI
 #                            own validation and its own publish.
 
 on:
+  # ⚠⚠⚠ ACTIONS BUDGET POLICY (owner directive, 2026-10-06 — CLAUDE.md "GitHub Actions budget").
+  # GitHub-hosted minutes are shared across the owner's projects and the monthly budget is small.
+  # Measured before this change (the 150 most recent runs): CI was ~94% of all usage, ~62 minutes
+  # per run — the 60-minute REPORTED heavy-sims job was the largest part — and every PR commit ran
+  # the whole surface TWICE (a `push` run on its branch plus a `pull_request` run at the same SHA),
+  # draft PRs included. What runs now, and why that is still enough evidence:
+  #
+  #   • push to the TRUNK only (`golem-line`) — the release candidate. Required jobs + publish.
+  #   • pull_request, NON-DRAFT only — the one place a topic branch is validated, once per commit.
+  #     A draft PR (the default for agent work) costs nothing until it is marked ready.
+  #   • NO push trigger on topic branches: they are proved locally (typecheck, lint, the check:*
+  #     gates, the targeted suites, the full fast surface) before anything is pushed.
+  #   • docs, notes and the Sentry relay's own commits run NOTHING (paths-ignore below).
+  #   • the heavy simulations are on demand: workflow_dispatch, or a trunk commit that says
+  #     `[heavy-sims]` in its message. They are reported, never a gate, and run locally for free.
+  #
+  # ⚠ WHAT THIS DOES NOT TOUCH: the required validation contract. .github/required-jobs.json, the
+  # job names, `publish.needs`, and the receipt the publisher verifies are unchanged, and a publish
+  # is still impossible without every required job green at that exact SHA. The receipt accepts any
+  # CI run of THIS file at the SHA (verify-ci-receipt.cjs), so a green non-draft PR run is as good
+  # evidence as a trunk run — that is the way to produce one without a new commit.
+  #
+  # ⚠ `promotions` (the HAL ledger, see promote.yml) is not in the list, so it never ran CI.
+  # ciPromotionIsNotAMutation holds the trunk list to exactly ['golem-line'] and the ignore list to
+  # docs-only paths, so neither can widen into a CI bypass.
   push:
-    # ⚠ `!promotions` — the ONE excluded branch. `promotions` is the HAL
-    # promotion control plane (see promote.yml): a ledger of exact-SHA
-    # requests, not game source. Running the full test surface there would
-    # validate a README, not a game. The SHA it promotes is validated by
-    # Change A's receipt inside the publisher, read from that SHA's own
-    # checkout. ciPromotionIsNotAMutation holds this list to exactly these
-    # two entries so the exclusion can never widen into a CI bypass.
-    branches: ['**', '!promotions']
+    branches: ['golem-line']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'sentry-inbox/**'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'sentry-inbox/**'
   workflow_dispatch:
 
 concurrency:
@@ -87,6 +114,7 @@ jobs:
   typecheck-source:
     name: typecheck (source · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -100,6 +128,7 @@ jobs:
   typecheck-tests:
     name: typecheck (tests · ratchet)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -113,6 +142,7 @@ jobs:
   lint:
     name: lint (required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -188,6 +218,7 @@ jobs:
   gates:
     name: source gates (ratchets · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -273,6 +304,7 @@ jobs:
   test-shard-1:
     name: jest shard 1/4 (fast · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -290,6 +322,7 @@ jobs:
   test-shard-2:
     name: jest shard 2/4 (fast · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -307,6 +340,7 @@ jobs:
   test-shard-3:
     name: jest shard 3/4 (fast · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -324,6 +358,7 @@ jobs:
   test-shard-4:
     name: jest shard 4/4 (fast · required)
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -342,6 +377,12 @@ jobs:
     name: jest (heavy sims · reported)
     runs-on: ubuntu-latest
     continue-on-error: true
+    # ⚠ ON DEMAND (budget policy — see the header). ~60 minutes, reported and never a gate, so it
+    # no longer runs on every push: dispatch it, or put `[heavy-sims]` in a trunk commit message.
+    # The same suites run locally with `npm run test:ci:heavy` at no Actions cost.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'push' && contains(github.event.head_commit.message, '[heavy-sims]'))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

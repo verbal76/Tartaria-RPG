@@ -195,15 +195,19 @@ describe('OTA-1391 — the trunk is actually IN the mobile workflows\' trigger l
     expect(gate).toContain('head_commit.message');
   });
 
-  it('⚠ …a non-trunk push builds the iOS preview as before, but Android is opt-in everywhere', () => {
-    // iOS: a preview build publishes nothing, so main / release/** / claude/** keep it.
-    expect(wf('build-ios.yml')).toContain("|| github.ref != 'refs/heads/golem-line'");
-    // Android: a build creates a GitHub Release and marks it latest, so NO branch builds
-    // merely on push (2026-10-04, runs 495/496 — topic branches about to publish releases).
-    const y = wf('build-apk.yml');
-    const gate = y.slice(y.indexOf('    if: >-'), y.indexOf('    env:'));
-    expect(gate).not.toContain('github.ref !=');
-    expect(gate).toContain('[build-apk]');
+  it('⚠ …no push builds anything unasked on ANY branch: iOS and Android are opt-in everywhere (Actions budget, 2026-10-06)', () => {
+    // iOS used to keep `github.ref != golem-line`, so every topic-branch push ran npm ci and then built a
+    // preview that publishes nothing — a standing no-op tax. Android was already opt-in (runs 495/496).
+    expect(wf('build-ios.yml')).not.toContain("|| github.ref != 'refs/heads/golem-line'");
+    for (const f of ['build-ios.yml', 'build-apk.yml']) {
+      const y = wf(f);
+      const gate = y.slice(y.indexOf('    if: >-'), y.indexOf('    env:'));
+      expect(gate).not.toContain('github.ref !=');
+      expect(gate).toContain("github.event_name == 'workflow_dispatch'");
+    }
+    expect(wf('build-ios.yml').slice(wf('build-ios.yml').indexOf('    if: >-'), wf('build-ios.yml').indexOf('    env:'))).toContain('[build-ios]');
+    const apk = wf('build-apk.yml');
+    expect(apk.slice(apk.indexOf('    if: >-'), apk.indexOf('    env:'))).toContain('[build-apk]');
   });
 
   it('⚠ a version tag still forces a build regardless', () => {
