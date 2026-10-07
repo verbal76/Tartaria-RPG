@@ -73,6 +73,8 @@ export const HEAVY_SUITES = [
 
   // ── formerly RED, repaired 2026-09-10 (test defects and budgets; production
   //    untouched). Green, and still here until the owner rules on promotion. ──
+  // NB: no `.test` — jest-expo collects EVERY file under __tests__/, so this IS a test (10 tests). A non-.test
+  // name is a trap, not a missing file: `jest __tests__/engineStateChaosSim.test.ts` finds nothing.
   'engineStateChaosSim.ts',          //  13s · green since 2026-09-10 (room key, roll queue)
   'completionistOutcomeSweep.test.ts', //  47s · green since 2026-09-10 (bullseye band)
   'interactionStress.test.ts',       // ~150s · green since 2026-09-10 (floor reconciled)
