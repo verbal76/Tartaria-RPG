@@ -13,6 +13,34 @@
 > before pushing", codename-first commit titles, the old Open/Closed-issues
 > HANDOFF format — are gone, not merely deprecated.)
 
+## Single source of truth — one codebase, many build targets (owner directive, 2026-10-12)
+
+**`golem-line` is the one authoritative integrated codebase.** Android, iOS, web,
+Windows, macOS, Linux and Steam Deck are *build targets* of it (`TARTARIA_LINE`,
+`Platform.OS`, `.web.tsx`, `app.config.js`), never separate versions. Branches are
+temporary workspaces: integrate the work into the trunk or it is not part of any
+product. Detail, mechanisms and the audit results: **`docs/SOURCE-OF-TRUTH.md`**; the
+per-branch record is **`docs/BRANCH-LEDGER.md`** (generated from `docs/branch-ledger.json`).
+
+- **Before starting work on ANY branch, check the ledger.** If related work already
+  exists on another branch, recover it deliberately (cherry-pick / port the specific
+  commits, not a blind merge) rather than re-deriving it. Never restore uncertain or
+  abandoned features without the owner; never delete a branch, rewrite shared history or
+  merge into a protected line without the owner.
+- **A platform build compiles the trunk only.** Every `build-*.yml` runs
+  `scripts/assert-authoritative-source.cjs` right after checkout (refuses commits not on
+  `golem-line`; fails closed; a pre-integration candidate needs `approved_source_sha` =
+  its full SHA) and uploads `build-provenance.json` (`scripts/build-provenance.cjs`).
+  A NEW build workflow must carry the same three steps — `singleSourceOfTruth.test.ts`
+  fails if it does not.
+- **A coordinated multiplatform release is ONE SHA.** Verify with
+  `scripts/release-manifest.cjs` before calling a set of builds one release.
+- **Keep the ledger honest:** a new long-lived branch holding work not on the trunk gets
+  an entry in `docs/branch-ledger.json` (then `node scripts/branch-ledger.mjs --render`);
+  `npm run check:branchledger` is a required CI gate.
+- This policy adds NO hosted-Actions cost: the guard and provenance run inside builds
+  that were already opted into; the ledger check joins the existing gates job.
+
 ## FIX RULE — kill the CATEGORY'S root cause, never just the incident
 
 Owner directive (2026-07-26): every fix must target the ROOT CAUSE of the
