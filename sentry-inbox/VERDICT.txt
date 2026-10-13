@@ -11,10 +11,6 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7717706963/events/?full=false
     1 page(s), 5 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7729887067/events/?full=false
-    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
-  /organizations/hot-attic-games-llc/issues/7729887118/events/?full=false
-    1 page(s), 8 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7730164474/events/?full=false
     1 page(s), 8 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7730164511/events/?full=false
@@ -192,7 +188,7 @@
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
-    1 page(s), 94 rows — COMPLETE — ended short of a full page
+    1 page(s), 92 rows — COMPLETE — ended short of a full page
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
