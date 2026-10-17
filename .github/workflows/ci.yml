@@ -272,6 +272,11 @@ jobs:
       # run, before any shard is trusted.
       - name: The four shards cover the whole required surface, exactly once (blocking)
         run: npm run check:shardcoverage
+      # ⚠⚠ SINGLE SOURCE OF TRUTH (docs/SOURCE-OF-TRUTH.md). The branch / recovery
+      # ledger is valid, complete for what it claims, and its rendered view is in
+      # sync. Local files only — no extra runner, no network.
+      - name: The branch recovery ledger is valid and in sync (blocking)
+        run: npm run check:branchledger
 
   # ⚠⚠⚠ FOUR SHARDS, ONE SURFACE. The required Jest surface is not smaller than
   # it was — it is DEALT ACROSS FOUR RUNNERS. Live `jest --listTests` discovery

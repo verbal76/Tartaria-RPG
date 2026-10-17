@@ -1,0 +1,158 @@
+{
+  "note": "EVIDENCE LEDGER, not a final causal graph. Machine-readable companion to relationship-ledger.md. Do not interpret edge count as importance ranking.",
+  "method": [
+    "static_import_evidence: grep -oE against real files for import specifiers (exact, complete)",
+    "targeted_full_body_reads: rng.ts, coreGuardians.ts, mainQuest.ts (partial), playerWalker.ts (full) read start-to-end"
+  ],
+  "relationships": [
+    {
+      "id": "REL-000001",
+      "source": "app/state/gameStore.ts",
+      "target": "132 distinct app/engine/* modules",
+      "target_count": 132,
+      "relation_class": "static_import",
+      "value_transferred": "every exported function/constant of those 132 modules (combat rules, loot tables, faction logic, mission engines, world map, etc.)",
+      "trigger": "module load time (unconditional)",
+      "directness": "direct",
+      "determinism": "deterministic",
+      "evidence": "grep -oE \"from '\\.\\./engine/[a-zA-Z0-9_]+'\" app/state/gameStore.ts | sort -u | wc -l -> 132",
+      "confidence": "PROVEN"
+    },
+    {
+      "id": "REL-000002",
+      "source": "app/state/gameStore.ts",
+      "target": "app/engine/coreGuardians.ts",
+      "relation_class": "deferred_require_plus_partial_static_import",
+      "value_transferred": "isCoreGuardian, capitalIdFromGuardian (static import, line 97); scaleStaticBoss and other exports via runtime require() at 10+ call sites (lines 11027, 13610, 20186, 22711, 25363, 25409, 28243, 30584, and more not individually enumerated)",
+      "trigger": "combat resolution / enemy-defeat / Core-recovery code paths, evaluated at runtime",
+      "directness": "direct",
+      "determinism": "conditional (depends on which code path executes)",
+      "evidence": "grep matches for both the static import line and the require() call sites",
+      "confidence": "PROVEN",
+      "flagged_unknown": "UNK-013 (why the mix of static-import-for-two-functions vs runtime-require()-for-the-rest, unlike the other 131 app/engine/* relationships from this same file which are all static imports)"
+    },
+    {
+      "id": "REL-000003",
+      "source": "app/engine/coreGuardians.ts",
+      "target": "app/engine/mainQuest.ts",
+      "relation_class": "static_import",
+      "value_transferred": "LOST_CAPITAL_LOCATIONS (9-element capital-id array)",
+      "trigger": "module load (unconditional)",
+      "directness": "direct",
+      "determinism": "deterministic",
+      "evidence": "coreGuardians.ts:27 `import { LOST_CAPITAL_LOCATIONS } from './mainQuest';`, both files read in full/partial directly",
+      "confidence": "PROVEN",
+      "note": "reverse relationship (mainQuest.ts importing FROM coreGuardians.ts) NOT found in the portion of mainQuest.ts read; one-directional as far as verified, matching coreGuardians.ts's own comment that this cannot cycle"
+    },
+    {
+      "id": "REL-000004",
+      "source": "app/engine/coreGuardians.ts",
+      "target": "app/engine/encounter.ts + app/engine/powerRating.ts",
+      "relation_class": "static_import",
+      "value_transferred": "enemyScalePower, AC_POWER_BASELINE, DMG_POWER_BASELINE (encounter.ts); playerPowerGear (powerRating.ts)",
+      "trigger": "module load; consumed inside guardianPlayerPower()",
+      "directness": "direct",
+      "determinism": "deterministic",
+      "evidence": "coreGuardians.ts:31-32, read directly",
+      "confidence": "PROVEN",
+      "significance": "Guardian difficulty and ordinary wilderness-encounter difficulty share ONE power-proxy formula (enemyScalePower), not independent systems"
+    },
+    {
+      "id": "REL-000005",
+      "source": "app/engine/mainQuest.ts",
+      "target": "app/engine/coreGuardians.ts (CORE_GUARDIAN_TRAIT domain)",
+      "relation_class": "shared_string_constant_convention",
+      "value_transferred": "no code dependency; mainQuest.ts's FACTION_CORE_GATES gates the CORE grant, coreGuardians.ts's CORE_GUARDIAN_TRAIT tags the fight; they meet only through gameStore.ts calling both",
+      "trigger": "n/a (convention, not import)",
+      "directness": "indirect",
+      "determinism": "n/a",
+      "evidence": "inferred from both files' full-body reads and REL-000002; gameStore.ts's full 36,793-line body not read in full",
+      "confidence": "STRONG",
+      "flagged_unknown": "UNK-012"
+    },
+    {
+      "id": "REL-000006",
+      "source": "test-utils/playerWalker.ts",
+      "target": "app/state/gameStore.ts",
+      "relation_class": "static_import",
+      "value_transferred": "useGameStore, type GameStore, setHomeworkTick (the entire real store instance and its type)",
+      "trigger": "module load; Walker cannot function without the real store",
+      "directness": "direct",
+      "determinism": "deterministic",
+      "evidence": "playerWalker.ts:40-41, file read in full",
+      "confidence": "PROVEN"
+    },
+    {
+      "id": "REL-000007",
+      "source": "test-utils/playerWalker.ts",
+      "target": "15 app/engine/* modules",
+      "target_count": 15,
+      "target_list": ["character.ts", "hunts.ts", "mysteries.ts", "factionStorylines.ts", "factions.ts", "factionQuests.ts", "contractMarkers.ts", "missionEncounterArm.ts", "missionEncounter.ts", "questStage.ts", "hub.ts", "whispers.ts", "worldMap.ts", "contractBroker.ts"],
+      "relation_class": "static_import",
+      "value_transferred": "mission/quest/faction/hub/whisper catalog data and routing helpers the Walker drives against",
+      "trigger": "module load",
+      "directness": "direct",
+      "determinism": "deterministic",
+      "evidence": "playerWalker.ts:42-57, full import block read directly",
+      "confidence": "PROVEN",
+      "note": "coreGuardians.ts and mainQuest.ts are NOT in this list -- confirms existing-walker-map.md's finding of zero Guardian-domain relationship"
+    },
+    {
+      "id": "REL-000008",
+      "source": "app/engine/rng.ts",
+      "target": "23 consumer files",
+      "target_count": 23,
+      "relation_class": "static_import",
+      "value_transferred": "every dice-roll / weighted-pick / chance-check result those files use",
+      "trigger": "module load",
+      "directness": "direct",
+      "determinism": "deterministic (import); outputs themselves are random",
+      "evidence": "grep against the import specifier, exact match; full list in rng-inventory.md",
+      "confidence": "PROVEN"
+    },
+    {
+      "id": "REL-000009",
+      "source": "app/engine/takeableGearSpawns.ts (hashSeed/mulberry32) + app/engine/fallenRevenants.ts (local copy) + app/engine/worldMap.ts (local xmur3 copy)",
+      "target": "app/engine/buildings.ts, app/state/gameStore.ts (consumers of the exported version only)",
+      "relation_class": "convergent_reimplementation_not_dependency_edge",
+      "value_transferred": "three independent deterministic-PRNG algorithm implementations, NOT unified",
+      "trigger": "n/a",
+      "directness": "n/a",
+      "determinism": "n/a",
+      "evidence": "grep -rln 'mulberry32|xmur3|hashSeed' app -- both the exported and the two local definitions found",
+      "confidence": "PROVEN",
+      "note": "drift finding, recorded not fixed per hard rule 4/5"
+    },
+    {
+      "id": "REL-000010",
+      "source": "any fight (including Guardian fights via coreGuardians.ts's spawnGuardianForCapital)",
+      "target": "app/state/combatResolution.ts",
+      "relation_class": "universal_mutation_door",
+      "value_transferred": "combat resolution state changes (HP, death, status, drops) for every fight, no Guardian-specific branch",
+      "trigger": "any combat encounter",
+      "directness": "inferred, not statement-traced",
+      "determinism": "n/a",
+      "evidence": "spawnGuardianForCapital returns an ordinary Enemy object (types.ts) not a Guardian-specific fight type; combatResolution.ts's export list (handlePlayerDeath, sweepDeadEnemies, etc.) contains no Guardian-specific branch name",
+      "confidence": "STRONG",
+      "flagged_unknown": "UNK-016 (statement-by-statement call path from 'enemy array contains a Guardian' to 'combatResolution.ts runs the fight' not traced)"
+    },
+    {
+      "id": "REL-000011",
+      "source": "app/state/slices/{bootSlice.ts,inventorySlice.ts,questSlice.ts,slotSlice.ts,vendorSlice.ts}",
+      "target": "app/engine/rng.ts",
+      "target_count": 5,
+      "relation_class": "static_import",
+      "value_transferred": "dice-roll / weighted-pick functions used inside slice actions",
+      "trigger": "module load",
+      "directness": "direct",
+      "determinism": "deterministic (import)",
+      "evidence": "grep in the state/ai inventory sweep",
+      "confidence": "PROVEN"
+    }
+  ],
+  "not_covered": {
+    "description": "Full many-to-many trace across all 341 system-candidates.md entries and the 112 character-state-inventory.md PlayerCharacter fields (up to 341x112 potential edges) was explicitly NOT attempted this pass.",
+    "flagged_unknown": "UNK-009",
+    "recommendation": "second architectural-review pass should scope this deliberately, not rush it"
+  }
+}
