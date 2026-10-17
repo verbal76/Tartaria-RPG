@@ -18,6 +18,16 @@ const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const deck = require('./deckProfile');
+
+// Steam Deck / Steam Machine profile (see deckProfile.js). Command-line switches must be set before
+// `app` is ready, so they come from the environment alone; the window decisions below also consult Steam.
+const envProfile = deck.detectProfile(process.env, process.platform, null);
+for (const [name, value] of deck.commandLineSwitches(envProfile)) {
+  if (value === undefined) app.commandLine.appendSwitch(name);
+  else app.commandLine.appendSwitch(name, value);
+}
+let profile = envProfile;
 
 // ───────────────────────── diagnostic log ─────────────────────────
 let LOG_PATH = null;
@@ -99,6 +109,30 @@ function initSteam() {
   }
 }
 
+// ── Steam Deck bridge ──────────────────────────────────────────────────────────────────────────────
+// What the renderer needs to know to behave on a handheld (controller hints, text entry route).
+ipcMain.handle('desktop:info', () => ({
+  isDeck: profile.isDeck, gamepadUI: profile.gamepadUI, steam: !!steam, platform: process.platform,
+}));
+// Valve requires text entry to open Steam's on-screen keyboard for controller players. This is the
+// full-screen Steam text dialog (ISteamUtils::ShowGamepadTextInput). Resolves {ok:false} when Steam is
+// not running or the dialog could not open, so the renderer falls back to its own on-screen keyboard.
+ipcMain.handle('steam:textInput', async (_evt, opts) => {
+  const o = opts && typeof opts === 'object' ? opts : {};
+  if (!steam || !steam.utils || typeof steam.utils.showGamepadTextInput !== 'function') return { ok: false, text: null };
+  try {
+    const max = Math.max(1, Math.min(2000, parseInt(o.maxCharacters, 10) || 280));
+    const text = await steam.utils.showGamepadTextInput(
+      o.password ? 1 : 0, o.multiline ? 1 : 0, String(o.description || 'Enter text').slice(0, 64), max,
+      typeof o.existingText === 'string' ? o.existingText.slice(0, max) : null,
+    );
+    return { ok: true, text: typeof text === 'string' ? text : null };
+  } catch (e) {
+    logLine(`[steam] text input failed: ${e && e.message}`);
+    return { ok: false, text: null };
+  }
+});
+
 ipcMain.handle('steam:achievement', (_evt, achievementId) => {
   if (!steam) return false;
   try { steam.achievement.activate(achievementId); return true; }
@@ -113,21 +147,19 @@ async function createWindow() {
   const { width: screenW, height: screenH } = primary.workAreaSize;
 
   const win = new BrowserWindow({
-    width: Math.min(1280, screenW),
-    height: Math.min(800, screenH),
-    minWidth: 640,
-    minHeight: 480,
+    ...deck.windowOptions(profile, { width: screenW, height: screenH }),
     backgroundColor: '#0a0908',
-    autoHideMenuBar: true,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      // Steam Deck: no on-screen text under 9px (Valve), 12px recommended. Deck-only (see deckProfile.js).
+      ...deck.webPreferencesFor(profile, process.env),
     },
   });
 
-  win.maximize();
+  if (!profile.gamepadUI) win.maximize();
   // Show no matter what — even on a failed load — so the window can't get stuck
   // hidden behind a never-firing ready-to-show.
   win.once('ready-to-show', () => win.show());
@@ -153,7 +185,6 @@ async function createWindow() {
   wc.on('before-input-event', (_evt, input) => {
     if (input.type === 'keyDown' && input.key === 'F11') win.setFullScreen(!win.isFullScreen());
   });
-  if (process.env.TARTARIA_FULLSCREEN === '1') win.setFullScreen(true);
 
   // DEV: live Expo web server. PROD: serve the static export over localhost.
   const devUrl = process.env.TARTARIA_DEV_URL;
@@ -189,6 +220,9 @@ app.whenReady().then(() => {
   logLine(`versions: electron ${process.versions.electron}, chrome ${process.versions.chrome}, node ${process.versions.node}`);
   logLine(`platform ${process.platform} ${process.arch} — log at ${LOG_PATH}`);
   initSteam();
+  // Steam may know it is a Deck even when the environment does not say so.
+  profile = deck.detectProfile(process.env, process.platform, steam && steam.utils);
+  logLine(`profile: deck=${profile.isDeck} gamepadUI=${profile.gamepadUI} steamLaunch=${profile.steamLaunch}`);
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
