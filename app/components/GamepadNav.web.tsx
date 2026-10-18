@@ -7,8 +7,15 @@
 //    etc. No more tab-shuffling 30× to change rows.
 //  • POPUP FOCUS CAPTURE — when a popup/modal opens it raises the stacking layer;
 //    focus jumps INTO it immediately, and snaps back to the screen when it closes.
-//  • A activates the highlighted control; a text field just focuses (physical
-//    keyboard types — no virtual keyboard on PC). B blurs a field / sends Escape.
+//  • A activates the highlighted control. On a text field, A opens TEXT ENTRY for controller players:
+//    Steam's own on-screen keyboard when the desktop bridge reports it opened, otherwise the built-in
+//    controller-only keyboard (gamepad/onScreenKeyboard.ts). B sends Escape / cancels.
+//
+// v3 (Steam Deck / Steam Machine pass — docs/STEAM-DECK.md):
+//  • INPUT MODE — tracks gamepad vs keyboard/mouse; under a controller the cursor is hidden and a glyph
+//    strip (A/B/X/Y …) shows the real controls; no mouse/keyboard prompts are ever drawn.
+//  • RIGHT STICK scrolls the nearest scrollable region; LB/RB page up/down. Y jumps to the typed-command
+//    field. While the on-screen keyboard is open, X deletes, Y spaces, Menu is Done.
 //
 // Works at the DOM level (react-native-web renders buttons as focusable nodes), so
 // no per-component wiring. Mounted once at the app root; renders nothing.
@@ -17,6 +24,10 @@
 // controller-only setups, and an explicit Back-button target for B.
 
 import { useEffect } from 'react';
+import { getInputMode, isHumanInput, setInputMode, subscribeInputMode } from './gamepad/inputMode';
+import { mountControllerHints } from './gamepad/controllerHints';
+import { activeOnScreenKeyboard } from './gamepad/onScreenKeyboard';
+import { enterTextWithController, isTextField, type TextBridge } from './gamepad/textEntry';
 
 const FOCUSABLE_SELECTOR =
   'a[href], button, input:not([type="hidden"]), textarea, select, [role="button"], [tabindex]:not([tabindex="-1"])';
@@ -30,8 +41,23 @@ export function GamepadNav(): null {
     const style = document.createElement('style');
     style.textContent =
       '.gp-focus{outline:3px solid #c9a86a !important;outline-offset:2px;border-radius:6px;' +
-      'box-shadow:0 0 10px rgba(201,168,106,0.7) !important;}';
+      'box-shadow:0 0 10px rgba(201,168,106,0.7) !important;}' +
+      // Under a controller there is no pointer to show (Valve: no mouse affordances while a pad is in use).
+      'body.gp-mode, body.gp-mode *{cursor:none !important;}';
     document.head.appendChild(style);
+
+    const hints = mountControllerHints(document);
+    const refreshHints = (): void => {
+      hints.update(getInputMode(), activeOnScreenKeyboard() ? 'keyboard' : 'browse');
+      document.body.classList.toggle('gp-mode', getInputMode() === 'gamepad');
+    };
+    const unsubscribeMode = subscribeInputMode(refreshHints);
+    // A real (trusted) mouse / key / touch event means the player is back on kbm. Our own synthetic
+    // Escape from B is not trusted and must not flip the mode.
+    const onHuman = (e: Event): void => { if (isHumanInput(e)) setInputMode('kbm'); };
+    const HUMAN_EVENTS = ['mousemove', 'mousedown', 'wheel', 'touchstart', 'keydown'] as const;
+    for (const ev of HUMAN_EVENTS) window.addEventListener(ev, onHuman, { passive: true, capture: true });
+    refreshHints();
 
     let highlighted: HTMLElement | null = null;
     let lastTopLayer = -1;
@@ -158,11 +184,56 @@ export function GamepadNav(): null {
     const activate = (): void => {
       if (!highlighted || !document.contains(highlighted)) { syncLayer(); return; }
       const tag = highlighted.tagName.toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+      if (isTextField(highlighted)) { openTextEntry(highlighted); return; }
+      if (tag === 'select') {
         try { highlighted.focus(); } catch { /* ignore */ }
         return;
       }
       try { highlighted.click(); } catch { /* ignore */ }
+    };
+
+    // Text entry for controller players: Steam's keyboard, else the built-in one. See gamepad/textEntry.ts.
+    const openTextEntry = (field: HTMLInputElement | HTMLTextAreaElement): void => {
+      if (activeOnScreenKeyboard()) return;
+      const bridge = (window as unknown as { tartariaDesktop?: TextBridge }).tartariaDesktop ?? null;
+      try { field.focus({ preventScroll: true }); } catch { /* ignore */ }
+      void enterTextWithController(field, bridge).then(() => {
+        // The keyboard overlay is gone; put the highlight back on the field the text went into.
+        if (document.contains(field)) setHighlight(field);
+        refreshHints();
+      });
+      refreshHints();
+    };
+
+    // Y — jump to the typed-command field (the lowest visible text field on the top layer).
+    const quickType = (): void => {
+      const { list } = topLayer();
+      const fields = list.filter((el) => isTextField(el));
+      if (!fields.length) return;
+      const target = fields.sort((a, b) => b.getBoundingClientRect().top - a.getBoundingClientRect().top)[0]!;
+      setHighlight(target);
+      openTextEntry(target as HTMLInputElement | HTMLTextAreaElement);
+    };
+
+    // The scrollable region the player is reading: the highlighted control's nearest scrollable ancestor,
+    // else the page.
+    const scrollRegion = (): HTMLElement | null => {
+      let n: HTMLElement | null = highlighted ?? (document.activeElement as HTMLElement | null);
+      while (n && n !== document.body) {
+        const s = window.getComputedStyle(n);
+        if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && n.scrollHeight > n.clientHeight + 2) return n;
+        n = n.parentElement;
+      }
+      // The main feed is the first big scrollable region when nothing is highlighted.
+      const all = Array.from(document.querySelectorAll<HTMLElement>('div')).filter((d) => {
+        const s = window.getComputedStyle(d);
+        return (s.overflowY === 'auto' || s.overflowY === 'scroll') && d.scrollHeight > d.clientHeight + 2 && isVisible(d);
+      });
+      return all.sort((a, b) => b.clientHeight - a.clientHeight)[0] ?? null;
+    };
+    const scrollBy = (dy: number): void => {
+      const r = scrollRegion();
+      if (r) r.scrollTop += dy; else window.scrollBy(0, dy);
     };
 
     const back = (): void => {
@@ -180,11 +251,13 @@ export function GamepadNav(): null {
     let raf = 0;
 
     const tick = (t: number): void => {
-      if (t - lastSync > 120) { lastSync = t; syncLayer(); } // detect popups ~8×/s
+      if (t - lastSync > 120) { lastSync = t; syncLayer(); refreshHints(); } // detect popups ~8×/s
       const pads = navigator.getGamepads ? navigator.getGamepads() : [];
       const gp = Array.from(pads).find((p): p is Gamepad => !!p);
       if (gp) {
         const down = (b: number): boolean => !!gp.buttons[b]?.pressed;
+        // Any button or a firm stick push means the controller is the active input.
+        if (gp.buttons.some((b) => b && b.pressed) || Math.abs(gp.axes[0] ?? 0) > 0.6 || Math.abs(gp.axes[1] ?? 0) > 0.6) setInputMode('gamepad');
         const edge = (b: number): boolean => { const now = down(b); const was = prev[b]; prev[b] = now; return now && !was; };
         // Standard gamepad: 0=A, 1=B, 12=up, 13=down, 14=left, 15=right.
         if (edge(12)) move('up');
@@ -193,6 +266,18 @@ export function GamepadNav(): null {
         if (edge(15)) move('right');
         if (edge(0)) activate();
         if (edge(1)) back();
+        // X / Y / Menu while the on-screen keyboard is open belong to the keyboard; otherwise Y types.
+        const osk = activeOnScreenKeyboard();
+        for (const b of [2, 3, 9]) {
+          if (!edge(b)) continue;
+          if (osk) osk.pressButton(b);
+          else if (b === 3) quickType();
+        }
+        // LB / RB page the feed; the right stick scrolls it continuously.
+        if (edge(4)) scrollBy(-Math.max(120, (scrollRegion()?.clientHeight ?? window.innerHeight) * 0.8));
+        if (edge(5)) scrollBy(Math.max(120, (scrollRegion()?.clientHeight ?? window.innerHeight) * 0.8));
+        const ry = gp.axes[3] ?? 0;
+        if (Math.abs(ry) > 0.25) scrollBy(ry * 22);
         // Left stick, with a step cooldown so it doesn't fly across the screen.
         const ax = gp.axes[0] ?? 0;
         const ay = gp.axes[1] ?? 0;
@@ -209,6 +294,10 @@ export function GamepadNav(): null {
 
     return () => {
       window.cancelAnimationFrame(raf);
+      unsubscribeMode();
+      for (const ev of HUMAN_EVENTS) window.removeEventListener(ev, onHuman, { capture: true } as EventListenerOptions);
+      hints.destroy();
+      document.body.classList.remove('gp-mode');
       setHighlight(null);
       try { style.remove(); } catch { /* ignore */ }
     };

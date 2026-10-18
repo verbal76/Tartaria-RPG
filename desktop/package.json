@@ -24,7 +24,7 @@
     "appId": "com.hotatticgames.tartaria.steam",
     "productName": "Tartaria Realms",
     "directories": { "output": "release" },
-    "files": ["main.js", "preload.js", "web-build/**/*"],
+    "files": ["main.js", "preload.js", "deckProfile.js", "web-build/**/*"],
     "win": { "target": "portable" },
     "mac": { "target": "dmg" },
     "linux": { "target": "AppImage", "category": "Game" }

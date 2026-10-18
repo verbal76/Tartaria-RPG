@@ -34,6 +34,10 @@ contextBridge.exposeInMainWorld('tartariaDesktop', {
   platform: process.platform,
   unlockAchievement: (achievementId) =>
     ipcRenderer.invoke('steam:achievement', achievementId),
+  // Steam Deck bridge — what the renderer needs to behave on a handheld (see deckProfile.js).
+  getInfo: () => ipcRenderer.invoke('desktop:info'),
+  // Steam's own on-screen keyboard for controller players. Resolves { ok, text }.
+  steamTextInput: (opts) => ipcRenderer.invoke('steam:textInput', opts),
   setZoom: (factor) => {
     const f = Number(factor);
     if (!Number.isFinite(f)) return;
