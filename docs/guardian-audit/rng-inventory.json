@@ -1,0 +1,533 @@
+{
+ "unseeded_mathrandom_sites": [
+  {
+   "id": "RNG-001",
+   "file": "app/ai/narration.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/ai/narration.ts"
+  },
+  {
+   "id": "RNG-002",
+   "file": "app/audio/AudioManager.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/audio/AudioManager.ts"
+  },
+  {
+   "id": "RNG-003",
+   "file": "app/buildInfo.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/buildInfo.ts"
+  },
+  {
+   "id": "RNG-004",
+   "file": "app/diagnostics/bootIdentity.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/diagnostics/bootIdentity.ts"
+  },
+  {
+   "id": "RNG-005",
+   "file": "app/diagnostics/crashCorrelation.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/diagnostics/crashCorrelation.ts"
+  },
+  {
+   "id": "RNG-006",
+   "file": "app/diagnostics/pendingBundle.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/diagnostics/pendingBundle.ts"
+  },
+  {
+   "id": "RNG-007",
+   "file": "app/engine/accessoryEffects.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/accessoryEffects.ts"
+  },
+  {
+   "id": "RNG-008",
+   "file": "app/engine/areaSearch.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/areaSearch.ts"
+  },
+  {
+   "id": "RNG-009",
+   "file": "app/engine/callToAction.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/callToAction.ts"
+  },
+  {
+   "id": "RNG-010",
+   "file": "app/engine/character.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/character.ts"
+  },
+  {
+   "id": "RNG-011",
+   "file": "app/engine/climbHeight.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/climbHeight.ts"
+  },
+  {
+   "id": "RNG-012",
+   "file": "app/engine/combatRules.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/combatRules.ts"
+  },
+  {
+   "id": "RNG-013",
+   "file": "app/engine/coreGuardians.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/coreGuardians.ts"
+  },
+  {
+   "id": "RNG-014",
+   "file": "app/engine/deathScene.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/deathScene.ts"
+  },
+  {
+   "id": "RNG-015",
+   "file": "app/engine/digging.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/digging.ts"
+  },
+  {
+   "id": "RNG-016",
+   "file": "app/engine/dogCompanion.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/dogCompanion.ts"
+  },
+  {
+   "id": "RNG-017",
+   "file": "app/engine/durability.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/durability.ts"
+  },
+  {
+   "id": "RNG-018",
+   "file": "app/engine/elevatedOverlay.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/elevatedOverlay.ts"
+  },
+  {
+   "id": "RNG-019",
+   "file": "app/engine/encounter.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/encounter.ts"
+  },
+  {
+   "id": "RNG-020",
+   "file": "app/engine/escort.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/escort.ts"
+  },
+  {
+   "id": "RNG-021",
+   "file": "app/engine/factionBodies.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/factionBodies.ts"
+  },
+  {
+   "id": "RNG-022",
+   "file": "app/engine/fallenLedgerStore.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/fallenLedgerStore.ts"
+  },
+  {
+   "id": "RNG-023",
+   "file": "app/engine/fallenSeal.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/fallenSeal.ts"
+  },
+  {
+   "id": "RNG-024",
+   "file": "app/engine/golems.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/golems.ts"
+  },
+  {
+   "id": "RNG-025",
+   "file": "app/engine/hooks.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/hooks.ts"
+  },
+  {
+   "id": "RNG-026",
+   "file": "app/engine/indoorAmbush.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/indoorAmbush.ts"
+  },
+  {
+   "id": "RNG-027",
+   "file": "app/engine/narrativeGenerator.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/narrativeGenerator.ts"
+  },
+  {
+   "id": "RNG-028",
+   "file": "app/engine/portability.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/portability.ts"
+  },
+  {
+   "id": "RNG-029",
+   "file": "app/engine/questGenerator.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/questGenerator.ts"
+  },
+  {
+   "id": "RNG-030",
+   "file": "app/engine/restWakeLines.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/restWakeLines.ts"
+  },
+  {
+   "id": "RNG-031",
+   "file": "app/engine/rng.ts",
+   "generator": "Math.random() \u2014 CORE WRAPPER MODULE",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/rng.ts"
+  },
+  {
+   "id": "RNG-032",
+   "file": "app/engine/saveSystem.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/saveSystem.ts"
+  },
+  {
+   "id": "RNG-033",
+   "file": "app/engine/sceneNounMaterial.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/sceneNounMaterial.ts"
+  },
+  {
+   "id": "RNG-034",
+   "file": "app/engine/scrapEngine.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/scrapEngine.ts"
+  },
+  {
+   "id": "RNG-035",
+   "file": "app/engine/statusEffects.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/statusEffects.ts"
+  },
+  {
+   "id": "RNG-036",
+   "file": "app/engine/vendors.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/vendors.ts"
+  },
+  {
+   "id": "RNG-037",
+   "file": "app/engine/waterBottle.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/waterBottle.ts"
+  },
+  {
+   "id": "RNG-038",
+   "file": "app/engine/weatherEffects.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/weatherEffects.ts"
+  },
+  {
+   "id": "RNG-039",
+   "file": "app/engine/whispers.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/engine/whispers.ts"
+  },
+  {
+   "id": "RNG-040",
+   "file": "app/screens/AboutScreen.tsx",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/screens/AboutScreen.tsx"
+  },
+  {
+   "id": "RNG-041",
+   "file": "app/state/combatResolution.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/combatResolution.ts"
+  },
+  {
+   "id": "RNG-042",
+   "file": "app/state/gameStore.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/gameStore.ts"
+  },
+  {
+   "id": "RNG-043",
+   "file": "app/state/gearWear.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/gearWear.ts"
+  },
+  {
+   "id": "RNG-044",
+   "file": "app/state/slices/craftingSlice.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/slices/craftingSlice.ts"
+  },
+  {
+   "id": "RNG-045",
+   "file": "app/state/slices/inventorySlice.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/slices/inventorySlice.ts"
+  },
+  {
+   "id": "RNG-046",
+   "file": "app/state/slices/questSlice.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/slices/questSlice.ts"
+  },
+  {
+   "id": "RNG-047",
+   "file": "app/state/slices/slotSlice.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/slices/slotSlice.ts"
+  },
+  {
+   "id": "RNG-048",
+   "file": "app/state/trapDive.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/trapDive.ts"
+  },
+  {
+   "id": "RNG-049",
+   "file": "app/state/whisperBeats.ts",
+   "generator": "Math.random() (V8/Hermes native PRNG)",
+   "seed_source": "none (unseeded in production); globally monkey-patched to a seeded LCG-style generator ONLY under Jest via jest.setup.js __TARTARIA_RESEED_RANDOM__",
+   "deterministic_in_test": true,
+   "deterministic_in_production": false,
+   "confidence": "PROVEN",
+   "evidence": "grep match: Math.random( present in app/state/whisperBeats.ts"
+  }
+ ],
+ "seeded_deterministic_prng_sites": [
+  {
+   "id": "RNG-DET-01",
+   "generator": "mulberry32(hashSeed(str))",
+   "file": "app/engine/takeableGearSpawns.ts",
+   "exported": true,
+   "seed_source": "string key (e.g. take-gear:<seedKey>), derived from room/scene key",
+   "consumers": [
+    "app/engine/buildings.ts",
+    "app/state/gameStore.ts"
+   ],
+   "confidence": "PROVEN"
+  },
+  {
+   "id": "RNG-DET-02",
+   "generator": "mulberry32(hashSeed(str)) \u2014 SEPARATE local implementation",
+   "file": "app/engine/fallenRevenants.ts",
+   "exported": false,
+   "seed_source": "string key, local to this file",
+   "confidence": "PROVEN",
+   "note": "duplicate implementation of the same algorithm as RNG-DET-01, not re-using the exported one"
+  },
+  {
+   "id": "RNG-DET-03",
+   "generator": "xmur3(str) hash -> stream",
+   "file": "app/engine/worldMap.ts",
+   "exported": false,
+   "seed_source": "player/character-derived seed string (characterSeed, though comment at line 159 says positions are canon now and characterSeed is vestigial)",
+   "confidence": "PROVEN",
+   "note": "third independent seeded-PRNG implementation"
+  }
+ ],
+ "harness_only_rng": {
+  "file": "jest.setup.js",
+  "mechanism": "global Math.random monkey-patch to a seeded generator (__s = __SEED)",
+  "hook": "__TARTARIA_RESEED_RANDOM__ (global), re-armed per test via jest.teardown.js setupFilesAfterEnv",
+  "reason_recorded_in_source": "a prior version reseeded per-file-byte-layout, which made every seeded draw a function of unrelated source edits (measured: 265,813 vs 269,967 draws from a 4-line reformat)",
+  "confidence": "PROVEN"
+ }
+}

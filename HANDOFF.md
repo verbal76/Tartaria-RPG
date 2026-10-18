@@ -7,6 +7,14 @@ real players and must stay current. See *"Which lines a change goes to"* in §4
 before deciding where a change ships; the answer depends on whether it is a bug
 fix or a direction change, and the publish default does **not** match the policy.
 
+> **⚠ SINGLE SOURCE OF TRUTH (owner directive, 2026-10-12).** `golem-line` is the one
+> authoritative integrated codebase; platforms are build *targets*, branches are temporary
+> workspaces. Every `build-*.yml` refuses a commit that is not on the trunk
+> (`scripts/assert-authoritative-source.cjs`) and uploads `build-provenance.json`; a
+> coordinated release is one SHA (`scripts/release-manifest.cjs`). Policy + mechanisms:
+> `docs/SOURCE-OF-TRUTH.md`; every branch is classified in `docs/BRANCH-LEDGER.md`
+> (check it before starting work — related work may already exist on another branch).
+
 > **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
 > HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
 > is preserved verbatim in **`HANDOFF-ARCHIVE.md`** next to this file — nothing
@@ -868,6 +876,12 @@ Worktrees used this session: `/tmp/hal-main-fix` (HaL2001), `/tmp/hal-golem`
 (golem-line), `/tmp/hal-eng7` (engine_Dev) — each checked out on its branch.
 
 ## 5. Native / artifact builds
+
+> **Every build workflow guards its source.** Since 2026-10-12 each `build-*.yml` runs
+> `assert-authoritative-source.cjs` right after checkout (commit must be on `golem-line`, or
+> approved by full SHA via the `approved_source_sha` dispatch input) and uploads
+> `build-provenance.json`. A build that is refused is a policy answer, not a broken runner —
+> integrate the work first. See `docs/SOURCE-OF-TRUTH.md`.
 
 ### ⚠⚠ WHO FIRES A BUILD — the owner's standing rule (OTA-1421)
 

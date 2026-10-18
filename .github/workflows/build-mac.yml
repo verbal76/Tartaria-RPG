@@ -30,6 +30,11 @@ on:
       - 'docs/**'
   workflow_dispatch:
     inputs:
+      approved_source_sha:
+        description: 'Full 40-char SHA of a deliberate PRE-INTEGRATION candidate. Leave blank: only golem-line, or a commit already on it, may be built (docs/SOURCE-OF-TRUTH.md).'
+        required: false
+        default: ''
+        type: string
       line:
         description: 'Product line (steam = the PC product; the others are for comparison)'
         required: false
@@ -58,6 +63,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # ⚠⚠ SINGLE SOURCE OF TRUTH (docs/SOURCE-OF-TRUTH.md). Platforms are build
+      # TARGETS of the one trunk, not versions. This refuses to compile a commit
+      # that is not on golem-line (unless approved by full SHA), then records
+      # exactly what was built. No extra runner: one API call + one small file.
+      - name: Assert authoritative source (single source of truth)
+        id: sot
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          APPROVED_SOURCE_SHA: ${{ github.event.inputs.approved_source_sha }}
+        run: node scripts/assert-authoritative-source.cjs
+
+      - name: Record build provenance
+        shell: bash
+        env:
+          SOURCE_INTEGRATION: ${{ steps.sot.outputs.integration }}
+          BUILD_PROFILE: ${{ 'dmg' }}
+        run: node scripts/build-provenance.cjs --platform macos --profile "$BUILD_PROFILE" --integration "$SOURCE_INTEGRATION" --out build-provenance.json
+
+      - name: Upload build provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-provenance-macos
+          path: build-provenance.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Setup Node
         uses: actions/setup-node@v4

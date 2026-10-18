@@ -40,7 +40,8 @@
     "check:kitexports": "node scripts/check-kit-exports.mjs",
     "check:testsplit": "node scripts/check-test-split.mjs",
     "check:requiredjobs": "node scripts/check-required-jobs.mjs",
-    "check:shardcoverage": "node scripts/check-shard-coverage.mjs"
+    "check:shardcoverage": "node scripts/check-shard-coverage.mjs",
+    "check:branchledger": "node scripts/branch-ledger.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
