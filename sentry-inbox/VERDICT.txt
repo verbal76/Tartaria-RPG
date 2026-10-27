@@ -5,10 +5,6 @@
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7742311625/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7757090086/events/?full=false
-    1 page(s), 12 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7757090096/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7758225633/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7774679158/events/?full=false
@@ -16,9 +12,9 @@
   /organizations/hot-attic-games-llc/issues/7795345485/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
-    1 page(s), 18 rows — COMPLETE — ended short of a full page
+    1 page(s), 5 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
-    1 page(s), 7 rows — COMPLETE — ended short of a full page
+    1 page(s), 5 rows — COMPLETE — ended short of a full page
   ⚠ Every listing ended short of a full page, so each genuinely ran out. MISSING parts are ABSENT FROM SENTRY — only a fresh send recovers them.
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
